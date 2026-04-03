@@ -9,8 +9,6 @@ interface CatalogToolbarProps {
   onSearchChange: (val: string) => void;
   activeSort: string;
   onSortChange: (val: string) => void;
-  activeTech: string;
-  onTechChange: (val: string) => void;
   activeBrand: string;
   onBrandChange: (val: string) => void;
   brands: string[];
