@@ -54,7 +54,7 @@ const CatalogPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [prodRes, catRes] = await Promise.all([
-        supabase.from("products").select("*, product_images(url, sort_order), product_colors(name, hex_code), product_sizes(size, sort_order), categories(slug, name_lv, name_en)").eq("active", true).order("created_at", { ascending: false }),
+        supabase.from("products").select("*, product_images(url, sort_order), product_colors(name, hex_code), product_sizes(size, sort_order), categories(slug, name_lv, name_en)").eq("active", true).order("created_at", { ascending: false }).limit(500),
         supabase.from("categories").select("id, slug, name_lv, name_en").order("sort_order"),
       ]);
       setDbProducts((prodRes.data as unknown as DBProduct[]) || []);
