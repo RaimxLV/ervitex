@@ -85,6 +85,7 @@ const CatalogPage = () => {
         material: p.material || undefined,
         colors: p.product_colors.map((c) => c.name),
         colorHexCodes: p.product_colors.map((c) => c.hex_code),
+        colorImageUrls: p.product_colors.map((c: any) => c.image_url || null),
         sizes: p.product_sizes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((s) => s.size),
         minOrder: p.min_order || undefined,
         images: p.product_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((i) => i.url),
@@ -204,7 +205,7 @@ const CatalogPage = () => {
               resultCount={sortedProducts.length}
             />
 
-            <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
               {paginatedProducts.map((product) => (
                 <ProductCard key={product.id} product={product as any} />
               ))}
