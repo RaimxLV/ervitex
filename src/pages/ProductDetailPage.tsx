@@ -209,9 +209,9 @@ const ProductDetailPage = () => {
             <div className="flex items-center gap-3">
               <span className="text-xs uppercase tracking-wider text-muted-foreground">{lang === "lv" ? "Dalīties:" : "Share:"}</span>
               <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer"
-                className="rounded-sm border border-border p-2 hover:bg-muted transition-colors"><Facebook className="h-4 w-4" /></a>
+                className="rounded-sm border border-border p-2 hover:bg-muted transition-colors"><ExternalLink className="h-4 w-4" /></a>
               <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`} target="_blank" rel="noopener noreferrer"
-                className="rounded-sm border border-border p-2 hover:bg-muted transition-colors"><Linkedin className="h-4 w-4" /></a>
+                className="rounded-sm border border-border p-2 hover:bg-muted transition-colors"><ExternalLink className="h-4 w-4" /></a>
               <button onClick={() => navigator.clipboard.writeText(shareUrl)}
                 className="rounded-sm border border-border p-2 hover:bg-muted transition-colors"><Share2 className="h-4 w-4" /></button>
             </div>
