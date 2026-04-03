@@ -118,7 +118,7 @@ const ServicesPage = () => {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {dtfSections.map((item, i) => (
               <motion.div
-                key={item.title}
+                key={item.title[lang]}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
