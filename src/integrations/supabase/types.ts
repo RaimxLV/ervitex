@@ -58,6 +58,7 @@ export type Database = {
           created_at: string
           hex_code: string | null
           id: string
+          image_url: string
           name: string
           product_id: string
         }
@@ -65,6 +66,7 @@ export type Database = {
           created_at?: string
           hex_code?: string | null
           id?: string
+          image_url?: string
           name: string
           product_id: string
         }
@@ -72,6 +74,7 @@ export type Database = {
           created_at?: string
           hex_code?: string | null
           id?: string
+          image_url?: string
           name?: string
           product_id?: string
         }
