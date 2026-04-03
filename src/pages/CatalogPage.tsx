@@ -178,8 +178,6 @@ const CatalogPage = () => {
               onSearchChange={setSearch}
               activeSort={activeSort}
               onSortChange={(val) => updateParam("sort", val)}
-              activeTech={activeTech}
-              onTechChange={(val) => updateParam("tech", activeTech === val ? "" : val)}
               activeBrand={activeBrand}
               onBrandChange={(val) => updateParam("brand", activeBrand === val ? "" : val)}
               brands={brands}
