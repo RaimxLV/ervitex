@@ -1,11 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search, ArrowUpDown } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
+import CategoryFilter from "@/components/catalog/CategoryFilter";
+import CatalogToolbar from "@/components/catalog/CatalogToolbar";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { products as staticProducts, categories as staticCategories } from "@/data/products";
@@ -41,6 +40,8 @@ interface DBCategory {
   name_en: string;
 }
 
+const PRINTING_TECHS = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
+
 const CatalogPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get("category") || "all";
@@ -56,7 +57,12 @@ const CatalogPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       const [prodRes, catRes] = await Promise.all([
-        supabase.from("products").select("*, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)").eq("active", true).order("created_at", { ascending: false }).limit(2000),
+        supabase
+          .from("products")
+          .select("*, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
+          .eq("active", true)
+          .order("created_at", { ascending: false })
+          .limit(2000),
         supabase.from("categories").select("id, slug, name_lv, name_en").order("sort_order"),
       ]);
       setDbProducts((prodRes.data as unknown as DBProduct[]) || []);
@@ -66,20 +72,19 @@ const CatalogPage = () => {
     fetchData();
   }, []);
 
-  // Normalize DB products to the same shape the cards expect
   const normalizedProducts = useMemo(() => {
     if (dbProducts.length > 0) {
-      return dbProducts.map(p => ({
+      return dbProducts.map((p) => ({
         id: p.id,
         name: { lv: p.name_lv, en: p.name_en },
         category: p.categories?.slug || "",
         description: { lv: p.description_lv || "", en: p.description_en || "" },
         longDescription: { lv: p.long_description_lv || "", en: p.long_description_en || "" },
         material: p.material || undefined,
-        colors: p.product_colors.map(c => c.name),
-        sizes: p.product_sizes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map(s => s.size),
+        colors: p.product_colors.map((c) => c.name),
+        sizes: p.product_sizes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((s) => s.size),
         minOrder: p.min_order || undefined,
-        images: p.product_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map(i => i.url),
+        images: p.product_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((i) => i.url),
         featured: p.featured || false,
         new: p.is_new || false,
         printingTechs: p.printing_techs || [],
@@ -87,18 +92,18 @@ const CatalogPage = () => {
         retailPrice: p.retail_price || 0,
       }));
     }
-    return staticProducts.map(p => ({ ...p, printingTechs: [] as string[], brand: "", retailPrice: 0 }));
+    return staticProducts.map((p) => ({ ...p, printingTechs: [] as string[], brand: "", retailPrice: 0 }));
   }, [dbProducts]);
 
   const cats = useMemo(() => {
     if (dbCategories.length > 0) {
-      return dbCategories.map(c => ({ id: c.slug, name: { lv: c.name_lv, en: c.name_en } }));
+      return dbCategories.map((c) => ({ id: c.slug, name: { lv: c.name_lv, en: c.name_en } }));
     }
-    return staticCategories.map(c => ({ id: c.id, name: c.name }));
+    return staticCategories.map((c) => ({ id: c.id, name: c.name }));
   }, [dbCategories]);
 
   const brands = useMemo(() => {
-    const set = new Set(normalizedProducts.map(p => p.brand).filter(Boolean));
+    const set = new Set(normalizedProducts.map((p) => p.brand).filter(Boolean));
     return Array.from(set).sort();
   }, [normalizedProducts]);
 
@@ -133,104 +138,80 @@ const CatalogPage = () => {
     }
   }, [filteredProducts, activeSort, lang]);
 
-  const printingTechs = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
+  const updateParam = (key: string, val: string) => {
+    const p = new URLSearchParams(searchParams);
+    val ? p.set(key, val) : p.delete(key);
+    setSearchParams(p);
+  };
+
+  const handleCategorySelect = (slug: string) => {
+    const p = new URLSearchParams(searchParams);
+    slug === "all" ? p.delete("category") : p.set("category", slug);
+    setSearchParams(p);
+  };
 
   return (
     <Layout>
-      <div className="container py-10 md:py-16">
-        <h1 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground md:text-4xl">{t("catalog.title")}</h1>
-        <p className="mt-2 text-muted-foreground">{t("catalog.subtitle")}</p>
+      <div className="container py-8 md:py-14">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground md:text-4xl">
+            {t("catalog.title")}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("catalog.subtitle")}</p>
+        </div>
 
-        {/* Category filters */}
-        <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap gap-2">
-            <Button
-              variant={activeCategory === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => { const p = new URLSearchParams(searchParams); p.delete("category"); setSearchParams(p); }}
-              className={`font-heading text-xs uppercase tracking-wider ${activeCategory === "all" ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
-            >
-              {t("catalog.all")}
-            </Button>
-            {cats.map((cat) => (
-              <Button
-                key={cat.id}
-                variant={activeCategory === cat.id ? "default" : "outline"}
-                size="sm"
-                onClick={() => { const p = new URLSearchParams(searchParams); p.set("category", cat.id); setSearchParams(p); }}
-                className={`font-heading text-xs uppercase tracking-wider ${activeCategory === cat.id ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
-              >
-                {cat.name[lang]}
-              </Button>
-            ))}
+        {/* Mobile category ribbon */}
+        <div className="mb-6 md:hidden">
+          <CategoryFilter categories={cats} activeCategory={activeCategory} onSelect={handleCategorySelect} />
+        </div>
+
+        {/* Desktop: sidebar + content */}
+        <div className="flex gap-8">
+          {/* Sidebar — desktop only */}
+          <aside className="hidden w-64 shrink-0 md:block">
+            <CategoryFilter categories={cats} activeCategory={activeCategory} onSelect={handleCategorySelect} />
+          </aside>
+
+          {/* Main content */}
+          <div className="min-w-0 flex-1">
+            <CatalogToolbar
+              search={search}
+              onSearchChange={setSearch}
+              activeSort={activeSort}
+              onSortChange={(val) => updateParam("sort", val)}
+              activeTech={activeTech}
+              onTechChange={(val) => updateParam("tech", activeTech === val ? "" : val)}
+              activeBrand={activeBrand}
+              onBrandChange={(val) => updateParam("brand", activeBrand === val ? "" : val)}
+              brands={brands}
+              printingTechs={PRINTING_TECHS}
+              resultCount={sortedProducts.length}
+            />
+
+            <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {sortedProducts.map((product) => (
+                <ProductCard key={product.id} product={product as any} />
+              ))}
+            </div>
+
+            {sortedProducts.length === 0 && loaded && (
+              <div className="py-20 text-center">
+                <p className="text-lg text-muted-foreground">{t("catalog.noResults")}</p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => {
+                    setSearch("");
+                    setSearchParams({});
+                  }}
+                >
+                  {t("catalog.clearFilters")}
+                </Button>
+              </div>
+            )}
           </div>
-           <div className="relative w-full md:w-72">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder={t("header.search")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
-          </div>
-          <Select value={activeSort} onValueChange={(val) => { const p = new URLSearchParams(searchParams); p.set("sort", val); setSearchParams(p); }}>
-            <SelectTrigger className="w-full md:w-48">
-              <ArrowUpDown className="h-4 w-4 mr-2" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">{lang === "lv" ? "Jaunākie" : "Newest"}</SelectItem>
-              <SelectItem value="name-asc">{lang === "lv" ? "Nosaukums A-Z" : "Name A-Z"}</SelectItem>
-              <SelectItem value="name-desc">{lang === "lv" ? "Nosaukums Z-A" : "Name Z-A"}</SelectItem>
-              <SelectItem value="price-asc">{lang === "lv" ? "Cena: zemākā" : "Price: Low"}</SelectItem>
-              <SelectItem value="price-desc">{lang === "lv" ? "Cena: augstākā" : "Price: High"}</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
-
-        {/* Tech filters */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          <span className="self-center text-xs uppercase tracking-wider text-muted-foreground mr-2">
-            {lang === "lv" ? "Tehnoloģija:" : "Technology:"}
-          </span>
-          {printingTechs.map(tech => (
-            <Button key={tech} variant={activeTech === tech ? "default" : "outline"} size="sm"
-              onClick={() => {
-                const p = new URLSearchParams(searchParams);
-                activeTech === tech ? p.delete("tech") : p.set("tech", tech);
-                setSearchParams(p);
-              }}
-              className={`text-xs ${activeTech === tech ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
-            >{tech}</Button>
-          ))}
-        </div>
-
-        {/* Brand filters */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          <span className="self-center text-xs uppercase tracking-wider text-muted-foreground mr-2">
-            {lang === "lv" ? "Ražotājs:" : "Brand:"}
-          </span>
-          {brands.map(brand => (
-            <Button key={brand} variant={activeBrand === brand ? "default" : "outline"} size="sm"
-              onClick={() => {
-                const p = new URLSearchParams(searchParams);
-                activeBrand === brand ? p.delete("brand") : p.set("brand", brand);
-                setSearchParams(p);
-              }}
-              className={`text-xs ${activeBrand === brand ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
-            >{brand}</Button>
-          ))}
-        </div>
-
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {sortedProducts.map((product) => (
-            <ProductCard key={product.id} product={product as any} />
-          ))}
-        </div>
-
-        {sortedProducts.length === 0 && loaded && (
-          <div className="py-20 text-center">
-            <p className="text-lg text-muted-foreground">{t("catalog.noResults")}</p>
-            <Button variant="outline" className="mt-4" onClick={() => { setSearch(""); setSearchParams({}); }}>
-              {t("catalog.clearFilters")}
-            </Button>
-          </div>
-        )}
       </div>
     </Layout>
   );
