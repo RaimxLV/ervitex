@@ -4,7 +4,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import ervitexLogo from "@/assets/ervitex-logo.png";
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   return (
     <footer className="border-t border-border bg-primary text-primary-foreground">
