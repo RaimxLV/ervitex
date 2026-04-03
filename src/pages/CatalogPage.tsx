@@ -139,15 +139,31 @@ const CatalogPage = () => {
     }
   }, [filteredProducts, activeSort, lang]);
 
+  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / ITEMS_PER_PAGE));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const paginatedProducts = useMemo(() => {
+    const start = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
+    return sortedProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [sortedProducts, safeCurrentPage]);
+
   const updateParam = (key: string, val: string) => {
     const p = new URLSearchParams(searchParams);
     val ? p.set(key, val) : p.delete(key);
+    if (key !== "page") p.delete("page"); // reset page on filter change
     setSearchParams(p);
   };
+
+  const goToPage = useCallback((page: number) => {
+    const p = new URLSearchParams(searchParams);
+    page > 1 ? p.set("page", String(page)) : p.delete("page");
+    setSearchParams(p);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [searchParams, setSearchParams]);
 
   const handleCategorySelect = (slug: string) => {
     const p = new URLSearchParams(searchParams);
     slug === "all" ? p.delete("category") : p.set("category", slug);
+    p.delete("page");
     setSearchParams(p);
   };
 
