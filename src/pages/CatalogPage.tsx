@@ -116,6 +116,23 @@ const CatalogPage = () => {
     });
   }, [activeCategory, activeTech, activeBrand, search, lang, normalizedProducts]);
 
+  const sortedProducts = useMemo(() => {
+    const arr = [...filteredProducts];
+    switch (activeSort) {
+      case "name-asc":
+        return arr.sort((a, b) => a.name[lang].localeCompare(b.name[lang], lang));
+      case "name-desc":
+        return arr.sort((a, b) => b.name[lang].localeCompare(a.name[lang], lang));
+      case "price-asc":
+        return arr.sort((a, b) => a.retailPrice - b.retailPrice);
+      case "price-desc":
+        return arr.sort((a, b) => b.retailPrice - a.retailPrice);
+      case "newest":
+      default:
+        return arr;
+    }
+  }, [filteredProducts, activeSort, lang]);
+
   const printingTechs = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
 
   return (
