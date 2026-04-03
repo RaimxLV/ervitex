@@ -4,7 +4,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import ervitexLogo from "@/assets/ervitex-logo.png";
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   return (
     <footer className="border-t border-border bg-primary text-primary-foreground">
@@ -44,7 +44,7 @@ const Footer = () => {
                 { lv: "DTF druka", en: "DTF Printing" },
                 { lv: "Termodruka", en: "Heat Transfer" },
               ].map((s) => (
-                <span key={s.en} className="text-sm text-primary-foreground/60">{s.lv}</span>
+                <span key={s.en} className="text-sm text-primary-foreground/60">{lang === "lv" ? s.lv : s.en}</span>
               ))}
             </nav>
           </div>
