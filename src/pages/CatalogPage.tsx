@@ -94,18 +94,24 @@ const CatalogPage = () => {
     return staticCategories.map(c => ({ id: c.id, name: c.name }));
   }, [dbCategories]);
 
+  const brands = useMemo(() => {
+    const set = new Set(normalizedProducts.map(p => p.brand).filter(Boolean));
+    return Array.from(set).sort();
+  }, [normalizedProducts]);
+
   const filteredProducts = useMemo(() => {
     return normalizedProducts.filter((p) => {
       const matchCategory = activeCategory === "all" || p.category === activeCategory;
       const matchTech = !activeTech || p.printingTechs.includes(activeTech);
+      const matchBrand = !activeBrand || p.brand === activeBrand;
       const matchSearch =
         !search ||
         p.name[lang].toLowerCase().includes(search.toLowerCase()) ||
         p.description[lang].toLowerCase().includes(search.toLowerCase()) ||
         p.material?.toLowerCase().includes(search.toLowerCase());
-      return matchCategory && matchSearch && matchTech;
+      return matchCategory && matchSearch && matchTech && matchBrand;
     });
-  }, [activeCategory, activeTech, search, lang, normalizedProducts]);
+  }, [activeCategory, activeTech, activeBrand, search, lang, normalizedProducts]);
 
   const printingTechs = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
 
