@@ -44,7 +44,7 @@ const Footer = () => {
                 { lv: "DTF druka", en: "DTF Printing" },
                 { lv: "Termodruka", en: "Heat Transfer" },
               ].map((s) => (
-                <span key={s.en} className="text-sm text-primary-foreground/60">{s.lv}</span>
+                <span key={s.en} className="text-sm text-primary-foreground/60">{lang === "lv" ? s.lv : s.en}</span>
               ))}
             </nav>
           </div>

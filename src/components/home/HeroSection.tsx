@@ -99,7 +99,7 @@ const HeroSection = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/5 hover:border-accent hover:text-accent font-heading text-xs uppercase tracking-[0.2em] rounded-none px-8 h-12"
+              className="border-2 border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent hover:text-accent font-heading text-xs uppercase tracking-[0.2em] rounded-none px-8 h-12"
               asChild
             >
               <Link to="/services">
