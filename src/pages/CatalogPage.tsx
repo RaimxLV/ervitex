@@ -204,10 +204,56 @@ const CatalogPage = () => {
             />
 
             <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {sortedProducts.map((product) => (
+              {paginatedProducts.map((product) => (
                 <ProductCard key={product.id} product={product as any} />
               ))}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex items-center justify-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={safeCurrentPage <= 1}
+                  onClick={() => goToPage(safeCurrentPage - 1)}
+                  className="font-heading text-xs uppercase tracking-wider"
+                >
+                  ← {lang === "lv" ? "Iepriekšējā" : "Previous"}
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - safeCurrentPage) <= 2)
+                  .reduce<(number | "ellipsis")[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && p - (arr[idx - 1]) > 1) acc.push("ellipsis");
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((item, idx) =>
+                    item === "ellipsis" ? (
+                      <span key={`e-${idx}`} className="px-1 text-muted-foreground">…</span>
+                    ) : (
+                      <Button
+                        key={item}
+                        variant={item === safeCurrentPage ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => goToPage(item)}
+                        className="font-heading min-w-[2.25rem] text-xs"
+                      >
+                        {item}
+                      </Button>
+                    )
+                  )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={safeCurrentPage >= totalPages}
+                  onClick={() => goToPage(safeCurrentPage + 1)}
+                  className="font-heading text-xs uppercase tracking-wider"
+                >
+                  {lang === "lv" ? "Nākamā" : "Next"} →
+                </Button>
+              </div>
+            )}
 
             {sortedProducts.length === 0 && loaded && (
               <div className="py-20 text-center">
