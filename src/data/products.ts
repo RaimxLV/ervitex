@@ -9,11 +9,14 @@ export interface Product {
   longDescription?: Record<Language, string>;
   material?: string;
   colors: string[];
+  colorHexCodes?: (string | null)[];
   sizes?: string[];
   minOrder?: number;
   images: string[];
   featured?: boolean;
   new?: boolean;
+  retailPrice?: number;
+  brand?: string;
 }
 
 export interface Category {

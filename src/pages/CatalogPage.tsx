@@ -84,6 +84,7 @@ const CatalogPage = () => {
         longDescription: { lv: p.long_description_lv || "", en: p.long_description_en || "" },
         material: p.material || undefined,
         colors: p.product_colors.map((c) => c.name),
+        colorHexCodes: p.product_colors.map((c) => c.hex_code),
         sizes: p.product_sizes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((s) => s.size),
         minOrder: p.min_order || undefined,
         images: p.product_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((i) => i.url),
