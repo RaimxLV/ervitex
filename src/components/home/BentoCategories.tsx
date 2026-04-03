@@ -74,7 +74,7 @@ const BentoCategories = () => {
         </motion.div>
 
         {/* Bento grid */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4" style={{ gridAutoRows: "180px", gridTemplateRows: "repeat(2, 220px)" }}>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4" style={{ gridTemplateRows: "220px 220px" }}>
           {bentoCategories.map((cat, i) => (
             <motion.div
               key={cat.id}
