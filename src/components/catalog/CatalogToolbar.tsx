@@ -18,9 +18,8 @@ interface CatalogToolbarProps {
 export default function CatalogToolbar({
   search, onSearchChange,
   activeSort, onSortChange,
-  activeTech, onTechChange,
   activeBrand, onBrandChange,
-  brands, printingTechs, resultCount,
+  brands, resultCount,
 }: CatalogToolbarProps) {
   const { lang } = useLanguage();
 
