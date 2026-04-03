@@ -223,7 +223,7 @@ const CatalogPage = () => {
           ))}
         </div>
 
-        {filteredProducts.length === 0 && loaded && (
+        {sortedProducts.length === 0 && loaded && (
           <div className="py-20 text-center">
             <p className="text-lg text-muted-foreground">{t("catalog.noResults")}</p>
             <Button variant="outline" className="mt-4" onClick={() => { setSearch(""); setSearchParams({}); }}>
