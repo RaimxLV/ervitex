@@ -144,6 +144,17 @@ export const translations = {
   "stats.clients": { lv: "Aktīvi klienti", en: "Active Clients" },
   "stats.items": { lv: "Piegādātas preces", en: "Items Delivered" },
   "stats.products": { lv: "Produktu līnijas", en: "Product Lines" },
+
+  // Team
+  "team.title": { lv: "Mūsu komanda", en: "Our Team" },
+  "team.subtitle": { lv: "Iepazīstieties ar profesionāļiem, kas rūpējas par jūsu projektiem", en: "Meet the professionals who take care of your projects" },
+
+  // Contact - Office
+  "contact.officeTitle": { lv: "Biroja informācija", en: "Office Information" },
+  "contact.specialistsTitle": { lv: "Mūsu speciālisti", en: "Our Specialists" },
+  "contact.regNr": { lv: "Reģ. Nr.", en: "Reg. No." },
+  "contact.accounting": { lv: "Grāmatvedība", en: "Accounting" },
+  "contact.officeEmail": { lv: "Biroja e-pasts", en: "Office Email" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
