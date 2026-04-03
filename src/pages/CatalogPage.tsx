@@ -40,7 +40,7 @@ interface DBCategory {
   name_en: string;
 }
 
-const PRINTING_TECHS = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
+
 
 const CatalogPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
