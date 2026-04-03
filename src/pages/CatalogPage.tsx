@@ -42,11 +42,14 @@ interface DBCategory {
 
 
 
+const ITEMS_PER_PAGE = 24;
+
 const CatalogPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get("category") || "all";
   const activeBrand = searchParams.get("brand") || "";
   const activeSort = searchParams.get("sort") || "newest";
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const [search, setSearch] = useState("");
   const { lang, t } = useLanguage();
   const [dbProducts, setDbProducts] = useState<DBProduct[]>([]);
