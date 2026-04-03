@@ -1,7 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { Product } from "@/data/products";
 import { cn } from "@/lib/utils";
@@ -20,8 +21,7 @@ const COLOR_NAME_TO_HEX: Record<string, string> = {
 
 function getHexForColor(name: string, hexCode?: string | null): string | null {
   if (hexCode) return hexCode;
-  const lower = name.toLowerCase().trim();
-  return COLOR_NAME_TO_HEX[lower] || null;
+  return COLOR_NAME_TO_HEX[name.toLowerCase().trim()] || null;
 }
 
 const MAX_SWATCHES = 6;
@@ -33,8 +33,52 @@ interface ExtendedProduct extends Product {
 
 const ProductCard = ({ product }: { product: ExtendedProduct }) => {
   const { lang } = useLanguage();
-  const [activeImageIdx, setActiveImageIdx] = useState<number | null>(null);
 
+  // Build slide images: product images + unique color variant images
+  const slideImages = useMemo(() => {
+    const imgs = [...product.images];
+    const imgSet = new Set(imgs);
+    product.colorImageUrls?.forEach((url) => {
+      if (url && !imgSet.has(url)) {
+        imgs.push(url);
+        imgSet.add(url);
+      }
+    });
+    return imgs.length > 0 ? imgs : ["/placeholder.svg"];
+  }, [product.images, product.colorImageUrls]);
+
+  const hasMultipleSlides = slideImages.length > 1;
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: hasMultipleSlides,
+    dragFree: false,
+    active: hasMultipleSlides,
+  });
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    onSelect();
+    return () => { emblaApi.off("select", onSelect); };
+  }, [emblaApi]);
+
+  const scrollPrev = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    emblaApi?.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    emblaApi?.scrollNext();
+  }, [emblaApi]);
+
+  // Color swatches
   const swatches = product.colors.slice(0, MAX_SWATCHES).map((color, i) => ({
     name: color,
     hex: getHexForColor(color, product.colorHexCodes?.[i]),
@@ -42,39 +86,49 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
   }));
   const extraColors = Math.max(0, product.colors.length - MAX_SWATCHES);
 
-  const displayImage = activeImageIdx !== null && swatches[activeImageIdx]?.imageUrl
-    ? swatches[activeImageIdx].imageUrl!
-    : product.images[0];
+  // Click swatch → scroll to matching slide
+  const handleSwatchClick = useCallback((e: React.MouseEvent, idx: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = swatches[idx]?.imageUrl;
+    if (url && emblaApi) {
+      const slideIdx = slideImages.indexOf(url);
+      if (slideIdx >= 0) emblaApi.scrollTo(slideIdx);
+    }
+  }, [swatches, slideImages, emblaApi]);
 
   const price = product.retailPrice;
   const hasPrice = price && price > 0;
 
-  const handleSwatchHover = useCallback((idx: number) => {
-    if (swatches[idx]?.imageUrl) {
-      setActiveImageIdx(idx);
-    }
-  }, [swatches]);
-
-  const handleSwatchLeave = useCallback(() => {
-    setActiveImageIdx(null);
-  }, []);
-
   return (
     <div className="group relative flex flex-col">
       <Link to={`/product/${product.id}`} className="block">
-        {/* Image */}
-        <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-muted">
-          <img
-            src={displayImage}
-            alt={product.name[lang]}
-            className="h-full w-full object-cover transition-all duration-500 group-hover:scale-110"
-            loading="lazy"
-          />
-          {/* Overlay on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        {/* Carousel Image Area */}
+        <div
+          className="relative aspect-[4/5] overflow-hidden rounded-sm bg-muted"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <div className="h-full w-full" ref={emblaRef}>
+            <div className="flex h-full">
+              {slideImages.map((src, i) => (
+                <div key={i} className="relative h-full min-w-0 flex-[0_0_100%]">
+                  <img
+                    src={src}
+                    alt={`${product.name[lang]} ${i + 1}`}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Gradient overlay on hover */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
           {/* Badges */}
-          <div className="absolute left-2 top-2 flex flex-col gap-1 sm:left-3 sm:top-3 sm:gap-1.5">
+          <div className="pointer-events-none absolute left-2 top-2 z-10 flex flex-col gap-1 sm:left-3 sm:top-3 sm:gap-1.5">
             {product.new && (
               <Badge className="bg-accent text-accent-foreground font-heading text-[8px] sm:text-[10px] uppercase tracking-widest shadow-lg px-1.5 sm:px-2">
                 {lang === "lv" ? "Jaunums" : "New"}
@@ -87,8 +141,43 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
             )}
           </div>
 
-          {/* Hover CTA */}
-          <div className="absolute bottom-0 left-0 right-0 hidden items-center justify-center p-4 opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 sm:flex">
+          {/* Desktop hover arrows */}
+          {hasMultipleSlides && isHovered && (
+            <>
+              <button
+                onClick={scrollPrev}
+                className="absolute left-1.5 top-1/2 z-10 -translate-y-1/2 hidden sm:flex h-7 w-7 items-center justify-center rounded-full bg-background/80 text-foreground shadow-md backdrop-blur-sm transition-opacity hover:bg-background"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={scrollNext}
+                className="absolute right-1.5 top-1/2 z-10 -translate-y-1/2 hidden sm:flex h-7 w-7 items-center justify-center rounded-full bg-background/80 text-foreground shadow-md backdrop-blur-sm transition-opacity hover:bg-background"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </>
+          )}
+
+          {/* Pagination dots */}
+          {hasMultipleSlides && (
+            <div className="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 flex gap-1">
+              {slideImages.map((_, i) => (
+                <span
+                  key={i}
+                  className={cn(
+                    "block rounded-full transition-all duration-200",
+                    i === selectedIndex
+                      ? "h-1.5 w-4 bg-accent"
+                      : "h-1.5 w-1.5 bg-background/60"
+                  )}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Hover CTA — desktop only */}
+          <div className="absolute bottom-6 left-0 right-0 hidden items-center justify-center opacity-0 translate-y-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0 sm:flex">
             <span className="flex items-center gap-2 rounded-sm bg-accent px-4 py-2 text-xs font-bold uppercase tracking-wider text-accent-foreground shadow-lg font-heading">
               {lang === "lv" ? "Apskatīt" : "View"} <ArrowRight className="h-3.5 w-3.5" />
             </span>
@@ -96,20 +185,15 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
         </div>
 
         {/* Info */}
-        <div className="mt-2 space-y-1 sm:mt-3 sm:space-y-2">
-          {/* Brand */}
+        <div className="mt-2 space-y-1 sm:mt-3 sm:space-y-1.5">
           {product.brand && (
             <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
               {product.brand}
             </span>
           )}
-
-          {/* Name */}
           <h3 className="font-heading text-xs sm:text-sm font-bold uppercase tracking-wide text-foreground transition-colors duration-200 group-hover:text-accent line-clamp-2 leading-tight">
             {product.name[lang]}
           </h3>
-
-          {/* Price */}
           {hasPrice && (
             <p className="font-heading text-sm sm:text-base font-black text-accent">
               €{price.toFixed(2)}
@@ -121,22 +205,16 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
         </div>
       </Link>
 
-      {/* Color swatches — outside Link so hover doesn't navigate */}
+      {/* Color swatches */}
       {swatches.length > 0 && (
-        <div className="flex items-center gap-1 pt-1 sm:gap-1.5" onMouseLeave={handleSwatchLeave}>
+        <div className="flex items-center gap-1 pt-1 sm:gap-1.5">
           {swatches.map((swatch, idx) => (
             <button
               key={swatch.name}
               title={swatch.name}
-              onMouseEnter={() => handleSwatchHover(idx)}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setActiveImageIdx(activeImageIdx === idx ? null : idx);
-              }}
+              onClick={(e) => handleSwatchClick(e, idx)}
               className={cn(
                 "h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-full border shadow-sm transition-transform duration-200 hover:scale-125",
-                activeImageIdx === idx && "ring-2 ring-accent ring-offset-1",
                 swatch.hex
                   ? "border-border/50"
                   : "border-border bg-gradient-to-br from-muted-foreground/20 to-muted-foreground/40"
