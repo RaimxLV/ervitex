@@ -64,7 +64,7 @@ const teamMembers = [
 ];
 
 const AboutPage = () => {
-  const { t, language } = useLanguage();
+  const { t, lang: language } = useLanguage();
 
   return (
     <Layout>

@@ -63,7 +63,7 @@ const specialists = [
 
 const ContactPage = () => {
   const { toast } = useToast();
-  const { t, language } = useLanguage();
+  const { t, lang: language } = useLanguage();
   const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", message: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
