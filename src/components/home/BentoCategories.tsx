@@ -14,31 +14,49 @@ const bentoCategories: BentoCategory[] = [
   {
     id: "tshirts",
     name: { lv: "T-krekli", en: "T-Shirts" },
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80",
-    className: "col-span-2 row-span-2",
+    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80",
+    className: "md:col-span-2 md:row-span-2",
   },
   {
     id: "polo",
     name: { lv: "Polo krekli", en: "Polo Shirts" },
-    image: "https://images.unsplash.com/photo-1625910513413-5fc42e2e9ac0?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1507679799987-c73b4177fea2?w=600&q=80",
     className: "",
   },
   {
     id: "jackets",
     name: { lv: "Virsjakas", en: "Jackets" },
-    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1605908502334-1e0d20441e4c?w=600&q=80",
     className: "",
   },
   {
     id: "workwear",
     name: { lv: "Darba apģērbs", en: "Workwear" },
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+    className: "md:col-span-2",
+  },
+  {
+    id: "sweaters",
+    name: { lv: "Džemperi & Hūdiji", en: "Sweatshirts & Hoodies" },
+    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80",
     className: "",
   },
   {
-    id: "accessories",
-    name: { lv: "Aksesuāri", en: "Accessories" },
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
+    id: "sportswear",
+    name: { lv: "Sporta apģērbs", en: "Sportswear" },
+    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80",
+    className: "",
+  },
+  {
+    id: "caps",
+    name: { lv: "Cepures", en: "Caps & Headwear" },
+    image: "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600&q=80",
+    className: "",
+  },
+  {
+    id: "bags",
+    name: { lv: "Somas", en: "Bags & Totes" },
+    image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c5?w=600&q=80",
     className: "",
   },
 ];
@@ -74,15 +92,15 @@ const BentoCategories = () => {
         </motion.div>
 
         {/* Bento grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 auto-rows-[180px] md:auto-rows-[220px]">
           {bentoCategories.map((cat, i) => (
             <motion.div
               key={cat.id}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
-              className={`${cat.className} min-h-[180px] md:min-h-[220px]`}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: i * 0.07 }}
+              className={cat.className}
             >
               <Link
                 to={`/catalog?category=${cat.id}`}
@@ -104,7 +122,7 @@ const BentoCategories = () => {
 
                 {/* Content */}
                 <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-6">
-                  <h3 className="font-heading text-base font-bold uppercase tracking-wider text-background md:text-lg">
+                  <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-background md:text-base lg:text-lg">
                     {cat.name[lang]}
                   </h3>
                 </div>
