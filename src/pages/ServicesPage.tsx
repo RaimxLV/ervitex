@@ -25,28 +25,43 @@ const fadeUp = {
 const dtfSections = [
   {
     icon: <Layers className="h-8 w-8" />,
-    title: "MATERIĀLI",
-    text: "DTF tehnoloģija ir neticami daudzpusīga. Tā ir piemērota T-krekliem, Polo krekliem, hūdijiem, vestēm, jakām, somām, darba apģērbam, lietussargiem un cepurēm. Izcila saite ar kokvilnu, neilonu, poliesteru un dažādiem audumu maisījumiem.",
+    title: { lv: "MATERIĀLI", en: "MATERIALS" },
+    text: {
+      lv: "DTF tehnoloģija ir neticami daudzpusīga. Tā ir piemērota T-krekliem, Polo krekliem, hūdijiem, vestēm, jakām, somām, darba apģērbam, lietussargiem un cepurēm. Izcila saite ar kokvilnu, neilonu, poliesteru un dažādiem audumu maisījumiem.",
+      en: "DTF technology is incredibly versatile. It's suitable for T-shirts, Polo shirts, hoodies, vests, jackets, bags, workwear, umbrellas, and caps. Excellent adhesion to cotton, nylon, polyester, and various fabric blends.",
+    },
   },
   {
     icon: <Sparkles className="h-8 w-8" />,
-    title: "KRĀSAS UN KVALITĀTE",
-    text: "Nodrošina pilnkrāsu (CMYK+W) druku ar fotoreālistisku precizitāti un košiem toņiem. Tehnoloģija ļauj realizēt vissmalkākās detaļas, pārejas un ēnas, nezaudējot krāsu intensitāti.",
+    title: { lv: "KRĀSAS UN KVALITĀTE", en: "COLORS & QUALITY" },
+    text: {
+      lv: "Nodrošina pilnkrāsu (CMYK+W) druku ar fotoreālistisku precizitāti un košiem toņiem. Tehnoloģija ļauj realizēt vissmalkākās detaļas, pārejas un ēnas, nezaudējot krāsu intensitāti.",
+      en: "Delivers full-color (CMYK+W) printing with photorealistic precision and vibrant tones. The technology reproduces the finest details, gradients, and shadows without losing color intensity.",
+    },
   },
   {
     icon: <Users className="h-8 w-8" />,
-    title: "PASŪTĪJUMA APJOMS",
-    text: "Ideāli piemērots gan individuāliem pasūtījumiem (no 1 eksemplāra), gan lielām tirāžām. Labākā izvēle mainīgo datu drukai – vārdiem, uzvārdiem vai unikāliem numuriem uz katra izstrādājuma.",
+    title: { lv: "PASŪTĪJUMA APJOMS", en: "ORDER VOLUME" },
+    text: {
+      lv: "Ideāli piemērots gan individuāliem pasūtījumiem (no 1 eksemplāra), gan lielām tirāžām. Labākā izvēle mainīgo datu drukai – vārdiem, uzvārdiem vai unikāliem numuriem uz katra izstrādājuma.",
+      en: "Perfectly suited for both individual orders (from 1 piece) and large runs. The best choice for variable data printing — names, surnames, or unique numbers on each item.",
+    },
   },
   {
     icon: <Tag className="h-8 w-8" />,
-    title: "CENAS EFEKTIVITĀTE",
-    text: "Cena tiek aprēķināta pēc apdrukas laukuma (cm²). Tā ir viena no izdevīgākajām metodēm daudzkrāsu drukai, jo nav nepieciešama dārga klišeju vai sietu sagatavošana.",
+    title: { lv: "CENAS EFEKTIVITĀTE", en: "COST EFFICIENCY" },
+    text: {
+      lv: "Cena tiek aprēķināta pēc apdrukas laukuma (cm²). Tā ir viena no izdevīgākajām metodēm daudzkrāsu drukai, jo nav nepieciešama dārga klišeju vai sietu sagatavošana.",
+      en: "Price is calculated by print area (cm²). It's one of the most cost-effective methods for full-color printing, as no expensive clichés or screen preparation is required.",
+    },
   },
   {
     icon: <ShieldCheck className="h-8 w-8" />,
-    title: "NOTURĪBA UN KOPŠANA",
-    text: "Īpaši elastīga un izturīga pret plaisāšanu. Saglabā sākotnējo izskatu pēc daudzām mazgāšanas reizēm. Kopšana: Mazgāt, žāvēt un gludināt no kreisās puses. Ieteicamā temperatūra līdz 40°C.",
+    title: { lv: "NOTURĪBA UN KOPŠANA", en: "DURABILITY & CARE" },
+    text: {
+      lv: "Īpaši elastīga un izturīga pret plaisāšanu. Saglabā sākotnējo izskatu pēc daudzām mazgāšanas reizēm. Kopšana: Mazgāt, žāvēt un gludināt no kreisās puses. Ieteicamā temperatūra līdz 40°C.",
+      en: "Highly elastic and resistant to cracking. Maintains its original appearance after many washes. Care: Wash, dry, and iron inside out. Recommended temperature up to 40°C.",
+    },
   },
 ];
 
