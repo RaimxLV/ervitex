@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import GoogleMapEmbed from "@/components/GoogleMapEmbed";
+import HausmanaKvartalsMap from "@/components/HausmanaKvartalsMap";
 
 const specialists = [
   {
@@ -157,6 +159,35 @@ const ContactPage = () => {
                 <Send className="mr-2 h-4 w-4" /> {t("contact.send")}
               </Button>
             </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Maps Section */}
+      <section className="bg-muted/50 py-16 md:py-24">
+        <div className="container">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mb-10 text-center">
+            <h2 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground">
+              {lang === "lv" ? "Kā mūs atrast" : "How to find us"}
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              {lang === "lv" ? "Braslas Biznesa Centrs, Braslas ielā 29, Rīga" : "Braslas Business Center, Braslas street 29, Riga"}
+            </p>
+          </motion.div>
+
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div>
+              <p className="mb-3 font-heading text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                {lang === "lv" ? "Atrašanās vieta kartē" : "Location on map"}
+              </p>
+              <GoogleMapEmbed />
+            </div>
+            <div>
+              <p className="mb-3 font-heading text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                {lang === "lv" ? "Ēku plāns — Hausmaņa Kvartāls" : "Building plan — Hausmaņa Kvartāls"}
+              </p>
+              <HausmanaKvartalsMap />
+            </div>
           </div>
         </div>
       </section>
