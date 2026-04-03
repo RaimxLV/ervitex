@@ -109,7 +109,6 @@ const CatalogPage = () => {
   const filteredProducts = useMemo(() => {
     return normalizedProducts.filter((p) => {
       const matchCategory = activeCategory === "all" || p.category === activeCategory;
-      const matchTech = !activeTech || p.printingTechs.includes(activeTech);
       const matchBrand = !activeBrand || p.brand === activeBrand;
       const matchSearch =
         !search ||
