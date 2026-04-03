@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import ervitexLogo from "@/assets/ervitex-logo.png";
 
 const Footer = () => {
   const { t } = useLanguage();
