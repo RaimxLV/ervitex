@@ -39,6 +39,7 @@ function getHexForColor(name: string, hexCode?: string | null): string | null {
 }
 
 const MAX_SWATCHES = 6;
+const SWATCH_SIZE = "h-4 w-4 sm:h-[18px] sm:w-[18px]";
 
 interface ExtendedProduct extends Product {
   colorHexCodes?: (string | null)[];
@@ -239,43 +240,51 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
         </div>
       </Link>
 
-      {/* Color swatches */}
+      {/* Color swatches — unified circles */}
       {swatches.length > 0 && (
-        <div className="flex items-center gap-1 pt-1 sm:gap-1.5">
-          {swatches.map((swatch, idx) => (
-            <button
-              key={swatch.name}
-              title={swatch.name}
-              onClick={(e) => handleSwatchClick(e, idx)}
-              className={cn(
-                "h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-full border shadow-sm transition-transform duration-200 hover:scale-125 overflow-hidden",
-                swatch.hex
-                  ? "border-border/50"
-                  : swatch.imageUrl
-                    ? "border-border/50"
-                    : "border-border"
-              )}
-              style={swatch.hex ? { backgroundColor: swatch.hex } : undefined}
-            >
-              {/* No hex but has image → show tiny product thumbnail as swatch */}
-              {!swatch.hex && swatch.imageUrl && (
-                <img
-                  src={swatch.imageUrl}
-                  alt={swatch.name}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
-              )}
-              {/* No hex and no image → show initials */}
-              {!swatch.hex && !swatch.imageUrl && (
-                <span className="flex h-full w-full items-center justify-center bg-muted text-[6px] font-bold text-muted-foreground">
-                  {swatch.name.slice(0, 2)}
-                </span>
-              )}
-            </button>
-          ))}
+        <div className="flex items-center gap-1.5 pt-1.5 sm:gap-2">
+          {swatches.map((swatch, idx) => {
+            const isActive = selectedIndex >= 0 && swatch.imageUrl && slideImages[selectedIndex] === swatch.imageUrl;
+            return (
+              <button
+                key={`${swatch.name}-${idx}`}
+                title={swatch.name}
+                onClick={(e) => handleSwatchClick(e, idx)}
+                className={cn(
+                  SWATCH_SIZE,
+                  "rounded-full overflow-hidden shadow-sm transition-all duration-200 hover:scale-110",
+                  isActive
+                    ? "ring-2 ring-accent ring-offset-1 ring-offset-background"
+                    : "ring-1 ring-border/40"
+                )}
+              >
+                {swatch.hex ? (
+                  /* Solid color fill */
+                  <span
+                    className="block h-full w-full rounded-full"
+                    style={{ backgroundColor: swatch.hex }}
+                  />
+                ) : swatch.imageUrl ? (
+                  /* Circular crop of fabric/product image */
+                  <img
+                    src={swatch.imageUrl}
+                    alt={swatch.name}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  /* Fallback: initials */
+                  <span className="flex h-full w-full items-center justify-center bg-muted text-[6px] font-bold text-muted-foreground rounded-full">
+                    {swatch.name.slice(0, 2).toUpperCase()}
+                  </span>
+                )}
+              </button>
+            );
+          })}
           {extraColors > 0 && (
-            <span className="text-[9px] sm:text-[10px] font-bold text-muted-foreground">+{extraColors}</span>
+            <span className="ml-0.5 text-[9px] sm:text-[10px] font-semibold text-muted-foreground">
+              +{extraColors}
+            </span>
           )}
         </div>
       )}
