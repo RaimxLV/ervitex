@@ -152,6 +152,7 @@ export type Database = {
       products: {
         Row: {
           active: boolean | null
+          brand: string | null
           bulk_discount_percent: number | null
           bulk_min_qty: number | null
           category_id: string | null
@@ -174,6 +175,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean | null
+          brand?: string | null
           bulk_discount_percent?: number | null
           bulk_min_qty?: number | null
           category_id?: string | null
@@ -196,6 +198,7 @@ export type Database = {
         }
         Update: {
           active?: boolean | null
+          brand?: string | null
           bulk_discount_percent?: number | null
           bulk_min_qty?: number | null
           category_id?: string | null
