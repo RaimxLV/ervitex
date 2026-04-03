@@ -81,6 +81,7 @@ const CatalogPage = () => {
         featured: p.featured || false,
         new: p.is_new || false,
         printingTechs: p.printing_techs || [],
+        brand: p.brand || "",
       }));
     }
     return staticProducts.map(p => ({ ...p, printingTechs: [] as string[] }));
