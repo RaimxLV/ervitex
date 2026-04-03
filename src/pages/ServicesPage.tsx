@@ -129,7 +129,7 @@ const ServicesPage = () => {
                   {item.icon}
                 </div>
                 <h3 className="mt-4 font-heading text-sm font-bold uppercase tracking-wider text-card-foreground">
-                  {item.title}
+                  {item.title[lang]}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                   {item.text}
