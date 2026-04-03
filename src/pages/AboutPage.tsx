@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Target, Users, Award, Factory } from "lucide-react";
+import { Target, Users, Award, Factory, Mail, Phone } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -10,8 +11,60 @@ const fadeUp = {
   transition: { duration: 0.6 },
 };
 
+const teamMembers = [
+  {
+    name: "Vilnis Lācis",
+    title: { lv: "Valdes priekšsēdētājs", en: "Chairman of the Board" },
+    email: "vilnis@ervitex.lv",
+    phone: "+371 67543384",
+    phoneLabel: { lv: "Tel", en: "Tel" },
+  },
+  {
+    name: "Ēriks Lācis",
+    title: { lv: "Tirdzniecības direktors", en: "Sales Director" },
+    email: "eriks@ervitex.lv",
+    phone: "+371 29395600",
+    phoneLabel: { lv: "Mob", en: "Mob" },
+  },
+  {
+    name: "Laura Daukšte",
+    title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" },
+    email: "laura@ervitex.lv",
+    phone: "+371 26164635",
+    phoneLabel: { lv: "Mob", en: "Mob" },
+  },
+  {
+    name: "Ilona Romanovska",
+    title: { lv: "Projektu vadītāja", en: "Project Manager" },
+    email: "ilona@ervitex.lv",
+    phone: "+371 29494626",
+    phoneLabel: { lv: "Mob", en: "Mob" },
+  },
+  {
+    name: "Santa Zvaigzne",
+    title: { lv: "Projektu vadītāja", en: "Project Manager" },
+    email: "santa.k@ervitex.lv",
+    phone: "67436899",
+    phoneLabel: { lv: "Tel", en: "Tel" },
+  },
+  {
+    name: "Justīne Strunka",
+    title: { lv: "Projektu vadītāja", en: "Project Manager" },
+    email: "justine@ervitex.lv",
+    phone: "29725412",
+    phoneLabel: { lv: "Mob", en: "Mob" },
+  },
+  {
+    name: "Evita Ņesterova",
+    title: { lv: "Mazumtirdzniecība", en: "Retail" },
+    email: "evita@ervitex.lv",
+    phone: "29475227",
+    phoneLabel: { lv: "Tel", en: "Tel" },
+  },
+];
+
 const AboutPage = () => {
-  const { t } = useLanguage();
+  const { t, lang: language } = useLanguage();
 
   return (
     <Layout>
@@ -66,19 +119,69 @@ const AboutPage = () => {
         </div>
       </section>
 
+      {/* Team Section */}
       <section className="container py-16 md:py-24">
-        <div className="grid gap-8 text-center sm:grid-cols-4">
-          {[
-            { num: "20+", label: t("stats.years") },
-            { num: "500+", label: t("stats.clients") },
-            { num: "1M+", label: t("stats.items") },
-            { num: "50+", label: t("stats.products") },
-          ].map((stat, i) => (
-            <motion.div key={i} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
-              <p className="font-heading text-4xl font-black text-accent">{stat.num}</p>
-              <p className="mt-1 text-sm text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+        <motion.div {...fadeUp} className="text-center">
+          <h2 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground">{t("team.title")}</h2>
+          <p className="mt-3 text-muted-foreground">{t("team.subtitle")}</p>
+        </motion.div>
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {teamMembers.map((member, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.07 }}
+              className="group rounded-sm border border-border bg-card p-6 transition-all hover:border-accent/40 hover:shadow-lg"
+            >
+              <div className="flex flex-col items-center text-center">
+                <Avatar className="h-20 w-20 border-2 border-muted">
+                  <AvatarFallback className="bg-accent/10 text-accent font-heading text-lg font-bold">
+                    {member.name.split(" ").map((n) => n[0]).join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <h3 className="mt-4 font-heading text-sm font-bold uppercase tracking-wider text-foreground">
+                  {member.name}
+                </h3>
+                <p className="mt-1 text-xs text-accent font-medium">{member.title[language]}</p>
+                <div className="mt-4 w-full space-y-2">
+                  <a
+                    href={`mailto:${member.email}`}
+                    className="flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
+                  >
+                    <Mail className="h-3.5 w-3.5" />
+                    {member.email}
+                  </a>
+                  <a
+                    href={`tel:${member.phone.replace(/\s/g, "")}`}
+                    className="flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
+                  >
+                    <Phone className="h-3.5 w-3.5" />
+                    {member.phoneLabel[language]}: {member.phone}
+                  </a>
+                </div>
+              </div>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      <section className="bg-muted py-16 md:py-24">
+        <div className="container">
+          <div className="grid gap-8 text-center sm:grid-cols-4">
+            {[
+              { num: "20+", label: t("stats.years") },
+              { num: "500+", label: t("stats.clients") },
+              { num: "1M+", label: t("stats.items") },
+              { num: "50+", label: t("stats.products") },
+            ].map((stat, i) => (
+              <motion.div key={i} initial={{ opacity: 0, scale: 0.8 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}>
+                <p className="font-heading text-4xl font-black text-accent">{stat.num}</p>
+                <p className="mt-1 text-sm text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
     </Layout>

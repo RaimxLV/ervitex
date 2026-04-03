@@ -104,7 +104,7 @@ export const translations = {
   "contact.email": { lv: "E-pasts", en: "Email" },
   "contact.address": { lv: "Adrese", en: "Address" },
   "contact.hours": { lv: "Darba laiks", en: "Hours" },
-  "contact.hoursValue": { lv: "P.–Pk.: 9:00–18:00", en: "Mon–Fri: 9:00–18:00" },
+  "contact.hoursValue": { lv: "P.–Ce.: 9:00–17:30 / Pk.: 9:00–16:00", en: "Mon–Thu: 9:00–17:30 / Fri: 9:00–16:00" },
   "contact.name": { lv: "Vārds, Uzvārds *", en: "Full Name *" },
   "contact.emailLabel": { lv: "E-pasts *", en: "Email *" },
   "contact.company": { lv: "Uzņēmums", en: "Company" },
@@ -144,6 +144,17 @@ export const translations = {
   "stats.clients": { lv: "Aktīvi klienti", en: "Active Clients" },
   "stats.items": { lv: "Piegādātas preces", en: "Items Delivered" },
   "stats.products": { lv: "Produktu līnijas", en: "Product Lines" },
+
+  // Team
+  "team.title": { lv: "Mūsu komanda", en: "Our Team" },
+  "team.subtitle": { lv: "Iepazīstieties ar profesionāļiem, kas rūpējas par jūsu projektiem", en: "Meet the professionals who take care of your projects" },
+
+  // Contact - Office
+  "contact.officeTitle": { lv: "Biroja informācija", en: "Office Information" },
+  "contact.specialistsTitle": { lv: "Mūsu speciālisti", en: "Our Specialists" },
+  "contact.regNr": { lv: "Reģ. Nr.", en: "Reg. No." },
+  "contact.accounting": { lv: "Grāmatvedība", en: "Accounting" },
+  "contact.officeEmail": { lv: "Biroja e-pasts", en: "Office Email" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
