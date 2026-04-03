@@ -25,28 +25,43 @@ const fadeUp = {
 const dtfSections = [
   {
     icon: <Layers className="h-8 w-8" />,
-    title: "MATERIĀLI",
-    text: "DTF tehnoloģija ir neticami daudzpusīga. Tā ir piemērota T-krekliem, Polo krekliem, hūdijiem, vestēm, jakām, somām, darba apģērbam, lietussargiem un cepurēm. Izcila saite ar kokvilnu, neilonu, poliesteru un dažādiem audumu maisījumiem.",
+    title: { lv: "MATERIĀLI", en: "MATERIALS" },
+    text: {
+      lv: "DTF tehnoloģija ir neticami daudzpusīga. Tā ir piemērota T-krekliem, Polo krekliem, hūdijiem, vestēm, jakām, somām, darba apģērbam, lietussargiem un cepurēm. Izcila saite ar kokvilnu, neilonu, poliesteru un dažādiem audumu maisījumiem.",
+      en: "DTF technology is incredibly versatile. It's suitable for T-shirts, Polo shirts, hoodies, vests, jackets, bags, workwear, umbrellas, and caps. Excellent adhesion to cotton, nylon, polyester, and various fabric blends.",
+    },
   },
   {
     icon: <Sparkles className="h-8 w-8" />,
-    title: "KRĀSAS UN KVALITĀTE",
-    text: "Nodrošina pilnkrāsu (CMYK+W) druku ar fotoreālistisku precizitāti un košiem toņiem. Tehnoloģija ļauj realizēt vissmalkākās detaļas, pārejas un ēnas, nezaudējot krāsu intensitāti.",
+    title: { lv: "KRĀSAS UN KVALITĀTE", en: "COLORS & QUALITY" },
+    text: {
+      lv: "Nodrošina pilnkrāsu (CMYK+W) druku ar fotoreālistisku precizitāti un košiem toņiem. Tehnoloģija ļauj realizēt vissmalkākās detaļas, pārejas un ēnas, nezaudējot krāsu intensitāti.",
+      en: "Delivers full-color (CMYK+W) printing with photorealistic precision and vibrant tones. The technology reproduces the finest details, gradients, and shadows without losing color intensity.",
+    },
   },
   {
     icon: <Users className="h-8 w-8" />,
-    title: "PASŪTĪJUMA APJOMS",
-    text: "Ideāli piemērots gan individuāliem pasūtījumiem (no 1 eksemplāra), gan lielām tirāžām. Labākā izvēle mainīgo datu drukai – vārdiem, uzvārdiem vai unikāliem numuriem uz katra izstrādājuma.",
+    title: { lv: "PASŪTĪJUMA APJOMS", en: "ORDER VOLUME" },
+    text: {
+      lv: "Ideāli piemērots gan individuāliem pasūtījumiem (no 1 eksemplāra), gan lielām tirāžām. Labākā izvēle mainīgo datu drukai – vārdiem, uzvārdiem vai unikāliem numuriem uz katra izstrādājuma.",
+      en: "Perfectly suited for both individual orders (from 1 piece) and large runs. The best choice for variable data printing — names, surnames, or unique numbers on each item.",
+    },
   },
   {
     icon: <Tag className="h-8 w-8" />,
-    title: "CENAS EFEKTIVITĀTE",
-    text: "Cena tiek aprēķināta pēc apdrukas laukuma (cm²). Tā ir viena no izdevīgākajām metodēm daudzkrāsu drukai, jo nav nepieciešama dārga klišeju vai sietu sagatavošana.",
+    title: { lv: "CENAS EFEKTIVITĀTE", en: "COST EFFICIENCY" },
+    text: {
+      lv: "Cena tiek aprēķināta pēc apdrukas laukuma (cm²). Tā ir viena no izdevīgākajām metodēm daudzkrāsu drukai, jo nav nepieciešama dārga klišeju vai sietu sagatavošana.",
+      en: "Price is calculated by print area (cm²). It's one of the most cost-effective methods for full-color printing, as no expensive clichés or screen preparation is required.",
+    },
   },
   {
     icon: <ShieldCheck className="h-8 w-8" />,
-    title: "NOTURĪBA UN KOPŠANA",
-    text: "Īpaši elastīga un izturīga pret plaisāšanu. Saglabā sākotnējo izskatu pēc daudzām mazgāšanas reizēm. Kopšana: Mazgāt, žāvēt un gludināt no kreisās puses. Ieteicamā temperatūra līdz 40°C.",
+    title: { lv: "NOTURĪBA UN KOPŠANA", en: "DURABILITY & CARE" },
+    text: {
+      lv: "Īpaši elastīga un izturīga pret plaisāšanu. Saglabā sākotnējo izskatu pēc daudzām mazgāšanas reizēm. Kopšana: Mazgāt, žāvēt un gludināt no kreisās puses. Ieteicamā temperatūra līdz 40°C.",
+      en: "Highly elastic and resistant to cracking. Maintains its original appearance after many washes. Care: Wash, dry, and iron inside out. Recommended temperature up to 40°C.",
+    },
   },
 ];
 
@@ -96,14 +111,14 @@ const ServicesPage = () => {
         <div className="container">
           <motion.div {...fadeUp} className="mb-12 max-w-3xl">
             <h2 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground md:text-4xl">
-              DTF druka – Inovācija un augstākā kvalitāte tekstila apdrukā
+              {lang === "lv" ? "DTF druka – Inovācija un augstākā kvalitāte tekstila apdrukā" : "DTF Printing – Innovation & Top Quality in Textile Printing"}
             </h2>
           </motion.div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {dtfSections.map((item, i) => (
               <motion.div
-                key={item.title}
+                key={item.title[lang]}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -114,10 +129,10 @@ const ServicesPage = () => {
                   {item.icon}
                 </div>
                 <h3 className="mt-4 font-heading text-sm font-bold uppercase tracking-wider text-card-foreground">
-                  {item.title}
+                  {item.title[lang]}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {item.text}
+                  {item.text[lang]}
                 </p>
               </motion.div>
             ))}
@@ -126,7 +141,7 @@ const ServicesPage = () => {
           <motion.div {...fadeUp} className="mt-10 text-center">
             <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest" asChild>
               <Link to="/contact">
-                Pieprasīt piedāvājumu <ArrowRight className="ml-2 h-4 w-4" />
+                {lang === "lv" ? "Pieprasīt piedāvājumu" : "Request a Quote"} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </motion.div>
