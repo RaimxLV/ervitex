@@ -12,7 +12,6 @@ interface CatalogToolbarProps {
   activeBrand: string;
   onBrandChange: (val: string) => void;
   brands: string[];
-  printingTechs: string[];
   resultCount: number;
 }
 
