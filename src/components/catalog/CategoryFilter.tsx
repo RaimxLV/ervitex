@@ -10,7 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Contact,
-  Pocket,
+  SwatchBook,
   CloudSnow,
   ShieldCheck,
   Zap,
