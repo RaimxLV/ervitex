@@ -19,6 +19,7 @@ import AdminProductForm from "./pages/admin/AdminProductForm.tsx";
 import AdminCategories from "./pages/admin/AdminCategories.tsx";
 import AdminQuotes from "./pages/admin/AdminQuotes.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import ScrollToTop from "./components/ScrollToTop.tsx";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/catalog" element={<CatalogPage />} />
