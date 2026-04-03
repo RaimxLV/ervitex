@@ -105,8 +105,10 @@ const ProductCard = ({ product }: { product: Product }) => {
                   key={swatch.name}
                   title={swatch.name}
                   className={cn(
-                    "h-4 w-4 rounded-full border border-border/50 shadow-sm transition-transform duration-200 hover:scale-125",
-                    !swatch.hex && "bg-muted"
+                    "h-4 w-4 rounded-full border shadow-sm transition-transform duration-200 hover:scale-125",
+                    swatch.hex
+                      ? "border-border/50"
+                      : "border-border bg-gradient-to-br from-muted-foreground/20 to-muted-foreground/40"
                   )}
                   style={swatch.hex ? { backgroundColor: swatch.hex } : undefined}
                 />
