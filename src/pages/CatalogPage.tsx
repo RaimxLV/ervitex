@@ -181,6 +181,7 @@ const CatalogPage = () => {
               <SelectItem value="price-desc">{lang === "lv" ? "Cena: augstākā" : "Price: High"}</SelectItem>
             </SelectContent>
           </Select>
+        </div>
 
         {/* Tech filters */}
         <div className="mt-4 flex flex-wrap gap-2">
