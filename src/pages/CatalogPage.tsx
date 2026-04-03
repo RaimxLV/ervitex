@@ -164,11 +164,23 @@ const CatalogPage = () => {
               </Button>
             ))}
           </div>
-          <div className="relative w-full md:w-72">
+           <div className="relative w-full md:w-72">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input placeholder={t("header.search")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
           </div>
-        </div>
+          <Select value={activeSort} onValueChange={(val) => { const p = new URLSearchParams(searchParams); p.set("sort", val); setSearchParams(p); }}>
+            <SelectTrigger className="w-full md:w-48">
+              <ArrowUpDown className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">{lang === "lv" ? "Jaunākie" : "Newest"}</SelectItem>
+              <SelectItem value="name-asc">{lang === "lv" ? "Nosaukums A-Z" : "Name A-Z"}</SelectItem>
+              <SelectItem value="name-desc">{lang === "lv" ? "Nosaukums Z-A" : "Name Z-A"}</SelectItem>
+              <SelectItem value="price-asc">{lang === "lv" ? "Cena: zemākā" : "Price: Low"}</SelectItem>
+              <SelectItem value="price-desc">{lang === "lv" ? "Cena: augstākā" : "Price: High"}</SelectItem>
+            </SelectContent>
+          </Select>
 
         {/* Tech filters */}
         <div className="mt-4 flex flex-wrap gap-2">
