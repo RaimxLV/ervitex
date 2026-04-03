@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle, Grid3x3, Scissors, Palette, Layers, Flame, PenTool } from "lucide-react";
+import { ArrowRight, CheckCircle, Grid3x3, Scissors, Palette, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import CategoryCard from "@/components/CategoryCard";
@@ -13,8 +13,6 @@ const iconMap: Record<string, React.ReactNode> = {
   Scissors: <Scissors className="h-6 w-6" />,
   Palette: <Palette className="h-6 w-6" />,
   Layers: <Layers className="h-6 w-6" />,
-  Flame: <Flame className="h-6 w-6" />,
-  PenTool: <PenTool className="h-6 w-6" />,
 };
 
 const fadeUp = {
