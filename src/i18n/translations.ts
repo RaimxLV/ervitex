@@ -104,7 +104,7 @@ export const translations = {
   "contact.email": { lv: "E-pasts", en: "Email" },
   "contact.address": { lv: "Adrese", en: "Address" },
   "contact.hours": { lv: "Darba laiks", en: "Hours" },
-  "contact.hoursValue": { lv: "P.–Pk.: 9:00–18:00", en: "Mon–Fri: 9:00–18:00" },
+  "contact.hoursValue": { lv: "P.–Ce.: 9:00–17:30 / Pk.: 9:00–16:00", en: "Mon–Thu: 9:00–17:30 / Fri: 9:00–16:00" },
   "contact.name": { lv: "Vārds, Uzvārds *", en: "Full Name *" },
   "contact.emailLabel": { lv: "E-pasts *", en: "Email *" },
   "contact.company": { lv: "Uzņēmums", en: "Company" },
