@@ -39,6 +39,7 @@ function getHexForColor(name: string, hexCode?: string | null): string | null {
 }
 
 const MAX_SWATCHES = 6;
+const SWATCH_SIZE = "h-4 w-4 sm:h-[18px] sm:w-[18px]";
 
 interface ExtendedProduct extends Product {
   colorHexCodes?: (string | null)[];
