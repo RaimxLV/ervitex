@@ -167,7 +167,23 @@ const CatalogPage = () => {
           ))}
         </div>
 
-        {/* Grid */}
+        {/* Brand filters */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <span className="self-center text-xs uppercase tracking-wider text-muted-foreground mr-2">
+            {lang === "lv" ? "Ražotājs:" : "Brand:"}
+          </span>
+          {brands.map(brand => (
+            <Button key={brand} variant={activeBrand === brand ? "default" : "outline"} size="sm"
+              onClick={() => {
+                const p = new URLSearchParams(searchParams);
+                activeBrand === brand ? p.delete("brand") : p.set("brand", brand);
+                setSearchParams(p);
+              }}
+              className={`text-xs ${activeBrand === brand ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
+            >{brand}</Button>
+          ))}
+        </div>
+
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredProducts.map((product) => (
             <ProductCard key={product.id} product={product as any} />
