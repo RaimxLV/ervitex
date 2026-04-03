@@ -117,7 +117,7 @@ const CatalogPage = () => {
         p.material?.toLowerCase().includes(search.toLowerCase());
       return matchCategory && matchSearch && matchBrand;
     });
-  }, [activeCategory, activeTech, activeBrand, search, lang, normalizedProducts]);
+  }, [activeCategory, activeBrand, search, lang, normalizedProducts]);
 
   const sortedProducts = useMemo(() => {
     const arr = [...filteredProducts];
