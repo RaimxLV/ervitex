@@ -40,12 +40,11 @@ interface DBCategory {
   name_en: string;
 }
 
-const PRINTING_TECHS = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
+
 
 const CatalogPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get("category") || "all";
-  const activeTech = searchParams.get("tech") || "";
   const activeBrand = searchParams.get("brand") || "";
   const activeSort = searchParams.get("sort") || "newest";
   const [search, setSearch] = useState("");
@@ -110,16 +109,15 @@ const CatalogPage = () => {
   const filteredProducts = useMemo(() => {
     return normalizedProducts.filter((p) => {
       const matchCategory = activeCategory === "all" || p.category === activeCategory;
-      const matchTech = !activeTech || p.printingTechs.includes(activeTech);
       const matchBrand = !activeBrand || p.brand === activeBrand;
       const matchSearch =
         !search ||
         p.name[lang].toLowerCase().includes(search.toLowerCase()) ||
         p.description[lang].toLowerCase().includes(search.toLowerCase()) ||
         p.material?.toLowerCase().includes(search.toLowerCase());
-      return matchCategory && matchSearch && matchTech && matchBrand;
+      return matchCategory && matchSearch && matchBrand;
     });
-  }, [activeCategory, activeTech, activeBrand, search, lang, normalizedProducts]);
+  }, [activeCategory, activeBrand, search, lang, normalizedProducts]);
 
   const sortedProducts = useMemo(() => {
     const arr = [...filteredProducts];
@@ -180,12 +178,9 @@ const CatalogPage = () => {
               onSearchChange={setSearch}
               activeSort={activeSort}
               onSortChange={(val) => updateParam("sort", val)}
-              activeTech={activeTech}
-              onTechChange={(val) => updateParam("tech", activeTech === val ? "" : val)}
               activeBrand={activeBrand}
               onBrandChange={(val) => updateParam("brand", activeBrand === val ? "" : val)}
               brands={brands}
-              printingTechs={PRINTING_TECHS}
               resultCount={sortedProducts.length}
             />
 

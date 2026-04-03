@@ -9,21 +9,17 @@ interface CatalogToolbarProps {
   onSearchChange: (val: string) => void;
   activeSort: string;
   onSortChange: (val: string) => void;
-  activeTech: string;
-  onTechChange: (val: string) => void;
   activeBrand: string;
   onBrandChange: (val: string) => void;
   brands: string[];
-  printingTechs: string[];
   resultCount: number;
 }
 
 export default function CatalogToolbar({
   search, onSearchChange,
   activeSort, onSortChange,
-  activeTech, onTechChange,
   activeBrand, onBrandChange,
-  brands, printingTechs, resultCount,
+  brands, resultCount,
 }: CatalogToolbarProps) {
   const { lang } = useLanguage();
 
@@ -66,31 +62,8 @@ export default function CatalogToolbar({
         </Select>
       </div>
 
-      {/* Filter chips: Tech + Brand */}
+      {/* Filter chips: Brand */}
       <div className="flex flex-wrap items-center gap-2">
-        {/* Tech */}
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground mr-1">
-          {lang === "lv" ? "Tehnoloģija:" : "Tech:"}
-        </span>
-        {printingTechs.map((tech) => (
-          <Button
-            key={tech}
-            variant="outline"
-            size="sm"
-            onClick={() => onTechChange(activeTech === tech ? "" : tech)}
-            className={`h-7 rounded-sm px-2.5 text-[10px] font-bold uppercase tracking-wider transition-all ${
-              activeTech === tech
-                ? "border-accent bg-accent text-accent-foreground hover:bg-accent/90"
-                : "border-border bg-card hover:border-accent hover:text-accent"
-            }`}
-          >
-            {tech}
-          </Button>
-        ))}
-
-        <div className="mx-2 h-4 w-px bg-border" />
-
-        {/* Brand */}
         <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground mr-1">
           {lang === "lv" ? "Ražotājs:" : "Brand:"}
         </span>
