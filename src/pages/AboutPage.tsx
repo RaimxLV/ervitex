@@ -64,7 +64,7 @@ const teamMembers = [
 ];
 
 const AboutPage = () => {
-  const { t, lang: language } = useLanguage();
+  const { t, lang } = useLanguage();
 
   return (
     <Layout>
@@ -144,7 +144,7 @@ const AboutPage = () => {
                 <h3 className="mt-4 font-heading text-sm font-bold uppercase tracking-wider text-foreground">
                   {member.name}
                 </h3>
-                <p className="mt-1 text-xs text-accent font-medium">{member.title[language]}</p>
+                <p className="mt-1 text-xs text-accent font-medium">{member.title[lang]}</p>
                 <div className="mt-4 w-full space-y-2">
                   <a
                     href={`mailto:${member.email}`}
@@ -158,7 +158,7 @@ const AboutPage = () => {
                     className="flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
                   >
                     <Phone className="h-3.5 w-3.5" />
-                    {member.phoneLabel[language]}: {member.phone}
+                    {member.phoneLabel[lang]}: {member.phone}
                   </a>
                 </div>
               </div>

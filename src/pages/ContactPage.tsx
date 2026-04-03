@@ -63,7 +63,7 @@ const specialists = [
 
 const ContactPage = () => {
   const { toast } = useToast();
-  const { t, lang: language } = useLanguage();
+  const { t, lang } = useLanguage();
   const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", message: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -121,9 +121,9 @@ const ContactPage = () => {
                 </div>
                 <div>
                   <p className="font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                    {language === "lv" ? "Brīvdienas" : "Weekends"}
+                    {lang === "lv" ? "Brīvdienas" : "Weekends"}
                   </p>
-                  <p className="text-foreground">{language === "lv" ? "Se., Sv.: Slēgts" : "Sat, Sun: Closed"}</p>
+                  <p className="text-foreground">{lang === "lv" ? "Se., Sv.: Slēgts" : "Sat, Sun: Closed"}</p>
                 </div>
               </div>
             </div>
@@ -186,13 +186,13 @@ const ContactPage = () => {
                   </Avatar>
                   <div className="min-w-0">
                     <h3 className="font-heading text-sm font-bold text-foreground">{member.name}</h3>
-                    <p className="text-xs text-accent font-medium">{member.title[language]}</p>
+                    <p className="text-xs text-accent font-medium">{member.title[lang]}</p>
                     <div className="mt-2 space-y-1">
                       <a href={`mailto:${member.email}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
                         <Mail className="h-3 w-3 shrink-0" /> {member.email}
                       </a>
                       <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-accent transition-colors">
-                        <Phone className="h-3 w-3 shrink-0" /> {member.phoneLabel[language]}: {member.phone}
+                        <Phone className="h-3 w-3 shrink-0" /> {member.phoneLabel[lang]}: {member.phone}
                       </a>
                     </div>
                   </div>
