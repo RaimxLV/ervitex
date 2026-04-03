@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, ArrowUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
@@ -45,6 +46,7 @@ const CatalogPage = () => {
   const activeCategory = searchParams.get("category") || "all";
   const activeTech = searchParams.get("tech") || "";
   const activeBrand = searchParams.get("brand") || "";
+  const activeSort = searchParams.get("sort") || "newest";
   const [search, setSearch] = useState("");
   const { lang, t } = useLanguage();
   const [dbProducts, setDbProducts] = useState<DBProduct[]>([]);
@@ -82,9 +84,10 @@ const CatalogPage = () => {
         new: p.is_new || false,
         printingTechs: p.printing_techs || [],
         brand: p.brand || "",
+        retailPrice: p.retail_price || 0,
       }));
     }
-    return staticProducts.map(p => ({ ...p, printingTechs: [] as string[], brand: "" }));
+    return staticProducts.map(p => ({ ...p, printingTechs: [] as string[], brand: "", retailPrice: 0 }));
   }, [dbProducts]);
 
   const cats = useMemo(() => {
@@ -112,6 +115,23 @@ const CatalogPage = () => {
       return matchCategory && matchSearch && matchTech && matchBrand;
     });
   }, [activeCategory, activeTech, activeBrand, search, lang, normalizedProducts]);
+
+  const sortedProducts = useMemo(() => {
+    const arr = [...filteredProducts];
+    switch (activeSort) {
+      case "name-asc":
+        return arr.sort((a, b) => a.name[lang].localeCompare(b.name[lang], lang));
+      case "name-desc":
+        return arr.sort((a, b) => b.name[lang].localeCompare(a.name[lang], lang));
+      case "price-asc":
+        return arr.sort((a, b) => a.retailPrice - b.retailPrice);
+      case "price-desc":
+        return arr.sort((a, b) => b.retailPrice - a.retailPrice);
+      case "newest":
+      default:
+        return arr;
+    }
+  }, [filteredProducts, activeSort, lang]);
 
   const printingTechs = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
 
@@ -144,10 +164,23 @@ const CatalogPage = () => {
               </Button>
             ))}
           </div>
-          <div className="relative w-full md:w-72">
+           <div className="relative w-full md:w-72">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input placeholder={t("header.search")} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
           </div>
+          <Select value={activeSort} onValueChange={(val) => { const p = new URLSearchParams(searchParams); p.set("sort", val); setSearchParams(p); }}>
+            <SelectTrigger className="w-full md:w-48">
+              <ArrowUpDown className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">{lang === "lv" ? "Jaunākie" : "Newest"}</SelectItem>
+              <SelectItem value="name-asc">{lang === "lv" ? "Nosaukums A-Z" : "Name A-Z"}</SelectItem>
+              <SelectItem value="name-desc">{lang === "lv" ? "Nosaukums Z-A" : "Name Z-A"}</SelectItem>
+              <SelectItem value="price-asc">{lang === "lv" ? "Cena: zemākā" : "Price: Low"}</SelectItem>
+              <SelectItem value="price-desc">{lang === "lv" ? "Cena: augstākā" : "Price: High"}</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Tech filters */}
@@ -185,12 +218,12 @@ const CatalogPage = () => {
         </div>
 
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredProducts.map((product) => (
+          {sortedProducts.map((product) => (
             <ProductCard key={product.id} product={product as any} />
           ))}
         </div>
 
-        {filteredProducts.length === 0 && loaded && (
+        {sortedProducts.length === 0 && loaded && (
           <div className="py-20 text-center">
             <p className="text-lg text-muted-foreground">{t("catalog.noResults")}</p>
             <Button variant="outline" className="mt-4" onClick={() => { setSearch(""); setSearchParams({}); }}>
