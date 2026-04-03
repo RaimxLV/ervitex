@@ -141,7 +141,7 @@ const ServicesPage = () => {
           <motion.div {...fadeUp} className="mt-10 text-center">
             <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest" asChild>
               <Link to="/contact">
-                Pieprasīt piedāvājumu <ArrowRight className="ml-2 h-4 w-4" />
+                {lang === "lv" ? "Pieprasīt piedāvājumu" : "Request a Quote"} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </motion.div>
