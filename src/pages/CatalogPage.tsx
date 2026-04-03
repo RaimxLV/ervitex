@@ -115,7 +115,7 @@ const CatalogPage = () => {
         p.name[lang].toLowerCase().includes(search.toLowerCase()) ||
         p.description[lang].toLowerCase().includes(search.toLowerCase()) ||
         p.material?.toLowerCase().includes(search.toLowerCase());
-      return matchCategory && matchSearch && matchTech && matchBrand;
+      return matchCategory && matchSearch && matchBrand;
     });
   }, [activeCategory, activeTech, activeBrand, search, lang, normalizedProducts]);
 
