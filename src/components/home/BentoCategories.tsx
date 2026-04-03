@@ -7,7 +7,7 @@ interface BentoCategory {
   id: string;
   name: Record<"lv" | "en", string>;
   image: string;
-  span: string; // tailwind col/row span classes
+  className: string;
 }
 
 const bentoCategories: BentoCategory[] = [
@@ -15,31 +15,31 @@ const bentoCategories: BentoCategory[] = [
     id: "tshirts",
     name: { lv: "T-krekli", en: "T-Shirts" },
     image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80",
-    span: "col-span-2 row-span-2 md:col-span-2 md:row-span-2",
+    className: "col-span-2 row-span-2",
   },
   {
     id: "polo",
     name: { lv: "Polo krekli", en: "Polo Shirts" },
     image: "https://images.unsplash.com/photo-1625910513413-5fc42e2e9ac0?w=600&q=80",
-    span: "col-span-1 row-span-1",
+    className: "",
   },
   {
     id: "jackets",
     name: { lv: "Virsjakas", en: "Jackets" },
     image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=80",
-    span: "col-span-1 row-span-1",
+    className: "",
   },
   {
     id: "workwear",
     name: { lv: "Darba apģērbs", en: "Workwear" },
     image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80",
-    span: "col-span-2 row-span-1 md:col-span-1 md:row-span-1",
+    className: "",
   },
   {
     id: "accessories",
     name: { lv: "Aksesuāri", en: "Accessories" },
     image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
-    span: "col-span-2 row-span-1 md:col-span-1 md:row-span-1",
+    className: "",
   },
 ];
 
@@ -53,7 +53,7 @@ const BentoCategories = () => {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
           className="mb-12"
         >
@@ -74,15 +74,15 @@ const BentoCategories = () => {
         </motion.div>
 
         {/* Bento grid */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4" style={{ gridTemplateRows: "220px 220px" }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           {bentoCategories.map((cat, i) => (
             <motion.div
               key={cat.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className={cat.span}
+              className={`${cat.className} min-h-[180px] md:min-h-[220px]`}
             >
               <Link
                 to={`/catalog?category=${cat.id}`}
