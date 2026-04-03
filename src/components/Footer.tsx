@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import ervitexLogo from "@/assets/ervitex-logo.png";
 
 const Footer = () => {
   const { t } = useLanguage();
@@ -10,7 +11,7 @@ const Footer = () => {
       <div className="container py-12 md:py-16">
         <div className="grid gap-8 md:grid-cols-4">
           <div className="space-y-4">
-            <span className="font-heading text-xl font-black uppercase tracking-widest">ERVITEX</span>
+            <img src={ervitexLogo} alt="Ervitex" className="h-8 w-auto brightness-0 invert" />
             <p className="text-sm text-primary-foreground/60">
               {t("footer.desc")}
             </p>

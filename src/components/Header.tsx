@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ervitexLogo from "@/assets/ervitex-logo.png";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Phone, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,10 +23,8 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-primary text-primary-foreground">
       <div className="container flex h-16 items-center justify-between md:h-20">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="font-heading text-xl font-black uppercase tracking-widest">
-            ERVITEX
-          </span>
+        <Link to="/" className="flex items-center">
+          <img src={ervitexLogo} alt="Ervitex" className="h-8 w-auto brightness-0 invert md:h-10" />
         </Link>
 
         {/* Desktop nav */}
