@@ -111,7 +111,7 @@ const ServicesPage = () => {
         <div className="container">
           <motion.div {...fadeUp} className="mb-12 max-w-3xl">
             <h2 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground md:text-4xl">
-              DTF druka – Inovācija un augstākā kvalitāte tekstila apdrukā
+              {lang === "lv" ? "DTF druka – Inovācija un augstākā kvalitāte tekstila apdrukā" : "DTF Printing – Innovation & Top Quality in Textile Printing"}
             </h2>
           </motion.div>
 
