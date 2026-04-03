@@ -132,7 +132,7 @@ const ServicesPage = () => {
                   {item.title[lang]}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {item.text}
+                  {item.text[lang]}
                 </p>
               </motion.div>
             ))}
