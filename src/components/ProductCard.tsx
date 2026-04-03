@@ -17,11 +17,25 @@ const COLOR_NAME_TO_HEX: Record<string, string> = {
   beige: "#D4C5A9", sand: "#C2B280", olive: "#6B7234", teal: "#0D9488",
   turquoise: "#06B6D4", lime: "#84CC16", coral: "#F97316", gold: "#D97706",
   silver: "#94A3B8", cream: "#FFFDD0", ivory: "#FFFFF0", maroon: "#800000",
+  "bottle green": "#006A4E", "kelly green": "#008000", "french navy": "#001F3F",
+  "bright royal": "#4169E1", "classic red": "#DC143C", "dark olive": "#556B2F",
+  aqua: "#00CED1", stone: "#A0937D", convoy: "#808080", graphite: "#4B5563",
+  sapphire: "#0F52BA", emerald: "#047857", cobalt: "#0047AB", azure: "#007FFF",
+  wine: "#722F37", indigo: "#4B0082", cyan: "#06B6D4", mint: "#98FB98",
+  fuchsia: "#D946EF", chocolate: "#5C3317", petrol: "#005F6B", ash: "#B2BEB5",
+  carbon: "#333333", slate: "#708090", frost: "#E1E8ED", lemon: "#FDE047",
 };
 
 function getHexForColor(name: string, hexCode?: string | null): string | null {
   if (hexCode) return hexCode;
-  return COLOR_NAME_TO_HEX[name.toLowerCase().trim()] || null;
+  const lower = name.toLowerCase().trim();
+  // Direct match
+  if (COLOR_NAME_TO_HEX[lower]) return COLOR_NAME_TO_HEX[lower];
+  // Try to find a color word inside compound names like "108F Black"
+  for (const [key, hex] of Object.entries(COLOR_NAME_TO_HEX)) {
+    if (lower.includes(key)) return hex;
+  }
+  return null;
 }
 
 const MAX_SWATCHES = 6;
@@ -100,6 +114,10 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
   const price = product.retailPrice;
   const hasPrice = price && price > 0;
 
+  // Cap pagination dots for cards with many images
+  const maxDots = 8;
+  const showDots = hasMultipleSlides && slideImages.length <= maxDots;
+
   return (
     <div className="group relative flex flex-col">
       <Link to={`/product/${product.id}`} className="block">
@@ -159,8 +177,8 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
             </>
           )}
 
-          {/* Pagination dots */}
-          {hasMultipleSlides && (
+          {/* Pagination dots — only if ≤ maxDots slides */}
+          {showDots && (
             <div className="absolute bottom-2 left-1/2 z-10 -translate-x-1/2 flex gap-1">
               {slideImages.map((_, i) => (
                 <span
@@ -173,6 +191,18 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
                   )}
                 />
               ))}
+            </div>
+          )}
+
+          {/* Progress bar for many slides */}
+          {hasMultipleSlides && !showDots && (
+            <div className="absolute bottom-2 left-3 right-3 z-10">
+              <div className="h-0.5 w-full rounded-full bg-background/30">
+                <div
+                  className="h-full rounded-full bg-accent transition-all duration-200"
+                  style={{ width: `${((selectedIndex + 1) / slideImages.length) * 100}%` }}
+                />
+              </div>
             </div>
           )}
 
@@ -194,12 +224,16 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
           <h3 className="font-heading text-xs sm:text-sm font-bold uppercase tracking-wide text-foreground transition-colors duration-200 group-hover:text-accent line-clamp-2 leading-tight">
             {product.name[lang]}
           </h3>
-          {hasPrice && (
+          {hasPrice ? (
             <p className="font-heading text-sm sm:text-base font-black text-accent">
               €{price.toFixed(2)}
               <span className="ml-1 text-[9px] sm:text-[10px] font-normal uppercase tracking-wider text-muted-foreground">
                 {lang === "lv" ? "ar PVN" : "incl. VAT"}
               </span>
+            </p>
+          ) : (
+            <p className="font-heading text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {lang === "lv" ? "Cena pēc pieprasījuma" : "Request quote"}
             </p>
           )}
         </div>
@@ -214,13 +248,31 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
               title={swatch.name}
               onClick={(e) => handleSwatchClick(e, idx)}
               className={cn(
-                "h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-full border shadow-sm transition-transform duration-200 hover:scale-125",
+                "h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-full border shadow-sm transition-transform duration-200 hover:scale-125 overflow-hidden",
                 swatch.hex
                   ? "border-border/50"
-                  : "border-border bg-gradient-to-br from-muted-foreground/20 to-muted-foreground/40"
+                  : swatch.imageUrl
+                    ? "border-border/50"
+                    : "border-border"
               )}
               style={swatch.hex ? { backgroundColor: swatch.hex } : undefined}
-            />
+            >
+              {/* No hex but has image → show tiny product thumbnail as swatch */}
+              {!swatch.hex && swatch.imageUrl && (
+                <img
+                  src={swatch.imageUrl}
+                  alt={swatch.name}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              )}
+              {/* No hex and no image → show initials */}
+              {!swatch.hex && !swatch.imageUrl && (
+                <span className="flex h-full w-full items-center justify-center bg-muted text-[6px] font-bold text-muted-foreground">
+                  {swatch.name.slice(0, 2)}
+                </span>
+              )}
+            </button>
           ))}
           {extraColors > 0 && (
             <span className="text-[9px] sm:text-[10px] font-bold text-muted-foreground">+{extraColors}</span>
