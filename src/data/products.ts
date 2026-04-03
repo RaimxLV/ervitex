@@ -165,10 +165,8 @@ export const products: Product[] = [
 ];
 
 export const services: Service[] = [
-  { id: "s1", title: { lv: "Sietspiede", en: "Screen Printing" }, description: { lv: "Augstas kvalitātes sietspiede no 25 gab. Spilgtas, izturīgas krāsas ar ilgstošu rezultātu.", en: "High-quality screen printing from 25 pcs. Vibrant, durable colors with long-lasting results." }, icon: "Grid3x3" },
-  { id: "s2", title: { lv: "Izšūšana", en: "Embroidery" }, description: { lv: "Profesionāla logo izšūšana uz cepurēm, polo, jakām un citiem izstrādājumiem.", en: "Professional logo embroidery on caps, polos, jackets, and more." }, icon: "Scissors" },
-  { id: "s3", title: { lv: "Sublimācija", en: "Sublimation" }, description: { lv: "Pilnkrāsu sublimācijas apdruka poliestera izstrādājumiem. Neierobežots krāsu skaits.", en: "Full-color sublimation on polyester garments. Unlimited colors." }, icon: "Palette" },
-  { id: "s4", title: { lv: "DTF druka", en: "DTF Printing" }, description: { lv: "Modernā DTF tehnoloģija — detalizēta, spilgta apdruka uz jebkura auduma.", en: "Modern DTF technology — detailed, vibrant prints on any fabric." }, icon: "Layers" },
-  { id: "s5", title: { lv: "Termodruka", en: "Heat Transfer" }, description: { lv: "Termopārneses apdruka nelieliem daudzumiem un sarežģītiem dizainiem.", en: "Heat transfer printing for small quantities and complex designs." }, icon: "Flame" },
-  { id: "s6", title: { lv: "Dizains", en: "Custom Design" }, description: { lv: "Mūsu dizaina komanda palīdzēs realizēt jūsu zīmola ideju ar profesionāliem maketiem.", en: "Our design team helps bring your brand vision to life with professional mockups." }, icon: "PenTool" },
+  { id: "s1", title: { lv: "DTF un Termodruka", en: "DTF & Heat Transfer" }, description: { lv: "No viena eksemplāra līdz personalizētai tirāžai — uz jebkura auduma.", en: "From a single piece to personalized runs — on any fabric." }, icon: "Layers" },
+  { id: "s2", title: { lv: "Sietspiede", en: "Screen Printing" }, description: { lv: "Industriāla kvalitāte lieliem apjomiem ar Pantone® precizitāti.", en: "Industrial quality for large volumes with Pantone® precision." }, icon: "Grid3x3" },
+  { id: "s3", title: { lv: "Izšūšana", en: "Embroidery" }, description: { lv: "Ekskluzīvs un ilgmūžīgs risinājums premium apģērbam.", en: "Exclusive and long-lasting solution for premium garments." }, icon: "Scissors" },
+  { id: "s4", title: { lv: "Sublimācija", en: "Sublimation" }, description: { lv: "Neierobežots dizains sportam un reklāmai uz poliestera.", en: "Unlimited designs for sport and promotion on polyester." }, icon: "Palette" },
 ];
