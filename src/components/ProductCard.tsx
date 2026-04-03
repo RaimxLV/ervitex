@@ -42,8 +42,8 @@ const ProductCard = ({ product }: { product: Product }) => {
         </div>
       </Link>
       <Button variant="outline" size="sm" className="mt-3 w-full border-foreground/20 text-xs uppercase tracking-wider hover:bg-accent hover:text-accent-foreground hover:border-accent" asChild>
-        <Link to={`/contact?product=${product.id}`}>
-          {t("catalog.quoteBtn")} <ArrowRight className="ml-1 h-3 w-3" />
+        <Link to={`/product/${product.id}`}>
+          {lang === "lv" ? "Apskatīt" : "View"} <ArrowRight className="ml-1 h-3 w-3" />
         </Link>
       </Button>
     </div>
