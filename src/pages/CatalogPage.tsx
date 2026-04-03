@@ -181,7 +181,6 @@ const CatalogPage = () => {
               activeBrand={activeBrand}
               onBrandChange={(val) => updateParam("brand", activeBrand === val ? "" : val)}
               brands={brands}
-              printingTechs={PRINTING_TECHS}
               resultCount={sortedProducts.length}
             />
 
