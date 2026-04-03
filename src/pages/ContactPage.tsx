@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import GoogleMapEmbed from "@/components/GoogleMapEmbed";
+import HausmanaKvartalsMap from "@/components/HausmanaKvartalsMap";
 
 const specialists = [
   {
