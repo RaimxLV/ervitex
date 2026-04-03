@@ -26,6 +26,7 @@ interface DBProduct {
   printing_techs: string[] | null;
   retail_price: number | null;
   wholesale_price: number | null;
+  brand: string | null;
   product_images: { url: string; sort_order: number | null }[];
   product_colors: { name: string; hex_code: string | null }[];
   product_sizes: { size: string; sort_order: number | null }[];
