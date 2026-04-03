@@ -44,6 +44,7 @@ const CatalogPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get("category") || "all";
   const activeTech = searchParams.get("tech") || "";
+  const activeBrand = searchParams.get("brand") || "";
   const [search, setSearch] = useState("");
   const { lang, t } = useLanguage();
   const [dbProducts, setDbProducts] = useState<DBProduct[]>([]);
