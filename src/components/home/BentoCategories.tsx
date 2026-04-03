@@ -8,56 +8,65 @@ interface BentoCategory {
   name: Record<"lv" | "en", string>;
   image: string;
   className: string;
+  imageClassName?: string;
 }
 
 const bentoCategories: BentoCategory[] = [
   {
-    id: "tshirts",
+    id: "t-krekli",
     name: { lv: "T-krekli", en: "T-Shirts" },
-    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80",
+    image: "https://www.ervitex.lv/images/stories/virtuemart/product/029344_955_stretch-t_f_preview2.jpg",
     className: "md:col-span-2 md:row-span-2",
+    imageClassName: "object-center",
   },
   {
-    id: "polo",
+    id: "polo-krekli",
     name: { lv: "Polo krekli", en: "Polo Shirts" },
-    image: "https://images.unsplash.com/photo-1507679799987-c73b4177fea2?w=600&q=80",
+    image: "https://www.ervitex.lv/images/stories/virtuemart/product/028244_44_classiclincolnss_f_preview.jpg",
     className: "",
+    imageClassName: "object-center",
   },
   {
-    id: "jackets",
+    id: "virsjakas",
     name: { lv: "Virsjakas", en: "Jackets" },
-    image: "https://images.unsplash.com/photo-1605908502334-1e0d20441e4c?w=600&q=80",
+    image: "https://www.ervitex.lv/images/stories/virtuemart/product/020970_99_kingsland_f_preview.jpg",
     className: "",
+    imageClassName: "object-center",
   },
   {
-    id: "workwear",
+    id: "darba-apgerbi",
     name: { lv: "Darba apģērbs", en: "Workwear" },
-    image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&q=80",
+    image: "https://www.ervitex.lv/images/stories/virtuemart/product/103500_Preview.jpg",
     className: "md:col-span-2",
+    imageClassName: "object-center",
   },
   {
-    id: "sweaters",
-    name: { lv: "Džemperi & Hūdiji", en: "Sweatshirts & Hoodies" },
-    image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80",
+    id: "dzemperi",
+    name: { lv: "Džemperi / Hūdiji", en: "Sweatshirts & Hoodies" },
+    image: "https://www.ervitex.lv/images/stories/virtuemart/product/021034_99_basichoodyfullzip_f_preview.jpg",
     className: "",
+    imageClassName: "object-center",
   },
   {
-    id: "sportswear",
+    id: "sportam",
     name: { lv: "Sporta apģērbs", en: "Sportswear" },
-    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80",
+    image: "https://www.ervitex.lv/images/stories/virtuemart/product/029336_5500_icesportt_f_preview.jpg",
     className: "",
+    imageClassName: "object-center",
   },
   {
-    id: "caps",
+    id: "cepures",
     name: { lv: "Cepures", en: "Caps & Headwear" },
-    image: "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600&q=80",
+    image: "https://www.ervitex.lv/images/stories/virtuemart/product/024065_35_texasbullcap_preview.jpg",
     className: "",
+    imageClassName: "object-center",
   },
   {
-    id: "bags",
+    id: "somas",
     name: { lv: "Somas", en: "Bags & Totes" },
-    image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c5?w=600&q=80",
+    image: "https://www.ervitex.lv/images/stories/virtuemart/product/040207_35_backpack_f_preview.jpg",
     className: "",
+    imageClassName: "object-center",
   },
 ];
 
@@ -104,13 +113,13 @@ const BentoCategories = () => {
             >
               <Link
                 to={`/catalog?category=${cat.id}`}
-                className="group relative block h-full w-full overflow-hidden rounded-sm"
+                className="group relative block h-full w-full overflow-hidden rounded-sm border border-border/60 bg-card shadow-[0_24px_80px_-36px_hsl(var(--foreground)/0.7)] transition-all duration-500 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_34px_110px_-44px_hsl(var(--accent)/0.65)]"
               >
                 {/* Image */}
                 <img
                   src={cat.image}
                   alt={cat.name[lang]}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className={`absolute inset-0 h-full w-full object-cover ${cat.imageClassName ?? "object-center"} transition-transform duration-700 group-hover:scale-105`}
                   loading="lazy"
                 />
 
