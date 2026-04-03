@@ -113,13 +113,13 @@ const BentoCategories = () => {
             >
               <Link
                 to={`/catalog?category=${cat.id}`}
-                className="group relative block h-full w-full overflow-hidden rounded-sm"
+                className="group relative block h-full w-full overflow-hidden rounded-sm border border-border/60 bg-card shadow-[0_24px_80px_-36px_hsl(var(--foreground)/0.7)] transition-all duration-500 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_34px_110px_-44px_hsl(var(--accent)/0.65)]"
               >
                 {/* Image */}
                 <img
                   src={cat.image}
                   alt={cat.name[lang]}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className={`absolute inset-0 h-full w-full object-cover ${cat.imageClassName ?? "object-center"} transition-transform duration-700 group-hover:scale-105`}
                   loading="lazy"
                 />
 
