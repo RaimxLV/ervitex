@@ -84,7 +84,7 @@ const CatalogPage = () => {
         brand: p.brand || "",
       }));
     }
-    return staticProducts.map(p => ({ ...p, printingTechs: [] as string[] }));
+    return staticProducts.map(p => ({ ...p, printingTechs: [] as string[], brand: "" }));
   }, [dbProducts]);
 
   const cats = useMemo(() => {
