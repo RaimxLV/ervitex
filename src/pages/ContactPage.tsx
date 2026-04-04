@@ -1,15 +1,20 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Clock, Send, Building, FileText } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mail, Phone, MapPin, Clock, Send, Building, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import GoogleMapEmbed from "@/components/GoogleMapEmbed";
 import HausmanaKvartalsMap from "@/components/HausmanaKvartalsMap";
+import vilnisPhoto from "@/assets/team/vilnis-lacis.jpg";
+import eriksPhoto from "@/assets/team/eriks-lacis.jpg";
+import lauraPhoto from "@/assets/team/laura-daukste.jpg";
+import ilonaPhoto from "@/assets/team/ilona-romanovska.jpg";
+import santaPhoto from "@/assets/team/santa-zvaigzne.jpg";
+import justinePhoto from "@/assets/team/justine-strunka.jpg";
 
 const specialists = [
   {
