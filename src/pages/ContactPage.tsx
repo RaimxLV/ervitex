@@ -209,6 +209,13 @@ const ContactPage = () => {
       <section className="bg-muted py-16 md:py-24">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="h-px w-12 bg-accent" />
+              <span className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent">
+                {lang === "lv" ? "Komanda" : "Team"}
+              </span>
+              <div className="h-px w-12 bg-accent" />
+            </div>
             <h2 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground">{t("contact.specialistsTitle")}</h2>
             <p className="mt-3 text-muted-foreground">{t("team.subtitle")}</p>
           </motion.div>
@@ -283,27 +290,6 @@ const ContactPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </Layout>
-  );
-};
-
-export default ContactPage;
-                    <p className="text-xs text-accent font-medium">{member.title[lang]}</p>
-                    <div className="mt-2 space-y-1">
-                      <a href={`mailto:${member.email}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
-                        <Mail className="h-3 w-3 shrink-0" /> {member.email}
-                      </a>
-                      <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-accent transition-colors">
-                        <Phone className="h-3 w-3 shrink-0" /> {member.phoneLabel[lang]}: {member.phone}
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
     </Layout>
   );
 };
