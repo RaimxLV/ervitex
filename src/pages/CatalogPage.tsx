@@ -172,7 +172,7 @@ const CatalogPage = () => {
 
   return (
     <Layout>
-      <div className="container py-8 md:py-14">
+      <div className="container px-4 py-8 md:py-14">
         {/* Header */}
         <div className="mb-8">
           <h1 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground md:text-4xl">
