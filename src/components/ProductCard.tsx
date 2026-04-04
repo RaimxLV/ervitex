@@ -101,6 +101,7 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [clickedSwatchIdx, setClickedSwatchIdx] = useState<number | null>(null);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -130,10 +131,11 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
   }));
   const extraColors = Math.max(0, product.colors.length - MAX_SWATCHES);
 
-  // Click swatch → scroll to matching slide
+  // Click swatch → scroll to matching slide & mark active
   const handleSwatchClick = useCallback((e: React.MouseEvent, idx: number) => {
     e.preventDefault();
     e.stopPropagation();
+    setClickedSwatchIdx(idx);
     const url = swatches[idx]?.imageUrl;
     if (url && emblaApi) {
       const slideIdx = slideImages.indexOf(url);
