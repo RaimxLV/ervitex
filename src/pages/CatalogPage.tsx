@@ -96,6 +96,7 @@ const CatalogPage = () => {
         retailPrice: p.retail_price || 0,
       }));
     }
+    if (!loaded) return [];
     return staticProducts.map((p) => ({ ...p, printingTechs: [] as string[], brand: "", retailPrice: 0 }));
   }, [dbProducts]);
 
