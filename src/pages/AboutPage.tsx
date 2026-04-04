@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Target, Users, Award, Factory, Mail, Phone } from "lucide-react";
+import { Target, Users, Award, Factory, Mail, Phone, X } from "lucide-react";
 import ervitexStore from "@/assets/ervitex-store.jpg";
 import Layout from "@/components/Layout";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -19,6 +21,7 @@ const teamMembers = [
     email: "vilnis@ervitex.lv",
     phone: "+371 67543384",
     phoneLabel: { lv: "Tel", en: "Tel" },
+    photo: null as string | null,
   },
   {
     name: "Ēriks Lācis",
@@ -26,6 +29,7 @@ const teamMembers = [
     email: "eriks@ervitex.lv",
     phone: "+371 29395600",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: null as string | null,
   },
   {
     name: "Laura Daukšte",
@@ -33,6 +37,7 @@ const teamMembers = [
     email: "laura@ervitex.lv",
     phone: "+371 26164635",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: null as string | null,
   },
   {
     name: "Ilona Romanovska",
@@ -40,6 +45,7 @@ const teamMembers = [
     email: "ilona@ervitex.lv",
     phone: "+371 29494626",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: null as string | null,
   },
   {
     name: "Santa Zvaigzne",
@@ -47,6 +53,7 @@ const teamMembers = [
     email: "santa.k@ervitex.lv",
     phone: "67436899",
     phoneLabel: { lv: "Tel", en: "Tel" },
+    photo: null as string | null,
   },
   {
     name: "Justīne Strunka",
@@ -54,6 +61,7 @@ const teamMembers = [
     email: "justine@ervitex.lv",
     phone: "29725412",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: null as string | null,
   },
   {
     name: "Evita Ņesterova",
@@ -61,11 +69,21 @@ const teamMembers = [
     email: "evita@ervitex.lv",
     phone: "29475227",
     phoneLabel: { lv: "Tel", en: "Tel" },
+    photo: null as string | null,
   },
 ];
 
 const AboutPage = () => {
   const { t, lang } = useLanguage();
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState<typeof teamMembers[0] | null>(null);
+
+  const openLightbox = (member: typeof teamMembers[0]) => {
+    if (member.photo) {
+      setSelectedMember(member);
+      setLightboxOpen(true);
+    }
+  };
 
   return (
     <Layout>
@@ -137,11 +155,23 @@ const AboutPage = () => {
               className="group rounded-sm border border-border bg-card p-6 transition-all hover:border-accent/40 hover:shadow-lg"
             >
               <div className="flex flex-col items-center text-center">
-                <Avatar className="h-20 w-20 border-2 border-muted">
-                  <AvatarFallback className="bg-accent/10 text-accent font-heading text-lg font-bold">
-                    {member.name.split(" ").map((n) => n[0]).join("")}
-                  </AvatarFallback>
-                </Avatar>
+                {/* Photo or Initials Fallback */}
+                <div
+                  className={`relative h-24 w-24 overflow-hidden rounded-full border-2 border-muted ${member.photo ? "cursor-pointer" : ""}`}
+                  onClick={() => openLightbox(member)}
+                >
+                  {member.photo ? (
+                    <img
+                      src={member.photo}
+                      alt={member.name}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-accent/10 text-accent font-heading text-xl font-bold">
+                      {member.name.split(" ").map((n) => n[0]).join("")}
+                    </div>
+                  )}
+                </div>
                 <h3 className="mt-4 font-heading text-sm font-bold uppercase tracking-wider text-foreground">
                   {member.name}
                 </h3>
@@ -167,6 +197,36 @@ const AboutPage = () => {
           ))}
         </div>
       </section>
+
+      {/* Lightbox Modal */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none [&>button]:hidden">
+          <VisuallyHidden>
+            <DialogTitle>{selectedMember?.name}</DialogTitle>
+          </VisuallyHidden>
+          {selectedMember?.photo && (
+            <div className="relative">
+              <img
+                src={selectedMember.photo}
+                alt={selectedMember.name}
+                className="w-full rounded-lg object-cover"
+              />
+              <button
+                onClick={() => setLightboxOpen(false)}
+                className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-110"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <div className="absolute bottom-0 left-0 right-0 rounded-b-lg bg-gradient-to-t from-black/70 to-transparent p-4">
+                <p className="font-heading text-sm font-bold uppercase tracking-wider text-white">
+                  {selectedMember.name}
+                </p>
+                <p className="text-xs text-white/80">{selectedMember.title[lang]}</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <section className="bg-muted py-16 md:py-24">
         <div className="container">
