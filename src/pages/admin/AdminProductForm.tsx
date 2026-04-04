@@ -9,13 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, X, Upload } from "lucide-react";
+import { ArrowLeft, Plus, X, Upload, GripVertical } from "lucide-react";
 
 const PRINTING_TECHS = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
 const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
 
 interface CategoryOption { id: string; name_en: string; slug: string; }
-interface ColorEntry { name: string; hex_code: string; }
+interface ColorEntry { name: string; hex_code: string; image_url: string; }
 
 const AdminProductForm = () => {
   const { id } = useParams();
@@ -27,7 +27,7 @@ const AdminProductForm = () => {
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [form, setForm] = useState({
     name_lv: "", name_en: "", description_lv: "", description_en: "",
-    long_description_lv: "", long_description_en: "", material: "",
+    long_description_lv: "", long_description_en: "", material: "", brand: "",
     category_id: "", min_order: 1, retail_price: "", wholesale_price: "",
     bulk_discount_percent: 0, bulk_min_qty: 100,
     printing_techs: [] as string[], featured: false, is_new: false, active: true,
@@ -36,6 +36,7 @@ const AdminProductForm = () => {
   const [sizes, setSizes] = useState<string[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadingColorImg, setUploadingColorImg] = useState<number | null>(null);
 
   useEffect(() => {
     supabase.from("categories").select("id, name_en, slug").order("sort_order").then(({ data }) => {
@@ -51,7 +52,8 @@ const AdminProductForm = () => {
       name_lv: product.name_lv, name_en: product.name_en,
       description_lv: product.description_lv || "", description_en: product.description_en || "",
       long_description_lv: product.long_description_lv || "", long_description_en: product.long_description_en || "",
-      material: product.material || "", category_id: product.category_id || "",
+      material: product.material || "", brand: product.brand || "",
+      category_id: product.category_id || "",
       min_order: product.min_order || 1,
       retail_price: product.retail_price?.toString() || "",
       wholesale_price: product.wholesale_price?.toString() || "",
@@ -62,10 +64,22 @@ const AdminProductForm = () => {
     });
     const { data: imgs } = await supabase.from("product_images").select("url").eq("product_id", id!).order("sort_order");
     setImageUrls(imgs?.map(i => i.url) || []);
-    const { data: clrs } = await supabase.from("product_colors").select("name, hex_code").eq("product_id", id!);
-    setColors(clrs?.map(c => ({ name: c.name, hex_code: c.hex_code || "#000000" })) || []);
+    const { data: clrs } = await supabase.from("product_colors").select("name, hex_code, image_url").eq("product_id", id!);
+    setColors(clrs?.map(c => ({ name: c.name, hex_code: c.hex_code || "#000000", image_url: c.image_url || "" })) || []);
     const { data: szs } = await supabase.from("product_sizes").select("size").eq("product_id", id!).order("sort_order");
     setSizes(szs?.map(s => s.size) || []);
+  };
+
+  const uploadFile = async (file: File): Promise<string | null> => {
+    const ext = file.name.split(".").pop();
+    const path = `${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file);
+    if (error) {
+      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+      return null;
+    }
+    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+    return data.publicUrl;
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,17 +87,25 @@ const AdminProductForm = () => {
     if (!files?.length) return;
     setUploading(true);
     for (const file of Array.from(files)) {
-      const ext = file.name.split(".").pop();
-      const path = `${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage.from("product-images").upload(path, file);
-      if (error) {
-        toast({ title: "Upload failed", description: error.message, variant: "destructive" });
-        continue;
-      }
-      const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-      setImageUrls(prev => [...prev, data.publicUrl]);
+      const url = await uploadFile(file);
+      if (url) setImageUrls(prev => [...prev, url]);
     }
     setUploading(false);
+  };
+
+  const handleColorImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingColorImg(idx);
+    const url = await uploadFile(file);
+    if (url) {
+      setColors(prev => {
+        const updated = [...prev];
+        updated[idx] = { ...updated[idx], image_url: url };
+        return updated;
+      });
+    }
+    setUploadingColorImg(null);
   };
 
   const toggleTech = (tech: string) => {
@@ -105,15 +127,19 @@ const AdminProductForm = () => {
       return;
     }
     setSaving(true);
+
+    const retailPrice = form.retail_price ? parseFloat(form.retail_price) : null;
+    const wholesalePrice = form.wholesale_price ? parseFloat(form.wholesale_price) : null;
+
     const productData = {
       name_lv: form.name_lv, name_en: form.name_en,
       description_lv: form.description_lv, description_en: form.description_en,
       long_description_lv: form.long_description_lv, long_description_en: form.long_description_en,
-      material: form.material,
+      material: form.material, brand: form.brand,
       category_id: form.category_id || null,
       min_order: form.min_order,
-      retail_price: form.retail_price ? parseFloat(form.retail_price) : null,
-      wholesale_price: form.wholesale_price ? parseFloat(form.wholesale_price) : null,
+      retail_price: retailPrice && retailPrice > 0 ? retailPrice : null,
+      wholesale_price: wholesalePrice && wholesalePrice > 0 ? wholesalePrice : null,
       bulk_discount_percent: form.bulk_discount_percent,
       bulk_min_qty: form.bulk_min_qty,
       printing_techs: form.printing_techs,
@@ -142,7 +168,12 @@ const AdminProductForm = () => {
     await supabase.from("product_colors").delete().eq("product_id", productId!);
     if (colors.length) {
       await supabase.from("product_colors").insert(
-        colors.map(c => ({ product_id: productId!, name: c.name, hex_code: c.hex_code }))
+        colors.map(c => ({
+          product_id: productId!,
+          name: c.name,
+          hex_code: c.hex_code,
+          image_url: c.image_url || "",
+        }))
       );
     }
 
@@ -157,6 +188,20 @@ const AdminProductForm = () => {
     setSaving(false);
     toast({ title: isEdit ? "Product updated" : "Product created" });
     navigate("/admin/products");
+  };
+
+  const removeImage = (idx: number) => {
+    setImageUrls(prev => prev.filter((_, j) => j !== idx));
+  };
+
+  const moveImage = (idx: number, dir: -1 | 1) => {
+    setImageUrls(prev => {
+      const arr = [...prev];
+      const target = idx + dir;
+      if (target < 0 || target >= arr.length) return arr;
+      [arr[idx], arr[target]] = [arr[target], arr[idx]];
+      return arr;
+    });
   };
 
   return (
@@ -179,6 +224,10 @@ const AdminProductForm = () => {
               <div><Label className="text-xs uppercase tracking-wider">Name (EN)</Label><Input value={form.name_en} onChange={e => setForm({...form, name_en: e.target.value})} /></div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
+              <div><Label className="text-xs uppercase tracking-wider">Brand</Label><Input value={form.brand} onChange={e => setForm({...form, brand: e.target.value})} placeholder="e.g. MALFINI, Clique" /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Material</Label><Input value={form.material} onChange={e => setForm({...form, material: e.target.value})} /></div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
               <div><Label className="text-xs uppercase tracking-wider">Description (LV)</Label><Textarea value={form.description_lv} onChange={e => setForm({...form, description_lv: e.target.value})} rows={3} /></div>
               <div><Label className="text-xs uppercase tracking-wider">Description (EN)</Label><Textarea value={form.description_en} onChange={e => setForm({...form, description_en: e.target.value})} rows={3} /></div>
             </div>
@@ -186,24 +235,22 @@ const AdminProductForm = () => {
               <div><Label className="text-xs uppercase tracking-wider">Long Description (LV)</Label><Textarea value={form.long_description_lv} onChange={e => setForm({...form, long_description_lv: e.target.value})} rows={4} /></div>
               <div><Label className="text-xs uppercase tracking-wider">Long Description (EN)</Label><Textarea value={form.long_description_en} onChange={e => setForm({...form, long_description_en: e.target.value})} rows={4} /></div>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <Label className="text-xs uppercase tracking-wider">Category</Label>
-                <Select value={form.category_id} onValueChange={v => setForm({...form, category_id: v})}>
-                  <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                  <SelectContent>
-                    {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name_en}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div><Label className="text-xs uppercase tracking-wider">Material</Label><Input value={form.material} onChange={e => setForm({...form, material: e.target.value})} /></div>
+            <div>
+              <Label className="text-xs uppercase tracking-wider">Category</Label>
+              <Select value={form.category_id} onValueChange={v => setForm({...form, category_id: v})}>
+                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                <SelectContent>
+                  {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name_en}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <div className="rounded-sm border border-border p-5 space-y-4">
             <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Pricing</h2>
+            <p className="text-xs text-muted-foreground">Leave price empty or set to 0 → catalog shows "Cena pēc pieprasījuma"</p>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><Label className="text-xs uppercase tracking-wider">Retail Price (€)</Label><Input type="number" step="0.01" value={form.retail_price} onChange={e => setForm({...form, retail_price: e.target.value})} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Retail Price (€)</Label><Input type="number" step="0.01" value={form.retail_price} onChange={e => setForm({...form, retail_price: e.target.value})} placeholder="0 = request quote" /></div>
               <div><Label className="text-xs uppercase tracking-wider">Wholesale Price (€)</Label><Input type="number" step="0.01" value={form.wholesale_price} onChange={e => setForm({...form, wholesale_price: e.target.value})} /></div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -238,18 +285,29 @@ const AdminProductForm = () => {
         {/* Right column */}
         <div className="space-y-6">
           <div className="rounded-sm border border-border p-5 space-y-4">
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Images</h2>
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Images ({imageUrls.length})</h2>
             <div className="grid grid-cols-3 gap-3">
               {imageUrls.map((url, i) => (
-                <div key={i} className="relative aspect-square overflow-hidden rounded-sm bg-muted">
+                <div key={i} className="group relative aspect-square overflow-hidden rounded-sm bg-muted">
                   <img src={url} alt="" className="h-full w-full object-cover" />
-                  <button onClick={() => setImageUrls(prev => prev.filter((_, j) => j !== i))}
-                    className="absolute right-1 top-1 rounded-full bg-destructive p-1 text-destructive-foreground">
-                    <X className="h-3 w-3" />
-                  </button>
+                  <div className="absolute inset-0 flex items-start justify-between bg-black/0 p-1 transition-all group-hover:bg-black/30">
+                    <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {i > 0 && (
+                        <button onClick={() => moveImage(i, -1)} className="rounded bg-background/80 p-0.5 text-[10px] font-bold">↑</button>
+                      )}
+                      {i < imageUrls.length - 1 && (
+                        <button onClick={() => moveImage(i, 1)} className="rounded bg-background/80 p-0.5 text-[10px] font-bold">↓</button>
+                      )}
+                    </div>
+                    <button onClick={() => removeImage(i)}
+                      className="rounded-full bg-destructive p-1 text-destructive-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                  {i === 0 && <span className="absolute bottom-1 left-1 rounded bg-accent px-1.5 py-0.5 text-[9px] font-bold text-accent-foreground">MAIN</span>}
                 </div>
               ))}
-              <label className="flex aspect-square cursor-pointer items-center justify-center rounded-sm border-2 border-dashed border-border hover:border-accent">
+              <label className="flex aspect-square cursor-pointer items-center justify-center rounded-sm border-2 border-dashed border-border hover:border-accent transition-colors">
                 <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
                 {uploading ? <div className="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent" /> : <Upload className="h-6 w-6 text-muted-foreground" />}
               </label>
@@ -270,24 +328,53 @@ const AdminProductForm = () => {
 
           <div className="rounded-sm border border-border p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Colors</h2>
-              <Button type="button" variant="outline" size="sm" onClick={() => setColors([...colors, { name: "", hex_code: "#000000" }])}>
-                <Plus className="mr-1 h-3 w-3" /> Add
+              <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Color Variants ({colors.length})</h2>
+              <Button type="button" variant="outline" size="sm" onClick={() => setColors([...colors, { name: "", hex_code: "#000000", image_url: "" }])}>
+                <Plus className="mr-1 h-3 w-3" /> Add Color
               </Button>
             </div>
-            {colors.map((color, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <input type="color" value={color.hex_code} onChange={e => {
-                  const updated = [...colors]; updated[i].hex_code = e.target.value; setColors(updated);
-                }} className="h-8 w-8 cursor-pointer rounded-sm border-0" />
-                <Input value={color.name} placeholder="Color name" onChange={e => {
-                  const updated = [...colors]; updated[i].name = e.target.value; setColors(updated);
-                }} className="flex-1" />
-                <Button type="button" variant="ghost" size="icon" onClick={() => setColors(colors.filter((_, j) => j !== i))}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+            <div className="space-y-3">
+              {colors.map((color, i) => (
+                <div key={i} className="rounded-sm border border-border p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={color.hex_code} onChange={e => {
+                      const updated = [...colors]; updated[i] = { ...updated[i], hex_code: e.target.value }; setColors(updated);
+                    }} className="h-8 w-8 cursor-pointer rounded-sm border-0 p-0" />
+                    <Input value={color.name} placeholder="Color name (e.g. Navy Blue)" onChange={e => {
+                      const updated = [...colors]; updated[i] = { ...updated[i], name: e.target.value }; setColors(updated);
+                    }} className="flex-1" />
+                    <Button type="button" variant="ghost" size="icon" onClick={() => setColors(colors.filter((_, j) => j !== i))}>
+                      <X className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                  {/* Color variant image */}
+                  <div className="flex items-center gap-2">
+                    {color.image_url ? (
+                      <div className="relative h-12 w-12 rounded-sm overflow-hidden bg-muted">
+                        <img src={color.image_url} alt="" className="h-full w-full object-cover" />
+                        <button
+                          onClick={() => { const updated = [...colors]; updated[i] = { ...updated[i], image_url: "" }; setColors(updated); }}
+                          className="absolute -right-0.5 -top-0.5 rounded-full bg-destructive p-0.5 text-destructive-foreground"
+                        >
+                          <X className="h-2.5 w-2.5" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-sm border border-dashed border-border hover:border-accent text-muted-foreground transition-colors">
+                        <input type="file" accept="image/*" className="hidden" onChange={e => handleColorImageUpload(e, i)} />
+                        {uploadingColorImg === i
+                          ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+                          : <Upload className="h-3.5 w-3.5" />}
+                      </label>
+                    )}
+                    <span className="text-[10px] text-muted-foreground">Variant image (shown in catalog thumbnails)</span>
+                  </div>
+                </div>
+              ))}
+              {colors.length === 0 && (
+                <p className="text-xs text-muted-foreground italic py-2">No color variants. Add colors to enable variant thumbnails in the catalog.</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
