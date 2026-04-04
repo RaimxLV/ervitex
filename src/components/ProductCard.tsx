@@ -68,7 +68,7 @@ function getHexForColor(name: string, hexCode?: string | null): string | null {
 }
 
 const MAX_SWATCHES = 6;
-const THUMB_SIZE = "h-8 w-8 sm:h-9 sm:w-9";
+const THUMB_SIZE = "h-6 w-6 sm:h-7 sm:w-7";
 
 interface ExtendedProduct extends Product {
   colorHexCodes?: (string | null)[];
