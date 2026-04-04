@@ -1,15 +1,20 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Clock, Send, Building, FileText } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mail, Phone, MapPin, Clock, Send, Building, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import GoogleMapEmbed from "@/components/GoogleMapEmbed";
 import HausmanaKvartalsMap from "@/components/HausmanaKvartalsMap";
+import vilnisPhoto from "@/assets/team/vilnis-lacis.jpg";
+import eriksPhoto from "@/assets/team/eriks-lacis.jpg";
+import lauraPhoto from "@/assets/team/laura-daukste.jpg";
+import ilonaPhoto from "@/assets/team/ilona-romanovska.jpg";
+import santaPhoto from "@/assets/team/santa-zvaigzne.jpg";
+import justinePhoto from "@/assets/team/justine-strunka.jpg";
 
 const specialists = [
   {
@@ -18,6 +23,7 @@ const specialists = [
     email: "vilnis@ervitex.lv",
     phone: "+371 67543384",
     phoneLabel: { lv: "Tel", en: "Tel" },
+    photo: vilnisPhoto,
   },
   {
     name: "Ēriks Lācis",
@@ -25,6 +31,7 @@ const specialists = [
     email: "eriks@ervitex.lv",
     phone: "+371 29395600",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: eriksPhoto,
   },
   {
     name: "Laura Daukšte",
@@ -32,6 +39,7 @@ const specialists = [
     email: "laura@ervitex.lv",
     phone: "+371 26164635",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: lauraPhoto,
   },
   {
     name: "Ilona Romanovska",
@@ -39,6 +47,7 @@ const specialists = [
     email: "ilona@ervitex.lv",
     phone: "+371 29494626",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: ilonaPhoto,
   },
   {
     name: "Santa Zvaigzne",
@@ -46,6 +55,7 @@ const specialists = [
     email: "santa.k@ervitex.lv",
     phone: "67436899",
     phoneLabel: { lv: "Tel", en: "Tel" },
+    photo: santaPhoto,
   },
   {
     name: "Justīne Strunka",
@@ -53,6 +63,7 @@ const specialists = [
     email: "justine@ervitex.lv",
     phone: "29725412",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: justinePhoto,
   },
   {
     name: "Evita Ņesterova",
@@ -60,6 +71,7 @@ const specialists = [
     email: "evita@ervitex.lv",
     phone: "29475227",
     phoneLabel: { lv: "Tel", en: "Tel" },
+    photo: null as string | null,
   },
 ];
 
@@ -67,6 +79,7 @@ const ContactPage = () => {
   const { toast } = useToast();
   const { t, lang } = useLanguage();
   const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", message: "" });
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -196,6 +209,13 @@ const ContactPage = () => {
       <section className="bg-muted py-16 md:py-24">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="h-px w-12 bg-accent" />
+              <span className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent">
+                {lang === "lv" ? "Komanda" : "Team"}
+              </span>
+              <div className="h-px w-12 bg-accent" />
+            </div>
             <h2 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground">{t("contact.specialistsTitle")}</h2>
             <p className="mt-3 text-muted-foreground">{t("team.subtitle")}</p>
           </motion.div>
@@ -207,14 +227,25 @@ const ContactPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="rounded-sm border border-border bg-card p-5 transition-all hover:border-accent/40 hover:shadow-lg"
+                className="group rounded-sm border border-border bg-card p-5 transition-all hover:border-accent/40 hover:shadow-lg"
               >
                 <div className="flex items-start gap-4">
-                  <Avatar className="h-14 w-14 shrink-0 border-2 border-muted">
-                    <AvatarFallback className="bg-accent/10 text-accent font-heading text-sm font-bold">
-                      {member.name.split(" ").map((n) => n[0]).join("")}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div
+                    className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-muted ${member.photo ? "cursor-pointer" : ""}`}
+                    onClick={() => member.photo && setLightboxImg(member.photo)}
+                  >
+                    {member.photo ? (
+                      <img
+                        src={member.photo}
+                        alt={member.name}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-accent/10 text-accent font-heading text-sm font-bold">
+                        {member.name.split(" ").map((n) => n[0]).join("")}
+                      </div>
+                    )}
+                  </div>
                   <div className="min-w-0">
                     <h3 className="font-heading text-sm font-bold text-foreground">{member.name}</h3>
                     <p className="text-xs text-accent font-medium">{member.title[lang]}</p>
@@ -233,6 +264,32 @@ const ContactPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {lightboxImg && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            onClick={() => setLightboxImg(null)}
+          >
+            <button
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-110"
+              onClick={() => setLightboxImg(null)}
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <img
+              src={lightboxImg}
+              alt="Specialist"
+              className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Layout>
   );
 };
