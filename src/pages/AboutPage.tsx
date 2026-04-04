@@ -6,6 +6,7 @@ import Layout from "@/components/Layout";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import lauraDaukstePhoto from "@/assets/team/laura-daukste.jpg";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -37,7 +38,7 @@ const teamMembers = [
     email: "laura@ervitex.lv",
     phone: "+371 26164635",
     phoneLabel: { lv: "Mob", en: "Mob" },
-    photo: null as string | null,
+    photo: lauraDaukstePhoto,
   },
   {
     name: "Ilona Romanovska",
