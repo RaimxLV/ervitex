@@ -269,41 +269,39 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
         </div>
       </Link>
 
-      {/* Color swatches — unified circles */}
+      {/* Variant thumbnails */}
       {swatches.length > 0 && (
-        <div className="flex items-center gap-1.5 pt-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 pt-1.5 sm:gap-1.5">
           {swatches.map((swatch, idx) => {
             const isActive = selectedIndex >= 0 && swatch.imageUrl && slideImages[selectedIndex] === swatch.imageUrl;
+            const thumbSrc = swatch.imageUrl || (swatch.hex ? null : null);
             return (
               <button
                 key={`${swatch.name}-${idx}`}
                 title={swatch.name}
                 onClick={(e) => handleSwatchClick(e, idx)}
                 className={cn(
-                  SWATCH_SIZE,
-                  "rounded-full overflow-hidden shadow-sm transition-all duration-200 hover:scale-110",
+                  THUMB_SIZE,
+                  "rounded-md overflow-hidden flex-shrink-0 transition-all duration-200 hover:scale-110",
                   isActive
-                    ? "ring-2 ring-accent ring-offset-1 ring-offset-background"
+                    ? "ring-2 ring-accent ring-offset-1 ring-offset-background shadow-md"
                     : "ring-1 ring-border/40"
                 )}
               >
-                {swatch.hex ? (
-                  /* Solid color fill */
-                  <span
-                    className="block h-full w-full rounded-full"
-                    style={{ backgroundColor: swatch.hex }}
-                  />
-                ) : swatch.imageUrl ? (
-                  /* Circular crop of fabric/product image */
+                {thumbSrc ? (
                   <img
-                    src={swatch.imageUrl}
+                    src={thumbSrc}
                     alt={swatch.name}
                     className="h-full w-full object-cover"
                     loading="lazy"
                   />
+                ) : swatch.hex ? (
+                  <span
+                    className="block h-full w-full"
+                    style={{ backgroundColor: swatch.hex }}
+                  />
                 ) : (
-                  /* Fallback: initials */
-                  <span className="flex h-full w-full items-center justify-center bg-muted text-[6px] font-bold text-muted-foreground rounded-full">
+                  <span className="flex h-full w-full items-center justify-center bg-muted text-[7px] font-bold text-muted-foreground">
                     {swatch.name.slice(0, 2).toUpperCase()}
                   </span>
                 )}
