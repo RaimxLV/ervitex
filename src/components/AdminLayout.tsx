@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, Menu, X } from "lucide-react";
+import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, Menu, X, Globe } from "lucide-react";
 
 const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
 
