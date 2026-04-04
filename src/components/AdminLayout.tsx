@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, Menu, X } from "lucide-react";
+import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, Menu, X, Globe } from "lucide-react";
 
 const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
 
@@ -60,8 +60,13 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           })}
       </nav>
 
-      <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
-        <p className="mb-2 truncate text-xs text-muted-foreground">{user?.email}</p>
+      <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4 space-y-2">
+        <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+        <Button variant="outline" size="sm" className="w-full text-xs" asChild>
+          <Link to="/">
+            <Globe className="mr-2 h-3 w-3" /> Uz veikalu
+          </Link>
+        </Button>
         <Button variant="outline" size="sm" className="w-full text-xs" onClick={handleSignOut}>
           <LogOut className="mr-2 h-3 w-3" /> Iziet
         </Button>
