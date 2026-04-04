@@ -23,6 +23,7 @@ const specialists = [
     email: "vilnis@ervitex.lv",
     phone: "+371 67543384",
     phoneLabel: { lv: "Tel", en: "Tel" },
+    photo: vilnisPhoto,
   },
   {
     name: "Ēriks Lācis",
@@ -30,6 +31,7 @@ const specialists = [
     email: "eriks@ervitex.lv",
     phone: "+371 29395600",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: eriksPhoto,
   },
   {
     name: "Laura Daukšte",
@@ -37,6 +39,7 @@ const specialists = [
     email: "laura@ervitex.lv",
     phone: "+371 26164635",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: lauraPhoto,
   },
   {
     name: "Ilona Romanovska",
@@ -44,6 +47,7 @@ const specialists = [
     email: "ilona@ervitex.lv",
     phone: "+371 29494626",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: ilonaPhoto,
   },
   {
     name: "Santa Zvaigzne",
@@ -51,6 +55,7 @@ const specialists = [
     email: "santa.k@ervitex.lv",
     phone: "67436899",
     phoneLabel: { lv: "Tel", en: "Tel" },
+    photo: santaPhoto,
   },
   {
     name: "Justīne Strunka",
@@ -58,6 +63,7 @@ const specialists = [
     email: "justine@ervitex.lv",
     phone: "29725412",
     phoneLabel: { lv: "Mob", en: "Mob" },
+    photo: justinePhoto,
   },
   {
     name: "Evita Ņesterova",
@@ -65,6 +71,7 @@ const specialists = [
     email: "evita@ervitex.lv",
     phone: "29475227",
     phoneLabel: { lv: "Tel", en: "Tel" },
+    photo: null as string | null,
   },
 ];
 
