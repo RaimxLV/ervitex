@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { UserPlus, Ban, KeyRound, Trash2, ShieldCheck, ShieldOff } from "lucide-react";
+import { UserPlus, KeyRound, Trash2, ShieldCheck, ShieldOff } from "lucide-react";
 
 const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
 
@@ -20,7 +20,7 @@ interface AdminUser {
 }
 
 const AdminUsers = () => {
-  const { user, session } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +59,7 @@ const AdminUsers = () => {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center py-20">
-          <p className="text-muted-foreground">Pieeja tikai Super Admin lietotājam.</p>
+          <p className="text-muted-foreground">Piekļuve liegta. Tikai Super Admin lietotājam.</p>
         </div>
       </AdminLayout>
     );
@@ -118,12 +118,12 @@ const AdminUsers = () => {
     <AdminLayout>
       <div className="space-y-8">
         <div>
-          <h1 className="font-heading text-2xl font-black uppercase tracking-wide">Lietotāju pārvaldība</h1>
+          <h1 className="font-heading text-xl sm:text-2xl font-black uppercase tracking-wide">Lietotāju pārvaldība</h1>
           <p className="mt-1 text-sm text-muted-foreground">Pievienot, bloķēt vai dzēst darbiniekus</p>
         </div>
 
-        {/* Create new user */}
-        <div className="rounded-sm border border-border bg-card p-6 space-y-4">
+        {/* Jauns lietotājs */}
+        <div className="rounded-sm border border-border bg-card p-4 sm:p-6 space-y-4">
           <h2 className="font-heading text-sm font-bold uppercase tracking-wider flex items-center gap-2">
             <UserPlus className="h-4 w-4" /> Pievienot jaunu darbinieku
           </h2>
@@ -137,16 +137,16 @@ const AdminUsers = () => {
               <Input value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Vismaz 8 simboli" type="password" />
             </div>
             <div className="flex items-end">
-              <Button onClick={handleCreate} disabled={creating} className="bg-accent text-accent-foreground hover:bg-accent/90">
+              <Button onClick={handleCreate} disabled={creating} className="w-full sm:w-auto bg-accent text-accent-foreground hover:bg-accent/90">
                 {creating ? "Veido..." : "Pievienot"}
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Users list */}
+        {/* Lietotāju saraksts */}
         <div className="rounded-sm border border-border bg-card">
-          <div className="border-b border-border px-6 py-4">
+          <div className="border-b border-border px-4 sm:px-6 py-4">
             <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Aktīvie lietotāji</h2>
           </div>
           {loading ? (
@@ -156,30 +156,32 @@ const AdminUsers = () => {
           ) : (
             <div className="divide-y divide-border">
               {users.map((u) => (
-                <div key={u.id} className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{u.email}</span>
-                      {u.is_super && (
-                        <span className="rounded-sm bg-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent">
-                          Super Admin
-                        </span>
-                      )}
-                      {u.banned && (
-                        <span className="rounded-sm bg-destructive/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-destructive">
-                          Bloķēts
-                        </span>
-                      )}
+                <div key={u.id} className="flex flex-col gap-3 px-4 sm:px-6 py-4">
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-0.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-medium">{u.email}</span>
+                        {u.is_super && (
+                          <span className="rounded-sm bg-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-accent">
+                            Super Admin
+                          </span>
+                        )}
+                        {u.banned && (
+                          <span className="rounded-sm bg-destructive/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-destructive">
+                            Bloķēts
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Pēdējā ieeja: {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString("lv") : "Nav"}
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Pēdējā ieeja: {u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString("lv") : "Nav"}
-                    </p>
                   </div>
 
                   {!u.is_super && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       {changingPw === u.id ? (
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <Input
                             value={newPw}
                             onChange={(e) => setNewPw(e.target.value)}
@@ -204,12 +206,11 @@ const AdminUsers = () => {
                             variant={u.banned ? "outline" : "destructive"}
                             onClick={() => handleToggleBan(u.id, u.banned)}
                             className="h-8 text-xs"
-                            title={u.banned ? "Atbloķēt" : "Bloķēt"}
                           >
                             {u.banned ? <ShieldCheck className="mr-1 h-3 w-3" /> : <ShieldOff className="mr-1 h-3 w-3" />}
                             {u.banned ? "Atbloķēt" : "Bloķēt"}
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => handleDelete(u.id, u.email!)} className="h-8 text-xs text-destructive hover:text-destructive">
+                          <Button size="sm" variant="ghost" onClick={() => handleDelete(u.id, u.email)} className="h-8 text-xs text-destructive hover:text-destructive">
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </>

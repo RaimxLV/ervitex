@@ -9,12 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Plus, X, Upload, GripVertical } from "lucide-react";
+import { ArrowLeft, Plus, X, Upload } from "lucide-react";
 
 const PRINTING_TECHS = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
 const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
 
-interface CategoryOption { id: string; name_en: string; slug: string; }
+interface CategoryOption { id: string; name_lv: string; slug: string; }
 interface ColorEntry { name: string; hex_code: string; image_url: string; }
 
 const AdminProductForm = () => {
@@ -39,7 +39,7 @@ const AdminProductForm = () => {
   const [uploadingColorImg, setUploadingColorImg] = useState<number | null>(null);
 
   useEffect(() => {
-    supabase.from("categories").select("id, name_en, slug").order("sort_order").then(({ data }) => {
+    supabase.from("categories").select("id, name_lv, slug").order("sort_order").then(({ data }) => {
       setCategories(data || []);
     });
     if (isEdit) loadProduct();
@@ -75,7 +75,7 @@ const AdminProductForm = () => {
     const path = `${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from("product-images").upload(path, file);
     if (error) {
-      toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+      toast({ title: "Augšupielāde neizdevās", description: error.message, variant: "destructive" });
       return null;
     }
     const { data } = supabase.storage.from("product-images").getPublicUrl(path);
@@ -123,7 +123,7 @@ const AdminProductForm = () => {
 
   const handleSave = async () => {
     if (!form.name_lv.trim() || !form.name_en.trim()) {
-      toast({ title: "Name required", variant: "destructive" });
+      toast({ title: "Nosaukums ir obligāts", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -149,14 +149,13 @@ const AdminProductForm = () => {
     let productId = id;
     if (isEdit) {
       const { error } = await supabase.from("products").update(productData).eq("id", id!);
-      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); setSaving(false); return; }
+      if (error) { toast({ title: "Kļūda", description: error.message, variant: "destructive" }); setSaving(false); return; }
     } else {
       const { data, error } = await supabase.from("products").insert(productData).select("id").single();
-      if (error || !data) { toast({ title: "Error", description: error?.message, variant: "destructive" }); setSaving(false); return; }
+      if (error || !data) { toast({ title: "Kļūda", description: error?.message, variant: "destructive" }); setSaving(false); return; }
       productId = data.id;
     }
 
-    // Sync images
     await supabase.from("product_images").delete().eq("product_id", productId!);
     if (imageUrls.length) {
       await supabase.from("product_images").insert(
@@ -164,20 +163,13 @@ const AdminProductForm = () => {
       );
     }
 
-    // Sync colors
     await supabase.from("product_colors").delete().eq("product_id", productId!);
     if (colors.length) {
       await supabase.from("product_colors").insert(
-        colors.map(c => ({
-          product_id: productId!,
-          name: c.name,
-          hex_code: c.hex_code,
-          image_url: c.image_url || "",
-        }))
+        colors.map(c => ({ product_id: productId!, name: c.name, hex_code: c.hex_code, image_url: c.image_url || "" }))
       );
     }
 
-    // Sync sizes
     await supabase.from("product_sizes").delete().eq("product_id", productId!);
     if (sizes.length) {
       await supabase.from("product_sizes").insert(
@@ -186,7 +178,7 @@ const AdminProductForm = () => {
     }
 
     setSaving(false);
-    toast({ title: isEdit ? "Product updated" : "Product created" });
+    toast({ title: isEdit ? "Produkts atjaunināts" : "Produkts izveidots" });
     navigate("/admin/products");
   };
 
@@ -207,61 +199,61 @@ const AdminProductForm = () => {
   return (
     <AdminLayout>
       <Button variant="ghost" className="mb-4 text-muted-foreground" onClick={() => navigate("/admin/products")}>
-        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Products
+        <ArrowLeft className="mr-2 h-4 w-4" /> Atpakaļ uz produktiem
       </Button>
 
-      <h1 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground">
-        {isEdit ? "Edit Product" : "New Product"}
+      <h1 className="font-heading text-xl sm:text-2xl font-black uppercase tracking-wide text-foreground">
+        {isEdit ? "Labot produktu" : "Jauns produkts"}
       </h1>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-2">
-        {/* Left column */}
+        {/* Kreisā kolonna */}
         <div className="space-y-6">
-          <div className="rounded-sm border border-border p-5 space-y-4">
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Basic Info</h2>
+          <div className="rounded-sm border border-border p-4 sm:p-5 space-y-4">
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Pamatinformācija</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><Label className="text-xs uppercase tracking-wider">Name (LV)</Label><Input value={form.name_lv} onChange={e => setForm({...form, name_lv: e.target.value})} /></div>
-              <div><Label className="text-xs uppercase tracking-wider">Name (EN)</Label><Input value={form.name_en} onChange={e => setForm({...form, name_en: e.target.value})} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Nosaukums (LV)</Label><Input value={form.name_lv} onChange={e => setForm({...form, name_lv: e.target.value})} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Nosaukums (EN)</Label><Input value={form.name_en} onChange={e => setForm({...form, name_en: e.target.value})} /></div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><Label className="text-xs uppercase tracking-wider">Brand</Label><Input value={form.brand} onChange={e => setForm({...form, brand: e.target.value})} placeholder="e.g. MALFINI, Clique" /></div>
-              <div><Label className="text-xs uppercase tracking-wider">Material</Label><Input value={form.material} onChange={e => setForm({...form, material: e.target.value})} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Zīmols</Label><Input value={form.brand} onChange={e => setForm({...form, brand: e.target.value})} placeholder="piem. MALFINI, Clique" /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Materiāls</Label><Input value={form.material} onChange={e => setForm({...form, material: e.target.value})} /></div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><Label className="text-xs uppercase tracking-wider">Description (LV)</Label><Textarea value={form.description_lv} onChange={e => setForm({...form, description_lv: e.target.value})} rows={3} /></div>
-              <div><Label className="text-xs uppercase tracking-wider">Description (EN)</Label><Textarea value={form.description_en} onChange={e => setForm({...form, description_en: e.target.value})} rows={3} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Apraksts (LV)</Label><Textarea value={form.description_lv} onChange={e => setForm({...form, description_lv: e.target.value})} rows={3} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Apraksts (EN)</Label><Textarea value={form.description_en} onChange={e => setForm({...form, description_en: e.target.value})} rows={3} /></div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><Label className="text-xs uppercase tracking-wider">Long Description (LV)</Label><Textarea value={form.long_description_lv} onChange={e => setForm({...form, long_description_lv: e.target.value})} rows={4} /></div>
-              <div><Label className="text-xs uppercase tracking-wider">Long Description (EN)</Label><Textarea value={form.long_description_en} onChange={e => setForm({...form, long_description_en: e.target.value})} rows={4} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Pilns apraksts (LV)</Label><Textarea value={form.long_description_lv} onChange={e => setForm({...form, long_description_lv: e.target.value})} rows={4} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Pilns apraksts (EN)</Label><Textarea value={form.long_description_en} onChange={e => setForm({...form, long_description_en: e.target.value})} rows={4} /></div>
             </div>
             <div>
-              <Label className="text-xs uppercase tracking-wider">Category</Label>
+              <Label className="text-xs uppercase tracking-wider">Kategorija</Label>
               <Select value={form.category_id} onValueChange={v => setForm({...form, category_id: v})}>
-                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Izvēlies kategoriju" /></SelectTrigger>
                 <SelectContent>
-                  {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name_en}</SelectItem>)}
+                  {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name_lv}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="rounded-sm border border-border p-5 space-y-4">
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Pricing</h2>
-            <p className="text-xs text-muted-foreground">Leave price empty or set to 0 → catalog shows "Cena pēc pieprasījuma"</p>
+          <div className="rounded-sm border border-border p-4 sm:p-5 space-y-4">
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Cenas</h2>
+            <p className="text-xs text-muted-foreground">Atstāj tukšu vai 0 → katalogā rādīs "Cena pēc pieprasījuma"</p>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><Label className="text-xs uppercase tracking-wider">Retail Price (€)</Label><Input type="number" step="0.01" value={form.retail_price} onChange={e => setForm({...form, retail_price: e.target.value})} placeholder="0 = request quote" /></div>
-              <div><Label className="text-xs uppercase tracking-wider">Wholesale Price (€)</Label><Input type="number" step="0.01" value={form.wholesale_price} onChange={e => setForm({...form, wholesale_price: e.target.value})} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Mazumtirdzniecības cena (€)</Label><Input type="number" step="0.01" value={form.retail_price} onChange={e => setForm({...form, retail_price: e.target.value})} placeholder="0 = pēc pieprasījuma" /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Vairumtirdzniecības cena (€)</Label><Input type="number" step="0.01" value={form.wholesale_price} onChange={e => setForm({...form, wholesale_price: e.target.value})} /></div>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
-              <div><Label className="text-xs uppercase tracking-wider">Min Order</Label><Input type="number" value={form.min_order} onChange={e => setForm({...form, min_order: parseInt(e.target.value) || 1})} /></div>
-              <div><Label className="text-xs uppercase tracking-wider">Bulk Discount %</Label><Input type="number" value={form.bulk_discount_percent} onChange={e => setForm({...form, bulk_discount_percent: parseFloat(e.target.value) || 0})} /></div>
-              <div><Label className="text-xs uppercase tracking-wider">Bulk Min Qty</Label><Input type="number" value={form.bulk_min_qty} onChange={e => setForm({...form, bulk_min_qty: parseInt(e.target.value) || 100})} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Min. pasūtījums</Label><Input type="number" value={form.min_order} onChange={e => setForm({...form, min_order: parseInt(e.target.value) || 1})} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Vairuma atlaide %</Label><Input type="number" value={form.bulk_discount_percent} onChange={e => setForm({...form, bulk_discount_percent: parseFloat(e.target.value) || 0})} /></div>
+              <div><Label className="text-xs uppercase tracking-wider">Vairuma min. daudz.</Label><Input type="number" value={form.bulk_min_qty} onChange={e => setForm({...form, bulk_min_qty: parseInt(e.target.value) || 100})} /></div>
             </div>
           </div>
 
-          <div className="rounded-sm border border-border p-5 space-y-4">
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Printing Technologies</h2>
+          <div className="rounded-sm border border-border p-4 sm:p-5 space-y-4">
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Apdruka tehnoloģijas</h2>
             <div className="flex flex-wrap gap-2">
               {PRINTING_TECHS.map(tech => (
                 <Button key={tech} type="button" variant={form.printing_techs.includes(tech) ? "default" : "outline"} size="sm"
@@ -272,20 +264,20 @@ const AdminProductForm = () => {
             </div>
           </div>
 
-          <div className="rounded-sm border border-border p-5 space-y-4">
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Flags</h2>
-            <div className="flex gap-6">
-              <label className="flex items-center gap-2 text-sm"><Switch checked={form.featured} onCheckedChange={v => setForm({...form, featured: v})} /> Featured</label>
-              <label className="flex items-center gap-2 text-sm"><Switch checked={form.is_new} onCheckedChange={v => setForm({...form, is_new: v})} /> New</label>
-              <label className="flex items-center gap-2 text-sm"><Switch checked={form.active} onCheckedChange={v => setForm({...form, active: v})} /> Active</label>
+          <div className="rounded-sm border border-border p-4 sm:p-5 space-y-4">
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Atzīmes</h2>
+            <div className="flex flex-wrap gap-4 sm:gap-6">
+              <label className="flex items-center gap-2 text-sm"><Switch checked={form.featured} onCheckedChange={v => setForm({...form, featured: v})} /> Izcelts</label>
+              <label className="flex items-center gap-2 text-sm"><Switch checked={form.is_new} onCheckedChange={v => setForm({...form, is_new: v})} /> Jauns</label>
+              <label className="flex items-center gap-2 text-sm"><Switch checked={form.active} onCheckedChange={v => setForm({...form, active: v})} /> Aktīvs</label>
             </div>
           </div>
         </div>
 
-        {/* Right column */}
+        {/* Labā kolonna */}
         <div className="space-y-6">
-          <div className="rounded-sm border border-border p-5 space-y-4">
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Images ({imageUrls.length})</h2>
+          <div className="rounded-sm border border-border p-4 sm:p-5 space-y-4">
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Attēli ({imageUrls.length})</h2>
             <div className="grid grid-cols-3 gap-3">
               {imageUrls.map((url, i) => (
                 <div key={i} className="group relative aspect-square overflow-hidden rounded-sm bg-muted">
@@ -304,7 +296,7 @@ const AdminProductForm = () => {
                       <X className="h-3 w-3" />
                     </button>
                   </div>
-                  {i === 0 && <span className="absolute bottom-1 left-1 rounded bg-accent px-1.5 py-0.5 text-[9px] font-bold text-accent-foreground">MAIN</span>}
+                  {i === 0 && <span className="absolute bottom-1 left-1 rounded bg-accent px-1.5 py-0.5 text-[9px] font-bold text-accent-foreground">GALVENAIS</span>}
                 </div>
               ))}
               <label className="flex aspect-square cursor-pointer items-center justify-center rounded-sm border-2 border-dashed border-border hover:border-accent transition-colors">
@@ -314,8 +306,8 @@ const AdminProductForm = () => {
             </div>
           </div>
 
-          <div className="rounded-sm border border-border p-5 space-y-4">
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Sizes</h2>
+          <div className="rounded-sm border border-border p-4 sm:p-5 space-y-4">
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Izmēri</h2>
             <div className="flex flex-wrap gap-2">
               {SIZE_OPTIONS.map(size => (
                 <Button key={size} type="button" variant={sizes.includes(size) ? "default" : "outline"} size="sm"
@@ -326,11 +318,11 @@ const AdminProductForm = () => {
             </div>
           </div>
 
-          <div className="rounded-sm border border-border p-5 space-y-4">
+          <div className="rounded-sm border border-border p-4 sm:p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Color Variants ({colors.length})</h2>
+              <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Krāsu varianti ({colors.length})</h2>
               <Button type="button" variant="outline" size="sm" onClick={() => setColors([...colors, { name: "", hex_code: "#000000", image_url: "" }])}>
-                <Plus className="mr-1 h-3 w-3" /> Add Color
+                <Plus className="mr-1 h-3 w-3" /> Pievienot krāsu
               </Button>
             </div>
             <div className="space-y-3">
@@ -340,14 +332,13 @@ const AdminProductForm = () => {
                     <input type="color" value={color.hex_code} onChange={e => {
                       const updated = [...colors]; updated[i] = { ...updated[i], hex_code: e.target.value }; setColors(updated);
                     }} className="h-8 w-8 cursor-pointer rounded-sm border-0 p-0" />
-                    <Input value={color.name} placeholder="Color name (e.g. Navy Blue)" onChange={e => {
+                    <Input value={color.name} placeholder="Krāsas nosaukums (piem. Tumši zils)" onChange={e => {
                       const updated = [...colors]; updated[i] = { ...updated[i], name: e.target.value }; setColors(updated);
                     }} className="flex-1" />
                     <Button type="button" variant="ghost" size="icon" onClick={() => setColors(colors.filter((_, j) => j !== i))}>
                       <X className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
-                  {/* Color variant image */}
                   <div className="flex items-center gap-2">
                     {color.image_url ? (
                       <div className="relative h-12 w-12 rounded-sm overflow-hidden bg-muted">
@@ -367,23 +358,23 @@ const AdminProductForm = () => {
                           : <Upload className="h-3.5 w-3.5" />}
                       </label>
                     )}
-                    <span className="text-[10px] text-muted-foreground">Variant image (shown in catalog thumbnails)</span>
+                    <span className="text-[10px] text-muted-foreground">Varianta attēls (redzams kataloga bildītēs)</span>
                   </div>
                 </div>
               ))}
               {colors.length === 0 && (
-                <p className="text-xs text-muted-foreground italic py-2">No color variants. Add colors to enable variant thumbnails in the catalog.</p>
+                <p className="text-xs text-muted-foreground italic py-2">Nav krāsu variantu. Pievieno krāsas, lai iespējotu variantu bildītes katalogā.</p>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-8 flex gap-3">
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Button onClick={handleSave} disabled={saving} className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest">
-          {saving ? "Saving..." : isEdit ? "Update Product" : "Create Product"}
+          {saving ? "Saglabā..." : isEdit ? "Saglabāt izmaiņas" : "Izveidot produktu"}
         </Button>
-        <Button variant="outline" onClick={() => navigate("/admin/products")}>Cancel</Button>
+        <Button variant="outline" onClick={() => navigate("/admin/products")}>Atcelt</Button>
       </div>
     </AdminLayout>
   );
