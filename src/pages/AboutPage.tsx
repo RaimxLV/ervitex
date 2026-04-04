@@ -10,6 +10,7 @@ import lauraDaukstePhoto from "@/assets/team/laura-daukste.jpg";
 import santaZvaigznePhoto from "@/assets/team/santa-zvaigzne.jpg";
 import justineStrunkaPhoto from "@/assets/team/justine-strunka.jpg";
 import ilonaRomanovskaPhoto from "@/assets/team/ilona-romanovska.jpg";
+import vilnisLacisPhoto from "@/assets/team/vilnis-lacis.jpg";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -25,7 +26,7 @@ const teamMembers = [
     email: "vilnis@ervitex.lv",
     phone: "+371 67543384",
     phoneLabel: { lv: "Tel", en: "Tel" },
-    photo: null as string | null,
+    photo: vilnisLacisPhoto,
   },
   {
     name: "Ēriks Lācis",
