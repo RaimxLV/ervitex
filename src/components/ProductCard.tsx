@@ -68,7 +68,7 @@ function getHexForColor(name: string, hexCode?: string | null): string | null {
 }
 
 const MAX_SWATCHES = 6;
-const THUMB_SIZE = "h-8 w-8 sm:h-9 sm:w-9";
+const THUMB_SIZE = "h-6 w-6 sm:h-7 sm:w-7";
 
 interface ExtendedProduct extends Product {
   colorHexCodes?: (string | null)[];
@@ -101,6 +101,7 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [clickedSwatchIdx, setClickedSwatchIdx] = useState<number | null>(null);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -130,10 +131,11 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
   }));
   const extraColors = Math.max(0, product.colors.length - MAX_SWATCHES);
 
-  // Click swatch → scroll to matching slide
+  // Click swatch → scroll to matching slide & mark active
   const handleSwatchClick = useCallback((e: React.MouseEvent, idx: number) => {
     e.preventDefault();
     e.stopPropagation();
+    setClickedSwatchIdx(idx);
     const url = swatches[idx]?.imageUrl;
     if (url && emblaApi) {
       const slideIdx = slideImages.indexOf(url);
@@ -273,8 +275,8 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
       {swatches.length > 0 && (
         <div className="flex items-center gap-1 pt-1.5 sm:gap-1.5">
           {swatches.map((swatch, idx) => {
-            const isActive = selectedIndex >= 0 && swatch.imageUrl && slideImages[selectedIndex] === swatch.imageUrl;
-            const thumbSrc = swatch.imageUrl || (swatch.hex ? null : null);
+            const isActive = clickedSwatchIdx === idx;
+            const thumbSrc = swatch.imageUrl;
             return (
               <button
                 key={`${swatch.name}-${idx}`}
@@ -282,10 +284,10 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
                 onClick={(e) => handleSwatchClick(e, idx)}
                 className={cn(
                   THUMB_SIZE,
-                  "rounded-md overflow-hidden flex-shrink-0 transition-all duration-200 hover:scale-110",
+                  "rounded overflow-hidden flex-shrink-0 transition-all duration-200 hover:scale-110",
                   isActive
-                    ? "ring-2 ring-accent ring-offset-1 ring-offset-background shadow-md"
-                    : "ring-1 ring-border/40"
+                    ? "ring-2 ring-accent ring-offset-1 ring-offset-background"
+                    : "ring-1 ring-border/30"
                 )}
               >
                 {thumbSrc ? (
