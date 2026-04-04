@@ -288,8 +288,6 @@ const ContactPage = () => {
 };
 
 export default ContactPage;
-                  <div className="min-w-0">
-                    <h3 className="font-heading text-sm font-bold text-foreground">{member.name}</h3>
                     <p className="text-xs text-accent font-medium">{member.title[lang]}</p>
                     <div className="mt-2 space-y-1">
                       <a href={`mailto:${member.email}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
