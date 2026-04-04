@@ -38,7 +38,7 @@ const teamMembers = [
     email: "laura@ervitex.lv",
     phone: "+371 26164635",
     phoneLabel: { lv: "Mob", en: "Mob" },
-    photo: null as string | null,
+    photo: lauraDaukstePhoto,
   },
   {
     name: "Ilona Romanovska",
