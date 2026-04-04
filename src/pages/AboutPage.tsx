@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import lauraDaukstePhoto from "@/assets/team/laura-daukste.jpg";
 import santaZvaigznePhoto from "@/assets/team/santa-zvaigzne.jpg";
+import justineStrunkaPhoto from "@/assets/team/justine-strunka.jpg";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
