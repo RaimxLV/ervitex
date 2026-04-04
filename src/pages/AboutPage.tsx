@@ -49,7 +49,7 @@ const teamMembers = [
     email: "ilona@ervitex.lv",
     phone: "+371 29494626",
     phoneLabel: { lv: "Mob", en: "Mob" },
-    photo: null as string | null,
+    photo: ilonaRomanovskaPhoto,
   },
   {
     name: "Santa Zvaigzne",
