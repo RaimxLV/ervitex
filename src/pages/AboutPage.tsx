@@ -11,6 +11,7 @@ import santaZvaigznePhoto from "@/assets/team/santa-zvaigzne.jpg";
 import justineStrunkaPhoto from "@/assets/team/justine-strunka.jpg";
 import ilonaRomanovskaPhoto from "@/assets/team/ilona-romanovska.jpg";
 import vilnisLacisPhoto from "@/assets/team/vilnis-lacis.jpg";
+import eriksLacisPhoto from "@/assets/team/eriks-lacis.jpg";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
