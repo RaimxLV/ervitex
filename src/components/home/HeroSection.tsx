@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
+import ScreenPressLineart from "./ScreenPressLineart";
 
 const HeroSection = () => {
   const { lang } = useLanguage();
