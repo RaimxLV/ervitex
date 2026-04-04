@@ -90,7 +90,7 @@ const AboutPage = () => {
             </div>
           </motion.div>
           <motion.div {...fadeUp} className="relative">
-            <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80" alt="Textile production" className="rounded-sm" />
+            <img src={ervitexStore} alt="Ervitex veikals" className="rounded-sm" />
             <div className="absolute bottom-0 left-0 h-1 w-full bg-accent" />
           </motion.div>
         </div>
