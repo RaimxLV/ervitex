@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Target, Users, Award, Factory, Mail, Phone } from "lucide-react";
+import ervitexStore from "@/assets/ervitex-store.jpg";
 import Layout from "@/components/Layout";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
