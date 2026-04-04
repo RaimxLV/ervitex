@@ -151,7 +151,7 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
   const showDots = hasMultipleSlides && slideImages.length <= maxDots;
 
   return (
-    <div className="group relative flex flex-col">
+    <div className="group relative flex flex-col p-1.5 sm:p-0">
       <Link to={`/product/${product.id}`} className="block">
         {/* Carousel Image Area */}
         <div
