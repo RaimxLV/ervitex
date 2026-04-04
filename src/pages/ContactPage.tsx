@@ -78,7 +78,7 @@ const specialists = [
 const ContactPage = () => {
   const { toast } = useToast();
   const { t, lang } = useLanguage();
-  const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", message: "" });
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
