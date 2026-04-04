@@ -128,6 +128,17 @@ const Header = () => {
       {/* Mobile nav */}
       {isOpen && (
         <div className="border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 lg:hidden">
+          <form onSubmit={handleSearch} className="mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-foreground/40" />
+              <Input
+                placeholder={lang === "lv" ? "Meklēt produktus..." : "Search products..."}
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                className="h-10 border-primary-foreground/20 bg-primary-foreground/10 pl-9 text-primary-foreground placeholder:text-primary-foreground/40"
+              />
+            </div>
+          </form>
           <nav className="flex flex-col gap-4">
             {navItems.map((item) => (
               <Link
