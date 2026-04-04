@@ -17,8 +17,20 @@ const navItems = [
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
   const { lang, setLang, t } = useLanguage();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      navigate(`/catalog?q=${encodeURIComponent(searchValue.trim())}`);
+      setSearchOpen(false);
+      setSearchValue("");
+      setIsOpen(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-primary text-primary-foreground">
