@@ -50,7 +50,14 @@ const CatalogPage = () => {
   const activeBrand = searchParams.get("brand") || "";
   const activeSort = searchParams.get("sort") || "newest";
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
-  const [search, setSearch] = useState("");
+  const initialSearch = searchParams.get("q") || "";
+  const [search, setSearch] = useState(initialSearch);
+
+  // Sync search from URL query param
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && q !== search) setSearch(q);
+  }, [searchParams.get("q")]);
   const { lang, t } = useLanguage();
   const [dbProducts, setDbProducts] = useState<DBProduct[]>([]);
   const [dbCategories, setDbCategories] = useState<DBCategory[]>([]);

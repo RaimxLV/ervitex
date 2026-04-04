@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ervitexLogo from "@/assets/ervitex-logo.png";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Phone, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,8 +17,20 @@ const navItems = [
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
   const { lang, setLang, t } = useLanguage();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchValue.trim()) {
+      navigate(`/catalog?q=${encodeURIComponent(searchValue.trim())}`);
+      setSearchOpen(false);
+      setSearchValue("");
+      setIsOpen(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-primary text-primary-foreground">
@@ -47,14 +59,16 @@ const Header = () => {
         <div className="hidden items-center gap-3 lg:flex">
           {/* Search */}
           {searchOpen ? (
-            <div className="flex items-center gap-2">
+            <form onSubmit={handleSearch} className="flex items-center gap-2">
               <Input
                 placeholder={t("header.search")}
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
                 className="h-9 w-48 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/40"
                 autoFocus
-                onBlur={() => setSearchOpen(false)}
+                onBlur={() => { if (!searchValue) setSearchOpen(false); }}
               />
-            </div>
+            </form>
           ) : (
             <button onClick={() => setSearchOpen(true)} className="p-2 text-primary-foreground/70 hover:text-primary-foreground transition-colors">
               <Search className="h-4 w-4" />
@@ -114,6 +128,17 @@ const Header = () => {
       {/* Mobile nav */}
       {isOpen && (
         <div className="border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 lg:hidden">
+          <form onSubmit={handleSearch} className="mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-foreground/40" />
+              <Input
+                placeholder={lang === "lv" ? "Meklēt produktus..." : "Search products..."}
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                className="h-10 border-primary-foreground/20 bg-primary-foreground/10 pl-9 text-primary-foreground placeholder:text-primary-foreground/40"
+              />
+            </div>
+          </form>
           <nav className="flex flex-col gap-4">
             {navItems.map((item) => (
               <Link
