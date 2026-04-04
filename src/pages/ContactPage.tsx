@@ -216,47 +216,52 @@ const ContactPage = () => {
               </span>
               <div className="h-px w-12 bg-accent" />
             </div>
-            <h2 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground">{t("contact.specialistsTitle")}</h2>
+            <h2 className="font-heading text-2xl font-black uppercase tracking-[-0.02em] text-foreground">{t("contact.specialistsTitle")}</h2>
             <p className="mt-3 text-muted-foreground">{t("team.subtitle")}</p>
           </motion.div>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {specialists.map((member, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="group rounded-sm border border-border bg-card p-5 transition-all hover:border-accent/40 hover:shadow-lg"
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="group relative overflow-hidden rounded-sm border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5"
               >
-                <div className="flex items-start gap-4">
-                  <div
-                    className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-muted ${member.photo ? "cursor-pointer" : ""}`}
-                    onClick={() => member.photo && setLightboxImg(member.photo)}
-                  >
-                    {member.photo ? (
-                      <img
-                        src={member.photo}
-                        alt={member.name}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-accent/10 text-accent font-heading text-sm font-bold">
-                        {member.name.split(" ").map((n) => n[0]).join("")}
-                      </div>
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="font-heading text-sm font-bold text-foreground">{member.name}</h3>
-                    <p className="text-xs text-accent font-medium">{member.title[lang]}</p>
-                    <div className="mt-2 space-y-1">
-                      <a href={`mailto:${member.email}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
-                        <Mail className="h-3 w-3 shrink-0" /> {member.email}
-                      </a>
-                      <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-accent transition-colors">
-                        <Phone className="h-3 w-3 shrink-0" /> {member.phoneLabel[lang]}: {member.phone}
-                      </a>
+                {/* Top accent line */}
+                <div className="absolute top-0 left-0 h-[3px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
+
+                {/* Photo area */}
+                <div
+                  className={`relative aspect-[4/3] w-full overflow-hidden bg-muted ${member.photo ? "cursor-pointer" : ""}`}
+                  onClick={() => member.photo && setLightboxImg(member.photo)}
+                >
+                  {member.photo ? (
+                    <img
+                      src={member.photo}
+                      alt={member.name}
+                      className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-accent/5 text-accent font-heading text-3xl font-black">
+                      {member.name.split(" ").map((n) => n[0]).join("")}
                     </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                </div>
+
+                {/* Info area - overlapping heading */}
+                <div className="relative -mt-4 mx-4 mb-4 rounded-sm bg-card/95 backdrop-blur-sm p-4 shadow-sm border border-border/50">
+                  <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">{member.name}</h3>
+                  <p className="text-xs text-accent font-medium mt-0.5">{member.title[lang]}</p>
+                  <div className="mt-3 space-y-1.5 border-t border-border pt-3">
+                    <a href={`mailto:${member.email}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
+                      <Mail className="h-3.5 w-3.5 shrink-0" /> {member.email}
+                    </a>
+                    <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors">
+                      <Phone className="h-3.5 w-3.5 shrink-0" /> {member.phoneLabel[lang]}: {member.phone}
+                    </a>
                   </div>
                 </div>
               </motion.div>
@@ -272,19 +277,32 @@ const ContactPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md"
             onClick={() => setLightboxImg(null)}
           >
             <button
-              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-110"
+              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-110"
               onClick={() => setLightboxImg(null)}
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </button>
-            <img
+            {/* Name overlay */}
+            {(() => {
+              const member = specialists.find((s) => s.photo === lightboxImg);
+              return member ? (
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-sm bg-card/90 backdrop-blur-sm px-6 py-3 text-center shadow-lg">
+                  <p className="font-heading text-sm font-bold uppercase tracking-wider text-foreground">{member.name}</p>
+                  <p className="text-xs text-accent">{member.title[lang]}</p>
+                </div>
+              ) : null;
+            })()}
+            <motion.img
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               src={lightboxImg}
               alt="Specialist"
-              className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain"
+              className="max-h-[80vh] max-w-[90vw] rounded-sm object-contain"
               onClick={(e) => e.stopPropagation()}
             />
           </motion.div>

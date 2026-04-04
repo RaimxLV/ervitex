@@ -257,7 +257,14 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
 
       <div className="mt-8 grid gap-6 sm:grid-cols-2">
         {section.features.map((feat, i) => (
-          <div key={i} className="flex gap-4">
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: i * 0.1 }}
+            className="flex gap-4"
+          >
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-accent/10 text-accent">
               {feat.icon}
             </div>
@@ -269,9 +276,63 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
                 {feat.text[lang]}
               </p>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
+
+      {/* Tech badges */}
+      {section.id === "screen" && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {[
+            { lv: "Max krāsas: 12", en: "Max colors: 12" },
+            { lv: "Industriāla skala", en: "Industrial Scale" },
+            { lv: "Pantone® precizitāte", en: "Pantone® Precision" },
+          ].map((badge, i) => (
+            <span key={i} className="inline-flex items-center rounded-sm border border-accent/20 bg-accent/5 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-wider text-accent">
+              {badge[lang]}
+            </span>
+          ))}
+        </div>
+      )}
+      {section.id === "dtf" && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {[
+            { lv: "No 1 gab.", en: "From 1 pc" },
+            { lv: "CMYK+W", en: "CMYK+W" },
+            { lv: "OEKO-TEX® saderīgs", en: "OEKO-TEX® Compatible" },
+          ].map((badge, i) => (
+            <span key={i} className="inline-flex items-center rounded-sm border border-accent/20 bg-accent/5 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-wider text-accent">
+              {badge[lang]}
+            </span>
+          ))}
+        </div>
+      )}
+      {section.id === "embroidery" && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {[
+            { lv: "3D efekts", en: "3D Effect" },
+            { lv: "Madeira/Isacord diegi", en: "Madeira/Isacord Threads" },
+            { lv: "Premium izskats", en: "Premium Look" },
+          ].map((badge, i) => (
+            <span key={i} className="inline-flex items-center rounded-sm border border-accent/20 bg-accent/5 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-wider text-accent">
+              {badge[lang]}
+            </span>
+          ))}
+        </div>
+      )}
+      {section.id === "sublimation" && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {[
+            { lv: "Pilna virsma", en: "Full Surface" },
+            { lv: "Eco krāsas", en: "Eco-Friendly Inks" },
+            { lv: "Fotogrāfiska kvalitāte", en: "Photo Quality" },
+          ].map((badge, i) => (
+            <span key={i} className="inline-flex items-center rounded-sm border border-accent/20 bg-accent/5 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-wider text-accent">
+              {badge[lang]}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Image carousel */}
       {serviceImages[section.id]?.length > 0 && (

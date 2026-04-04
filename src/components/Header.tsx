@@ -33,7 +33,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-primary text-primary-foreground">
+    <header className="sticky top-0 z-50 border-b border-border bg-primary/95 backdrop-blur-md text-primary-foreground">
       <div className="container flex h-16 items-center justify-between md:h-20">
         <Link to="/" className="flex items-center">
           <img src={ervitexLogo} alt="Ervitex" className="h-8 w-auto brightness-0 invert md:h-10" />
