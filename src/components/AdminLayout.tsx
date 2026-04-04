@@ -1,13 +1,16 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree } from "lucide-react";
+import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users } from "lucide-react";
+
+const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
 
 const navItems = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/admin/products", icon: Package, label: "Products" },
   { to: "/admin/categories", icon: FolderTree, label: "Categories" },
   { to: "/admin/quotes", icon: MessageSquare, label: "Quotes" },
+  { to: "/admin/users", icon: Users, label: "Lietotāji", superOnly: true },
 ];
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
