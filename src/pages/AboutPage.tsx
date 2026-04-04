@@ -55,7 +55,7 @@ const teamMembers = [
     email: "santa.k@ervitex.lv",
     phone: "67436899",
     phoneLabel: { lv: "Tel", en: "Tel" },
-    photo: null as string | null,
+    photo: santaZvaigznePhoto,
   },
   {
     name: "Justīne Strunka",
