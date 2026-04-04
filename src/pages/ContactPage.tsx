@@ -277,19 +277,32 @@ const ContactPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md"
             onClick={() => setLightboxImg(null)}
           >
             <button
-              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-110"
+              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-110"
               onClick={() => setLightboxImg(null)}
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5" />
             </button>
-            <img
+            {/* Name overlay */}
+            {(() => {
+              const member = specialists.find((s) => s.photo === lightboxImg);
+              return member ? (
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-sm bg-card/90 backdrop-blur-sm px-6 py-3 text-center shadow-lg">
+                  <p className="font-heading text-sm font-bold uppercase tracking-wider text-foreground">{member.name}</p>
+                  <p className="text-xs text-accent">{member.title[lang]}</p>
+                </div>
+              ) : null;
+            })()}
+            <motion.img
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
               src={lightboxImg}
               alt="Specialist"
-              className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain"
+              className="max-h-[80vh] max-w-[90vw] rounded-sm object-contain"
               onClick={(e) => e.stopPropagation()}
             />
           </motion.div>
