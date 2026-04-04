@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import lauraDaukstePhoto from "@/assets/team/laura-daukste.jpg";
 import santaZvaigznePhoto from "@/assets/team/santa-zvaigzne.jpg";
+import justineStrunkaPhoto from "@/assets/team/justine-strunka.jpg";
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -63,7 +64,7 @@ const teamMembers = [
     email: "justine@ervitex.lv",
     phone: "29725412",
     phoneLabel: { lv: "Mob", en: "Mob" },
-    photo: null as string | null,
+    photo: justineStrunkaPhoto,
   },
   {
     name: "Evita Ņesterova",
