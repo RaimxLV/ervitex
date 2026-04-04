@@ -67,7 +67,7 @@ function getHexForColor(name: string, hexCode?: string | null): string | null {
   return null;
 }
 
-const MAX_SWATCHES = 6;
+const MAX_SWATCHES = 5;
 const THUMB_SIZE = "h-6 w-6 sm:h-7 sm:w-7";
 
 interface ExtendedProduct extends Product {
@@ -151,7 +151,7 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
   const showDots = hasMultipleSlides && slideImages.length <= maxDots;
 
   return (
-    <div className="group relative flex flex-col">
+    <div className="group relative flex flex-col p-1.5 sm:p-0">
       <Link to={`/product/${product.id}`} className="block">
         {/* Carousel Image Area */}
         <div
@@ -311,8 +311,8 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
             );
           })}
           {extraColors > 0 && (
-            <span className="ml-0.5 text-[9px] sm:text-[10px] font-semibold text-muted-foreground">
-              +{extraColors}
+            <span className="ml-0.5 text-[9px] sm:text-[10px] font-semibold text-accent/70">
+              +{extraColors} {lang === "lv" ? "vēl" : "more"}
             </span>
           )}
         </div>
