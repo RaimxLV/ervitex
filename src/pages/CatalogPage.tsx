@@ -214,18 +214,19 @@ const CatalogPage = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="mt-8 flex items-center justify-center gap-2">
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   disabled={safeCurrentPage <= 1}
                   onClick={() => goToPage(safeCurrentPage - 1)}
-                  className="font-heading text-xs uppercase tracking-wider"
+                  className="font-heading text-xs uppercase tracking-wider min-w-0 px-2 sm:px-3"
                 >
-                  ← {lang === "lv" ? "Iepriekšējā" : "Previous"}
+                  <span className="hidden sm:inline">← {lang === "lv" ? "Iepriekšējā" : "Previous"}</span>
+                  <span className="sm:hidden">←</span>
                 </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - safeCurrentPage) <= 2)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - safeCurrentPage) <= 1)
                   .reduce<(number | "ellipsis")[]>((acc, p, idx, arr) => {
                     if (idx > 0 && p - (arr[idx - 1]) > 1) acc.push("ellipsis");
                     acc.push(p);
@@ -233,14 +234,14 @@ const CatalogPage = () => {
                   }, [])
                   .map((item, idx) =>
                     item === "ellipsis" ? (
-                      <span key={`e-${idx}`} className="px-1 text-muted-foreground">…</span>
+                      <span key={`e-${idx}`} className="px-0.5 text-muted-foreground">…</span>
                     ) : (
                       <Button
                         key={item}
                         variant={item === safeCurrentPage ? "default" : "outline"}
                         size="sm"
                         onClick={() => goToPage(item)}
-                        className="font-heading min-w-[2.25rem] text-xs"
+                        className="font-heading min-w-[2rem] sm:min-w-[2.25rem] text-xs px-1.5 sm:px-2"
                       >
                         {item}
                       </Button>
@@ -251,9 +252,10 @@ const CatalogPage = () => {
                   size="sm"
                   disabled={safeCurrentPage >= totalPages}
                   onClick={() => goToPage(safeCurrentPage + 1)}
-                  className="font-heading text-xs uppercase tracking-wider"
+                  className="font-heading text-xs uppercase tracking-wider min-w-0 px-2 sm:px-3"
                 >
-                  {lang === "lv" ? "Nākamā" : "Next"} →
+                  <span className="hidden sm:inline">{lang === "lv" ? "Nākamā" : "Next"} →</span>
+                  <span className="sm:hidden">→</span>
                 </Button>
               </div>
             )}

@@ -311,8 +311,8 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
             );
           })}
           {extraColors > 0 && (
-            <span className="ml-0.5 text-[9px] sm:text-[10px] font-semibold text-muted-foreground">
-              +{extraColors}
+            <span className="ml-0.5 text-[9px] sm:text-[10px] font-semibold text-accent/70">
+              +{extraColors} {lang === "lv" ? "vēl" : "more"}
             </span>
           )}
         </div>
