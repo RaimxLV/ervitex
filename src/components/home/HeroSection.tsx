@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
+import ScreenPressLineart from "./ScreenPressLineart";
 
 const HeroSection = () => {
   const { lang } = useLanguage();
@@ -16,6 +17,16 @@ const HeroSection = () => {
 
       {/* Geometric accent lines */}
       <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-accent/20 to-transparent" />
+
+      {/* Screen press lineart background */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 2, delay: 0.5 }}
+        className="absolute right-[-5%] top-1/2 -translate-y-1/2 w-[70%] max-w-[700px] text-primary-foreground/[0.07] pointer-events-none md:w-[55%] md:right-0 md:text-primary-foreground/[0.1]"
+      >
+        <ScreenPressLineart />
+      </motion.div>
       <div className="absolute top-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-accent/10 to-transparent" />
       
       {/* Accent corner detail */}
