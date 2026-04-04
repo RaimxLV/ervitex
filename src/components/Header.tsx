@@ -59,14 +59,16 @@ const Header = () => {
         <div className="hidden items-center gap-3 lg:flex">
           {/* Search */}
           {searchOpen ? (
-            <div className="flex items-center gap-2">
+            <form onSubmit={handleSearch} className="flex items-center gap-2">
               <Input
                 placeholder={t("header.search")}
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
                 className="h-9 w-48 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/40"
                 autoFocus
-                onBlur={() => setSearchOpen(false)}
+                onBlur={() => { if (!searchValue) setSearchOpen(false); }}
               />
-            </div>
+            </form>
           ) : (
             <button onClick={() => setSearchOpen(true)} className="p-2 text-primary-foreground/70 hover:text-primary-foreground transition-colors">
               <Search className="h-4 w-4" />
