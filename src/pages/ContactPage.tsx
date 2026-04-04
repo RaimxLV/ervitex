@@ -220,14 +220,74 @@ const ContactPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="rounded-sm border border-border bg-card p-5 transition-all hover:border-accent/40 hover:shadow-lg"
+                className="group rounded-sm border border-border bg-card p-5 transition-all hover:border-accent/40 hover:shadow-lg"
               >
                 <div className="flex items-start gap-4">
-                  <Avatar className="h-14 w-14 shrink-0 border-2 border-muted">
-                    <AvatarFallback className="bg-accent/10 text-accent font-heading text-sm font-bold">
-                      {member.name.split(" ").map((n) => n[0]).join("")}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div
+                    className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-muted ${member.photo ? "cursor-pointer" : ""}`}
+                    onClick={() => member.photo && setLightboxImg(member.photo)}
+                  >
+                    {member.photo ? (
+                      <img
+                        src={member.photo}
+                        alt={member.name}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-accent/10 text-accent font-heading text-sm font-bold">
+                        {member.name.split(" ").map((n) => n[0]).join("")}
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-heading text-sm font-bold text-foreground">{member.name}</h3>
+                    <p className="text-xs text-accent font-medium">{member.title[lang]}</p>
+                    <div className="mt-2 space-y-1">
+                      <a href={`mailto:${member.email}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
+                        <Mail className="h-3 w-3 shrink-0" /> {member.email}
+                      </a>
+                      <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-accent transition-colors">
+                        <Phone className="h-3 w-3 shrink-0" /> {member.phoneLabel[lang]}: {member.phone}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {lightboxImg && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            onClick={() => setLightboxImg(null)}
+          >
+            <button
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-110"
+              onClick={() => setLightboxImg(null)}
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <img
+              src={lightboxImg}
+              alt="Specialist"
+              className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Layout>
+  );
+};
+
+export default ContactPage;
                   <div className="min-w-0">
                     <h3 className="font-heading text-sm font-bold text-foreground">{member.name}</h3>
                     <p className="text-xs text-accent font-medium">{member.title[lang]}</p>
