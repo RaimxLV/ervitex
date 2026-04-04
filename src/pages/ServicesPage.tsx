@@ -272,6 +272,14 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
           </div>
         ))}
       </div>
+
+      {/* Image carousel */}
+      {serviceImages[section.id]?.length > 0 && (
+        <ServiceImageCarousel
+          images={serviceImages[section.id]}
+          alt={section.title.en}
+        />
+      )}
     </motion.div>
   );
 };
