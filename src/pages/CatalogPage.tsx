@@ -206,7 +206,7 @@ const CatalogPage = () => {
               resultCount={sortedProducts.length}
             />
 
-            <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
+            <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-3">
               {paginatedProducts.map((product) => (
                 <ProductCard key={product.id} product={product as any} />
               ))}
