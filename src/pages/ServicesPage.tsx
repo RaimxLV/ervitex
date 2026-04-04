@@ -8,7 +8,21 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
+import ServiceImageCarousel from "@/components/services/ServiceImageCarousel";
 import { useLanguage } from "@/i18n/LanguageContext";
+
+// Screen printing photos
+import screenPrint1 from "@/assets/services/screen-printing-1.jpg";
+import screenPrint2 from "@/assets/services/screen-printing-2.jpg";
+import screenPrint3 from "@/assets/services/screen-printing-3.jpg";
+import screenPrint4 from "@/assets/services/screen-printing-4.jpg";
+
+const serviceImages: Record<string, string[]> = {
+  screen: [screenPrint1, screenPrint2, screenPrint3, screenPrint4],
+  dtf: [],
+  embroidery: [],
+  sublimation: [],
+};
 
 const fadeUp = {
   initial: { opacity: 0, y: 30 },
@@ -258,6 +272,14 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
           </div>
         ))}
       </div>
+
+      {/* Image carousel */}
+      {serviceImages[section.id]?.length > 0 && (
+        <ServiceImageCarousel
+          images={serviceImages[section.id]}
+          alt={section.title.en}
+        />
+      )}
     </motion.div>
   );
 };
