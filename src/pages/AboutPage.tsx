@@ -64,7 +64,7 @@ const teamMembers = [
     email: "justine@ervitex.lv",
     phone: "29725412",
     phoneLabel: { lv: "Mob", en: "Mob" },
-    photo: null as string | null,
+    photo: justineStrunkaPhoto,
   },
   {
     name: "Evita Ņesterova",
