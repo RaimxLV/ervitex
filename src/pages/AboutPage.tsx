@@ -26,7 +26,7 @@ const teamMembers = [
     email: "vilnis@ervitex.lv",
     phone: "+371 67543384",
     phoneLabel: { lv: "Tel", en: "Tel" },
-    photo: null as string | null,
+    photo: vilnisLacisPhoto,
   },
   {
     name: "Ēriks Lācis",
