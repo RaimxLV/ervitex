@@ -275,8 +275,8 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
       {swatches.length > 0 && (
         <div className="flex items-center gap-1 pt-1.5 sm:gap-1.5">
           {swatches.map((swatch, idx) => {
-            const isActive = selectedIndex >= 0 && swatch.imageUrl && slideImages[selectedIndex] === swatch.imageUrl;
-            const thumbSrc = swatch.imageUrl || (swatch.hex ? null : null);
+            const isActive = clickedSwatchIdx === idx;
+            const thumbSrc = swatch.imageUrl;
             return (
               <button
                 key={`${swatch.name}-${idx}`}
@@ -284,10 +284,10 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
                 onClick={(e) => handleSwatchClick(e, idx)}
                 className={cn(
                   THUMB_SIZE,
-                  "rounded-md overflow-hidden flex-shrink-0 transition-all duration-200 hover:scale-110",
+                  "rounded overflow-hidden flex-shrink-0 transition-all duration-200 hover:scale-110",
                   isActive
-                    ? "ring-2 ring-accent ring-offset-1 ring-offset-background shadow-md"
-                    : "ring-1 ring-border/40"
+                    ? "ring-2 ring-accent ring-offset-1 ring-offset-background"
+                    : "ring-1 ring-border/30"
                 )}
               >
                 {thumbSrc ? (
