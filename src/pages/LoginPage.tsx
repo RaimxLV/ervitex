@@ -30,7 +30,14 @@ const LoginPage = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md space-y-8 rounded-sm border border-border bg-card p-8">
+      <div className="w-full max-w-md space-y-8 rounded-sm border border-border bg-card p-8 relative">
+        <button
+          onClick={() => navigate("/")}
+          className="absolute top-4 left-4 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Atpakaļ
+        </button>
         <div className="text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-sm bg-accent">
             <Lock className="h-6 w-6 text-accent-foreground" />
