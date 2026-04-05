@@ -271,6 +271,9 @@ const ContactPage = () => {
         </div>
       </section>
 
+      {/* Store Locations */}
+      <StoreLocations />
+
       {/* Lightbox */}
       <AnimatePresence>
         {lightboxImg && (
