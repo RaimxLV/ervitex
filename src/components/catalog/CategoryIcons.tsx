@@ -319,28 +319,95 @@ export const IconApron: React.FC<IconProps> = (p) => (
   </Svg>
 );
 
-// Master map: slug → icon component
+// Pletkrekli — Knit sweater
+export const IconKnitSweater: React.FC<IconProps> = (p) => (
+  <Svg {...p}>
+    <path d="M8 3 L4 6 L6 8 L7 6 L7 21 L17 21 L17 6 L18 8 L20 6 L16 3 Q12 5 8 3 Z" />
+    <path d="M7 10 Q9 9 11 10 Q13 11 15 10 Q17 9 17 10" />
+    <path d="M7 14 Q9 13 11 14 Q13 15 15 14 Q17 13 17 14" />
+  </Svg>
+);
+
+// Adījumi — Knitted texture
+export const IconKnit: React.FC<IconProps> = (p) => (
+  <Svg {...p}>
+    <path d="M8 3 L4 6 L6 8 L7 6 L7 21 L17 21 L17 6 L18 8 L20 6 L16 3 Q12 5 8 3 Z" />
+    <path d="M9 9 L12 7 L15 9 L12 11 Z" />
+    <path d="M9 13 L12 11 L15 13 L12 15 Z" />
+    <path d="M9 17 L12 15 L15 17 L12 19 Z" />
+  </Svg>
+);
+
+// Termoveļa — Thermal underwear (layered body)
+export const IconThermal: React.FC<IconProps> = (p) => (
+  <Svg {...p}>
+    <path d="M9 3 L7 5 L7 12 L17 12 L17 5 L15 3 Q12 5 9 3 Z" />
+    <path d="M8 13 L8 22 L11.5 22 L12 16 L12.5 22 L16 22 L16 13 Z" />
+    <line x1="7" y1="12" x2="17" y2="12" />
+  </Svg>
+);
+
+// Darba apavi — Work boot
+export const IconWorkBoot: React.FC<IconProps> = (p) => (
+  <Svg {...p}>
+    <path d="M6 8 L6 16 L4 16 L4 19 L20 19 L20 16 L18 14 L18 8 Q18 5 12 5 Q6 5 6 8 Z" />
+    <line x1="4" y1="16" x2="20" y2="16" />
+    <path d="M9 8 L9 14" />
+    <path d="M12 8 L12 14" />
+    <path d="M15 8 L15 14" />
+  </Svg>
+);
+
+// Krūzes — Mug
+export const IconMug: React.FC<IconProps> = (p) => (
+  <Svg {...p}>
+    <rect x="5" y="6" width="11" height="14" rx="2" />
+    <path d="M16 9 Q20 9 20 13 Q20 17 16 17" />
+    <line x1="5" y1="20" x2="16" y2="20" />
+  </Svg>
+);
+
+// Sejas maskas — Face mask
+export const IconFaceMask: React.FC<IconProps> = (p) => (
+  <Svg {...p}>
+    <path d="M4 9 Q4 7 8 6 L12 5 L16 6 Q20 7 20 9 L20 13 Q20 17 12 19 Q4 17 4 13 Z" />
+    <line x1="4" y1="9" x2="2" y2="8" />
+    <line x1="20" y1="9" x2="22" y2="8" />
+    <line x1="6" y1="11" x2="18" y2="11" />
+    <line x1="6" y1="14" x2="18" y2="14" />
+  </Svg>
+);
+
+// Lietussargi — Umbrella
+export const IconUmbrella: React.FC<IconProps> = (p) => (
+  <Svg {...p}>
+    <path d="M12 2 Q3 2 3 10 L12 10 L21 10 Q21 2 12 2 Z" />
+    <line x1="12" y1="10" x2="12" y2="20" />
+    <path d="M12 20 Q12 22 14 22" />
+  </Svg>
+);
+
+// Master map: slug → icon component (matched to actual DB slugs)
 export const CATEGORY_ICON_MAP: Record<string, React.ReactNode> = {
   "t-krekli": <IconTShirt />,
   "polo-krekli": <IconPolo />,
-  "krekli": <IconShirt />,
-  "dzemperi-hudiji": <IconHoodie />,
-  "jakas": <IconJacket />,
+  "dzemperi": <IconHoodie />,
+  "flisa-jakas": <IconFleece />,
   "virsjakas": <IconOvercoat />,
   "vestes": <IconVest />,
-  "softshell": <IconSoftshell />,
-  "fleece": <IconFleece />,
-  "bikses-sorti": <IconPants />,
-  "kleitas-svārki": <IconDress />,
-  "lietus-apgerbs": <IconRaincoat />,
-  "darba-apgerbi": <IconWorkwear />,
-  "sportam": <IconSport />,
-  "berni": <IconKids />,
+  "pletkrekli": <IconKnitSweater />,
+  "adijumi": <IconKnit />,
+  "bikses": <IconPants />,
   "cepures": <IconCap />,
-  "šalles-lakati": <IconScarf />,
   "somas": <IconBackpack />,
   "aksesuari": <IconAccessories />,
   "audumu-maisini": <IconToteBag />,
-  "dvieli": <IconTowel />,
-  "priekšauti": <IconApron />,
+  "lietussargi": <IconUmbrella />,
+  "darba-apgerbi": <IconWorkwear />,
+  "termovela": <IconThermal />,
+  "darba-apavi": <IconWorkBoot />,
+  "sportam": <IconSport />,
+  "berniem": <IconKids />,
+  "kruzes": <IconMug />,
+  "sejas-maskas": <IconFaceMask />,
 };
