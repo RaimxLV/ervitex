@@ -231,6 +231,19 @@ const ProductDetailPage = () => {
               </h3>
               <QuoteRequestForm productId={product.id} productName={product.name[lang]} />
             </div>
+
+            {/* Call button */}
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground font-heading text-xs uppercase tracking-widest"
+              asChild
+            >
+              <a href="tel:+37129475227">
+                <PhoneCall className="mr-2 h-4 w-4" />
+                {lang === "lv" ? "Zvanīt un konsultēties" : "Call & Consult"}
+              </a>
+            </Button>
           </div>
         </div>
       </div>

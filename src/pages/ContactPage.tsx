@@ -76,6 +76,18 @@ const ContactPage = () => {
                 <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{t("contact.accounting")}</p>
                 <a href="tel:+37167552540" className="mt-1 block text-sm text-foreground hover:text-accent transition-colors">+371 67552540</a>
               </div>
+              <div>
+                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{lang === "lv" ? "Tālrunis" : "Phone"}</p>
+                <a href="tel:+37129475227" className="mt-1 block text-sm text-foreground hover:text-accent transition-colors">+371 29475227</a>
+              </div>
+              <div className="col-span-2 mt-2">
+                <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest" asChild>
+                  <a href="tel:+37129475227">
+                    <PhoneCall className="mr-2 h-4 w-4" />
+                    {lang === "lv" ? "Zvanīt tūlīt" : "Call Now"}
+                  </a>
+                </Button>
+              </div>
               <div className="col-span-2">
                 <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{t("contact.regNr")}</p>
                 <p className="mt-1 text-sm text-foreground">LV40002074377</p>
