@@ -1,4 +1,4 @@
-import { Package, Ruler } from "lucide-react";
+import { Ruler, SwatchBook } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ColorSwatchSelector, { type ColorVariant } from "./ColorSwatchSelector";
 
@@ -10,6 +10,8 @@ interface ProductSpecsProps {
   onColorSelect: (color: ColorVariant) => void;
 }
 
+const ICON_STROKE = 1.2;
+
 const ProductSpecs = ({ material, sizes, colors, minOrder, onColorSelect }: ProductSpecsProps) => {
   const { t } = useLanguage();
 
@@ -17,7 +19,7 @@ const ProductSpecs = ({ material, sizes, colors, minOrder, onColorSelect }: Prod
     <div className="space-y-4 rounded-sm border border-border p-5">
       {material && (
         <div className="flex items-start gap-3">
-          <Package className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+          <SwatchBook className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={ICON_STROKE} />
           <div>
             <p className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">
               {t("product.material")}
@@ -29,7 +31,7 @@ const ProductSpecs = ({ material, sizes, colors, minOrder, onColorSelect }: Prod
 
       {sizes.length > 0 && (
         <div className="flex items-start gap-3">
-          <Ruler className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+          <Ruler className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={ICON_STROKE} />
           <div>
             <p className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">
               {t("product.sizes")}
