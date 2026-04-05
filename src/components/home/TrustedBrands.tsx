@@ -26,7 +26,7 @@ const TrustedBrands = () => {
             </span>
             <div className="h-px w-10 bg-accent" />
           </div>
-          <h2 className="font-heading text-xl font-black uppercase tracking-[-0.02em] text-foreground md:text-2xl">
+          <h2 className="font-heading text-xl font-black uppercase text-foreground md:text-2xl">
             {lang === "lv" ? "Uzticami zīmoli" : "Trusted Brands"}
           </h2>
         </motion.div>
