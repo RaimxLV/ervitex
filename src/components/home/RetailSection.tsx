@@ -103,6 +103,9 @@ const RetailSection = () => {
               </Button>
             </a>
           </div>
+          <div className="mt-10">
+            <ModernGallery slides={slides} aspectRatio="16/9" />
+          </div>
         </motion.div>
       </div>
     </section>
