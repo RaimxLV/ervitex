@@ -71,7 +71,7 @@ export default function CategoryFilter({ categories, activeCategory, onSelect }:
           "transition-colors",
           isActive ? "text-accent-foreground" : "text-muted-foreground group-hover/chip:text-accent"
         )}>
-          {CATEGORY_ICONS[cat.id] || <LayoutGrid className="h-5 w-5" />}
+          {CATEGORY_ICON_MAP[cat.id] || <IconAll />}
         </span>
         {cat.name[lang]}
       </button>
