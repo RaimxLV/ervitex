@@ -3,9 +3,25 @@ import { Store, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Link } from "react-router-dom";
+import ModernGallery, { type GallerySlide } from "@/components/ModernGallery";
+import tbodeStore from "@/assets/tbode-store.jpg";
+import tbodeMugs from "@/assets/tbode-mugs.jpg";
+import tbodeLatvija from "@/assets/tbode-latvija.jpg";
+import tbodeBottles from "@/assets/tbode-bottles.jpg";
+import tbodeApparel from "@/assets/tbode-apparel.jpg";
+import tbodeSouvenirs from "@/assets/tbode-souvenirs.jpg";
 
 const RetailSection = () => {
   const { lang } = useLanguage();
+
+  const slides: GallerySlide[] = [
+    { src: tbodeStore, caption: "T-Bode — T/C Akropole" },
+    { src: tbodeApparel, caption: lang === "lv" ? "Latvija kolekcija" : "Latvija Collection" },
+    { src: tbodeMugs, caption: lang === "lv" ? "Krūzes un aksesuāri" : "Mugs & Accessories" },
+    { src: tbodeLatvija, caption: lang === "lv" ? "Suvenīri un dāvanas" : "Souvenirs & Gifts" },
+    { src: tbodeBottles, caption: lang === "lv" ? "Termokrūzes" : "Travel Mugs" },
+    { src: tbodeSouvenirs, caption: lang === "lv" ? "Unikālie suvenīri" : "Unique Souvenirs" },
+  ];
 
   return (
     <section className="border-t border-border bg-muted/30 py-16 md:py-24">
@@ -86,6 +102,9 @@ const RetailSection = () => {
                 www.t-bode.lv
               </Button>
             </a>
+          </div>
+          <div className="mt-10">
+            <ModernGallery slides={slides} aspectRatio="16/9" />
           </div>
         </motion.div>
       </div>
