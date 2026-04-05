@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ervitexLogo from "@/assets/ervitex-logo.png";
+import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Phone, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
