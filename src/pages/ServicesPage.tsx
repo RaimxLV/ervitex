@@ -174,9 +174,10 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
 
       {/* Image carousel */}
       {serviceImages[section.id]?.length > 0 && (
-        <ServiceImageCarousel
-          images={serviceImages[section.id]}
-          alt={section.title.en}
+        <ModernGallery
+          slides={serviceImages[section.id].map((src) => ({ src }))}
+          aspectRatio="16/9"
+          className="mt-6"
         />
       )}
     </motion.div>
