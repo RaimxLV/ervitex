@@ -13,7 +13,11 @@ const Footer = () => {
     <footer className="border-t border-border bg-primary text-primary-foreground">
       <div className="container py-8 md:py-16">
         <div className="mb-6">
-          <img src={ervitexLogo} alt="Ervitex" className="h-7 w-auto brightness-0 invert" />
+          <div className="flex items-center gap-3">
+            <img src={ervitexLogo} alt="Ervitex" className="h-7 w-auto brightness-0 invert" />
+            <span className="h-5 w-px bg-primary-foreground/20" />
+            <img src={stellaLogo} alt="Stanley/Stella Dealer" className="h-3.5 w-auto opacity-50" />
+          </div>
           <p className="mt-2 text-xs text-primary-foreground/50 max-w-[220px]">
             {lang === "lv" ? "Jūsu uzticamais apģērbu partneris" : "Your trusted apparel partner"}
           </p>
