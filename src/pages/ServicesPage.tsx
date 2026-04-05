@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   Printer, Grid3X3, PenLine, Wind, ArrowRight,
-  SwatchBook, Palette, ShieldCheck, ShoppingBag, Package,
-  Focus, MessageCircle,
+  Layers, Palette, ShieldCheck, ShoppingBag, Tag,
+  Paintbrush, MessageCircle, CircleCheck, Cylinder,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
