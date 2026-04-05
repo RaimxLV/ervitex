@@ -90,12 +90,12 @@ const Footer = () => {
       </div>
 
       <div className="border-t border-primary-foreground/10 bg-primary">
-        <div className="container flex items-center justify-between py-4">
-          <div className="flex items-center gap-3">
+        <div className="container flex flex-col items-center justify-center gap-2 py-4 text-center">
+          <div className="flex items-center gap-3 flex-wrap justify-center">
             <span className="text-[10px] text-primary-foreground/25">
               © {new Date().getFullYear()} SIA Ervitex. {t("footer.rights")}
             </span>
-            <span className="hidden sm:flex items-center gap-2 text-[10px] text-primary-foreground/20">
+            <span className="flex items-center gap-2 text-[10px] text-primary-foreground/20">
               <span>·</span>
               <Link to="/privacy" className="hover:text-accent/60 transition-colors">
                 {lang === "lv" ? "Privātuma politika" : "Privacy Policy"}
@@ -104,16 +104,17 @@ const Footer = () => {
               <Link to="/terms" className="hover:text-accent/60 transition-colors">
                 {lang === "lv" ? "Lietošanas noteikumi" : "Terms of Service"}
               </Link>
+              <span>·</span>
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1 hover:text-accent/60 transition-colors"
+                aria-label="Admin access"
+              >
+                <Lock className="h-3 w-3" strokeWidth={SW} />
+                <span>{lang === "lv" ? "Piekļuve" : "Access"}</span>
+              </Link>
             </span>
           </div>
-          <Link
-            to="/login"
-            className="inline-flex items-center gap-1 text-[10px] text-primary-foreground/20 hover:text-accent/60 transition-colors"
-            aria-label="Admin access"
-          >
-            <Lock className="h-3 w-3" strokeWidth={SW} />
-            <span className="hidden sm:inline">{lang === "lv" ? "Piekļuve" : "Access"}</span>
-          </Link>
         </div>
       </div>
     </footer>
