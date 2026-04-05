@@ -9,18 +9,17 @@ const GROUPS: { label: Record<string, string>; slugs: string[] }[] = [
   {
     label: { lv: "Apģērbi", en: "Clothing" },
     slugs: [
-      "t-krekli", "polo-krekli", "krekli", "dzemperi-hudiji",
-      "jakas", "virsjakas", "vestes", "softshell", "fleece",
-      "bikses-sorti", "kleitas-svārki", "lietus-apgerbs",
+      "t-krekli", "polo-krekli", "pletkrekli", "adijumi", "dzemperi",
+      "flisa-jakas", "virsjakas", "vestes", "bikses", "termovela",
     ],
   },
   {
     label: { lv: "Speciālie", en: "Workwear & Sport" },
-    slugs: ["darba-apgerbi", "sportam", "berni"],
+    slugs: ["darba-apgerbi", "darba-apavi", "sportam", "berniem"],
   },
   {
     label: { lv: "Aksesuāri", en: "Accessories" },
-    slugs: ["cepures", "šalles-lakati", "somas", "aksesuari", "audumu-maisini", "dvieli", "priekšauti"],
+    slugs: ["cepures", "somas", "aksesuari", "audumu-maisini", "lietussargi", "kruzes", "sejas-maskas"],
   },
 ];
 
