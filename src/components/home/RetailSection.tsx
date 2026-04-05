@@ -14,6 +14,15 @@ import tbodeSouvenirs from "@/assets/tbode-souvenirs.jpg";
 const RetailSection = () => {
   const { lang } = useLanguage();
 
+  const slides: GallerySlide[] = [
+    { src: tbodeStore, caption: "T-Bode — T/C Akropole" },
+    { src: tbodeApparel, caption: lang === "lv" ? "Latvija kolekcija" : "Latvija Collection" },
+    { src: tbodeMugs, caption: lang === "lv" ? "Krūzes un aksesuāri" : "Mugs & Accessories" },
+    { src: tbodeLatvija, caption: lang === "lv" ? "Suvenīri un dāvanas" : "Souvenirs & Gifts" },
+    { src: tbodeBottles, caption: lang === "lv" ? "Termokrūzes" : "Travel Mugs" },
+    { src: tbodeSouvenirs, caption: lang === "lv" ? "Unikālie suvenīri" : "Unique Souvenirs" },
+  ];
+
   return (
     <section className="border-t border-border bg-muted/30 py-16 md:py-24">
       <div className="container">
