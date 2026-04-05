@@ -14,10 +14,15 @@ import screenPrint1 from "@/assets/services/screen-printing-1.jpg";
 import screenPrint2 from "@/assets/services/screen-printing-2.jpg";
 import screenPrint3 from "@/assets/services/screen-printing-3.jpg";
 import screenPrint4 from "@/assets/services/screen-printing-4.jpg";
+import dtf1 from "@/assets/services/dtf-1.jpg";
+import dtf2 from "@/assets/services/dtf-2.jpg";
+import dtf3 from "@/assets/services/dtf-3.jpg";
+import dtf4 from "@/assets/services/dtf-4.jpg";
+import dtf5 from "@/assets/services/dtf-5.jpg";
 
 const serviceImages: Record<string, string[]> = {
   screen: [screenPrint1, screenPrint2, screenPrint3, screenPrint4],
-  dtf: [],
+  dtf: [dtf1, dtf2, dtf3, dtf4, dtf5],
   embroidery: [],
   sublimation: [],
 };
