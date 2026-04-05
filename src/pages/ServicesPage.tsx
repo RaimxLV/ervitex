@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
-import ServiceImageCarousel from "@/components/services/ServiceImageCarousel";
+import ModernGallery, { type GallerySlide } from "@/components/ModernGallery";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 import screenPrint1 from "@/assets/services/screen-printing-1.jpg";
@@ -174,9 +174,10 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
 
       {/* Image carousel */}
       {serviceImages[section.id]?.length > 0 && (
-        <ServiceImageCarousel
-          images={serviceImages[section.id]}
-          alt={section.title.en}
+        <ModernGallery
+          slides={serviceImages[section.id].map((src) => ({ src }))}
+          aspectRatio="16/9"
+          className="mt-6"
         />
       )}
     </motion.div>
