@@ -62,6 +62,11 @@ const AboutPage = () => {
               <p>{t("about.story1")}</p>
               <p>{t("about.story2")}</p>
               <p>{t("about.story3")}</p>
+              <p className="font-medium text-foreground/80">
+                {lang === "lv"
+                  ? "Vairāk nekā 20 gadu pieredze, 3000+ produktu katalogā un 4 augstas veiktspējas drukas tehnoloģijas — sietspiede, DTF, izšūšana un sublimācija."
+                  : "Over 20 years of experience, 3,000+ products in our catalog, and 4 high-performance printing technologies — screen printing, DTF, embroidery, and sublimation."}
+              </p>
             </div>
           </motion.div>
           <motion.div
@@ -200,8 +205,8 @@ const AboutPage = () => {
             {[
               { num: "20+", label: t("stats.years") },
               { num: "500+", label: t("stats.clients") },
-              { num: "1M+", label: t("stats.items") },
-              { num: "50+", label: t("stats.products") },
+              { num: "3000+", label: lang === "lv" ? "Produkti katalogā" : "Products in Catalog" },
+              { num: "4", label: lang === "lv" ? "Drukas tehnoloģijas" : "Printing Technologies" },
             ].map((stat, i) => (
               <div key={i}>
                 <p className="font-heading text-4xl font-bold text-accent">{stat.num}</p>

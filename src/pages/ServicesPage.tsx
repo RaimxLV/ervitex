@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   Printer, Grid3X3, PenLine, Wind, ArrowRight,
   Layers, Palette, ShieldCheck, ShoppingBag, Tag,
-  Paintbrush, MessageCircle, CircleCheck, Cylinder,
+  Paintbrush, MessageCircle, CircleCheck, Cylinder, FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
@@ -71,8 +71,8 @@ const serviceSections: ServiceSection[] = [
     icon: <Grid3X3 className="h-7 w-7" strokeWidth={SW} />,
     title: { lv: "Sietspiede", en: "Screen Printing" },
     subtitle: {
-      lv: "Industriāla kvalitāte lieliem apjomiem — klasika ar nepārspējamu krāsu intensitāti.",
-      en: "Industrial quality for large volumes — a time-tested method with unmatched colour intensity.",
+      lv: "Industriāla kvalitāte lieliem apjomiem — klasika ar nepārspējamu krāsu intensitāti. Powered by M&R industrial automation — 100% Pantone® precizitāte un stabila kvalitāte liela apjoma tirāžās.",
+      en: "Industrial quality for large volumes — a time-tested method with unmatched colour intensity. Powered by M&R industrial automation for 100% Pantone® accuracy and high-volume consistency.",
     },
     features: [
       { icon: <Layers className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Materiāli", en: "Materials" }, text: { lv: "Labākā izvēle t-krekliem, polo un auduma maisiņiem lielos daudzumos.", en: "The go-to method for t-shirts, polos, and tote bags in large quantities." } },
@@ -218,6 +218,87 @@ const ServicesPage = () => {
           {serviceSections.map((section, i) => (
             <ServiceSectionCard key={section.id} section={section} index={i} />
           ))}
+        </div>
+      </section>
+
+      {/* Technical Requirements */}
+      <section className="bg-muted py-16 md:py-24">
+        <div className="container">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <span className="block h-px w-8 bg-accent" />
+              <span className="font-body text-[10px] font-semibold uppercase tracking-[0.4em] text-accent">
+                {lang === "lv" ? "Tehniskās prasības" : "Technical Requirements"}
+              </span>
+            </div>
+            <h2 className="font-heading text-2xl font-bold uppercase text-foreground md:text-3xl">
+              {lang === "lv" ? "Failu sagatavošana" : "File Preparation"}
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm text-muted-foreground leading-relaxed">
+              {lang === "lv"
+                ? "Lai nodrošinātu augstāko drukas kvalitāti, lūdzu ievērojiet šīs vadlīnijas:"
+                : "To ensure the highest print quality, please follow these guidelines:"}
+            </p>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  title: { lv: "Vektora faili", en: "Vector Files" },
+                  desc: { lv: "AI, PDF vai EPS formātā. Rastra attēli — min. 300 DPI.", en: "AI, PDF, or EPS format. Raster images — min. 300 DPI." },
+                },
+                {
+                  title: { lv: "Krāsu telpa", en: "Colour Space" },
+                  desc: { lv: "CMYK vai Pantone® Solid Coated. Neizmantojiet RGB.", en: "CMYK or Pantone® Solid Coated. Do not use RGB." },
+                },
+                {
+                  title: { lv: "Fonti", en: "Fonts" },
+                  desc: { lv: "Visi fonti jāpārveido līknēs (outlines/curves).", en: "All fonts must be converted to outlines/curves." },
+                },
+                {
+                  title: { lv: "Izmērs", en: "Size" },
+                  desc: { lv: "Dizains reālajā izmērā (1:1). Norādiet novietojumu uz apģērba.", en: "Design at actual size (1:1). Specify placement on garment." },
+                },
+                {
+                  title: { lv: "Izšūšana", en: "Embroidery" },
+                  desc: { lv: "Vienkāršotas formas bez gradieniem. Maks. 12 krāsas.", en: "Simplified shapes without gradients. Max 12 colours." },
+                },
+                {
+                  title: { lv: "Piegāde", en: "Delivery" },
+                  desc: { lv: "Sūtiet uz birojs@ervitex.lv vai saskaņojiet ar projektu vadītāju.", en: "Send to birojs@ervitex.lv or coordinate with your project manager." },
+                },
+              ].map((item, i) => (
+                <div key={i} className="border border-border bg-card p-5">
+                  <div className="flex items-start gap-3">
+                    <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" strokeWidth={SW} />
+                    <div>
+                      <h3 className="font-heading text-xs font-bold uppercase text-card-foreground">{item.title[lang]}</h3>
+                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{item.desc[lang]}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* OEKO-TEX Badge */}
+      <section className="border-t border-border bg-card py-10">
+        <div className="container flex flex-col items-center gap-4 text-center">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="h-8 w-8 text-accent" strokeWidth={SW} />
+            <span className="font-heading text-sm font-bold uppercase text-card-foreground tracking-wide">OEKO-TEX® Standard 100</span>
+          </div>
+          <p className="max-w-md text-xs leading-relaxed text-muted-foreground">
+            {lang === "lv"
+              ? "Mūsu izmantotie materiāli un drukas tehnoloģijas atbilst OEKO-TEX® standartiem — droši cilvēkiem un videi."
+              : "Our materials and printing technologies comply with OEKO-TEX® standards — safe for people and the environment."}
+          </p>
         </div>
       </section>
 
