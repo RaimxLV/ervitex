@@ -200,8 +200,8 @@ const AboutPage = () => {
             {[
               { num: "20+", label: t("stats.years") },
               { num: "500+", label: t("stats.clients") },
-              { num: "1M+", label: t("stats.items") },
-              { num: "50+", label: t("stats.products") },
+              { num: "3000+", label: lang === "lv" ? "Produkti katalogā" : "Products in Catalog" },
+              { num: "4", label: lang === "lv" ? "Drukas tehnoloģijas" : "Printing Technologies" },
             ].map((stat, i) => (
               <div key={i}>
                 <p className="font-heading text-4xl font-bold text-accent">{stat.num}</p>

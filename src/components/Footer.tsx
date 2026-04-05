@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, Lock } from "lucide-react";
+import { Mail, Phone, MapPin, Lock, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ervitexLogo from "@/assets/ervitex-logo.png";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";

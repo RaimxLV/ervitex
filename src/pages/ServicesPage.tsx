@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   Printer, Grid3X3, PenLine, Wind, ArrowRight,
   Layers, Palette, ShieldCheck, ShoppingBag, Tag,
-  Paintbrush, MessageCircle, CircleCheck, Cylinder,
+  Paintbrush, MessageCircle, CircleCheck, Cylinder, FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
