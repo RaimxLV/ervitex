@@ -104,7 +104,7 @@ export default function CategoryFilter({ categories, activeCategory, onSelect }:
                   : "border-border bg-card text-card-foreground hover:border-accent"
               )}
             >
-              <LayoutGrid className="h-5 w-5" />
+              <IconAll />
               {lang === "lv" ? "Visi" : "All"}
             </button>
             {categories.map((cat) => renderChip(cat))}
