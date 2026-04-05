@@ -63,7 +63,7 @@ const serviceSections: ServiceSection[] = [
       en: "Industrial quality for large volumes — a time-tested method with unmatched colour intensity.",
     },
     features: [
-      { icon: <SwatchBook className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Materiāli", en: "Materials" }, text: { lv: "Labākā izvēle t-krekliem, polo un auduma maisiņiem lielos daudzumos.", en: "The go-to method for t-shirts, polos, and tote bags in large quantities." } },
+      { icon: <Layers className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Materiāli", en: "Materials" }, text: { lv: "Labākā izvēle t-krekliem, polo un auduma maisiņiem lielos daudzumos.", en: "The go-to method for t-shirts, polos, and tote bags in large quantities." } },
       { icon: <Palette className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Krāsas", en: "Colors" }, text: { lv: "Pantone® Solid Coated precizitāte. Īpaši koši un sedzoši toņi.", en: "Pantone® Solid Coated precision. Exceptionally vibrant and opaque tones." } },
       { icon: <ShoppingBag className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Pasūtījums", en: "Ordering" }, text: { lv: "Ekonomiski izdevīgākais veids tirāžām virs 50 vienībām.", en: "The most cost-effective method for runs exceeding 50 pieces." } },
       { icon: <ShieldCheck className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Noturība", en: "Durability" }, text: { lv: "Augstākā mehāniskā izturība — krāsa iesūcas tieši audumā.", en: "Superior mechanical resistance — ink bonds directly with the fabric." } },
