@@ -36,10 +36,10 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-primary/80 backdrop-blur-md text-primary-foreground">
       <div className="container flex h-16 items-center justify-between md:h-20">
-        <Link to="/" className="flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-2 sm:gap-3">
           <img src={ervitexLogo} alt="Ervitex" className="h-8 w-auto brightness-0 invert md:h-10" />
-          <span className="h-6 w-px bg-primary-foreground/20 hidden sm:block" />
-          <img src={stellaLogo} alt="Stanley/Stella Dealer" className="h-4 w-auto opacity-60 hidden sm:block md:h-5" />
+          <span className="h-5 w-px bg-primary-foreground/20 sm:h-6" />
+          <img src={stellaLogo} alt="Stanley/Stella Dealer" className="h-3 w-auto opacity-60 sm:h-4 md:h-5" />
         </Link>
 
         {/* Desktop nav */}
