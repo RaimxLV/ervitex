@@ -50,17 +50,17 @@ const serviceSections: ServiceSection[] = [
     id: "dtf",
     icon: <Layers className="h-8 w-8" />,
     title: {
-      lv: "DTF un Termodruka – No viena eksemplāra līdz personalizētai tirāžai",
-      en: "DTF & Heat Transfer – From One Piece to Personalized Runs",
+      lv: "DTF un termodruka",
+      en: "DTF & Heat Transfer",
     },
     subtitle: {
-      lv: "Modernākā digitālā tehnoloģija ar neierobežotām personalizācijas iespējām.",
-      en: "The most advanced digital technology with unlimited personalization options.",
+      lv: "No viena eksemplāra līdz personalizētai tirāžai — modernākā digitālā tehnoloģija.",
+      en: "From a single piece to personalized runs — the most advanced digital technology.",
     },
     features: [
       {
         icon: <Shirt className="h-6 w-6" />,
-        label: { lv: "MATERIĀLI", en: "MATERIALS" },
+        label: { lv: "Materiāli", en: "Materials" },
         text: {
           lv: "Kokvilna, poliesters, neilons, darba apģērbs, somas, cepures.",
           en: "Cotton, polyester, nylon, workwear, bags, caps.",
@@ -68,26 +68,26 @@ const serviceSections: ServiceSection[] = [
       },
       {
         icon: <Palette className="h-6 w-6" />,
-        label: { lv: "KRĀSAS", en: "COLORS" },
+        label: { lv: "Krāsas", en: "Colors" },
         text: {
-          lv: "Pilnkrāsu CMYK+W druka un speciālās plēves (zelta, sudraba, atstarojošas). Pantone matching available.",
-          en: "Full-color CMYK+W printing and specialty films (gold, silver, reflective). Pantone matching available.",
+          lv: "Pilnkrāsu CMYK+W druka, speciālās plēves (zelta, sudraba, atstarojošas). Pantone® atbilstība pieejama.",
+          en: "Full-color CMYK+W printing, specialty films (gold, silver, reflective). Pantone® matching available.",
         },
       },
       {
         icon: <UserPlus className="h-6 w-6" />,
-        label: { lv: "PASŪTĪJUMS", en: "ORDERING" },
+        label: { lv: "Pasūtījums", en: "Ordering" },
         text: {
-          lv: "Ideāli piemērots individuāliem vārdiem, numuriem un mazām tirāžām (no 1 gab.).",
-          en: "Perfect for individual names, numbers, and small runs (from 1 pc).",
+          lv: "Ideāli individuāliem vārdiem, numuriem un mazām tirāžām — no 1 gabala.",
+          en: "Ideal for individual names, numbers, and small runs — starting from 1 piece.",
         },
       },
       {
         icon: <Wind className="h-6 w-6" />,
-        label: { lv: "KOPŠANA", en: "CARE" },
+        label: { lv: "Kopšana", en: "Care" },
         text: {
-          lv: "Mazgāt līdz 40°C, gludināt no kreisās puses.",
-          en: "Wash up to 40°C, iron inside out.",
+          lv: "Mazgāt līdz 40 °C, gludināt no kreisās puses.",
+          en: "Wash up to 40 °C, iron inside out.",
         },
       },
     ],
@@ -96,44 +96,44 @@ const serviceSections: ServiceSection[] = [
     id: "screen",
     icon: <Grid3x3 className="h-8 w-8" />,
     title: {
-      lv: "Sietspiede – Industriāla kvalitāte lieliem apjomiem",
-      en: "Screen Printing – Industrial Quality for Large Volumes",
+      lv: "Sietspiede",
+      en: "Screen Printing",
     },
     subtitle: {
-      lv: "Klasiski pārbaudīta metode ar nepārspējamu krāsu intensitāti.",
-      en: "A time-tested method with unmatched color intensity.",
+      lv: "Industriāla kvalitāte lieliem apjomiem — klasika ar nepārspējamu krāsu intensitāti.",
+      en: "Industrial quality for large volumes — a time-tested method with unmatched colour intensity.",
     },
     features: [
       {
         icon: <Box className="h-6 w-6" />,
-        label: { lv: "MATERIĀLI", en: "MATERIALS" },
+        label: { lv: "Materiāli", en: "Materials" },
         text: {
-          lv: "Labākā izvēle T-krekliem, polo un auduma maisiņiem lielos daudzumos.",
-          en: "Best choice for T-shirts, polos, and tote bags in large quantities.",
+          lv: "Labākā izvēle t-krekliem, polo un auduma maisiņiem lielos daudzumos.",
+          en: "The go-to method for t-shirts, polos, and tote bags in large quantities.",
         },
       },
       {
         icon: <BookOpen className="h-6 w-6" />,
-        label: { lv: "KRĀSAS", en: "COLORS" },
+        label: { lv: "Krāsas", en: "Colors" },
         text: {
-          lv: "Pantone® solid Coated precizitāte. Īpaši koši un sedzoši toņi.",
-          en: "Pantone® solid Coated precision. Exceptionally vibrant and opaque tones.",
+          lv: "Pantone® Solid Coated precizitāte. Īpaši koši un sedzoši toņi.",
+          en: "Pantone® Solid Coated precision. Exceptionally vibrant and opaque tones.",
         },
       },
       {
         icon: <TrendingUp className="h-6 w-6" />,
-        label: { lv: "PASŪTĪJUMS", en: "ORDERING" },
+        label: { lv: "Pasūtījums", en: "Ordering" },
         text: {
-          lv: "Ekonomiski izdevīgākais veids tirāžām virs 50 gabaliem.",
-          en: "The most cost-effective method for runs over 50 pieces.",
+          lv: "Ekonomiski izdevīgākais veids tirāžām virs 50 vienībām.",
+          en: "The most cost-effective method for runs exceeding 50 pieces.",
         },
       },
       {
         icon: <ShieldCheck className="h-6 w-6" />,
-        label: { lv: "NOTURĪBA", en: "DURABILITY" },
+        label: { lv: "Noturība", en: "Durability" },
         text: {
-          lv: "Augstākā mehāniskā izturība. Krāsa burtiski iesūcas audumā.",
-          en: "Highest mechanical durability. Ink literally absorbs into the fabric.",
+          lv: "Augstākā mehāniskā izturība — krāsa iesūcas tieši audumā.",
+          en: "Superior mechanical resistance — ink bonds directly with the fabric.",
         },
       },
     ],
@@ -142,17 +142,17 @@ const serviceSections: ServiceSection[] = [
     id: "embroidery",
     icon: <Scissors className="h-8 w-8" />,
     title: {
-      lv: "Izšūšana – Ekskluzīvs un ilgmūžīgs risinājums",
-      en: "Embroidery – Exclusive and Long-Lasting Solution",
+      lv: "Izšūšana",
+      en: "Embroidery",
     },
     subtitle: {
-      lv: "Premium izskats un neierobežota ilgmūžība jūsu zīmolam.",
-      en: "Premium look and unlimited lifespan for your brand.",
+      lv: "Ekskluzīvs un ilgmūžīgs risinājums — premium izskats jūsu zīmolam.",
+      en: "An exclusive, long-lasting solution — premium aesthetics for your brand.",
     },
     features: [
       {
         icon: <Briefcase className="h-6 w-6" />,
-        label: { lv: "PIELIETOJUMS", en: "APPLICATIONS" },
+        label: { lv: "Pielietojums", en: "Applications" },
         text: {
           lv: "Polo krekli, flīsa jakas, cepures, frotē dvieļi, reprezentācijas apģērbs.",
           en: "Polo shirts, fleece jackets, caps, terry towels, corporate apparel.",
@@ -160,25 +160,25 @@ const serviceSections: ServiceSection[] = [
       },
       {
         icon: <Zap className="h-6 w-6" />,
-        label: { lv: "KVALITĀTE", en: "QUALITY" },
+        label: { lv: "Kvalitāte", en: "Quality" },
         text: {
-          lv: "3D efekts un tekstūra. Piešķir apģērbam augstu pievienoto vērtību.",
-          en: "3D effect and texture. Adds premium perceived value to garments.",
+          lv: "3D efekts un taustāma tekstūra. Piešķir apģērbam augstu pievienoto vērtību.",
+          en: "3D effect and tangible texture. Adds measurable perceived value to garments.",
         },
       },
       {
         icon: <Droplet className="h-6 w-6" />,
-        label: { lv: "DIEGI", en: "THREADS" },
+        label: { lv: "Diegi", en: "Threads" },
         text: {
-          lv: "Plaša krāsu izvēle (Madeira/Isacord), ieskaitot metāliskos diegus.",
-          en: "Wide color selection (Madeira/Isacord), including metallic threads.",
+          lv: "Plaša krāsu palete (Madeira / Isacord), ieskaitot metāliskos diegus.",
+          en: "Wide colour palette (Madeira / Isacord), including metallic threads.",
         },
       },
       {
         icon: <Infinity className="h-6 w-6" />,
-        label: { lv: "NOTURĪBA", en: "DURABILITY" },
+        label: { lv: "Noturība", en: "Durability" },
         text: {
-          lv: "Neierobežots kalpošanas laiks. Drīkst mazgāt augstās temperatūrās.",
+          lv: "Neierobežots kalpošanas laiks. Droši mazgāt augstās temperatūrās.",
           en: "Unlimited lifespan. Safe to wash at high temperatures.",
         },
       },
@@ -188,44 +188,44 @@ const serviceSections: ServiceSection[] = [
     id: "sublimation",
     icon: <Palette className="h-8 w-8" />,
     title: {
-      lv: "Sublimācija – Neierobežots dizains sportam un reklāmai",
-      en: "Sublimation – Unlimited Designs for Sport & Promotion",
+      lv: "Sublimācija",
+      en: "Sublimation",
     },
     subtitle: {
-      lv: "Krāsa kļūst par auduma daļu — fotogrāfiska kvalitāte bez robežām.",
-      en: "Color becomes part of the fabric — photographic quality without limits.",
+      lv: "Neierobežots dizains sportam un reklāmai — fotogrāfiska kvalitāte bez robežām.",
+      en: "Unlimited design for sport & promotion — photographic quality without boundaries.",
     },
     features: [
       {
         icon: <Activity className="h-6 w-6" />,
-        label: { lv: "MATERIĀLI", en: "MATERIALS" },
+        label: { lv: "Materiāli", en: "Materials" },
         text: {
-          lv: "Tikai sintētiski (poliestera) audumi — sporta formas, karogi, speciālie suvenīri.",
-          en: "Synthetic (polyester) fabrics only — sports uniforms, flags, specialty souvenirs.",
+          lv: "Tikai sintētiski (poliestera) audumi — sporta formas, karogi, suvenīri.",
+          en: "Polyester fabrics only — sports uniforms, flags, specialty souvenirs.",
         },
       },
       {
         icon: <Maximize className="h-6 w-6" />,
-        label: { lv: "DIZAINS", en: "DESIGN" },
+        label: { lv: "Dizains", en: "Design" },
         text: {
-          lv: "Druka pa visu izstrādājuma laukumu. Krāsa kļūst par auduma sastāvdaļu (nejūtama uz tausti).",
-          en: "Full-surface printing. Color becomes part of the fabric (imperceptible to touch).",
+          lv: "Druka pa visu virsmu. Krāsa kļūst par auduma daļu — nejūtama uz tausti.",
+          en: "Full-surface printing. Colour becomes part of the fabric — imperceptible to touch.",
         },
       },
       {
         icon: <Thermometer className="h-6 w-6" />,
-        label: { lv: "ĪPAŠĪBAS", en: "PROPERTIES" },
+        label: { lv: "Īpašības", en: "Properties" },
         text: {
-          lv: "Audums saglabā elpošanas funkcijas. Ideāls aktīvam sportam.",
-          en: "Fabric retains breathability. Ideal for active sports.",
+          lv: "Audums saglabā elpojamību. Ideāli aktīvam sportam.",
+          en: "Fabric retains full breathability. Ideal for active sports.",
         },
       },
       {
         icon: <Tag className="h-6 w-6" />,
-        label: { lv: "CENA", en: "PRICE" },
+        label: { lv: "Cena", en: "Pricing" },
         text: {
           lv: "Nav atkarīga no krāsu skaita dizainā.",
-          en: "Not dependent on the number of colors in the design.",
+          en: "Independent of the number of colours in the design.",
         },
       },
     ],
@@ -248,10 +248,10 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
           {section.icon}
         </div>
         <div>
-          <h2 className="font-heading text-lg font-black uppercase tracking-wide text-card-foreground md:text-xl">
+          <h2 className="font-heading text-lg font-black uppercase tracking-[-0.02em] text-card-foreground md:text-xl">
             {section.title[lang]}
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">{section.subtitle[lang]}</p>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{section.subtitle[lang]}</p>
         </div>
       </div>
 
@@ -269,10 +269,10 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
               {feat.icon}
             </div>
             <div>
-              <h3 className="font-heading text-xs font-bold uppercase tracking-widest text-card-foreground">
+              <h3 className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-card-foreground">
                 {feat.label[lang]}
               </h3>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                 {feat.text[lang]}
               </p>
             </div>
@@ -284,7 +284,7 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
       {section.id === "screen" && (
         <div className="mt-6 flex flex-wrap gap-2">
           {[
-            { lv: "Max krāsas: 12", en: "Max colors: 12" },
+            { lv: "Maks. krāsas: 12", en: "Max colours: 12" },
             { lv: "Industriāla skala", en: "Industrial Scale" },
             { lv: "Pantone® precizitāte", en: "Pantone® Precision" },
           ].map((badge, i) => (
@@ -311,7 +311,7 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
         <div className="mt-6 flex flex-wrap gap-2">
           {[
             { lv: "3D efekts", en: "3D Effect" },
-            { lv: "Madeira/Isacord diegi", en: "Madeira/Isacord Threads" },
+            { lv: "Madeira / Isacord", en: "Madeira / Isacord" },
             { lv: "Premium izskats", en: "Premium Look" },
           ].map((badge, i) => (
             <span key={i} className="inline-flex items-center rounded-sm border border-accent/20 bg-accent/5 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-wider text-accent">
@@ -324,8 +324,8 @@ const ServiceSectionCard = ({ section, index }: { section: ServiceSection; index
         <div className="mt-6 flex flex-wrap gap-2">
           {[
             { lv: "Pilna virsma", en: "Full Surface" },
-            { lv: "Eco krāsas", en: "Eco-Friendly Inks" },
-            { lv: "Fotogrāfiska kvalitāte", en: "Photo Quality" },
+            { lv: "Eko krāsas", en: "Eco-Friendly Inks" },
+            { lv: "Foto kvalitāte", en: "Photo Quality" },
           ].map((badge, i) => (
             <span key={i} className="inline-flex items-center rounded-sm border border-accent/20 bg-accent/5 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-wider text-accent">
               {badge[lang]}
@@ -354,8 +354,8 @@ const ServicesPage = () => {
       <section className="bg-primary py-16 text-primary-foreground md:py-24">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <h1 className="font-heading text-3xl font-black uppercase tracking-wide md:text-5xl">{t("services.title")}</h1>
-            <p className="mt-4 max-w-2xl text-lg text-primary-foreground/60">{t("services.subtitle")}</p>
+            <h1 className="font-heading text-3xl font-black uppercase tracking-[-0.02em] md:text-5xl">{t("services.title")}</h1>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-primary-foreground/60">{t("services.subtitle")}</p>
           </motion.div>
         </div>
         <div className="mt-0 h-1 bg-accent" />
@@ -375,15 +375,15 @@ const ServicesPage = () => {
         <div className="container text-center">
           <motion.div {...fadeUp}>
             <MessageCircle className="mx-auto mb-4 h-10 w-10 text-accent" />
-            <h2 className="font-heading text-2xl font-black uppercase tracking-wide md:text-4xl">
+            <h2 className="font-heading text-2xl font-black uppercase tracking-[-0.02em] md:text-4xl">
               {lang === "lv"
-                ? "Saņemt bezmaksas konsultāciju par tehnoloģijām"
-                : "Get a Free Technology Consultation"}
+                ? "Bezmaksas tehnoloģiju konsultācija"
+                : "Free Technology Consultation"}
             </h2>
-            <p className="mx-auto mt-3 max-w-md text-primary-foreground/50">
+            <p className="mx-auto mt-4 max-w-md leading-relaxed text-primary-foreground/50">
               {lang === "lv"
-                ? "Mūsu speciālisti palīdzēs izvēlēties labāko apdrukāšanas tehnoloģiju jūsu projektam."
-                : "Our specialists will help you choose the best printing technology for your project."}
+                ? "Mūsu speciālisti palīdzēs izvēlēties labāko apdrukas tehnoloģiju tieši jūsu projektam."
+                : "Our specialists will help you choose the optimal printing technology for your specific project."}
             </p>
             <Button size="lg" className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest" asChild>
               <Link to="/contact">
