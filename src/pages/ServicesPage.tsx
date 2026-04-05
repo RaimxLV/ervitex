@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
-  Printer, Layers, Scissors, Palette, ArrowRight,
-  Shirt, UserPlus, Wind, Box, BookOpen, TrendingUp,
-  ShieldCheck, Briefcase, Zap, Droplets, Infinity,
-  Activity, Maximize, Thermometer, Tag, MessageCircle,
+  Printer, Grid3X3, PenLine, Wind, ArrowRight,
+  SwatchBook, Palette, ShieldCheck, ShoppingBag, Package,
+  Focus, MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
