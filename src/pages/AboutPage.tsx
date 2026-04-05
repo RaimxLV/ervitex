@@ -6,27 +6,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 
 const SW = 1.2;
 
-const teamMembers = [
-  { name: "Vilnis Lācis", title: { lv: "Valdes priekšsēdētājs", en: "Chairman of the Board" }, email: "vilnis@ervitex.lv", phone: "+371 67543384", phoneLabel: { lv: "Tel", en: "Tel" }, photo: vilnisLacisPhoto },
-  { name: "Ēriks Lācis", title: { lv: "Tirdzniecības direktors", en: "Sales Director" }, email: "eriks@ervitex.lv", phone: "+371 29395600", phoneLabel: { lv: "Mob", en: "Mob" }, photo: eriksLacisPhoto },
-  { name: "Laura Daukšte", title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" }, email: "laura@ervitex.lv", phone: "+371 26164635", phoneLabel: { lv: "Mob", en: "Mob" }, photo: lauraDaukstePhoto },
-  { name: "Ilona Romanovska", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "ilona@ervitex.lv", phone: "+371 29494626", phoneLabel: { lv: "Mob", en: "Mob" }, photo: ilonaRomanovskaPhoto },
-  { name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "67436899", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaZvaigznePhoto },
-  { name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "29725412", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justineStrunkaPhoto },
-  { name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: null as string | null },
-];
-
 const AboutPage = () => {
   const { t, lang } = useLanguage();
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<typeof teamMembers[0] | null>(null);
-
-  const openLightbox = (member: typeof teamMembers[0]) => {
-    if (member.photo) {
-      setSelectedMember(member);
-      setLightboxOpen(true);
-    }
-  };
 
   return (
     <Layout>
