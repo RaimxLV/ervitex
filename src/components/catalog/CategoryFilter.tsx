@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import {
-  Shirt,
   ShoppingBag,
   HardHat,
   Dumbbell,
@@ -28,30 +27,38 @@ import {
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 
+const CATEGORY_ICON_CLASS = "h-5 w-5";
+const CATEGORY_ICON_STROKE = 1.2;
+
+const iconProps = {
+  className: CATEGORY_ICON_CLASS,
+  strokeWidth: CATEGORY_ICON_STROKE,
+};
+
 // Icon mapping per category slug — each category gets a unique icon
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  "t-krekli": <Shirt className="h-5 w-5" />,
-  "polo-krekli": <Contact className="h-5 w-5" />,
-  "krekli": <Shirt className="h-5 w-5" />,
-  "dzemperi-hudiji": <SwatchBook className="h-5 w-5" />,
-  "jakas": <CloudSnow className="h-5 w-5" />,
-  "virsjakas": <ShieldCheck className="h-5 w-5" />,
-  "vestes": <Zap className="h-5 w-5" />,
-  "bikses-sorti": <RectangleVertical className="h-5 w-5" />,
-  "kleitas-svārki": <Sparkles className="h-5 w-5" />,
-  "cepures": <HardHat className="h-5 w-5" />,
-  "šalles-lakati": <Ribbon className="h-5 w-5" />,
-  "somas": <Backpack className="h-5 w-5" />,
-  "aksesuari": <Gem className="h-5 w-5" />,
-  "darba-apgerbi": <Hammer className="h-5 w-5" />,
-  "sportam": <Dumbbell className="h-5 w-5" />,
-  "berni": <Baby className="h-5 w-5" />,
-  "lietus-apgerbs": <Umbrella className="h-5 w-5" />,
-  "audumu-maisini": <ShoppingBag className="h-5 w-5" />,
-  "dvieli": <Droplets className="h-5 w-5" />,
-  "priekšauti": <ChefHat className="h-5 w-5" />,
-  "softshell": <Shield className="h-5 w-5" />,
-  "fleece": <Flame className="h-5 w-5" />,
+  "t-krekli": <SwatchBook {...iconProps} />,
+  "polo-krekli": <Contact {...iconProps} />,
+  "krekli": <SwatchBook {...iconProps} />,
+  "dzemperi-hudiji": <SwatchBook {...iconProps} />,
+  "jakas": <CloudSnow {...iconProps} />,
+  "virsjakas": <ShieldCheck {...iconProps} />,
+  "vestes": <Zap {...iconProps} />,
+  "bikses-sorti": <RectangleVertical {...iconProps} />,
+  "kleitas-svārki": <Sparkles {...iconProps} />,
+  "cepures": <HardHat {...iconProps} />,
+  "šalles-lakati": <Ribbon {...iconProps} />,
+  "somas": <Backpack {...iconProps} />,
+  "aksesuari": <Gem {...iconProps} />,
+  "darba-apgerbi": <Hammer {...iconProps} />,
+  "sportam": <Dumbbell {...iconProps} />,
+  "berni": <Baby {...iconProps} />,
+  "lietus-apgerbs": <Umbrella {...iconProps} />,
+  "audumu-maisini": <ShoppingBag {...iconProps} />,
+  "dvieli": <Droplets {...iconProps} />,
+  "priekšauti": <ChefHat {...iconProps} />,
+  "softshell": <Shield {...iconProps} />,
+  "fleece": <Flame {...iconProps} />,
 };
 
 // Group definitions
