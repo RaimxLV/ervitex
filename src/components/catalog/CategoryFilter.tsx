@@ -1,65 +1,8 @@
 import { useRef } from "react";
-import {
-  ShoppingBag,
-  HardHat,
-  Dumbbell,
-  Baby,
-  Umbrella,
-  LayoutGrid,
-  ChevronLeft,
-  ChevronRight,
-  Contact,
-  SwatchBook,
-  CloudSnow,
-  ShieldCheck,
-  Zap,
-  Shield,
-  Flame,
-  RectangleVertical,
-  Sparkles,
-  Ribbon,
-  Gem,
-  Hammer,
-  Backpack,
-  Droplets,
-  ChefHat,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
-
-const CATEGORY_ICON_CLASS = "h-5 w-5";
-const CATEGORY_ICON_STROKE = 1.2;
-
-const iconProps = {
-  className: CATEGORY_ICON_CLASS,
-  strokeWidth: CATEGORY_ICON_STROKE,
-};
-
-// Icon mapping per category slug — each category gets a unique icon
-const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  "t-krekli": <SwatchBook {...iconProps} />,
-  "polo-krekli": <Contact {...iconProps} />,
-  "krekli": <SwatchBook {...iconProps} />,
-  "dzemperi-hudiji": <SwatchBook {...iconProps} />,
-  "jakas": <CloudSnow {...iconProps} />,
-  "virsjakas": <ShieldCheck {...iconProps} />,
-  "vestes": <Zap {...iconProps} />,
-  "bikses-sorti": <RectangleVertical {...iconProps} />,
-  "kleitas-svārki": <Sparkles {...iconProps} />,
-  "cepures": <HardHat {...iconProps} />,
-  "šalles-lakati": <Ribbon {...iconProps} />,
-  "somas": <Backpack {...iconProps} />,
-  "aksesuari": <Gem {...iconProps} />,
-  "darba-apgerbi": <Hammer {...iconProps} />,
-  "sportam": <Dumbbell {...iconProps} />,
-  "berni": <Baby {...iconProps} />,
-  "lietus-apgerbs": <Umbrella {...iconProps} />,
-  "audumu-maisini": <ShoppingBag {...iconProps} />,
-  "dvieli": <Droplets {...iconProps} />,
-  "priekšauti": <ChefHat {...iconProps} />,
-  "softshell": <Shield {...iconProps} />,
-  "fleece": <Flame {...iconProps} />,
-};
+import { CATEGORY_ICON_MAP, IconAll } from "./CategoryIcons";
 
 // Group definitions
 const GROUPS: { label: Record<string, string>; slugs: string[] }[] = [
