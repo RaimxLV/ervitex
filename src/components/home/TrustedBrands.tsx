@@ -21,12 +21,12 @@ const TrustedBrands = () => {
         >
           <div className="flex items-center justify-center gap-3 mb-3">
             <div className="h-px w-10 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent">
+            <span className="font-heading text-[10px] font-bold uppercase text-accent">
               {lang === "lv" ? "Partneri" : "Partners"}
             </span>
             <div className="h-px w-10 bg-accent" />
           </div>
-          <h2 className="font-heading text-xl font-black uppercase tracking-[-0.02em] text-foreground md:text-2xl">
+          <h2 className="font-heading text-xl font-black uppercase text-foreground md:text-2xl">
             {lang === "lv" ? "Uzticami zīmoli" : "Trusted Brands"}
           </h2>
         </motion.div>
@@ -41,7 +41,7 @@ const TrustedBrands = () => {
                     key={`${setIdx}-${i}`}
                     className="mx-6 flex items-center md:mx-10"
                   >
-                    <span className="font-heading text-lg font-bold uppercase tracking-wider text-muted-foreground/40 transition-colors duration-300 hover:text-foreground md:text-xl">
+                    <span className="font-heading text-lg font-bold uppercase text-muted-foreground/40 transition-colors duration-300 hover:text-foreground md:text-xl">
                       {brand}
                     </span>
                   </div>
