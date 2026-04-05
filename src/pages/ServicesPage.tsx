@@ -71,8 +71,8 @@ const serviceSections: ServiceSection[] = [
     icon: <Grid3X3 className="h-7 w-7" strokeWidth={SW} />,
     title: { lv: "Sietspiede", en: "Screen Printing" },
     subtitle: {
-      lv: "Industriāla kvalitāte lieliem apjomiem — klasika ar nepārspējamu krāsu intensitāti.",
-      en: "Industrial quality for large volumes — a time-tested method with unmatched colour intensity.",
+      lv: "Industriāla kvalitāte lieliem apjomiem — klasika ar nepārspējamu krāsu intensitāti. Powered by M&R industrial automation — 100% Pantone® precizitāte un stabila kvalitāte liela apjoma tirāžās.",
+      en: "Industrial quality for large volumes — a time-tested method with unmatched colour intensity. Powered by M&R industrial automation for 100% Pantone® accuracy and high-volume consistency.",
     },
     features: [
       { icon: <Layers className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Materiāli", en: "Materials" }, text: { lv: "Labākā izvēle t-krekliem, polo un auduma maisiņiem lielos daudzumos.", en: "The go-to method for t-shirts, polos, and tote bags in large quantities." } },
