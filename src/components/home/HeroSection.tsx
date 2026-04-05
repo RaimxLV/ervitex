@@ -11,13 +11,16 @@ const HeroSection = () => {
   const { lang } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
 
-  const { scrollY } = useScroll();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
 
   // Layer 1: slow parallax (0.2 factor)
-  const bgY = useTransform(scrollY, [0, 800], [0, 160]);
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 160]);
 
-  // Layer 3: scroll-driven darkness overlay (fully black at 400px)
-  const darkOverlayOpacity = useTransform(scrollY, [0, 400], [0, 1]);
+  // Layer 3: scroll-driven darkness overlay
+  const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.6], [0, 1]);
 
   return (
     <section

@@ -12,18 +12,18 @@ const Footer = () => {
   return (
     <footer className="border-t border-border bg-primary text-primary-foreground">
       <div className="container py-8 md:py-16">
-        <div className="mb-6">
-          <div className="flex items-center gap-3">
+        <div className="mb-6 text-center">
+          <div className="flex items-center justify-center gap-3">
             <img src={ervitexLogo} alt="Ervitex" className="h-7 w-auto brightness-0 invert" />
             <span className="h-5 w-px bg-primary-foreground/20" />
             <img src={stellaLogo} alt="Stanley/Stella Dealer" className="h-3.5 w-auto opacity-50" />
           </div>
-          <p className="mt-2 text-xs text-primary-foreground/50 max-w-[220px]">
+          <p className="mt-2 text-xs text-primary-foreground/50">
             {lang === "lv" ? "Jūsu uzticamais apģērbu partneris" : "Your trusted apparel partner"}
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-5 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-5 md:grid-cols-3 text-center">
           <div className="space-y-2">
             <h4 className="font-heading text-[10px] font-bold uppercase text-primary-foreground/35">
               {t("footer.navigation")}
@@ -62,11 +62,11 @@ const Footer = () => {
             </nav>
           </div>
 
-          <div className="col-span-2 md:col-span-2 space-y-2 mt-1 md:mt-0">
+          <div className="col-span-2 md:col-span-1 space-y-2 mt-1 md:mt-0">
             <h4 className="font-heading text-[10px] font-bold uppercase text-primary-foreground/35">
               {t("footer.contact")}
             </h4>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 items-center">
               <a href="tel:+37167818282" className="inline-flex items-center gap-2 text-xs text-primary-foreground/55 hover:text-accent transition-colors">
                 <Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={SW} /> +371 678 18282
               </a>
@@ -90,12 +90,12 @@ const Footer = () => {
       </div>
 
       <div className="border-t border-primary-foreground/10 bg-primary">
-        <div className="container flex items-center justify-between py-4">
-          <div className="flex items-center gap-3">
+        <div className="container flex flex-col items-center justify-center gap-2 py-4 text-center">
+          <div className="flex items-center gap-3 flex-wrap justify-center">
             <span className="text-[10px] text-primary-foreground/25">
               © {new Date().getFullYear()} SIA Ervitex. {t("footer.rights")}
             </span>
-            <span className="hidden sm:flex items-center gap-2 text-[10px] text-primary-foreground/20">
+            <span className="flex items-center gap-2 text-[10px] text-primary-foreground/20">
               <span>·</span>
               <Link to="/privacy" className="hover:text-accent/60 transition-colors">
                 {lang === "lv" ? "Privātuma politika" : "Privacy Policy"}
@@ -104,16 +104,17 @@ const Footer = () => {
               <Link to="/terms" className="hover:text-accent/60 transition-colors">
                 {lang === "lv" ? "Lietošanas noteikumi" : "Terms of Service"}
               </Link>
+              <span>·</span>
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1 hover:text-accent/60 transition-colors"
+                aria-label="Admin access"
+              >
+                <Lock className="h-3 w-3" strokeWidth={SW} />
+                <span>{lang === "lv" ? "Piekļuve" : "Access"}</span>
+              </Link>
             </span>
           </div>
-          <Link
-            to="/login"
-            className="inline-flex items-center gap-1 text-[10px] text-primary-foreground/20 hover:text-accent/60 transition-colors"
-            aria-label="Admin access"
-          >
-            <Lock className="h-3 w-3" strokeWidth={SW} />
-            <span className="hidden sm:inline">{lang === "lv" ? "Piekļuve" : "Access"}</span>
-          </Link>
         </div>
       </div>
     </footer>
