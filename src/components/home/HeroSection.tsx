@@ -137,7 +137,7 @@ const HeroSection = () => {
           >
             <Button
               size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase rounded-none px-10 h-13 shadow-[0_0_30px_hsl(var(--accent)/0.3)]"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase rounded-none px-14 py-4 h-14 min-w-[220px] justify-center shadow-[0_0_30px_hsl(var(--accent)/0.3)]"
               asChild
             >
               <Link to="/catalog">
@@ -148,7 +148,7 @@ const HeroSection = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent hover:text-accent font-heading text-xs uppercase rounded-none px-8 h-13"
+              className="border border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent hover:text-accent font-heading text-xs uppercase rounded-none px-14 py-4 h-14 min-w-[220px] justify-center"
               asChild
             >
               <Link to="/services">
