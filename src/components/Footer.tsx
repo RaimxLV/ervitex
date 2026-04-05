@@ -81,11 +81,31 @@ const Footer = () => {
         </div>
       </div>
 
+      {/* OEKO-TEX badge */}
+      <div className="border-t border-primary-foreground/10 bg-primary">
+        <div className="container flex items-center justify-center gap-2 py-3">
+          <ShieldCheck className="h-4 w-4 text-accent" strokeWidth={SW} />
+          <span className="text-[10px] font-heading uppercase text-primary-foreground/40 tracking-wide">OEKO-TEX® Standard 100</span>
+        </div>
+      </div>
+
       <div className="border-t border-primary-foreground/10 bg-primary">
         <div className="container flex items-center justify-between py-4">
-          <span className="text-[10px] text-primary-foreground/25">
-            © {new Date().getFullYear()} SIA Ervitex. {t("footer.rights")}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] text-primary-foreground/25">
+              © {new Date().getFullYear()} SIA Ervitex. {t("footer.rights")}
+            </span>
+            <span className="hidden sm:flex items-center gap-2 text-[10px] text-primary-foreground/20">
+              <span>·</span>
+              <Link to="/privacy" className="hover:text-accent/60 transition-colors">
+                {lang === "lv" ? "Privātuma politika" : "Privacy Policy"}
+              </Link>
+              <span>·</span>
+              <Link to="/terms" className="hover:text-accent/60 transition-colors">
+                {lang === "lv" ? "Lietošanas noteikumi" : "Terms of Service"}
+              </Link>
+            </span>
+          </div>
           <Link
             to="/login"
             className="inline-flex items-center gap-1 text-[10px] text-primary-foreground/20 hover:text-accent/60 transition-colors"
