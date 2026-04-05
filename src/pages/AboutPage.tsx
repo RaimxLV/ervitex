@@ -1,17 +1,8 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Target, Users, Award, Factory, Mail, Phone, X } from "lucide-react";
+import { Target, Users, Award, Factory } from "lucide-react";
 import ervitexStore from "@/assets/ervitex-store.jpg";
 import Layout from "@/components/Layout";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import lauraDaukstePhoto from "@/assets/team/laura-daukste.jpg";
-import santaZvaigznePhoto from "@/assets/team/santa-zvaigzne.jpg";
-import justineStrunkaPhoto from "@/assets/team/justine-strunka.jpg";
-import ilonaRomanovskaPhoto from "@/assets/team/ilona-romanovska.jpg";
-import vilnisLacisPhoto from "@/assets/team/vilnis-lacis.jpg";
-import eriksLacisPhoto from "@/assets/team/eriks-lacis.jpg";
 
 const SW = 1.2;
 
