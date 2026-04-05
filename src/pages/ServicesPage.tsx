@@ -78,9 +78,9 @@ const serviceSections: ServiceSection[] = [
       en: "An exclusive, long-lasting solution — premium aesthetics for your brand.",
     },
     features: [
-      { icon: <Package className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Pielietojums", en: "Applications" }, text: { lv: "Polo krekli, flīsa jakas, cepures, frotē dvieļi, reprezentācijas apģērbs.", en: "Polo shirts, fleece jackets, caps, terry towels, corporate apparel." } },
+      { icon: <CircleCheck className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Paredzēts", en: "Intended For" }, text: { lv: "Polo krekli, flīsa jakas, cepures, frotē dvieļi, reprezentācijas apģērbs.", en: "Polo shirts, fleece jackets, caps, terry towels, corporate apparel." } },
       { icon: <ShieldCheck className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Kvalitāte", en: "Quality" }, text: { lv: "3D efekts un taustāma tekstūra. Piešķir apģērbam augstu pievienoto vērtību.", en: "3D effect and tangible texture. Adds measurable perceived value to garments." } },
-      { icon: <Palette className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Diegi", en: "Threads" }, text: { lv: "Plaša krāsu palete (Madeira / Isacord), ieskaitot metāliskos diegus.", en: "Wide colour palette (Madeira / Isacord), including metallic threads." } },
+      { icon: <Cylinder className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Diegi", en: "Threads" }, text: { lv: "Plaša krāsu palete (Madeira / Isacord), ieskaitot metāliskos diegus.", en: "Wide colour palette (Madeira / Isacord), including metallic threads." } },
       { icon: <ShieldCheck className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Noturība", en: "Durability" }, text: { lv: "Neierobežots kalpošanas laiks. Droši mazgāt augstās temperatūrās.", en: "Unlimited lifespan. Safe to wash at high temperatures." } },
     ],
   },
