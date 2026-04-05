@@ -99,7 +99,8 @@ const bentoItems: BentoItem[] = [
   },
 ];
 
-const scrollingText = "TEKSTILA APDRUKA  ·  IZŠŪŠANA  ·  B2B SERVISS  ·  SUBLIMĀCIJA  ·  VAIRUMTIRDZNIECĪBA  ·  ";
+const scrollingTextLv = "TEKSTILA APDRUKA  ·  IZŠŪŠANA  ·  B2B SERVISS  ·  SUBLIMĀCIJA  ·  VAIRUMTIRDZNIECĪBA  ·  ";
+const scrollingTextEn = "TEXTILE PRINTING  ·  EMBROIDERY  ·  B2B SERVICE  ·  SUBLIMATION  ·  WHOLESALE  ·  ";
 
 const BentoCategories = () => {
   const { lang } = useLanguage();
