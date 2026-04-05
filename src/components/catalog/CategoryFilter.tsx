@@ -158,7 +158,7 @@ export default function CategoryFilter({ categories, activeCategory, onSelect }:
                       "shrink-0 transition-colors",
                       isActive ? "text-accent-foreground" : "text-muted-foreground group-hover/item:text-accent"
                     )}>
-                      {CATEGORY_ICONS[cat.id] || <LayoutGrid className="h-4 w-4" />}
+                      {CATEGORY_ICON_MAP[cat.id] || <IconAll />}
                     </span>
                     <span className="truncate">{cat.name[lang]}</span>
                   </button>
