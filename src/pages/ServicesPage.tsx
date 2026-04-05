@@ -48,7 +48,7 @@ const serviceSections: ServiceSection[] = [
       en: "From a single piece to personalized runs — the most advanced digital technology.",
     },
     features: [
-      { icon: <SwatchBook className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Materiāli", en: "Materials" }, text: { lv: "Kokvilna, poliesters, neilons, darba apģērbs, somas, cepures.", en: "Cotton, polyester, nylon, workwear, bags, caps." } },
+      { icon: <Layers className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Materiāli", en: "Materials" }, text: { lv: "Kokvilna, poliesters, neilons, darba apģērbs, somas, cepures.", en: "Cotton, polyester, nylon, workwear, bags, caps." } },
       { icon: <Palette className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Krāsas", en: "Colors" }, text: { lv: "Pilnkrāsu CMYK+W druka, speciālās plēves (zelta, sudraba, atstarojošas). Pantone® atbilstība pieejama.", en: "Full-color CMYK+W printing, specialty films (gold, silver, reflective). Pantone® matching available." } },
       { icon: <ShoppingBag className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Pasūtījums", en: "Ordering" }, text: { lv: "Ideāli individuāliem vārdiem, numuriem un mazām tirāžām — no 1 gabala.", en: "Ideal for individual names, numbers, and small runs — starting from 1 piece." } },
       { icon: <ShieldCheck className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Kopšana", en: "Care" }, text: { lv: "Mazgāt līdz 40 °C, gludināt no kreisās puses.", en: "Wash up to 40 °C, iron inside out." } },
