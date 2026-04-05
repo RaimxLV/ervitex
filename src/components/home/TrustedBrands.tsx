@@ -21,7 +21,7 @@ const TrustedBrands = () => {
         >
           <div className="flex items-center justify-center gap-3 mb-3">
             <div className="h-px w-10 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent">
+            <span className="font-heading text-[10px] font-bold uppercase text-accent">
               {lang === "lv" ? "Partneri" : "Partners"}
             </span>
             <div className="h-px w-10 bg-accent" />
