@@ -31,8 +31,8 @@ const values = [
     icon: CheckCircle,
     title: { lv: "Stabilitāte", en: "Reliability" },
     desc: {
-      lv: "Precīzi izpildes termiņi un individuāla apkalpošana katram klientam.",
-      en: "Precise deadlines and personalized service for every client.",
+      lv: "Precīzi izpildes termiņi un individuāla pieeja katram klientam.",
+      en: "Precise deadlines and a tailored approach for every client.",
     },
   },
 ];

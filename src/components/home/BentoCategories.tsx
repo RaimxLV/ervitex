@@ -214,7 +214,7 @@ const BentoCategories = () => {
                 key={i}
                 className="font-heading text-lg font-black uppercase tracking-[0.15em] text-muted-foreground/30 md:text-2xl"
               >
-                {scrollingText}
+                {lang === "lv" ? scrollingTextLv : scrollingTextEn}
               </span>
             ))}
           </div>

@@ -27,18 +27,45 @@ const RetailSection = () => {
           </div>
 
           <h2 className="font-heading text-2xl font-black uppercase tracking-[-0.02em] text-foreground md:text-3xl">
-            {lang === "lv" ? "T-Shirt Store By T-Bode" : "T-Shirt Store By T-Bode"}
+            T-Shirt Store By T-Bode
           </h2>
 
           <div className="mt-6 flex justify-center">
             <Store className="h-10 w-10 text-accent/60" />
           </div>
 
-          <p className="mt-6 text-muted-foreground leading-relaxed md:text-lg">
-            {lang === "lv"
-              ? "SIA Ervitex nodrošina ne tikai vairumtirdzniecības un rūpnieciskās apdrukas pakalpojumus, bet arī t-kreklu apdruku vienā eksemplārā. Mūsu mazumtirdzniecības veikalos \"T-Shirt Store By T-Bode\" varat iegādāties vīriešu, sieviešu un bērnu t-kreklus, džemperus un dažādus aksesuārus, kā arī pasūtīt apdruku vienā vai vairākos eksemplāros tās pašas dienas laikā. Piedāvājumā ir arī suvenīrlīnija ar Latvijas simboliku. Pasūtījumus var veikt arī internetā www.t-bode.lv."
-              : "SIA Ervitex provides not only wholesale and industrial printing services, but also single-copy t-shirt printing. In our retail stores \"T-Shirt Store By T-Bode\" you can purchase men's, women's, and children's t-shirts, sweaters, and various accessories, as well as order prints in one or more copies on the same day. We also offer a souvenir line with Latvian symbols. Orders can also be placed online at www.t-bode.lv."}
-          </p>
+          <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed md:text-lg">
+            <p>
+              {lang === "lv"
+                ? "Ervitex — Jūsu partneris gan industriāla mēroga projektos, gan individuālos pasūtījumos."
+                : "Ervitex — your partner for both industrial-scale projects and individual orders."}
+            </p>
+            <p>
+              {lang === "lv"
+                ? "Papildus vairumtirdzniecības servisam, mūsu mazumtirdzniecības tīklā «T-Shirt Store By T-Bode» piedāvājam tūlītēju apdruku un plašu gatavās produkcijas klāstu lielākajos Rīgas tirdzniecības centros."
+                : "Beyond wholesale, our retail chain «T-Shirt Store By T-Bode» offers same-day custom printing and a wide selection of ready-made products across major Riga shopping centres."}
+            </p>
+            <ul className="mx-auto max-w-md space-y-1.5 text-left text-sm md:text-base">
+              <li className="flex items-start gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                {lang === "lv"
+                  ? "Vīriešu, sieviešu un bērnu t-krekli, džemperi un aksesuāri"
+                  : "Men's, women's, and children's t-shirts, sweaters, and accessories"}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                {lang === "lv"
+                  ? "Apdruka vienā vai vairākos eksemplāros — tās pašas dienas laikā"
+                  : "Single or multi-copy printing — same-day turnaround"}
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                {lang === "lv"
+                  ? "Suvenīrlīnija ar Latvijas simboliku"
+                  : "Souvenir line featuring Latvian symbols"}
+              </li>
+            </ul>
+          </div>
 
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link to="/contact">
@@ -47,7 +74,7 @@ const RetailSection = () => {
                 className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest"
               >
                 <Store className="mr-2 h-4 w-4" />
-                {lang === "lv" ? "Mūsu veikalus var atrast šeit" : "Find our stores here"}
+                {lang === "lv" ? "Mūsu veikalu adreses" : "Find our stores"}
               </Button>
             </Link>
             <a href="https://www.t-bode.lv" target="_blank" rel="noopener noreferrer">

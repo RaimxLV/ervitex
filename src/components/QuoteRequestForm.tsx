@@ -51,7 +51,7 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
           <Input value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
         </div>
         <div>
-          <Label className="text-xs uppercase tracking-wider">Email *</Label>
+          <Label className="text-xs uppercase tracking-wider">{lang === "lv" ? "E-pasts *" : "Email *"}</Label>
           <Input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} required />
         </div>
       </div>
