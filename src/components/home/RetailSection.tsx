@@ -20,18 +20,18 @@ const RetailSection = () => {
           {/* Eyebrow */}
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="h-px w-10 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent">
+            <span className="font-heading text-[10px] font-bold uppercase text-accent">
               {lang === "lv" ? "Mazumtirdzniecība" : "Retail"}
             </span>
             <div className="h-px w-10 bg-accent" />
           </div>
 
-          <h2 className="font-heading text-2xl font-black uppercase tracking-[-0.02em] text-foreground md:text-3xl">
+          <h2 className="font-heading text-2xl font-black uppercase text-foreground md:text-3xl">
             T-Shirt Store By T-Bode
           </h2>
 
           <div className="mt-6 flex justify-center">
-            <Store className="h-10 w-10 text-accent/60" />
+            <Store className="h-8 w-8 text-accent/60" strokeWidth={1.5} />
           </div>
 
           <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed md:text-lg">
@@ -71,9 +71,9 @@ const RetailSection = () => {
             <Link to="/contact">
               <Button
                 size="lg"
-                className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest"
+                className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase"
               >
-                <Store className="mr-2 h-4 w-4" />
+                <Store className="mr-2 h-4 w-4" strokeWidth={1.5} />
                 {lang === "lv" ? "Mūsu veikalu adreses" : "Find our stores"}
               </Button>
             </Link>
@@ -81,9 +81,9 @@ const RetailSection = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="font-heading text-xs uppercase tracking-widest border-accent/30 text-accent hover:bg-accent/10"
+                className="font-heading text-xs uppercase border-accent/30 text-accent hover:bg-accent/10"
               >
-                <ExternalLink className="mr-2 h-4 w-4" />
+                <ExternalLink className="mr-2 h-4 w-4" strokeWidth={1.5} />
                 www.t-bode.lv
               </Button>
             </a>

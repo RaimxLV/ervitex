@@ -25,78 +25,16 @@ interface BentoItem {
 }
 
 const bentoItems: BentoItem[] = [
-  {
-    id: "t-krekli",
-    name: { lv: "T-KREKLI", en: "T-SHIRTS" },
-    image: tshirtsImg,
-    gridArea: "tshirts",
-    link: "/catalog?category=t-krekli",
-  },
-  {
-    id: "polo-krekli",
-    name: { lv: "POLO KREKLI", en: "POLO SHIRTS" },
-    image: poloImg,
-    gridArea: "polo",
-    link: "/catalog?category=polo-krekli",
-  },
-  {
-    id: "virsjakas",
-    name: { lv: "VIRSJAKAS", en: "JACKETS" },
-    image: jacketsImg,
-    gridArea: "jackets",
-    link: "/catalog?category=virsjakas",
-  },
-  {
-    id: "darba-apgerbi",
-    name: { lv: "DARBA APĢĒRBS", en: "WORKWEAR" },
-    image: workwearImg,
-    gridArea: "workwear",
-    link: "/catalog?category=darba-apgerbi",
-  },
-  {
-    id: "sportam",
-    name: { lv: "SPORTA APĢĒRBS", en: "SPORTSWEAR" },
-    image: sportswearImg,
-    gridArea: "sport",
-    link: "/catalog?category=sportam",
-  },
-  {
-    id: "dzemperi",
-    name: { lv: "DŽEMPERI & HŪDIJI", en: "HOODIES & SWEATSHIRTS" },
-    image: hoodiesImg,
-    gridArea: "hoodies",
-    link: "/catalog?category=dzemperi",
-  },
-  {
-    id: "cepures",
-    name: { lv: "CEPURES", en: "CAPS & HEADWEAR" },
-    image: capsImg,
-    gridArea: "caps",
-    link: "/catalog?category=cepures",
-  },
-  {
-    id: "somas",
-    name: { lv: "SOMAS", en: "BAGS & TOTES" },
-    image: bagsImg,
-    gridArea: "bags",
-    link: "/catalog?category=somas",
-  },
-  {
-    id: "jaunumi",
-    name: { lv: "JAUNUMI", en: "NEW ARRIVALS" },
-    image: newArrivalsImg,
-    gridArea: "new",
-    link: "/catalog?sort=newest",
-    icon: <Sparkles className="h-4 w-4" />,
-  },
-  {
-    id: "popularakie",
-    name: { lv: "POPULĀRĀKIE", en: "BEST SELLERS" },
-    image: bestsellersImg,
-    gridArea: "best",
-    link: "/catalog?sort=popular",
-    icon: <TrendingUp className="h-4 w-4" />,
-  },
+  { id: "t-krekli", name: { lv: "T-KREKLI", en: "T-SHIRTS" }, image: tshirtsImg, gridArea: "tshirts", link: "/catalog?category=t-krekli" },
+  { id: "polo-krekli", name: { lv: "POLO KREKLI", en: "POLO SHIRTS" }, image: poloImg, gridArea: "polo", link: "/catalog?category=polo-krekli" },
+  { id: "virsjakas", name: { lv: "VIRSJAKAS", en: "JACKETS" }, image: jacketsImg, gridArea: "jackets", link: "/catalog?category=virsjakas" },
+  { id: "darba-apgerbi", name: { lv: "DARBA APĢĒRBS", en: "WORKWEAR" }, image: workwearImg, gridArea: "workwear", link: "/catalog?category=darba-apgerbi" },
+  { id: "sportam", name: { lv: "SPORTA APĢĒRBS", en: "SPORTSWEAR" }, image: sportswearImg, gridArea: "sport", link: "/catalog?category=sportam" },
+  { id: "dzemperi", name: { lv: "DŽEMPERI & HŪDIJI", en: "HOODIES & SWEATSHIRTS" }, image: hoodiesImg, gridArea: "hoodies", link: "/catalog?category=dzemperi" },
+  { id: "cepures", name: { lv: "CEPURES", en: "CAPS & HEADWEAR" }, image: capsImg, gridArea: "caps", link: "/catalog?category=cepures" },
+  { id: "somas", name: { lv: "SOMAS", en: "BAGS & TOTES" }, image: bagsImg, gridArea: "bags", link: "/catalog?category=somas" },
+  { id: "jaunumi", name: { lv: "JAUNUMI", en: "NEW ARRIVALS" }, image: newArrivalsImg, gridArea: "new", link: "/catalog?sort=newest", icon: <Sparkles className="h-4 w-4" strokeWidth={1.5} /> },
+  { id: "popularakie", name: { lv: "POPULĀRĀKIE", en: "BEST SELLERS" }, image: bestsellersImg, gridArea: "best", link: "/catalog?sort=popular", icon: <TrendingUp className="h-4 w-4" strokeWidth={1.5} /> },
 ];
 
 const scrollingTextLv = "TEKSTILA APDRUKA  ·  IZŠŪŠANA  ·  B2B SERVISS  ·  SUBLIMĀCIJA  ·  VAIRUMTIRDZNIECĪBA  ·  ";
@@ -118,11 +56,11 @@ const BentoCategories = () => {
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="h-px w-12 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent">
+            <span className="font-heading text-[10px] font-bold uppercase text-accent">
               {lang === "lv" ? "Kategorijas" : "Categories"}
             </span>
           </div>
-          <h2 className="font-heading text-3xl font-black uppercase tracking-tight text-foreground md:text-5xl">
+          <h2 className="font-heading text-3xl font-black uppercase text-foreground md:text-5xl">
             {lang === "lv" ? "Produktu katalogs" : "Product Catalog"}
           </h2>
           <p className="mt-3 max-w-md text-sm text-muted-foreground">
@@ -132,7 +70,7 @@ const BentoCategories = () => {
           </p>
         </motion.div>
 
-        {/* Bento Grid - Desktop uses grid-template-areas, mobile uses simple 2-col */}
+        {/* Bento Grid - Mobile */}
         <div
           className="grid grid-cols-2 gap-2.5 md:gap-3"
           style={{
@@ -146,7 +84,6 @@ const BentoCategories = () => {
             `,
           }}
         >
-          {/* Mobile: first 8 items in simple bento */}
           {bentoItems.slice(0, 8).map((item, i) => (
             <motion.div
               key={item.id}
@@ -162,7 +99,7 @@ const BentoCategories = () => {
           ))}
         </div>
 
-        {/* Desktop Bento - larger, asymmetric layout */}
+        {/* Desktop Bento */}
         <div
           className="hidden md:grid gap-3"
           style={{
@@ -190,7 +127,7 @@ const BentoCategories = () => {
           ))}
         </div>
 
-        {/* Mobile: New Arrivals & Best Sellers row */}
+        {/* Mobile: New Arrivals & Best Sellers */}
         <div className="grid grid-cols-2 gap-2.5 mt-2.5 md:hidden">
           {bentoItems.slice(8).map((item, i) => (
             <motion.div
@@ -212,7 +149,7 @@ const BentoCategories = () => {
             {[...Array(3)].map((_, i) => (
               <span
                 key={i}
-                className="font-heading text-lg font-black uppercase tracking-[0.15em] text-muted-foreground/30 md:text-2xl"
+                className="font-heading text-lg font-black uppercase text-muted-foreground/30 md:text-2xl"
               >
                 {lang === "lv" ? scrollingTextLv : scrollingTextEn}
               </span>
@@ -231,7 +168,7 @@ const BentoCategories = () => {
           <Button
             asChild
             size="lg"
-            className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-sm font-bold uppercase tracking-wider px-10 py-6 rounded-sm"
+            className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-sm font-bold uppercase px-10 py-6"
           >
             <Link to="/catalog">
               {lang === "lv" ? "PARĀDĪT VISU KATALOGU" : "VIEW FULL CATALOG"}
@@ -246,7 +183,7 @@ const BentoCategories = () => {
 const BentoCard = ({ item, lang }: { item: BentoItem; lang: "lv" | "en" }) => (
   <Link
     to={item.link}
-    className="group relative block h-full w-full overflow-hidden rounded-lg bg-card transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_-20px_hsl(var(--accent)/0.4)]"
+    className="group relative block h-full w-full overflow-hidden bg-card transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_-20px_hsl(var(--accent)/0.4)]"
   >
     <img
       src={item.image}
@@ -257,23 +194,21 @@ const BentoCard = ({ item, lang }: { item: BentoItem; lang: "lv" | "en" }) => (
     <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/30 to-transparent transition-all duration-500 group-hover:from-foreground/90" />
 
     {/* Accent line bottom */}
-    <div className="absolute bottom-0 left-0 h-[3px] w-0 bg-accent transition-all duration-500 group-hover:w-full rounded-b-lg" />
+    <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
 
     {/* Content */}
     <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-5">
       <div className="flex items-center gap-2">
-        {item.icon && (
-          <span className="text-accent">{item.icon}</span>
-        )}
-        <h3 className="font-heading text-xs font-bold uppercase tracking-wider text-background md:text-sm lg:text-base">
+        {item.icon && <span className="text-accent">{item.icon}</span>}
+        <h3 className="font-heading text-xs font-bold uppercase text-background md:text-sm lg:text-base">
           {item.name[lang]}
         </h3>
       </div>
     </div>
 
     {/* Arrow */}
-    <div className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-background/10 text-background/60 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100 group-hover:bg-accent group-hover:text-accent-foreground">
-      <ArrowUpRight className="h-3.5 w-3.5" />
+    <div className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center bg-background/10 text-background/60 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100 group-hover:bg-accent group-hover:text-accent-foreground">
+      <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
     </div>
   </Link>
 );

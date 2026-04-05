@@ -53,12 +53,12 @@ const ValueCards = () => {
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="h-px w-12 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent">
+            <span className="font-heading text-[10px] font-bold uppercase text-accent">
               {lang === "lv" ? "Kāpēc mēs" : "Why Us"}
             </span>
             <div className="h-px w-12 bg-accent" />
           </div>
-          <h2 className="font-heading text-3xl font-black uppercase tracking-tight text-foreground md:text-5xl">
+          <h2 className="font-heading text-3xl font-black uppercase text-foreground md:text-5xl">
             {lang === "lv" ? "Mūsu vērtības" : "Our Values"}
           </h2>
         </motion.div>
@@ -74,18 +74,16 @@ const ValueCards = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="group relative overflow-hidden rounded-sm border border-border bg-card p-6 transition-all duration-300 hover:border-accent hover:shadow-xl hover:shadow-accent/5"
+                className="group relative overflow-hidden border border-border bg-card p-6 transition-all duration-300 hover:border-accent hover:shadow-xl hover:shadow-accent/5"
               >
                 {/* Top accent line */}
-                <div className="absolute top-0 left-0 h-[3px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
+                <div className="absolute top-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
 
-                {/* Icon */}
-                <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-accent/10 text-accent transition-all duration-300 group-hover:bg-accent group-hover:text-accent-foreground">
-                  <Icon className="h-5 w-5" strokeWidth={2} />
-                </div>
+                {/* Icon — clean, no background box */}
+                <Icon className="h-6 w-6 text-accent" strokeWidth={1.5} />
 
                 {/* Title */}
-                <h3 className="mt-5 font-heading text-xs font-bold uppercase tracking-[0.2em] text-card-foreground">
+                <h3 className="mt-5 font-heading text-sm font-bold uppercase text-card-foreground">
                   {v.title[lang]}
                 </h3>
 
