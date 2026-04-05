@@ -19,11 +19,18 @@ import dtf2 from "@/assets/services/dtf-2.jpg";
 import dtf3 from "@/assets/services/dtf-3.jpg";
 import dtf4 from "@/assets/services/dtf-4.jpg";
 import dtf5 from "@/assets/services/dtf-5.jpg";
+import emb1 from "@/assets/services/embroidery-1.jpg";
+import emb2 from "@/assets/services/embroidery-2.jpg";
+import emb3 from "@/assets/services/embroidery-3.jpg";
+import emb4 from "@/assets/services/embroidery-4.jpg";
+import emb5 from "@/assets/services/embroidery-5.jpg";
+import emb6 from "@/assets/services/embroidery-6.jpg";
+import emb7 from "@/assets/services/embroidery-7.jpg";
 
 const serviceImages: Record<string, string[]> = {
   screen: [screenPrint1, screenPrint2, screenPrint3, screenPrint4],
   dtf: [dtf1, dtf2, dtf3, dtf4, dtf5],
-  embroidery: [],
+  embroidery: [emb1, emb2, emb3, emb4, emb5, emb6, emb7],
   sublimation: [],
 };
 
