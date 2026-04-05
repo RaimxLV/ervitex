@@ -22,7 +22,7 @@ const CtaSection = () => {
           transition={{ duration: 0.7 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <h2 className="font-heading text-3xl font-black uppercase tracking-tight text-primary-foreground md:text-5xl">
+          <h2 className="font-heading text-3xl font-black uppercase text-primary-foreground md:text-5xl">
             {lang === "lv" ? "Gatavi sākt?" : "Ready to Start?"}
           </h2>
           <p className="mx-auto mt-4 max-w-md text-sm text-primary-foreground/50 md:text-base">
@@ -32,7 +32,7 @@ const CtaSection = () => {
           </p>
           <Button
             size="lg"
-            className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-[0.2em] rounded-none px-10 h-12"
+            className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase rounded-none px-10 h-12"
             asChild
           >
             <Link to="/contact">

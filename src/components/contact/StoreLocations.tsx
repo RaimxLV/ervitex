@@ -51,12 +51,12 @@ const StoreLocations = () => {
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="h-px w-12 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent">
+            <span className="font-heading text-[10px] font-bold uppercase text-accent">
               T-Bode
             </span>
             <div className="h-px w-12 bg-accent" />
           </div>
-          <h2 className="font-heading text-2xl font-black uppercase tracking-[-0.02em] text-foreground">
+          <h2 className="font-heading text-2xl font-black uppercase text-foreground">
             {lang === "lv" ? "Mūsu Veikali" : "Our Stores"}
           </h2>
           <p className="mt-3 text-muted-foreground">
@@ -75,33 +75,31 @@ const StoreLocations = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
-              className="group rounded-sm border border-border bg-card p-5 transition-all duration-300 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5"
+              className="group border border-border bg-card p-5 transition-all duration-300 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5"
             >
               <div className="flex items-center gap-2 mb-4">
-                <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-accent/10 text-accent">
-                  <StoreIcon className="h-4 w-4" />
-                </div>
-                <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
+                <StoreIcon className="h-4 w-4 text-accent" strokeWidth={1.5} />
+                <h3 className="font-heading text-sm font-bold uppercase text-foreground">
                   {store.name}
                 </h3>
               </div>
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 <div className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                  <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60" strokeWidth={1.5} />
                   <span>{store.address}</span>
                 </div>
                 <a
                   href={`mailto:${store.email}`}
                   className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
                 >
-                  <Mail className="h-3.5 w-3.5 shrink-0" />
+                  <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
                   {store.email}
                 </a>
                 <a
                   href={`tel:${store.phone.replace(/\s/g, "")}`}
                   className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
                 >
-                  <Phone className="h-3.5 w-3.5 shrink-0" />
+                  <Phone className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
                   {store.phone}
                 </a>
               </div>
@@ -115,15 +113,13 @@ const StoreLocations = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-8 rounded-sm border border-accent/20 bg-accent/5 p-6"
+          className="mt-8 border border-accent/20 bg-accent/5 p-6"
         >
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-accent/10 text-accent">
-                <StoreIcon className="h-5 w-5" />
-              </div>
+              <StoreIcon className="h-5 w-5 text-accent" strokeWidth={1.5} />
               <div>
-                <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
+                <h3 className="font-heading text-sm font-bold uppercase text-foreground">
                   {office.name}
                 </h3>
                 <p className="text-xs text-muted-foreground">{office.address}</p>
@@ -134,14 +130,14 @@ const StoreLocations = () => {
                 href={`mailto:${office.email}`}
                 className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
               >
-                <Mail className="h-3.5 w-3.5" />
+                <Mail className="h-3.5 w-3.5" strokeWidth={1.5} />
                 {office.email}
               </a>
               <a
                 href={`tel:${office.phone.replace(/\s/g, "")}`}
                 className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
               >
-                <Phone className="h-3.5 w-3.5" />
+                <Phone className="h-3.5 w-3.5" strokeWidth={1.5} />
                 {office.phone}
               </a>
             </div>

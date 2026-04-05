@@ -45,7 +45,7 @@ const Header = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`text-sm font-medium uppercase tracking-wider transition-colors hover:text-accent ${
+              className={`text-sm font-medium uppercase transition-colors hover:text-accent ${
                 location.pathname === item.path
                   ? "text-accent"
                   : "text-primary-foreground/70"
@@ -71,12 +71,12 @@ const Header = () => {
             </form>
           ) : (
             <button onClick={() => setSearchOpen(true)} className="p-2 text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-              <Search className="h-4 w-4" />
+              <Search className="h-4 w-4" strokeWidth={1.5} />
             </button>
           )}
 
           {/* Language switcher */}
-          <div className="flex items-center rounded border border-primary-foreground/20 text-xs font-medium">
+          <div className="flex items-center border border-primary-foreground/20 text-xs font-medium">
             <button
               onClick={() => setLang("lv")}
               className={`px-2 py-1.5 transition-colors ${lang === "lv" ? "bg-accent text-accent-foreground" : "text-primary-foreground/70 hover:text-primary-foreground"}`}
@@ -92,7 +92,7 @@ const Header = () => {
           </div>
 
           <a href="tel:+37167818282" className="flex items-center gap-1.5 text-sm text-primary-foreground/70 hover:text-primary-foreground">
-            <Phone className="h-4 w-4" />
+            <Phone className="h-4 w-4" strokeWidth={1.5} />
             +371 678 18282
           </a>
           <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
@@ -102,7 +102,7 @@ const Header = () => {
 
         {/* Mobile controls */}
         <div className="flex items-center gap-2 lg:hidden">
-          <div className="flex items-center rounded border border-primary-foreground/20 text-xs font-medium">
+          <div className="flex items-center border border-primary-foreground/20 text-xs font-medium">
             <button
               onClick={() => setLang("lv")}
               className={`px-1.5 py-1 transition-colors ${lang === "lv" ? "bg-accent text-accent-foreground" : "text-primary-foreground/70"}`}
@@ -118,9 +118,9 @@ const Header = () => {
           </div>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="inline-flex items-center justify-center rounded-md p-2 text-primary-foreground"
+            className="inline-flex items-center justify-center p-2 text-primary-foreground"
           >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {isOpen ? <X className="h-6 w-6" strokeWidth={1.5} /> : <Menu className="h-6 w-6" strokeWidth={1.5} />}
           </button>
         </div>
       </div>
@@ -130,7 +130,7 @@ const Header = () => {
         <div className="border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 lg:hidden">
           <form onSubmit={handleSearch} className="mb-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-foreground/40" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-foreground/40" strokeWidth={1.5} />
               <Input
                 placeholder={lang === "lv" ? "Meklēt produktus..." : "Search products..."}
                 value={searchValue}
@@ -145,7 +145,7 @@ const Header = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsOpen(false)}
-                className={`text-base font-medium uppercase tracking-wider transition-colors ${
+                className={`text-base font-medium uppercase transition-colors ${
                   location.pathname === item.path
                     ? "text-accent"
                     : "text-primary-foreground/70"

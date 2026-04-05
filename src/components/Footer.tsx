@@ -20,7 +20,7 @@ const Footer = () => {
         {/* 2-column grid for nav + services */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-5 md:grid-cols-4">
           <div className="space-y-2">
-            <h4 className="font-heading text-[10px] font-bold uppercase tracking-widest text-primary-foreground/35">
+            <h4 className="font-heading text-[10px] font-bold uppercase text-primary-foreground/35">
               {t("footer.navigation")}
             </h4>
             <nav className="flex flex-col gap-1.5">
@@ -39,7 +39,7 @@ const Footer = () => {
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-heading text-[10px] font-bold uppercase tracking-widest text-primary-foreground/35">
+            <h4 className="font-heading text-[10px] font-bold uppercase text-primary-foreground/35">
               {t("footer.services")}
             </h4>
             <nav className="flex flex-col gap-1.5">
@@ -57,27 +57,27 @@ const Footer = () => {
             </nav>
           </div>
 
-          {/* Contact - spans full width on mobile, 1 col on desktop */}
+          {/* Contact */}
           <div className="col-span-2 md:col-span-2 space-y-2 mt-1 md:mt-0">
-            <h4 className="font-heading text-[10px] font-bold uppercase tracking-widest text-primary-foreground/35">
+            <h4 className="font-heading text-[10px] font-bold uppercase text-primary-foreground/35">
               {t("footer.contact")}
             </h4>
             <div className="flex flex-col gap-2">
               <a href="tel:+37167818282" className="inline-flex items-center gap-2 text-xs text-primary-foreground/55 hover:text-accent transition-colors">
-                <Phone className="h-3.5 w-3.5 shrink-0" /> +371 678 18282
+                <Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} /> +371 678 18282
               </a>
               <a href="mailto:info@ervitex.lv" className="inline-flex items-center gap-2 text-xs text-primary-foreground/55 hover:text-accent transition-colors">
-                <Mail className="h-3.5 w-3.5 shrink-0" /> info@ervitex.lv
+                <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} /> info@ervitex.lv
               </a>
               <span className="inline-flex items-center gap-2 text-xs text-primary-foreground/55">
-                <MapPin className="h-3.5 w-3.5 shrink-0" /> Rīga, Latvia
+                <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} /> Rīga, Latvia
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sub-footer with copyright + discreet admin link */}
+      {/* Sub-footer */}
       <div className="border-t border-primary-foreground/10 bg-primary">
         <div className="container flex items-center justify-between py-4">
           <span className="text-[10px] text-primary-foreground/25">
@@ -88,7 +88,7 @@ const Footer = () => {
             className="inline-flex items-center gap-1 text-[10px] text-primary-foreground/20 hover:text-accent/60 transition-colors"
             aria-label="Admin access"
           >
-            <Lock className="h-3 w-3" />
+            <Lock className="h-3 w-3" strokeWidth={1.5} />
             <span className="hidden sm:inline">{lang === "lv" ? "Piekļuve" : "Access"}</span>
           </Link>
         </div>

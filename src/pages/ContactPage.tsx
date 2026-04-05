@@ -93,7 +93,7 @@ const ContactPage = () => {
       <section className="bg-primary py-16 text-primary-foreground md:py-24">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <h1 className="font-heading text-3xl font-black uppercase tracking-wide md:text-5xl">{t("contact.title")}</h1>
+            <h1 className="font-heading text-3xl font-black uppercase md:text-5xl">{t("contact.title")}</h1>
             <p className="mt-4 max-w-lg text-lg text-primary-foreground/60">{t("contact.subtitle")}</p>
           </motion.div>
         </div>
@@ -103,74 +103,80 @@ const ContactPage = () => {
       {/* General Office Info + Form */}
       <section className="container py-16 md:py-24">
         <div className="grid gap-12 lg:grid-cols-5">
-          <div className="space-y-8 lg:col-span-2">
-            <div>
-              <h2 className="font-heading text-xl font-black uppercase tracking-wide text-foreground">{t("contact.officeTitle")}</h2>
-              <p className="mt-2 text-muted-foreground">{t("contact.responseTime")}</p>
-            </div>
+          <div className="lg:col-span-2">
+            <h2 className="font-heading text-xl font-black uppercase text-foreground">{t("contact.officeTitle")}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{t("contact.responseTime")}</p>
 
-            <div className="space-y-5">
-              {[
-                { icon: <MapPin className="h-5 w-5" />, label: t("contact.address"), value: "Braslas Biznesa Centrs, ieeja \"D\", 2. stāvs\nBraslas ielā 29, Rīga, LV-1084" },
-                { icon: <Mail className="h-5 w-5" />, label: t("contact.officeEmail"), value: "birojs@ervitex.lv", href: "mailto:birojs@ervitex.lv" },
-                { icon: <Phone className="h-5 w-5" />, label: t("contact.accounting"), value: "+371 67552540", href: "tel:+37167552540" },
-                { icon: <FileText className="h-5 w-5" />, label: t("contact.regNr"), value: "LV40002074377" },
-                { icon: <Clock className="h-5 w-5" />, label: t("contact.hours"), value: t("contact.hoursValue") },
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-accent/10 text-accent">
-                    {item.icon}
-                  </div>
-                  <div>
-                    <p className="font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">{item.label}</p>
-                    {item.href ? (
-                      <a href={item.href} className="text-foreground hover:text-accent transition-colors">{item.value}</a>
-                    ) : (
-                      <p className="text-foreground whitespace-pre-line">{item.value}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-sm bg-accent/10 text-accent">
-                  <Building className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                    {lang === "lv" ? "Brīvdienas" : "Weekends"}
-                  </p>
-                  <p className="text-foreground">{lang === "lv" ? "Se., Sv.: Slēgts" : "Sat, Sun: Closed"}</p>
-                </div>
+            {/* Office info grid */}
+            <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-6">
+              <div>
+                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">
+                  {t("contact.address")}
+                </p>
+                <p className="mt-1 text-sm text-foreground leading-snug">
+                  Braslas Biznesa Centrs,{"\n"}ieeja "D", 2. stāvs{"\n"}Braslas ielā 29, Rīga, LV-1084
+                </p>
+              </div>
+              <div>
+                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">
+                  {t("contact.hours")}
+                </p>
+                <p className="mt-1 text-sm text-foreground">{t("contact.hoursValue")}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {lang === "lv" ? "Se., Sv.: Slēgts" : "Sat, Sun: Closed"}
+                </p>
+              </div>
+              <div>
+                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">
+                  {t("contact.officeEmail")}
+                </p>
+                <a href="mailto:birojs@ervitex.lv" className="mt-1 block text-sm text-foreground hover:text-accent transition-colors">
+                  birojs@ervitex.lv
+                </a>
+              </div>
+              <div>
+                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">
+                  {t("contact.accounting")}
+                </p>
+                <a href="tel:+37167552540" className="mt-1 block text-sm text-foreground hover:text-accent transition-colors">
+                  +371 67552540
+                </a>
+              </div>
+              <div className="col-span-2">
+                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">
+                  {t("contact.regNr")}
+                </p>
+                <p className="mt-1 text-sm text-foreground">LV40002074377</p>
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-3">
-            <form onSubmit={handleSubmit} className="space-y-5 rounded-sm border border-border p-6 md:p-8">
+            <form onSubmit={handleSubmit} className="space-y-5 border border-border p-6 md:p-8">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{t("contact.name")}</label>
+                  <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.name")}</label>
                   <Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{t("contact.emailLabel")}</label>
+                  <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.emailLabel")}</label>
                   <Input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{t("contact.company")}</label>
+                  <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.company")}</label>
                   <Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{t("contact.phoneLabel")}</label>
+                  <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.phoneLabel")}</label>
                   <Input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{t("contact.message")}</label>
+                <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.message")}</label>
                 <Textarea required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={t("contact.messagePlaceholder")} />
               </div>
-              <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest sm:w-auto">
-                <Send className="mr-2 h-4 w-4" /> {t("contact.send")}
+              <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase sm:w-auto">
+                <Send className="mr-2 h-4 w-4" strokeWidth={1.5} /> {t("contact.send")}
               </Button>
             </form>
           </div>
@@ -181,7 +187,7 @@ const ContactPage = () => {
       <section className="bg-muted/50 py-16 md:py-24">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mb-10 text-center">
-            <h2 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground">
+            <h2 className="font-heading text-2xl font-black uppercase text-foreground">
               {lang === "lv" ? "Kā mūs atrast" : "How to find us"}
             </h2>
             <p className="mt-3 text-muted-foreground">
@@ -191,13 +197,13 @@ const ContactPage = () => {
 
           <div className="grid gap-8 lg:grid-cols-2">
             <div>
-              <p className="mb-3 font-heading text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              <p className="mb-3 font-heading text-xs font-bold uppercase text-muted-foreground">
                 {lang === "lv" ? "Atrašanās vieta kartē" : "Location on map"}
               </p>
               <GoogleMapEmbed />
             </div>
             <div>
-              <p className="mb-3 font-heading text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
+              <p className="mb-3 font-heading text-xs font-bold uppercase text-muted-foreground">
                 {lang === "lv" ? "Ēku plāns — Hausmaņa Kvartāls" : "Building plan — Hausmaņa Kvartāls"}
               </p>
               <HausmanaKvartalsMap />
@@ -212,12 +218,12 @@ const ContactPage = () => {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="h-px w-12 bg-accent" />
-              <span className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent">
+              <span className="font-heading text-[10px] font-bold uppercase text-accent">
                 {lang === "lv" ? "Komanda" : "Team"}
               </span>
               <div className="h-px w-12 bg-accent" />
             </div>
-            <h2 className="font-heading text-2xl font-black uppercase tracking-[-0.02em] text-foreground">{t("contact.specialistsTitle")}</h2>
+            <h2 className="font-heading text-2xl font-black uppercase text-foreground">{t("contact.specialistsTitle")}</h2>
             <p className="mt-3 text-muted-foreground">{t("team.subtitle")}</p>
           </motion.div>
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -228,10 +234,10 @@ const ContactPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="group relative overflow-hidden rounded-sm border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5"
+                className="group relative overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5"
               >
                 {/* Top accent line */}
-                <div className="absolute top-0 left-0 h-[3px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
+                <div className="absolute top-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
 
                 {/* Photo area */}
                 <div
@@ -252,16 +258,16 @@ const ContactPage = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
 
-                {/* Info area - overlapping heading */}
-                <div className="relative -mt-4 mx-4 mb-4 rounded-sm bg-card/95 backdrop-blur-sm p-4 shadow-sm border border-border/50">
-                  <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">{member.name}</h3>
+                {/* Info area */}
+                <div className="relative -mt-4 mx-4 mb-4 bg-card/95 backdrop-blur-sm p-4 shadow-sm border border-border/50">
+                  <h3 className="font-heading text-sm font-bold uppercase text-foreground">{member.name}</h3>
                   <p className="text-xs text-accent font-medium mt-0.5">{member.title[lang]}</p>
                   <div className="mt-3 space-y-1.5 border-t border-border pt-3">
                     <a href={`mailto:${member.email}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
-                      <Mail className="h-3.5 w-3.5 shrink-0" /> {member.email}
+                      <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} /> {member.email}
                     </a>
                     <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors">
-                      <Phone className="h-3.5 w-3.5 shrink-0" /> {member.phoneLabel[lang]}: {member.phone}
+                      <Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5} /> {member.phoneLabel[lang]}: {member.phone}
                     </a>
                   </div>
                 </div>
@@ -285,17 +291,16 @@ const ContactPage = () => {
             onClick={() => setLightboxImg(null)}
           >
             <button
-              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-110"
+              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center bg-accent text-accent-foreground shadow-lg transition-transform hover:scale-110"
               onClick={() => setLightboxImg(null)}
             >
-              <X className="h-5 w-5" />
+              <X className="h-5 w-5" strokeWidth={1.5} />
             </button>
-            {/* Name overlay */}
             {(() => {
               const member = specialists.find((s) => s.photo === lightboxImg);
               return member ? (
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-sm bg-card/90 backdrop-blur-sm px-6 py-3 text-center shadow-lg">
-                  <p className="font-heading text-sm font-bold uppercase tracking-wider text-foreground">{member.name}</p>
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-card/90 backdrop-blur-sm px-6 py-3 text-center shadow-lg">
+                  <p className="font-heading text-sm font-bold uppercase text-foreground">{member.name}</p>
                   <p className="text-xs text-accent">{member.title[lang]}</p>
                 </div>
               ) : null;
@@ -306,7 +311,7 @@ const ContactPage = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               src={lightboxImg}
               alt="Specialist"
-              className="max-h-[80vh] max-w-[90vw] rounded-sm object-contain"
+              className="max-h-[80vh] max-w-[90vw] object-contain"
               onClick={(e) => e.stopPropagation()}
             />
           </motion.div>

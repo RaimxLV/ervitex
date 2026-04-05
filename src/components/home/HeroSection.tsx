@@ -28,7 +28,7 @@ const HeroSection = () => {
         <ScreenPressLineart />
       </motion.div>
       <div className="absolute top-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-accent/10 to-transparent" />
-      
+
       {/* Accent corner detail */}
       <motion.div
         initial={{ scaleX: 0 }}
@@ -53,7 +53,7 @@ const HeroSection = () => {
             className="mb-8 flex items-center gap-3"
           >
             <div className="h-px w-12 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent">
+            <span className="font-heading text-[10px] font-bold uppercase text-accent">
               {lang === "lv" ? "Kopš 2003. gada" : "Since 2003"}
             </span>
           </motion.div>
@@ -63,7 +63,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="font-heading text-4xl font-black uppercase leading-[0.9] tracking-tight text-primary-foreground sm:text-5xl md:text-7xl lg:text-8xl"
+            className="font-heading text-4xl font-black uppercase leading-[0.9] text-primary-foreground sm:text-5xl md:text-7xl lg:text-8xl"
           >
             {lang === "lv" ? "Tekstila" : "Textile"}
             <br />
@@ -99,7 +99,7 @@ const HeroSection = () => {
           >
             <Button
               size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-[0.2em] rounded-none px-8 h-12"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase rounded-none px-8 h-12"
               asChild
             >
               <Link to="/catalog">
@@ -110,7 +110,7 @@ const HeroSection = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent hover:text-accent font-heading text-xs uppercase tracking-[0.2em] rounded-none px-8 h-12"
+              className="border-2 border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent hover:text-accent font-heading text-xs uppercase rounded-none px-8 h-12"
               asChild
             >
               <Link to="/services">
@@ -138,7 +138,7 @@ const HeroSection = () => {
                 transition={{ duration: 0.5, delay: 1.3 + i * 0.15 }}
               >
                 <div className="font-heading text-2xl font-black text-accent md:text-3xl">{stat.value}</div>
-                <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.2em] text-primary-foreground/40">{stat.label}</div>
+                <div className="mt-1 text-[10px] font-medium uppercase text-primary-foreground/40">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -156,7 +156,7 @@ const HeroSection = () => {
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          <ChevronDown className="h-5 w-5 text-primary-foreground/30" />
+          <ChevronDown className="h-5 w-5 text-primary-foreground/30" strokeWidth={1.5} />
         </motion.div>
       </motion.div>
 
