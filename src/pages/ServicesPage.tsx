@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
-import ServiceImageCarousel from "@/components/services/ServiceImageCarousel";
+import ModernGallery, { type GallerySlide } from "@/components/ModernGallery";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 import screenPrint1 from "@/assets/services/screen-printing-1.jpg";
