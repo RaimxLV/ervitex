@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Phone, Send, X } from "lucide-react";
+import { Mail, Phone, Send, X, PhoneCall } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,9 +22,9 @@ const specialists = [
   { name: "Ēriks Lācis", title: { lv: "Tirdzniecības direktors", en: "Sales Director" }, email: "eriks@ervitex.lv", phone: "+371 29395600", phoneLabel: { lv: "Mob", en: "Mob" }, photo: eriksPhoto },
   { name: "Laura Daukšte", title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" }, email: "laura@ervitex.lv", phone: "+371 26164635", phoneLabel: { lv: "Mob", en: "Mob" }, photo: lauraPhoto },
   { name: "Ilona Romanovska", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "ilona@ervitex.lv", phone: "+371 29494626", phoneLabel: { lv: "Mob", en: "Mob" }, photo: ilonaPhoto },
-  { name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "67436899", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaPhoto },
-  { name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "29725412", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justinePhoto },
-  { name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: null as string | null },
+  { name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "+371 67436899", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaPhoto },
+  { name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "+371 29725412", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justinePhoto },
+  { name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: null as string | null },
 ];
 
 const ContactPage = () => {
@@ -75,6 +75,18 @@ const ContactPage = () => {
               <div>
                 <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{t("contact.accounting")}</p>
                 <a href="tel:+37167552540" className="mt-1 block text-sm text-foreground hover:text-accent transition-colors">+371 67552540</a>
+              </div>
+              <div>
+                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{lang === "lv" ? "Tālrunis" : "Phone"}</p>
+                <a href="tel:+37129475227" className="mt-1 block text-sm text-foreground hover:text-accent transition-colors">+371 29475227</a>
+              </div>
+              <div className="col-span-2 mt-2">
+                <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest" asChild>
+                  <a href="tel:+37129475227">
+                    <PhoneCall className="mr-2 h-4 w-4" />
+                    {lang === "lv" ? "Zvanīt tūlīt" : "Call Now"}
+                  </a>
+                </Button>
               </div>
               <div className="col-span-2">
                 <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{t("contact.regNr")}</p>
