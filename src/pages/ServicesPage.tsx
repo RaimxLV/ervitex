@@ -93,10 +93,10 @@ const serviceSections: ServiceSection[] = [
       en: "Unlimited design for sport & promotion — photographic quality without boundaries.",
     },
     features: [
-      { icon: <SwatchBook className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Materiāli", en: "Materials" }, text: { lv: "Tikai sintētiski (poliestera) audumi — sporta formas, karogi, suvenīri.", en: "Polyester fabrics only — sports uniforms, flags, specialty souvenirs." } },
-      { icon: <Focus className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Dizains", en: "Design" }, text: { lv: "Druka pa visu virsmu. Krāsa kļūst par auduma daļu — nejūtama uz tausti.", en: "Full-surface printing. Colour becomes part of the fabric — imperceptible to touch." } },
+      { icon: <Layers className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Materiāli", en: "Materials" }, text: { lv: "Tikai sintētiski (poliestera) audumi — sporta formas, karogi, suvenīri.", en: "Polyester fabrics only — sports uniforms, flags, specialty souvenirs." } },
+      { icon: <Paintbrush className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Dizains", en: "Design" }, text: { lv: "Druka pa visu virsmu. Krāsa kļūst par auduma daļu — nejūtama uz tausti.", en: "Full-surface printing. Colour becomes part of the fabric — imperceptible to touch." } },
       { icon: <ShieldCheck className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Īpašības", en: "Properties" }, text: { lv: "Audums saglabā elpojamību. Ideāli aktīvam sportam.", en: "Fabric retains full breathability. Ideal for active sports." } },
-      { icon: <ShoppingBag className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Cena", en: "Pricing" }, text: { lv: "Nav atkarīga no krāsu skaita dizainā.", en: "Independent of the number of colours in the design." } },
+      { icon: <Tag className="h-5 w-5" strokeWidth={SW} />, label: { lv: "Cena", en: "Pricing" }, text: { lv: "Nav atkarīga no krāsu skaita dizainā.", en: "Independent of the number of colours in the design." } },
     ],
   },
 ];
