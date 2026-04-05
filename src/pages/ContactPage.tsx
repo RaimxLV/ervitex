@@ -22,9 +22,9 @@ const specialists = [
   { name: "Ēriks Lācis", title: { lv: "Tirdzniecības direktors", en: "Sales Director" }, email: "eriks@ervitex.lv", phone: "+371 29395600", phoneLabel: { lv: "Mob", en: "Mob" }, photo: eriksPhoto },
   { name: "Laura Daukšte", title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" }, email: "laura@ervitex.lv", phone: "+371 26164635", phoneLabel: { lv: "Mob", en: "Mob" }, photo: lauraPhoto },
   { name: "Ilona Romanovska", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "ilona@ervitex.lv", phone: "+371 29494626", phoneLabel: { lv: "Mob", en: "Mob" }, photo: ilonaPhoto },
-  { name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "67436899", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaPhoto },
-  { name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "29725412", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justinePhoto },
-  { name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: null as string | null },
+  { name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "+371 67436899", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaPhoto },
+  { name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "+371 29725412", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justinePhoto },
+  { name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: null as string | null },
 ];
 
 const ContactPage = () => {
