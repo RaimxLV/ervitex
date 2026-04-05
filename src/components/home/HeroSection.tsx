@@ -4,8 +4,7 @@ import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useRef } from "react";
-import heroModel1 from "@/assets/hero-model-1.jpg";
-import heroModel2 from "@/assets/hero-model-2.jpg";
+import heroCombined from "@/assets/hero-combined.jpg";
 
 const HeroSection = () => {
   const { lang } = useLanguage();
@@ -16,10 +15,7 @@ const HeroSection = () => {
     offset: ["start start", "end start"],
   });
 
-  // Layer 1: slow parallax (0.2 factor)
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, 160]);
-
-  // Layer 3: scroll-driven darkness overlay
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.6], [0, 1]);
 
   return (
@@ -27,64 +23,31 @@ const HeroSection = () => {
       ref={sectionRef}
       className="relative min-h-[100svh] flex items-center overflow-hidden bg-primary"
     >
-      {/* ── Layer 1: Deep Background — parallax images ── */}
+      {/* ── Single combined background with parallax ── */}
       <motion.div
         style={{ y: bgY }}
         className="absolute inset-0 will-change-transform"
       >
-        {/* Model 1 — left side, asymmetric */}
-        <div className="absolute left-[-5%] top-[5%] w-[55%] h-[90%] md:left-[2%] md:w-[40%]">
-          <img
-            src={heroModel1}
-            alt=""
-            width={1080}
-            height={1920}
-            className="w-full h-full object-cover object-top opacity-60"
-          />
-        </div>
-
-        {/* Model 2 — right side, offset */}
-        <div className="absolute right-[-8%] top-[10%] w-[50%] h-[85%] md:right-[5%] md:w-[35%]">
-          <img
-            src={heroModel2}
-            alt=""
-            width={1080}
-            height={1920}
-            loading="lazy"
-            className="w-full h-full object-cover object-top opacity-40 md:opacity-50"
-          />
-        </div>
+        <img
+          src={heroCombined}
+          alt=""
+          className="w-full h-full object-cover opacity-50"
+        />
       </motion.div>
 
-      {/* ── Layer 2: Radial gradient mask ── */}
+      {/* ── Gradient mask for text readability ── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 70% 70% at 30% 50%, transparent 15%, hsl(var(--primary)) 85%)",
+            "linear-gradient(to right, hsl(var(--primary)) 5%, hsl(var(--primary) / 0.7) 35%, transparent 70%)",
         }}
       />
 
-      {/* ── Layer 3: Scroll-driven darkness overlay ── */}
+      {/* ── Scroll-driven darkness overlay ── */}
       <motion.div
         style={{ opacity: darkOverlayOpacity }}
         className="absolute inset-0 bg-primary pointer-events-none"
-      />
-
-      {/* ── Light leaks ── */}
-      <div
-        className="absolute top-0 left-0 w-[300px] h-[300px] pointer-events-none opacity-20 md:opacity-30"
-        style={{
-          background:
-            "radial-gradient(circle at 0% 0%, hsl(var(--accent) / 0.4), transparent 60%)",
-        }}
-      />
-      <div
-        className="absolute bottom-0 right-0 w-[250px] h-[250px] pointer-events-none opacity-15 md:opacity-20"
-        style={{
-          background:
-            "radial-gradient(circle at 100% 100%, hsl(0 0% 100% / 0.15), transparent 60%)",
-        }}
       />
 
       {/* ── Content ── */}
