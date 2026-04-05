@@ -1,66 +1,112 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import ScreenPressLineart from "./ScreenPressLineart";
+import { useRef } from "react";
+import heroModel1 from "@/assets/hero-model-1.jpg";
+import heroModel2 from "@/assets/hero-model-2.jpg";
 
 const HeroSection = () => {
   const { lang } = useLanguage();
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const { scrollY } = useScroll();
+
+  // Layer 1: slow parallax (0.2 factor)
+  const bgY = useTransform(scrollY, [0, 800], [0, 160]);
+
+  // Layer 3: scroll-driven darkness overlay (fully black at 400px)
+  const darkOverlayOpacity = useTransform(scrollY, [0, 400], [0, 1]);
 
   return (
-    <section className="relative min-h-[100svh] flex items-center overflow-hidden bg-primary">
-      {/* Animated grain overlay */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
-      }} />
-
-      <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-accent/20 to-transparent" />
-
+    <section
+      ref={sectionRef}
+      className="relative min-h-[100svh] flex items-center overflow-hidden bg-primary"
+    >
+      {/* ── Layer 1: Deep Background — parallax images ── */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 2, delay: 0.5 }}
-        className="absolute right-[-5%] top-1/2 -translate-y-1/2 w-[70%] max-w-[700px] text-primary-foreground/[0.07] pointer-events-none md:w-[55%] md:right-0 md:text-primary-foreground/[0.1]"
+        style={{ y: bgY }}
+        className="absolute inset-0 will-change-transform"
       >
-        <ScreenPressLineart />
+        {/* Model 1 — left side, asymmetric */}
+        <div className="absolute left-[-5%] top-[5%] w-[55%] h-[90%] md:left-[2%] md:w-[40%]">
+          <img
+            src={heroModel1}
+            alt=""
+            width={1080}
+            height={1920}
+            className="w-full h-full object-cover object-top opacity-60"
+          />
+        </div>
+
+        {/* Model 2 — right side, offset */}
+        <div className="absolute right-[-8%] top-[10%] w-[50%] h-[85%] md:right-[5%] md:w-[35%]">
+          <img
+            src={heroModel2}
+            alt=""
+            width={1080}
+            height={1920}
+            loading="lazy"
+            className="w-full h-full object-cover object-top opacity-40 md:opacity-50"
+          />
+        </div>
       </motion.div>
-      <div className="absolute top-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-accent/10 to-transparent" />
 
-      <motion.div
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 1.2, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute top-0 left-0 h-1 w-32 bg-accent origin-left"
-      />
-      <motion.div
-        initial={{ scaleY: 0 }}
-        animate={{ scaleY: 1 }}
-        transition={{ duration: 1.2, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute top-0 left-0 w-1 h-32 bg-accent origin-top"
+      {/* ── Layer 2: Radial gradient mask ── */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 70% at 30% 50%, transparent 15%, hsl(var(--primary)) 85%)",
+        }}
       />
 
+      {/* ── Layer 3: Scroll-driven darkness overlay ── */}
+      <motion.div
+        style={{ opacity: darkOverlayOpacity }}
+        className="absolute inset-0 bg-primary pointer-events-none"
+      />
+
+      {/* ── Light leaks ── */}
+      <div
+        className="absolute top-0 left-0 w-[300px] h-[300px] pointer-events-none opacity-20 md:opacity-30"
+        style={{
+          background:
+            "radial-gradient(circle at 0% 0%, hsl(var(--accent) / 0.4), transparent 60%)",
+        }}
+      />
+      <div
+        className="absolute bottom-0 right-0 w-[250px] h-[250px] pointer-events-none opacity-15 md:opacity-20"
+        style={{
+          background:
+            "radial-gradient(circle at 100% 100%, hsl(0 0% 100% / 0.15), transparent 60%)",
+        }}
+      />
+
+      {/* ── Content ── */}
       <div className="container relative z-10 py-20">
-        <div className="max-w-4xl">
-          {/* Badge */}
+        <div className="max-w-3xl">
+          {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="mb-8 flex items-center gap-3"
+            className="mb-6 flex items-center gap-3"
           >
-            <div className="h-px w-12 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase text-accent">
+            <div className="h-px w-10 bg-accent" />
+            <span className="font-heading text-[10px] font-bold uppercase text-accent tracking-wide">
               {lang === "lv" ? "Kopš 2003. gada" : "Since 2003"}
             </span>
           </motion.div>
 
-          {/* Main heading */}
+          {/* Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 60 }}
+            initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="font-heading text-4xl font-bold uppercase leading-[0.9] text-primary-foreground sm:text-5xl md:text-7xl lg:text-8xl"
+            className="font-heading text-4xl font-bold leading-[0.95] text-primary-foreground sm:text-5xl md:text-7xl lg:text-[5.5rem]"
+            style={{ letterSpacing: "-0.04em" }}
           >
             {lang === "lv" ? "Tekstila" : "Textile"}
             <br />
@@ -75,14 +121,14 @@ const HeroSection = () => {
             </span>
           </motion.h1>
 
-          {/* Subtitle — static, no animation */}
-          <p className="mt-8 max-w-lg text-sm leading-relaxed text-primary-foreground/50 md:text-base">
+          {/* Subtitle */}
+          <p className="mt-6 max-w-md text-sm leading-relaxed text-primary-foreground/50 md:text-base">
             {lang === "lv"
               ? "Ervitex — Jūsu partneris tekstila apstrādē kopš 2003. gada. Profesionāla pieredze, precizitāte un pārbaudītas tehnoloģijas."
               : "Ervitex — Your textile partner since 2003. Professional expertise, precision, and proven technologies."}
           </p>
 
-          {/* CTAs */}
+          {/* CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -91,7 +137,7 @@ const HeroSection = () => {
           >
             <Button
               size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase rounded-none px-8 h-12"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase rounded-none px-10 h-13 shadow-[0_0_30px_hsl(var(--accent)/0.3)]"
               asChild
             >
               <Link to="/catalog">
@@ -102,7 +148,7 @@ const HeroSection = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border-2 border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent hover:text-accent font-heading text-xs uppercase rounded-none px-8 h-12"
+              className="border border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent hover:text-accent font-heading text-xs uppercase rounded-none px-8 h-13"
               asChild
             >
               <Link to="/services">
@@ -111,38 +157,43 @@ const HeroSection = () => {
             </Button>
           </motion.div>
 
-          {/* Stats bar — static */}
-          <div className="mt-16 flex gap-10 border-t border-primary-foreground/10 pt-8">
+          {/* Stats */}
+          <div className="mt-14 flex gap-10 border-t border-primary-foreground/10 pt-7">
             {[
               { value: "20+", label: lang === "lv" ? "Gadi pieredzē" : "Years Experience" },
               { value: "3000+", label: lang === "lv" ? "Produkti" : "Products" },
               { value: "4", label: lang === "lv" ? "Drukas tehnoloģijas" : "Print Technologies" },
             ].map((stat, i) => (
               <div key={i}>
-                <div className="font-heading text-2xl font-bold text-accent md:text-3xl">{stat.value}</div>
-                <div className="mt-1 text-[10px] font-medium uppercase text-primary-foreground/40">{stat.label}</div>
+                <div className="font-heading text-2xl font-bold text-accent md:text-3xl">
+                  {stat.value}
+                </div>
+                <div className="mt-1 text-[10px] font-medium uppercase text-primary-foreground/40">
+                  {stat.label}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* ── Scroll indicator ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.8 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
+        <Mouse className="h-5 w-5 text-primary-foreground/30" strokeWidth={1.2} />
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <ChevronDown className="h-5 w-5 text-primary-foreground/30" strokeWidth={1.2} />
-        </motion.div>
+          className="w-px h-6 bg-primary-foreground/20 origin-top"
+          animate={{ scaleY: [0, 1, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        />
       </motion.div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-accent" />
+      {/* Bottom accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-accent" />
     </section>
   );
 };
