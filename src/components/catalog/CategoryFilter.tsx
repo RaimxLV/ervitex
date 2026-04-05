@@ -131,7 +131,7 @@ export default function CategoryFilter({ categories, activeCategory, onSelect }:
               : "border-border bg-card text-card-foreground hover:border-accent hover:text-accent"
           )}
         >
-          <LayoutGrid className="h-5 w-5" />
+          <IconAll />
           {lang === "lv" ? "Visi produkti" : "All Products"}
         </button>
 
