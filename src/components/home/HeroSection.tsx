@@ -15,10 +15,8 @@ const HeroSection = () => {
         backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
       }} />
 
-      {/* Geometric accent lines */}
       <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-accent/20 to-transparent" />
 
-      {/* Screen press lineart background */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -29,7 +27,6 @@ const HeroSection = () => {
       </motion.div>
       <div className="absolute top-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-accent/10 to-transparent" />
 
-      {/* Accent corner detail */}
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
@@ -63,7 +60,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="font-heading text-4xl font-black uppercase leading-[0.9] text-primary-foreground sm:text-5xl md:text-7xl lg:text-8xl"
+            className="font-heading text-4xl font-bold uppercase leading-[0.9] text-primary-foreground sm:text-5xl md:text-7xl lg:text-8xl"
           >
             {lang === "lv" ? "Tekstila" : "Textile"}
             <br />
@@ -78,17 +75,12 @@ const HeroSection = () => {
             </span>
           </motion.h1>
 
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="mt-8 max-w-lg text-sm leading-relaxed text-primary-foreground/50 md:text-base"
-          >
+          {/* Subtitle — static, no animation */}
+          <p className="mt-8 max-w-lg text-sm leading-relaxed text-primary-foreground/50 md:text-base">
             {lang === "lv"
               ? "Ervitex — Jūsu partneris tekstila apstrādē kopš 2003. gada. Profesionāla pieredze, precizitāte un pārbaudītas tehnoloģijas."
               : "Ervitex — Your textile partner since 2003. Professional expertise, precision, and proven technologies."}
-          </motion.p>
+          </p>
 
           {/* CTAs */}
           <motion.div
@@ -119,29 +111,19 @@ const HeroSection = () => {
             </Button>
           </motion.div>
 
-          {/* Stats bar */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
-            className="mt-16 flex gap-10 border-t border-primary-foreground/10 pt-8"
-          >
+          {/* Stats bar — static */}
+          <div className="mt-16 flex gap-10 border-t border-primary-foreground/10 pt-8">
             {[
               { value: "20+", label: lang === "lv" ? "Gadi pieredzē" : "Years Experience" },
               { value: "3000+", label: lang === "lv" ? "Produkti" : "Products" },
               { value: "4", label: lang === "lv" ? "Drukas tehnoloģijas" : "Print Technologies" },
             ].map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 1.3 + i * 0.15 }}
-              >
-                <div className="font-heading text-2xl font-black text-accent md:text-3xl">{stat.value}</div>
+              <div key={i}>
+                <div className="font-heading text-2xl font-bold text-accent md:text-3xl">{stat.value}</div>
                 <div className="mt-1 text-[10px] font-medium uppercase text-primary-foreground/40">{stat.label}</div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
 
@@ -156,11 +138,10 @@ const HeroSection = () => {
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          <ChevronDown className="h-5 w-5 text-primary-foreground/30" strokeWidth={1.5} />
+          <ChevronDown className="h-5 w-5 text-primary-foreground/30" strokeWidth={1.2} />
         </motion.div>
       </motion.div>
 
-      {/* Bottom accent */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-accent" />
     </section>
   );

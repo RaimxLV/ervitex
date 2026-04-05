@@ -33,8 +33,8 @@ const bentoItems: BentoItem[] = [
   { id: "dzemperi", name: { lv: "DŽEMPERI & HŪDIJI", en: "HOODIES & SWEATSHIRTS" }, image: hoodiesImg, gridArea: "hoodies", link: "/catalog?category=dzemperi" },
   { id: "cepures", name: { lv: "CEPURES", en: "CAPS & HEADWEAR" }, image: capsImg, gridArea: "caps", link: "/catalog?category=cepures" },
   { id: "somas", name: { lv: "SOMAS", en: "BAGS & TOTES" }, image: bagsImg, gridArea: "bags", link: "/catalog?category=somas" },
-  { id: "jaunumi", name: { lv: "JAUNUMI", en: "NEW ARRIVALS" }, image: newArrivalsImg, gridArea: "new", link: "/catalog?sort=newest", icon: <Sparkles className="h-4 w-4" strokeWidth={1.5} /> },
-  { id: "popularakie", name: { lv: "POPULĀRĀKIE", en: "BEST SELLERS" }, image: bestsellersImg, gridArea: "best", link: "/catalog?sort=popular", icon: <TrendingUp className="h-4 w-4" strokeWidth={1.5} /> },
+  { id: "jaunumi", name: { lv: "JAUNUMI", en: "NEW ARRIVALS" }, image: newArrivalsImg, gridArea: "new", link: "/catalog?sort=newest", icon: <Sparkles className="h-4 w-4" strokeWidth={1.2} /> },
+  { id: "popularakie", name: { lv: "POPULĀRĀKIE", en: "BEST SELLERS" }, image: bestsellersImg, gridArea: "best", link: "/catalog?sort=popular", icon: <TrendingUp className="h-4 w-4" strokeWidth={1.2} /> },
 ];
 
 const scrollingTextLv = "TEKSTILA APDRUKA  ·  IZŠŪŠANA  ·  B2B SERVISS  ·  SUBLIMĀCIJA  ·  VAIRUMTIRDZNIECĪBA  ·  ";
@@ -50,7 +50,7 @@ const BentoCategories = () => {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="mb-10"
         >
@@ -60,7 +60,7 @@ const BentoCategories = () => {
               {lang === "lv" ? "Kategorijas" : "Categories"}
             </span>
           </div>
-          <h2 className="font-heading text-3xl font-black uppercase text-foreground md:text-5xl">
+          <h2 className="font-heading text-3xl font-bold uppercase text-foreground md:text-5xl">
             {lang === "lv" ? "Produktu katalogs" : "Product Catalog"}
           </h2>
           <p className="mt-3 max-w-md text-sm text-muted-foreground">
@@ -71,8 +71,12 @@ const BentoCategories = () => {
         </motion.div>
 
         {/* Bento Grid - Mobile */}
-        <div
-          className="grid grid-cols-2 gap-2.5 md:gap-3"
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="grid grid-cols-2 gap-2.5 md:hidden"
           style={{
             gridTemplateRows: "repeat(5, 200px)",
             gridTemplateAreas: `
@@ -84,23 +88,19 @@ const BentoCategories = () => {
             `,
           }}
         >
-          {bentoItems.slice(0, 8).map((item, i) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5, delay: i * 0.06 }}
-              style={{ gridArea: item.gridArea }}
-              className="block md:hidden"
-            >
+          {bentoItems.slice(0, 8).map((item) => (
+            <div key={item.id} style={{ gridArea: item.gridArea }}>
               <BentoCard item={item} lang={lang} />
-            </motion.div>
+            </div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Desktop Bento */}
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="hidden md:grid gap-3"
           style={{
             gridTemplateColumns: "repeat(4, 1fr)",
@@ -113,33 +113,19 @@ const BentoCategories = () => {
             `,
           }}
         >
-          {bentoItems.map((item, i) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.5, delay: i * 0.06 }}
-              style={{ gridArea: item.gridArea }}
-            >
+          {bentoItems.map((item) => (
+            <div key={item.id} style={{ gridArea: item.gridArea }}>
               <BentoCard item={item} lang={lang} />
-            </motion.div>
+            </div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Mobile: New Arrivals & Best Sellers */}
         <div className="grid grid-cols-2 gap-2.5 mt-2.5 md:hidden">
-          {bentoItems.slice(8).map((item, i) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-30px" }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="h-[160px]"
-            >
+          {bentoItems.slice(8).map((item) => (
+            <div key={item.id} className="h-[160px]">
               <BentoCard item={item} lang={lang} />
-            </motion.div>
+            </div>
           ))}
         </div>
 
@@ -149,7 +135,7 @@ const BentoCategories = () => {
             {[...Array(3)].map((_, i) => (
               <span
                 key={i}
-                className="font-heading text-lg font-black uppercase text-muted-foreground/30 md:text-2xl"
+                className="font-heading text-lg font-bold uppercase text-muted-foreground/30 md:text-2xl"
               >
                 {lang === "lv" ? scrollingTextLv : scrollingTextEn}
               </span>
@@ -162,7 +148,7 @@ const BentoCategories = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5 }}
           className="mt-10 flex justify-center"
         >
           <Button
@@ -193,10 +179,8 @@ const BentoCard = ({ item, lang }: { item: BentoItem; lang: "lv" | "en" }) => (
     />
     <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/30 to-transparent transition-all duration-500 group-hover:from-foreground/90" />
 
-    {/* Accent line bottom */}
     <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
 
-    {/* Content */}
     <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-5">
       <div className="flex items-center gap-2">
         {item.icon && <span className="text-accent">{item.icon}</span>}
@@ -206,9 +190,8 @@ const BentoCard = ({ item, lang }: { item: BentoItem; lang: "lv" | "en" }) => (
       </div>
     </div>
 
-    {/* Arrow */}
     <div className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center bg-background/10 text-background/60 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100 group-hover:bg-accent group-hover:text-accent-foreground">
-      <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+      <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.2} />
     </div>
   </Link>
 );

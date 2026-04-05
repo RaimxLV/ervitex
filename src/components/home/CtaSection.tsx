@@ -9,20 +9,19 @@ const CtaSection = () => {
 
   return (
     <section className="relative overflow-hidden bg-primary py-20 md:py-28">
-      {/* Geometric accents */}
       <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-accent/15 to-transparent" />
       <div className="absolute bottom-0 right-0 h-1 w-32 bg-accent" />
       <div className="absolute bottom-0 right-0 w-1 h-32 bg-accent" />
 
       <div className="container relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
+          transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <h2 className="font-heading text-3xl font-black uppercase text-primary-foreground md:text-5xl">
+          <h2 className="font-heading text-3xl font-bold uppercase text-primary-foreground md:text-5xl">
             {lang === "lv" ? "Gatavi sākt?" : "Ready to Start?"}
           </h2>
           <p className="mx-auto mt-4 max-w-md text-sm text-primary-foreground/50 md:text-base">

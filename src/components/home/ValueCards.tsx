@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { Award, Zap, ShieldCheck, CheckCircle } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
+const SW = 1.2;
+
 const values = [
   {
     icon: Award,
@@ -43,7 +45,7 @@ const ValueCards = () => {
   return (
     <section className="bg-muted py-20 md:py-28">
       <div className="container">
-        {/* Section header */}
+        {/* Section header — single container animation */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -58,43 +60,42 @@ const ValueCards = () => {
             </span>
             <div className="h-px w-12 bg-accent" />
           </div>
-          <h2 className="font-heading text-3xl font-black uppercase text-foreground md:text-5xl">
+          <h2 className="font-heading text-3xl font-bold uppercase text-foreground md:text-5xl">
             {lang === "lv" ? "Mūsu vērtības" : "Our Values"}
           </h2>
         </motion.div>
 
-        {/* Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Cards — single container animation, no per-card animations */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        >
           {values.map((v, i) => {
             const Icon = v.icon;
             return (
-              <motion.div
+              <div
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="group relative overflow-hidden border border-border bg-card p-6 transition-all duration-300 hover:border-accent hover:shadow-xl hover:shadow-accent/5"
               >
                 {/* Top accent line */}
                 <div className="absolute top-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
 
-                {/* Icon — clean, no background box */}
-                <Icon className="h-6 w-6 text-accent" strokeWidth={1.5} />
+                <Icon className="h-6 w-6 text-accent" strokeWidth={SW} />
 
-                {/* Title */}
                 <h3 className="mt-5 font-heading text-sm font-bold uppercase text-card-foreground">
                   {v.title[lang]}
                 </h3>
 
-                {/* Description */}
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                   {v.desc[lang]}
                 </p>
-              </motion.div>
+              </div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
