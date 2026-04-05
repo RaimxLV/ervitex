@@ -41,7 +41,7 @@ const TrustedBrands = () => {
                     key={`${setIdx}-${i}`}
                     className="mx-6 flex items-center md:mx-10"
                   >
-                    <span className="font-heading text-lg font-bold uppercase tracking-wider text-muted-foreground/40 transition-colors duration-300 hover:text-foreground md:text-xl">
+                    <span className="font-heading text-lg font-bold uppercase text-muted-foreground/40 transition-colors duration-300 hover:text-foreground md:text-xl">
                       {brand}
                     </span>
                   </div>
