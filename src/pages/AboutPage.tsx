@@ -62,6 +62,11 @@ const AboutPage = () => {
               <p>{t("about.story1")}</p>
               <p>{t("about.story2")}</p>
               <p>{t("about.story3")}</p>
+              <p className="font-medium text-foreground/80">
+                {lang === "lv"
+                  ? "Vairāk nekā 20 gadu pieredze, 3000+ produktu katalogā un 4 augstas veiktspējas drukas tehnoloģijas — sietspiede, DTF, izšūšana un sublimācija."
+                  : "Over 20 years of experience, 3,000+ products in our catalog, and 4 high-performance printing technologies — screen printing, DTF, embroidery, and sublimation."}
+              </p>
             </div>
           </motion.div>
           <motion.div
