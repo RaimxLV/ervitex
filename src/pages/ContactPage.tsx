@@ -9,6 +9,7 @@ import Layout from "@/components/Layout";
 import { useLanguage } from "@/i18n/LanguageContext";
 import GoogleMapEmbed from "@/components/GoogleMapEmbed";
 import HausmanaKvartalsMap from "@/components/HausmanaKvartalsMap";
+import StoreLocations from "@/components/contact/StoreLocations";
 import vilnisPhoto from "@/assets/team/vilnis-lacis.jpg";
 import eriksPhoto from "@/assets/team/eriks-lacis.jpg";
 import lauraPhoto from "@/assets/team/laura-daukste.jpg";
@@ -269,6 +270,9 @@ const ContactPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Store Locations */}
+      <StoreLocations />
 
       {/* Lightbox */}
       <AnimatePresence>

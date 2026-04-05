@@ -4,6 +4,7 @@ import BentoCategories from "@/components/home/BentoCategories";
 import TrustedBrands from "@/components/home/TrustedBrands";
 import ValueCards from "@/components/home/ValueCards";
 import CtaSection from "@/components/home/CtaSection";
+import RetailSection from "@/components/home/RetailSection";
 
 const Index = () => {
   return (
@@ -13,6 +14,7 @@ const Index = () => {
       <TrustedBrands />
       <ValueCards />
       <CtaSection />
+      <RetailSection />
     </Layout>
   );
 };
