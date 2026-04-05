@@ -3,6 +3,13 @@ import { Store, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { Link } from "react-router-dom";
+import ModernGallery, { type GallerySlide } from "@/components/ModernGallery";
+import tbodeStore from "@/assets/tbode-store.jpg";
+import tbodeMugs from "@/assets/tbode-mugs.jpg";
+import tbodeLatvija from "@/assets/tbode-latvija.jpg";
+import tbodeBottles from "@/assets/tbode-bottles.jpg";
+import tbodeApparel from "@/assets/tbode-apparel.jpg";
+import tbodeSouvenirs from "@/assets/tbode-souvenirs.jpg";
 
 const RetailSection = () => {
   const { lang } = useLanguage();
