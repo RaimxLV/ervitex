@@ -4,8 +4,7 @@ import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useRef } from "react";
-import heroModel1 from "@/assets/hero-model-1.jpg";
-import heroModel2 from "@/assets/hero-model-2.jpg";
+import heroModels from "@/assets/hero-models.jpg";
 
 const HeroSection = () => {
   const { lang } = useLanguage();
@@ -16,61 +15,52 @@ const HeroSection = () => {
     offset: ["start start", "end start"],
   });
 
-  // Double parallax — background moves slower (0.2 factor ≈ 80px travel)
+  // Parallax — background moves slower (0.2 factor)
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 80]);
-  // Fade-to-black on scroll
-  const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.6], [0, 1]);
+  // Aggressive fade-to-black on scroll
+  const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.4], [0, 1]);
 
   return (
     <section
       ref={sectionRef}
       className="relative min-h-[100svh] flex items-center overflow-hidden bg-primary"
     >
-      {/* ── Layer 1: Model images with slow parallax ── */}
+      {/* ── Layer 1: Single background image with parallax ── */}
       <motion.div
         style={{ y: bgY }}
         className="absolute inset-0 will-change-transform"
       >
-        {/* Desktop: two models side by side, asymmetric to the right */}
+        {/* Desktop: models positioned to the right */}
         <div className="hidden md:block absolute inset-0">
           <img
-            src={heroModel1}
+            src={heroModels}
             alt=""
-            className="absolute top-0 right-[15%] h-full w-[45%] object-cover object-top opacity-40"
-          />
-          <img
-            src={heroModel2}
-            alt=""
-            className="absolute top-0 right-[-5%] h-full w-[40%] object-cover object-top opacity-35"
-          />
-          {/* Blend seam between images */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(to right, transparent 50%, hsl(var(--primary) / 0.4) 58%, transparent 66%)",
-            }}
+            width={1920}
+            height={1080}
+            className="absolute top-0 right-0 h-full w-[75%] object-cover object-[center_15%] opacity-45"
           />
         </div>
 
-        {/* Mobile: single model centered */}
+        {/* Mobile: models below text area, centered */}
         <div className="md:hidden absolute inset-0">
           <img
-            src={heroModel1}
+            src={heroModels}
             alt=""
-            className="w-full h-full object-cover object-[center_20%] opacity-30"
+            width={1920}
+            height={1080}
+            className="w-full h-full object-cover object-[center_15%] opacity-30"
           />
         </div>
       </motion.div>
 
       {/* ── Layer 2: Atmosphere — light leaks ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Top-right warm light leak */}
+        {/* Top-right warm accent light leak */}
         <div
           className="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full opacity-20 blur-[120px]"
           style={{ background: "radial-gradient(circle, hsl(var(--accent) / 0.6), transparent 70%)" }}
         />
-        {/* Bottom-left subtle light leak */}
+        {/* Bottom-left subtle white light leak */}
         <div
           className="absolute -bottom-[15%] -left-[10%] w-[50%] h-[50%] rounded-full opacity-10 blur-[100px]"
           style={{ background: "radial-gradient(circle, hsl(0 0% 100% / 0.4), transparent 70%)" }}
@@ -87,11 +77,11 @@ const HeroSection = () => {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to right, hsl(var(--primary)) 5%, hsl(var(--primary) / 0.85) 25%, hsl(var(--primary) / 0.5) 45%, transparent 70%)",
+            "linear-gradient(to right, hsl(var(--primary)) 5%, hsl(var(--primary) / 0.85) 25%, hsl(var(--primary) / 0.4) 50%, transparent 75%)",
         }}
       />
 
-      {/* ── Scroll-driven fade-to-black ── */}
+      {/* ── Scroll-driven aggressive fade-to-black ── */}
       <motion.div
         style={{ opacity: darkOverlayOpacity }}
         className="absolute inset-0 bg-primary pointer-events-none"
