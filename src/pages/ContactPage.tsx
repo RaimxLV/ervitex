@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Phone, Send, X, PhoneCall } from "lucide-react";
+import { Mail, Phone, Send, X, PhoneCall, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,10 +34,28 @@ const ContactPage = () => {
   const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", message: "" });
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [sending, setSending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({ title: t("contact.sent"), description: t("contact.sentDesc") });
-    setForm({ name: "", email: "", company: "", phone: "", message: "" });
+    setSending(true);
+    try {
+      const { error } = await supabase.from("quote_requests").insert({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        company: form.company.trim() || null,
+        phone: form.phone.trim() || null,
+        message: form.message.trim(),
+        status: "new",
+      });
+      if (error) throw error;
+      toast({ title: t("contact.sent"), description: t("contact.sentDesc") });
+      setForm({ name: "", email: "", company: "", phone: "", message: "" });
+    } catch {
+      toast({ title: lang === "lv" ? "Kļūda" : "Error", description: lang === "lv" ? "Neizdevās nosūtīt ziņu. Mēģiniet vēlreiz." : "Failed to send message. Please try again.", variant: "destructive" });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -119,8 +138,8 @@ const ContactPage = () => {
                 <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.message")}</label>
                 <Textarea required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={t("contact.messagePlaceholder")} />
               </div>
-              <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase sm:w-auto">
-                <Send className="mr-2 h-4 w-4" strokeWidth={1.2} /> {t("contact.send")}
+              <Button type="submit" size="lg" disabled={sending} className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase sm:w-auto">
+                {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" strokeWidth={1.2} />} {sending ? (lang === "lv" ? "Sūta..." : "Sending...") : t("contact.send")}
               </Button>
             </form>
           </div>
