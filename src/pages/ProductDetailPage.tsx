@@ -170,9 +170,28 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-              {product.longDescription[lang] || product.description[lang]}
-            </p>
+            <div className="text-muted-foreground leading-relaxed space-y-3">
+              {(product.longDescription[lang] || product.description[lang])
+                .split('\n')
+                .filter((line: string) => line.trim() !== '')
+                .map((line: string, i: number) => {
+                  if (line.startsWith('### ')) {
+                    return <h3 key={i} className="text-foreground font-semibold text-base mt-4 mb-1">{line.replace('### ', '')}</h3>;
+                  }
+                  // Render **bold** markdown
+                  const parts = line.split(/(\*\*[^*]+\*\*)/g);
+                  const rendered = parts.map((part: string, j: number) => {
+                    if (part.startsWith('**') && part.endsWith('**')) {
+                      return <strong key={j} className="text-foreground">{part.slice(2, -2)}</strong>;
+                    }
+                    return <span key={j}>{part}</span>;
+                  });
+                  if (line.startsWith('• ')) {
+                    return <div key={i} className="flex gap-2 ml-1"><span>•</span><span>{rendered.map((r: React.ReactNode, idx: number) => <span key={idx}>{idx === 0 && typeof r === 'object' && (r as any)?.props?.children?.toString().startsWith('• ') ? <span>{(r as any).props.children.toString().slice(2)}</span> : r}</span>)}</span></div>;
+                  }
+                  return <p key={i}>{rendered}</p>;
+                })}
+            </div>
 
             {/* Specs with interactive color swatches */}
             <ProductSpecs
