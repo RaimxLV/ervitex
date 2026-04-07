@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import ervitexLogo from "@/assets/ervitex-logo-2.svg";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Phone, Search } from "lucide-react";
+import { Menu, X, Phone, Search, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { toast } from "sonner";
 
 const navItems = [
   { key: "nav.home" as const, path: "/" },
