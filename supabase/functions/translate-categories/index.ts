@@ -52,7 +52,7 @@ ${JSON.stringify(payload, null, 2)}
 Return ONLY valid JSON array:
 [{"id":"...","description_lv":"...","description_en":"..."}]`;
 
-    const aiResponse = await fetch("https://ai-gateway.lovable.dev/v1/chat/completions", {
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
