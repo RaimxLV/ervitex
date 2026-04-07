@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import CategoryFilter from "@/components/catalog/CategoryFilter";
@@ -223,11 +224,26 @@ const CatalogPage = () => {
               resultCount={sortedProducts.length}
             />
 
+            {!loaded ? (
+              <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-3">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div key={i} className="overflow-hidden border border-border bg-card">
+                    <Skeleton className="aspect-square w-full" />
+                    <div className="p-3 space-y-2">
+                      <Skeleton className="h-3 w-3/4" />
+                      <Skeleton className="h-3 w-1/2" />
+                      <Skeleton className="h-4 w-1/3 mt-2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
             <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-3">
               {paginatedProducts.map((product) => (
                 <ProductCard key={product.id} product={product as any} />
               ))}
             </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
