@@ -16,9 +16,9 @@ const HeroSection = () => {
   });
 
   // Parallax — background moves slower (0.2 factor)
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, 80]);
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 160]);
   // Aggressive fade-to-black on scroll
-  const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.4], [0, 1]);
+  const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
 
   return (
     <section
