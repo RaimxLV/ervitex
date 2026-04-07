@@ -170,26 +170,25 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-            <div className="text-muted-foreground leading-relaxed space-y-3">
+            <div className="text-muted-foreground leading-relaxed space-y-1">
               {(product.longDescription[lang] || product.description[lang])
                 .split('\n')
                 .filter((line: string) => line.trim() !== '')
                 .map((line: string, i: number) => {
+                  const renderInline = (text: string) => {
+                    return text.split(/(\*\*[^*]+\*\*)/g).map((part: string, j: number) =>
+                      part.startsWith('**') && part.endsWith('**')
+                        ? <strong key={j} className="text-foreground">{part.slice(2, -2)}</strong>
+                        : <span key={j}>{part}</span>
+                    );
+                  };
                   if (line.startsWith('### ')) {
-                    return <h3 key={i} className="text-foreground font-semibold text-base mt-4 mb-1">{line.replace('### ', '')}</h3>;
+                    return <h3 key={i} className="text-foreground font-semibold text-base mt-4 mb-1">{line.slice(4)}</h3>;
                   }
-                  // Render **bold** markdown
-                  const parts = line.split(/(\*\*[^*]+\*\*)/g);
-                  const rendered = parts.map((part: string, j: number) => {
-                    if (part.startsWith('**') && part.endsWith('**')) {
-                      return <strong key={j} className="text-foreground">{part.slice(2, -2)}</strong>;
-                    }
-                    return <span key={j}>{part}</span>;
-                  });
                   if (line.startsWith('• ')) {
-                    return <div key={i} className="flex gap-2 ml-1"><span>•</span><span>{rendered.map((r: React.ReactNode, idx: number) => <span key={idx}>{idx === 0 && typeof r === 'object' && (r as any)?.props?.children?.toString().startsWith('• ') ? <span>{(r as any).props.children.toString().slice(2)}</span> : r}</span>)}</span></div>;
+                    return <div key={i} className="flex gap-2 ml-2"><span className="shrink-0">•</span><span>{renderInline(line.slice(2))}</span></div>;
                   }
-                  return <p key={i}>{rendered}</p>;
+                  return <p key={i} className="mb-2">{renderInline(line)}</p>;
                 })}
             </div>
 
