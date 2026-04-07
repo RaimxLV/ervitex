@@ -123,9 +123,9 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
     emblaApi?.scrollNext();
   }, [emblaApi]);
 
-  // Color swatches — fall back to product images if no colors defined
-  const hasColors = product.colors.length > 0;
-  const swatches = hasColors
+  // Color swatches — fall back to product images if few/no colors but multiple images
+  const hasEnoughColors = product.colors.length > 1;
+  const swatches = hasEnoughColors
     ? product.colors.slice(0, MAX_SWATCHES).map((color, i) => ({
         name: color,
         hex: getHexForColor(color, product.colorHexCodes?.[i]),
@@ -137,10 +137,18 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
           hex: null as string | null,
           imageUrl: url,
         }))
-      : [];
-  const extraColors = hasColors
+      : product.colors.length === 1
+        ? [{
+            name: product.colors[0],
+            hex: getHexForColor(product.colors[0], product.colorHexCodes?.[0]),
+            imageUrl: product.colorImageUrls?.[0] || null,
+          }]
+        : [];
+  const extraColors = hasEnoughColors
     ? Math.max(0, product.colors.length - MAX_SWATCHES)
-    : Math.max(0, slideImages.length - MAX_SWATCHES);
+    : slideImages.length > 1
+      ? Math.max(0, slideImages.length - MAX_SWATCHES)
+      : 0;
 
   // Click swatch → scroll to matching slide & mark active
   const handleSwatchClick = useCallback((e: React.MouseEvent, idx: number) => {
