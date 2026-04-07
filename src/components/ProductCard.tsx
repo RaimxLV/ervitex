@@ -162,12 +162,18 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
           <div className="h-full w-full" ref={emblaRef}>
             <div className="flex h-full">
               {slideImages.map((src, i) => (
-                <div key={i} className="relative h-full min-w-0 flex-[0_0_100%]">
+                <div key={i} className="relative h-full min-w-0 flex-[0_0_100%] flex items-center justify-center bg-white">
                   <img
                     src={src}
                     alt={`${product.name[lang]} ${i + 1}`}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-contain"
                     loading="lazy"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (target.src !== "/placeholder.svg") {
+                        target.src = "/placeholder.svg";
+                      }
+                    }}
                   />
                 </div>
               ))}

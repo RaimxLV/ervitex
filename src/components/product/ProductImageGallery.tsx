@@ -34,11 +34,17 @@ const ProductImageGallery = ({ images, alt, activeColorImage }: ProductImageGall
   return (
     <div className="space-y-3">
       {/* Main image */}
-      <div className="aspect-square overflow-hidden rounded-sm bg-muted">
+      <div className="aspect-square overflow-hidden rounded-sm bg-white flex items-center justify-center">
         <img
           src={displayImage || images[0]}
           alt={alt}
-          className="h-full w-full object-cover transition-all duration-300"
+          className="h-full w-full object-contain transition-all duration-300"
+          onError={(e) => {
+            const target = e.currentTarget;
+            if (target.src !== "/placeholder.svg") {
+              target.src = "/placeholder.svg";
+            }
+          }}
         />
       </div>
 
@@ -57,7 +63,18 @@ const ProductImageGallery = ({ images, alt, activeColorImage }: ProductImageGall
                   : "ring-transparent hover:ring-accent/40"
               }`}
             >
-              <img src={img} alt="" className="h-full w-full object-cover" loading="lazy" />
+              <img
+                src={img}
+                alt=""
+                className="h-full w-full object-contain bg-white"
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (target.src !== "/placeholder.svg") {
+                    target.src = "/placeholder.svg";
+                  }
+                }}
+              />
             </button>
           ))}
         </div>
