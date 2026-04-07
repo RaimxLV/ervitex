@@ -134,12 +134,21 @@ const ProductDetailPage = () => {
   return (
     <Layout>
       <div className="container py-8 md:py-16">
-        <Link
-          to="/catalog"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-accent transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" /> {t("product.back")}
-        </Link>
+        <nav aria-label="breadcrumb" className="mb-4">
+          <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+            <li><Link to="/" className="hover:text-accent transition-colors">{lang === "lv" ? "Sākums" : "Home"}</Link></li>
+            <li className="text-muted-foreground/50">/</li>
+            <li><Link to="/catalog" className="hover:text-accent transition-colors">{lang === "lv" ? "Katalogs" : "Catalog"}</Link></li>
+            {product.categoryName[lang] && (
+              <>
+                <li className="text-muted-foreground/50">/</li>
+                <li><Link to={`/catalog?category=${product.category}`} className="hover:text-accent transition-colors">{product.categoryName[lang]}</Link></li>
+              </>
+            )}
+            <li className="text-muted-foreground/50">/</li>
+            <li className="text-foreground font-medium truncate max-w-[200px]">{product.name[lang]}</li>
+          </ol>
+        </nav>
 
         <div className="mt-6 grid gap-10 lg:grid-cols-2">
           {/* Image Gallery with color-switching */}
