@@ -170,9 +170,27 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-              {product.longDescription[lang] || product.description[lang]}
-            </p>
+            <div className="text-muted-foreground leading-relaxed space-y-1">
+              {(product.longDescription[lang] || product.description[lang])
+                .split('\n')
+                .filter((line: string) => line.trim() !== '')
+                .map((line: string, i: number) => {
+                  const renderInline = (text: string) => {
+                    return text.split(/(\*\*[^*]+\*\*)/g).map((part: string, j: number) =>
+                      part.startsWith('**') && part.endsWith('**')
+                        ? <strong key={j} className="text-foreground">{part.slice(2, -2)}</strong>
+                        : <span key={j}>{part}</span>
+                    );
+                  };
+                  if (line.startsWith('### ')) {
+                    return <h3 key={i} className="text-foreground font-semibold text-base mt-4 mb-1">{line.slice(4)}</h3>;
+                  }
+                  if (line.startsWith('• ')) {
+                    return <div key={i} className="flex gap-2 ml-2"><span className="shrink-0">•</span><span>{renderInline(line.slice(2))}</span></div>;
+                  }
+                  return <p key={i} className="mb-2">{renderInline(line)}</p>;
+                })}
+            </div>
 
             {/* Specs with interactive color swatches */}
             <ProductSpecs
