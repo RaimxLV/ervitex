@@ -65,17 +65,27 @@ const CatalogPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [prodRes, catRes] = await Promise.all([
-        supabase
+      // Fetch all products in batches of 1000 to bypass Supabase default limit
+      const PAGE_SIZE = 1000;
+      let allProducts: DBProduct[] = [];
+      let page = 0;
+      let hasMore = true;
+      while (hasMore) {
+        const { data } = await supabase
           .from("products")
           .select("*, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
           .eq("active", true)
           .order("created_at", { ascending: false })
-          .limit(2000),
-        supabase.from("categories").select("id, slug, name_lv, name_en").order("sort_order"),
-      ]);
-      setDbProducts((prodRes.data as unknown as DBProduct[]) || []);
-      setDbCategories(catRes.data || []);
+          .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+        const batch = (data as unknown as DBProduct[]) || [];
+        allProducts = allProducts.concat(batch);
+        hasMore = batch.length === PAGE_SIZE;
+        page++;
+      }
+
+      const { data: catData } = await supabase.from("categories").select("id, slug, name_lv, name_en").order("sort_order");
+      setDbProducts(allProducts);
+      setDbCategories(catData || []);
       setLoaded(true);
     };
     fetchData();
