@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Lock, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import ervitexLogo from "@/assets/ervitex-logo.png";
+import ervitexLogo from "@/assets/ervitex-logo-2.svg";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 
 const SW = 1.2;
@@ -14,7 +14,7 @@ const Footer = () => {
       <div className="container py-8 md:py-16">
         <div className="mb-6 text-center">
           <div className="flex items-center justify-center gap-3">
-            <img src={ervitexLogo} alt="Ervitex" className="h-7 w-auto brightness-0 invert" />
+            <img src={ervitexLogo} alt="Ervitex" className="h-7 w-auto" />
             <span className="h-5 w-px bg-primary-foreground/20" />
             <img src={stellaLogo} alt="Stanley/Stella Dealer" className="h-3.5 w-auto opacity-50" />
           </div>

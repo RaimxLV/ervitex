@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ervitexLogo from "@/assets/ervitex-logo.png";
+import ervitexLogo from "@/assets/ervitex-logo-2.svg";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Phone, Search } from "lucide-react";
@@ -37,7 +37,7 @@ const Header = () => {
     <header className="sticky top-0 z-50 bg-primary/80 backdrop-blur-md text-primary-foreground">
       <div className="container flex h-16 items-center justify-between md:h-20">
         <Link to="/" className="flex items-center gap-2 sm:gap-3">
-          <img src={ervitexLogo} alt="Ervitex" className="h-8 w-auto brightness-0 invert md:h-10" />
+          <img src={ervitexLogo} alt="Ervitex" className="h-8 w-auto md:h-10" />
           <span className="h-5 w-px bg-primary-foreground/20 sm:h-6" />
           <img src={stellaLogo} alt="Stanley/Stella Dealer" className="h-4 w-auto opacity-70 sm:h-5 md:h-6" />
         </Link>
