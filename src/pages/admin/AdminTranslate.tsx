@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Languages, Play, Square, CheckCircle2 } from "lucide-react";
+import { Languages, Play, Square, CheckCircle2, FolderTree } from "lucide-react";
 import { toast } from "sonner";
 
 const BATCH_SIZE = 10;
@@ -17,7 +17,13 @@ const AdminTranslate = () => {
   const [done, setDone] = useState(false);
   const stopRef = useRef(false);
 
+  // Category translation state
+  const [catRunning, setCatRunning] = useState(false);
+  const [catDone, setCatDone] = useState(false);
+  const [catLog, setCatLog] = useState<string[]>([]);
+
   const addLog = (msg: string) => setLog((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
+  const addCatLog = (msg: string) => setCatLog((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
 
   const runTranslation = async () => {
     setRunning(true);
@@ -38,37 +44,19 @@ const AdminTranslate = () => {
           headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
         });
 
-        if (resp.error) {
-          addLog(`❌ Kļūda: ${resp.error.message}`);
-          break;
-        }
-
+        if (resp.error) { addLog(`❌ Kļūda: ${resp.error.message}`); break; }
         const result = resp.data;
-
-        if (result.error) {
-          addLog(`❌ Kļūda: ${result.error}`);
-          break;
-        }
+        if (result.error) { addLog(`❌ Kļūda: ${result.error}`); break; }
 
         totalTranslated += result.translated || 0;
         setTranslated(totalTranslated);
         setOffset(currentOffset);
         addLog(`✅ Iztulkoti: ${result.translated || 0}, Kopā: ${totalTranslated}`);
 
-        if (result.done) {
-          addLog("🎉 Visi produkti apstrādāti!");
-          setDone(true);
-          break;
-        }
-
+        if (result.done) { addLog("🎉 Visi produkti apstrādāti!"); setDone(true); break; }
         currentOffset = result.offset;
-
-        // Small delay to avoid rate limiting
         await new Promise((r) => setTimeout(r, 1000));
-      } catch (err: any) {
-        addLog(`❌ Kļūda: ${err.message}`);
-        break;
-      }
+      } catch (err: any) { addLog(`❌ Kļūda: ${err.message}`); break; }
     }
 
     if (stopRef.current) addLog("⏹ Apturēts lietotāja pieprasījumā.");
@@ -76,10 +64,33 @@ const AdminTranslate = () => {
     toast.success(`Tulkošana pabeigta! Iztulkoti ${totalTranslated} produkti.`);
   };
 
-  const stop = () => {
-    stopRef.current = true;
+  const runCategoryTranslation = async () => {
+    setCatRunning(true);
+    setCatDone(false);
+    addCatLog("Sākam kategoriju tulkošanu...");
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const resp = await supabase.functions.invoke("translate-categories", {
+        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+      });
+
+      if (resp.error) { addCatLog(`❌ Kļūda: ${resp.error.message}`); setCatRunning(false); return; }
+      const result = resp.data;
+      if (result.error) { addCatLog(`❌ Kļūda: ${result.error}`); setCatRunning(false); return; }
+
+      addCatLog(`✅ Iztulkotas ${result.translated} no ${result.total} kategorijām`);
+      addCatLog("🎉 Kategoriju tulkošana pabeigta!");
+      setCatDone(true);
+      toast.success(`Iztulkotas ${result.translated} kategorijas!`);
+    } catch (err: any) {
+      addCatLog(`❌ Kļūda: ${err.message}`);
+    }
+
+    setCatRunning(false);
   };
 
+  const stop = () => { stopRef.current = true; };
   const progress = Math.min((offset / TOTAL_PRODUCTS) * 100, 100);
 
   return (
@@ -87,17 +98,19 @@ const AdminTranslate = () => {
       <div className="space-y-6">
         <div className="flex items-center gap-3">
           <Languages className="h-6 w-6 text-accent" />
-          <h1 className="text-2xl font-bold">Produktu tulkošana (LV → EN)</h1>
+          <h1 className="text-2xl font-bold">Tulkošana (LV → EN)</h1>
         </div>
 
+        {/* Products section */}
         <div className="rounded-lg border border-border bg-card p-6 space-y-4">
-          <p className="text-muted-foreground">
-            Šis rīks automātiski iztulkos visu {TOTAL_PRODUCTS} produktu nosaukumus un aprakstus no latviešu uz angļu valodu, izmantojot AI.
-            Process notiek pa {BATCH_SIZE} produktiem vienlaicīgi.
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Languages className="h-5 w-5" /> Produktu tulkošana
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Automātiski iztulko visu {TOTAL_PRODUCTS} produktu nosaukumus un aprakstus, pa {BATCH_SIZE} vienlaicīgi.
           </p>
-
           <div className="flex gap-3">
-            <Button onClick={runTranslation} disabled={running} className="gap-2">
+            <Button onClick={runTranslation} disabled={running || catRunning} className="gap-2">
               <Play className="h-4 w-4" />
               {done ? "Palaist vēlreiz" : "Sākt tulkošanu"}
             </Button>
@@ -107,7 +120,6 @@ const AdminTranslate = () => {
               </Button>
             )}
           </div>
-
           {(running || translated > 0) && (
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
@@ -117,25 +129,47 @@ const AdminTranslate = () => {
               <Progress value={progress} />
             </div>
           )}
-
           {done && (
-            <div className="flex items-center gap-2 text-green-600">
+            <div className="flex items-center gap-2 text-accent">
               <CheckCircle2 className="h-5 w-5" />
               <span className="font-medium">Tulkošana pabeigta!</span>
             </div>
           )}
+          {log.length > 0 && (
+            <div className="rounded-lg border border-border bg-muted/30 p-4 max-h-48 overflow-y-auto">
+              <div className="space-y-1 text-xs font-mono">
+                {log.map((l, i) => <div key={i}>{l}</div>)}
+              </div>
+            </div>
+          )}
         </div>
 
-        {log.length > 0 && (
-          <div className="rounded-lg border border-border bg-muted/30 p-4 max-h-80 overflow-y-auto">
-            <h3 className="font-medium mb-2">Žurnāls</h3>
-            <div className="space-y-1 text-xs font-mono">
-              {log.map((l, i) => (
-                <div key={i}>{l}</div>
-              ))}
+        {/* Categories section */}
+        <div className="rounded-lg border border-border bg-card p-6 space-y-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <FolderTree className="h-5 w-5" /> Kategoriju tulkošana
+          </h2>
+          <p className="text-muted-foreground text-sm">
+            Ģenerē un iztulko kategoriju aprakstus latviešu un angļu valodā.
+          </p>
+          <Button onClick={runCategoryTranslation} disabled={catRunning || running} className="gap-2">
+            <Play className="h-4 w-4" />
+            {catDone ? "Palaist vēlreiz" : "Tulkot kategorijas"}
+          </Button>
+          {catDone && (
+            <div className="flex items-center gap-2 text-accent">
+              <CheckCircle2 className="h-5 w-5" />
+              <span className="font-medium">Kategoriju tulkošana pabeigta!</span>
             </div>
-          </div>
-        )}
+          )}
+          {catLog.length > 0 && (
+            <div className="rounded-lg border border-border bg-muted/30 p-4 max-h-48 overflow-y-auto">
+              <div className="space-y-1 text-xs font-mono">
+                {catLog.map((l, i) => <div key={i}>{l}</div>)}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </AdminLayout>
   );
