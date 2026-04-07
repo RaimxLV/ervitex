@@ -9,10 +9,10 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       const [p, c, q, nq] = await Promise.all([
-        supabase.from("products").select("id", { count: "exact", head: true }),
-        supabase.from("categories").select("id", { count: "exact", head: true }),
-        supabase.from("quote_requests").select("id", { count: "exact", head: true }),
-        supabase.from("quote_requests").select("id", { count: "exact", head: true }).eq("status", "new"),
+        supabase.from("products").select("*", { count: "exact", head: true }).eq("active", true),
+        supabase.from("categories").select("*", { count: "exact", head: true }),
+        supabase.from("quote_requests").select("*", { count: "exact", head: true }),
+        supabase.from("quote_requests").select("*", { count: "exact", head: true }).eq("status", "new"),
       ]);
       setStats({
         products: p.count ?? 0,
