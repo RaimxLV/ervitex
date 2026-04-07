@@ -19,6 +19,7 @@ import AdminProductForm from "./pages/admin/AdminProductForm.tsx";
 import AdminCategories from "./pages/admin/AdminCategories.tsx";
 import AdminQuotes from "./pages/admin/AdminQuotes.tsx";
 import AdminUsers from "./pages/admin/AdminUsers.tsx";
+import AdminTranslate from "./pages/admin/AdminTranslate.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import PrivacyPage from "./pages/PrivacyPage.tsx";
 import TermsPage from "./pages/TermsPage.tsx";
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
               <Route path="/admin/quotes" element={<ProtectedRoute><AdminQuotes /></ProtectedRoute>} />
               <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
+              <Route path="/admin/translate" element={<ProtectedRoute><AdminTranslate /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
