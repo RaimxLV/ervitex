@@ -170,7 +170,7 @@ const ProductDetailPage = () => {
               </div>
             </div>
 
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.longDescription[lang] || product.description[lang]}
             </p>
 
