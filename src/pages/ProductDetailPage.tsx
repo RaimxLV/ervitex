@@ -7,6 +7,7 @@ import Layout from "@/components/Layout";
 import QuoteRequestForm from "@/components/QuoteRequestForm";
 import ProductImageGallery from "@/components/product/ProductImageGallery";
 import ProductSpecs from "@/components/product/ProductSpecs";
+import RelatedProducts from "@/components/product/RelatedProducts";
 import type { ColorVariant } from "@/components/product/ColorSwatchSelector";
 import { products as staticProducts, categories as staticCategories } from "@/data/products";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -16,6 +17,7 @@ interface NormalizedProduct {
   id: string;
   name: { lv: string; en: string };
   category: string;
+  categoryId: string;
   categoryName: { lv: string; en: string };
   description: { lv: string; en: string };
   longDescription: { lv: string; en: string };
@@ -51,6 +53,7 @@ const ProductDetailPage = () => {
           id: p.id,
           name: { lv: p.name_lv, en: p.name_en },
           category: p.categories?.slug || "",
+          categoryId: p.category_id || "",
           categoryName: { lv: p.categories?.name_lv || "", en: p.categories?.name_en || "" },
           description: { lv: p.description_lv || "", en: p.description_en || "" },
           longDescription: { lv: p.long_description_lv || "", en: p.long_description_en || "" },
@@ -80,6 +83,7 @@ const ProductDetailPage = () => {
             id: sp.id,
             name: sp.name,
             category: sp.category,
+            categoryId: "",
             categoryName: cat?.name || { lv: "", en: "" },
             description: sp.description,
             longDescription: sp.longDescription || sp.description,
@@ -264,6 +268,10 @@ const ProductDetailPage = () => {
             </Button>
           </div>
         </div>
+
+        {product.categoryId && (
+          <RelatedProducts categoryId={product.categoryId} currentProductId={product.id} />
+        )}
       </div>
     </Layout>
   );
