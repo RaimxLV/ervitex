@@ -19,6 +19,7 @@ import AdminProductForm from "./pages/admin/AdminProductForm.tsx";
 import AdminCategories from "./pages/admin/AdminCategories.tsx";
 import AdminQuotes from "./pages/admin/AdminQuotes.tsx";
 import AdminUsers from "./pages/admin/AdminUsers.tsx";
+import AdminTranslate from "./pages/admin/AdminTranslate.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import PrivacyPage from "./pages/PrivacyPage.tsx";
 import TermsPage from "./pages/TermsPage.tsx";
