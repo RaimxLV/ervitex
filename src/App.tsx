@@ -20,6 +20,8 @@ import AdminCategories from "./pages/admin/AdminCategories.tsx";
 import AdminQuotes from "./pages/admin/AdminQuotes.tsx";
 import AdminUsers from "./pages/admin/AdminUsers.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import PrivacyPage from "./pages/PrivacyPage.tsx";
+import TermsPage from "./pages/TermsPage.tsx";
 import ScrollToTop from "./components/ScrollToTop.tsx";
 
 const queryClient = new QueryClient();
@@ -42,6 +44,8 @@ const App = () => (
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/terms" element={<TermsPage />} />
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
               <Route path="/admin/products/:id" element={<ProtectedRoute><AdminProductForm /></ProtectedRoute>} />
