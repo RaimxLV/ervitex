@@ -26,12 +26,16 @@ import emb4 from "@/assets/services/embroidery-4.jpg";
 import emb5 from "@/assets/services/embroidery-5.jpg";
 import emb6 from "@/assets/services/embroidery-6.jpg";
 import emb7 from "@/assets/services/embroidery-7.jpg";
+import sub1 from "@/assets/services/sublimation-1.jpg";
+import sub2 from "@/assets/services/sublimation-2.jpg";
+import sub3 from "@/assets/services/sublimation-3.jpg";
+import sub4 from "@/assets/services/sublimation-4.jpg";
 
 const serviceImages: Record<string, string[]> = {
   screen: [screenPrint1, screenPrint2, screenPrint3, screenPrint4],
   dtf: [dtf1, dtf2, dtf3, dtf4, dtf5],
   embroidery: [emb1, emb2, emb3, emb4, emb5, emb6, emb7],
-  sublimation: [],
+  sublimation: [sub1, sub2, sub3, sub4],
 };
 
 const SW = 1.2;
