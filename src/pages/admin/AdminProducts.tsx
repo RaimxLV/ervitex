@@ -98,7 +98,6 @@ const AdminProducts = () => {
   useEffect(() => { setPage(1); }, [search, filterCategory, filterBrand, filterStatus]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Vai tiešām dzēst šo produktu?")) return;
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) {
       toast({ title: "Kļūda", description: error.message, variant: "destructive" });
@@ -245,9 +244,25 @@ const AdminProducts = () => {
                     <Button variant="ghost" size="icon" asChild>
                       <Link to={`/admin/products/${p.id}`}><Pencil className="h-4 w-4" /></Link>
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(p.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Dzēst produktu?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Vai tiešām vēlaties dzēst "{p.name_lv}"? Šo darbību nevar atsaukt.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Atcelt</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(p.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Dzēst</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </td>
               </tr>
@@ -292,9 +307,25 @@ const AdminProducts = () => {
                   <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
                     <Link to={`/admin/products/${p.id}`}><Pencil className="h-3.5 w-3.5" /></Link>
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleDelete(p.id)}>
-                    <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Dzēst produktu?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Vai tiešām vēlaties dzēst "{p.name_lv}"? Šo darbību nevar atsaukt.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Atcelt</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDelete(p.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Dzēst</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </CardContent>
