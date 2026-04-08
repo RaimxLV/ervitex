@@ -25,43 +25,65 @@ const AdminTranslate = () => {
   const addLog = (msg: string) => setLog((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
   const addCatLog = (msg: string) => setCatLog((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
 
-  const runTranslation = async () => {
+  const runTranslation = async (resume = false) => {
     setRunning(true);
     setDone(false);
     stopRef.current = false;
-    let currentOffset = 0;
-    let totalTranslated = 0;
-
-    addLog("Sākam tulkošanu...");
-
-    while (!stopRef.current) {
-      try {
-        addLog(`Apstrādājam batch: offset ${currentOffset}, batch size ${BATCH_SIZE}`);
-
-        const { data: { session } } = await supabase.auth.getSession();
-        const resp = await supabase.functions.invoke("translate-products", {
-          body: { offset: currentOffset, limit: BATCH_SIZE },
-          headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
-        });
-
-        if (resp.error) { addLog(`❌ Kļūda: ${resp.error.message}`); break; }
-        const result = resp.data;
-        if (result.error) { addLog(`❌ Kļūda: ${result.error}`); break; }
-
-        totalTranslated += result.translated || 0;
-        setTranslated(totalTranslated);
-        setOffset(currentOffset);
-        addLog(`✅ Iztulkoti: ${result.translated || 0}, Kopā: ${totalTranslated}`);
-
-        if (result.done) { addLog("🎉 Visi produkti apstrādāti!"); setDone(true); break; }
-        currentOffset = result.offset;
-        await new Promise((r) => setTimeout(r, 1000));
-      } catch (err: any) { addLog(`❌ Kļūda: ${err.message}`); break; }
+    let currentOffset = resume ? offset : 0;
+    let totalTranslated = resume ? translated : 0;
+    if (!resume) {
+      setOffset(0);
+      setTranslated(0);
     }
 
-    if (stopRef.current) addLog("⏹ Apturēts lietotāja pieprasījumā.");
+    addLog(resume ? `Turpinām no offset ${currentOffset}...` : "Sākam tulkošanu...");
+
+    while (!stopRef.current) {
+      let retries = 0;
+      const MAX_RETRIES = 3;
+      let success = false;
+
+      while (retries < MAX_RETRIES && !success && !stopRef.current) {
+        try {
+          addLog(`Apstrādājam batch: offset ${currentOffset}, batch size ${BATCH_SIZE}${retries > 0 ? ` (mēģinājums ${retries + 1})` : ""}`);
+
+          const { data: { session } } = await supabase.auth.getSession();
+          const resp = await supabase.functions.invoke("translate-products", {
+            body: { offset: currentOffset, limit: BATCH_SIZE },
+            headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined,
+          });
+
+          if (resp.error) throw new Error(resp.error.message);
+          const result = resp.data;
+          if (result.error) throw new Error(result.error);
+
+          totalTranslated += result.translated || 0;
+          setTranslated(totalTranslated);
+          setOffset(currentOffset);
+          addLog(`✅ Iztulkoti: ${result.translated || 0}, Kopā: ${totalTranslated}`);
+
+          if (result.done) { addLog("🎉 Visi produkti apstrādāti!"); setDone(true); setRunning(false); toast.success(`Tulkošana pabeigta! Iztulkoti ${totalTranslated} produkti.`); return; }
+          currentOffset = result.offset;
+          success = true;
+          await new Promise((r) => setTimeout(r, 1000));
+        } catch (err: any) {
+          retries++;
+          if (retries < MAX_RETRIES) {
+            const wait = retries * 3;
+            addLog(`⚠️ Kļūda: ${err.message}. Mēģinām vēlreiz pēc ${wait}s...`);
+            await new Promise((r) => setTimeout(r, wait * 1000));
+          } else {
+            addLog(`❌ Kļūda pēc ${MAX_RETRIES} mēģinājumiem: ${err.message}`);
+            addLog(`💡 Varat turpināt no offset ${currentOffset}, nospiežot "Turpināt"`);
+            setRunning(false);
+            return;
+          }
+        }
+      }
+    }
+
+    if (stopRef.current) addLog("⏹ Apturēts. Varat turpināt vēlāk.");
     setRunning(false);
-    toast.success(`Tulkošana pabeigta! Iztulkoti ${totalTranslated} produkti.`);
   };
 
   const runCategoryTranslation = async () => {
@@ -110,10 +132,15 @@ const AdminTranslate = () => {
             Automātiski iztulko visu {TOTAL_PRODUCTS} produktu nosaukumus un aprakstus, pa {BATCH_SIZE} vienlaicīgi.
           </p>
           <div className="flex gap-3">
-            <Button onClick={runTranslation} disabled={running || catRunning} className="gap-2">
+            <Button onClick={() => runTranslation(false)} disabled={running || catRunning} className="gap-2">
               <Play className="h-4 w-4" />
               {done ? "Palaist vēlreiz" : "Sākt tulkošanu"}
             </Button>
+            {!running && !done && translated > 0 && (
+              <Button onClick={() => runTranslation(true)} disabled={catRunning} variant="outline" className="gap-2">
+                <Play className="h-4 w-4" /> Turpināt (no {offset})
+              </Button>
+            )}
             {running && (
               <Button variant="destructive" onClick={stop} className="gap-2">
                 <Square className="h-4 w-4" /> Apturēt
