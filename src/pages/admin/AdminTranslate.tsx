@@ -132,10 +132,15 @@ const AdminTranslate = () => {
             Automātiski iztulko visu {TOTAL_PRODUCTS} produktu nosaukumus un aprakstus, pa {BATCH_SIZE} vienlaicīgi.
           </p>
           <div className="flex gap-3">
-            <Button onClick={runTranslation} disabled={running || catRunning} className="gap-2">
+            <Button onClick={() => runTranslation(false)} disabled={running || catRunning} className="gap-2">
               <Play className="h-4 w-4" />
               {done ? "Palaist vēlreiz" : "Sākt tulkošanu"}
             </Button>
+            {!running && !done && translated > 0 && (
+              <Button onClick={() => runTranslation(true)} disabled={catRunning} variant="outline" className="gap-2">
+                <Play className="h-4 w-4" /> Turpināt (no {offset})
+              </Button>
+            )}
             {running && (
               <Button variant="destructive" onClick={stop} className="gap-2">
                 <Square className="h-4 w-4" /> Apturēt
