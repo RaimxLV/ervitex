@@ -5,11 +5,11 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-const LAT = 56.9534;
-const LNG = 24.1625;
+const LAT = 56.9617;
+const LNG = 24.1664;
 
-const WAZE_URL = "https://waze.com/ul?q=Braslas%20iela%2029%20Riga&ll=56.9534,24.1625&navigate=yes";
-const GMAPS_URL = "https://www.google.com/maps/dir/?api=1&destination=Braslas+iela+29+R%C4%ABga+D+ieeja";
+const WAZE_URL = "https://waze.com/ul?q=Braslas%20iela%2029%20Riga&ll=56.9617,24.1664&navigate=yes";
+const GMAPS_URL = "https://www.google.com/maps/dir/?api=1&destination=56.9617,24.1664";
 
 const GoogleMapEmbed = () => {
   const mapRef = useRef<HTMLDivElement>(null);
