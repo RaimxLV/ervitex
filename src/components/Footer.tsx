@@ -6,7 +6,7 @@ import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 
 const SW = 1.2;
 
-const SHARE_URL = "https://ervitex.lovable.app";
+const SHARE_URL = "https://www.ervitex.lv";
 const SHARE_TEXT = "Ervitex – apģērbu personalizācija un vairumtirdzniecība";
 
 const FacebookIcon = ({ className }: { className?: string }) => (
