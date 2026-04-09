@@ -132,7 +132,7 @@ const Footer = () => {
                     aria-label={s.label}
                     className="flex h-8 w-8 items-center justify-center rounded-sm border border-primary-foreground/10 text-primary-foreground/50 transition-all hover:border-accent/50 hover:text-accent"
                   >
-                    <s.icon className="h-4 w-4" strokeWidth={SW} />
+                    <s.Icon className="h-4 w-4" />
                   </a>
                 ))}
                 <a
