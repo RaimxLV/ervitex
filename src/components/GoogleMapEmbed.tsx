@@ -26,8 +26,8 @@ const GoogleMapEmbed = () => {
       attributionControl: false,
     });
 
-    // Dark monochrome tiles (CartoDB Dark Matter)
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+    // Light map tiles (CartoDB Voyager)
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
       maxZoom: 19,
     }).addTo(map);
 
