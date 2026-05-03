@@ -86,6 +86,13 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "product_colors_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       product_images: {
@@ -118,6 +125,13 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "product_images_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       product_sizes: {
@@ -148,6 +162,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_sizes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_public"
             referencedColumns: ["id"]
           },
         ]
@@ -277,6 +298,13 @@ export type Database = {
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "quote_requests_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -299,7 +327,77 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      products_public: {
+        Row: {
+          active: boolean | null
+          brand: string | null
+          category_id: string | null
+          created_at: string | null
+          description_en: string | null
+          description_lv: string | null
+          featured: boolean | null
+          id: string | null
+          is_new: boolean | null
+          long_description_en: string | null
+          long_description_lv: string | null
+          material: string | null
+          min_order: number | null
+          name_en: string | null
+          name_lv: string | null
+          printing_techs: string[] | null
+          retail_price: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          brand?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          description_en?: string | null
+          description_lv?: string | null
+          featured?: boolean | null
+          id?: string | null
+          is_new?: boolean | null
+          long_description_en?: string | null
+          long_description_lv?: string | null
+          material?: string | null
+          min_order?: number | null
+          name_en?: string | null
+          name_lv?: string | null
+          printing_techs?: string[] | null
+          retail_price?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          brand?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          description_en?: string | null
+          description_lv?: string | null
+          featured?: boolean | null
+          id?: string | null
+          is_new?: boolean | null
+          long_description_en?: string | null
+          long_description_lv?: string | null
+          material?: string | null
+          min_order?: number | null
+          name_en?: string | null
+          name_lv?: string | null
+          printing_techs?: string[] | null
+          retail_price?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_role: {
