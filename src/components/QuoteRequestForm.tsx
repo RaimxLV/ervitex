@@ -21,17 +21,31 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim()) {
-      toast({ title: lang === "lv" ? "Aizpildiet obligātos laukus" : "Fill in required fields", variant: "destructive" });
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const phone = form.phone.trim();
+    const company = form.company.trim();
+    const message = form.message.trim();
+
+    if (name.length < 2 || name.length > 100) {
+      toast({ title: lang === "lv" ? "Nederīgs vārds" : "Invalid name", variant: "destructive" });
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) {
+      toast({ title: lang === "lv" ? "Nederīgs e-pasts" : "Invalid email", variant: "destructive" });
+      return;
+    }
+    if (phone.length > 50 || company.length > 200 || message.length > 5000) {
+      toast({ title: lang === "lv" ? "Pārāk garš teksts" : "Text too long", variant: "destructive" });
       return;
     }
     setSending(true);
     const { error } = await supabase.from("quote_requests").insert({
-      name: form.name.trim(),
-      email: form.email.trim(),
-      phone: form.phone.trim(),
-      company: form.company.trim(),
-      message: productName ? `[${productName}] ${form.message.trim()}` : form.message.trim(),
+      name,
+      email,
+      phone,
+      company,
+      message: productName ? `[${productName}] ${message}` : message,
       product_id: productId || null,
     });
     setSending(false);

@@ -38,14 +38,33 @@ const ContactPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const phone = form.phone.trim();
+    const company = form.company.trim();
+    const message = form.message.trim();
+
+    if (name.length < 2 || name.length > 100) {
+      toast({ title: lang === "lv" ? "Nederīgs vārds" : "Invalid name", variant: "destructive" });
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 255) {
+      toast({ title: lang === "lv" ? "Nederīgs e-pasts" : "Invalid email", variant: "destructive" });
+      return;
+    }
+    if (phone.length > 50 || company.length > 200 || message.length > 5000) {
+      toast({ title: lang === "lv" ? "Pārāk garš teksts" : "Text too long", variant: "destructive" });
+      return;
+    }
+
     setSending(true);
     try {
       const { error } = await supabase.from("quote_requests").insert({
-        name: form.name.trim(),
-        email: form.email.trim(),
-        company: form.company.trim() || null,
-        phone: form.phone.trim() || null,
-        message: form.message.trim(),
+        name,
+        email,
+        company: company || null,
+        phone: phone || null,
+        message,
         status: "new",
       });
       if (error) throw error;
