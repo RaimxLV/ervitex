@@ -302,6 +302,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_product_wholesale: {
+        Args: { _product_id: string }
+        Returns: {
+          bulk_discount_percent: number
+          bulk_min_qty: number
+          wholesale_price: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
