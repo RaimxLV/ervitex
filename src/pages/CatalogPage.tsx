@@ -8,7 +8,7 @@ import CategoryFilter from "@/components/catalog/CategoryFilter";
 import CatalogToolbar from "@/components/catalog/CatalogToolbar";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import { products as staticProducts, categories as staticCategories } from "@/data/products";
+
 
 interface DBProduct {
   id: string;
