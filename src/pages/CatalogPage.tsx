@@ -114,19 +114,15 @@ const CatalogPage = () => {
         retailPrice: p.retail_price || 0,
       }));
     }
-    if (!loaded) return [];
-    return staticProducts.map((p) => ({ ...p, printingTechs: [] as string[], brand: "", retailPrice: 0 }));
+    return [];
   }, [dbProducts]);
 
   const cats = useMemo(() => {
-    if (dbCategories.length > 0) {
-      return dbCategories.map((c) => ({ id: c.slug, name: { lv: c.name_lv, en: c.name_en } }));
-    }
-    return staticCategories.map((c) => ({ id: c.id, name: c.name }));
+    return dbCategories.map((c) => ({ id: c.slug, name: { lv: c.name_lv, en: c.name_en } }));
   }, [dbCategories]);
 
   const brands = useMemo(() => {
-    const set = new Set(normalizedProducts.map((p) => p.brand).filter(Boolean));
+    const set = new Set(normalizedProducts.map((p) => p.brand).filter(Boolean) as string[]);
     return Array.from(set).sort();
   }, [normalizedProducts]);
 
