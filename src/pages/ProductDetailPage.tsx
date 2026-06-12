@@ -9,7 +9,7 @@ import ProductImageGallery from "@/components/product/ProductImageGallery";
 import ProductSpecs from "@/components/product/ProductSpecs";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import type { ColorVariant } from "@/components/product/ColorSwatchSelector";
-import { products as staticProducts, categories as staticCategories } from "@/data/products";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
