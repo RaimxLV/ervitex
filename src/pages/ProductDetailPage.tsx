@@ -9,7 +9,7 @@ import ProductImageGallery from "@/components/product/ProductImageGallery";
 import ProductSpecs from "@/components/product/ProductSpecs";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import type { ColorVariant } from "@/components/product/ColorSwatchSelector";
-import { products as staticProducts, categories as staticCategories } from "@/data/products";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -75,27 +75,6 @@ const ProductDetailPage = () => {
           retailPrice: p.retail_price || undefined,
           wholesalePrice: p.wholesale_price || undefined,
         });
-      } else {
-        const sp = staticProducts.find((p) => p.id === id);
-        if (sp) {
-          const cat = staticCategories.find((c) => c.id === sp.category);
-          setProduct({
-            id: sp.id,
-            name: sp.name,
-            category: sp.category,
-            categoryId: "",
-            categoryName: cat?.name || { lv: "", en: "" },
-            description: sp.description,
-            longDescription: sp.longDescription || sp.description,
-            material: sp.material,
-            colors: sp.colors.map((c) => ({ name: c })),
-            sizes: sp.sizes || [],
-            minOrder: sp.minOrder,
-            images: sp.images,
-            isNew: sp.new || false,
-            printingTechs: [],
-          });
-        }
       }
       setLoading(false);
     };
