@@ -169,29 +169,43 @@ const BentoCategories = () => {
 const BentoCard = ({ item, lang }: { item: BentoItem; lang: "lv" | "en" }) => (
   <Link
     to={item.link}
-    className="group relative block h-full w-full overflow-hidden bg-card transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_60px_-20px_hsl(var(--accent)/0.4)]"
+    className="group relative block h-full w-full overflow-hidden bg-card"
   >
+    {/* Edge-to-edge photo with slow zoom on hover */}
     <img
       src={item.image}
       alt={item.name[lang]}
-      className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
+      className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-110"
       loading="lazy"
     />
-    <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/30 to-transparent transition-all duration-500 group-hover:from-foreground/90" />
 
-    <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
+    {/* Resting gradient: bottom darken for legibility */}
+    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent transition-opacity duration-500 group-hover:opacity-0" />
 
-    <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-5">
-      <div className="flex items-center gap-2">
+    {/* Hover gradient: full-cover dark wash with accent tint */}
+    <div className="absolute inset-0 bg-gradient-to-br from-black/75 via-black/55 to-[hsl(var(--accent)/0.35)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+    {/* Accent underline that fills on hover */}
+    <div className="absolute bottom-0 left-0 h-[3px] w-0 bg-accent transition-all duration-700 ease-out group-hover:w-full" />
+
+    {/* Title — slides up subtly on hover */}
+    <div className="absolute inset-0 flex flex-col justify-end p-5 md:p-6">
+      <div className="flex items-center gap-2 transition-transform duration-500 ease-out group-hover:-translate-y-1">
         {item.icon && <span className="text-accent">{item.icon}</span>}
-        <h3 className="font-heading text-xs font-bold uppercase text-background md:text-sm lg:text-base">
+        <h3 className="font-heading text-sm font-bold uppercase tracking-wide text-white md:text-base lg:text-lg drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]">
           {item.name[lang]}
         </h3>
       </div>
+      {/* Reveal CTA line on hover */}
+      <div className="mt-2 flex items-center gap-1.5 overflow-hidden text-[10px] font-bold uppercase tracking-[0.18em] text-white/90 max-h-0 opacity-0 transition-all duration-500 group-hover:max-h-6 group-hover:opacity-100">
+        <span>{lang === "lv" ? "Skatīt kolekciju" : "View collection"}</span>
+        <ArrowUpRight className="h-3 w-3" strokeWidth={2} />
+      </div>
     </div>
 
-    <div className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center bg-background/10 text-background/60 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100 group-hover:bg-accent group-hover:text-accent-foreground">
-      <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.2} />
+    {/* Top-right arrow badge */}
+    <div className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/0 backdrop-blur-md transition-all duration-500 group-hover:bg-accent group-hover:text-accent-foreground group-hover:scale-110">
+      <ArrowUpRight className="h-4 w-4 opacity-0 transition-opacity duration-500 group-hover:opacity-100" strokeWidth={2} />
     </div>
   </Link>
 );
