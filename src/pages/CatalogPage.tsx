@@ -28,6 +28,9 @@ interface DBProduct {
   retail_price: number | null;
   wholesale_price: number | null;
   brand: string | null;
+  hidden_manual: boolean | null;
+  hide_when_oos: boolean | null;
+  ss_in_stock: boolean | null;
   product_images: { url: string; sort_order: number | null }[];
   product_colors: { name: string; hex_code: string | null }[];
   product_sizes: { size: string; sort_order: number | null }[];
