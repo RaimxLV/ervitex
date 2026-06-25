@@ -31,6 +31,7 @@ const AdminProductForm = () => {
     category_id: "", min_order: 1, retail_price: "", wholesale_price: "",
     bulk_discount_percent: 0, bulk_min_qty: 100,
     printing_techs: [] as string[], featured: false, is_new: false, active: true,
+    ss_style_code: "", price_override: "", hidden_manual: false, hide_when_oos: false,
   });
   const [colors, setColors] = useState<ColorEntry[]>([]);
   const [sizes, setSizes] = useState<string[]>([]);
