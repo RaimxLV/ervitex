@@ -51,6 +51,14 @@ const Header = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMegaOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(currentUrl);
     toast.success(lang === "lv" ? "Saite nokopēta!" : "Link copied!");
