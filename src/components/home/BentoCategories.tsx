@@ -174,7 +174,7 @@ const BentoCard = ({ item, lang }: { item: BentoItem; lang: "lv" | "en" }) => (
     <img
       src={item.image}
       alt={item.name[lang]}
-      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+      className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
       loading="lazy"
     />
     <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/30 to-transparent transition-all duration-500 group-hover:from-foreground/90" />
