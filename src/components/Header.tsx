@@ -23,12 +23,23 @@ const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
+  const [megaOpen, setMegaOpen] = useState(false);
+  const megaTimer = useRef<number | null>(null);
   const shareRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { lang, setLang, t } = useLanguage();
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+
+  const openMega = () => {
+    if (megaTimer.current) window.clearTimeout(megaTimer.current);
+    setMegaOpen(true);
+  };
+  const closeMegaSoon = () => {
+    if (megaTimer.current) window.clearTimeout(megaTimer.current);
+    megaTimer.current = window.setTimeout(() => setMegaOpen(false), 120);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
