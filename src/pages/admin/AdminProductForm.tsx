@@ -281,6 +281,25 @@ const AdminProductForm = () => {
               <label className="flex items-center gap-2 text-sm"><Switch checked={form.active} onCheckedChange={v => setForm({...form, active: v})} /> Aktīvs</label>
             </div>
           </div>
+
+          <div className="rounded-sm border border-border p-4 sm:p-5 space-y-4">
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Stanley/Stella sinhronizācija</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label className="text-xs uppercase tracking-wider">S/S stila kods</Label>
+                <Input value={form.ss_style_code} onChange={e => setForm({...form, ss_style_code: e.target.value})} placeholder="piem. STTU755" />
+                <p className="mt-1 text-[11px] text-muted-foreground">Aizpildi, lai automātiski sinhronizētu noliktavu un cenu</p>
+              </div>
+              <div>
+                <Label className="text-xs uppercase tracking-wider">Manuālā cena (€) — pārraksta S/S</Label>
+                <Input type="number" step="0.01" value={form.price_override} onChange={e => setForm({...form, price_override: e.target.value})} placeholder="Tukšs = lieto S/S cenu" />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-4 sm:gap-6">
+              <label className="flex items-center gap-2 text-sm"><Switch checked={form.hidden_manual} onCheckedChange={v => setForm({...form, hidden_manual: v})} /> Vienmēr paslēpt</label>
+              <label className="flex items-center gap-2 text-sm"><Switch checked={form.hide_when_oos} onCheckedChange={v => setForm({...form, hide_when_oos: v})} /> Paslēpt, ja nav noliktavā</label>
+            </div>
+          </div>
         </div>
 
         {/* Labā kolonna */}
