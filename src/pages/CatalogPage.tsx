@@ -123,7 +123,13 @@ const CatalogPage = () => {
 
   const brands = useMemo(() => {
     const set = new Set(normalizedProducts.map((p) => p.brand).filter(Boolean) as string[]);
-    return Array.from(set).sort();
+    // Stanley/Stella ir mūsu primārais piegādātājs — vienmēr pirmais filtros
+    const PRIMARY = ["Stanley/Stella", "Stanley & Stella", "Stanley Stella"];
+    const all = Array.from(set);
+    const primary = PRIMARY.filter((b) => all.some((x) => x.toLowerCase() === b.toLowerCase()))
+      .map((b) => all.find((x) => x.toLowerCase() === b.toLowerCase()) as string);
+    const rest = all.filter((b) => !primary.includes(b)).sort();
+    return [...primary, ...rest];
   }, [normalizedProducts]);
 
   const filteredProducts = useMemo(() => {
