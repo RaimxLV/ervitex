@@ -85,7 +85,7 @@ const Header = () => {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-6 xl:flex">
           {navItems.map((item) => {
             const isCatalog = item.path === "/catalog";
             const active = location.pathname === item.path;
@@ -129,7 +129,7 @@ const Header = () => {
           })}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden items-center gap-3 xl:flex">
           {/* Search */}
           {searchOpen ? (
             <form onSubmit={handleSearch} className="flex items-center gap-2">
@@ -226,7 +226,7 @@ const Header = () => {
         </div>
 
         {/* Mobile controls */}
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex items-center gap-2 xl:hidden">
           <div className="flex items-center border border-primary-foreground/20 text-xs font-medium">
             <button
               onClick={() => setLang("lv")}
@@ -252,7 +252,7 @@ const Header = () => {
 
       {/* Desktop Mega Menu */}
       <div
-        className={`hidden lg:block absolute left-0 right-0 top-full origin-top transition-all duration-200 ${
+        className={`hidden xl:block absolute left-0 right-0 top-full origin-top transition-all duration-200 ${
           megaOpen
             ? "pointer-events-auto opacity-100 translate-y-0"
             : "pointer-events-none opacity-0 -translate-y-2"
@@ -270,7 +270,7 @@ const Header = () => {
 
       {/* Mobile nav */}
       {isOpen && (
-        <div className="border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 lg:hidden">
+        <div className="border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 xl:hidden">
           <form onSubmit={handleSearch} className="mb-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-foreground/40" strokeWidth={1.5} />
