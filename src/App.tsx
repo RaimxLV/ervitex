@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
 import CatalogPage from "./pages/CatalogPage.tsx";
+import StanleyStellaPage from "./pages/StanleyStellaPage.tsx";
 import ProductDetailPage from "./pages/ProductDetailPage.tsx";
 import ServicesPage from "./pages/ServicesPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
@@ -40,6 +41,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/catalog" element={<CatalogPage />} />
+              <Route path="/stanley-stella" element={<StanleyStellaPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/about" element={<AboutPage />} />

@@ -4,6 +4,7 @@ export const translations = {
   // Navigation
   "nav.home": { lv: "Sākums", en: "Home" },
   "nav.catalog": { lv: "Katalogs", en: "Catalog" },
+  "nav.stanleyStella": { lv: "Stanley/Stella", en: "Stanley/Stella" },
   "nav.services": { lv: "Pakalpojumi", en: "Services" },
   "nav.about": { lv: "Par mums", en: "About" },
   "nav.contact": { lv: "Kontakti", en: "Contact" },
