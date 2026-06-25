@@ -77,7 +77,7 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-primary/80 backdrop-blur-md text-primary-foreground">
-      <div className="container flex h-16 items-center justify-between md:h-20">
+      <div className="relative flex h-16 items-center justify-between px-4 sm:px-6 md:h-20">
         <Link to="/" className="flex items-center gap-2 sm:gap-3">
           <img src={ervitexLogo} alt="Ervitex" className="h-8 w-auto md:h-10" />
           <span className="h-5 w-px bg-primary-foreground/20 sm:h-6" />
@@ -85,7 +85,7 @@ const Header = () => {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-6 xl:flex">
+        <nav className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-6 xl:flex">
           {navItems.map((item) => {
             const isCatalog = item.path === "/catalog";
             const active = location.pathname === item.path;
