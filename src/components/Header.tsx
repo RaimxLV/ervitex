@@ -216,7 +216,7 @@ const Header = () => {
             </button>
           </div>
 
-          <a href="tel:+37167818282" className="flex items-center gap-1.5 text-sm text-primary-foreground/70 hover:text-primary-foreground">
+          <a href="tel:+37167818282" className="flex items-center gap-1.5 whitespace-nowrap text-sm text-primary-foreground/70 hover:text-primary-foreground">
             <Phone className="h-4 w-4" strokeWidth={1.5} />
             +371 678 18282
           </a>
