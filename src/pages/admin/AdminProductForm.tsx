@@ -149,6 +149,10 @@ const AdminProductForm = () => {
       bulk_min_qty: form.bulk_min_qty,
       printing_techs: form.printing_techs,
       featured: form.featured, is_new: form.is_new, active: form.active,
+      ss_style_code: form.ss_style_code.trim() || null,
+      price_override: form.price_override ? parseFloat(form.price_override) : null,
+      hidden_manual: form.hidden_manual,
+      hide_when_oos: form.hide_when_oos,
     };
 
     let productId = id;
