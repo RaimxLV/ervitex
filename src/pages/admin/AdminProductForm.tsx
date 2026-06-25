@@ -62,6 +62,10 @@ const AdminProductForm = () => {
       bulk_min_qty: product.bulk_min_qty || 100,
       printing_techs: product.printing_techs || [],
       featured: product.featured || false, is_new: product.is_new || false, active: product.active ?? true,
+      ss_style_code: (product as any).ss_style_code || "",
+      price_override: (product as any).price_override?.toString() || "",
+      hidden_manual: (product as any).hidden_manual || false,
+      hide_when_oos: (product as any).hide_when_oos || false,
     });
     const { data: imgs } = await supabase.from("product_images").select("url").eq("product_id", id!).order("sort_order");
     setImageUrls(imgs?.map(i => i.url) || []);
