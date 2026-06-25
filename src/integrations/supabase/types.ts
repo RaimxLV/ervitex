@@ -163,16 +163,24 @@ export type Database = {
           description_en: string | null
           description_lv: string | null
           featured: boolean | null
+          hidden_manual: boolean
+          hide_when_oos: boolean
           id: string
           is_new: boolean | null
+          last_synced_at: string | null
           long_description_en: string | null
           long_description_lv: string | null
           material: string | null
           min_order: number | null
           name_en: string
           name_lv: string
+          price_override: number | null
           printing_techs: string[] | null
           retail_price: number | null
+          ss_in_stock: boolean | null
+          ss_stock_qty: number | null
+          ss_style_code: string | null
+          ss_wholesale_price: number | null
           updated_at: string
           wholesale_price: number | null
         }
@@ -186,16 +194,24 @@ export type Database = {
           description_en?: string | null
           description_lv?: string | null
           featured?: boolean | null
+          hidden_manual?: boolean
+          hide_when_oos?: boolean
           id?: string
           is_new?: boolean | null
+          last_synced_at?: string | null
           long_description_en?: string | null
           long_description_lv?: string | null
           material?: string | null
           min_order?: number | null
           name_en: string
           name_lv: string
+          price_override?: number | null
           printing_techs?: string[] | null
           retail_price?: number | null
+          ss_in_stock?: boolean | null
+          ss_stock_qty?: number | null
+          ss_style_code?: string | null
+          ss_wholesale_price?: number | null
           updated_at?: string
           wholesale_price?: number | null
         }
@@ -209,16 +225,24 @@ export type Database = {
           description_en?: string | null
           description_lv?: string | null
           featured?: boolean | null
+          hidden_manual?: boolean
+          hide_when_oos?: boolean
           id?: string
           is_new?: boolean | null
+          last_synced_at?: string | null
           long_description_en?: string | null
           long_description_lv?: string | null
           material?: string | null
           min_order?: number | null
           name_en?: string
           name_lv?: string
+          price_override?: number | null
           printing_techs?: string[] | null
           retail_price?: number | null
+          ss_in_stock?: boolean | null
+          ss_stock_qty?: number | null
+          ss_style_code?: string | null
+          ss_wholesale_price?: number | null
           updated_at?: string
           wholesale_price?: number | null
         }
@@ -278,6 +302,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sync_logs: {
+        Row: {
+          details: Json | null
+          finished_at: string | null
+          id: string
+          message: string | null
+          products_created: number | null
+          products_failed: number | null
+          products_updated: number | null
+          source: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          details?: Json | null
+          finished_at?: string | null
+          id?: string
+          message?: string | null
+          products_created?: number | null
+          products_failed?: number | null
+          products_updated?: number | null
+          source: string
+          started_at?: string
+          status: string
+        }
+        Update: {
+          details?: Json | null
+          finished_at?: string | null
+          id?: string
+          message?: string | null
+          products_created?: number | null
+          products_failed?: number | null
+          products_updated?: number | null
+          source?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
