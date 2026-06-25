@@ -45,8 +45,8 @@ const BentoCategories = () => {
 
   return (
     <section className="bg-background py-16 md:py-24">
+      {/* Section header — kept in container for legibility */}
       <div className="container px-4">
-        {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -69,65 +69,69 @@ const BentoCategories = () => {
               : "Explore our extensive textile range — from everyday wear to professional workwear."}
           </p>
         </motion.div>
+      </div>
 
-        {/* Bento Grid - Mobile */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="grid grid-cols-2 gap-2.5 md:hidden"
-          style={{
-            gridTemplateRows: "repeat(5, 200px)",
-            gridTemplateAreas: `
-              "tshirts tshirts"
-              "polo jackets"
-              "workwear workwear"
-              "sport hoodies"
-              "caps bags"
-            `,
-          }}
-        >
-          {bentoItems.slice(0, 8).map((item) => (
-            <div key={item.id} style={{ gridArea: item.gridArea }}>
-              <BentoCard item={item} lang={lang} />
-            </div>
-          ))}
-        </motion.div>
+      {/* Bento Grid — full bleed to viewport edges, zero gaps */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="grid grid-cols-2 gap-0 md:hidden"
+        style={{
+          gridTemplateRows: "repeat(5, 42vw)",
+          gridTemplateAreas: `
+            "tshirts tshirts"
+            "polo jackets"
+            "workwear workwear"
+            "sport hoodies"
+            "caps bags"
+          `,
+        }}
+      >
+        {bentoItems.slice(0, 8).map((item) => (
+          <div key={item.id} style={{ gridArea: item.gridArea }}>
+            <BentoCard item={item} lang={lang} />
+          </div>
+        ))}
+      </motion.div>
 
-        {/* Desktop Bento */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="hidden md:grid gap-3"
-          style={{
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gridTemplateRows: "240px 240px 240px 200px",
-            gridTemplateAreas: `
-              "tshirts tshirts polo jackets"
-              "workwear workwear sport sport"
-              "hoodies caps bags bags"
-              "new new best best"
-            `,
-          }}
-        >
-          {bentoItems.map((item) => (
-            <div key={item.id} style={{ gridArea: item.gridArea }}>
-              <BentoCard item={item} lang={lang} />
-            </div>
-          ))}
-        </motion.div>
+      {/* Desktop Bento — full bleed, no gaps */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="hidden md:grid gap-0"
+        style={{
+          gridTemplateColumns: "repeat(4, 1fr)",
+          gridTemplateRows: "22vw 22vw 22vw 18vw",
+          gridTemplateAreas: `
+            "tshirts tshirts polo jackets"
+            "workwear workwear sport sport"
+            "hoodies caps bags bags"
+            "new new best best"
+          `,
+        }}
+      >
+        {bentoItems.map((item) => (
+          <div key={item.id} style={{ gridArea: item.gridArea }}>
+            <BentoCard item={item} lang={lang} />
+          </div>
+        ))}
+      </motion.div>
 
-        {/* Mobile: New Arrivals & Best Sellers */}
-        <div className="grid grid-cols-2 gap-2.5 mt-2.5 md:hidden">
-          {bentoItems.slice(8).map((item) => (
-            <div key={item.id} className="h-[160px]">
-              <BentoCard item={item} lang={lang} />
-            </div>
-          ))}
-        </div>
+      {/* Mobile: New Arrivals & Best Sellers — full bleed */}
+      <div className="grid grid-cols-2 gap-0 md:hidden">
+        {bentoItems.slice(8).map((item) => (
+          <div key={item.id} className="h-[42vw]">
+            <BentoCard item={item} lang={lang} />
+          </div>
+        ))}
+      </div>
+
+      <div className="container px-4">
+
 
         {/* Scrolling Banner */}
         <div className="mt-10 overflow-hidden border-y border-border/40 py-4">
