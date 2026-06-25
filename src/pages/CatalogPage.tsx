@@ -77,13 +77,16 @@ const CatalogPage = () => {
       while (hasMore) {
         const { data } = await supabase
           .from("products")
-          .select("id, category_id, name_lv, name_en, description_lv, description_en, long_description_lv, long_description_en, material, min_order, retail_price, printing_techs, featured, is_new, active, created_at, updated_at, brand, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
+          .select("id, category_id, name_lv, name_en, description_lv, description_en, long_description_lv, long_description_en, material, min_order, retail_price, printing_techs, featured, is_new, active, created_at, updated_at, brand, hidden_manual, hide_when_oos, ss_in_stock, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
           .eq("active", true)
+          .eq("hidden_manual", false)
           .order("created_at", { ascending: false })
           .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
-        const batch = (data as unknown as DBProduct[]) || [];
+        const batch = ((data as unknown as DBProduct[]) || []).filter(
+          (p) => !(p.hide_when_oos && p.ss_in_stock === false)
+        );
         allProducts = allProducts.concat(batch);
-        hasMore = batch.length === PAGE_SIZE;
+        hasMore = (data?.length || 0) === PAGE_SIZE;
         page++;
       }
 
