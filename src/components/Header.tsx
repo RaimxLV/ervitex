@@ -2,11 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import ervitexLogo from "@/assets/ervitex-logo-2.svg";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Phone, Search, Share2 } from "lucide-react";
+import { Menu, X, Phone, Search, Share2, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { toast } from "sonner";
+import CatalogMegaMenu from "@/components/CatalogMegaMenu";
 
 const navItems = [
   { key: "nav.home" as const, path: "/" },
@@ -22,12 +23,23 @@ const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
+  const [megaOpen, setMegaOpen] = useState(false);
+  const megaTimer = useRef<number | null>(null);
   const shareRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { lang, setLang, t } = useLanguage();
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+
+  const openMega = () => {
+    if (megaTimer.current) window.clearTimeout(megaTimer.current);
+    setMegaOpen(true);
+  };
+  const closeMegaSoon = () => {
+    if (megaTimer.current) window.clearTimeout(megaTimer.current);
+    megaTimer.current = window.setTimeout(() => setMegaOpen(false), 120);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -37,6 +49,14 @@ const Header = () => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMegaOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
   }, []);
 
   const handleCopyLink = () => {
@@ -66,19 +86,47 @@ const Header = () => {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-6 lg:flex">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`text-sm font-medium uppercase transition-colors hover:text-accent ${
-                location.pathname === item.path
-                  ? "text-accent"
-                  : "text-primary-foreground/70"
-              }`}
-            >
-              {t(item.key)}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const isCatalog = item.path === "/catalog";
+            const active = location.pathname === item.path;
+            if (isCatalog) {
+              return (
+                <div
+                  key={item.path}
+                  className="relative"
+                  onMouseEnter={openMega}
+                  onMouseLeave={closeMegaSoon}
+                >
+                  <Link
+                    to={item.path}
+                    onFocus={openMega}
+                    aria-haspopup="menu"
+                    aria-expanded={megaOpen}
+                    className={`flex items-center gap-1 text-sm font-medium uppercase transition-colors hover:text-accent ${
+                      active ? "text-accent" : "text-primary-foreground/70"
+                    }`}
+                  >
+                    {t(item.key)}
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 transition-transform duration-200 ${megaOpen ? "rotate-180" : ""}`}
+                      strokeWidth={2}
+                    />
+                  </Link>
+                </div>
+              );
+            }
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`text-sm font-medium uppercase transition-colors hover:text-accent ${
+                  active ? "text-accent" : "text-primary-foreground/70"
+                }`}
+              >
+                {t(item.key)}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
@@ -201,6 +249,24 @@ const Header = () => {
           </button>
         </div>
       </div>
+
+      {/* Desktop Mega Menu */}
+      <div
+        className={`hidden lg:block absolute left-0 right-0 top-full origin-top transition-all duration-200 ${
+          megaOpen
+            ? "pointer-events-auto opacity-100 translate-y-0"
+            : "pointer-events-none opacity-0 -translate-y-2"
+        }`}
+        onMouseEnter={openMega}
+        onMouseLeave={closeMegaSoon}
+      >
+        <div className="border-t border-border bg-background text-foreground shadow-2xl shadow-primary/30">
+          <div className="container">
+            <CatalogMegaMenu onNavigate={() => setMegaOpen(false)} />
+          </div>
+        </div>
+      </div>
+
 
       {/* Mobile nav */}
       {isOpen && (
