@@ -6,7 +6,9 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useRef } from "react";
 import heroModels from "@/assets/hero-models.jpg";
 import heroLoopAsset from "@/assets/hero-loop.mp4.asset.json";
+import heroPosterAsset from "@/assets/hero-poster.jpg.asset.json";
 const heroLoop = heroLoopAsset.url;
+const heroPoster = heroPosterAsset.url;
 
 const HeroSection = () => {
   const { lang } = useLanguage();
@@ -39,8 +41,8 @@ const HeroSection = () => {
           muted
           loop
           playsInline
-          preload="metadata"
-          poster={heroModels}
+          preload="auto"
+          poster={heroPoster}
           className="absolute inset-0 h-full w-full object-cover object-center opacity-55"
         />
 
@@ -48,6 +50,7 @@ const HeroSection = () => {
         <div className="hidden">
           <img src={heroModels} alt="" width={1920} height={1080} />
         </div>
+
       </motion.div>
 
       {/* ── Layer 2: Atmosphere — light leaks ── */}
