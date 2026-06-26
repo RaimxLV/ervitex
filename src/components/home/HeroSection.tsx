@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useRef } from "react";
 import heroModels from "@/assets/hero-models.jpg";
-import heroLoop from "@/assets/hero-loop.mp4";
+import heroLoopAsset from "@/assets/hero-loop.mp4.asset.json";
+const heroLoop = heroLoopAsset.url;
 
 const HeroSection = () => {
   const { lang } = useLanguage();
