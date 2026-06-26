@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useRef } from "react";
 import heroModels from "@/assets/hero-models.jpg";
+import heroLoopAsset from "@/assets/hero-loop.mp4.asset.json";
+const heroLoop = heroLoopAsset.url;
 
 const HeroSection = () => {
   const { lang } = useLanguage();
@@ -30,26 +32,21 @@ const HeroSection = () => {
         style={{ y: bgY }}
         className="absolute inset-0 will-change-transform"
       >
-        {/* Desktop: models positioned to the right */}
-        <div className="hidden md:block absolute inset-0">
-          <img
-            src={heroModels}
-            alt=""
-            width={1920}
-            height={1080}
-            className="absolute top-0 right-0 h-full w-[75%] object-cover object-[center_15%] opacity-45"
-          />
-        </div>
+        {/* Video loop — full bleed */}
+        <video
+          src={heroLoop}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={heroModels}
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-55"
+        />
 
-        {/* Mobile: models below text area, centered */}
-        <div className="md:hidden absolute inset-0">
-          <img
-            src={heroModels}
-            alt=""
-            width={1920}
-            height={1080}
-            className="w-full h-full object-cover object-[center_15%] opacity-30"
-          />
+        {/* Legacy image fallback (hidden, kept for reference) */}
+        <div className="hidden">
+          <img src={heroModels} alt="" width={1920} height={1080} />
         </div>
       </motion.div>
 
