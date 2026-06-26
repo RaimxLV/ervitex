@@ -51,10 +51,6 @@ const HeroSection = () => {
           <img src={heroModels} alt="" width={1920} height={1080} />
         </div>
 
-        {/* Legacy image fallback (hidden, kept for reference) */}
-        <div className="hidden">
-          <img src={heroModels} alt="" width={1920} height={1080} />
-        </div>
       </motion.div>
 
       {/* ── Layer 2: Atmosphere — light leaks ── */}
