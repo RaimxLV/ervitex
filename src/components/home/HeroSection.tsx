@@ -41,10 +41,15 @@ const HeroSection = () => {
           muted
           loop
           playsInline
-          preload="metadata"
-          poster={heroModels}
+          preload="auto"
+          poster={heroPoster}
           className="absolute inset-0 h-full w-full object-cover object-center opacity-55"
         />
+
+        {/* Legacy image fallback (hidden, kept for reference) */}
+        <div className="hidden">
+          <img src={heroModels} alt="" width={1920} height={1080} />
+        </div>
 
         {/* Legacy image fallback (hidden, kept for reference) */}
         <div className="hidden">
