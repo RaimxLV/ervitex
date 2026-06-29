@@ -358,12 +358,17 @@ export type Database = {
         Row: {
           color_code: string | null
           created_at: string
+          fname: string | null
           height: number | null
           id: string
           image_type: string | null
+          is_main: boolean | null
+          is_over: boolean | null
+          photo_shoot_code: string | null
+          photo_style: string | null
           public_url: string | null
           sort_order: number | null
-          source_url: string | null
+          source_url: string
           storage_path: string | null
           style_code: string
           width: number | null
@@ -371,12 +376,17 @@ export type Database = {
         Insert: {
           color_code?: string | null
           created_at?: string
+          fname?: string | null
           height?: number | null
           id?: string
           image_type?: string | null
+          is_main?: boolean | null
+          is_over?: boolean | null
+          photo_shoot_code?: string | null
+          photo_style?: string | null
           public_url?: string | null
           sort_order?: number | null
-          source_url?: string | null
+          source_url: string
           storage_path?: string | null
           style_code: string
           width?: number | null
@@ -384,12 +394,17 @@ export type Database = {
         Update: {
           color_code?: string | null
           created_at?: string
+          fname?: string | null
           height?: number | null
           id?: string
           image_type?: string | null
+          is_main?: boolean | null
+          is_over?: boolean | null
+          photo_shoot_code?: string | null
+          photo_style?: string | null
           public_url?: string | null
           sort_order?: number | null
-          source_url?: string | null
+          source_url?: string
           storage_path?: string | null
           style_code?: string
           width?: number | null
@@ -450,27 +465,36 @@ export type Database = {
       ss_stock: {
         Row: {
           incoming_quantity: number | null
+          location_code: string | null
           next_arrival_date: string | null
           quantity: number
+          receipt_date: string | null
           sku: string
           style_code: string
           updated_at: string
+          variant_code: string | null
         }
         Insert: {
           incoming_quantity?: number | null
+          location_code?: string | null
           next_arrival_date?: string | null
           quantity?: number
+          receipt_date?: string | null
           sku: string
           style_code: string
           updated_at?: string
+          variant_code?: string | null
         }
         Update: {
           incoming_quantity?: number | null
+          location_code?: string | null
           next_arrival_date?: string | null
           quantity?: number
+          receipt_date?: string | null
           sku?: string
           style_code?: string
           updated_at?: string
+          variant_code?: string | null
         }
         Relationships: []
       }
@@ -478,6 +502,7 @@ export type Database = {
         Row: {
           brand: string | null
           category: string | null
+          category_code: string | null
           composition: string | null
           created_at: string
           fit: string | null
@@ -486,21 +511,27 @@ export type Database = {
           id: string
           last_synced_at: string | null
           long_description: string | null
+          main_picture_url: string | null
           name: string
           neckline: string | null
+          over_picture_url: string | null
           published: boolean
           raw: Json | null
           segment: string | null
           short_description: string | null
           sleeve: string | null
+          specifications: string | null
           style_code: string
           type: string | null
+          type_code: string | null
           updated_at: string
+          wash_instructions: string | null
           weight_gsm: number | null
         }
         Insert: {
           brand?: string | null
           category?: string | null
+          category_code?: string | null
           composition?: string | null
           created_at?: string
           fit?: string | null
@@ -509,21 +540,27 @@ export type Database = {
           id?: string
           last_synced_at?: string | null
           long_description?: string | null
+          main_picture_url?: string | null
           name: string
           neckline?: string | null
+          over_picture_url?: string | null
           published?: boolean
           raw?: Json | null
           segment?: string | null
           short_description?: string | null
           sleeve?: string | null
+          specifications?: string | null
           style_code: string
           type?: string | null
+          type_code?: string | null
           updated_at?: string
+          wash_instructions?: string | null
           weight_gsm?: number | null
         }
         Update: {
           brand?: string | null
           category?: string | null
+          category_code?: string | null
           composition?: string | null
           created_at?: string
           fit?: string | null
@@ -532,16 +569,21 @@ export type Database = {
           id?: string
           last_synced_at?: string | null
           long_description?: string | null
+          main_picture_url?: string | null
           name?: string
           neckline?: string | null
+          over_picture_url?: string | null
           published?: boolean
           raw?: Json | null
           segment?: string | null
           short_description?: string | null
           sleeve?: string | null
+          specifications?: string | null
           style_code?: string
           type?: string | null
+          type_code?: string | null
           updated_at?: string
+          wash_instructions?: string | null
           weight_gsm?: number | null
         }
         Relationships: []
@@ -549,42 +591,60 @@ export type Database = {
       ss_variants: {
         Row: {
           color_code: string | null
+          color_group: string | null
           color_name: string | null
+          color_sequence: number | null
           created_at: string
           ean: string | null
+          hex_color_code: string | null
           hidden_by_admin: boolean
           id: string
+          published: boolean | null
           raw: Json | null
           size_code: string | null
+          size_sequence: number | null
           sku: string
           style_code: string
           updated_at: string
+          weight_grams: number | null
         }
         Insert: {
           color_code?: string | null
+          color_group?: string | null
           color_name?: string | null
+          color_sequence?: number | null
           created_at?: string
           ean?: string | null
+          hex_color_code?: string | null
           hidden_by_admin?: boolean
           id?: string
+          published?: boolean | null
           raw?: Json | null
           size_code?: string | null
+          size_sequence?: number | null
           sku: string
           style_code: string
           updated_at?: string
+          weight_grams?: number | null
         }
         Update: {
           color_code?: string | null
+          color_group?: string | null
           color_name?: string | null
+          color_sequence?: number | null
           created_at?: string
           ean?: string | null
+          hex_color_code?: string | null
           hidden_by_admin?: boolean
           id?: string
+          published?: boolean | null
           raw?: Json | null
           size_code?: string | null
+          size_sequence?: number | null
           sku?: string
           style_code?: string
           updated_at?: string
+          weight_grams?: number | null
         }
         Relationships: []
       }
@@ -651,23 +711,29 @@ export type Database = {
         Row: {
           brand: string | null
           category: string | null
+          category_code: string | null
           color_count: number | null
           composition: string | null
           fit: string | null
           gender: string | null
-          image_path: string | null
-          image_url: string | null
+          hidden_by_admin: boolean | null
           long_description: string | null
+          main_picture_url: string | null
           name: string | null
           neckline: string | null
+          over_picture_url: string | null
+          published: boolean | null
           raw: Json | null
           segment: string | null
           short_description: string | null
           size_count: number | null
           sleeve: string | null
+          specifications: string | null
           style_code: string | null
           total_stock: number | null
           type: string | null
+          type_code: string | null
+          wash_instructions: string | null
           weight_gsm: number | null
         }
         Relationships: []
