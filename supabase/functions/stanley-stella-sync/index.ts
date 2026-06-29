@@ -196,12 +196,13 @@ async function syncStyles(sb: SupabaseClient) {
         ean: toStr(v.EAN),
         weight_grams: toNum(v.WeightPerUnit),
         published: toBool(v.Published, true),
-        raw: v,
+        raw: null,
       });
     }
   }
 
-  const s = await chunkUpsert(sb, "ss_styles", styles, "style_code");
+  // Smaller chunks for ss_styles (rows can be large with long descriptions) — avoids Postgres statement timeout.
+  const s = await chunkUpsert(sb, "ss_styles", styles, "style_code", 50);
   const v = await chunkUpsert(sb, "ss_variants", variants, "sku");
   const c = colors.size
     ? await chunkUpsert(sb, "ss_colors", Array.from(colors.values()), "code")
