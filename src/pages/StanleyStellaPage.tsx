@@ -239,8 +239,11 @@ const StanleyStellaPage = () => {
       ? detailImages.filter((i) => i.color_code === activeColor)
       : detailImages;
     const final = list.length ? list : detailImages;
-    return final.map((i) => resolveUrl(i.source_url)).filter((x): x is string => !!x);
-  }, [detailImages, activeColor]);
+    const urls = final.map((i) => resolveUrl(i.source_url)).filter((x): x is string => !!x);
+    if (urls.length) return urls;
+    const fallback = resolveUrl(openStyle?.cover_url || openStyle?.main_picture_url);
+    return fallback ? [fallback] : [];
+  }, [detailImages, activeColor, openStyle]);
 
   useEffect(() => { setGalleryIdx(0); }, [activeColor, openStyle?.style_code]);
 
