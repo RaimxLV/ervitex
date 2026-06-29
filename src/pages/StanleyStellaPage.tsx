@@ -307,8 +307,8 @@ const StanleyStellaPage = () => {
             <>
               <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-4">
                 {slice.map((s) => {
-                  const main = resolveUrl(s.main_picture_url);
-                  const over = resolveUrl(s.over_picture_url);
+                  const main = resolveUrl(s.cover_url || s.main_picture_url);
+                  const over = resolveUrl(s.over_url || s.over_picture_url);
                   const swatches = styleColorHex.get(s.style_code);
                   return (
                     <button
