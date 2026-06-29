@@ -18,15 +18,18 @@ async function ssCall(endpoint: string, extra: Record<string, unknown> = {}) {
 
   const res = await fetch(`${SS_HOST}${endpoint}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
     body: JSON.stringify({
       jsonrpc: "2.0",
       method: "call",
       params: { db_name: DB_NAME, user, password, ...extra },
     }),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status} on ${endpoint}`);
-  const json = await res.json();
+  const text = await res.text();
+  if (!res.ok) throw new Error(`HTTP ${res.status} on ${endpoint}: ${text.slice(0, 200)}`);
+  let json: any;
+  try { json = JSON.parse(text); }
+  catch { throw new Error(`Non-JSON response from ${endpoint}: ${text.slice(0, 200)}`); }
   if (json.error) throw new Error(json.error?.data?.message || json.error?.message || "RPC error");
   const raw = json.result ?? "[]";
   return typeof raw === "string" ? JSON.parse(raw) : raw;
@@ -69,7 +72,7 @@ async function finishLog(sb: SupabaseClient, id: string | undefined, patch: Reco
 // ---------------------------------------------------------------- syncers ---
 
 async function syncColors(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/colors/get_json");
+  const rows = await ssCall("/webrequest/color/get_json");
   const data = (rows as any[]).map((r) => ({
     code: String(pick(r, "Code", "ColorCode", "Id") ?? ""),
     name: String(pick(r, "Name", "ColorName") ?? ""),
@@ -80,7 +83,7 @@ async function syncColors(sb: SupabaseClient) {
 }
 
 async function syncSizes(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/sizes/get_json");
+  const rows = await ssCall("/webrequest/size/get_json");
   const data = (rows as any[]).map((r, idx) => ({
     code: String(pick(r, "Code", "SizeCode", "Id") ?? ""),
     name: String(pick(r, "Name", "SizeName") ?? ""),
@@ -163,7 +166,7 @@ async function syncPrices(sb: SupabaseClient) {
 }
 
 async function syncCombos(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/combo/get_json").catch(() => []);
+  const rows = await ssCall("/webrequest/combostyles/get_json").catch(() => []);
   const data: any[] = [];
   for (const r of rows as any[]) {
     const style = pick(r, "StyleCode", "Style_Code");
@@ -192,7 +195,7 @@ async function syncCombos(sb: SupabaseClient) {
 // Images: pulls V2 image list, then downloads NEW ones into the ss-images bucket
 // and stores public URL. Skips ones already mirrored.
 async function syncImages(sb: SupabaseClient, maxDownloads = 200) {
-  const rows = await ssCall("/webrequest/v2/product_images/get_json", { LanguageCode: DEFAULT_LANG });
+  const rows = await ssCall("/webrequest/products_imagesV2/get_json", { LanguageCode: DEFAULT_LANG });
   const wanted: { style: string; color: string | null; type: string; sort: number; url: string }[] = [];
 
   for (const r of rows as any[]) {
