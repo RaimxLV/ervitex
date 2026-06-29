@@ -212,6 +212,55 @@ const AdminDashboard = () => {
           </p>
         </div>
       </div>
+
+      <div className="mt-10 rounded-sm border border-border bg-card p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Piegādātāja cenas (Stanley/Stella)</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Iepirkuma un ieteicamās mazumtirdzniecības cenas. Redzamas tikai administrātoriem.</p>
+          </div>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Meklēt SKU vai modeli"
+              value={priceQuery}
+              onChange={(e) => setPriceQuery(e.target.value)}
+              className="w-64 pl-8"
+            />
+          </div>
+        </div>
+        <div className="mt-4 max-h-[480px] overflow-y-auto border border-border">
+          <table className="w-full text-xs">
+            <thead className="sticky top-0 z-10 bg-muted text-[10px] uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">Modelis</th>
+                <th className="px-3 py-2 text-left">SKU</th>
+                <th className="px-3 py-2 text-right">Iepirkuma cena</th>
+                <th className="px-3 py-2 text-right">Ieteicamā mazumcena</th>
+                <th className="px-3 py-2 text-left">Valūta</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pricesLoading ? (
+                <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">Ielādē...</td></tr>
+              ) : filteredPrices.length === 0 ? (
+                <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">Nav datu</td></tr>
+              ) : (
+                filteredPrices.map((p) => (
+                  <tr key={p.sku} className="border-t border-border hover:bg-muted/50">
+                    <td className="px-3 py-1.5 font-mono">{p.style_code}</td>
+                    <td className="px-3 py-1.5 font-mono">{p.sku}</td>
+                    <td className="px-3 py-1.5 text-right font-medium">{p.purchase_price != null ? Number(p.purchase_price).toFixed(2) : "—"}</td>
+                    <td className="px-3 py-1.5 text-right">{p.suggested_retail_price != null ? Number(p.suggested_retail_price).toFixed(2) : "—"}</td>
+                    <td className="px-3 py-1.5">{p.currency || "EUR"}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-2 text-[11px] text-muted-foreground">Rāda pirmos 500 ierakstus. Izmantojiet meklēšanu, lai atrastu konkrētu modeli vai SKU.</p>
+      </div>
     </AdminLayout>
   );
 };
