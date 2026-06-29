@@ -44,12 +44,28 @@ Deno.serve(async (req) => {
   );
 
   let limit = 5;
+  let testOnly = false;
+  let styleFilter: string | undefined;
   try {
     if (req.method === "POST") {
       const body = await req.json().catch(() => ({}));
       if (typeof body.limit === "number") limit = Math.min(Math.max(body.limit, 1), 50);
+      if (body.test === true) testOnly = true;
+      if (typeof body.style === "string") styleFilter = body.style;
     }
   } catch (_) { /* noop */ }
+
+  // Auth check only — uses tiny payload (filter by future date returns 0 rows)
+  if (testOnly) {
+    try {
+      const rows = await ssCall("/webrequest/products/get_json", { LastUpdate: "2099-01-01 00:00:00" });
+      return new Response(JSON.stringify({ ok: true, auth: "valid", rows: Array.isArray(rows) ? rows.length : 0 }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    } catch (e) {
+      return new Response(JSON.stringify({ ok: false, error: (e as Error).message }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+  }
 
   const { data: logRow } = await supabase
     .from("sync_logs")
@@ -62,8 +78,10 @@ Deno.serve(async (req) => {
   const errors: string[] = [];
 
   try {
-    // Fetch products. S/S API endpoint: /webrequest/products/get_json
-    const products = await ssCall("/webrequest/products/get_json", {});
+    // Fetch products. Use Style filter when possible to stay under memory limit.
+    const params: Record<string, unknown> = {};
+    if (styleFilter) params.Style = styleFilter;
+    const products = await ssCall("/webrequest/products/get_json", params);
     if (!Array.isArray(products)) throw new Error("Unexpected products payload");
 
     // Group rows by StyleCode so we collect colors/sizes/images per style.
