@@ -117,15 +117,12 @@ const AdminDashboard = () => {
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={runImport} disabled={importing} variant="outline">
-              <RefreshCw className={`mr-2 h-4 w-4 ${importing ? "animate-spin" : ""}`} />
-              {importing ? "Importē..." : "Importēt 5 paraugus"}
-            </Button>
             <Button onClick={runSync} disabled={syncing} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
               {syncing ? "Sinhronizē..." : "Sinhronizēt tagad"}
             </Button>
           </div>
+
         </div>
       </div>
     </AdminLayout>
