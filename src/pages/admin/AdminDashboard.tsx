@@ -60,22 +60,8 @@ const AdminDashboard = () => {
     }
   };
 
-  const runImport = async () => {
-    setImporting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("stanley-stella-import", { body: { limit: 5 } });
-      if (error) throw error;
-      toast({
-        title: "Imports pabeigts",
-        description: `Pievienotas ${data?.inserted ?? 0} preces (${data?.skipped ?? 0} jau eksistēja)`,
-      });
-      await Promise.all([fetchStats(), fetchLastSync()]);
-    } catch (e: any) {
-      toast({ title: "Imports neizdevās", description: e.message, variant: "destructive" });
-    } finally {
-      setImporting(false);
-    }
-  };
+
+
 
   const cards = [
     { label: "Produkti", value: stats.products, icon: Package, color: "text-blue-500" },
