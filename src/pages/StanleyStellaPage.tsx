@@ -1,82 +1,69 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
-import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 
-interface DBProduct {
-  id: string;
-  name_lv: string; name_en: string;
-  description_lv: string | null; description_en: string | null;
-  long_description_lv: string | null; long_description_en: string | null;
-  material: string | null; min_order: number | null;
-  featured: boolean | null; is_new: boolean | null;
-  category_id: string | null; printing_techs: string[] | null;
-  retail_price: number | null; brand: string | null;
-  hidden_manual: boolean | null; hide_when_oos: boolean | null; ss_in_stock: boolean | null;
-  product_images: { url: string; sort_order: number | null }[];
-  product_colors: { name: string; hex_code: string | null; image_url: string | null }[];
-  product_sizes: { size: string; sort_order: number | null }[];
-  categories: { slug: string; name_lv: string; name_en: string } | null;
+interface LiveProduct {
+  styleCode: string;
+  name: string;
+  shortDescription: string;
+  category: string;
+  gender: string;
+  composition: string;
+  segment: string;
+  colors: { name: string; hex: string | null; image: string | null }[];
+  sizes: string[];
+  images: string[];
 }
-
-const SS_BRANDS = ["stanley/stella", "stanley & stella", "stanley stella"];
 
 const StanleyStellaPage = () => {
   const { lang } = useLanguage();
-  const [products, setProducts] = useState<DBProduct[]>([]);
+  const [products, setProducts] = useState<LiveProduct[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
-        .from("products")
-        .select("id, category_id, name_lv, name_en, description_lv, description_en, long_description_lv, long_description_en, material, min_order, retail_price, printing_techs, featured, is_new, brand, hidden_manual, hide_when_oos, ss_in_stock, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
-        .eq("active", true).eq("hidden_manual", false)
-        .order("created_at", { ascending: false });
-      const filtered = ((data as unknown as DBProduct[]) || [])
-        .filter((p) => p.brand && SS_BRANDS.includes(p.brand.toLowerCase()))
-        .filter((p) => !(p.hide_when_oos && p.ss_in_stock === false));
-      setProducts(filtered);
-      setLoaded(true);
+      try {
+        const langCode = lang === "lv" ? "en_GB" : "en_GB"; // S/S nepiedāvā lv
+        const { data, error } = await supabase.functions.invoke("stanley-stella-live", {
+          method: "GET",
+          // @ts-expect-error supabase-js supports query via path
+          body: undefined,
+        } as any);
+        // supabase-js doesn't pass query params nicely; use fetch directly
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stanley-stella-live?limit=24&lang=${langCode}`;
+        const res = await fetch(url, {
+          headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        });
+        const json = await res.json();
+        if (!json.ok) throw new Error(json.error || "Failed to load");
+        setProducts(json.products || []);
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
+        setLoaded(true);
+      }
     })();
-  }, []);
-
-  const normalized = useMemo(() => products.map((p) => ({
-    id: p.id,
-    name: { lv: p.name_lv, en: p.name_en },
-    category: p.categories?.slug || "",
-    description: { lv: p.description_lv || "", en: p.description_en || "" },
-    longDescription: { lv: p.long_description_lv || "", en: p.long_description_en || "" },
-    material: p.material || undefined,
-    colors: p.product_colors.map((c) => c.name),
-    colorHexCodes: p.product_colors.map((c) => c.hex_code),
-    colorImageUrls: p.product_colors.map((c) => c.image_url || null),
-    sizes: p.product_sizes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((s) => s.size),
-    minOrder: p.min_order || undefined,
-    images: p.product_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((i) => i.url),
-    featured: p.featured || false,
-    new: p.is_new || false,
-    printingTechs: p.printing_techs || [],
-    brand: p.brand || "",
-    retailPrice: p.retail_price || 0,
-  })), [products]);
+  }, [lang]);
 
   const heroCopy = lang === "lv"
     ? {
         eyebrow: "Oficiālais Stanley/Stella dīleris Latvijā",
         title: "Stanley/Stella",
-        sub: "Belģijas premium tekstilzīmols ar ētisku ražošanu un GOTS sertificētu bioloģisko kokvilnu. Pilna kolekcija pieejama caur Ervitex ar profesionālu apdruku un izšūšanu.",
+        sub: "Beļģijas premium tekstilzīmols ar ētisku ražošanu un GOTS sertificētu bioloģisko kokvilnu. Pilna kolekcija pieejama caur Ervitex ar profesionālu apdruku un izšūšanu.",
         cta: "Skatīt visu kolekciju",
         contact: "Pieprasīt cenu",
-        emptyTitle: "Drīzumā šeit būs Stanley/Stella preces",
-        emptySub: "Šobrīd importējam kolekciju. Sazinies, lai uzzinātu pieejamību.",
+        emptyTitle: "Nevarējām ielādēt kolekciju",
+        emptySub: "Mēģini vēlreiz pēc brīža vai sazinies ar mums.",
         sectionTitle: "Aktuālā kolekcija",
-        sectionSub: "Izlase no Stanley/Stella sortimenta",
+        sectionSub: "Tieša pieslēgšanās Stanley/Stella API — tikai noliktavā esošās preces",
+        sizesLabel: "Izmēri",
+        colorsLabel: "Krāsas",
         why: [
           { t: "GOTS bioloģiskā kokvilna", d: "Sertificēti materiāli, sekojami no šķiedras līdz veikalam." },
           { t: "Fair Wear Foundation", d: "Ētiska ražošana Bangladešā ar pilnu caurredzamību." },
@@ -89,10 +76,12 @@ const StanleyStellaPage = () => {
         sub: "Belgian premium textile brand with ethical production and GOTS-certified organic cotton. Full collection available through Ervitex with professional printing and embroidery.",
         cta: "View full collection",
         contact: "Request a Quote",
-        emptyTitle: "Stanley/Stella products coming soon",
-        emptySub: "We're importing the collection. Get in touch for availability.",
+        emptyTitle: "Couldn't load the collection",
+        emptySub: "Please try again in a moment or get in touch.",
         sectionTitle: "Current collection",
-        sectionSub: "A selection from the Stanley/Stella range",
+        sectionSub: "Live from the Stanley/Stella API — in-stock styles only",
+        sizesLabel: "Sizes",
+        colorsLabel: "Colors",
         why: [
           { t: "GOTS organic cotton", d: "Certified materials, traceable from fibre to store." },
           { t: "Fair Wear Foundation", d: "Ethical production in Bangladesh with full transparency." },
@@ -113,9 +102,6 @@ const StanleyStellaPage = () => {
             </h1>
             <p className="max-w-2xl text-base text-primary-foreground/70 md:text-lg">{heroCopy.sub}</p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link to="/catalog?brand=Stanley%2FStella">{heroCopy.cta}</Link>
-              </Button>
               <Button asChild variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10">
                 <Link to="/contact">{heroCopy.contact}</Link>
               </Button>
@@ -146,16 +132,11 @@ const StanleyStellaPage = () => {
               <h2 className="font-heading text-2xl font-black uppercase tracking-wide md:text-3xl">{heroCopy.sectionTitle}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{heroCopy.sectionSub}</p>
             </div>
-            {loaded && normalized.length > 0 && (
-              <Button asChild variant="outline">
-                <Link to="/catalog?brand=Stanley%2FStella">{heroCopy.cta} →</Link>
-              </Button>
-            )}
           </div>
 
           {!loaded ? (
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => (
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="overflow-hidden border border-border bg-card">
                   <Skeleton className="aspect-square w-full" />
                   <div className="space-y-2 p-3">
@@ -165,18 +146,43 @@ const StanleyStellaPage = () => {
                 </div>
               ))}
             </div>
-          ) : normalized.length === 0 ? (
+          ) : error || products.length === 0 ? (
             <div className="rounded-sm border border-dashed border-border p-10 text-center">
               <h3 className="font-heading text-lg font-bold uppercase">{heroCopy.emptyTitle}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{heroCopy.emptySub}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{error || heroCopy.emptySub}</p>
               <Button asChild className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
                 <Link to="/contact">{heroCopy.contact}</Link>
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-3">
-              {normalized.slice(0, 12).map((p) => (
-                <ProductCard key={p.id} product={p as any} />
+            <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-4">
+              {products.map((p) => (
+                <article key={p.styleCode} className="group overflow-hidden border border-border bg-card transition-colors hover:border-accent">
+                  <div className="relative aspect-square overflow-hidden bg-muted">
+                    {p.images[0] ? (
+                      <img
+                        src={p.images[0]}
+                        alt={p.name}
+                        loading="lazy"
+                        className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No image</div>
+                    )}
+                    <span className="absolute left-2 top-2 bg-primary px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">
+                      {p.styleCode}
+                    </span>
+                  </div>
+                  <div className="space-y-2 p-3">
+                    <h3 className="font-heading text-sm font-bold uppercase tracking-wide line-clamp-1">{p.name}</h3>
+                    <p className="line-clamp-2 text-xs text-muted-foreground">{p.shortDescription}</p>
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                        {p.colors.length} {heroCopy.colorsLabel.toLowerCase()} · {p.sizes.length} {heroCopy.sizesLabel.toLowerCase()}
+                      </span>
+                    </div>
+                  </div>
+                </article>
               ))}
             </div>
           )}
