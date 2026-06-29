@@ -18,15 +18,18 @@ async function ssCall(endpoint: string, extra: Record<string, unknown> = {}) {
 
   const res = await fetch(`${SS_HOST}${endpoint}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
     body: JSON.stringify({
       jsonrpc: "2.0",
       method: "call",
       params: { db_name: DB_NAME, user, password, ...extra },
     }),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status} on ${endpoint}`);
-  const json = await res.json();
+  const text = await res.text();
+  if (!res.ok) throw new Error(`HTTP ${res.status} on ${endpoint}: ${text.slice(0, 200)}`);
+  let json: any;
+  try { json = JSON.parse(text); }
+  catch { throw new Error(`Non-JSON response from ${endpoint}: ${text.slice(0, 200)}`); }
   if (json.error) throw new Error(json.error?.data?.message || json.error?.message || "RPC error");
   const raw = json.result ?? "[]";
   return typeof raw === "string" ? JSON.parse(raw) : raw;
