@@ -192,7 +192,7 @@ async function syncCombos(sb: SupabaseClient) {
 // Images: pulls V2 image list, then downloads NEW ones into the ss-images bucket
 // and stores public URL. Skips ones already mirrored.
 async function syncImages(sb: SupabaseClient, maxDownloads = 200) {
-  const rows = await ssCall("/webrequest/v2/product_images/get_json", { LanguageCode: DEFAULT_LANG });
+  const rows = await ssCall("/webrequest/products_imagesV2/get_json", { LanguageCode: DEFAULT_LANG });
   const wanted: { style: string; color: string | null; type: string; sort: number; url: string }[] = [];
 
   for (const r of rows as any[]) {
