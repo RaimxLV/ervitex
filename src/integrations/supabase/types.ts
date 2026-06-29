@@ -647,7 +647,25 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      ss_style_summary: {
+        Row: {
+          brand: string | null
+          category: string | null
+          color_count: number | null
+          composition: string | null
+          gender: string | null
+          image_path: string | null
+          image_url: string | null
+          name: string | null
+          segment: string | null
+          short_description: string | null
+          size_count: number | null
+          style_code: string | null
+          total_stock: number | null
+          type: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_product_wholesale: {
