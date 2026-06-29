@@ -714,6 +714,7 @@ export type Database = {
           category_code: string | null
           color_count: number | null
           composition: string | null
+          cover_url: string | null
           fit: string | null
           gender: string | null
           hidden_by_admin: boolean | null
@@ -722,6 +723,7 @@ export type Database = {
           name: string | null
           neckline: string | null
           over_picture_url: string | null
+          over_url: string | null
           published: boolean | null
           raw: Json | null
           segment: string | null

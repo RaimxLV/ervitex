@@ -156,7 +156,8 @@ async function syncStyles(sb: SupabaseClient) {
       over_picture_url: toStr(row.OverPicture),
       published: toBool(row.StylePublished, true),
       brand: "Stanley/Stella",
-      raw: row,
+      // Strip giant Variants/Layers arrays from raw to keep row size sane
+      raw: (() => { const { Variants, Layers, ...rest } = row; return rest; })(),
       last_synced_at: new Date().toISOString(),
     });
 
@@ -195,12 +196,13 @@ async function syncStyles(sb: SupabaseClient) {
         ean: toStr(v.EAN),
         weight_grams: toNum(v.WeightPerUnit),
         published: toBool(v.Published, true),
-        raw: v,
+        raw: null,
       });
     }
   }
 
-  const s = await chunkUpsert(sb, "ss_styles", styles, "style_code");
+  // Smaller chunks for ss_styles (rows can be large with long descriptions) — avoids Postgres statement timeout.
+  const s = await chunkUpsert(sb, "ss_styles", styles, "style_code", 50);
   const v = await chunkUpsert(sb, "ss_variants", variants, "sku");
   const c = colors.size
     ? await chunkUpsert(sb, "ss_colors", Array.from(colors.values()), "code")
@@ -296,7 +298,10 @@ async function syncImages(sb: SupabaseClient) {
     const colorCode = toStr(r.ColorCode);
     const photoType = toStr(r.PhotoTypeCode) ?? "MAIN";
     const sortOrder = toInt(r.PhotoSequenceCode, 0);
-    const key = `${style}|${colorCode ?? ""}|${photoType}|${sortOrder}`;
+    const fname = toStr(r.FName) ?? url;
+    // Dedup on the same key the DB unique index uses (incl. FName) so every
+    // distinct photo file survives the upsert.
+    const key = `${style}|${colorCode ?? ""}|${photoType}|${fname}`;
     if (seen.has(key)) continue;
     seen.add(key);
     data.push({
@@ -313,7 +318,7 @@ async function syncImages(sb: SupabaseClient) {
     });
   }
 
-  return chunkUpsert(sb, "ss_images", data, "style_code,color_code,image_type,sort_order");
+  return chunkUpsert(sb, "ss_images", data, "style_code,color_code,image_type,fname");
 }
 
 // INSPECT: introspect raw responses (used during development)
