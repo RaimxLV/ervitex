@@ -20,7 +20,7 @@ interface StyleRow {
   composition: string | null;
 }
 
-interface ImageRow { style_code: string; color_code: string | null; public_url: string; sort_order: number }
+interface ImageRow { style_code: string; color_code: string | null; public_url: string | null; storage_path: string | null; sort_order: number }
 interface VariantRow { style_code: string; color_code: string | null; color_name: string | null; size_code: string | null }
 interface StockRow { style_code: string; quantity: number }
 
@@ -59,19 +59,34 @@ const StanleyStellaPage = () => {
       }
       setStyles(all);
 
-      // images (one per style — first by sort_order)
+      // images (one per style — first by sort_order). Storage bucket is private, so use signed URLs.
       const imgMap = new Map<string, string>();
+      const pathToStyle = new Map<string, string>();
       let ifrom = 0;
       while (true) {
         const { data } = await supabase
           .from("ss_images")
-          .select("style_code,public_url,sort_order")
+          .select("style_code,public_url,storage_path,sort_order")
           .order("sort_order", { ascending: true })
           .range(ifrom, ifrom + step - 1);
         if (!data?.length) break;
-        for (const r of data as any[]) if (!imgMap.has(r.style_code)) imgMap.set(r.style_code, r.public_url);
+        for (const r of data as ImageRow[]) {
+          if (imgMap.has(r.style_code)) continue;
+          if (r.storage_path) pathToStyle.set(r.storage_path, r.style_code);
+          else if (r.public_url) imgMap.set(r.style_code, r.public_url);
+        }
         if (data.length < step) break;
         ifrom += step;
+      }
+      const paths = Array.from(pathToStyle.keys());
+      for (let i = 0; i < paths.length; i += 100) {
+        const batch = paths.slice(i, i + 100);
+        const { data } = await supabase.storage.from("ss-images").createSignedUrls(batch, 60 * 60);
+        for (const signed of data || []) {
+          if (!signed.path || !signed.signedUrl) continue;
+          const styleCode = pathToStyle.get(signed.path);
+          if (styleCode && !imgMap.has(styleCode)) imgMap.set(styleCode, signed.signedUrl);
+        }
       }
       setImages(imgMap);
 
