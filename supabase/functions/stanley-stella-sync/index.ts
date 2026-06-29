@@ -69,7 +69,7 @@ async function finishLog(sb: SupabaseClient, id: string | undefined, patch: Reco
 // ---------------------------------------------------------------- syncers ---
 
 async function syncColors(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/colors/get_json");
+  const rows = await ssCall("/webrequest/color/get_json");
   const data = (rows as any[]).map((r) => ({
     code: String(pick(r, "Code", "ColorCode", "Id") ?? ""),
     name: String(pick(r, "Name", "ColorName") ?? ""),
