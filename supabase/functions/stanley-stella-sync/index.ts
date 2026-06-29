@@ -122,19 +122,23 @@ async function syncSizes(sb: SupabaseClient) {
 }
 
 // STYLES + VARIANTS + COLORS: /webrequest/productsV2/get_json
+// Strict 1:1 mapping per https://api.stanleystella.com/introduction-to-our-data
 async function syncStyles(sb: SupabaseClient) {
+  // Per docs: we fetch ALL styles (Published filter handled per-style/variant after).
+  // Styles that disappear from the feed are auto-archived.
   const rows = await ssCall("/webrequest/productsV2/get_json", {
     LanguageCode: DEFAULT_LANG,
-    Published: true,
   }) as any[];
 
   const styles: any[] = [];
   const variants: any[] = [];
   const colors = new Map<string, { code: string; name: string; hex: string | null; raw: any }>();
+  const seenStyleCodes = new Set<string>();
 
   for (const row of rows) {
     const styleCode = toStr(row.StyleCode);
     if (!styleCode) continue;
+    seenStyleCodes.add(styleCode);
 
     styles.push({
       style_code: styleCode,
@@ -146,7 +150,8 @@ async function syncStyles(sb: SupabaseClient) {
       type: toStr(row.Type),
       type_code: toStr(row.TypeCode),
       gender: toStr(row.Gender),
-      segment: toStr(row.StyleMainsSegments) ?? toStr(row.Segment) ?? toStr(row.StyleSegment),
+      segment: toStr(row.Segment) ?? toStr(row.StyleSegment),
+      style_main_segment: toStr(row.StyleMainsSegments),
       fit: toStr(row.Fit),
       neckline: toStr(row.Neckline),
       sleeve: toStr(row.Sleeve),
@@ -154,15 +159,17 @@ async function syncStyles(sb: SupabaseClient) {
       specifications: toStr(row.Specifications),
       main_picture_url: toStr(row.MainPicture),
       over_picture_url: toStr(row.OverPicture),
+      sequence_style: toInt(row.SequenceStyle, 9999),
+      new_style: toBool(row.NewStyle, false),
       published: toBool(row.StylePublished, true),
+      archived: false,
+      archived_at: null,
       brand: "Stanley/Stella",
-      // Strip giant Variants/Layers arrays from raw to keep row size sane
       raw: (() => { const { Variants, Layers, ...rest } = row; return rest; })(),
       last_synced_at: new Date().toISOString(),
     });
 
     const vList = Array.isArray(row.Variants) ? row.Variants : [];
-    // Compute style-level composition + GSM from the first variant (uniform across SKUs)
     if (vList.length) {
       const v0 = vList[0];
       const composition = toStr(v0.CompositionList);
@@ -181,7 +188,7 @@ async function syncStyles(sb: SupabaseClient) {
       const colorName = toStr(v.Color);
       const hex = toStr(v.HexaColorCode);
       if (colorCode && !colors.has(colorCode)) {
-        colors.set(colorCode, { code: colorCode, name: colorName ?? colorCode, hex, raw: v });
+        colors.set(colorCode, { code: colorCode, name: colorName ?? colorCode, hex, raw: { HexaColorCode: hex, ColorGroup: v.ColorGroup } });
       }
       variants.push({
         sku,
@@ -196,18 +203,42 @@ async function syncStyles(sb: SupabaseClient) {
         ean: toStr(v.EAN),
         weight_grams: toNum(v.WeightPerUnit),
         published: toBool(v.Published, true),
+        new_color: toBool(v.NewColor, false),
+        new_style: toBool(v.NewStyle, false),
         raw: null,
       });
     }
   }
 
-  // Smaller chunks for ss_styles (rows can be large with long descriptions) — avoids Postgres statement timeout.
   const s = await chunkUpsert(sb, "ss_styles", styles, "style_code", 50);
   const v = await chunkUpsert(sb, "ss_variants", variants, "sku");
   const c = colors.size
     ? await chunkUpsert(sb, "ss_colors", Array.from(colors.values()), "code")
     : 0;
-  return { styles: s, variants: v, colors_from_variants: c };
+
+  // ARCHIVAL: mark styles not returned by the API as archived (hidden from catalog)
+  let archived = 0;
+  if (seenStyleCodes.size) {
+    const codes = Array.from(seenStyleCodes);
+    // Fetch existing non-archived style codes and diff
+    const { data: existing } = await sb
+      .from("ss_styles")
+      .select("style_code")
+      .eq("archived", false);
+    const toArchive = (existing ?? [])
+      .map((r: any) => r.style_code)
+      .filter((c: string) => !seenStyleCodes.has(c));
+    for (let i = 0; i < toArchive.length; i += 200) {
+      const slice = toArchive.slice(i, i + 200);
+      const { error } = await sb
+        .from("ss_styles")
+        .update({ archived: true, archived_at: new Date().toISOString() })
+        .in("style_code", slice);
+      if (!error) archived += slice.length;
+    }
+  }
+
+  return { styles: s, variants: v, colors_from_variants: c, archived };
 }
 
 // STOCK V2: /webrequest/v2/stock/get_json
