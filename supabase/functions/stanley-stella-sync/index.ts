@@ -156,7 +156,8 @@ async function syncStyles(sb: SupabaseClient) {
       over_picture_url: toStr(row.OverPicture),
       published: toBool(row.StylePublished, true),
       brand: "Stanley/Stella",
-      raw: row,
+      // Strip giant Variants/Layers arrays from raw to keep row size sane
+      raw: (() => { const { Variants, Layers, ...rest } = row; return rest; })(),
       last_synced_at: new Date().toISOString(),
     });
 
