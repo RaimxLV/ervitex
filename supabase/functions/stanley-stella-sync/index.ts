@@ -80,7 +80,7 @@ async function syncColors(sb: SupabaseClient) {
 }
 
 async function syncSizes(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/sizes/get_json");
+  const rows = await ssCall("/webrequest/size/get_json");
   const data = (rows as any[]).map((r, idx) => ({
     code: String(pick(r, "Code", "SizeCode", "Id") ?? ""),
     name: String(pick(r, "Name", "SizeName") ?? ""),
