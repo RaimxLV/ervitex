@@ -4,8 +4,13 @@
 //
 // Modes: catalog | colors | sizes | styles | stock | prices | combos | images | all | inspect
 
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
+const corsHeaders: Record<string, string> = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+};
 
 const SS_HOST = "https://api.stanleystella.com";
 const DB_NAME = "production_api";
