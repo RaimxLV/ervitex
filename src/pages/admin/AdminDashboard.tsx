@@ -1,9 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Package, MessageSquare, FolderTree, TrendingUp, RefreshCw, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Package, MessageSquare, FolderTree, TrendingUp, RefreshCw, CheckCircle2, AlertTriangle, Search } from "lucide-react";
+
+interface PriceRow {
+  sku: string;
+  style_code: string;
+  purchase_price: number | null;
+  suggested_retail_price: number | null;
+  currency: string | null;
+}
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -11,7 +20,10 @@ const AdminDashboard = () => {
   const [ssStats, setSsStats] = useState({ styles: 0, variants: 0, stock: 0, prices: 0, images: 0 });
   const [syncing, setSyncing] = useState(false);
   const [syncStep, setSyncStep] = useState<string | null>(null);
-  
+  const [prices, setPrices] = useState<PriceRow[]>([]);
+  const [pricesLoading, setPricesLoading] = useState(false);
+  const [priceQuery, setPriceQuery] = useState("");
+
   const [lastSync, setLastSync] = useState<{ status: string; message: string | null; finished_at: string | null } | null>(null);
 
   const fetchStats = async () => {
