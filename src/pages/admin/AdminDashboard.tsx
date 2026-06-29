@@ -9,7 +9,7 @@ const AdminDashboard = () => {
   const { toast } = useToast();
   const [stats, setStats] = useState({ products: 0, categories: 0, quotes: 0, newQuotes: 0 });
   const [syncing, setSyncing] = useState(false);
-  const [importing, setImporting] = useState(false);
+  
   const [lastSync, setLastSync] = useState<{ status: string; message: string | null; finished_at: string | null } | null>(null);
 
   const fetchStats = async () => {
