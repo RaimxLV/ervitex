@@ -1,9 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Package, MessageSquare, FolderTree, TrendingUp, RefreshCw, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Package, MessageSquare, FolderTree, TrendingUp, RefreshCw, CheckCircle2, AlertTriangle, Search } from "lucide-react";
+
+interface PriceRow {
+  sku: string;
+  style_code: string;
+  purchase_price: number | null;
+  suggested_retail_price: number | null;
+  currency: string | null;
+}
 
 const AdminDashboard = () => {
   const { toast } = useToast();
@@ -11,7 +20,10 @@ const AdminDashboard = () => {
   const [ssStats, setSsStats] = useState({ styles: 0, variants: 0, stock: 0, prices: 0, images: 0 });
   const [syncing, setSyncing] = useState(false);
   const [syncStep, setSyncStep] = useState<string | null>(null);
-  
+  const [prices, setPrices] = useState<PriceRow[]>([]);
+  const [pricesLoading, setPricesLoading] = useState(false);
+  const [priceQuery, setPriceQuery] = useState("");
+
   const [lastSync, setLastSync] = useState<{ status: string; message: string | null; finished_at: string | null } | null>(null);
 
   const fetchStats = async () => {
@@ -54,7 +66,25 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchStats();
     fetchLastSync();
+    loadPrices();
   }, []);
+
+  const loadPrices = async () => {
+    setPricesLoading(true);
+    const { data } = await supabase
+      .from("ss_prices")
+      .select("sku,style_code,purchase_price,suggested_retail_price,currency")
+      .order("style_code", { ascending: true })
+      .limit(500);
+    setPrices((data || []) as PriceRow[]);
+    setPricesLoading(false);
+  };
+
+  const filteredPrices = useMemo(() => {
+    const n = priceQuery.trim().toLowerCase();
+    if (!n) return prices;
+    return prices.filter((p) => `${p.style_code} ${p.sku}`.toLowerCase().includes(n));
+  }, [prices, priceQuery]);
 
   const callSync = async (mode: string) => {
     const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stanley-stella-sync?mode=${mode}`;
@@ -181,6 +211,55 @@ const AdminDashboard = () => {
             Pircējiem cenas netiek rādītas automātiski — tās paliek administrēšanai un uzcenojuma kontrolei. Klientiem redzams katalogs un pieprasījuma forma.
           </p>
         </div>
+      </div>
+
+      <div className="mt-10 rounded-sm border border-border bg-card p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Piegādātāja cenas (Stanley/Stella)</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Iepirkuma un ieteicamās mazumtirdzniecības cenas. Redzamas tikai administrātoriem.</p>
+          </div>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Meklēt SKU vai modeli"
+              value={priceQuery}
+              onChange={(e) => setPriceQuery(e.target.value)}
+              className="w-64 pl-8"
+            />
+          </div>
+        </div>
+        <div className="mt-4 max-h-[480px] overflow-y-auto border border-border">
+          <table className="w-full text-xs">
+            <thead className="sticky top-0 z-10 bg-muted text-[10px] uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">Modelis</th>
+                <th className="px-3 py-2 text-left">SKU</th>
+                <th className="px-3 py-2 text-right">Iepirkuma cena</th>
+                <th className="px-3 py-2 text-right">Ieteicamā mazumcena</th>
+                <th className="px-3 py-2 text-left">Valūta</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pricesLoading ? (
+                <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">Ielādē...</td></tr>
+              ) : filteredPrices.length === 0 ? (
+                <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">Nav datu</td></tr>
+              ) : (
+                filteredPrices.map((p) => (
+                  <tr key={p.sku} className="border-t border-border hover:bg-muted/50">
+                    <td className="px-3 py-1.5 font-mono">{p.style_code}</td>
+                    <td className="px-3 py-1.5 font-mono">{p.sku}</td>
+                    <td className="px-3 py-1.5 text-right font-medium">{p.purchase_price != null ? Number(p.purchase_price).toFixed(2) : "—"}</td>
+                    <td className="px-3 py-1.5 text-right">{p.suggested_retail_price != null ? Number(p.suggested_retail_price).toFixed(2) : "—"}</td>
+                    <td className="px-3 py-1.5">{p.currency || "EUR"}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-2 text-[11px] text-muted-foreground">Rāda pirmos 500 ierakstus. Izmantojiet meklēšanu, lai atrastu konkrētu modeli vai SKU.</p>
       </div>
     </AdminLayout>
   );
