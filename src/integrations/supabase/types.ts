@@ -500,6 +500,8 @@ export type Database = {
       }
       ss_styles: {
         Row: {
+          archived: boolean | null
+          archived_at: string | null
           brand: string | null
           category: string | null
           category_code: string | null
@@ -514,14 +516,17 @@ export type Database = {
           main_picture_url: string | null
           name: string
           neckline: string | null
+          new_style: boolean | null
           over_picture_url: string | null
           published: boolean
           raw: Json | null
           segment: string | null
+          sequence_style: number | null
           short_description: string | null
           sleeve: string | null
           specifications: string | null
           style_code: string
+          style_main_segment: string | null
           type: string | null
           type_code: string | null
           updated_at: string
@@ -529,6 +534,8 @@ export type Database = {
           weight_gsm: number | null
         }
         Insert: {
+          archived?: boolean | null
+          archived_at?: string | null
           brand?: string | null
           category?: string | null
           category_code?: string | null
@@ -543,14 +550,17 @@ export type Database = {
           main_picture_url?: string | null
           name: string
           neckline?: string | null
+          new_style?: boolean | null
           over_picture_url?: string | null
           published?: boolean
           raw?: Json | null
           segment?: string | null
+          sequence_style?: number | null
           short_description?: string | null
           sleeve?: string | null
           specifications?: string | null
           style_code: string
+          style_main_segment?: string | null
           type?: string | null
           type_code?: string | null
           updated_at?: string
@@ -558,6 +568,8 @@ export type Database = {
           weight_gsm?: number | null
         }
         Update: {
+          archived?: boolean | null
+          archived_at?: string | null
           brand?: string | null
           category?: string | null
           category_code?: string | null
@@ -572,14 +584,17 @@ export type Database = {
           main_picture_url?: string | null
           name?: string
           neckline?: string | null
+          new_style?: boolean | null
           over_picture_url?: string | null
           published?: boolean
           raw?: Json | null
           segment?: string | null
+          sequence_style?: number | null
           short_description?: string | null
           sleeve?: string | null
           specifications?: string | null
           style_code?: string
+          style_main_segment?: string | null
           type?: string | null
           type_code?: string | null
           updated_at?: string
@@ -599,6 +614,8 @@ export type Database = {
           hex_color_code: string | null
           hidden_by_admin: boolean
           id: string
+          new_color: boolean | null
+          new_style: boolean | null
           published: boolean | null
           raw: Json | null
           size_code: string | null
@@ -618,6 +635,8 @@ export type Database = {
           hex_color_code?: string | null
           hidden_by_admin?: boolean
           id?: string
+          new_color?: boolean | null
+          new_style?: boolean | null
           published?: boolean | null
           raw?: Json | null
           size_code?: string | null
@@ -637,6 +656,8 @@ export type Database = {
           hex_color_code?: string | null
           hidden_by_admin?: boolean
           id?: string
+          new_color?: boolean | null
+          new_style?: boolean | null
           published?: boolean | null
           raw?: Json | null
           size_code?: string | null
@@ -709,30 +730,31 @@ export type Database = {
     Views: {
       ss_style_summary: {
         Row: {
+          archived: boolean | null
           brand: string | null
           category: string | null
           category_code: string | null
           color_count: number | null
           composition: string | null
-          cover_url: string | null
+          cover_source_url: string | null
+          cover_storage_path: string | null
           fit: string | null
           gender: string | null
-          hidden_by_admin: boolean | null
+          has_new_color: boolean | null
           long_description: string | null
-          main_picture_url: string | null
           name: string | null
           neckline: string | null
-          over_picture_url: string | null
-          over_url: string | null
+          new_style: boolean | null
+          over_source_url: string | null
+          over_storage_path: string | null
           published: boolean | null
-          raw: Json | null
           segment: string | null
+          sequence_style: number | null
           short_description: string | null
           size_count: number | null
           sleeve: string | null
-          specifications: string | null
           style_code: string | null
-          total_stock: number | null
+          style_main_segment: string | null
           type: string | null
           type_code: string | null
           wash_instructions: string | null
