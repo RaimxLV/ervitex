@@ -356,12 +356,12 @@ export type Database = {
       }
       ss_images: {
         Row: {
-          color_code: string | null
+          color_code: string
           created_at: string
-          fname: string | null
+          fname: string
           height: number | null
           id: string
-          image_type: string | null
+          image_type: string
           is_main: boolean | null
           is_over: boolean | null
           photo_shoot_code: string | null
@@ -374,12 +374,12 @@ export type Database = {
           width: number | null
         }
         Insert: {
-          color_code?: string | null
+          color_code?: string
           created_at?: string
-          fname?: string | null
+          fname?: string
           height?: number | null
           id?: string
-          image_type?: string | null
+          image_type?: string
           is_main?: boolean | null
           is_over?: boolean | null
           photo_shoot_code?: string | null
@@ -392,12 +392,12 @@ export type Database = {
           width?: number | null
         }
         Update: {
-          color_code?: string | null
+          color_code?: string
           created_at?: string
-          fname?: string | null
+          fname?: string
           height?: number | null
           id?: string
-          image_type?: string | null
+          image_type?: string
           is_main?: boolean | null
           is_over?: boolean | null
           photo_shoot_code?: string | null
