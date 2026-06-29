@@ -30,6 +30,8 @@ interface SummaryRow {
   specifications: string | null;
   main_picture_url: string | null;
   over_picture_url: string | null;
+  cover_url: string | null;
+  over_url: string | null;
   raw: any;
   total_stock: number;
   color_count: number;
