@@ -653,16 +653,22 @@ export type Database = {
           category: string | null
           color_count: number | null
           composition: string | null
+          fit: string | null
           gender: string | null
           image_path: string | null
           image_url: string | null
+          long_description: string | null
           name: string | null
+          neckline: string | null
+          raw: Json | null
           segment: string | null
           short_description: string | null
           size_count: number | null
+          sleeve: string | null
           style_code: string | null
           total_stock: number | null
           type: string | null
+          weight_gsm: number | null
         }
         Relationships: []
       }
