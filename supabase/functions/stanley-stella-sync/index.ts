@@ -224,7 +224,7 @@ async function syncCombos(sb: SupabaseClient) {
 // and stores public URL. Skips ones already mirrored.
 async function syncImages(sb: SupabaseClient, maxDownloads = 200) {
   const rows = await ssCall("/webrequest/products_imagesV2/get_json", { LanguageCode: DEFAULT_LANG });
-  const wanted: { style: string; color: string | null; type: string; sort: number; url: string }[] = [];
+  const wanted: { style: string; color: string | null; type: string; sort: number; url: string; primary: boolean }[] = [];
 
   for (const r of rows as any[]) {
     const style = pick(r, "StyleCode", "Style_Code");
@@ -240,14 +240,28 @@ async function syncImages(sb: SupabaseClient, maxDownloads = 200) {
         type: pick(p, "PhotoTypeCode", "PictureType", "Type", "PhotoStyle") || "main",
         sort: normalizeNumber(pick(p, "PhotoSequenceCode", "Sequence", "Sort"), idx),
         url,
+        primary: normalizeBool(pick(p, "MainPicture", "Main", "IsMain"), false),
       });
     });
   }
 
+  const primaryByStyle = new Map<string, typeof wanted[number]>();
+  for (const img of wanted) {
+    const current = primaryByStyle.get(img.style);
+    if (!current || (img.primary && !current.primary) || (img.primary === current.primary && img.sort < current.sort)) {
+      primaryByStyle.set(img.style, img);
+    }
+  }
+  const primaryUrls = new Set(Array.from(primaryByStyle.values()).map((img) => img.url));
+  const orderedWanted = [
+    ...Array.from(primaryByStyle.values()),
+    ...wanted.filter((img) => !primaryUrls.has(img.url)),
+  ];
+
   // Diff against existing
   const { data: existing } = await sb.from("ss_images").select("source_url");
   const have = new Set((existing || []).map((e: any) => e.source_url));
-  const todo = wanted.filter((w) => !have.has(w.url));
+  const todo = orderedWanted.filter((w) => !have.has(w.url));
 
   let downloaded = 0;
   const inserts: any[] = [];
