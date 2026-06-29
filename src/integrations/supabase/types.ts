@@ -303,6 +303,331 @@ export type Database = {
           },
         ]
       }
+      ss_colors: {
+        Row: {
+          code: string
+          hex: string | null
+          name: string
+          raw: Json | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          hex?: string | null
+          name: string
+          raw?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          hex?: string | null
+          name?: string
+          raw?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ss_combos: {
+        Row: {
+          combo_style_code: string
+          combo_type: string | null
+          created_at: string
+          id: string
+          raw: Json | null
+          style_code: string
+        }
+        Insert: {
+          combo_style_code: string
+          combo_type?: string | null
+          created_at?: string
+          id?: string
+          raw?: Json | null
+          style_code: string
+        }
+        Update: {
+          combo_style_code?: string
+          combo_type?: string | null
+          created_at?: string
+          id?: string
+          raw?: Json | null
+          style_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ss_combos_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "ss_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
+      ss_images: {
+        Row: {
+          color_code: string | null
+          created_at: string
+          height: number | null
+          id: string
+          image_type: string | null
+          public_url: string | null
+          sort_order: number | null
+          source_url: string | null
+          storage_path: string | null
+          style_code: string
+          width: number | null
+        }
+        Insert: {
+          color_code?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          image_type?: string | null
+          public_url?: string | null
+          sort_order?: number | null
+          source_url?: string | null
+          storage_path?: string | null
+          style_code: string
+          width?: number | null
+        }
+        Update: {
+          color_code?: string | null
+          created_at?: string
+          height?: number | null
+          id?: string
+          image_type?: string | null
+          public_url?: string | null
+          sort_order?: number | null
+          source_url?: string | null
+          storage_path?: string | null
+          style_code?: string
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ss_images_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "ss_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
+      ss_prices: {
+        Row: {
+          currency: string | null
+          purchase_price: number | null
+          sku: string
+          style_code: string
+          suggested_retail_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          currency?: string | null
+          purchase_price?: number | null
+          sku: string
+          style_code: string
+          suggested_retail_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          currency?: string | null
+          purchase_price?: number | null
+          sku?: string
+          style_code?: string
+          suggested_retail_price?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ss_prices_sku_fkey"
+            columns: ["sku"]
+            isOneToOne: true
+            referencedRelation: "ss_variants"
+            referencedColumns: ["sku"]
+          },
+        ]
+      }
+      ss_sizes: {
+        Row: {
+          code: string
+          name: string
+          raw: Json | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          name: string
+          raw?: Json | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          name?: string
+          raw?: Json | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ss_stock: {
+        Row: {
+          incoming_quantity: number | null
+          next_arrival_date: string | null
+          quantity: number
+          sku: string
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          incoming_quantity?: number | null
+          next_arrival_date?: string | null
+          quantity?: number
+          sku: string
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          incoming_quantity?: number | null
+          next_arrival_date?: string | null
+          quantity?: number
+          sku?: string
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ss_stock_sku_fkey"
+            columns: ["sku"]
+            isOneToOne: true
+            referencedRelation: "ss_variants"
+            referencedColumns: ["sku"]
+          },
+        ]
+      }
+      ss_styles: {
+        Row: {
+          brand: string | null
+          category: string | null
+          composition: string | null
+          created_at: string
+          fit: string | null
+          gender: string | null
+          hidden_by_admin: boolean
+          id: string
+          last_synced_at: string | null
+          long_description: string | null
+          name: string
+          neckline: string | null
+          published: boolean
+          raw: Json | null
+          segment: string | null
+          short_description: string | null
+          sleeve: string | null
+          style_code: string
+          type: string | null
+          updated_at: string
+          weight_gsm: number | null
+        }
+        Insert: {
+          brand?: string | null
+          category?: string | null
+          composition?: string | null
+          created_at?: string
+          fit?: string | null
+          gender?: string | null
+          hidden_by_admin?: boolean
+          id?: string
+          last_synced_at?: string | null
+          long_description?: string | null
+          name: string
+          neckline?: string | null
+          published?: boolean
+          raw?: Json | null
+          segment?: string | null
+          short_description?: string | null
+          sleeve?: string | null
+          style_code: string
+          type?: string | null
+          updated_at?: string
+          weight_gsm?: number | null
+        }
+        Update: {
+          brand?: string | null
+          category?: string | null
+          composition?: string | null
+          created_at?: string
+          fit?: string | null
+          gender?: string | null
+          hidden_by_admin?: boolean
+          id?: string
+          last_synced_at?: string | null
+          long_description?: string | null
+          name?: string
+          neckline?: string | null
+          published?: boolean
+          raw?: Json | null
+          segment?: string | null
+          short_description?: string | null
+          sleeve?: string | null
+          style_code?: string
+          type?: string | null
+          updated_at?: string
+          weight_gsm?: number | null
+        }
+        Relationships: []
+      }
+      ss_variants: {
+        Row: {
+          color_code: string | null
+          color_name: string | null
+          created_at: string
+          ean: string | null
+          hidden_by_admin: boolean
+          id: string
+          raw: Json | null
+          size_code: string | null
+          sku: string
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          color_code?: string | null
+          color_name?: string | null
+          created_at?: string
+          ean?: string | null
+          hidden_by_admin?: boolean
+          id?: string
+          raw?: Json | null
+          size_code?: string | null
+          sku: string
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          color_code?: string | null
+          color_name?: string | null
+          created_at?: string
+          ean?: string | null
+          hidden_by_admin?: boolean
+          id?: string
+          raw?: Json | null
+          size_code?: string | null
+          sku?: string
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ss_variants_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "ss_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
       sync_logs: {
         Row: {
           details: Json | null
