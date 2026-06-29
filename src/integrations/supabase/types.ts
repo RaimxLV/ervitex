@@ -738,23 +738,30 @@ export type Database = {
           composition: string | null
           cover_source_url: string | null
           cover_storage_path: string | null
+          cover_url: string | null
           fit: string | null
           gender: string | null
           has_new_color: boolean | null
           long_description: string | null
+          main_picture_url: string | null
           name: string | null
           neckline: string | null
           new_style: boolean | null
+          over_picture_url: string | null
           over_source_url: string | null
           over_storage_path: string | null
+          over_url: string | null
           published: boolean | null
+          raw: Json | null
           segment: string | null
           sequence_style: number | null
           short_description: string | null
           size_count: number | null
           sleeve: string | null
+          specifications: string | null
           style_code: string | null
           style_main_segment: string | null
+          total_stock: number | null
           type: string | null
           type_code: string | null
           wash_instructions: string | null

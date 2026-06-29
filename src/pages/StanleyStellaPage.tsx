@@ -107,6 +107,7 @@ const StanleyStellaPage = () => {
         const { data, error } = await supabase
           .from("ss_style_summary" as any)
           .select("*")
+          .order("sequence_style", { ascending: true, nullsFirst: false })
           .order("name", { ascending: true })
           .range(from, from + step - 1);
         if (error) break;
