@@ -3,183 +3,236 @@ import { Link } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
-
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 
-interface LiveProduct {
-  styleCode: string;
+interface StyleRow {
+  style_code: string;
   name: string;
-  shortDescription: string;
-  category: string;
-  gender: string;
-  composition: string;
-  segment: string;
-  colors: { name: string; hex: string | null; image: string | null }[];
-  sizes: string[];
-  images: string[];
+  short_description: string | null;
+  category: string | null;
+  gender: string | null;
+  segment: string | null;
+  composition: string | null;
 }
+
+interface ImageRow { style_code: string; color_code: string | null; public_url: string; sort_order: number }
+interface VariantRow { style_code: string; color_code: string | null; color_name: string | null; size_code: string | null }
+interface StockRow { style_code: string; quantity: number }
+
+const PAGE_SIZE = 48;
 
 const StanleyStellaPage = () => {
   const { lang } = useLanguage();
-  const [products, setProducts] = useState<LiveProduct[]>([]);
+  const [styles, setStyles] = useState<StyleRow[]>([]);
+  const [images, setImages] = useState<Map<string, string>>(new Map());
+  const [variants, setVariants] = useState<Map<string, VariantRow[]>>(new Map());
+  const [stockMap, setStockMap] = useState<Map<string, number>>(new Map());
   const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  const [q, setQ] = useState("");
+  const [category, setCategory] = useState<string>("all");
+  const [gender, setGender] = useState<string>("all");
+  const [inStockOnly, setInStockOnly] = useState(true);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     (async () => {
-      try {
-        const langCode = "en_GB"; // S/S API nepiedāvā lv
-        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stanley-stella-live?limit=24&lang=${langCode}`;
-        const res = await fetch(url, {
-          headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-        });
-        const json = await res.json();
-
-        if (!json.ok) throw new Error(json.error || "Failed to load");
-        setProducts(json.products || []);
-      } catch (e: any) {
-        setError(e.message);
-      } finally {
-        setLoaded(true);
+      // Batch fetch all styles
+      const all: StyleRow[] = [];
+      const step = 1000;
+      let from = 0;
+      while (true) {
+        const { data, error } = await supabase
+          .from("ss_styles")
+          .select("style_code,name,short_description,category,gender,segment,composition")
+          .order("name", { ascending: true })
+          .range(from, from + step - 1);
+        if (error) break;
+        all.push(...((data || []) as StyleRow[]));
+        if (!data || data.length < step) break;
+        from += step;
       }
+      setStyles(all);
+
+      // images (one per style — first by sort_order)
+      const imgMap = new Map<string, string>();
+      let ifrom = 0;
+      while (true) {
+        const { data } = await supabase
+          .from("ss_images")
+          .select("style_code,public_url,sort_order")
+          .order("sort_order", { ascending: true })
+          .range(ifrom, ifrom + step - 1);
+        if (!data?.length) break;
+        for (const r of data as any[]) if (!imgMap.has(r.style_code)) imgMap.set(r.style_code, r.public_url);
+        if (data.length < step) break;
+        ifrom += step;
+      }
+      setImages(imgMap);
+
+      // variants
+      const vMap = new Map<string, VariantRow[]>();
+      let vfrom = 0;
+      while (true) {
+        const { data } = await supabase
+          .from("ss_variants")
+          .select("style_code,color_code,color_name,size_code")
+          .range(vfrom, vfrom + step - 1);
+        if (!data?.length) break;
+        for (const v of data as VariantRow[]) {
+          const arr = vMap.get(v.style_code) || [];
+          arr.push(v);
+          vMap.set(v.style_code, arr);
+        }
+        if (data.length < step) break;
+        vfrom += step;
+      }
+      setVariants(vMap);
+
+      // stock totals per style
+      const sMap = new Map<string, number>();
+      let sfrom = 0;
+      while (true) {
+        const { data } = await supabase
+          .from("ss_stock")
+          .select("style_code,quantity")
+          .range(sfrom, sfrom + step - 1);
+        if (!data?.length) break;
+        for (const s of data as StockRow[]) sMap.set(s.style_code, (sMap.get(s.style_code) || 0) + (s.quantity || 0));
+        if (data.length < step) break;
+        sfrom += step;
+      }
+      setStockMap(sMap);
+
+      setLoaded(true);
     })();
-  }, [lang]);
+  }, []);
 
-  const heroCopy = lang === "lv"
-    ? {
-        eyebrow: "Oficiālais Stanley/Stella dīleris Latvijā",
-        title: "Stanley/Stella",
-        sub: "Beļģijas premium tekstilzīmols ar ētisku ražošanu un GOTS sertificētu bioloģisko kokvilnu. Pilna kolekcija pieejama caur Ervitex ar profesionālu apdruku un izšūšanu.",
-        cta: "Skatīt visu kolekciju",
-        contact: "Pieprasīt cenu",
-        emptyTitle: "Nevarējām ielādēt kolekciju",
-        emptySub: "Mēģini vēlreiz pēc brīža vai sazinies ar mums.",
-        sectionTitle: "Aktuālā kolekcija",
-        sectionSub: "Tieša pieslēgšanās Stanley/Stella API — tikai noliktavā esošās preces",
-        sizesLabel: "Izmēri",
-        colorsLabel: "Krāsas",
-        why: [
-          { t: "GOTS bioloģiskā kokvilna", d: "Sertificēti materiāli, sekojami no šķiedras līdz veikalam." },
-          { t: "Fair Wear Foundation", d: "Ētiska ražošana Bangladešā ar pilnu caurredzamību." },
-          { t: "Premium kvalitāte", d: "Belgian-design tekstils, kas iztur profesionālu apdruku." },
-        ],
-      }
-    : {
-        eyebrow: "Official Stanley/Stella dealer in Latvia",
-        title: "Stanley/Stella",
-        sub: "Belgian premium textile brand with ethical production and GOTS-certified organic cotton. Full collection available through Ervitex with professional printing and embroidery.",
-        cta: "View full collection",
-        contact: "Request a Quote",
-        emptyTitle: "Couldn't load the collection",
-        emptySub: "Please try again in a moment or get in touch.",
-        sectionTitle: "Current collection",
-        sectionSub: "Live from the Stanley/Stella API — in-stock styles only",
-        sizesLabel: "Sizes",
-        colorsLabel: "Colors",
-        why: [
-          { t: "GOTS organic cotton", d: "Certified materials, traceable from fibre to store." },
-          { t: "Fair Wear Foundation", d: "Ethical production in Bangladesh with full transparency." },
-          { t: "Premium quality", d: "Belgian-designed textile built for professional printing." },
-        ],
-      };
+  const categories = useMemo(() => Array.from(new Set(styles.map((s) => s.category).filter(Boolean))).sort() as string[], [styles]);
+  const genders = useMemo(() => Array.from(new Set(styles.map((s) => s.gender).filter(Boolean))).sort() as string[], [styles]);
+
+  const filtered = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    return styles.filter((s) => {
+      if (category !== "all" && s.category !== category) return false;
+      if (gender !== "all" && s.gender !== gender) return false;
+      if (inStockOnly && (stockMap.get(s.style_code) || 0) <= 0) return false;
+      if (needle && !`${s.name} ${s.style_code} ${s.short_description ?? ""}`.toLowerCase().includes(needle)) return false;
+      return true;
+    });
+  }, [styles, q, category, gender, inStockOnly, stockMap]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const slice = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  useEffect(() => { setPage(1); }, [q, category, gender, inStockOnly]);
+
+  const tLabels = lang === "lv"
+    ? { search: "Meklēt", category: "Kategorija", gender: "Dzimums", inStock: "Tikai noliktavā", all: "Visas", results: "rezultāti", colors: "krāsas", sizes: "izmēri", stock: "noliktavā", contact: "Pieprasīt cenu", noResults: "Nav rezultātu", noImage: "Bez attēla" }
+    : { search: "Search", category: "Category", gender: "Gender", inStock: "In stock only", all: "All", results: "results", colors: "colors", sizes: "sizes", stock: "in stock", contact: "Request a Quote", noResults: "No results", noImage: "No image" };
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="bg-primary text-primary-foreground">
-        <div className="container px-4 py-16 md:py-24">
-          <div className="flex flex-col gap-6 md:max-w-3xl">
-            <img src={stellaLogo} alt="Stanley/Stella" className="h-8 w-auto opacity-90 md:h-10" />
-            <p className="text-xs uppercase tracking-[0.25em] text-accent">{heroCopy.eyebrow}</p>
-            <h1 className="font-heading text-4xl font-black uppercase leading-none tracking-tight md:text-6xl">
-              {heroCopy.title}
-            </h1>
-            <p className="max-w-2xl text-base text-primary-foreground/70 md:text-lg">{heroCopy.sub}</p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Button asChild variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10">
-                <Link to="/contact">{heroCopy.contact}</Link>
-              </Button>
-            </div>
+      {/* Header strip — no marketing fluff */}
+      <section className="border-b border-border bg-primary text-primary-foreground">
+        <div className="container flex flex-wrap items-center justify-between gap-4 px-4 py-6">
+          <div className="flex items-center gap-4">
+            <img src={stellaLogo} alt="Stanley/Stella" className="h-8 w-auto md:h-10" />
+            <span className="font-heading text-xl font-black uppercase tracking-wide">Stanley/Stella</span>
           </div>
+          <Button asChild variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10">
+            <Link to="/contact">{tLabels.contact}</Link>
+          </Button>
         </div>
       </section>
 
-      {/* Why */}
-      <section className="border-b border-border bg-background">
-        <div className="container px-4 py-12 md:py-16">
-          <div className="grid gap-6 md:grid-cols-3">
-            {heroCopy.why.map((w) => (
-              <div key={w.t} className="rounded-sm border border-border p-6">
-                <h3 className="font-heading text-sm font-bold uppercase tracking-wider">{w.t}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{w.d}</p>
-              </div>
-            ))}
-          </div>
+      {/* Filters */}
+      <section className="border-b border-border bg-card">
+        <div className="container grid gap-3 px-4 py-4 md:grid-cols-[1fr_180px_180px_auto_auto]">
+          <Input placeholder={tLabels.search} value={q} onChange={(e) => setQ(e.target.value)} />
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger><SelectValue placeholder={tLabels.category} /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{tLabels.category}: {tLabels.all}</SelectItem>
+              {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={gender} onValueChange={setGender}>
+            <SelectTrigger><SelectValue placeholder={tLabels.gender} /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{tLabels.gender}: {tLabels.all}</SelectItem>
+              {genders.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <label className="flex items-center gap-2 text-sm">
+            <Checkbox checked={inStockOnly} onCheckedChange={(v) => setInStockOnly(!!v)} />
+            {tLabels.inStock}
+          </label>
+          <span className="self-center text-xs text-muted-foreground">{filtered.length} {tLabels.results}</span>
         </div>
       </section>
 
-      {/* Products */}
+      {/* Grid */}
       <section className="bg-background">
-        <div className="container px-4 py-12 md:py-16">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="font-heading text-2xl font-black uppercase tracking-wide md:text-3xl">{heroCopy.sectionTitle}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{heroCopy.sectionSub}</p>
-            </div>
-          </div>
-
+        <div className="container px-4 py-8">
           {!loaded ? (
             <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="overflow-hidden border border-border bg-card">
                   <Skeleton className="aspect-square w-full" />
-                  <div className="space-y-2 p-3">
-                    <Skeleton className="h-3 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
+                  <div className="space-y-2 p-3"><Skeleton className="h-3 w-3/4" /><Skeleton className="h-3 w-1/2" /></div>
                 </div>
               ))}
             </div>
-          ) : error || products.length === 0 ? (
-            <div className="rounded-sm border border-dashed border-border p-10 text-center">
-              <h3 className="font-heading text-lg font-bold uppercase">{heroCopy.emptyTitle}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{error || heroCopy.emptySub}</p>
-              <Button asChild className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link to="/contact">{heroCopy.contact}</Link>
-              </Button>
+          ) : slice.length === 0 ? (
+            <div className="rounded-sm border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+              {tLabels.noResults}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-4">
-              {products.map((p) => (
-                <article key={p.styleCode} className="group overflow-hidden border border-border bg-card transition-colors hover:border-accent">
-                  <div className="relative aspect-square overflow-hidden bg-muted">
-                    {p.images[0] ? (
-                      <img
-                        src={p.images[0]}
-                        alt={p.name}
-                        loading="lazy"
-                        className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-xs text-muted-foreground">No image</div>
-                    )}
-                    <span className="absolute left-2 top-2 bg-primary px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">
-                      {p.styleCode}
-                    </span>
-                  </div>
-                  <div className="space-y-2 p-3">
-                    <h3 className="font-heading text-sm font-bold uppercase tracking-wide line-clamp-1">{p.name}</h3>
-                    <p className="line-clamp-2 text-xs text-muted-foreground">{p.shortDescription}</p>
-                    <div className="flex items-center gap-2 pt-1">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                        {p.colors.length} {heroCopy.colorsLabel.toLowerCase()} · {p.sizes.length} {heroCopy.sizesLabel.toLowerCase()}
-                      </span>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-4">
+                {slice.map((s) => {
+                  const img = images.get(s.style_code);
+                  const v = variants.get(s.style_code) || [];
+                  const colorCount = new Set(v.map((x) => x.color_code).filter(Boolean)).size;
+                  const sizeCount = new Set(v.map((x) => x.size_code).filter(Boolean)).size;
+                  const stock = stockMap.get(s.style_code) || 0;
+                  return (
+                    <article key={s.style_code} className="group overflow-hidden border border-border bg-card transition-colors hover:border-accent">
+                      <div className="relative aspect-square overflow-hidden bg-muted">
+                        {img ? (
+                          <img src={img} alt={s.name} loading="lazy" className="h-full w-full object-contain p-4 transition-transform duration-500 group-hover:scale-105" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs text-muted-foreground">{tLabels.noImage}</div>
+                        )}
+                        <span className="absolute left-2 top-2 bg-primary px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">{s.style_code}</span>
+                        {stock > 0 && <span className="absolute right-2 top-2 bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-foreground">{stock} {tLabels.stock}</span>}
+                      </div>
+                      <div className="space-y-1 p-3">
+                        <h3 className="font-heading text-sm font-bold uppercase tracking-wide line-clamp-1">{s.name}</h3>
+                        {s.short_description && <p className="line-clamp-2 text-xs text-muted-foreground">{s.short_description}</p>}
+                        <p className="pt-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+                          {colorCount} {tLabels.colors} · {sizeCount} {tLabels.sizes}
+                        </p>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+
+              {pageCount > 1 && (
+                <div className="mt-8 flex items-center justify-center gap-2">
+                  <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</Button>
+                  <span className="text-xs text-muted-foreground">{page} / {pageCount}</span>
+                  <Button variant="outline" size="sm" disabled={page >= pageCount} onClick={() => setPage((p) => p + 1)}>›</Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
