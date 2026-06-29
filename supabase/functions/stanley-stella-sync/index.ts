@@ -163,7 +163,7 @@ async function syncPrices(sb: SupabaseClient) {
 }
 
 async function syncCombos(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/combo/get_json").catch(() => []);
+  const rows = await ssCall("/webrequest/combostyles/get_json").catch(() => []);
   const data: any[] = [];
   for (const r of rows as any[]) {
     const style = pick(r, "StyleCode", "Style_Code");
