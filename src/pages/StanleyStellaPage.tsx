@@ -29,18 +29,13 @@ const StanleyStellaPage = () => {
   useEffect(() => {
     (async () => {
       try {
-        const langCode = lang === "lv" ? "en_GB" : "en_GB"; // S/S nepiedāvā lv
-        const { data, error } = await supabase.functions.invoke("stanley-stella-live", {
-          method: "GET",
-          // @ts-expect-error supabase-js supports query via path
-          body: undefined,
-        } as any);
-        // supabase-js doesn't pass query params nicely; use fetch directly
+        const langCode = "en_GB"; // S/S API nepiedāvā lv
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stanley-stella-live?limit=24&lang=${langCode}`;
         const res = await fetch(url, {
           headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
         });
         const json = await res.json();
+
         if (!json.ok) throw new Error(json.error || "Failed to load");
         setProducts(json.products || []);
       } catch (e: any) {
