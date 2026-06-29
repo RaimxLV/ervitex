@@ -41,7 +41,7 @@ const HeroSection = () => {
           playsInline
           preload="auto"
           poster={heroPoster}
-          className="absolute inset-0 h-full w-full object-cover object-center opacity-55"
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-80"
         />
 
         {/* Legacy image fallback (hidden, kept for reference) */}
@@ -75,7 +75,7 @@ const HeroSection = () => {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to right, hsl(var(--primary)) 5%, hsl(var(--primary) / 0.85) 25%, hsl(var(--primary) / 0.4) 50%, transparent 75%)",
+            "linear-gradient(to right, hsl(var(--primary) / 0.7) 5%, hsl(var(--primary) / 0.45) 25%, hsl(var(--primary) / 0.15) 50%, transparent 70%)",
         }}
       />
 
