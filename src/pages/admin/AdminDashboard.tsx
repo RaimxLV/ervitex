@@ -9,7 +9,7 @@ const AdminDashboard = () => {
   const { toast } = useToast();
   const [stats, setStats] = useState({ products: 0, categories: 0, quotes: 0, newQuotes: 0 });
   const [syncing, setSyncing] = useState(false);
-  const [importing, setImporting] = useState(false);
+  
   const [lastSync, setLastSync] = useState<{ status: string; message: string | null; finished_at: string | null } | null>(null);
 
   const fetchStats = async () => {
@@ -60,22 +60,8 @@ const AdminDashboard = () => {
     }
   };
 
-  const runImport = async () => {
-    setImporting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("stanley-stella-import", { body: { limit: 5 } });
-      if (error) throw error;
-      toast({
-        title: "Imports pabeigts",
-        description: `Pievienotas ${data?.inserted ?? 0} preces (${data?.skipped ?? 0} jau eksistēja)`,
-      });
-      await Promise.all([fetchStats(), fetchLastSync()]);
-    } catch (e: any) {
-      toast({ title: "Imports neizdevās", description: e.message, variant: "destructive" });
-    } finally {
-      setImporting(false);
-    }
-  };
+
+
 
   const cards = [
     { label: "Produkti", value: stats.products, icon: Package, color: "text-blue-500" },
@@ -117,15 +103,12 @@ const AdminDashboard = () => {
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={runImport} disabled={importing} variant="outline">
-              <RefreshCw className={`mr-2 h-4 w-4 ${importing ? "animate-spin" : ""}`} />
-              {importing ? "Importē..." : "Importēt 5 paraugus"}
-            </Button>
             <Button onClick={runSync} disabled={syncing} className="bg-accent text-accent-foreground hover:bg-accent/90">
               <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
               {syncing ? "Sinhronizē..." : "Sinhronizēt tagad"}
             </Button>
           </div>
+
         </div>
       </div>
     </AdminLayout>
