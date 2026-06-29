@@ -298,7 +298,10 @@ async function syncImages(sb: SupabaseClient) {
     const colorCode = toStr(r.ColorCode);
     const photoType = toStr(r.PhotoTypeCode) ?? "MAIN";
     const sortOrder = toInt(r.PhotoSequenceCode, 0);
-    const key = `${style}|${colorCode ?? ""}|${photoType}|${sortOrder}`;
+    const fname = toStr(r.FName) ?? url;
+    // Dedup on the same key the DB unique index uses (incl. FName) so every
+    // distinct photo file survives the upsert.
+    const key = `${style}|${colorCode ?? ""}|${photoType}|${fname}`;
     if (seen.has(key)) continue;
     seen.add(key);
     data.push({
@@ -315,7 +318,7 @@ async function syncImages(sb: SupabaseClient) {
     });
   }
 
-  return chunkUpsert(sb, "ss_images", data, "style_code,color_code,image_type,sort_order");
+  return chunkUpsert(sb, "ss_images", data, "style_code,color_code,image_type,fname");
 }
 
 // INSPECT: introspect raw responses (used during development)
