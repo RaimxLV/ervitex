@@ -30,12 +30,11 @@ const AdminDashboard = () => {
   const fetchLastSync = async () => {
     const { data } = await supabase
       .from("sync_logs")
-      .select("status, message, finished_at")
-      .eq("source", "stanley-stella")
+      .select("source, status, message, finished_at")
+      .like("source", "stanley-stella%")
       .order("started_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    setLastSync(data || null);
+      .limit(5);
+    setLastSync(data?.[0] ? (data[0] as any) : null);
   };
 
   useEffect(() => {
@@ -43,15 +42,20 @@ const AdminDashboard = () => {
     fetchLastSync();
   }, []);
 
-  const runSync = async () => {
+  const runSync = async (mode: string) => {
     setSyncing(true);
     try {
-      const { data, error } = await supabase.functions.invoke("stanley-stella-sync");
-      if (error) throw error;
-      toast({
-        title: "Sinhronizācija pabeigta",
-        description: `Atjauninātas ${data?.updated ?? 0} preces${data?.failed ? `, ${data.failed} neizdevās` : ""}`,
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stanley-stella-sync?mode=${mode}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
       });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "Sync failed");
+      toast({ title: `Sinhronizēts: ${mode}`, description: JSON.stringify(data.result).slice(0, 140) });
       await fetchLastSync();
     } catch (e: any) {
       toast({ title: "Sinhronizācija neizdevās", description: e.message, variant: "destructive" });
@@ -60,14 +64,22 @@ const AdminDashboard = () => {
     }
   };
 
-
-
-
   const cards = [
     { label: "Produkti", value: stats.products, icon: Package, color: "text-blue-500" },
     { label: "Kategorijas", value: stats.categories, icon: FolderTree, color: "text-green-500" },
     { label: "Pieprasījumi", value: stats.quotes, icon: MessageSquare, color: "text-purple-500" },
     { label: "Jauni pieprasījumi", value: stats.newQuotes, icon: TrendingUp, color: "text-accent" },
+  ];
+
+  const syncModes = [
+    { id: "colors",  label: "Krāsas" },
+    { id: "sizes",   label: "Izmēri" },
+    { id: "styles",  label: "Modeļi" },
+    { id: "stock",   label: "Noliktava" },
+    { id: "prices",  label: "Cenas" },
+    { id: "combos",  label: "Kombo" },
+    { id: "images",  label: "Attēli (200)" },
+    { id: "all",     label: "VISS" },
   ];
 
   return (
@@ -91,24 +103,29 @@ const AdminDashboard = () => {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Stanley/Stella sinhronizācija</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Atjaunina noliktavu un vairumtirdzniecības cenas precēm ar S/S stila kodu. Manuālās cenas netiek pārrakstītas.
-            </p>
             {lastSync && (
               <p className="mt-2 text-xs text-muted-foreground">
-                Pēdējā: <span className="font-semibold text-foreground">{lastSync.status}</span>
+                Pēdējā ({(lastSync as any).source}): <span className="font-semibold text-foreground">{lastSync.status}</span>
                 {lastSync.finished_at && ` · ${new Date(lastSync.finished_at).toLocaleString("lv-LV")}`}
                 {lastSync.message && ` · ${lastSync.message}`}
               </p>
             )}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={runSync} disabled={syncing} className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-              {syncing ? "Sinhronizē..." : "Sinhronizēt tagad"}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {syncModes.map((m) => (
+            <Button
+              key={m.id}
+              onClick={() => runSync(m.id)}
+              disabled={syncing}
+              variant={m.id === "all" ? "default" : "outline"}
+              className={m.id === "all" ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}
+              size="sm"
+            >
+              <RefreshCw className={`mr-2 h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`} />
+              {m.label}
             </Button>
-          </div>
-
+          ))}
         </div>
       </div>
     </AdminLayout>
