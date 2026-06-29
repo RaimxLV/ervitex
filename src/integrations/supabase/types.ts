@@ -352,15 +352,7 @@ export type Database = {
           raw?: Json | null
           style_code?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "ss_combos_style_code_fkey"
-            columns: ["style_code"]
-            isOneToOne: false
-            referencedRelation: "ss_styles"
-            referencedColumns: ["style_code"]
-          },
-        ]
+        Relationships: []
       }
       ss_images: {
         Row: {
@@ -402,15 +394,7 @@ export type Database = {
           style_code?: string
           width?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "ss_images_style_code_fkey"
-            columns: ["style_code"]
-            isOneToOne: false
-            referencedRelation: "ss_styles"
-            referencedColumns: ["style_code"]
-          },
-        ]
+        Relationships: []
       }
       ss_prices: {
         Row: {
@@ -437,15 +421,7 @@ export type Database = {
           suggested_retail_price?: number | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "ss_prices_sku_fkey"
-            columns: ["sku"]
-            isOneToOne: true
-            referencedRelation: "ss_variants"
-            referencedColumns: ["sku"]
-          },
-        ]
+        Relationships: []
       }
       ss_sizes: {
         Row: {
@@ -496,15 +472,7 @@ export type Database = {
           style_code?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "ss_stock_sku_fkey"
-            columns: ["sku"]
-            isOneToOne: true
-            referencedRelation: "ss_variants"
-            referencedColumns: ["sku"]
-          },
-        ]
+        Relationships: []
       }
       ss_styles: {
         Row: {
@@ -618,15 +586,7 @@ export type Database = {
           style_code?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "ss_variants_style_code_fkey"
-            columns: ["style_code"]
-            isOneToOne: false
-            referencedRelation: "ss_styles"
-            referencedColumns: ["style_code"]
-          },
-        ]
+        Relationships: []
       }
       sync_logs: {
         Row: {
