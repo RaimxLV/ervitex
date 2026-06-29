@@ -37,32 +37,47 @@ const pick = (obj: any, ...keys: string[]) => {
   return undefined;
 };
 
+// Recursively pulls Cloudinary image URLs out of nested Pictures arrays.
+function collectImages(node: any, out: Set<string>) {
+  if (!node) return;
+  if (typeof node === "string") {
+    if (/^https?:\/\//.test(node) && /\.(jpg|jpeg|png|webp)/i.test(node)) out.add(node);
+    return;
+  }
+  if (Array.isArray(node)) { for (const item of node) collectImages(item, out); return; }
+  if (typeof node === "object") {
+    for (const k of ["HTMLPath", "Picture", "PictureURL", "Image", "ImageUrl", "HighResUrl"]) {
+      if (typeof node[k] === "string" && /^https?:\/\//.test(node[k])) out.add(node[k]);
+    }
+    if (Array.isArray(node.Pictures)) collectImages(node.Pictures, out);
+  }
+}
+
 function normalizeStyle(row: any) {
   const style = pick(row, "StyleCode", "Style_Code", "Style");
   if (!style) return null;
 
-  // V2 groups variants under a child array — try common shapes.
   const variants: any[] = row.Variants || row.Colors || row.SKUs || row.Skus || [];
-
   const colorMap = new Map<string, { hex: string | null; img: string | null }>();
   const sizes = new Set<string>();
   const images = new Set<string>();
 
-  // Style-level images
-  for (const k of ["Picture", "PictureURL", "Image", "ImageUrl", "HighResUrl", "MainPicture"]) {
-    if (row[k]) images.add(row[k]);
-  }
+  collectImages(row, images);
 
   for (const v of variants) {
-    const cName = pick(v, "ColorName", "Color");
+    const cName = pick(v, "ColorName", "Color", "Name");
     const cHex = pick(v, "HexCode", "Hex", "ColorHex");
-    const cImg = pick(v, "ColorImage", "Picture", "Image", "ImageUrl");
+    const cImg = pick(v, "ColorImage");
     if (cName && !colorMap.has(cName)) colorMap.set(cName, { hex: cHex || null, img: cImg || null });
     const sz = pick(v, "SizeCode", "Size");
     if (sz) sizes.add(String(sz));
-    for (const k of ["Picture", "PictureURL", "Image", "ImageUrl", "HighResUrl"]) {
-      if (v[k]) images.add(v[k]);
-    }
+    collectImages(v, images);
+  }
+
+  // Style-level sizes array fallback
+  if (Array.isArray(row.Sizes)) for (const s of row.Sizes) {
+    const sz = typeof s === "string" ? s : pick(s, "SizeCode", "Size");
+    if (sz) sizes.add(String(sz));
   }
 
   return {
@@ -78,6 +93,7 @@ function normalizeStyle(row: any) {
     images: Array.from(images).slice(0, 8),
   };
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
