@@ -66,7 +66,25 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchStats();
     fetchLastSync();
+    loadPrices();
   }, []);
+
+  const loadPrices = async () => {
+    setPricesLoading(true);
+    const { data } = await supabase
+      .from("ss_prices")
+      .select("sku,style_code,purchase_price,suggested_retail_price,currency")
+      .order("style_code", { ascending: true })
+      .limit(500);
+    setPrices((data || []) as PriceRow[]);
+    setPricesLoading(false);
+  };
+
+  const filteredPrices = useMemo(() => {
+    const n = priceQuery.trim().toLowerCase();
+    if (!n) return prices;
+    return prices.filter((p) => `${p.style_code} ${p.sku}`.toLowerCase().includes(n));
+  }, [prices, priceQuery]);
 
   const callSync = async (mode: string) => {
     const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stanley-stella-sync?mode=${mode}`;
