@@ -1,6 +1,8 @@
-// Stanley/Stella unified sync.
+// Stanley/Stella unified sync — strict mapping per official API (productsV2,
+// v2/stock, products/get_prices, products_imagesV2, color, size, combostyles).
+// Field names match the live API response exactly (verified via /inspect).
+//
 // Modes: catalog | colors | sizes | styles | stock | prices | combos | images | all | inspect
-// Called manually from admin or by pg_cron on a schedule.
 
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
@@ -9,7 +11,7 @@ const SS_HOST = "https://api.stanleystella.com";
 const DB_NAME = "production_api";
 const DEFAULT_LANG = "en_GB";
 
-// ---------------------------------------------------------------- helpers ---
+// ----------------------------------------------------------------- helpers ---
 
 async function ssCall(endpoint: string, extra: Record<string, unknown> = {}) {
   const user = Deno.env.get("STANLEY_STELLA_USER");
@@ -36,26 +38,30 @@ async function ssCall(endpoint: string, extra: Record<string, unknown> = {}) {
   return typeof raw === "string" ? JSON.parse(raw) : raw;
 }
 
-const pick = (o: any, ...keys: string[]) => {
-  for (const k of keys) if (o?.[k] !== undefined && o?.[k] !== null && o?.[k] !== "") return o[k];
-  return undefined;
+const toBool = (v: unknown, fallback = false): boolean => {
+  if (v === true || v === false) return v;
+  if (v === null || v === undefined || v === "") return fallback;
+  if (typeof v === "number") return v !== 0;
+  const s = String(v).trim().toLowerCase();
+  return ["true", "1", "yes", "y", "t"].includes(s);
 };
 
-const normalizeBool = (value: unknown, fallback = true) => {
-  if (value === undefined || value === null || value === "") return fallback;
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value !== 0;
-  const v = String(value).trim().toLowerCase();
-  return ["true", "1", "yes", "y"].includes(v);
+const toNum = (v: unknown): number | null => {
+  if (v === null || v === undefined || v === "") return null;
+  const n = Number(String(v).replace(",", "."));
+  return Number.isFinite(n) ? n : null;
 };
 
-const normalizeNumber = (value: unknown, fallback = 0) => {
-  if (value === undefined || value === null || value === "") return fallback;
-  const n = Number(String(value).replace(",", "."));
-  return Number.isFinite(n) ? n : fallback;
+const toInt = (v: unknown, fallback = 0): number => {
+  const n = toNum(v);
+  return n === null ? fallback : Math.trunc(n);
 };
 
-const getArray = (value: unknown) => Array.isArray(value) ? value : [];
+const toStr = (v: unknown): string | null => {
+  if (v === null || v === undefined) return null;
+  const s = String(v).trim();
+  return s === "" ? null : s;
+};
 
 async function chunkUpsert(
   sb: SupabaseClient,
@@ -75,89 +81,115 @@ async function chunkUpsert(
 }
 
 async function startLog(sb: SupabaseClient, source: string) {
-  const { data } = await sb.from("sync_logs")
-    .insert({ source, status: "running" })
-    .select("id").single();
+  const { data } = await sb.from("sync_logs").insert({ source, status: "running" }).select("id").single();
   return data?.id as string | undefined;
 }
-
 async function finishLog(sb: SupabaseClient, id: string | undefined, patch: Record<string, unknown>) {
   if (!id) return;
   await sb.from("sync_logs").update({ ...patch, finished_at: new Date().toISOString() }).eq("id", id);
 }
 
-// ---------------------------------------------------------------- syncers ---
-
+// ----------------------------------------------------------------- syncers ---
+// COLORS: /webrequest/color/get_json — rarely used; ss_styles sync re-populates hex too
 async function syncColors(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/color/get_json");
-  const data = (rows as any[]).map((r) => ({
-    code: String(pick(r, "Code", "ColorCode", "Id") ?? ""),
-    name: String(pick(r, "Name", "ColorName") ?? ""),
-    hex: pick(r, "Hex", "HexCode", "Color_Hex", "HexaColorCode") ?? null,
+  const rows = await ssCall("/webrequest/color/get_json") as any[];
+  // The dedicated colors endpoint returns Code+Name only on most accounts.
+  // Hex is reliable via Variants.HexaColorCode (done in syncStyles).
+  const data = rows.map((r) => ({
+    code: toStr(r.Code) ?? "",
+    name: toStr(r.Name) ?? toStr(r.Code) ?? "",
+    hex: toStr(r.HexaColorCode) ?? toStr(r.Hex),
     raw: r,
   })).filter((r) => r.code);
   return chunkUpsert(sb, "ss_colors", data, "code");
 }
 
+// SIZES: /webrequest/size/get_json
 async function syncSizes(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/size/get_json");
-  const data = (rows as any[]).map((r, idx) => ({
-    code: String(pick(r, "Code", "SizeCode", "Id") ?? ""),
-    name: String(pick(r, "Name", "SizeName") ?? ""),
-    sort_order: Number(pick(r, "Sequence", "SortOrder") ?? idx),
+  const rows = await ssCall("/webrequest/size/get_json") as any[];
+  const data = rows.map((r, idx) => ({
+    code: toStr(r.Code) ?? "",
+    name: toStr(r.Name) ?? toStr(r.Code) ?? "",
+    sort_order: toInt(r.Sequence ?? r.SizeSequence ?? idx, idx),
     raw: r,
   })).filter((r) => r.code);
   return chunkUpsert(sb, "ss_sizes", data, "code");
 }
 
+// STYLES + VARIANTS + COLORS: /webrequest/productsV2/get_json
 async function syncStyles(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/productsV2/get_json", { LanguageCode: DEFAULT_LANG, Published: true });
+  const rows = await ssCall("/webrequest/productsV2/get_json", {
+    LanguageCode: DEFAULT_LANG,
+    Published: true,
+  }) as any[];
+
   const styles: any[] = [];
   const variants: any[] = [];
   const colors = new Map<string, { code: string; name: string; hex: string | null; raw: any }>();
 
-  for (const row of rows as any[]) {
-    const style = pick(row, "StyleCode", "Style_Code", "Style");
-    if (!style) continue;
+  for (const row of rows) {
+    const styleCode = toStr(row.StyleCode);
+    if (!styleCode) continue;
+
     styles.push({
-      style_code: style,
-      name: pick(row, "StyleName", "Name") || style,
-      short_description: pick(row, "ShortDescription") || null,
-      long_description: pick(row, "LongDescription", "Description") || null,
-      category: pick(row, "Category", "Type") || null,
-      type: pick(row, "Type") || null,
-      gender: pick(row, "Gender") || null,
-      segment: pick(row, "StyleMainsSegments", "StyleMainSegments", "Segment") || null,
-      composition: pick(row, "Composition", "Material") || null,
-      weight_gsm: normalizeNumber(pick(row, "Weight", "GSM"), 0) || null,
-      fit: pick(row, "Fit") || null,
-      neckline: pick(row, "Neckline") || null,
-      sleeve: pick(row, "Sleeve") || null,
-      published: normalizeBool(pick(row, "Published"), true),
+      style_code: styleCode,
+      name: toStr(row.StyleName) ?? styleCode,
+      short_description: toStr(row.ShortDescription),
+      long_description: toStr(row.LongDescription),
+      category: toStr(row.Category),
+      category_code: toStr(row.CategoryCode),
+      type: toStr(row.Type),
+      type_code: toStr(row.TypeCode),
+      gender: toStr(row.Gender),
+      segment: toStr(row.StyleMainsSegments) ?? toStr(row.Segment) ?? toStr(row.StyleSegment),
+      fit: toStr(row.Fit),
+      neckline: toStr(row.Neckline),
+      sleeve: toStr(row.Sleeve),
+      wash_instructions: toStr(row.WashInstructions),
+      specifications: toStr(row.Specifications),
+      main_picture_url: toStr(row.MainPicture),
+      over_picture_url: toStr(row.OverPicture),
+      published: toBool(row.StylePublished, true),
+      brand: "Stanley/Stella",
       raw: row,
       last_synced_at: new Date().toISOString(),
     });
 
-    const vlist: any[] = getArray(row.Variants || row.SKUs || row.Skus);
-    for (const v of vlist) {
-      const sku = pick(v, "B2BSKUREF", "SKU", "Sku", "Code");
+    const vList = Array.isArray(row.Variants) ? row.Variants : [];
+    // Compute style-level composition + GSM from the first variant (uniform across SKUs)
+    if (vList.length) {
+      const v0 = vList[0];
+      const composition = toStr(v0.CompositionList);
+      const weightGsm = toNum(v0.Weight);
+      if (composition || weightGsm) {
+        const last = styles[styles.length - 1];
+        last.composition = composition;
+        last.weight_gsm = weightGsm;
+      }
+    }
+
+    for (const v of vList) {
+      const sku = toStr(v.B2BSKUREF);
       if (!sku) continue;
-      const colorCode = pick(v, "ColorCode", "Color_Code");
-      if (colorCode && !colors.has(String(colorCode))) {
-        colors.set(String(colorCode), {
-          code: String(colorCode),
-          name: String(pick(v, "ColorName", "Color") || colorCode),
-          hex: pick(v, "HexaColorCode", "Hex", "HexCode") || null,
-          raw: v,
-        });
+      const colorCode = toStr(v.ColorCode);
+      const colorName = toStr(v.Color);
+      const hex = toStr(v.HexaColorCode);
+      if (colorCode && !colors.has(colorCode)) {
+        colors.set(colorCode, { code: colorCode, name: colorName ?? colorCode, hex, raw: v });
       }
       variants.push({
-        sku: String(sku),
-        style_code: style,
-        color_code: colorCode || null,
-        color_name: pick(v, "ColorName", "Color") || null,
-        size_code: pick(v, "SizeCode", "Size") || null,
-        ean: pick(v, "EAN", "Ean", "Barcode") || null,
+        sku,
+        style_code: styleCode,
+        color_code: colorCode,
+        color_name: colorName,
+        hex_color_code: hex,
+        color_group: toStr(v.ColorGroup),
+        color_sequence: toInt(v.ColorSequence, 0),
+        size_code: toStr(v.SizeCode),
+        size_sequence: toInt(v.SizeSequence, 0),
+        ean: toStr(v.EAN),
+        weight_grams: toNum(v.WeightPerUnit),
+        published: toBool(v.Published, true),
         raw: v,
       });
     }
@@ -165,54 +197,75 @@ async function syncStyles(sb: SupabaseClient) {
 
   const s = await chunkUpsert(sb, "ss_styles", styles, "style_code");
   const v = await chunkUpsert(sb, "ss_variants", variants, "sku");
-  const c = colors.size ? await chunkUpsert(sb, "ss_colors", Array.from(colors.values()), "code") : 0;
+  const c = colors.size
+    ? await chunkUpsert(sb, "ss_colors", Array.from(colors.values()), "code")
+    : 0;
   return { styles: s, variants: v, colors_from_variants: c };
 }
 
+// STOCK V2: /webrequest/v2/stock/get_json
 async function syncStock(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/v2/stock/get_json", { LanguageCode: DEFAULT_LANG, Is_Inventory: true });
-  const data = (rows as any[]).map((r) => ({
-    sku: String(pick(r, "B2BSKUREF", "SKU", "Sku") ?? ""),
-    style_code: String(pick(r, "StyleCode", "Style_Code", "Style") ?? ""),
-    quantity: normalizeNumber(pick(r, "Available_Quantity", "Quantity", "Qty", "QTY", "Stock", "StockQuantity", "AvailableQuantity"), 0),
-    incoming_quantity: normalizeNumber(pick(r, "IncomingQuantity", "Incoming", "InboundQuantity"), 0),
-    next_arrival_date: pick(r, "NextArrivalDate") || null,
-  })).filter((r) => r.sku);
-  return chunkUpsert(sb, "ss_stock", data, "sku");
-}
+  const rows = await ssCall("/webrequest/v2/stock/get_json", {
+    LanguageCode: DEFAULT_LANG,
+    Is_Inventory: true,
+  }) as any[];
 
-async function syncPrices(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/products/get_prices");
-  const data = (rows as any[]).map((r) => ({
-    sku: String(pick(r, "B2BSKUREF", "SKU", "Sku") ?? ""),
-    style_code: String(pick(r, "StyleCode", "Style_Code", "Style") ?? ""),
-    purchase_price: normalizeNumber(pick(r, "PurchasePrice", "Price", "UnitPrice", "YourPrice"), 0) || null,
-    suggested_retail_price: normalizeNumber(pick(r, "SuggestedRetailPrice", "SRP", "RecommendedRetailPrice", "RecommendedSalesPriceGT10pcs", "RecommendedSalesSmallBrand"), 0) || null,
-    currency: pick(r, "Currency") || "EUR",
-  })).filter((r) => r.sku);
-  return chunkUpsert(sb, "ss_prices", data, "sku");
-}
-
-async function syncCombos(sb: SupabaseClient) {
-  const rows = await ssCall("/webrequest/combostyles/get_json").catch(() => []);
-  const data: any[] = [];
-  for (const r of rows as any[]) {
-    const style = pick(r, "StyleCode", "Style_Code");
-    const combos: any[] = getArray(r.Combo || r.Combos);
-    if (!style || !combos.length) continue;
-    for (const c of combos) {
-      const ccode = pick(c, "StyleCode", "Style_Code", "Code");
-      if (!ccode) continue;
-      data.push({
-        style_code: style,
-        combo_style_code: ccode,
-        combo_type: pick(c, "Type") || null,
-        raw: c,
+  // Aggregate by SKU across all locations (sum available qty)
+  const bySku = new Map<string, any>();
+  for (const r of rows) {
+    const sku = toStr(r.SKU);
+    if (!sku) continue;
+    const cur = bySku.get(sku);
+    const qty = toInt(r.Available_Quantity, 0);
+    const styleCode = toStr(r.Style_Code) ?? cur?.style_code ?? "";
+    if (cur) {
+      cur.quantity += qty;
+    } else {
+      bySku.set(sku, {
+        sku,
+        style_code: styleCode,
+        quantity: qty,
+        incoming_quantity: 0,
+        variant_code: toStr(r.Variant_Code),
+        location_code: toStr(r.Location_Code),
+        receipt_date: toStr(r.Receipt_Date),
       });
     }
   }
+  return chunkUpsert(sb, "ss_stock", Array.from(bySku.values()), "sku");
+}
+
+// PRICES: /webrequest/products/get_prices — returns variant-level brackets
+async function syncPrices(sb: SupabaseClient) {
+  const rows = await ssCall("/webrequest/products/get_prices") as any[];
+  const data = rows.map((r) => {
+    const sku = toStr(r.B2BSKUREF);
+    if (!sku) return null;
+    return {
+      sku,
+      style_code: sku.slice(0, 7), // STxxx### (style prefix); we keep raw for safety
+      purchase_price: toNum(r.PurchasePrice),
+      suggested_retail_price: toNum(r.RecommendedSalesPriceGT10pcs) ?? toNum(r.RecommendedSalesSmallBrand),
+      currency: "EUR",
+    };
+  }).filter(Boolean) as any[];
+  return chunkUpsert(sb, "ss_prices", data, "sku");
+}
+
+// COMBOS: /webrequest/combostyles/get_json
+async function syncCombos(sb: SupabaseClient) {
+  const rows = await ssCall("/webrequest/combostyles/get_json").catch(() => []) as any[];
+  const data: any[] = [];
+  for (const r of rows) {
+    const style = toStr(r.StyleCode);
+    const combos = Array.isArray(r.Combos) ? r.Combos : Array.isArray(r.Combo) ? r.Combo : [];
+    if (!style || !combos.length) continue;
+    for (const c of combos) {
+      const cc = toStr(c.StyleCode);
+      if (cc) data.push({ style_code: style, combo_style_code: cc, combo_type: toStr(c.Type), raw: c });
+    }
+  }
   if (!data.length) return 0;
-  // Replace combos for involved styles
   const styles = Array.from(new Set(data.map((d) => d.style_code)));
   for (let i = 0; i < styles.length; i += 200) {
     await sb.from("ss_combos").delete().in("style_code", styles.slice(i, i + 200));
@@ -220,92 +273,52 @@ async function syncCombos(sb: SupabaseClient) {
   return chunkUpsert(sb, "ss_combos", data, "id");
 }
 
-// Images: pulls V2 image list, then downloads NEW ones into the ss-images bucket
-// and stores public URL. Skips ones already mirrored.
-async function syncImages(sb: SupabaseClient, maxDownloads = 200) {
-  const rows = await ssCall("/webrequest/products_imagesV2/get_json", { LanguageCode: DEFAULT_LANG });
-  const wanted: { style: string; color: string | null; type: string; sort: number; url: string; primary: boolean }[] = [];
+// IMAGES: /webrequest/products_imagesV2/get_json — metadata only.
+// We HOTLINK from Stanley/Stella's Cloudinary CDN (HTMLPath). No download, no
+// bucket dependency — instant full coverage of all photo types per color.
+async function syncImages(sb: SupabaseClient) {
+  const rows = await ssCall("/webrequest/products_imagesV2/get_json", {
+    LanguageCode: DEFAULT_LANG,
+  }) as any[];
 
-  for (const r of rows as any[]) {
-    const style = pick(r, "StyleCode", "Style_Code");
-    if (!style) continue;
-    const pics: any[] = getArray(r.Pictures || r.Images);
-    const sourceRows = pics.length ? pics : [r];
-    sourceRows.forEach((p, idx) => {
-      const url = pick(p, "HTMLPath", "HighResUrl", "Picture", "PictureURL", "Image", "ImageUrl", "URL", "Url");
-      if (!url) return;
-      wanted.push({
-        style,
-        color: pick(p, "ColorCode", "Color_Code") || null,
-        type: pick(p, "PhotoTypeCode", "PictureType", "Type", "PhotoStyle") || "main",
-        sort: normalizeNumber(pick(p, "PhotoSequenceCode", "Sequence", "Sort"), idx),
-        url,
-        primary: normalizeBool(pick(p, "MainPicture", "Main", "IsMain"), false),
-      });
+  const seen = new Set<string>();
+  const data: any[] = [];
+
+  for (const r of rows) {
+    const style = toStr(r.StyleCode);
+    const url = toStr(r.HTMLPath);
+    if (!style || !url) continue;
+    const colorCode = toStr(r.ColorCode);
+    const photoType = toStr(r.PhotoTypeCode) ?? "MAIN";
+    const sortOrder = toInt(r.PhotoSequenceCode, 0);
+    const key = `${style}|${colorCode ?? ""}|${photoType}|${sortOrder}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    data.push({
+      style_code: style,
+      color_code: colorCode,
+      image_type: photoType,
+      photo_style: toStr(r.PhotoStyle),
+      photo_shoot_code: toStr(r.PhotoShootCode),
+      fname: toStr(r.FName),
+      sort_order: sortOrder,
+      source_url: url,
+      is_main: toBool(r.MainPicture, false),
+      is_over: toBool(r.OverPicture, false),
     });
   }
 
-  const primaryByStyle = new Map<string, typeof wanted[number]>();
-  for (const img of wanted) {
-    const current = primaryByStyle.get(img.style);
-    if (!current || (img.primary && !current.primary) || (img.primary === current.primary && img.sort < current.sort)) {
-      primaryByStyle.set(img.style, img);
-    }
-  }
-  const primaryUrls = new Set(Array.from(primaryByStyle.values()).map((img) => img.url));
-  const orderedWanted = [
-    ...Array.from(primaryByStyle.values()),
-    ...wanted.filter((img) => !primaryUrls.has(img.url)),
-  ];
-
-  // Diff against existing
-  const { data: existing } = await sb.from("ss_images").select("source_url");
-  const have = new Set((existing || []).map((e: any) => e.source_url));
-  const todo = orderedWanted.filter((w) => !have.has(w.url));
-
-  let downloaded = 0;
-  const inserts: any[] = [];
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-
-  for (const w of todo.slice(0, maxDownloads)) {
-    try {
-      const r = await fetch(w.url);
-      if (!r.ok) continue;
-      const buf = new Uint8Array(await r.arrayBuffer());
-      const ext = (w.url.match(/\.(jpe?g|png|webp)/i)?.[1] || "jpg").toLowerCase();
-      const safeColor = (w.color || "x").replace(/[^a-z0-9]/gi, "");
-      const path = `${w.style}/${safeColor}/${w.type}-${w.sort}-${Date.now()}.${ext}`;
-      const up = await sb.storage.from("ss-images").upload(path, buf, {
-        contentType: r.headers.get("content-type") || `image/${ext}`,
-        upsert: false,
-      });
-      if (up.error) continue;
-      const publicUrl = `${supabaseUrl}/storage/v1/object/public/ss-images/${path}`;
-      inserts.push({
-        style_code: w.style,
-        color_code: w.color,
-        image_type: w.type,
-        sort_order: w.sort,
-        source_url: w.url,
-        storage_path: path,
-        public_url: publicUrl,
-      });
-      downloaded++;
-    } catch (_) { /* skip */ }
-  }
-  if (inserts.length) await chunkUpsert(sb, "ss_images", inserts, "style_code,color_code,image_type,sort_order");
-  return { wanted: wanted.length, new: todo.length, downloaded, remaining: Math.max(0, todo.length - downloaded) };
+  return chunkUpsert(sb, "ss_images", data, "style_code,color_code,image_type,sort_order");
 }
 
+// INSPECT: introspect raw responses (used during development)
 async function inspectApi() {
-  const sample = (rows: any[]) => rows.slice(0, 2).map((row) => ({
+  const sample = (rows: any[]) => rows.slice(0, 1).map((row) => ({
     keys: Object.keys(row),
-    style: pick(row, "StyleCode", "Style_Code", "Style"),
-    sku: pick(row, "B2BSKUREF", "SKU", "Sku"),
-    quantity: pick(row, "Quantity", "Qty", "QTY", "Stock", "StockQuantity", "AvailableQuantity"),
-    url: pick(row, "HTMLPath", "HighResUrl", "Picture", "PictureURL", "Image", "ImageUrl", "URL", "Url"),
+    style: row.StyleCode, sku: row.B2BSKUREF ?? row.SKU,
     variants: Array.isArray(row.Variants) ? row.Variants.length : undefined,
     firstVariantKeys: Array.isArray(row.Variants) && row.Variants[0] ? Object.keys(row.Variants[0]) : undefined,
+    url: row.HTMLPath,
   }));
   const [styles, stock, prices, images] = await Promise.all([
     ssCall("/webrequest/productsV2/get_json", { LanguageCode: DEFAULT_LANG, Published: true, StyleCode: "STTU169" }),
@@ -321,34 +334,29 @@ async function inspectApi() {
   };
 }
 
-// ---------------------------------------------------------------- handler ---
+// ----------------------------------------------------------------- handler ---
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const url = new URL(req.url);
-  const mode = (url.searchParams.get("mode") || "catalog").toLowerCase();
-  const maxImg = Number(url.searchParams.get("maxImages") || 200);
+  const mode = (url.searchParams.get("mode") || "all").toLowerCase();
 
   const logId = await startLog(sb, `stanley-stella:${mode}`);
   const result: Record<string, unknown> = {};
 
   try {
     if (mode === "inspect") result.inspect = await inspectApi();
-    if (mode === "colors" || mode === "catalog" || mode === "all") result.colors = await syncColors(sb);
     if (mode === "sizes"  || mode === "catalog" || mode === "all") result.sizes  = await syncSizes(sb);
+    if (mode === "colors" || mode === "catalog" || mode === "all") result.colors = await syncColors(sb);
     if (mode === "styles" || mode === "catalog" || mode === "all") result.styles = await syncStyles(sb);
     if (mode === "stock"  || mode === "catalog" || mode === "all") result.stock  = await syncStock(sb);
     if (mode === "prices" || mode === "catalog" || mode === "all") result.prices = await syncPrices(sb);
+    if (mode === "images" || mode === "catalog" || mode === "all") result.images = await syncImages(sb);
     if (mode === "combos" || mode === "all") result.combos = await syncCombos(sb);
-    if (mode === "images" || mode === "all") result.images = await syncImages(sb, maxImg);
 
-    await finishLog(sb, logId, {
-      status: "success",
-      message: `Sync (${mode}) ok`,
-      details: result,
-    });
+    await finishLog(sb, logId, { status: "success", message: `Sync (${mode}) ok`, details: result });
     return new Response(JSON.stringify({ ok: true, mode, result }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
