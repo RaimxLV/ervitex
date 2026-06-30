@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { Product } from "@/data/products";
+
 
 const COLOR_NAME_TO_HEX: Record<string, string> = {
   white: "#FFFFFF", black: "#000000", navy: "#1B2A4A", red: "#DC2626",
@@ -52,8 +53,45 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
     return imgs;
   }, [product.images, product.colorImageUrls]);
 
-  const main = images[0] || null;
+  const [activeIdx, setActiveIdx] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const swiped = useRef(false);
+
+  const current = images[activeIdx] || images[0] || null;
   const over = images[1] || null;
+  const hasMultiple = images.length > 1;
+
+  const goTo = (idx: number) => {
+    if (images.length === 0) return;
+    const next = (idx + images.length) % images.length;
+    setActiveIdx(next);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    swiped.current = false;
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const dx = e.touches[0].clientX - touchStartX.current;
+    const dy = e.touches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)) {
+      swiped.current = true;
+    }
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 30 && hasMultiple) {
+      e.preventDefault();
+      e.stopPropagation();
+      goTo(activeIdx + (dx < 0 ? 1 : -1));
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
 
   const swatches = useMemo(
     () =>
@@ -71,25 +109,38 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
   return (
     <Link
       to={`/product/${product.id}`}
+      onClick={(e) => {
+        if (swiped.current) {
+          e.preventDefault();
+          swiped.current = false;
+        }
+      }}
       className="group block overflow-hidden border border-border bg-card text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
     >
-      <div className="catalog-card-media relative aspect-[3/4] overflow-hidden">
-        {main ? (
+      <div
+        className="catalog-card-media relative aspect-[3/4] overflow-hidden touch-pan-y select-none"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        {current ? (
           <>
             <img
-              src={main}
+              src={current}
               alt={product.name[lang]}
               loading="lazy"
-              className={`absolute inset-0 h-full w-full scale-[1.08] object-contain object-center p-1 transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
+              draggable={false}
+              className={`absolute inset-0 h-full w-full scale-[1.08] object-contain object-center p-1 transition-opacity duration-500 ${over && activeIdx === 0 ? "group-hover:opacity-0" : ""}`}
               onError={(e) => {
                 e.currentTarget.style.display = "none";
               }}
             />
-            {over && (
+            {over && activeIdx === 0 && (
               <img
                 src={over}
                 alt=""
                 loading="lazy"
+                draggable={false}
                 className="absolute inset-0 h-full w-full scale-[1.08] object-contain object-center p-1 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               />
             )}
@@ -119,7 +170,19 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
             </Badge>
           )}
         </div>
+
+        {hasMultiple && (
+          <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1 md:hidden">
+            {images.slice(0, 8).map((_, i) => (
+              <span
+                key={i}
+                className={`h-1 w-1 rounded-full transition-colors ${i === activeIdx ? "bg-foreground" : "bg-foreground/30"}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
+
 
       <div className="space-y-1.5 p-3">
         <h3 className="font-heading text-sm font-bold uppercase tracking-wide line-clamp-1 transition-colors group-hover:text-accent">
