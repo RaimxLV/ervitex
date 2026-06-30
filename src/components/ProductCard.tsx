@@ -73,14 +73,14 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
       to={`/product/${product.id}`}
       className="group block overflow-hidden border border-border bg-card text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
     >
-      <div className="relative aspect-[3/4] overflow-hidden bg-[#EFEAE0]">
+      <div className="catalog-card-media relative aspect-[3/4] overflow-hidden">
         {main ? (
           <>
             <img
               src={main}
               alt={product.name[lang]}
               loading="lazy"
-              className={`absolute inset-0 h-full w-full object-contain object-center p-3 transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
+              className={`absolute inset-0 h-full w-full scale-[1.08] object-contain object-center p-1 transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
               onError={(e) => {
                 e.currentTarget.style.display = "none";
               }}
@@ -90,7 +90,7 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
                 src={over}
                 alt=""
                 loading="lazy"
-                className="absolute inset-0 h-full w-full object-contain object-center p-3 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                className="absolute inset-0 h-full w-full scale-[1.08] object-contain object-center p-1 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               />
             )}
           </>
