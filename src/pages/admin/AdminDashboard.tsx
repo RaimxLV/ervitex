@@ -216,8 +216,13 @@ const AdminDashboard = () => {
       <div className="mt-10 rounded-sm border border-border bg-card p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Piegādātāja cenas (Stanley/Stella)</h2>
-            <p className="mt-1 text-xs text-muted-foreground">Iepirkuma un ieteicamās mazumtirdzniecības cenas. Redzamas tikai administrātoriem.</p>
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Stanley/Stella cenas (API spogulis)</h2>
+            <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
+              Šī tabula ir tikai lasāms Stanley/Stella API spogulis. Lauki tiek ņemti 1:1 no oficiālā <code className="font-mono">/webrequest/prices/get_json</code> izsaukuma:
+              <br />• <span className="font-semibold text-foreground">Iepirkuma cena</span> = <code className="font-mono">PurchasePrice</code> (mūsu B2B cena no S/S)
+              <br />• <span className="font-semibold text-foreground">Ieteicamā mazumcena</span> = <code className="font-mono">SuggestedRetailPrice</code> (S/S ieteikums, nav saistošs)
+              <br />Rediģēšana un dzēšana šeit ir bloķēta tāpēc, ka nākamā sinhronizācija to tāpat pārrakstītu. Lai mainītu klientam redzamo cenu, pievienojiet uzcenojumu atsevišķā vietā (nākotnē) vai mainiet manuāli iekšējos produktos.
+            </p>
           </div>
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -233,10 +238,10 @@ const AdminDashboard = () => {
           <table className="w-full text-xs">
             <thead className="sticky top-0 z-10 bg-muted text-[10px] uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left">Modelis</th>
-                <th className="px-3 py-2 text-left">SKU</th>
-                <th className="px-3 py-2 text-right">Iepirkuma cena</th>
-                <th className="px-3 py-2 text-right">Ieteicamā mazumcena</th>
+                <th className="px-3 py-2 text-left">Modelis (StyleCode)</th>
+                <th className="px-3 py-2 text-left">SKU (B2BSKUREF)</th>
+                <th className="px-3 py-2 text-right">PurchasePrice</th>
+                <th className="px-3 py-2 text-right">SuggestedRetailPrice</th>
                 <th className="px-3 py-2 text-left">Valūta</th>
               </tr>
             </thead>
@@ -259,7 +264,7 @@ const AdminDashboard = () => {
             </tbody>
           </table>
         </div>
-        <p className="mt-2 text-[11px] text-muted-foreground">Rāda pirmos 500 ierakstus. Izmantojiet meklēšanu, lai atrastu konkrētu modeli vai SKU.</p>
+        <p className="mt-2 text-[11px] text-muted-foreground">Rāda pirmos 500 ierakstus pēc StyleCode. Izmantojiet meklēšanu, lai atrastu konkrētu modeli vai SKU.</p>
       </div>
     </AdminLayout>
   );
