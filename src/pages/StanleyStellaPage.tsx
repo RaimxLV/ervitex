@@ -72,8 +72,7 @@ const resolveUrl = (u?: string | null, transform?: string) => {
   const path = u.replace(/^\/+/, "");
   return CDN_BASE + (transform ? `${transform}/${path}` : path);
 };
-const THUMB_TRANSFORM = "f_auto,q_auto,w_640,h_854,c_fill,g_auto";
-const CARD_IMAGE_CLASS = "absolute inset-0 h-full w-full -translate-y-[3.5%] scale-[1.12] object-cover object-center transition-opacity duration-500";
+const THUMB_TRANSFORM = "f_auto,q_auto,w_600,c_fill,g_auto";
 
 const SIZE_ORDER = ["XXXS","XXS","XS","S","M","L","XL","XXL","2XL","3XL","XXXL","4XL","XXXXL","5XL","XXXXXL","6XL"];
 const sizeIndex = (s: string | null | undefined) => {
@@ -335,14 +334,14 @@ const StanleyStellaPage = () => {
                               src={main}
                               alt={s.name}
                               loading="lazy"
-                              className={`${CARD_IMAGE_CLASS} ${over ? "group-hover:opacity-0" : ""}`}
+                              className={`absolute inset-0 h-full w-full scale-[1.04] object-cover object-center transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
                             />
                             {over && (
                               <img
                                 src={over}
                                 alt=""
                                 loading="lazy"
-                                className={`${CARD_IMAGE_CLASS} opacity-0 group-hover:opacity-100`}
+                                className="absolute inset-0 h-full w-full scale-[1.04] object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                               />
                             )}
                           </>
