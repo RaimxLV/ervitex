@@ -260,8 +260,7 @@ const StanleyStellaPage = () => {
       <section className="border-b border-border bg-primary text-primary-foreground">
         <div className="container flex flex-wrap items-center justify-between gap-4 px-4 py-6">
           <div className="flex items-center gap-4">
-            <img src={stellaLogo} alt="Stanley/Stella" className="h-8 w-auto md:h-10" />
-            <span className="font-heading text-xl font-black uppercase tracking-wide">Stanley/Stella</span>
+            <img src={stellaLogo} alt="Stanley/Stella Official Dealer" className="h-8 w-auto md:h-10" />
           </div>
           <Button asChild variant="outline" className="border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10">
             <Link to="/contact">{t.contact}</Link>
@@ -321,21 +320,21 @@ const StanleyStellaPage = () => {
                       onClick={() => openDetail(s)}
                       className="group block overflow-hidden border border-border bg-card text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
                     >
-                      <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+                      <div className="relative aspect-[3/4] overflow-hidden bg-[#EFEAE0]">
                         {main ? (
                           <>
                             <img
                               src={main}
                               alt={s.name}
                               loading="lazy"
-                              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
+                              className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
                             />
                             {over && (
                               <img
                                 src={over}
                                 alt=""
                                 loading="lazy"
-                                className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                                className="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                               />
                             )}
                           </>
@@ -343,7 +342,6 @@ const StanleyStellaPage = () => {
                           <div className="flex h-full items-center justify-center text-xs text-muted-foreground">{t.noImage}</div>
                         )}
                         <span className="absolute left-2 top-2 bg-primary px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">{s.style_code}</span>
-                        {s.total_stock > 0 && <span className="absolute right-2 top-2 bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent-foreground">{s.total_stock.toLocaleString("lv-LV")} {t.stock}</span>}
                       </div>
                       <div className="space-y-1.5 p-3">
                         <h3 className="font-heading text-sm font-bold uppercase tracking-wide line-clamp-1">{s.name}</h3>
