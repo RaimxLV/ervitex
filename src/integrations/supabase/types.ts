@@ -786,6 +786,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      refresh_ss_style_summary: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin"
