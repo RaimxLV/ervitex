@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/i18n/LanguageContext";
 import type { Product } from "@/data/products";
+
 
 const COLOR_NAME_TO_HEX: Record<string, string> = {
   white: "#FFFFFF", black: "#000000", navy: "#1B2A4A", red: "#DC2626",
