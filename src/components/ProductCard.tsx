@@ -52,7 +52,7 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
     return imgs;
   }, [product.images, product.colorImageUrls]);
 
-  const main = images[0] || "/placeholder.svg";
+  const main = images[0] || null;
   const over = images[1] || null;
 
   const swatches = useMemo(
