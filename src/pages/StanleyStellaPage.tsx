@@ -106,7 +106,7 @@ const StanleyStellaPage = () => {
       while (true) {
         const { data, error } = await supabase
           .from("ss_style_summary" as any)
-          .select("*")
+          .select("style_code,name,short_description,long_description,category,gender,segment,composition,type,brand,fit,weight_gsm,neckline,sleeve,wash_instructions,specifications,main_picture_url,over_picture_url,cover_url,over_url,total_stock,color_count,size_count")
           .order("sequence_style", { ascending: true, nullsFirst: false })
           .order("name", { ascending: true })
           .range(from, from + step - 1);
@@ -327,14 +327,14 @@ const StanleyStellaPage = () => {
                               src={main}
                               alt={s.name}
                               loading="lazy"
-                              className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
+                              className={`absolute inset-0 h-full w-full scale-[1.04] object-cover object-center transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
                             />
                             {over && (
                               <img
                                 src={over}
                                 alt=""
                                 loading="lazy"
-                                className="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                                className="absolute inset-0 h-full w-full scale-[1.04] object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                               />
                             )}
                           </>
