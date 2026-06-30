@@ -61,11 +61,18 @@ interface ImageRow {
 
 const PAGE_SIZE = 24;
 const CDN_BASE = "https://res.cloudinary.com/www-stanleystella-com/image/upload/";
-const resolveUrl = (u?: string | null) => {
+const resolveUrl = (u?: string | null, transform?: string) => {
   if (!u) return null;
-  if (/^https?:\/\//i.test(u)) return u;
-  return CDN_BASE + u.replace(/^\/+/, "");
+  if (/^https?:\/\//i.test(u)) {
+    if (transform && u.includes("res.cloudinary.com") && u.includes("/image/upload/")) {
+      return u.replace("/image/upload/", `/image/upload/${transform}/`);
+    }
+    return u;
+  }
+  const path = u.replace(/^\/+/, "");
+  return CDN_BASE + (transform ? `${transform}/${path}` : path);
 };
+const THUMB_TRANSFORM = "f_auto,q_auto,w_600,c_fill,g_auto";
 
 const SIZE_ORDER = ["XXXS","XXS","XS","S","M","L","XL","XXL","2XL","3XL","XXXL","4XL","XXXXL","5XL","XXXXXL","6XL"];
 const sizeIndex = (s: string | null | undefined) => {
@@ -106,7 +113,7 @@ const StanleyStellaPage = () => {
       while (true) {
         const { data, error } = await supabase
           .from("ss_style_summary" as any)
-          .select("*")
+          .select("style_code,name,short_description,long_description,category,gender,segment,composition,type,brand,fit,weight_gsm,neckline,sleeve,wash_instructions,specifications,main_picture_url,over_picture_url,cover_url,over_url,total_stock,color_count,size_count")
           .order("sequence_style", { ascending: true, nullsFirst: false })
           .order("name", { ascending: true })
           .range(from, from + step - 1);
@@ -310,8 +317,8 @@ const StanleyStellaPage = () => {
             <>
               <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-4">
                 {slice.map((s) => {
-                  const main = resolveUrl(s.cover_url || s.main_picture_url);
-                  const over = resolveUrl(s.over_url || s.over_picture_url);
+                  const main = resolveUrl(s.cover_url || s.main_picture_url, THUMB_TRANSFORM);
+                  const over = resolveUrl(s.over_url || s.over_picture_url, THUMB_TRANSFORM);
                   const swatches = styleColorHex.get(s.style_code);
                   return (
                     <button
@@ -327,14 +334,14 @@ const StanleyStellaPage = () => {
                               src={main}
                               alt={s.name}
                               loading="lazy"
-                              className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
+                              className={`absolute inset-0 h-full w-full scale-[1.04] object-cover object-center transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
                             />
                             {over && (
                               <img
                                 src={over}
                                 alt=""
                                 loading="lazy"
-                                className="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                                className="absolute inset-0 h-full w-full scale-[1.04] object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                               />
                             )}
                           </>
