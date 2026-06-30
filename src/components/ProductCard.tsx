@@ -80,7 +80,7 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
               src={main}
               alt={product.name[lang]}
               loading="lazy"
-              className={`absolute inset-0 h-full w-full scale-[1.04] object-cover object-center transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
+              className={`absolute inset-0 h-full w-full object-contain object-center p-3 transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
               onError={(e) => {
                 e.currentTarget.style.display = "none";
               }}
@@ -90,7 +90,7 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
                 src={over}
                 alt=""
                 loading="lazy"
-                className="absolute inset-0 h-full w-full scale-[1.04] object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                className="absolute inset-0 h-full w-full object-contain object-center p-3 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               />
             )}
           </>
