@@ -233,7 +233,7 @@ const CatalogPage = () => {
             />
 
             {!loaded ? (
-              <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-3">
+              <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
                 {Array.from({ length: 12 }).map((_, i) => (
                   <div key={i} className="overflow-hidden border border-border bg-card">
                     <Skeleton className="aspect-square w-full" />
@@ -246,7 +246,7 @@ const CatalogPage = () => {
                 ))}
               </div>
             ) : (
-            <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-3">
+            <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
               {paginatedProducts.map((product) => (
                 <ProductCard key={product.id} product={product as any} />
               ))}
