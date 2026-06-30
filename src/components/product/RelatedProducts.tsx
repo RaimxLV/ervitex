@@ -55,7 +55,7 @@ const RelatedProducts = ({ categoryId, currentProductId }: RelatedProductsProps)
       <h2 className="font-heading text-lg font-bold uppercase tracking-wider text-foreground mb-6">
         {lang === "lv" ? "Līdzīgi produkti" : "Related Products"}
       </h2>
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
         {products.map((p) => (
           <ProductCard key={p.id} product={p} />
         ))}
