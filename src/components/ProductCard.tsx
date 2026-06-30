@@ -74,23 +74,31 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
       className="group block overflow-hidden border border-border bg-card text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-[#EFEAE0]">
-        <img
-          src={main}
-          alt={product.name[lang]}
-          loading="lazy"
-          className={`absolute inset-0 h-full w-full scale-[1.04] object-cover object-center transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
-          onError={(e) => {
-            const t = e.currentTarget;
-            if (t.src !== window.location.origin + "/placeholder.svg") t.src = "/placeholder.svg";
-          }}
-        />
-        {over && (
-          <img
-            src={over}
-            alt=""
-            loading="lazy"
-            className="absolute inset-0 h-full w-full scale-[1.04] object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          />
+        {main ? (
+          <>
+            <img
+              src={main}
+              alt={product.name[lang]}
+              loading="lazy"
+              className={`absolute inset-0 h-full w-full scale-[1.04] object-cover object-center transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+            {over && (
+              <img
+                src={over}
+                alt=""
+                loading="lazy"
+                className="absolute inset-0 h-full w-full scale-[1.04] object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              />
+            )}
+          </>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground/60">
+            <span className="font-heading text-xs uppercase tracking-widest">{product.brand || "Ervitex"}</span>
+            <span className="font-mono text-[10px]">{product.name[lang]}</span>
+          </div>
         )}
 
         {product.brand && (
