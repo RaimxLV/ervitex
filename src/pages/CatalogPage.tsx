@@ -87,6 +87,7 @@ const CatalogPage = () => {
   const { lang, t } = useLanguage();
   const [dbProducts, setDbProducts] = useState<DBProduct[]>([]);
   const [dbCategories, setDbCategories] = useState<DBCategory[]>([]);
+  const [ssEnrichment, setSsEnrichment] = useState<Map<string, SsEnrichment>>(new Map());
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -99,7 +100,7 @@ const CatalogPage = () => {
       while (hasMore) {
         const { data } = await supabase
           .from("products")
-          .select("id, category_id, name_lv, name_en, description_lv, description_en, long_description_lv, long_description_en, material, min_order, retail_price, printing_techs, featured, is_new, active, created_at, updated_at, brand, hidden_manual, hide_when_oos, ss_in_stock, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
+          .select("id, category_id, name_lv, name_en, description_lv, description_en, long_description_lv, long_description_en, material, min_order, retail_price, printing_techs, featured, is_new, active, created_at, updated_at, brand, hidden_manual, hide_when_oos, ss_in_stock, ss_style_code, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
           .eq("active", true)
           .eq("hidden_manual", false)
           .order("created_at", { ascending: false })
@@ -116,34 +117,87 @@ const CatalogPage = () => {
       setDbProducts(allProducts);
       setDbCategories(catData || []);
       setLoaded(true);
+
+      // Enrich Stanley/Stella products with real S/S data (images, colors, name)
+      const ssCodes = Array.from(new Set(
+        allProducts
+          .filter((p) => (p.brand || "").toLowerCase().includes("stanley") && p.ss_style_code)
+          .map((p) => p.ss_style_code as string)
+      ));
+      if (ssCodes.length) {
+        const [{ data: summary }, { data: variants }] = await Promise.all([
+          supabase.from("ss_style_summary" as any)
+            .select("style_code,name,short_description,cover_url,over_url,main_picture_url,over_picture_url")
+            .in("style_code", ssCodes),
+          supabase.from("ss_variants")
+            .select("style_code,color_code,color_name,hex_color_code,color_sequence")
+            .in("style_code", ssCodes),
+        ]);
+        const colorsByStyle = new Map<string, { name: string; hex: string | null; seq: number }[]>();
+        for (const v of (variants || []) as any[]) {
+          if (!v.color_code) continue;
+          const arr = colorsByStyle.get(v.style_code) || [];
+          if (!arr.some((c) => c.name === (v.color_name || v.color_code))) {
+            arr.push({ name: v.color_name || v.color_code, hex: v.hex_color_code || null, seq: v.color_sequence ?? 0 });
+            colorsByStyle.set(v.style_code, arr);
+          }
+        }
+        const map = new Map<string, SsEnrichment>();
+        for (const s of (summary || []) as any[]) {
+          const cover = resolveSsUrl(s.cover_url || s.main_picture_url);
+          const over = resolveSsUrl(s.over_url || s.over_picture_url);
+          const imgs = [cover, over].filter((x): x is string => !!x);
+          const cols = (colorsByStyle.get(s.style_code) || []).sort((a, b) => a.seq - b.seq);
+          map.set(s.style_code, {
+            name: s.name || s.style_code,
+            short_description: s.short_description || null,
+            images: imgs,
+            colors: cols.map(({ name, hex }) => ({ name, hex })),
+          });
+        }
+        setSsEnrichment(map);
+      }
     };
     fetchData();
   }, []);
 
   const normalizedProducts = useMemo(() => {
     if (dbProducts.length > 0) {
-      return dbProducts.map((p) => ({
-        id: p.id,
-        name: { lv: p.name_lv, en: p.name_en },
-        category: p.categories?.slug || "",
-        description: { lv: p.description_lv || "", en: p.description_en || "" },
-        longDescription: { lv: p.long_description_lv || "", en: p.long_description_en || "" },
-        material: p.material || undefined,
-        colors: p.product_colors.map((c) => c.name),
-        colorHexCodes: p.product_colors.map((c) => c.hex_code),
-        colorImageUrls: p.product_colors.map((c: any) => c.image_url || null),
-        sizes: p.product_sizes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((s) => s.size),
-        minOrder: p.min_order || undefined,
-        images: p.product_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((i) => i.url),
-        featured: p.featured || false,
-        new: p.is_new || false,
-        printingTechs: p.printing_techs || [],
-        brand: p.brand || "",
-        retailPrice: p.retail_price || 0,
-      }));
+      return dbProducts.map((p) => {
+        const ss = p.ss_style_code ? ssEnrichment.get(p.ss_style_code) : undefined;
+        const baseImages = p.product_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((i) => i.url);
+        const baseColors = p.product_colors.map((c) => c.name);
+        const baseHex = p.product_colors.map((c) => c.hex_code);
+        return {
+          id: p.id,
+          name: {
+            lv: ss?.name || p.name_lv,
+            en: ss?.name || p.name_en,
+          },
+          category: p.categories?.slug || "",
+          description: {
+            lv: ss?.short_description || p.description_lv || "",
+            en: ss?.short_description || p.description_en || "",
+          },
+          longDescription: { lv: p.long_description_lv || "", en: p.long_description_en || "" },
+          material: p.material || undefined,
+          colors: ss?.colors.length ? ss.colors.map((c) => c.name) : baseColors,
+          colorHexCodes: ss?.colors.length ? ss.colors.map((c) => c.hex) : baseHex,
+          colorImageUrls: ss?.colors.length ? ss.colors.map(() => null) : p.product_colors.map((c: any) => c.image_url || null),
+          sizes: p.product_sizes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((s) => s.size),
+          minOrder: p.min_order || undefined,
+          images: ss?.images.length ? ss.images : baseImages,
+          featured: p.featured || false,
+          new: p.is_new || false,
+          printingTechs: p.printing_techs || [],
+          brand: p.brand || "",
+          retailPrice: p.retail_price || 0,
+        };
+      });
     }
     return [];
-  }, [dbProducts]);
+  }, [dbProducts, ssEnrichment]);
+
 
   const cats = useMemo(() => {
     return dbCategories.map((c) => ({ id: c.slug, name: { lv: c.name_lv, en: c.name_en } }));
