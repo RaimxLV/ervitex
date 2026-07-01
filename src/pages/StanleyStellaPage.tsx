@@ -87,11 +87,18 @@ const sizeIndex = (s: string | null | undefined) => {
 
 const StanleyStellaPage = () => {
   const { lang } = useLanguage();
+  const { isAdmin } = useAuth();
   const [rows, setRows] = useState<SummaryRow[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   // style_code -> { colors: Map<color_code, hex>, mainByColor: Map<color, url[]> }
   const [styleColorHex, setStyleColorHex] = useState<Map<string, Map<string, string | null>>>(new Map());
+
+  // Admin: catalog mapping style_code -> { id, retail_price }
+  const [catalogMap, setCatalogMap] = useState<Map<string, { id: string; retail_price: number | null }>>(new Map());
+  const [priceDialogOpen, setPriceDialogOpen] = useState(false);
+  const [priceInput, setPriceInput] = useState("");
+  const [priceSaving, setPriceSaving] = useState(false);
 
   const [q, setQ] = useState("");
   const [category, setCategory] = useState<string>("all");
@@ -107,6 +114,7 @@ const StanleyStellaPage = () => {
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [galleryIdx, setGalleryIdx] = useState(0);
   const [showVariants, setShowVariants] = useState(false);
+
 
   // Bulk load summary
   useEffect(() => {
