@@ -4,12 +4,16 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "@/hooks/use-toast";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
+
 
 interface SummaryRow {
   style_code: string;
@@ -83,11 +87,18 @@ const sizeIndex = (s: string | null | undefined) => {
 
 const StanleyStellaPage = () => {
   const { lang } = useLanguage();
+  const { isAdmin } = useAuth();
   const [rows, setRows] = useState<SummaryRow[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   // style_code -> { colors: Map<color_code, hex>, mainByColor: Map<color, url[]> }
   const [styleColorHex, setStyleColorHex] = useState<Map<string, Map<string, string | null>>>(new Map());
+
+  // Admin: catalog mapping style_code -> { id, retail_price }
+  const [catalogMap, setCatalogMap] = useState<Map<string, { id: string; retail_price: number | null }>>(new Map());
+  const [priceDialogOpen, setPriceDialogOpen] = useState(false);
+  const [priceInput, setPriceInput] = useState("");
+  const [priceSaving, setPriceSaving] = useState(false);
 
   const [q, setQ] = useState("");
   const [category, setCategory] = useState<string>("all");
@@ -103,6 +114,7 @@ const StanleyStellaPage = () => {
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [galleryIdx, setGalleryIdx] = useState(0);
   const [showVariants, setShowVariants] = useState(false);
+
 
   // Bulk load summary
   useEffect(() => {
@@ -169,6 +181,90 @@ const StanleyStellaPage = () => {
       });
     })();
   }, [slice]);
+
+  // Admin: load which Stanley/Stella styles already sit in the public catalog
+  const loadCatalogMap = async () => {
+    const { data } = await supabase
+      .from("products")
+      .select("id,retail_price,ss_style_code,name_lv")
+      .eq("brand", "Stanley/Stella");
+    const m = new Map<string, { id: string; retail_price: number | null }>();
+    for (const p of (data || []) as any[]) {
+      const key = (p.ss_style_code || p.name_lv || "").toUpperCase().trim();
+      if (key) m.set(key, { id: p.id, retail_price: p.retail_price ?? null });
+    }
+    setCatalogMap(m);
+  };
+  useEffect(() => { if (isAdmin) loadCatalogMap(); }, [isAdmin]);
+
+  const openPriceDialog = () => {
+    if (!openStyle) return;
+    const existing = catalogMap.get(openStyle.style_code);
+    setPriceInput(existing?.retail_price ? String(existing.retail_price) : "");
+    setPriceDialogOpen(true);
+  };
+
+  const savePrice = async () => {
+    if (!openStyle) return;
+    const price = parseFloat(priceInput.replace(",", "."));
+    if (!Number.isFinite(price) || price < 0) {
+      toast({ title: lang === "lv" ? "Nederīga cena" : "Invalid price", variant: "destructive" });
+      return;
+    }
+    setPriceSaving(true);
+    try {
+      const existing = catalogMap.get(openStyle.style_code);
+      if (existing) {
+        const { error } = await supabase
+          .from("products")
+          .update({ retail_price: price, active: true, hidden_manual: false })
+          .eq("id", existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("products").insert({
+          name_lv: openStyle.style_code,
+          name_en: openStyle.name || openStyle.style_code,
+          description_lv: openStyle.short_description || "",
+          description_en: openStyle.short_description || "",
+          brand: "Stanley/Stella",
+          ss_style_code: openStyle.style_code,
+          retail_price: price,
+          active: true,
+          hidden_manual: false,
+        });
+        if (error) throw error;
+      }
+      toast({ title: lang === "lv" ? "Saglabāts katalogā" : "Saved to catalog" });
+      setPriceDialogOpen(false);
+      await loadCatalogMap();
+    } catch (e: any) {
+      toast({ title: e.message || "Error", variant: "destructive" });
+    } finally {
+      setPriceSaving(false);
+    }
+  };
+
+  const removeFromCatalog = async () => {
+    if (!openStyle) return;
+    const existing = catalogMap.get(openStyle.style_code);
+    if (!existing) return;
+    setPriceSaving(true);
+    try {
+      const { error } = await supabase
+        .from("products")
+        .update({ active: false, hidden_manual: true })
+        .eq("id", existing.id);
+      if (error) throw error;
+      toast({ title: lang === "lv" ? "Noņemts no kataloga" : "Removed from catalog" });
+      setPriceDialogOpen(false);
+      await loadCatalogMap();
+    } catch (e: any) {
+      toast({ title: e.message || "Error", variant: "destructive" });
+    } finally {
+      setPriceSaving(false);
+    }
+  };
+
 
   const openDetail = async (r: SummaryRow) => {
     setOpenStyle(r);
@@ -349,6 +445,13 @@ const StanleyStellaPage = () => {
                           <div className="flex h-full items-center justify-center text-xs text-muted-foreground">{t.noImage}</div>
                         )}
                         <span className="absolute left-2 top-2 bg-primary px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">{s.style_code}</span>
+                        {isAdmin && catalogMap.get(s.style_code) && (
+                          <span className="absolute right-2 top-2 bg-accent px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wider text-accent-foreground">
+                            {catalogMap.get(s.style_code)!.retail_price
+                              ? `€${Number(catalogMap.get(s.style_code)!.retail_price).toFixed(2)}`
+                              : (lang === "lv" ? "Katalogā" : "In catalog")}
+                          </span>
+                        )}
                       </div>
                       <div className="space-y-1.5 p-3">
                         <h3 className="font-heading text-sm font-bold uppercase tracking-wide line-clamp-1">{s.name}</h3>
@@ -461,6 +564,35 @@ const StanleyStellaPage = () => {
                   </Link>
                 </Button>
 
+                {isAdmin && (() => {
+                  const inCatalog = catalogMap.get(openStyle.style_code);
+                  return (
+                    <div className="rounded-sm border border-dashed border-accent/50 bg-accent/5 p-3">
+                      <p className="mb-2 font-heading text-[11px] font-bold uppercase tracking-wider text-accent">
+                        {lang === "lv" ? "Admin: Katalogs" : "Admin: Catalog"}
+                      </p>
+                      {inCatalog ? (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-sm">
+                            {lang === "lv" ? "Katalogā:" : "In catalog:"}{" "}
+                            <span className="font-heading font-black text-accent">
+                              {inCatalog.retail_price ? `€${Number(inCatalog.retail_price).toFixed(2)}` : "—"}
+                            </span>
+                          </span>
+                          <Button size="sm" variant="outline" onClick={openPriceDialog}>
+                            {lang === "lv" ? "Rediģēt cenu" : "Edit price"}
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="outline" className="w-full" onClick={openPriceDialog}>
+                          + {lang === "lv" ? "Pievienot katalogam ar cenu" : "Add to catalog with price"}
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
+
+
                 {descBullets.length > 0 && (
                   <div>
                     <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{t.description}</h4>
@@ -533,7 +665,56 @@ const StanleyStellaPage = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <Dialog open={priceDialogOpen} onOpenChange={setPriceDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {openStyle?.style_code} — {openStyle?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <div>
+              <Label htmlFor="ss-price">
+                {lang === "lv" ? "Mazumtirdzniecības cena (EUR ar PVN)" : "Retail price (EUR incl. VAT)"}
+              </Label>
+              <Input
+                id="ss-price"
+                type="number"
+                inputMode="decimal"
+                step="0.01"
+                min="0"
+                value={priceInput}
+                onChange={(e) => setPriceInput(e.target.value)}
+                placeholder="0.00"
+                autoFocus
+              />
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {lang === "lv"
+                  ? "Modelis parādīsies sadaļā Katalogs ar īstajām Stanley/Stella bildēm un krāsām."
+                  : "Model appears in Catalog with real Stanley/Stella imagery and colours."}
+              </p>
+            </div>
+            <div className="flex justify-between gap-2 pt-2">
+              {openStyle && catalogMap.get(openStyle.style_code) ? (
+                <Button variant="ghost" size="sm" className="text-destructive" disabled={priceSaving} onClick={removeFromCatalog}>
+                  {lang === "lv" ? "Noņemt no kataloga" : "Remove from catalog"}
+                </Button>
+              ) : <span />}
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => setPriceDialogOpen(false)} disabled={priceSaving}>
+                  {lang === "lv" ? "Atcelt" : "Cancel"}
+                </Button>
+                <Button size="sm" onClick={savePrice} disabled={priceSaving}>
+                  {priceSaving ? (lang === "lv" ? "Saglabā…" : "Saving…") : (lang === "lv" ? "Saglabāt" : "Save")}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
+
   );
 };
 
