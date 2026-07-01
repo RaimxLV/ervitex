@@ -182,6 +182,90 @@ const StanleyStellaPage = () => {
     })();
   }, [slice]);
 
+  // Admin: load which Stanley/Stella styles already sit in the public catalog
+  const loadCatalogMap = async () => {
+    const { data } = await supabase
+      .from("products")
+      .select("id,retail_price,ss_style_code,name_lv")
+      .eq("brand", "Stanley/Stella");
+    const m = new Map<string, { id: string; retail_price: number | null }>();
+    for (const p of (data || []) as any[]) {
+      const key = (p.ss_style_code || p.name_lv || "").toUpperCase().trim();
+      if (key) m.set(key, { id: p.id, retail_price: p.retail_price ?? null });
+    }
+    setCatalogMap(m);
+  };
+  useEffect(() => { if (isAdmin) loadCatalogMap(); }, [isAdmin]);
+
+  const openPriceDialog = () => {
+    if (!openStyle) return;
+    const existing = catalogMap.get(openStyle.style_code);
+    setPriceInput(existing?.retail_price ? String(existing.retail_price) : "");
+    setPriceDialogOpen(true);
+  };
+
+  const savePrice = async () => {
+    if (!openStyle) return;
+    const price = parseFloat(priceInput.replace(",", "."));
+    if (!Number.isFinite(price) || price < 0) {
+      toast({ title: lang === "lv" ? "Nederīga cena" : "Invalid price", variant: "destructive" });
+      return;
+    }
+    setPriceSaving(true);
+    try {
+      const existing = catalogMap.get(openStyle.style_code);
+      if (existing) {
+        const { error } = await supabase
+          .from("products")
+          .update({ retail_price: price, active: true, hidden_manual: false })
+          .eq("id", existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("products").insert({
+          name_lv: openStyle.style_code,
+          name_en: openStyle.name || openStyle.style_code,
+          description_lv: openStyle.short_description || "",
+          description_en: openStyle.short_description || "",
+          brand: "Stanley/Stella",
+          ss_style_code: openStyle.style_code,
+          retail_price: price,
+          active: true,
+          hidden_manual: false,
+        });
+        if (error) throw error;
+      }
+      toast({ title: lang === "lv" ? "Saglabāts katalogā" : "Saved to catalog" });
+      setPriceDialogOpen(false);
+      await loadCatalogMap();
+    } catch (e: any) {
+      toast({ title: e.message || "Error", variant: "destructive" });
+    } finally {
+      setPriceSaving(false);
+    }
+  };
+
+  const removeFromCatalog = async () => {
+    if (!openStyle) return;
+    const existing = catalogMap.get(openStyle.style_code);
+    if (!existing) return;
+    setPriceSaving(true);
+    try {
+      const { error } = await supabase
+        .from("products")
+        .update({ active: false, hidden_manual: true })
+        .eq("id", existing.id);
+      if (error) throw error;
+      toast({ title: lang === "lv" ? "Noņemts no kataloga" : "Removed from catalog" });
+      setPriceDialogOpen(false);
+      await loadCatalogMap();
+    } catch (e: any) {
+      toast({ title: e.message || "Error", variant: "destructive" });
+    } finally {
+      setPriceSaving(false);
+    }
+  };
+
+
   const openDetail = async (r: SummaryRow) => {
     setOpenStyle(r);
     setDetailLoading(true);
