@@ -31,10 +31,32 @@ interface DBProduct {
   hidden_manual: boolean | null;
   hide_when_oos: boolean | null;
   ss_in_stock: boolean | null;
+  ss_style_code: string | null;
   product_images: { url: string; sort_order: number | null }[];
   product_colors: { name: string; hex_code: string | null }[];
   product_sizes: { size: string; sort_order: number | null }[];
   categories: { slug: string; name_lv: string; name_en: string } | null;
+}
+
+// Resolve Stanley/Stella Cloudinary URLs and apply catalog thumbnail transform.
+const SS_CDN_BASE = "https://res.cloudinary.com/www-stanleystella-com/image/upload/";
+const SS_THUMB = "f_auto,q_auto,w_600,c_fill,g_auto";
+const resolveSsUrl = (u?: string | null): string | null => {
+  if (!u) return null;
+  if (/^https?:\/\//i.test(u)) {
+    if (u.includes("res.cloudinary.com") && u.includes("/image/upload/")) {
+      return u.replace("/image/upload/", `/image/upload/${SS_THUMB}/`);
+    }
+    return u;
+  }
+  return SS_CDN_BASE + SS_THUMB + "/" + u.replace(/^\/+/, "");
+};
+
+interface SsEnrichment {
+  name: string;
+  short_description: string | null;
+  images: string[];
+  colors: { name: string; hex: string | null }[];
 }
 
 interface DBCategory {
