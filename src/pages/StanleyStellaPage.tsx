@@ -445,6 +445,13 @@ const StanleyStellaPage = () => {
                           <div className="flex h-full items-center justify-center text-xs text-muted-foreground">{t.noImage}</div>
                         )}
                         <span className="absolute left-2 top-2 bg-primary px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">{s.style_code}</span>
+                        {isAdmin && catalogMap.get(s.style_code) && (
+                          <span className="absolute right-2 top-2 bg-accent px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wider text-accent-foreground">
+                            {catalogMap.get(s.style_code)!.retail_price
+                              ? `€${Number(catalogMap.get(s.style_code)!.retail_price).toFixed(2)}`
+                              : (lang === "lv" ? "Katalogā" : "In catalog")}
+                          </span>
+                        )}
                       </div>
                       <div className="space-y-1.5 p-3">
                         <h3 className="font-heading text-sm font-bold uppercase tracking-wide line-clamp-1">{s.name}</h3>
