@@ -665,7 +665,56 @@ const StanleyStellaPage = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      <Dialog open={priceDialogOpen} onOpenChange={setPriceDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {openStyle?.style_code} — {openStyle?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <div>
+              <Label htmlFor="ss-price">
+                {lang === "lv" ? "Mazumtirdzniecības cena (EUR ar PVN)" : "Retail price (EUR incl. VAT)"}
+              </Label>
+              <Input
+                id="ss-price"
+                type="number"
+                inputMode="decimal"
+                step="0.01"
+                min="0"
+                value={priceInput}
+                onChange={(e) => setPriceInput(e.target.value)}
+                placeholder="0.00"
+                autoFocus
+              />
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {lang === "lv"
+                  ? "Modelis parādīsies sadaļā Katalogs ar īstajām Stanley/Stella bildēm un krāsām."
+                  : "Model appears in Catalog with real Stanley/Stella imagery and colours."}
+              </p>
+            </div>
+            <div className="flex justify-between gap-2 pt-2">
+              {openStyle && catalogMap.get(openStyle.style_code) ? (
+                <Button variant="ghost" size="sm" className="text-destructive" disabled={priceSaving} onClick={removeFromCatalog}>
+                  {lang === "lv" ? "Noņemt no kataloga" : "Remove from catalog"}
+                </Button>
+              ) : <span />}
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => setPriceDialogOpen(false)} disabled={priceSaving}>
+                  {lang === "lv" ? "Atcelt" : "Cancel"}
+                </Button>
+                <Button size="sm" onClick={savePrice} disabled={priceSaving}>
+                  {priceSaving ? (lang === "lv" ? "Saglabā…" : "Saving…") : (lang === "lv" ? "Saglabāt" : "Save")}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
+
   );
 };
 
