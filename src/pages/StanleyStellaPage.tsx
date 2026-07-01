@@ -564,6 +564,35 @@ const StanleyStellaPage = () => {
                   </Link>
                 </Button>
 
+                {isAdmin && (() => {
+                  const inCatalog = catalogMap.get(openStyle.style_code);
+                  return (
+                    <div className="rounded-sm border border-dashed border-accent/50 bg-accent/5 p-3">
+                      <p className="mb-2 font-heading text-[11px] font-bold uppercase tracking-wider text-accent">
+                        {lang === "lv" ? "Admin: Katalogs" : "Admin: Catalog"}
+                      </p>
+                      {inCatalog ? (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-sm">
+                            {lang === "lv" ? "Katalogā:" : "In catalog:"}{" "}
+                            <span className="font-heading font-black text-accent">
+                              {inCatalog.retail_price ? `€${Number(inCatalog.retail_price).toFixed(2)}` : "—"}
+                            </span>
+                          </span>
+                          <Button size="sm" variant="outline" onClick={openPriceDialog}>
+                            {lang === "lv" ? "Rediģēt cenu" : "Edit price"}
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button size="sm" variant="outline" className="w-full" onClick={openPriceDialog}>
+                          + {lang === "lv" ? "Pievienot katalogam ar cenu" : "Add to catalog with price"}
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
+
+
                 {descBullets.length > 0 && (
                   <div>
                     <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{t.description}</h4>
