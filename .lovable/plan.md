@@ -1,61 +1,46 @@
 
+# Vienota Stanley/Stella + Katalogs plūsma
 
-## Fix Category Filter Icons
+Tu saprati pareizi. Šobrīd `products` tabulā ir 126 manuāli pievienoti Stanley/Stella modeļi (piem. `STTU200`, `STSU011`) ar mūsu cenām, bet tie neizmanto reālos S/S attēlus/krāsas/nosaukumus no `ss_styles` — tāpēc rāda tukšas/dīvainas kartītes. Vienlaikus `ss_style_code` kolonna produktiem nav aizpildīta, kaut arī `name_lv` jau satur stila kodu.
 
-### Problem
-The category filter uses repetitive icons — many categories share `Shirt`, `Wind`, `Layers`, or fall back to the generic `LayoutGrid` icon. This looks unprofessional, especially on mobile where the horizontal carousel shows the same grid icon repeatedly.
+## Ko izdaru
 
-### Solution
-Replace the `CATEGORY_ICONS` mapping in `CategoryFilter.tsx` with distinct, semantically appropriate Lucide icons for each category.
+### 1. Sasaistu esošos katalogā ievietotos modeļus ar S/S datiem (vienreizējs)
+- Ievadu `ss_style_code` visiem `brand='Stanley/Stella'` produktiem no `name_lv` (upper-case, trim).
+- Rezultāts: katalogā rādot šo produktu, varam paņemt attēlus, krāsu apļus un pilno nosaukumu no `ss_style_summary`.
 
-### Icon Mapping
+### 2. Katalogs lapa — S/S produktiem izmanto īsto S/S kartīti
+- `CatalogPage.tsx` fetch iemet LEFT JOIN uz `ss_style_summary` pēc `ss_style_code`.
+- `ProductCard.tsx` (tikai S/S produktiem ar aizpildītu `ss_style_code`):
+  - Nosaukums = `ss_styles.name` (piem. "ASHER") + zem tā mūsu kods
+  - Attēli = `ss_style_summary.images` (pilnīgi tāds pats swipe/hover kā S/S lapā)
+  - Krāsu apļi = `ss_style_summary.colors` (HEX no ss_variants)
+  - Cena = `retail_price` no `products` (mūsu manuālā) — negrozām
+  - Zīmola tegs = `STANLEY/STELLA`
+- Ja `ss_style_code` ir bet `ss_style_summary` nav (arhivēts), krītam atpakaļ uz esošo dizainu.
 
-| Category Slug | Current Icon | New Icon (Lucide) |
-|---|---|---|
-| `t-krekli` | Shirt | **Shirt** (keep) |
-| `polo-krekli` | Shirt | **Crown** (polo collar distinction) or keep Shirt with different styling |
-| `krekli` | Shirt | **Shirt** (keep) |
-| `dzemperi-hudiji` | Layers | **Hoodie** — Lucide doesn't have hoodie, use **SwatchBook** or **Pocket** to suggest hoodie/pullover |
-| `jakas` | Wind | **JacketIcon** — use **Cloudy** or **Shield** |
-| `virsjakas` | Wind | **Mountain** (outdoor jacket) |
-| `vestes` | Wind | **Vest** — not in Lucide, use **SquareStack** |
-| `softshell` | Wind | **CloudRain** (weather protection) |
-| `fleece` | Layers | **Flame** (warmth) |
-| `bikses-sorti` | Layers | **Scissors** or **RectangleVertical** — pants silhouette |
-| `kleitas-svārki` | Shirt | **Sparkles** or **CircleDot** |
-| `cepures` | HardHat | **HardHat** (keep, it's a hat) |
-| `šalles-lakati` | Wind | **Ribbon** (scarf-like) |
-| `somas` | ShoppingBag | **Backpack** |
-| `aksesuari` | ShoppingBag | **Watch** or **Gem** |
-| `darba-apgerbi` | HardHat | **Wrench** or **HardHat** with **Hammer** |
-| `sportam` | Dumbbell | **Dumbbell** (keep) |
-| `berni` | Baby | **Baby** (keep) |
-| `lietus-apgerbs` | Umbrella | **Umbrella** (keep) |
-| `audumu-maisini` | ShoppingBag | **ShoppingBag** (keep) |
-| `dvieli` | Layers | **Droplets** (towels/water) |
-| `priekšauti` | Layers | **ChefHat** (apron context) |
+### 3. Stanley/Stella lapa — "Pievienot katalogam ar cenu" (tikai adminam)
+- `StanleyStellaPage.tsx` kartītei apakšā (tikai `is_admin`):
+  - Ja stils **jau ir** katalogā → mazs zaļš tegs "Katalogā €12.34" + poga "Rediģēt cenu".
+  - Ja **nav** → poga "+ Pievienot katalogam".
+- Klikšķis atver mazu Dialog (cenas ievade EUR ar PVN + kategorija dropdown, iepriekš aizpildīts no S/S `Type`).
+- Saglabā:
+  - Ja produkts eksistē → `UPDATE products SET retail_price=…, active=true, hidden_manual=false`.
+  - Ja nav → `INSERT` jauns `products` ieraksts ar `brand='Stanley/Stella'`, `name_lv = style_code`, `ss_style_code = style_code`, `retail_price`, `active=true`.
+- Refresh — modelis uzreiz parādās sadaļā **Katalogs** ar īsto S/S attēlu un mūsu cenu.
 
-**Better approach**: Since many garment-specific icons aren't in Lucide, I'll use the best available distinct icons and ensure no two adjacent categories in the carousel share the same icon. The key changes:
+### 4. Noņemšana (opcionāli tajā pašā dialogā)
+Poga "Noņemt no kataloga" → `active=false, hidden_manual=true`. S/S lapā paliek redzams.
 
-- `polo-krekli` → `Contact` (collar silhouette)
-- `dzemperi-hudiji` → `Pocket` (hoodie pocket)  
-- `bikses-sorti` → `Footprints` or custom — actually use `RectangleVertical` for pants shape
-- `virsjakas` → `ShieldCheck` (protection/outdoor)
-- `jakas` → `CloudSnow` (weather jacket)
-- `aksesuari` → `Gem`
-- `šalles-lakati` → `Ribbon`  
-- `dvieli` → `Droplets`
-- `priekšauti` → `ChefHat`
-- `fleece` → `Flame`
-- `softshell` → `Shield`
-- `vestes` → `Zap`
-- `kleitas-svārki` → `Sparkles`
-- `darba-apgerbi` → `Hammer`
-- `somas` → `Backpack`
+## Tehniskās detaļas (izstrādes piezīmes)
 
-### File Changed
-**`src/components/catalog/CategoryFilter.tsx`** — Update imports and `CATEGORY_ICONS` map only. No structural/layout changes needed since the carousel and sidebar already work correctly per the screenshot.
+- Migrācijas nav vajadzīgas — `products.ss_style_code` jau eksistē. Vienreizējs `UPDATE` aizpildīs saiti.
+- RLS: `products` INSERT/UPDATE jau atļauts `admin` lomai (pārbaudīšu, ja nav — pieliksim policy).
+- Query: pievienojam `useQuery` `ss_style_summary` uz katalogu ar `.in('style_code', priceSyleCodes)` — viens papildu request, kešots.
+- Neietekmē citus brandus (BagBase, Beechfield, Quadra, Westford Mill) — tie turpina rādīt savas manuālās bildes.
+- S/S atsevišķā lapa `/stanley-stella` nemainās vizuāli, tikai pievienojas admin-only pogas.
 
-### Styling
-No changes needed — active state (red bg, white text/icon) and inactive state (light border, hover red outline) are already implemented correctly as shown in the screenshot.
+## Rezultāts
 
+- Katalogs: S/S modeļiem ir profesionāli attēli, krāsas, nosaukumi + mūsu cena.
+- S/S lapa: viena poga = jauns modelis parādās Katalogā ar cenu. Nav vairs jāievada dati divās vietās.
