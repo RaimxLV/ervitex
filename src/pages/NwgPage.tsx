@@ -81,8 +81,12 @@ const hexOf = (v: VariantRow) => {
 
 const NwgPage = () => {
   const { lang } = useLanguage();
+  const { isAdmin } = useAuth();
   const [rows, setRows] = useState<SummaryRow[]>([]);
   const [loaded, setLoaded] = useState(false);
+  // product_number -> catalog product id (present = in shop)
+  const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
+  const [toggling, setToggling] = useState<string | null>(null);
 
   const [q, setQ] = useState("");
   const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
