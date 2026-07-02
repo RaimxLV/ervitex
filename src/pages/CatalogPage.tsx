@@ -105,6 +105,7 @@ const CatalogPage = () => {
           .select("id, category_id, name_lv, name_en, description_lv, description_en, long_description_lv, long_description_en, material, min_order, retail_price, printing_techs, featured, is_new, active, created_at, updated_at, brand, hidden_manual, hide_when_oos, ss_in_stock, ss_style_code, nwg_product_number, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
           .eq("active", true)
           .eq("hidden_manual", false)
+          .is("nwg_product_number", null)
           .order("created_at", { ascending: false })
           .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
         const batch = ((data as unknown as DBProduct[]) || []).filter(
