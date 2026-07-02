@@ -1007,6 +1007,72 @@ export type Database = {
         }
         Relationships: []
       }
+      nwg_style_summary: {
+        Row: {
+          brand: string | null
+          catalog_text: string | null
+          category: string | null
+          color_count: number | null
+          commerce_text: string | null
+          country_of_origin: string | null
+          currency: string | null
+          fabrics: string | null
+          fit: string | null
+          gender: string | null
+          hover_picture_url: string | null
+          main_picture_url: string | null
+          name: string | null
+          product_number: string | null
+          retail_price: number | null
+          size_count: number | null
+          total_stock: number | null
+          usp: string | null
+          weight: string | null
+        }
+        Insert: {
+          brand?: string | null
+          catalog_text?: string | null
+          category?: string | null
+          color_count?: never
+          commerce_text?: string | null
+          country_of_origin?: string | null
+          currency?: string | null
+          fabrics?: string | null
+          fit?: string | null
+          gender?: string | null
+          hover_picture_url?: never
+          main_picture_url?: never
+          name?: string | null
+          product_number?: string | null
+          retail_price?: number | null
+          size_count?: never
+          total_stock?: never
+          usp?: string | null
+          weight?: string | null
+        }
+        Update: {
+          brand?: string | null
+          catalog_text?: string | null
+          category?: string | null
+          color_count?: never
+          commerce_text?: string | null
+          country_of_origin?: string | null
+          currency?: string | null
+          fabrics?: string | null
+          fit?: string | null
+          gender?: string | null
+          hover_picture_url?: never
+          main_picture_url?: never
+          name?: string | null
+          product_number?: string | null
+          retail_price?: number | null
+          size_count?: never
+          total_stock?: never
+          usp?: string | null
+          weight?: string | null
+        }
+        Relationships: []
+      }
       ss_style_summary: {
         Row: {
           archived: boolean | null

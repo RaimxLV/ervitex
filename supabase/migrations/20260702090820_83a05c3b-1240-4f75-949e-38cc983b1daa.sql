@@ -1,0 +1,1 @@
+ALTER VIEW public.nwg_style_summary SET (security_invoker = true);
