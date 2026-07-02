@@ -452,11 +452,28 @@ const NwgPage = () => {
                               {variants.length > 8 && <span className="text-[10px] text-muted-foreground">+{variants.length - 8}</span>}
                             </div>
                           )}
+                          {isAdmin && (
+                            <div className="pt-2">
+                              <button
+                                type="button"
+                                disabled={toggling === s.product_number}
+                                onClick={(e) => { e.stopPropagation(); toggleCatalog(s); }}
+                                className={`w-full border px-2 py-1 font-heading text-[10px] font-bold uppercase tracking-wider transition-colors ${catalogMap.has(s.product_number) ? "border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20" : "border-accent bg-accent text-accent-foreground hover:bg-accent/90"} disabled:opacity-50`}
+                              >
+                                {toggling === s.product_number
+                                  ? "…"
+                                  : catalogMap.has(s.product_number)
+                                    ? (lang === "lv" ? "✓ Katalogā — noņemt" : "✓ In catalog — remove")
+                                    : (lang === "lv" ? "+ Pievienot katalogam" : "+ Add to catalog")}
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </button>
                     );
                   })}
                 </div>
+
 
                 {pageCount > 1 && (
                   <div className="mt-8 flex items-center justify-center gap-2">
