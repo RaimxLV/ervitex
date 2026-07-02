@@ -1,0 +1,2 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS nwg_product_number TEXT;
+CREATE INDEX IF NOT EXISTS idx_products_nwg_product_number ON public.products(nwg_product_number) WHERE nwg_product_number IS NOT NULL;
