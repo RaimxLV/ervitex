@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
 import CatalogPage from "./pages/CatalogPage.tsx";
 import StanleyStellaPage from "./pages/StanleyStellaPage.tsx";
+import NwgPage from "./pages/NwgPage.tsx";
 import ProductDetailPage from "./pages/ProductDetailPage.tsx";
 import ServicesPage from "./pages/ServicesPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
