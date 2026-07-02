@@ -53,6 +53,249 @@ export type Database = {
         }
         Relationships: []
       }
+      nwg_assortments: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string | null
+          parent_id: string | null
+          raw: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          name?: string | null
+          parent_id?: string | null
+          raw?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string | null
+          parent_id?: string | null
+          raw?: Json | null
+        }
+        Relationships: []
+      }
+      nwg_images: {
+        Row: {
+          created_at: string | null
+          file_name: string | null
+          high_res_url: string | null
+          id: number
+          image_url: string | null
+          item_number: string | null
+          large_thumbnail_url: string | null
+          picture_angle: string | null
+          picture_type: string | null
+          product_number: string
+          resource_file_id: string | null
+          sort_order: number | null
+          standard_url: string | null
+          thumbnail_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_name?: string | null
+          high_res_url?: string | null
+          id?: number
+          image_url?: string | null
+          item_number?: string | null
+          large_thumbnail_url?: string | null
+          picture_angle?: string | null
+          picture_type?: string | null
+          product_number: string
+          resource_file_id?: string | null
+          sort_order?: number | null
+          standard_url?: string | null
+          thumbnail_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_name?: string | null
+          high_res_url?: string | null
+          id?: number
+          image_url?: string | null
+          item_number?: string | null
+          large_thumbnail_url?: string | null
+          picture_angle?: string | null
+          picture_type?: string | null
+          product_number?: string
+          resource_file_id?: string | null
+          sort_order?: number | null
+          standard_url?: string | null
+          thumbnail_url?: string | null
+        }
+        Relationships: []
+      }
+      nwg_skus: {
+        Row: {
+          active: boolean | null
+          availability: number | null
+          created_at: string | null
+          currency: string | null
+          discontinued: boolean | null
+          ean: string | null
+          item_number: string | null
+          product_number: string
+          retail_price: number | null
+          sales_price: number | null
+          size: string | null
+          size_sequence: string | null
+          sku: string
+        }
+        Insert: {
+          active?: boolean | null
+          availability?: number | null
+          created_at?: string | null
+          currency?: string | null
+          discontinued?: boolean | null
+          ean?: string | null
+          item_number?: string | null
+          product_number: string
+          retail_price?: number | null
+          sales_price?: number | null
+          size?: string | null
+          size_sequence?: string | null
+          sku: string
+        }
+        Update: {
+          active?: boolean | null
+          availability?: number | null
+          created_at?: string | null
+          currency?: string | null
+          discontinued?: boolean | null
+          ean?: string | null
+          item_number?: string | null
+          product_number?: string
+          retail_price?: number | null
+          sales_price?: number | null
+          size?: string | null
+          size_sequence?: string | null
+          sku?: string
+        }
+        Relationships: []
+      }
+      nwg_styles: {
+        Row: {
+          archived: boolean | null
+          archived_at: string | null
+          assortment_ids: string[] | null
+          brand: string | null
+          catalog_text: string | null
+          category: string | null
+          commerce_text: string | null
+          country_of_origin: string | null
+          created_at: string | null
+          currency: string | null
+          fabrics: string | null
+          fit: string | null
+          gender: string | null
+          last_synced_at: string | null
+          main_picture_url: string | null
+          name: string | null
+          product_number: string
+          published: boolean | null
+          raw: Json | null
+          retail_price: number | null
+          updated_at: string | null
+          usp: string | null
+          weight: string | null
+        }
+        Insert: {
+          archived?: boolean | null
+          archived_at?: string | null
+          assortment_ids?: string[] | null
+          brand?: string | null
+          catalog_text?: string | null
+          category?: string | null
+          commerce_text?: string | null
+          country_of_origin?: string | null
+          created_at?: string | null
+          currency?: string | null
+          fabrics?: string | null
+          fit?: string | null
+          gender?: string | null
+          last_synced_at?: string | null
+          main_picture_url?: string | null
+          name?: string | null
+          product_number: string
+          published?: boolean | null
+          raw?: Json | null
+          retail_price?: number | null
+          updated_at?: string | null
+          usp?: string | null
+          weight?: string | null
+        }
+        Update: {
+          archived?: boolean | null
+          archived_at?: string | null
+          assortment_ids?: string[] | null
+          brand?: string | null
+          catalog_text?: string | null
+          category?: string | null
+          commerce_text?: string | null
+          country_of_origin?: string | null
+          created_at?: string | null
+          currency?: string | null
+          fabrics?: string | null
+          fit?: string | null
+          gender?: string | null
+          last_synced_at?: string | null
+          main_picture_url?: string | null
+          name?: string | null
+          product_number?: string
+          published?: boolean | null
+          raw?: Json | null
+          retail_price?: number | null
+          updated_at?: string | null
+          usp?: string | null
+          weight?: string | null
+        }
+        Relationships: []
+      }
+      nwg_variants: {
+        Row: {
+          color_code: string | null
+          color_name: string | null
+          created_at: string | null
+          filter_color: string | null
+          item_number: string
+          main_picture_url: string | null
+          outlet: boolean | null
+          product_number: string
+          raw: Json | null
+          shade_color: string | null
+          web_color: string[] | null
+        }
+        Insert: {
+          color_code?: string | null
+          color_name?: string | null
+          created_at?: string | null
+          filter_color?: string | null
+          item_number: string
+          main_picture_url?: string | null
+          outlet?: boolean | null
+          product_number: string
+          raw?: Json | null
+          shade_color?: string | null
+          web_color?: string[] | null
+        }
+        Update: {
+          color_code?: string | null
+          color_name?: string | null
+          created_at?: string | null
+          filter_color?: string | null
+          item_number?: string
+          main_picture_url?: string | null
+          outlet?: boolean | null
+          product_number?: string
+          raw?: Json | null
+          shade_color?: string | null
+          web_color?: string[] | null
+        }
+        Relationships: []
+      }
       product_colors: {
         Row: {
           created_at: string
@@ -174,6 +417,7 @@ export type Database = {
           min_order: number | null
           name_en: string
           name_lv: string
+          nwg_product_number: string | null
           price_override: number | null
           printing_techs: string[] | null
           retail_price: number | null
@@ -205,6 +449,7 @@ export type Database = {
           min_order?: number | null
           name_en: string
           name_lv: string
+          nwg_product_number?: string | null
           price_override?: number | null
           printing_techs?: string[] | null
           retail_price?: number | null
@@ -236,6 +481,7 @@ export type Database = {
           min_order?: number | null
           name_en?: string
           name_lv?: string
+          nwg_product_number?: string | null
           price_override?: number | null
           printing_techs?: string[] | null
           retail_price?: number | null
@@ -728,6 +974,39 @@ export type Database = {
       }
     }
     Views: {
+      nwg_skus_public: {
+        Row: {
+          active: boolean | null
+          availability: number | null
+          discontinued: boolean | null
+          item_number: string | null
+          product_number: string | null
+          size: string | null
+          size_sequence: string | null
+          sku: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          availability?: number | null
+          discontinued?: boolean | null
+          item_number?: string | null
+          product_number?: string | null
+          size?: string | null
+          size_sequence?: string | null
+          sku?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          availability?: number | null
+          discontinued?: boolean | null
+          item_number?: string | null
+          product_number?: string | null
+          size?: string | null
+          size_sequence?: string | null
+          sku?: string | null
+        }
+        Relationships: []
+      }
       ss_style_summary: {
         Row: {
           archived: boolean | null

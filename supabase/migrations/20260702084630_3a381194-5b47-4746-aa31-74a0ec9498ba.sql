@@ -1,0 +1,1 @@
+ALTER VIEW public.nwg_skus_public SET (security_invoker = true);
