@@ -89,6 +89,7 @@ const CatalogPage = () => {
   const [dbProducts, setDbProducts] = useState<DBProduct[]>([]);
   const [dbCategories, setDbCategories] = useState<DBCategory[]>([]);
   const [ssEnrichment, setSsEnrichment] = useState<Map<string, SsEnrichment>>(new Map());
+  const [nwgEnrichment, setNwgEnrichment] = useState<Map<string, SsEnrichment>>(new Map());
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
