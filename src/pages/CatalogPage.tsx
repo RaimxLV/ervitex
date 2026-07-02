@@ -32,6 +32,7 @@ interface DBProduct {
   hide_when_oos: boolean | null;
   ss_in_stock: boolean | null;
   ss_style_code: string | null;
+  nwg_product_number: string | null;
   product_images: { url: string; sort_order: number | null }[];
   product_colors: { name: string; hex_code: string | null }[];
   product_sizes: { size: string; sort_order: number | null }[];
