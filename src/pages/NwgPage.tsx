@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "@/hooks/use-toast";
 
 interface SummaryRow {
   product_number: string;
@@ -79,8 +81,12 @@ const hexOf = (v: VariantRow) => {
 
 const NwgPage = () => {
   const { lang } = useLanguage();
+  const { isAdmin } = useAuth();
   const [rows, setRows] = useState<SummaryRow[]>([]);
   const [loaded, setLoaded] = useState(false);
+  // product_number -> catalog product id (present = in shop)
+  const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
+  const [toggling, setToggling] = useState<string | null>(null);
 
   const [q, setQ] = useState("");
   const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
@@ -123,6 +129,55 @@ const NwgPage = () => {
       setLoaded(true);
     })();
   }, []);
+
+  // Admin: which NWG styles already sit in the public catalog
+  const loadCatalogMap = async () => {
+    const { data } = await supabase
+      .from("products")
+      .select("id,nwg_product_number")
+      .not("nwg_product_number", "is", null);
+    const m = new Map<string, string>();
+    for (const p of (data || []) as any[]) {
+      if (p.nwg_product_number) m.set(p.nwg_product_number, p.id);
+    }
+    setCatalogMap(m);
+  };
+  useEffect(() => { if (isAdmin) loadCatalogMap(); }, [isAdmin]);
+
+  const toggleCatalog = async (s: SummaryRow) => {
+    setToggling(s.product_number);
+    try {
+      const existing = catalogMap.get(s.product_number);
+      if (existing) {
+        const { error } = await supabase
+          .from("products")
+          .update({ active: false, hidden_manual: true })
+          .eq("id", existing);
+        if (error) throw error;
+        toast({ title: lang === "lv" ? "Noņemts no kataloga" : "Removed from catalog" });
+      } else {
+        const { error } = await supabase.from("products").insert({
+          name_lv: s.name || s.product_number,
+          name_en: s.name || s.product_number,
+          description_lv: s.commerce_text || "",
+          description_en: s.commerce_text || "",
+          brand: s.brand || "New Wave Group",
+          nwg_product_number: s.product_number,
+          retail_price: 0,
+          active: true,
+          hidden_manual: false,
+        });
+        if (error) throw error;
+        toast({ title: lang === "lv" ? "Pievienots katalogam" : "Added to catalog" });
+      }
+      await loadCatalogMap();
+    } catch (e: any) {
+      toast({ title: e.message || "Error", variant: "destructive" });
+    } finally {
+      setToggling(null);
+    }
+  };
+
 
   const brands = useMemo(() => {
     const counts = new Map<string, number>();
@@ -397,11 +452,28 @@ const NwgPage = () => {
                               {variants.length > 8 && <span className="text-[10px] text-muted-foreground">+{variants.length - 8}</span>}
                             </div>
                           )}
+                          {isAdmin && (
+                            <div className="pt-2">
+                              <button
+                                type="button"
+                                disabled={toggling === s.product_number}
+                                onClick={(e) => { e.stopPropagation(); toggleCatalog(s); }}
+                                className={`w-full border px-2 py-1 font-heading text-[10px] font-bold uppercase tracking-wider transition-colors ${catalogMap.has(s.product_number) ? "border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20" : "border-accent bg-accent text-accent-foreground hover:bg-accent/90"} disabled:opacity-50`}
+                              >
+                                {toggling === s.product_number
+                                  ? "…"
+                                  : catalogMap.has(s.product_number)
+                                    ? (lang === "lv" ? "✓ Katalogā — noņemt" : "✓ In catalog — remove")
+                                    : (lang === "lv" ? "+ Pievienot katalogam" : "+ Add to catalog")}
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </button>
                     );
                   })}
                 </div>
+
 
                 {pageCount > 1 && (
                   <div className="mt-8 flex items-center justify-center gap-2">

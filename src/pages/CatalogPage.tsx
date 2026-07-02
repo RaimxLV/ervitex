@@ -32,6 +32,7 @@ interface DBProduct {
   hide_when_oos: boolean | null;
   ss_in_stock: boolean | null;
   ss_style_code: string | null;
+  nwg_product_number: string | null;
   product_images: { url: string; sort_order: number | null }[];
   product_colors: { name: string; hex_code: string | null }[];
   product_sizes: { size: string; sort_order: number | null }[];
@@ -88,6 +89,7 @@ const CatalogPage = () => {
   const [dbProducts, setDbProducts] = useState<DBProduct[]>([]);
   const [dbCategories, setDbCategories] = useState<DBCategory[]>([]);
   const [ssEnrichment, setSsEnrichment] = useState<Map<string, SsEnrichment>>(new Map());
+  const [nwgEnrichment, setNwgEnrichment] = useState<Map<string, SsEnrichment>>(new Map());
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -100,7 +102,7 @@ const CatalogPage = () => {
       while (hasMore) {
         const { data } = await supabase
           .from("products")
-          .select("id, category_id, name_lv, name_en, description_lv, description_en, long_description_lv, long_description_en, material, min_order, retail_price, printing_techs, featured, is_new, active, created_at, updated_at, brand, hidden_manual, hide_when_oos, ss_in_stock, ss_style_code, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
+          .select("id, category_id, name_lv, name_en, description_lv, description_en, long_description_lv, long_description_en, material, min_order, retail_price, printing_techs, featured, is_new, active, created_at, updated_at, brand, hidden_manual, hide_when_oos, ss_in_stock, ss_style_code, nwg_product_number, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
           .eq("active", true)
           .eq("hidden_manual", false)
           .order("created_at", { ascending: false })
@@ -157,46 +159,91 @@ const CatalogPage = () => {
         }
         setSsEnrichment(map);
       }
+
+      // NWG enrichment: LEFT JOIN nwg_style_summary + nwg_variants
+      const nwgNums = Array.from(new Set(
+        allProducts
+          .filter((p) => p.nwg_product_number)
+          .map((p) => p.nwg_product_number as string)
+      ));
+      if (nwgNums.length) {
+        const [{ data: nSummary }, { data: nVariants }] = await Promise.all([
+          supabase.from("nwg_style_summary" as any)
+            .select("product_number,name,commerce_text,main_picture_url,hover_picture_url")
+            .in("product_number", nwgNums),
+          supabase.from("nwg_variants")
+            .select("product_number,color_name,color_code,web_color,shade_color,main_picture_url")
+            .in("product_number", nwgNums),
+        ]);
+        const nColorsByStyle = new Map<string, { name: string; hex: string | null }[]>();
+        for (const v of (nVariants || []) as any[]) {
+          const name = v.color_name || v.color_code;
+          if (!name) continue;
+          const hex = (v.web_color?.[0] ? (String(v.web_color[0]).startsWith("#") ? v.web_color[0] : `#${v.web_color[0]}`) : (v.shade_color?.startsWith("#") ? v.shade_color : null));
+          const arr = nColorsByStyle.get(v.product_number) || [];
+          if (!arr.some((c) => c.name === name)) {
+            arr.push({ name, hex });
+            nColorsByStyle.set(v.product_number, arr);
+          }
+        }
+        const nMap = new Map<string, SsEnrichment>();
+        for (const s of (nSummary || []) as any[]) {
+          const imgs = [s.main_picture_url, s.hover_picture_url].filter((u: string | null): u is string => !!u);
+          nMap.set(s.product_number, {
+            name: s.name || s.product_number,
+            short_description: s.commerce_text || null,
+            images: imgs,
+            colors: nColorsByStyle.get(s.product_number) || [],
+          });
+        }
+        setNwgEnrichment(nMap);
+      }
     };
     fetchData();
   }, []);
+
 
   const normalizedProducts = useMemo(() => {
     if (dbProducts.length > 0) {
       return dbProducts.map((p) => {
         const ss = p.ss_style_code ? ssEnrichment.get(p.ss_style_code) : undefined;
+        const nwg = p.nwg_product_number ? nwgEnrichment.get(p.nwg_product_number) : undefined;
+        const enrich = ss || nwg;
         const baseImages = p.product_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((i) => i.url);
         const baseColors = p.product_colors.map((c) => c.name);
         const baseHex = p.product_colors.map((c) => c.hex_code);
+        const isNwg = !!p.nwg_product_number;
         return {
           id: p.id,
           name: {
-            lv: ss?.name || p.name_lv,
-            en: ss?.name || p.name_en,
+            lv: enrich?.name || p.name_lv,
+            en: enrich?.name || p.name_en,
           },
           category: p.categories?.slug || "",
           description: {
-            lv: ss?.short_description || p.description_lv || "",
-            en: ss?.short_description || p.description_en || "",
+            lv: enrich?.short_description || p.description_lv || "",
+            en: enrich?.short_description || p.description_en || "",
           },
           longDescription: { lv: p.long_description_lv || "", en: p.long_description_en || "" },
           material: p.material || undefined,
-          colors: ss?.colors.length ? ss.colors.map((c) => c.name) : baseColors,
-          colorHexCodes: ss?.colors.length ? ss.colors.map((c) => c.hex) : baseHex,
-          colorImageUrls: ss?.colors.length ? ss.colors.map(() => null) : p.product_colors.map((c: any) => c.image_url || null),
+          colors: enrich?.colors.length ? enrich.colors.map((c) => c.name) : baseColors,
+          colorHexCodes: enrich?.colors.length ? enrich.colors.map((c) => c.hex) : baseHex,
+          colorImageUrls: enrich?.colors.length ? enrich.colors.map(() => null) : p.product_colors.map((c: any) => c.image_url || null),
           sizes: p.product_sizes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((s) => s.size),
           minOrder: p.min_order || undefined,
-          images: ss?.images.length ? ss.images : baseImages,
+          images: enrich?.images.length ? enrich.images : baseImages,
           featured: p.featured || false,
           new: p.is_new || false,
           printingTechs: p.printing_techs || [],
           brand: p.brand || "",
-          retailPrice: p.retail_price || 0,
+          // NWG pricing intentionally hidden site-wide until markup rules are defined
+          retailPrice: isNwg ? 0 : (p.retail_price || 0),
         };
       });
     }
     return [];
-  }, [dbProducts, ssEnrichment]);
+  }, [dbProducts, ssEnrichment, nwgEnrichment]);
+
 
 
   const cats = useMemo(() => {
