@@ -207,38 +207,43 @@ const CatalogPage = () => {
     if (dbProducts.length > 0) {
       return dbProducts.map((p) => {
         const ss = p.ss_style_code ? ssEnrichment.get(p.ss_style_code) : undefined;
+        const nwg = p.nwg_product_number ? nwgEnrichment.get(p.nwg_product_number) : undefined;
+        const enrich = ss || nwg;
         const baseImages = p.product_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((i) => i.url);
         const baseColors = p.product_colors.map((c) => c.name);
         const baseHex = p.product_colors.map((c) => c.hex_code);
+        const isNwg = !!p.nwg_product_number;
         return {
           id: p.id,
           name: {
-            lv: ss?.name || p.name_lv,
-            en: ss?.name || p.name_en,
+            lv: enrich?.name || p.name_lv,
+            en: enrich?.name || p.name_en,
           },
           category: p.categories?.slug || "",
           description: {
-            lv: ss?.short_description || p.description_lv || "",
-            en: ss?.short_description || p.description_en || "",
+            lv: enrich?.short_description || p.description_lv || "",
+            en: enrich?.short_description || p.description_en || "",
           },
           longDescription: { lv: p.long_description_lv || "", en: p.long_description_en || "" },
           material: p.material || undefined,
-          colors: ss?.colors.length ? ss.colors.map((c) => c.name) : baseColors,
-          colorHexCodes: ss?.colors.length ? ss.colors.map((c) => c.hex) : baseHex,
-          colorImageUrls: ss?.colors.length ? ss.colors.map(() => null) : p.product_colors.map((c: any) => c.image_url || null),
+          colors: enrich?.colors.length ? enrich.colors.map((c) => c.name) : baseColors,
+          colorHexCodes: enrich?.colors.length ? enrich.colors.map((c) => c.hex) : baseHex,
+          colorImageUrls: enrich?.colors.length ? enrich.colors.map(() => null) : p.product_colors.map((c: any) => c.image_url || null),
           sizes: p.product_sizes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((s) => s.size),
           minOrder: p.min_order || undefined,
-          images: ss?.images.length ? ss.images : baseImages,
+          images: enrich?.images.length ? enrich.images : baseImages,
           featured: p.featured || false,
           new: p.is_new || false,
           printingTechs: p.printing_techs || [],
           brand: p.brand || "",
-          retailPrice: p.retail_price || 0,
+          // NWG pricing intentionally hidden site-wide until markup rules are defined
+          retailPrice: isNwg ? 0 : (p.retail_price || 0),
         };
       });
     }
     return [];
-  }, [dbProducts, ssEnrichment]);
+  }, [dbProducts, ssEnrichment, nwgEnrichment]);
+
 
 
   const cats = useMemo(() => {
