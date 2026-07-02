@@ -159,9 +159,49 @@ const CatalogPage = () => {
         }
         setSsEnrichment(map);
       }
+
+      // NWG enrichment: LEFT JOIN nwg_style_summary + nwg_variants
+      const nwgNums = Array.from(new Set(
+        allProducts
+          .filter((p) => p.nwg_product_number)
+          .map((p) => p.nwg_product_number as string)
+      ));
+      if (nwgNums.length) {
+        const [{ data: nSummary }, { data: nVariants }] = await Promise.all([
+          supabase.from("nwg_style_summary" as any)
+            .select("product_number,name,commerce_text,main_picture_url,hover_picture_url")
+            .in("product_number", nwgNums),
+          supabase.from("nwg_variants")
+            .select("product_number,color_name,color_code,web_color,shade_color,main_picture_url")
+            .in("product_number", nwgNums),
+        ]);
+        const nColorsByStyle = new Map<string, { name: string; hex: string | null }[]>();
+        for (const v of (nVariants || []) as any[]) {
+          const name = v.color_name || v.color_code;
+          if (!name) continue;
+          const hex = (v.web_color?.[0] ? (String(v.web_color[0]).startsWith("#") ? v.web_color[0] : `#${v.web_color[0]}`) : (v.shade_color?.startsWith("#") ? v.shade_color : null));
+          const arr = nColorsByStyle.get(v.product_number) || [];
+          if (!arr.some((c) => c.name === name)) {
+            arr.push({ name, hex });
+            nColorsByStyle.set(v.product_number, arr);
+          }
+        }
+        const nMap = new Map<string, SsEnrichment>();
+        for (const s of (nSummary || []) as any[]) {
+          const imgs = [s.main_picture_url, s.hover_picture_url].filter((u: string | null): u is string => !!u);
+          nMap.set(s.product_number, {
+            name: s.name || s.product_number,
+            short_description: s.commerce_text || null,
+            images: imgs,
+            colors: nColorsByStyle.get(s.product_number) || [],
+          });
+        }
+        setNwgEnrichment(nMap);
+      }
     };
     fetchData();
   }, []);
+
 
   const normalizedProducts = useMemo(() => {
     if (dbProducts.length > 0) {
