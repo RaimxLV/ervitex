@@ -130,6 +130,55 @@ const NwgPage = () => {
     })();
   }, []);
 
+  // Admin: which NWG styles already sit in the public catalog
+  const loadCatalogMap = async () => {
+    const { data } = await supabase
+      .from("products")
+      .select("id,nwg_product_number")
+      .not("nwg_product_number", "is", null);
+    const m = new Map<string, string>();
+    for (const p of (data || []) as any[]) {
+      if (p.nwg_product_number) m.set(p.nwg_product_number, p.id);
+    }
+    setCatalogMap(m);
+  };
+  useEffect(() => { if (isAdmin) loadCatalogMap(); }, [isAdmin]);
+
+  const toggleCatalog = async (s: SummaryRow) => {
+    setToggling(s.product_number);
+    try {
+      const existing = catalogMap.get(s.product_number);
+      if (existing) {
+        const { error } = await supabase
+          .from("products")
+          .update({ active: false, hidden_manual: true })
+          .eq("id", existing);
+        if (error) throw error;
+        toast({ title: lang === "lv" ? "Noņemts no kataloga" : "Removed from catalog" });
+      } else {
+        const { error } = await supabase.from("products").insert({
+          name_lv: s.name || s.product_number,
+          name_en: s.name || s.product_number,
+          description_lv: s.commerce_text || "",
+          description_en: s.commerce_text || "",
+          brand: s.brand || "New Wave Group",
+          nwg_product_number: s.product_number,
+          retail_price: 0,
+          active: true,
+          hidden_manual: false,
+        });
+        if (error) throw error;
+        toast({ title: lang === "lv" ? "Pievienots katalogam" : "Added to catalog" });
+      }
+      await loadCatalogMap();
+    } catch (e: any) {
+      toast({ title: e.message || "Error", variant: "destructive" });
+    } finally {
+      setToggling(null);
+    }
+  };
+
+
   const brands = useMemo(() => {
     const counts = new Map<string, number>();
     for (const r of rows) if (r.brand) counts.set(r.brand, (counts.get(r.brand) || 0) + 1);
