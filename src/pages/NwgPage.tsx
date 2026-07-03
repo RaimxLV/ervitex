@@ -585,12 +585,17 @@ const NwgPage = () => {
                   const price = mk && open.retail_price ? open.retail_price * mk : null;
                   if (!price) return null;
                   return (
-                    <p className="font-heading text-2xl font-black text-accent">
-                      €{price.toFixed(2)}
-                      <span className="ml-2 text-[10px] font-normal uppercase tracking-wider text-muted-foreground">
-                        {lang === "lv" ? "ar PVN" : "incl. VAT"}
-                      </span>
-                    </p>
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground/80">
+                        €{(price / 1.21).toFixed(2)} <span className="uppercase tracking-wider">{lang === "lv" ? "bez PVN" : "excl. VAT"}</span>
+                      </p>
+                      <p className="font-heading text-2xl font-black text-accent">
+                        €{price.toFixed(2)}
+                        <span className="ml-2 text-[10px] font-normal uppercase tracking-wider text-muted-foreground">
+                          {lang === "lv" ? "ar PVN" : "incl. VAT"}
+                        </span>
+                      </p>
+                    </div>
                   );
                 })()}
 
