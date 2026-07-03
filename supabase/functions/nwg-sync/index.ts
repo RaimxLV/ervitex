@@ -351,13 +351,14 @@ async function syncStyles(
 }
 
 
-async function inspectApi() {
-  // Simple probe — token validity + sample product
+async function inspectApi(q?: string) {
   const schema = await gql<any>(`{ __schema { queryType { name } } }`);
+  const query = q || "*";
   let sample: any = null;
   try {
     sample = await gql<any>(
-      `query { productSearch(q:"*", language:"en", assortmentId:"", page:1, pageSize:2){ count result{ productNumber productName productBrand } } }`,
+      `query($q:String!){ productSearch(q:$q, language:"en", assortmentId:"", page:1, pageSize:2){ count result{ productNumber productName productBrand retailPrice{ price currency } variations{ itemNumber skus{ sku prices{ currency salesPrice retailPrice priceList } retailPrice{ price currency } } } } } }`,
+      { q: query },
     );
   } catch (e) {
     sample = { error: (e as Error).message };
@@ -381,7 +382,7 @@ Deno.serve(async (req) => {
   const result: Record<string, unknown> = {};
 
   try {
-    if (mode === "inspect") result.inspect = await inspectApi();
+    if (mode === "inspect") result.inspect = await inspectApi(q);
     if (mode === "assortments" || mode === "all") result.assortments = await syncAssortments(sb);
     if (mode === "styles" || mode === "all") {
       result.catalog = await syncStyles(sb, {
