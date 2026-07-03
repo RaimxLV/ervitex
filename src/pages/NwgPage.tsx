@@ -65,7 +65,24 @@ interface SkuRow {
 }
 
 const PAGE_SIZE = 24;
-const PRIORITY_BRANDS = ["Craft", "Clique", "Cutter & Buck", "ProJob", "James Harvest", "J.Harvest & Frost", "Jobman", "Craft AP", "Clique Retail", "New Wave Profile"];
+// Only these brands are visible on the NWG page. Value = retail markup multiplier.
+const BRAND_MARKUPS: Record<string, number> = {
+  "Clique": 1.67,
+  "Craft": 1.55,
+  "Craft Teamwear": 1.55,
+  "Cutter & Buck": 1.55,
+  "ProJob": 1.55,
+  "Sagaform": 1.55,
+  "Untagged Movement": 1.55,
+};
+const ALLOWED_BRANDS = Object.keys(BRAND_MARKUPS);
+const normBrand = (b: string | null | undefined) => (b || "").trim().toLowerCase();
+const BRAND_LOOKUP = new Map(ALLOWED_BRANDS.map((b) => [normBrand(b), b]));
+const markupFor = (brand: string | null | undefined) => {
+  const key = BRAND_LOOKUP.get(normBrand(brand));
+  return key ? BRAND_MARKUPS[key] : null;
+};
+const PRIORITY_BRANDS = ALLOWED_BRANDS;
 const SIZE_ORDER = ["XXXS","XXS","XS","S","M","L","XL","XXL","2XL","3XL","XXXL","4XL","XXXXL","5XL","XXXXXL","6XL"];
 const sizeIndex = (s: string | null | undefined) => {
   if (!s) return 999;
