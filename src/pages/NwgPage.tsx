@@ -575,6 +575,20 @@ const NwgPage = () => {
                   {open.gender && <div><span className="font-semibold">{t.gender}: </span><span className="text-muted-foreground">{open.gender}</span></div>}
                 </div>
 
+                {(() => {
+                  const mk = markupFor(open.brand);
+                  const price = mk && open.retail_price ? open.retail_price * mk : null;
+                  if (!price) return null;
+                  return (
+                    <p className="font-heading text-2xl font-black text-accent">
+                      €{price.toFixed(2)}
+                      <span className="ml-2 text-[10px] font-normal uppercase tracking-wider text-muted-foreground">
+                        {lang === "lv" ? "ar PVN" : "incl. VAT"}
+                      </span>
+                    </p>
+                  );
+                })()}
+
                 {detailLoading ? (
                   <Skeleton className="h-16 w-full" />
                 ) : detailVariants.length > 0 && (
