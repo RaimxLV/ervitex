@@ -234,7 +234,7 @@ const NwgPage = () => {
       if (needle && !`${s.name} ${s.product_number} ${s.commerce_text ?? ""}`.toLowerCase().includes(needle)) return false;
       return true;
     });
-  }, [rows, q, selectedBrands, selectedCategories, selectedGenders, inStockOnly]);
+  }, [visibleRows, q, selectedBrands, selectedCategories, selectedGenders, inStockOnly]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const slice = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
