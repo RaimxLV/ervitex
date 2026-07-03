@@ -474,6 +474,7 @@ const NwgPage = () => {
                               })}
                               {variants.length > 8 && <span className="text-[10px] text-muted-foreground">+{variants.length - 8}</span>}
                             </div>
+                          )}
                           {(() => {
                             const mk = markupFor(s.brand);
                             const price = mk && s.retail_price ? s.retail_price * mk : null;
