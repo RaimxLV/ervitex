@@ -481,12 +481,17 @@ const NwgPage = () => {
                             return (
                               <div className="pt-1">
                                 {price ? (
-                                  <p className="font-heading text-sm font-black text-accent">
-                                    €{price.toFixed(2)}
-                                    <span className="ml-1 text-[9px] font-normal uppercase tracking-wider text-muted-foreground">
-                                      {lang === "lv" ? "ar PVN" : "incl. VAT"}
-                                    </span>
-                                  </p>
+                                  <>
+                                    <p className="text-[10px] font-medium text-muted-foreground/80">
+                                      €{(price / 1.21).toFixed(2)} <span className="uppercase tracking-wider">{lang === "lv" ? "bez PVN" : "excl. VAT"}</span>
+                                    </p>
+                                    <p className="font-heading text-sm font-black text-accent">
+                                      €{price.toFixed(2)}
+                                      <span className="ml-1 text-[9px] font-normal uppercase tracking-wider text-muted-foreground">
+                                        {lang === "lv" ? "ar PVN" : "incl. VAT"}
+                                      </span>
+                                    </p>
+                                  </>
                                 ) : (
                                   <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                                     {lang === "lv" ? "Cena pēc pieprasījuma" : "Request quote"}
