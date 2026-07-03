@@ -67,13 +67,13 @@ interface SkuRow {
 const PAGE_SIZE = 24;
 // Only these brands are visible on the NWG page. Value = retail markup multiplier.
 const BRAND_MARKUPS: Record<string, number> = {
-  "Clique": 1.67,
-  "Craft": 1.55,
-  "Craft Teamwear": 1.55,
-  "Cutter & Buck": 1.55,
-  "ProJob": 1.55,
-  "Sagaform": 1.55,
-  "Untagged Movement": 1.55,
+  "Clique": 1.0167,
+  "Craft": 1.0155,
+  "Craft Teamwear": 1.0155,
+  "Cutter & Buck": 1.0155,
+  "ProJob": 1.0155,
+  "Sagaform": 1.0155,
+  "Untagged Movement": 1.0155,
 };
 const ALLOWED_BRANDS = Object.keys(BRAND_MARKUPS);
 const normBrand = (b: string | null | undefined) => (b || "").trim().toLowerCase();
