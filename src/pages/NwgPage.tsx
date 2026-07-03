@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -65,7 +65,24 @@ interface SkuRow {
 }
 
 const PAGE_SIZE = 24;
-const PRIORITY_BRANDS = ["Craft", "Clique", "Cutter & Buck", "ProJob", "James Harvest", "J.Harvest & Frost", "Jobman", "Craft AP", "Clique Retail", "New Wave Profile"];
+// Only these brands are visible on the NWG page. Value = retail markup multiplier.
+const BRAND_MARKUPS: Record<string, number> = {
+  "Clique": 1.67,
+  "Craft": 1.55,
+  "Craft Teamwear": 1.55,
+  "Cutter & Buck": 1.55,
+  "ProJob": 1.55,
+  "Sagaform": 1.55,
+  "Untagged Movement": 1.55,
+};
+const ALLOWED_BRANDS = Object.keys(BRAND_MARKUPS);
+const normBrand = (b: string | null | undefined) => (b || "").trim().toLowerCase();
+const BRAND_LOOKUP = new Map(ALLOWED_BRANDS.map((b) => [normBrand(b), b]));
+const markupFor = (brand: string | null | undefined) => {
+  const key = BRAND_LOOKUP.get(normBrand(brand));
+  return key ? BRAND_MARKUPS[key] : null;
+};
+const PRIORITY_BRANDS = ALLOWED_BRANDS;
 const SIZE_ORDER = ["XXXS","XXS","XS","S","M","L","XL","XXL","2XL","3XL","XXXL","4XL","XXXXL","5XL","XXXXXL","6XL"];
 const sizeIndex = (s: string | null | undefined) => {
   if (!s) return 999;
@@ -179,9 +196,12 @@ const NwgPage = () => {
   };
 
 
+  // Only display rows for brands we sell publicly (with defined markup).
+  const visibleRows = useMemo(() => rows.filter((r) => markupFor(r.brand) !== null), [rows]);
+
   const brands = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const r of rows) if (r.brand) counts.set(r.brand, (counts.get(r.brand) || 0) + 1);
+    for (const r of visibleRows) if (r.brand) counts.set(r.brand, (counts.get(r.brand) || 0) + 1);
     const arr = Array.from(counts.entries()).map(([label, count]) => ({ label, count }));
     arr.sort((a, b) => {
       const ai = PRIORITY_BRANDS.indexOf(a.label);
@@ -190,23 +210,23 @@ const NwgPage = () => {
       return b.count - a.count;
     });
     return arr;
-  }, [rows]);
+  }, [visibleRows]);
 
   const categories = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const r of rows) if (r.category) counts.set(r.category, (counts.get(r.category) || 0) + 1);
+    for (const r of visibleRows) if (r.category) counts.set(r.category, (counts.get(r.category) || 0) + 1);
     return Array.from(counts.entries()).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
-  }, [rows]);
+  }, [visibleRows]);
 
   const genders = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const r of rows) if (r.gender) counts.set(r.gender, (counts.get(r.gender) || 0) + 1);
+    for (const r of visibleRows) if (r.gender) counts.set(r.gender, (counts.get(r.gender) || 0) + 1);
     return Array.from(counts.entries()).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
-  }, [rows]);
+  }, [visibleRows]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return rows.filter((s) => {
+    return visibleRows.filter((s) => {
       if (selectedBrands.size && (!s.brand || !selectedBrands.has(s.brand))) return false;
       if (selectedCategories.size && (!s.category || !selectedCategories.has(s.category))) return false;
       if (selectedGenders.size && (!s.gender || !selectedGenders.has(s.gender))) return false;
@@ -214,7 +234,7 @@ const NwgPage = () => {
       if (needle && !`${s.name} ${s.product_number} ${s.commerce_text ?? ""}`.toLowerCase().includes(needle)) return false;
       return true;
     });
-  }, [rows, q, selectedBrands, selectedCategories, selectedGenders, inStockOnly]);
+  }, [visibleRows, q, selectedBrands, selectedCategories, selectedGenders, inStockOnly]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const slice = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -319,8 +339,11 @@ const NwgPage = () => {
   const FilterGroup = ({ title, items, selected, onToggle }: { title: string; items: { label: string; count: number }[]; selected: Set<string>; onToggle: (v: string) => void }) => (
     <div className="border-b border-border pb-4">
       <h3 className="mb-2 font-heading text-xs font-bold uppercase tracking-wider">{title}</h3>
-      <ScrollArea className="max-h-56">
-        <ul className="space-y-1 pr-2">
+      <div className="max-h-72 overflow-y-auto pr-1">
+        <ul className="space-y-1">
+          {items.length === 0 && (
+            <li className="text-[11px] text-muted-foreground">—</li>
+          )}
           {items.map((it) => (
             <li key={it.label}>
               <label className="flex cursor-pointer items-center gap-2 text-sm hover:text-accent">
@@ -331,7 +354,7 @@ const NwgPage = () => {
             </li>
           ))}
         </ul>
-      </ScrollArea>
+      </div>
     </div>
   );
 
@@ -452,6 +475,26 @@ const NwgPage = () => {
                               {variants.length > 8 && <span className="text-[10px] text-muted-foreground">+{variants.length - 8}</span>}
                             </div>
                           )}
+                          {(() => {
+                            const mk = markupFor(s.brand);
+                            const price = mk && s.retail_price ? s.retail_price * mk : null;
+                            return (
+                              <div className="pt-1">
+                                {price ? (
+                                  <p className="font-heading text-sm font-black text-accent">
+                                    €{price.toFixed(2)}
+                                    <span className="ml-1 text-[9px] font-normal uppercase tracking-wider text-muted-foreground">
+                                      {lang === "lv" ? "ar PVN" : "incl. VAT"}
+                                    </span>
+                                  </p>
+                                ) : (
+                                  <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                                    {lang === "lv" ? "Cena pēc pieprasījuma" : "Request quote"}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })()}
                           {isAdmin && (
                             <div className="pt-2">
                               <button
@@ -531,6 +574,20 @@ const NwgPage = () => {
                   {open.weight && <div><span className="font-semibold">{t.weight}: </span><span className="text-muted-foreground">{open.weight}</span></div>}
                   {open.gender && <div><span className="font-semibold">{t.gender}: </span><span className="text-muted-foreground">{open.gender}</span></div>}
                 </div>
+
+                {(() => {
+                  const mk = markupFor(open.brand);
+                  const price = mk && open.retail_price ? open.retail_price * mk : null;
+                  if (!price) return null;
+                  return (
+                    <p className="font-heading text-2xl font-black text-accent">
+                      €{price.toFixed(2)}
+                      <span className="ml-2 text-[10px] font-normal uppercase tracking-wider text-muted-foreground">
+                        {lang === "lv" ? "ar PVN" : "incl. VAT"}
+                      </span>
+                    </p>
+                  );
+                })()}
 
                 {detailLoading ? (
                   <Skeleton className="h-16 w-full" />
