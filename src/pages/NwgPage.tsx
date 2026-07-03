@@ -339,8 +339,11 @@ const NwgPage = () => {
   const FilterGroup = ({ title, items, selected, onToggle }: { title: string; items: { label: string; count: number }[]; selected: Set<string>; onToggle: (v: string) => void }) => (
     <div className="border-b border-border pb-4">
       <h3 className="mb-2 font-heading text-xs font-bold uppercase tracking-wider">{title}</h3>
-      <ScrollArea className="max-h-56">
-        <ul className="space-y-1 pr-2">
+      <div className="max-h-72 overflow-y-auto pr-1">
+        <ul className="space-y-1">
+          {items.length === 0 && (
+            <li className="text-[11px] text-muted-foreground">—</li>
+          )}
           {items.map((it) => (
             <li key={it.label}>
               <label className="flex cursor-pointer items-center gap-2 text-sm hover:text-accent">
@@ -351,7 +354,7 @@ const NwgPage = () => {
             </li>
           ))}
         </ul>
-      </ScrollArea>
+      </div>
     </div>
   );
 
