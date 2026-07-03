@@ -382,7 +382,7 @@ Deno.serve(async (req) => {
   const result: Record<string, unknown> = {};
 
   try {
-    if (mode === "inspect") result.inspect = await inspectApi();
+    if (mode === "inspect") result.inspect = await inspectApi(q);
     if (mode === "assortments" || mode === "all") result.assortments = await syncAssortments(sb);
     if (mode === "styles" || mode === "all") {
       result.catalog = await syncStyles(sb, {
