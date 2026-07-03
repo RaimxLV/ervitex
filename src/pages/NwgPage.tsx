@@ -196,9 +196,12 @@ const NwgPage = () => {
   };
 
 
+  // Only display rows for brands we sell publicly (with defined markup).
+  const visibleRows = useMemo(() => rows.filter((r) => markupFor(r.brand) !== null), [rows]);
+
   const brands = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const r of rows) if (r.brand) counts.set(r.brand, (counts.get(r.brand) || 0) + 1);
+    for (const r of visibleRows) if (r.brand) counts.set(r.brand, (counts.get(r.brand) || 0) + 1);
     const arr = Array.from(counts.entries()).map(([label, count]) => ({ label, count }));
     arr.sort((a, b) => {
       const ai = PRIORITY_BRANDS.indexOf(a.label);
@@ -207,23 +210,23 @@ const NwgPage = () => {
       return b.count - a.count;
     });
     return arr;
-  }, [rows]);
+  }, [visibleRows]);
 
   const categories = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const r of rows) if (r.category) counts.set(r.category, (counts.get(r.category) || 0) + 1);
+    for (const r of visibleRows) if (r.category) counts.set(r.category, (counts.get(r.category) || 0) + 1);
     return Array.from(counts.entries()).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
-  }, [rows]);
+  }, [visibleRows]);
 
   const genders = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const r of rows) if (r.gender) counts.set(r.gender, (counts.get(r.gender) || 0) + 1);
+    for (const r of visibleRows) if (r.gender) counts.set(r.gender, (counts.get(r.gender) || 0) + 1);
     return Array.from(counts.entries()).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
-  }, [rows]);
+  }, [visibleRows]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return rows.filter((s) => {
+    return visibleRows.filter((s) => {
       if (selectedBrands.size && (!s.brand || !selectedBrands.has(s.brand))) return false;
       if (selectedCategories.size && (!s.category || !selectedCategories.has(s.category))) return false;
       if (selectedGenders.size && (!s.gender || !selectedGenders.has(s.gender))) return false;
