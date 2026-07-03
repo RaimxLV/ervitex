@@ -474,7 +474,26 @@ const NwgPage = () => {
                               })}
                               {variants.length > 8 && <span className="text-[10px] text-muted-foreground">+{variants.length - 8}</span>}
                             </div>
-                          )}
+                          {(() => {
+                            const mk = markupFor(s.brand);
+                            const price = mk && s.retail_price ? s.retail_price * mk : null;
+                            return (
+                              <div className="pt-1">
+                                {price ? (
+                                  <p className="font-heading text-sm font-black text-accent">
+                                    €{price.toFixed(2)}
+                                    <span className="ml-1 text-[9px] font-normal uppercase tracking-wider text-muted-foreground">
+                                      {lang === "lv" ? "ar PVN" : "incl. VAT"}
+                                    </span>
+                                  </p>
+                                ) : (
+                                  <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                                    {lang === "lv" ? "Cena pēc pieprasījuma" : "Request quote"}
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          })()}
                           {isAdmin && (
                             <div className="pt-2">
                               <button
