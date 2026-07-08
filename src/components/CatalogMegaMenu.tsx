@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { ArrowRight, Sparkles, Star } from "lucide-react";
-import newArrivalsImg from "@/assets/bento/new-arrivals.jpg";
-import bestsellersImg from "@/assets/bento/bestsellers.jpg";
+import { ArrowRight } from "lucide-react";
 
 interface MegaMenuProps {
   onNavigate?: () => void;
