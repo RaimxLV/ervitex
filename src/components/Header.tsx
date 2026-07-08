@@ -289,18 +289,41 @@ const Header = () => {
           </form>
           <nav className="flex flex-col gap-4">
             {navItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setIsOpen(false)}
-                className={`text-base font-medium uppercase transition-colors ${
-                  location.pathname === item.path
-                    ? "text-accent"
-                    : "text-primary-foreground/70"
-                }`}
-              >
-                {t(item.key)}
-              </Link>
+              <div key={item.path}>
+                <Link
+                  to={item.path}
+                  onClick={() => setIsOpen(false)}
+                  className={`text-base font-medium uppercase transition-colors ${
+                    location.pathname === item.path
+                      ? "text-accent"
+                      : "text-primary-foreground/70"
+                  }`}
+                >
+                  {t(item.key)}
+                </Link>
+                {item.path === "/catalog" && (
+                  <div className="ml-4 mt-2 flex flex-col gap-2 border-l border-primary-foreground/10 pl-3">
+                    {catalogSubItems.map((s) => (
+                      s.disabled ? (
+                        <span key={s.lv} className="text-sm text-primary-foreground/40">
+                          {lang === "lv" ? s.lv : s.en}
+                        </span>
+                      ) : (
+                        <Link
+                          key={s.path}
+                          to={s.path}
+                          onClick={() => setIsOpen(false)}
+                          className={`text-sm transition-colors ${
+                            location.pathname === s.path ? "text-accent" : "text-primary-foreground/70 hover:text-accent"
+                          }`}
+                        >
+                          {lang === "lv" ? s.lv : s.en}
+                        </Link>
+                      )
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
             <Button asChild className="mt-2 w-full bg-accent text-accent-foreground hover:bg-accent/90">
               <Link to="/contact" onClick={() => setIsOpen(false)}>{t("header.quote")}</Link>
