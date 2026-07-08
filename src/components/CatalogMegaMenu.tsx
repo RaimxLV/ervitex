@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { ArrowRight, Sparkles, Star } from "lucide-react";
-import newArrivalsImg from "@/assets/bento/new-arrivals.jpg";
-import bestsellersImg from "@/assets/bento/bestsellers.jpg";
+import { ArrowRight } from "lucide-react";
 
 interface MegaMenuProps {
   onNavigate?: () => void;
@@ -60,60 +58,41 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
         </Link>
       </div>
 
-      {/* Feature cards */}
+      {/* Catalog brands */}
       <div>
         <h3 className="mb-5 text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground font-heading">
-          {lang === "lv" ? "Izceltie" : "Featured"}
+          {lang === "lv" ? "Katalogi" : "Catalogs"}
         </h3>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Link
-            to="/catalog?sort=newest"
-            onClick={onNavigate}
-            role="menuitem"
-            className="group relative block aspect-[4/5] overflow-hidden rounded-sm border border-border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            <img
-              src={newArrivalsImg}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/40 to-transparent" />
-            <div className="absolute inset-0 flex flex-col justify-end p-4">
-              <Sparkles className="mb-2 h-4 w-4 text-accent" strokeWidth={2} />
-              <p className="font-heading text-base font-bold uppercase tracking-wider text-primary-foreground">
-                {lang === "lv" ? "Jaunumi" : "New Arrivals"}
-              </p>
-              <p className="mt-0.5 text-[11px] text-primary-foreground/70">
-                {lang === "lv" ? "Svaigākās kolekcijas" : "Latest drops"}
-              </p>
-            </div>
-          </Link>
-
-          <Link
-            to="/stanley-stella"
-            onClick={onNavigate}
-            role="menuitem"
-            className="group relative block aspect-[4/5] overflow-hidden rounded-sm border border-border bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            <img
-              src={bestsellersImg}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/40 to-transparent" />
-            <div className="absolute inset-0 flex flex-col justify-end p-4">
-              <Star className="mb-2 h-4 w-4 text-accent" strokeWidth={2} fill="currentColor" />
-              <p className="font-heading text-base font-bold uppercase tracking-wider text-primary-foreground">
-                Stanley/Stella
-              </p>
-              <p className="mt-0.5 text-[11px] text-primary-foreground/70">
-                {lang === "lv" ? "Premium kolekcija" : "Premium collection"}
-              </p>
-            </div>
-          </Link>
-        </div>
+        <ul className="flex flex-col gap-1">
+          <li>
+            <Link
+              to="/stanley-stella"
+              onClick={onNavigate}
+              role="menuitem"
+              className="group flex items-center justify-between rounded-sm py-2.5 px-2 -mx-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-accent"
+            >
+              <span className="font-heading uppercase tracking-wide text-[13px]">Stanley/Stella</span>
+              <ArrowRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/nwg"
+              onClick={onNavigate}
+              role="menuitem"
+              className="group flex items-center justify-between rounded-sm py-2.5 px-2 -mx-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-accent"
+            >
+              <span className="font-heading uppercase tracking-wide text-[13px]">New Wave Group</span>
+              <ArrowRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+            </Link>
+          </li>
+          <li>
+            <span className="flex items-center justify-between rounded-sm py-2.5 px-2 -mx-2 text-sm font-medium text-muted-foreground/60 cursor-not-allowed">
+              <span className="font-heading uppercase tracking-wide text-[13px]">PF Concept</span>
+              <span className="text-[10px] uppercase tracking-wider">{lang === "lv" ? "Drīzumā" : "Soon"}</span>
+            </span>
+          </li>
+        </ul>
       </div>
     </div>
   );
