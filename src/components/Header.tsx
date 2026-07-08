@@ -12,11 +12,15 @@ import CatalogMegaMenu from "@/components/CatalogMegaMenu";
 const navItems = [
   { key: "nav.home" as const, path: "/" },
   { key: "nav.catalog" as const, path: "/catalog" },
-  { key: "nav.stanleyStella" as const, path: "/stanley-stella" },
-  { key: "nav.nwg" as const, path: "/nwg" },
   { key: "nav.services" as const, path: "/services" },
   { key: "nav.about" as const, path: "/about" },
   { key: "nav.contact" as const, path: "/contact" },
+];
+
+const catalogSubItems = [
+  { path: "/stanley-stella", lv: "Stanley/Stella", en: "Stanley/Stella" },
+  { path: "/nwg", lv: "New Wave Group", en: "New Wave Group" },
+  { path: "#", lv: "PF Concept (drīzumā)", en: "PF Concept (coming soon)", disabled: true },
 ];
 
 const Header = () => {
