@@ -1365,6 +1365,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      refresh_catalog_items_mv: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
     }
     Enums: {

@@ -35,6 +35,55 @@ interface EnrichedItem extends CatalogItem {
   buckets: Set<ColorBucketKey>;
 }
 
+// ---- Normalization: merge duplicate labels across suppliers ----
+const GENDER_MAP: Record<string, string | null> = {
+  male: "Men", men: "Men", mens: "Men", "men's": "Men",
+  female: "Women", women: "Women", womens: "Women", "women's": "Women", ladies: "Women",
+  junior: "Kids", juniors: "Kids", kid: "Kids", kids: "Kids",
+  children: "Kids", child: "Kids", youth: "Kids",
+  baby: "Baby", babies: "Baby", infant: "Baby",
+  unisex: "Unisex", adult: "Unisex",
+  none: "", "-": "", accessories: "",
+};
+const normalizeGender = (raw?: string | null): string | null => {
+  if (!raw) return null;
+  const key = raw.trim().toLowerCase();
+  if (key in GENDER_MAP) {
+    const v = GENDER_MAP[key];
+    return v === "" ? null : v;
+  }
+  return raw.trim();
+};
+
+const CATEGORY_MAP: Record<string, string> = {
+  "t-shirt": "T-shirts", "tshirt": "T-shirts", "tshirts": "T-shirts", "t-shirts": "T-shirts",
+  "polo": "Polos", "polos": "Polos",
+  "hoodie": "Hoodies", "hoodies": "Hoodies",
+  "sweater": "Sweaters", "sweaters": "Sweaters",
+  "jacket": "Jackets", "jackets": "Jackets",
+  "cap": "Caps & Hats", "caps": "Caps & Hats", "hat": "Caps & Hats", "hats": "Caps & Hats",
+  "caps & hats": "Caps & Hats", "headwear": "Caps & Hats",
+  "beanie": "Beanies", "beanies": "Beanies",
+  "bag": "Bags", "bags": "Bags",
+  "backpack": "Backpacks", "backpacks": "Backpacks",
+  "short": "Shorts", "shorts": "Shorts",
+  "trouser": "Trousers", "trousers": "Trousers", "pant": "Trousers", "pants": "Trousers",
+  "bottom": "Bottoms", "bottoms": "Bottoms",
+  "top": "Tops", "tops": "Tops",
+};
+const normalizeCategory = (raw?: string | null): string | null => {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (!trimmed || trimmed === "-" || trimmed.toLowerCase() === "none") return null;
+  return CATEGORY_MAP[trimmed.toLowerCase()] || trimmed;
+};
+const normalizeText = (raw?: string | null): string | null => {
+  if (!raw) return null;
+  const t = raw.trim();
+  if (!t || t === "-" || t.toLowerCase() === "none") return null;
+  return t;
+};
+
 const PAGE_SIZE = 24;
 
 const SS_CDN_BASE = "https://res.cloudinary.com/www-stanleystella-com/image/upload/";
@@ -106,7 +155,7 @@ const CatalogPage = () => {
     setSearchParams(p, { replace: true });
   }, [q, sources, brands, categories, groups, genders, colors, page, setSearchParams]);
 
-  // Load data
+  // Load data (single fetch — MV is small enough)
   useEffect(() => {
     (async () => {
       const all: CatalogItem[] = [];
@@ -133,7 +182,14 @@ const CatalogPage = () => {
           const b = bucketOf(hexes[i], names[i]);
           if (b) buckets.add(b);
         }
-        return { ...it, buckets };
+        return {
+          ...it,
+          brand: normalizeText(it.brand),
+          category: normalizeCategory(it.category),
+          group_name: normalizeText(it.group_name),
+          gender: normalizeGender(it.gender),
+          buckets,
+        };
       });
       setItems(enriched);
       setLoaded(true);
