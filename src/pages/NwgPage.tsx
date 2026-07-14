@@ -268,14 +268,33 @@ const NwgPage = () => {
       if (selectedGenders.size && (!s.gender || !selectedGenders.has(s.gender))) return false;
       if (inStockOnly && s.total_stock <= 0) return false;
       if (needle && !`${s.name} ${s.product_number} ${s.commerce_text ?? ""}`.toLowerCase().includes(needle)) return false;
+      if (selectedBuckets.size) {
+        const bc = colorMap.get(s.product_number)?.buckets;
+        if (!bc) return false;
+        let ok = false;
+        for (const b of selectedBuckets) if (bc.has(b)) { ok = true; break; }
+        if (!ok) return false;
+      }
       return true;
     });
-  }, [visibleRows, q, selectedBrands, selectedCategories, selectedGenders, inStockOnly]);
+  }, [visibleRows, q, selectedBrands, selectedCategories, selectedGenders, inStockOnly, selectedBuckets, colorMap]);
+
+  const bucketItems = useMemo(() => {
+    const counts = new Map<ColorBucketKey, number>();
+    for (const r of visibleRows) {
+      const bc = colorMap.get(r.product_number)?.buckets;
+      if (!bc) continue;
+      for (const b of bc) counts.set(b, (counts.get(b) || 0) + 1);
+    }
+    return COLOR_BUCKETS
+      .map((b) => ({ key: b.key, label: lang === "lv" ? b.lv : b.en, count: counts.get(b.key) || 0 }))
+      .filter((x) => x.count > 0);
+  }, [visibleRows, colorMap, lang]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const slice = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  useEffect(() => { setPage(1); }, [q, selectedBrands, selectedCategories, selectedGenders, inStockOnly]);
+  useEffect(() => { setPage(1); }, [q, selectedBrands, selectedCategories, selectedGenders, inStockOnly, selectedBuckets]);
 
   // Fetch color variants for visible cards
   useEffect(() => {
