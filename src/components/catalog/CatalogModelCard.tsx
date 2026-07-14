@@ -82,9 +82,21 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
             <p className="line-clamp-2 text-xs text-muted-foreground">{subtitle}</p>
           )}
           {swatches && swatches.length > 0 && (
-            <div className="flex flex-wrap gap-1 pt-1">
+            <div className="flex flex-wrap items-center gap-1 pt-1">
               {swatches.slice(0, 8).map((s, i) => {
-                const bg = s.hex && s.hex.length >= 4 ? s.hex : "#ccc";
+                const raw = (s.hex || "").trim();
+                const bg = raw.length >= 4 ? raw : "#ccc";
+                // Detect near-white / very light swatches so we can give them a
+                // stronger dark border — otherwise they disappear on the white
+                // card background and the whole row of swatches looks "empty".
+                let isLight = false;
+                const hx = bg.replace("#", "");
+                if (hx.length === 6 && /^[0-9a-fA-F]{6}$/.test(hx)) {
+                  const r = parseInt(hx.slice(0, 2), 16);
+                  const g = parseInt(hx.slice(2, 4), 16);
+                  const b = parseInt(hx.slice(4, 6), 16);
+                  isLight = (r * 299 + g * 587 + b * 114) / 1000 > 225;
+                }
                 const clickable = !!s.onSelect;
                 return (
                   <span
@@ -97,18 +109,23 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
                         ? (e) => { e.stopPropagation(); s.onSelect!(); }
                         : undefined
                     }
-                    className={`h-4 w-4 rounded-full border transition-transform ${
-                      s.active ? "border-foreground scale-125 ring-1 ring-foreground/30" : "border-border"
+                    className={`inline-block h-4 w-4 rounded-full transition-transform ${
+                      s.active
+                        ? "ring-2 ring-foreground ring-offset-1 ring-offset-background scale-110"
+                        : isLight
+                          ? "border border-neutral-500"
+                          : "border border-black/20"
                     } ${clickable ? "cursor-pointer hover:scale-110" : ""}`}
                     style={{ backgroundColor: bg }}
                   />
                 );
               })}
               {extraSwatches && extraSwatches > 0 ? (
-                <span className="text-[10px] text-muted-foreground">+{extraSwatches}</span>
+                <span className="text-[10px] leading-none text-muted-foreground">+{extraSwatches}</span>
               ) : null}
             </div>
           )}
+
           <div className="mt-auto pt-1">{price}</div>
           {footer}
         </div>
