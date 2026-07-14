@@ -12,6 +12,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import CatalogFiltersSidebar from "@/components/catalog/CatalogFiltersSidebar";
+import { COLOR_BUCKETS, bucketOf, type ColorBucketKey } from "@/lib/colorBuckets";
 
 interface SummaryRow {
   product_number: string;
@@ -110,6 +111,8 @@ const NwgPage = () => {
   const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [selectedGenders, setSelectedGenders] = useState<Set<string>>(new Set());
+  const [selectedBuckets, setSelectedBuckets] = useState<Set<ColorBucketKey>>(new Set());
+  const [colorMap, setColorMap] = useState<Map<string, { buckets: Set<ColorBucketKey>; bucketImages: Map<ColorBucketKey, string> }>>(new Map());
   const [inStockOnly, setInStockOnly] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -145,6 +148,38 @@ const NwgPage = () => {
       }
       setRows(all);
       setLoaded(true);
+    })();
+  }, []);
+
+  // Per-color bucket data from unified catalog for color filter + image swap.
+  useEffect(() => {
+    (async () => {
+      const rows: any[] = [];
+      const step = 1000; let from = 0;
+      while (true) {
+        const { data, error } = await supabase
+          .from("catalog_items" as any)
+          .select("id,colors")
+          .eq("source", "nwg")
+          .range(from, from + step - 1);
+        if (error || !data) break;
+        rows.push(...data);
+        if (data.length < step) break;
+        from += step;
+      }
+      const m = new Map<string, { buckets: Set<ColorBucketKey>; bucketImages: Map<ColorBucketKey, string> }>();
+      for (const row of rows) {
+        const buckets = new Set<ColorBucketKey>();
+        const bucketImages = new Map<ColorBucketKey, string>();
+        for (const c of (row.colors || []) as { h: string | null; n: string | null; u: string | null }[]) {
+          const b = bucketOf(c.h, c.n);
+          if (!b) continue;
+          buckets.add(b);
+          if (c.u && !bucketImages.has(b)) bucketImages.set(b, c.u);
+        }
+        m.set(row.id, { buckets, bucketImages });
+      }
+      setColorMap(m);
     })();
   }, []);
 
@@ -233,14 +268,33 @@ const NwgPage = () => {
       if (selectedGenders.size && (!s.gender || !selectedGenders.has(s.gender))) return false;
       if (inStockOnly && s.total_stock <= 0) return false;
       if (needle && !`${s.name} ${s.product_number} ${s.commerce_text ?? ""}`.toLowerCase().includes(needle)) return false;
+      if (selectedBuckets.size) {
+        const bc = colorMap.get(s.product_number)?.buckets;
+        if (!bc) return false;
+        let ok = false;
+        for (const b of selectedBuckets) if (bc.has(b)) { ok = true; break; }
+        if (!ok) return false;
+      }
       return true;
     });
-  }, [visibleRows, q, selectedBrands, selectedCategories, selectedGenders, inStockOnly]);
+  }, [visibleRows, q, selectedBrands, selectedCategories, selectedGenders, inStockOnly, selectedBuckets, colorMap]);
+
+  const bucketItems = useMemo(() => {
+    const counts = new Map<ColorBucketKey, number>();
+    for (const r of visibleRows) {
+      const bc = colorMap.get(r.product_number)?.buckets;
+      if (!bc) continue;
+      for (const b of bc) counts.set(b, (counts.get(b) || 0) + 1);
+    }
+    return COLOR_BUCKETS
+      .map((b) => ({ key: b.key, label: lang === "lv" ? b.lv : b.en, count: counts.get(b.key) || 0 }))
+      .filter((x) => x.count > 0);
+  }, [visibleRows, colorMap, lang]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const slice = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  useEffect(() => { setPage(1); }, [q, selectedBrands, selectedCategories, selectedGenders, inStockOnly]);
+  useEffect(() => { setPage(1); }, [q, selectedBrands, selectedCategories, selectedGenders, inStockOnly, selectedBuckets]);
 
   // Fetch color variants for visible cards
   useEffect(() => {
@@ -366,8 +420,26 @@ const NwgPage = () => {
       <section className="bg-background">
         <div className="container grid gap-6 px-4 py-8 lg:grid-cols-[260px_1fr]">
           <CatalogFiltersSidebar
-            onClearAll={() => { setSelectedBrands(new Set()); setSelectedCategories(new Set()); setSelectedGenders(new Set()); }}
+            onClearAll={() => { setSelectedBrands(new Set()); setSelectedCategories(new Set()); setSelectedGenders(new Set()); setSelectedBuckets(new Set()); }}
             sections={[
+              {
+                key: "color",
+                title: lang === "lv" ? "Krāsa" : "Color",
+                items: bucketItems.map((b) => ({ label: b.label, count: b.count })),
+                selected: new Set(
+                  [...selectedBuckets]
+                    .map((k) => COLOR_BUCKETS.find((x) => x.key === k))
+                    .filter(Boolean)
+                    .map((b) => (lang === "lv" ? b!.lv : b!.en))
+                ),
+                onToggle: (label) => {
+                  const b = COLOR_BUCKETS.find((x) => (lang === "lv" ? x.lv : x.en) === label);
+                  if (!b) return;
+                  const next = new Set(selectedBuckets);
+                  next.has(b.key) ? next.delete(b.key) : next.add(b.key);
+                  setSelectedBuckets(next);
+                },
+              },
               { key: "brand", title: t.brand, items: brands, selected: selectedBrands, onToggle: (v) => toggle(selectedBrands, setSelectedBrands, v) },
               { key: "gender", title: t.gender, items: genders, selected: selectedGenders, onToggle: (v) => toggle(selectedGenders, setSelectedGenders, v) },
               { key: "category", title: t.category, items: categories, selected: selectedCategories, onToggle: (v) => toggle(selectedCategories, setSelectedCategories, v) },
@@ -393,8 +465,17 @@ const NwgPage = () => {
                     const variants = cardVariants.get(s.product_number) || [];
                     const activeVariantItem = cardActive.get(s.product_number);
                     const activeV = activeVariantItem ? variants.find((v) => v.item_number === activeVariantItem) : null;
-                    const main = activeV?.main_picture_url || s.main_picture_url;
-                    const hover = s.hover_picture_url;
+                    let main: string | null = activeV?.main_picture_url || s.main_picture_url;
+                    let hover: string | null = s.hover_picture_url;
+                    if (!activeV && selectedBuckets.size) {
+                      const imgs = colorMap.get(s.product_number)?.bucketImages;
+                      if (imgs) {
+                        for (const b of selectedBuckets) {
+                          const u = imgs.get(b);
+                          if (u) { main = u; hover = null; break; }
+                        }
+                      }
+                    }
                     return (
                       <button
                         key={s.product_number}

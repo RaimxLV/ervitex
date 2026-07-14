@@ -1151,6 +1151,7 @@ export type Database = {
           category: string | null
           color_hexes: string[] | null
           color_names: string[] | null
+          colors: Json | null
           description: string | null
           gender: string | null
           group_name: string | null

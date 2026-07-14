@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar from "@/components/catalog/CatalogFiltersSidebar";
+import { COLOR_BUCKETS, bucketOf, type ColorBucketKey } from "@/lib/colorBuckets";
 
 interface SummaryRow {
   model_code: string;
@@ -56,6 +57,9 @@ const PfConceptPage = () => {
   const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set());
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [selectedGenders, setSelectedGenders] = useState<Set<string>>(new Set());
+  const [selectedBuckets, setSelectedBuckets] = useState<Set<ColorBucketKey>>(new Set());
+  const [colorMap, setColorMap] = useState<Map<string, { buckets: Set<ColorBucketKey>; bucketImages: Map<ColorBucketKey, string> }>>(new Map());
   const [page, setPage] = useState(1);
 
   const [cardVariants, setCardVariants] = useState<Map<string, VariantRow[]>>(new Map());
@@ -89,6 +93,38 @@ const PfConceptPage = () => {
     })();
   }, []);
 
+  // Per-color bucket data from unified catalog for color filter + image swap.
+  useEffect(() => {
+    (async () => {
+      const rows: any[] = [];
+      const step = 1000; let from = 0;
+      while (true) {
+        const { data, error } = await supabase
+          .from("catalog_items" as any)
+          .select("id,colors")
+          .eq("source", "pf")
+          .range(from, from + step - 1);
+        if (error || !data) break;
+        rows.push(...data);
+        if (data.length < step) break;
+        from += step;
+      }
+      const m = new Map<string, { buckets: Set<ColorBucketKey>; bucketImages: Map<ColorBucketKey, string> }>();
+      for (const row of rows) {
+        const buckets = new Set<ColorBucketKey>();
+        const bucketImages = new Map<ColorBucketKey, string>();
+        for (const c of (row.colors || []) as { h: string | null; n: string | null; u: string | null }[]) {
+          const b = bucketOf(c.h, c.n);
+          if (!b) continue;
+          buckets.add(b);
+          if (c.u && !bucketImages.has(b)) bucketImages.set(b, c.u);
+        }
+        m.set(row.id, { buckets, bucketImages });
+      }
+      setColorMap(m);
+    })();
+  }, []);
+
   const brands = useMemo(() => {
     const counts = new Map<string, number>();
     for (const r of rows) if (r.brand) counts.set(r.brand, (counts.get(r.brand) || 0) + 1);
@@ -118,13 +154,32 @@ const PfConceptPage = () => {
       if (selectedGroups.size && (!s.category_group || !selectedGroups.has(s.category_group))) return false;
       if (selectedCategories.size && (!s.category || !selectedCategories.has(s.category))) return false;
       if (needle && !`${s.description ?? ""} ${s.model_code} ${s.ext_desc ?? ""}`.toLowerCase().includes(needle)) return false;
+      if (selectedBuckets.size) {
+        const bc = colorMap.get(s.model_code)?.buckets;
+        if (!bc) return false;
+        let ok = false;
+        for (const b of selectedBuckets) if (bc.has(b)) { ok = true; break; }
+        if (!ok) return false;
+      }
       return true;
     });
-  }, [rows, q, selectedBrands, selectedGroups, selectedCategories]);
+  }, [rows, q, selectedBrands, selectedGroups, selectedCategories, selectedBuckets, colorMap]);
+
+  const bucketItems = useMemo(() => {
+    const counts = new Map<ColorBucketKey, number>();
+    for (const r of rows) {
+      const bc = colorMap.get(r.model_code)?.buckets;
+      if (!bc) continue;
+      for (const b of bc) counts.set(b, (counts.get(b) || 0) + 1);
+    }
+    return COLOR_BUCKETS
+      .map((b) => ({ key: b.key, label: lang === "lv" ? b.lv : b.en, count: counts.get(b.key) || 0 }))
+      .filter((x) => x.count > 0);
+  }, [rows, colorMap, lang]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const slice = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  useEffect(() => { setPage(1); }, [q, selectedBrands, selectedGroups, selectedCategories]);
+  useEffect(() => { setPage(1); }, [q, selectedBrands, selectedGroups, selectedCategories, selectedBuckets]);
 
   // Fetch color variants for visible cards
   useEffect(() => {
@@ -219,8 +274,26 @@ const PfConceptPage = () => {
       <section className="bg-background">
         <div className="container grid gap-6 px-4 py-8 lg:grid-cols-[260px_1fr]">
           <CatalogFiltersSidebar
-            onClearAll={() => { setSelectedBrands(new Set()); setSelectedGroups(new Set()); setSelectedCategories(new Set()); }}
+            onClearAll={() => { setSelectedBrands(new Set()); setSelectedGroups(new Set()); setSelectedCategories(new Set()); setSelectedBuckets(new Set()); }}
             sections={[
+              {
+                key: "color",
+                title: lang === "lv" ? "Krāsa" : "Color",
+                items: bucketItems.map((b) => ({ label: b.label, count: b.count })),
+                selected: new Set(
+                  [...selectedBuckets]
+                    .map((k) => COLOR_BUCKETS.find((x) => x.key === k))
+                    .filter(Boolean)
+                    .map((b) => (lang === "lv" ? b!.lv : b!.en))
+                ),
+                onToggle: (label) => {
+                  const b = COLOR_BUCKETS.find((x) => (lang === "lv" ? x.lv : x.en) === label);
+                  if (!b) return;
+                  const next = new Set(selectedBuckets);
+                  next.has(b.key) ? next.delete(b.key) : next.add(b.key);
+                  setSelectedBuckets(next);
+                },
+              },
               { key: "group", title: t.group, items: groups, selected: selectedGroups, onToggle: (v) => toggle(selectedGroups, setSelectedGroups, v) },
               { key: "category", title: t.category, items: categories, selected: selectedCategories, onToggle: (v) => toggle(selectedCategories, setSelectedCategories, v) },
               { key: "brand", title: t.brand, items: brands, selected: selectedBrands, onToggle: (v) => toggle(selectedBrands, setSelectedBrands, v) },
@@ -246,10 +319,16 @@ const PfConceptPage = () => {
                     const variants = colorSwatches(cardVariants.get(s.model_code) || []);
                     const activeItem = cardActive.get(s.model_code);
                     const activeV = activeItem ? variants.find((v) => v.item_code === activeItem) : null;
-                    const activeImgSrc = activeV
-                      ? undefined // will be fetched only in detail; for card, fall back to main
-                      : undefined;
-                    const main = activeImgSrc || s.main_image_url;
+                    let main: string | null = s.main_image_url;
+                    if (!activeV && selectedBuckets.size) {
+                      const imgs = colorMap.get(s.model_code)?.bucketImages;
+                      if (imgs) {
+                        for (const b of selectedBuckets) {
+                          const u = imgs.get(b);
+                          if (u) { main = u; break; }
+                        }
+                      }
+                    }
                     return (
                       <button
                         key={s.model_code}

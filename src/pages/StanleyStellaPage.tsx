@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 import CatalogFiltersSidebar from "@/components/catalog/CatalogFiltersSidebar";
+import { COLOR_BUCKETS, bucketOf, type ColorBucketKey } from "@/lib/colorBuckets";
 
 
 interface SummaryRow {
@@ -103,6 +104,8 @@ const StanleyStellaPage = () => {
   const [q, setQ] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [selectedGenders, setSelectedGenders] = useState<Set<string>>(new Set());
+  const [selectedBuckets, setSelectedBuckets] = useState<Set<ColorBucketKey>>(new Set());
+  const [colorMap, setColorMap] = useState<Map<string, { buckets: Set<ColorBucketKey>; bucketImages: Map<ColorBucketKey, string> }>>(new Map());
   const [inStockOnly, setInStockOnly] = useState(true);
   const [page, setPage] = useState(1);
 
@@ -139,6 +142,38 @@ const StanleyStellaPage = () => {
     })();
   }, []);
 
+  // Load per-color bucket data from unified catalog for color filtering + image swap.
+  useEffect(() => {
+    (async () => {
+      const rows: any[] = [];
+      const step = 1000; let from = 0;
+      while (true) {
+        const { data, error } = await supabase
+          .from("catalog_items" as any)
+          .select("id,colors")
+          .eq("source", "ss")
+          .range(from, from + step - 1);
+        if (error || !data) break;
+        rows.push(...data);
+        if (data.length < step) break;
+        from += step;
+      }
+      const m = new Map<string, { buckets: Set<ColorBucketKey>; bucketImages: Map<ColorBucketKey, string> }>();
+      for (const row of rows) {
+        const buckets = new Set<ColorBucketKey>();
+        const bucketImages = new Map<ColorBucketKey, string>();
+        for (const c of (row.colors || []) as { h: string | null; n: string | null; u: string | null }[]) {
+          const b = bucketOf(c.h, c.n);
+          if (!b) continue;
+          buckets.add(b);
+          if (c.u && !bucketImages.has(b)) bucketImages.set(b, c.u);
+        }
+        m.set(row.id, { buckets, bucketImages });
+      }
+      setColorMap(m);
+    })();
+  }, []);
+
   const categories = useMemo(() => {
     const counts = new Map<string, number>();
     for (const r of rows) if (r.category) counts.set(r.category, (counts.get(r.category) || 0) + 1);
@@ -157,14 +192,33 @@ const StanleyStellaPage = () => {
       if (selectedGenders.size && (!s.gender || !selectedGenders.has(s.gender))) return false;
       if (inStockOnly && s.total_stock <= 0) return false;
       if (needle && !`${s.name} ${s.style_code} ${s.short_description ?? ""}`.toLowerCase().includes(needle)) return false;
+      if (selectedBuckets.size) {
+        const bc = colorMap.get(s.style_code)?.buckets;
+        if (!bc) return false;
+        let ok = false;
+        for (const b of selectedBuckets) if (bc.has(b)) { ok = true; break; }
+        if (!ok) return false;
+      }
       return true;
     });
-  }, [rows, q, selectedCategories, selectedGenders, inStockOnly]);
+  }, [rows, q, selectedCategories, selectedGenders, inStockOnly, selectedBuckets, colorMap]);
+
+  const bucketItems = useMemo(() => {
+    const counts = new Map<ColorBucketKey, number>();
+    for (const r of rows) {
+      const bc = colorMap.get(r.style_code)?.buckets;
+      if (!bc) continue;
+      for (const b of bc) counts.set(b, (counts.get(b) || 0) + 1);
+    }
+    return COLOR_BUCKETS
+      .map((b) => ({ key: b.key, label: lang === "lv" ? b.lv : b.en, count: counts.get(b.key) || 0 }))
+      .filter((x) => x.count > 0);
+  }, [rows, colorMap, lang]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const slice = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  useEffect(() => { setPage(1); }, [q, selectedCategories, selectedGenders, inStockOnly]);
+  useEffect(() => { setPage(1); }, [q, selectedCategories, selectedGenders, inStockOnly, selectedBuckets]);
 
   const toggle = (set: Set<string>, setSet: (s: Set<string>) => void, v: string) => {
     const next = new Set(set);
@@ -400,8 +454,26 @@ const StanleyStellaPage = () => {
       <section className="bg-background">
         <div className="container grid gap-6 px-4 py-8 lg:grid-cols-[260px_1fr]">
           <CatalogFiltersSidebar
-            onClearAll={() => { setSelectedCategories(new Set()); setSelectedGenders(new Set()); }}
+            onClearAll={() => { setSelectedCategories(new Set()); setSelectedGenders(new Set()); setSelectedBuckets(new Set()); }}
             sections={[
+              {
+                key: "color",
+                title: lang === "lv" ? "Krāsa" : "Color",
+                items: bucketItems.map((b) => ({ label: b.label, count: b.count })),
+                selected: new Set(
+                  [...selectedBuckets]
+                    .map((k) => COLOR_BUCKETS.find((x) => x.key === k))
+                    .filter(Boolean)
+                    .map((b) => (lang === "lv" ? b!.lv : b!.en))
+                ),
+                onToggle: (label) => {
+                  const b = COLOR_BUCKETS.find((x) => (lang === "lv" ? x.lv : x.en) === label);
+                  if (!b) return;
+                  const next = new Set(selectedBuckets);
+                  next.has(b.key) ? next.delete(b.key) : next.add(b.key);
+                  setSelectedBuckets(next);
+                },
+              },
               { key: "category", title: t.category, items: categories, selected: selectedCategories, onToggle: (v) => toggle(selectedCategories, setSelectedCategories, v) },
               { key: "gender", title: t.gender, items: genders, selected: selectedGenders, onToggle: (v) => toggle(selectedGenders, setSelectedGenders, v) },
             ]}
@@ -423,8 +495,18 @@ const StanleyStellaPage = () => {
             <>
               <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-4">
                 {slice.map((s) => {
-                  const main = resolveUrl(s.cover_url || s.main_picture_url, THUMB_TRANSFORM);
-                  const over = resolveUrl(s.over_url || s.over_picture_url, THUMB_TRANSFORM);
+                  let main = resolveUrl(s.cover_url || s.main_picture_url, THUMB_TRANSFORM);
+                  let over: string | null = resolveUrl(s.over_url || s.over_picture_url, THUMB_TRANSFORM);
+                  // If a color filter is active, show the matching color's image.
+                  if (selectedBuckets.size) {
+                    const imgs = colorMap.get(s.style_code)?.bucketImages;
+                    if (imgs) {
+                      for (const b of selectedBuckets) {
+                        const u = imgs.get(b);
+                        if (u) { main = resolveUrl(u, THUMB_TRANSFORM); over = null; break; }
+                      }
+                    }
+                  }
                   const swatches = styleColorHex.get(s.style_code);
                   return (
                     <button
@@ -433,21 +515,21 @@ const StanleyStellaPage = () => {
                       onClick={() => openDetail(s)}
                       className="group block overflow-hidden border border-border bg-card text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
                     >
-                      <div className="relative aspect-[3/4] overflow-hidden bg-[#EFEAE0]">
+                      <div className="relative aspect-[3/4] overflow-hidden bg-white">
                         {main ? (
                           <>
                             <img
                               src={main}
                               alt={s.name}
                               loading="lazy"
-                              className={`absolute inset-0 h-full w-full scale-[1.04] object-cover object-center transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
+                              className={`absolute inset-0 h-full w-full object-contain p-2 transition-opacity duration-500 ${over ? "group-hover:opacity-0" : ""}`}
                             />
                             {over && (
                               <img
                                 src={over}
                                 alt=""
                                 loading="lazy"
-                                className="absolute inset-0 h-full w-full scale-[1.04] object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                                className="absolute inset-0 h-full w-full object-contain p-2 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                               />
                             )}
                           </>
