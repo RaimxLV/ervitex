@@ -471,13 +471,10 @@ const CatalogCard = ({ item, lang, viewLabel }: CardProps) => {
           </div>
         )}
         <Badge className="absolute left-2 top-2 rounded-none bg-primary px-2 py-0 font-heading text-[9px] uppercase tracking-widest text-primary-foreground">
-          {SOURCE_META[item.source][lang]}
+          {item.brand && item.brand.toLowerCase() !== SOURCE_META[item.source][lang].toLowerCase()
+            ? item.brand
+            : SOURCE_META[item.source][lang]}
         </Badge>
-        {item.brand && (
-          <span className="absolute right-2 top-2 max-w-[60%] truncate bg-background/90 px-1.5 py-0.5 text-right font-heading text-[9px] font-bold uppercase tracking-wider text-foreground">
-            {item.brand}
-          </span>
-        )}
       </div>
 
       <div className="space-y-1.5 p-3">
