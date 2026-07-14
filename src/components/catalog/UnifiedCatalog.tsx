@@ -135,10 +135,10 @@ interface Props {
 const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const { lang } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const [items, setItems] = useState<EnrichedItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [selected, setSelected] = useState<EnrichedItem | null>(null);
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(
