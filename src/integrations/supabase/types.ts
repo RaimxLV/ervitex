@@ -1163,6 +1163,24 @@ export type Database = {
         }
         Relationships: []
       }
+      catalog_items_mv: {
+        Row: {
+          brand: string | null
+          category: string | null
+          color_hexes: string[] | null
+          color_names: string[] | null
+          description: string | null
+          gender: string | null
+          group_name: string | null
+          hover_image_url: string | null
+          id: string | null
+          image_url: string | null
+          name: string | null
+          sort_order: number | null
+          source: string | null
+        }
+        Relationships: []
+      }
       nwg_skus_public: {
         Row: {
           active: boolean | null
@@ -1365,6 +1383,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      refresh_catalog_items_mv: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
     }
     Enums: {
