@@ -420,8 +420,26 @@ const NwgPage = () => {
       <section className="bg-background">
         <div className="container grid gap-6 px-4 py-8 lg:grid-cols-[260px_1fr]">
           <CatalogFiltersSidebar
-            onClearAll={() => { setSelectedBrands(new Set()); setSelectedCategories(new Set()); setSelectedGenders(new Set()); }}
+            onClearAll={() => { setSelectedBrands(new Set()); setSelectedCategories(new Set()); setSelectedGenders(new Set()); setSelectedBuckets(new Set()); }}
             sections={[
+              {
+                key: "color",
+                title: lang === "lv" ? "Krāsa" : "Color",
+                items: bucketItems.map((b) => ({ label: b.label, count: b.count })),
+                selected: new Set(
+                  [...selectedBuckets]
+                    .map((k) => COLOR_BUCKETS.find((x) => x.key === k))
+                    .filter(Boolean)
+                    .map((b) => (lang === "lv" ? b!.lv : b!.en))
+                ),
+                onToggle: (label) => {
+                  const b = COLOR_BUCKETS.find((x) => (lang === "lv" ? x.lv : x.en) === label);
+                  if (!b) return;
+                  const next = new Set(selectedBuckets);
+                  next.has(b.key) ? next.delete(b.key) : next.add(b.key);
+                  setSelectedBuckets(next);
+                },
+              },
               { key: "brand", title: t.brand, items: brands, selected: selectedBrands, onToggle: (v) => toggle(selectedBrands, setSelectedBrands, v) },
               { key: "gender", title: t.gender, items: genders, selected: selectedGenders, onToggle: (v) => toggle(selectedGenders, setSelectedGenders, v) },
               { key: "category", title: t.category, items: categories, selected: selectedCategories, onToggle: (v) => toggle(selectedCategories, setSelectedCategories, v) },
