@@ -25,6 +25,7 @@ interface ColorDetail {
   name: string;
   hex: string | null;
   images: string[];
+  sizes: string[];
 }
 
 interface ProductDetail {
@@ -33,8 +34,13 @@ interface ProductDetail {
   brand: string | null;
   category: string | null;
   gender: string | null;
+  shortDescription: string | null;
   description: string | null;
+  features: string[];
   material: string | null;
+  care: string | null;
+  specs: { label: string; value: string }[];
+  notice: string | null;
   sizes: string[];
   colors: ColorDetail[];
 }
@@ -61,6 +67,44 @@ const ssUrl = (raw?: string | null): string | null => {
 /* ---------- Loaders ---------- */
 const HEX_VALID = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
 const cleanHex = (h?: string | null) => (h && HEX_VALID.test(h.trim()) ? h.trim() : null);
+
+const SIZE_ORDER = ["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "2XL", "3XL", "XXXL", "4XL", "XXXXL", "5XL", "XXXXXL", "6XL"];
+const sizeIndex = (s?: string | null) => {
+  if (!s) return 999;
+  const i = SIZE_ORDER.indexOf(s.toUpperCase());
+  return i === -1 ? 500 : i;
+};
+
+const lines = (txt?: string | null) =>
+  (txt || "")
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+const cleanText = (v?: unknown): string | null => {
+  if (v === null || v === undefined) return null;
+  const s = String(v).trim();
+  if (!s || s === "false" || s === "[object Object]") return null;
+  return s;
+};
+
+const addSpec = (arr: { label: string; value: string }[], label: string, value?: unknown, suffix = "") => {
+  const v = cleanText(value);
+  if (v) arr.push({ label, value: `${v}${suffix}` });
+};
+
+const uniqueSortedSizes = (sizes: Iterable<string>) =>
+  Array.from(new Set(Array.from(sizes).filter(Boolean))).sort((a, b) => sizeIndex(a) - sizeIndex(b) || a.localeCompare(b));
+
+const isLightHex = (hex?: string | null) => {
+  const bg = cleanHex(hex) || "#e5e5e5";
+  const hx = bg.replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(hx)) return false;
+  const r = parseInt(hx.slice(0, 2), 16);
+  const g = parseInt(hx.slice(2, 4), 16);
+  const b = parseInt(hx.slice(4, 6), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 225;
+};
 
 async function loadSS(styleCode: string): Promise<ProductDetail | null> {
   const [styleRes, variantsRes, imagesRes] = await Promise.all([
