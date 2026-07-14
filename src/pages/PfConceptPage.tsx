@@ -154,13 +154,32 @@ const PfConceptPage = () => {
       if (selectedGroups.size && (!s.category_group || !selectedGroups.has(s.category_group))) return false;
       if (selectedCategories.size && (!s.category || !selectedCategories.has(s.category))) return false;
       if (needle && !`${s.description ?? ""} ${s.model_code} ${s.ext_desc ?? ""}`.toLowerCase().includes(needle)) return false;
+      if (selectedBuckets.size) {
+        const bc = colorMap.get(s.model_code)?.buckets;
+        if (!bc) return false;
+        let ok = false;
+        for (const b of selectedBuckets) if (bc.has(b)) { ok = true; break; }
+        if (!ok) return false;
+      }
       return true;
     });
-  }, [rows, q, selectedBrands, selectedGroups, selectedCategories]);
+  }, [rows, q, selectedBrands, selectedGroups, selectedCategories, selectedBuckets, colorMap]);
+
+  const bucketItems = useMemo(() => {
+    const counts = new Map<ColorBucketKey, number>();
+    for (const r of rows) {
+      const bc = colorMap.get(r.model_code)?.buckets;
+      if (!bc) continue;
+      for (const b of bc) counts.set(b, (counts.get(b) || 0) + 1);
+    }
+    return COLOR_BUCKETS
+      .map((b) => ({ key: b.key, label: lang === "lv" ? b.lv : b.en, count: counts.get(b.key) || 0 }))
+      .filter((x) => x.count > 0);
+  }, [rows, colorMap, lang]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const slice = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  useEffect(() => { setPage(1); }, [q, selectedBrands, selectedGroups, selectedCategories]);
+  useEffect(() => { setPage(1); }, [q, selectedBrands, selectedGroups, selectedCategories, selectedBuckets]);
 
   // Fetch color variants for visible cards
   useEffect(() => {
