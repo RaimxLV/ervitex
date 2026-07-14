@@ -1,14 +1,25 @@
-// PF Concept — Data Feeds v3 sync (public feeds, no auth required)
-// Docs: https://thedigitalcatalogue.com/pdf/2025/data_feed_manual.pdf
-// Product feed: https://www.pfconcept.com/portal/datafeed/productfeed_en_v3.json (~188 MB)
+// PF Concept — Data Feeds v3 sync with Storage-cached, chunked architecture
 //
-// Modes:
-//   ?mode=products&offset=0&limit=500   process a window of models
-//   ?mode=probe                          fetch first model only (sanity test)
-//   ?lang=en                             feed language (en, de, fr, ...)
+// Two-phase design to stay well under edge-function memory/CPU limits and
+// avoid re-downloading the 188 MB feed on every invocation.
 //
-// Because the feed is ~188 MB, we stream it with @streamparser/json and skip
-// until `offset`, then process `limit` models per invocation.
+// Phase 1 — CACHE (run once per full sync):
+//   ?mode=cache&lang=en&chunkSize=150
+//   Streams the public PF feed, splits models into small JSON chunk files,
+//   uploads each chunk to Storage bucket `pf-feeds/chunks/<lang>/chunk_XXXX.json`,
+//   and writes a `manifest.json` with total chunks + model count.
+//
+// Phase 2 — PROCESS (run many times, cheap):
+//   ?mode=process&lang=en&from=0&to=9        process chunks 0..9 inclusive
+//   ?mode=process&lang=en&chunk=42            process a single chunk
+//   Each chunk is a few MB, parses instantly, upserts to pf_styles/variants/images.
+//
+// Helpers:
+//   ?mode=manifest&lang=en                    read manifest
+//   ?mode=probe                                sanity fetch first bytes of feed
+//
+// Storage bucket `pf-feeds` is PRIVATE. Only the service role (this function)
+// reads/writes it. No public exposure.
 
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { JSONParser } from "https://esm.sh/@streamparser/json@0.0.21";
@@ -19,9 +30,11 @@ const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
 };
 
+const BUCKET = "pf-feeds";
 const IMG_BASE_500 = "https://images.pfconcept.com/ProductImages_All/JPG/500x500/";
 const IMG_BASE_1600 = "https://images.pfconcept.com/ProductImages_All/JPG/1600x1600/";
 
+// ---------------------------------------------------------------- utils
 const toStr = (v: unknown): string | null => {
   if (v === null || v === undefined) return null;
   const s = String(v).trim();
@@ -42,7 +55,6 @@ async function chunkUpsert(
   sb: SupabaseClient, table: string, rows: any[], conflict: string, size = 300,
 ) {
   if (!rows.length) return 0;
-  // dedupe by conflict key
   const keys = conflict.split(",").map((s) => s.trim());
   const map = new Map<string, any>();
   for (const r of rows) map.set(keys.map((k) => String(r[k] ?? "")).join("\u0001"), r);
@@ -66,22 +78,18 @@ async function finishLog(sb: SupabaseClient, id: string | undefined, patch: Reco
   await sb.from("sync_logs").update({ ...patch, finished_at: new Date().toISOString() }).eq("id", id);
 }
 
-// --------------------------------------------------------------- mapping
+// -------------------------------------------------------- mapping (model → rows)
 
-interface Batches {
-  styles: any[]; variants: any[]; images: any[];
-}
+interface Batches { styles: any[]; variants: any[]; images: any[]; }
 
 function mapModel(model: any, batches: Batches) {
   const modelCode = toStr(model?.modelCode);
   if (!modelCode) return;
 
-  const items = Array.isArray(model?.items) ? model.items : (model?.items?.item ? [{ item: model.items.item }] : []);
-  // items shape in feed is: "items": [ { "item": {...} }, ... ]
-  const flatItems = items.map((x: any) => x?.item ?? x).filter(Boolean);
+  const rawItems = Array.isArray(model?.items) ? model.items : (model?.items ? [model.items] : []);
+  const flatItems = rawItems.map((x: any) => x?.item ?? x).filter(Boolean);
 
-  // Colors are attached per item; collect distinct color palette at model level
-  const colorMap = new Map<string, { code: string; desc: string | null; base: string | null; hex: string | null; pms: string | null }>();
+  const colorMap = new Map<string, boolean>();
   const attrs: Record<string, string | null> = {};
   let brand: string | null = null;
   let categoryGroup: string | null = null;
@@ -91,7 +99,6 @@ function mapModel(model: any, batches: Batches) {
   let gender: string | null = null;
   let country: string | null = null;
 
-  // Attributes at model level
   const modelAttrs = model?.attributes?.attribute;
   if (Array.isArray(modelAttrs)) {
     for (const a of modelAttrs) {
@@ -113,19 +120,10 @@ function mapModel(model: any, batches: Batches) {
 
     const colors = it?.colors?.color;
     const colorArr: any[] = Array.isArray(colors) ? colors : (colors ? [colors] : []);
-    // Pick primary color for variant row (first)
     const primary = colorArr[0] ?? null;
     for (const c of colorArr) {
       const cc = toStr(c?.colorCode);
-      if (cc && !colorMap.has(cc)) {
-        colorMap.set(cc, {
-          code: cc,
-          desc: toStr(c?.colorDesc),
-          base: toStr(c?.baseColor),
-          hex: toStr(c?.hexColor),
-          pms: toStr(c?.pmsColorReference),
-        });
-      }
+      if (cc) colorMap.set(cc, true);
     }
 
     batches.variants.push({
@@ -146,7 +144,6 @@ function mapModel(model: any, batches: Batches) {
       raw: null,
     });
 
-    // Images from imageData
     const imgD = it?.imageData ?? {};
     const imgFields: Array<[string, string]> = [
       ["main", "imageMain"], ["front", "imageFront"], ["back", "imageBack"],
@@ -171,7 +168,6 @@ function mapModel(model: any, batches: Batches) {
     }
   }
 
-  // Fallback main image if items lacked one
   const firstImgRow = batches.images.find((i) => i.model_code === modelCode && i.kind === "main");
   const mainImage = firstImgRow?.filename ?? `${modelCode}.jpg`;
 
@@ -204,15 +200,14 @@ async function flushBatches(sb: SupabaseClient, b: Batches) {
   b.styles = []; b.variants = []; b.images = [];
 }
 
-// --------------------------------------------------------------- streaming
+// ------------------------------------------------------- Phase 1: CACHE + SPLIT
 
-async function syncProducts(
+async function cacheAndSplit(
   sb: SupabaseClient,
-  opts: { lang?: string; offset?: number; limit?: number } = {},
+  opts: { lang?: string; chunkSize?: number } = {},
 ) {
   const lang = (opts.lang || "en").toLowerCase();
-  const offset = Math.max(0, opts.offset ?? 0);
-  const limit = Math.max(1, Math.min(opts.limit ?? 500, 2000));
+  const chunkSize = Math.max(50, Math.min(opts.chunkSize ?? 150, 500));
   const url = `https://www.pfconcept.com/portal/datafeed/productfeed_${lang}_v3.json`;
 
   const res = await fetch(url);
@@ -224,19 +219,32 @@ async function syncProducts(
     keepStack: false,
   });
 
-  let seen = 0;
-  let processed = 0;
-  const batches: Batches = { styles: [], variants: [], images: [] };
-  let stop = false;
+  let modelCount = 0;
+  let chunkIdx = 0;
+  let currentBatch: any[] = [];
+  const uploads: Promise<any>[] = [];
+
+  const flushChunk = async () => {
+    if (!currentBatch.length) return;
+    const idx = chunkIdx++;
+    const path = `chunks/${lang}/chunk_${String(idx).padStart(4, "0")}.json`;
+    const body = new Blob([JSON.stringify(currentBatch)], { type: "application/json" });
+    currentBatch = [];
+    // Serialize uploads to avoid concurrent-memory spikes
+    const { error } = await sb.storage.from(BUCKET).upload(path, body, {
+      upsert: true, contentType: "application/json",
+    });
+    if (error) throw new Error(`upload ${path}: ${error.message}`);
+  };
 
   const done = new Promise<void>((resolve, reject) => {
     parser.onValue = (v: any) => {
-      if (stop) return;
-      seen++;
-      if (seen <= offset) return;
-      if (processed >= limit) { stop = true; return; }
-      try { mapModel(v.value, batches); processed++; }
-      catch (e) { console.error("mapModel:", (e as Error).message); }
+      currentBatch.push(v.value);
+      modelCount++;
+      if (currentBatch.length >= chunkSize) {
+        // Fire-and-hold: push a promise, awaited between reads below
+        uploads.push(flushChunk());
+      }
     };
     parser.onEnd = () => resolve();
     parser.onError = (e: any) => reject(e);
@@ -244,39 +252,88 @@ async function syncProducts(
 
   const reader = res.body.getReader();
   try {
-    while (!stop) {
+    while (true) {
       const { value, done: rd } = await reader.read();
       if (rd) break;
-      try { parser.write(value); } catch (e) {
-        // parser may throw on stop — treat gracefully
-        if (!stop) throw e;
-      }
-      // Periodically flush to keep memory low
-      if (batches.styles.length >= 100) {
-        await flushBatches(sb, batches);
+      parser.write(value);
+      // Backpressure: await any pending uploads before continuing to read
+      if (uploads.length) {
+        await Promise.all(uploads.splice(0));
       }
     }
   } finally {
     try { reader.cancel(); } catch {}
   }
-  if (!stop) { try { parser.end(); await done; } catch {} }
-  await flushBatches(sb, batches);
+  parser.end();
+  await done;
+  await flushChunk();
+  if (uploads.length) await Promise.all(uploads);
 
-  return { lang, offset, limit, seen_before_stop: seen, processed, next_offset: offset + processed, has_more: processed >= limit };
+  // Write manifest
+  const manifest = {
+    lang,
+    chunk_size: chunkSize,
+    total_chunks: chunkIdx,
+    total_models: modelCount,
+    created_at: new Date().toISOString(),
+    source_url: url,
+  };
+  const { error: mErr } = await sb.storage.from(BUCKET).upload(
+    `chunks/${lang}/manifest.json`,
+    new Blob([JSON.stringify(manifest, null, 2)], { type: "application/json" }),
+    { upsert: true, contentType: "application/json" },
+  );
+  if (mErr) throw new Error(`manifest upload: ${mErr.message}`);
+
+  return manifest;
+}
+
+// ------------------------------------------------------- Phase 2: PROCESS chunk
+
+async function readManifest(sb: SupabaseClient, lang: string) {
+  const { data, error } = await sb.storage.from(BUCKET).download(`chunks/${lang}/manifest.json`);
+  if (error) throw new Error(`manifest: ${error.message}`);
+  return JSON.parse(await data.text());
+}
+
+async function processChunk(sb: SupabaseClient, lang: string, chunkIdx: number) {
+  const path = `chunks/${lang}/chunk_${String(chunkIdx).padStart(4, "0")}.json`;
+  const { data, error } = await sb.storage.from(BUCKET).download(path);
+  if (error) throw new Error(`download ${path}: ${error.message}`);
+  const models: any[] = JSON.parse(await data.text());
+  const batches: Batches = { styles: [], variants: [], images: [] };
+  for (const m of models) mapModel(m, batches);
+  const s = batches.styles.length, v = batches.variants.length, i = batches.images.length;
+  await flushBatches(sb, batches);
+  return { chunk: chunkIdx, models: models.length, styles: s, variants: v, images: i };
+}
+
+async function processRange(sb: SupabaseClient, lang: string, from: number, to: number) {
+  const results: any[] = [];
+  for (let i = from; i <= to; i++) {
+    try {
+      results.push(await processChunk(sb, lang, i));
+    } catch (e) {
+      results.push({ chunk: i, error: (e as Error).message });
+    }
+  }
+  const totals = results.reduce(
+    (acc, r) => ({
+      models: acc.models + (r.models ?? 0),
+      styles: acc.styles + (r.styles ?? 0),
+      variants: acc.variants + (r.variants ?? 0),
+      images: acc.images + (r.images ?? 0),
+    }),
+    { models: 0, styles: 0, variants: 0, images: 0 },
+  );
+  return { from, to, totals, chunks_processed: results.length, results };
 }
 
 async function probe(lang = "en") {
   const url = `https://www.pfconcept.com/portal/datafeed/productfeed_${lang}_v3.json`;
-  const res = await fetch(url, { headers: { Range: "bytes=0-200000" } });
+  const res = await fetch(url, { headers: { Range: "bytes=0-100000" } });
   const text = await res.text();
-  const idx = text.indexOf('"model"');
-  return {
-    ok: res.ok,
-    status: res.status,
-    length_hint: res.headers.get("content-length"),
-    sample_head: text.slice(0, 500),
-    first_model_at: idx,
-  };
+  return { ok: res.ok, status: res.status, sample: text.slice(0, 400) };
 }
 
 // ------------------------------------------------------------------ handler
@@ -285,16 +342,33 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const url = new URL(req.url);
-  const mode = (url.searchParams.get("mode") || "products").toLowerCase();
+  const mode = (url.searchParams.get("mode") || "manifest").toLowerCase();
   const lang = url.searchParams.get("lang") || "en";
-  const offset = Number(url.searchParams.get("offset") || "0");
-  const limit = Number(url.searchParams.get("limit") || "500");
 
   const logId = await startLog(sb, `pf:${mode}`);
   try {
     let result: unknown;
-    if (mode === "probe") result = await probe(lang);
-    else result = await syncProducts(sb, { lang, offset, limit });
+    if (mode === "probe") {
+      result = await probe(lang);
+    } else if (mode === "cache") {
+      const chunkSize = Number(url.searchParams.get("chunkSize") || "150");
+      result = await cacheAndSplit(sb, { lang, chunkSize });
+    } else if (mode === "manifest") {
+      result = await readManifest(sb, lang);
+    } else if (mode === "process") {
+      const chunk = url.searchParams.get("chunk");
+      const from = url.searchParams.get("from");
+      const to = url.searchParams.get("to");
+      if (chunk !== null) {
+        result = await processChunk(sb, lang, Number(chunk));
+      } else if (from !== null && to !== null) {
+        result = await processRange(sb, lang, Number(from), Number(to));
+      } else {
+        throw new Error("process mode requires ?chunk=N or ?from=A&to=B");
+      }
+    } else {
+      throw new Error(`unknown mode: ${mode}`);
+    }
 
     await finishLog(sb, logId, { status: "success", message: `PF sync (${mode}) ok`, details: result as any });
     return new Response(JSON.stringify({ ok: true, mode, result }), {
