@@ -465,8 +465,17 @@ const NwgPage = () => {
                     const variants = cardVariants.get(s.product_number) || [];
                     const activeVariantItem = cardActive.get(s.product_number);
                     const activeV = activeVariantItem ? variants.find((v) => v.item_number === activeVariantItem) : null;
-                    const main = activeV?.main_picture_url || s.main_picture_url;
-                    const hover = s.hover_picture_url;
+                    let main: string | null = activeV?.main_picture_url || s.main_picture_url;
+                    let hover: string | null = s.hover_picture_url;
+                    if (!activeV && selectedBuckets.size) {
+                      const imgs = colorMap.get(s.product_number)?.bucketImages;
+                      if (imgs) {
+                        for (const b of selectedBuckets) {
+                          const u = imgs.get(b);
+                          if (u) { main = u; hover = null; break; }
+                        }
+                      }
+                    }
                     return (
                       <button
                         key={s.product_number}
