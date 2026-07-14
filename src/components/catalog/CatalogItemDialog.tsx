@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
-import QuoteRequestForm from "@/components/QuoteRequestForm";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
+import { Link } from "react-router-dom";
 
 interface Props {
   open: boolean;
@@ -108,7 +109,11 @@ const isLightHex = (hex?: string | null) => {
 
 async function loadSS(styleCode: string): Promise<ProductDetail | null> {
   const [styleRes, variantsRes, imagesRes] = await Promise.all([
-    supabase.from("ss_styles").select("style_code,name,short_description,long_description,category,type,gender,composition,brand").eq("style_code", styleCode).maybeSingle(),
+    supabase
+      .from("ss_styles")
+      .select("style_code,name,short_description,long_description,category,type,gender,segment,style_main_segment,fit,weight_gsm,neckline,sleeve,wash_instructions,specifications,composition,brand,main_picture_url,over_picture_url,raw")
+      .eq("style_code", styleCode)
+      .maybeSingle(),
     supabase.from("ss_variants").select("color_code,color_name,hex_color_code,size_code,color_sequence,size_sequence").eq("style_code", styleCode),
     supabase.from("ss_images").select("color_code,image_type,fname,public_url,source_url,sort_order,is_main").eq("style_code", styleCode).order("sort_order", { ascending: true }),
   ]);
@@ -116,10 +121,12 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
   if (!style) return null;
   const variants = variantsRes.data || [];
   const images = imagesRes.data || [];
+  const raw = ((style as any).raw || {}) as Record<string, unknown>;
 
   // Colors (ordered by color_sequence)
   const colorMap = new Map<string, { code: string; name: string; hex: string | null; seq: number }>();
   const sizeMap = new Map<string, number>();
+  const sizesByColor = new Map<string, Set<string>>();
   for (const v of variants) {
     if (v.color_code && !colorMap.has(v.color_code)) {
       colorMap.set(v.color_code, {
@@ -130,26 +137,50 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
       });
     }
     if (v.size_code) sizeMap.set(v.size_code, Math.min(sizeMap.get(v.size_code) ?? 9999, v.size_sequence ?? 9999));
+    if (v.color_code && v.size_code) {
+      if (!sizesByColor.has(v.color_code)) sizesByColor.set(v.color_code, new Set());
+      sizesByColor.get(v.color_code)!.add(v.size_code);
+    }
   }
   const sortedColors = [...colorMap.values()].sort((a, b) => a.seq - b.seq);
-  const sortedSizes = [...sizeMap.entries()].sort((a, b) => a[1] - b[1]).map((x) => x[0]);
+  const sortedSizes = [...sizeMap.entries()].sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0])).map((x) => x[0]);
 
   // Group images by color
   const imgByColor = new Map<string, string[]>();
+  const fallbackImages: string[] = [];
   for (const im of images) {
     const url = ssUrl((im as any).public_url) || ssUrl((im as any).source_url);
     if (!url) continue;
     const key = (im as any).color_code || "";
     if (!imgByColor.has(key)) imgByColor.set(key, []);
     imgByColor.get(key)!.push(url);
+    if ((im as any).is_main || !key) fallbackImages.push(url);
   }
+  const mainPicture = ssUrl((style as any).main_picture_url);
+  const overPicture = ssUrl((style as any).over_picture_url);
+  if (mainPicture) fallbackImages.unshift(mainPicture);
+  if (overPicture) fallbackImages.push(overPicture);
+
+  const dedupe = (arr: string[]) => Array.from(new Set(arr.filter(Boolean)));
 
   const colors: ColorDetail[] = sortedColors.map((c) => ({
     code: c.code,
     name: c.name,
     hex: c.hex,
-    images: imgByColor.get(c.code) || [],
+    images: dedupe(imgByColor.get(c.code) || fallbackImages),
+    sizes: uniqueSortedSizes(sizesByColor.get(c.code) || []),
   }));
+
+  const specs: { label: string; value: string }[] = [];
+  addSpec(specs, "Fit", (style as any).fit || raw.Fit);
+  addSpec(specs, "Weight", (style as any).weight_gsm || raw.Weight, (style as any).weight_gsm || raw.Weight ? " GSM" : "");
+  addSpec(specs, "Neckline", (style as any).neckline || raw.Neckline);
+  addSpec(specs, "Sleeve", (style as any).sleeve || raw.Sleeve);
+  addSpec(specs, "Category", (style as any).category || raw.Category);
+  addSpec(specs, "Type", (style as any).type || raw.Type);
+  addSpec(specs, "Gender", (style as any).gender || raw.Gender);
+  addSpec(specs, "Segment", (style as any).style_main_segment || (style as any).segment || raw.StyleMainsSegments || raw.Segment);
+  const features = lines((style as any).long_description || raw.LongDescription || (style as any).specifications || raw.Specifications);
 
   return {
     title: style.name,
@@ -157,8 +188,13 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
     brand: (style as any).brand || "Stanley/Stella",
     category: style.category || style.type,
     gender: style.gender,
-    description: style.long_description || style.short_description,
+    shortDescription: cleanText((style as any).short_description || raw.ShortDescription),
+    description: cleanText((style as any).long_description || raw.LongDescription || (style as any).short_description || raw.ShortDescription),
+    features,
     material: (style as any).composition || null,
+    care: cleanText((style as any).wash_instructions || raw.WashInstructions),
+    specs,
+    notice: cleanText(raw.StyleNotice || raw.Notice),
     sizes: sortedSizes,
     colors,
   };
@@ -212,6 +248,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     name: v.color_name || v.color_code || v.item_number,
     hex: hexFromNwg(v),
     images: imgByItem.get(v.item_number) || (v.main_picture_url ? [v.main_picture_url] : []),
+    sizes: uniqueSortedSizes((sizesByItem.get(v.item_number) || []).map((s) => s.s)),
   }));
 
   const sizeSet = new Map<string, string>();
@@ -224,8 +261,16 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     brand: style.brand,
     category: style.category,
     gender: style.gender,
+    shortDescription: cleanText(style.commerce_text),
     description: [style.commerce_text, style.catalog_text, style.usp].filter(Boolean).join("\n\n") || null,
+    features: lines(style.usp),
     material: style.fabrics || style.fit || null,
+    care: null,
+    specs: [
+      ...(style.fit ? [{ label: "Fit", value: style.fit }] : []),
+      ...(style.gender ? [{ label: "Gender", value: style.gender }] : []),
+    ],
+    notice: null,
     sizes,
     colors,
   };
@@ -257,10 +302,15 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
   }
 
   const colorMap = new Map<string, { code: string; name: string; hex: string | null; itemCodes: Set<string> }>();
+  const sizesByColor = new Map<string, Set<string>>();
   const sizeSet = new Set<string>();
   for (const v of variants as any[]) {
     if (v.size) sizeSet.add(v.size);
     const key = v.color_code || v.color_desc || v.item_code;
+    if (v.size) {
+      if (!sizesByColor.has(key)) sizesByColor.set(key, new Set());
+      sizesByColor.get(key)!.add(v.size);
+    }
     if (!colorMap.has(key)) {
       colorMap.set(key, {
         code: key,
@@ -275,7 +325,7 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
   const colors: ColorDetail[] = [...colorMap.values()].map((c) => {
     const imgs: string[] = [];
     for (const ic of c.itemCodes) for (const u of imgByItem.get(ic) || []) if (!imgs.includes(u)) imgs.push(u);
-    return { code: c.code, name: c.name, hex: c.hex, images: imgs.length ? imgs : modelImgs };
+    return { code: c.code, name: c.name, hex: c.hex, images: imgs.length ? imgs : modelImgs, sizes: uniqueSortedSizes(sizesByColor.get(c.code) || []) };
   });
 
   const sizeOrder = ["XXS","XS","S","M","L","XL","XXL","XXXL","3XL","4XL","5XL"];
@@ -294,8 +344,16 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
     brand: style.brand,
     category: style.category || style.category_group,
     gender: style.gender,
+    shortDescription: cleanText(style.description),
     description: style.ext_desc || style.description || null,
+    features: lines(style.ext_desc),
     material: style.material || null,
+    care: null,
+    specs: [
+      ...(style.category_group ? [{ label: "Group", value: style.category_group }] : []),
+      ...(style.gender ? [{ label: "Gender", value: style.gender }] : []),
+    ],
+    notice: null,
     sizes,
     colors,
   };
@@ -344,11 +402,71 @@ const CatalogItemDialog = ({
   }, [currentColor, detail, image]);
 
   const mainImg = gallery[imgIndex] || gallery[0] || image;
+  const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : detail?.sizes || [];
+  const descriptionLines = detail?.features.length ? detail.features : lines(detail?.description || descriptionFallback);
+  const label = {
+    lv: {
+      description: "Apraksts",
+      composition: "Sastāvs",
+      care: "Kopšanas instrukcijas",
+      specifications: "Specifikācija",
+      colors: "Krāsas",
+      sizes: "Izmēri",
+      request: "Pieprasīt cenu šim modelim",
+      noImage: "Bez attēla",
+      allColors: "Visas krāsas",
+    },
+    en: {
+      description: "Description",
+      composition: "Composition",
+      care: "Care instructions",
+      specifications: "Specifications",
+      colors: "Colors",
+      sizes: "Sizes",
+      request: "Request a quote for this model",
+      noImage: "No image",
+      allColors: "All colours",
+    },
+  }[lang];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto p-0">
-        <div className="p-6">
+      <DialogContent className="max-w-6xl max-h-[92vh] overflow-y-auto bg-background p-0">
+        <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
+          <div className="space-y-3">
+            <div className="aspect-[3/4] w-full overflow-hidden bg-muted">
+              {mainImg ? (
+                <img
+                  src={mainImg}
+                  alt={currentColor?.name || detail?.title || id}
+                  className="h-full w-full object-cover"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
+                />
+              ) : loading ? (
+                <Skeleton className="h-full w-full" />
+              ) : (
+                <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                  {label.noImage}
+                </div>
+              )}
+            </div>
+            {gallery.length > 1 && (
+              <div className="grid grid-cols-5 gap-2">
+                {gallery.slice(0, 15).map((u, i) => (
+                  <button
+                    key={u + i}
+                    type="button"
+                    onClick={() => setImgIndex(i)}
+                    className={`aspect-square overflow-hidden border-2 ${i === imgIndex ? "border-accent" : "border-transparent hover:border-border"} bg-muted`}
+                  >
+                    <img src={u} alt="" className="h-full w-full object-cover" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-6">
           <DialogHeader>
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="font-mono text-[10px] uppercase">
@@ -371,48 +489,14 @@ const CatalogItemDialog = ({
                 </Badge>
               )}
             </div>
-            <DialogTitle className="mt-1 font-heading text-2xl uppercase tracking-wide">
+            <DialogTitle className="mt-1 font-heading text-3xl font-black uppercase tracking-wide">
               {detail?.title || name || id}
             </DialogTitle>
+            {(detail?.shortDescription || descriptionFallback) && (
+              <p className="text-base text-muted-foreground">{detail?.shortDescription || descriptionFallback}</p>
+            )}
           </DialogHeader>
 
-          <div className="mt-4 grid gap-6 md:grid-cols-2">
-            {/* Gallery */}
-            <div>
-              <div className="aspect-[3/4] w-full overflow-hidden bg-white border border-border">
-                {mainImg ? (
-                  <img
-                    src={mainImg}
-                    alt={currentColor?.name || detail?.title || id}
-                    className="h-full w-full object-contain p-2"
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
-                  />
-                ) : loading ? (
-                  <Skeleton className="h-full w-full" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                    {lang === "lv" ? "Bez attēla" : "No image"}
-                  </div>
-                )}
-              </div>
-              {gallery.length > 1 && (
-                <div className="mt-2 grid grid-cols-6 gap-1">
-                  {gallery.slice(0, 12).map((u, i) => (
-                    <button
-                      key={u + i}
-                      type="button"
-                      onClick={() => setImgIndex(i)}
-                      className={`aspect-square overflow-hidden border ${i === imgIndex ? "border-accent ring-1 ring-accent" : "border-border"} bg-white`}
-                    >
-                      <img src={u} alt="" className="h-full w-full object-contain p-0.5" loading="lazy" />
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="space-y-5">
               {loading && !detail && (
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-3/4" />
@@ -421,49 +505,39 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {(detail?.description || descriptionFallback) && (
-                <div>
-                  <h4 className="mb-1 font-heading text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    {lang === "lv" ? "Apraksts" : "Description"}
-                  </h4>
-                  <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/85">
-                    {detail?.description || descriptionFallback}
-                  </p>
+              {(detail?.specs.length ?? 0) > 0 && (
+                <div className="flex flex-wrap gap-x-8 gap-y-2 border-y border-border py-3 text-sm">
+                  {detail!.specs.map((s) => (
+                    <div key={`${s.label}-${s.value}`}>
+                      <span className="font-semibold">{s.label}: </span>
+                      <span className="text-muted-foreground">{s.value}</span>
+                    </div>
+                  ))}
                 </div>
               )}
 
-              {detail?.material && (
-                <div>
-                  <h4 className="mb-1 font-heading text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    {lang === "lv" ? "Materiāls" : "Material"}
-                  </h4>
-                  <p className="text-sm text-foreground/85">{detail.material}</p>
-                </div>
-              )}
-
-              {/* Colors */}
               {(detail?.colors.length ?? 0) > 0 && (
                 <div>
                   <div className="mb-2 flex items-baseline justify-between">
-                    <h4 className="font-heading text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                      {lang === "lv" ? "Krāsas" : "Colors"} ({detail!.colors.length})
+                    <h4 className="font-heading text-sm font-bold uppercase tracking-wider">
+                      {label.colors} ({detail!.colors.length})
                     </h4>
-                    {currentColor && (
-                      <span className="text-xs text-foreground">{currentColor.name}</span>
-                    )}
+                    <span className="text-xs text-muted-foreground">
+                      {currentColor ? `${currentColor.name} - ${currentColor.code}` : label.allColors}
+                    </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {detail!.colors.map((c) => {
                       const isActive = c.code === activeColor;
                       const hex = c.hex || "#e5e5e5";
-                      const light = /^#(f|e)/i.test(hex);
                       return (
                         <button
                           key={c.code}
                           type="button"
                           onClick={() => { setActiveColor(c.code); setImgIndex(0); }}
-                          title={c.name}
-                          className={`h-7 w-7 rounded-full transition ${isActive ? "ring-2 ring-accent ring-offset-2 ring-offset-background" : ""} ${light ? "border border-black/25" : "border border-black/10"}`}
+                          title={`${c.name} – ${c.code}`}
+                          aria-label={c.name}
+                          className={`h-7 w-7 rounded-full border-2 transition-transform ${isActive ? "border-foreground ring-2 ring-foreground/30 scale-110" : isLightHex(hex) ? "border-neutral-500 hover:scale-105" : "border-border hover:scale-105"}`}
                           style={{ backgroundColor: hex }}
                         />
                       );
@@ -472,14 +546,47 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {/* Sizes */}
-              {(detail?.sizes.length ?? 0) > 0 && (
+              <Button asChild size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
+                <Link to={`/contact?style=${encodeURIComponent(detail?.code || id)}${currentColor ? `&color=${encodeURIComponent(currentColor.code)}` : ""}`}>
+                  {label.request}
+                </Link>
+              </Button>
+
+              {descriptionLines.length > 0 && (
                 <div>
-                  <h4 className="mb-2 font-heading text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    {lang === "lv" ? "Izmēri" : "Sizes"}
+                  <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.description}</h4>
+                  <ul className="space-y-1.5 text-sm">
+                    {descriptionLines.map((b, i) => (
+                      <li key={`${b}-${i}`} className="flex gap-2">
+                        <span className="mt-0.5 text-accent">✓</span>
+                        <span className="text-foreground/90">{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {detail?.material && (
+                <div>
+                  <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">
+                    {label.composition}
                   </h4>
+                  <p className="text-sm text-foreground/85">{detail.material}</p>
+                </div>
+              )}
+
+              {detail?.care && (
+                <div>
+                  <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.care}</h4>
+                  <p className="whitespace-pre-line text-sm text-foreground/90">{detail.care}</p>
+                </div>
+              )}
+
+              {visibleSizes.length > 0 && (
+                <div>
+                  <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.sizes}</h4>
                   <div className="flex flex-wrap gap-1.5">
-                    {detail!.sizes.map((s) => (
+                    {visibleSizes.map((s) => (
                       <span
                         key={s}
                         className="min-w-[2.25rem] rounded-sm border border-border px-2 py-1 text-center text-xs font-medium text-foreground"
@@ -491,6 +598,10 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
+              {detail?.notice && (
+                <p className="border-t border-border pt-4 text-sm text-muted-foreground">{detail.notice}</p>
+              )}
+
               {/* Loading fallback swatches */}
               {!detail && !loading && swatches && swatches.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
@@ -499,18 +610,7 @@ const CatalogItemDialog = ({
                   ))}
                 </div>
               )}
-
-              <div className="border-t border-border pt-4">
-                <h3 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider">
-                  {lang === "lv" ? "Pieprasīt cenu" : "Request a Quote"}
-                </h3>
-                <QuoteRequestForm
-                  productId={`${source}-${id}${currentColor ? `-${currentColor.code}` : ""}`}
-                  productName={`${detail?.title || name || id}${currentColor ? ` — ${currentColor.name}` : ""}`}
-                />
-              </div>
             </div>
-          </div>
         </div>
       </DialogContent>
     </Dialog>
