@@ -319,10 +319,16 @@ const PfConceptPage = () => {
                     const variants = colorSwatches(cardVariants.get(s.model_code) || []);
                     const activeItem = cardActive.get(s.model_code);
                     const activeV = activeItem ? variants.find((v) => v.item_code === activeItem) : null;
-                    const activeImgSrc = activeV
-                      ? undefined // will be fetched only in detail; for card, fall back to main
-                      : undefined;
-                    const main = activeImgSrc || s.main_image_url;
+                    let main: string | null = s.main_image_url;
+                    if (!activeV && selectedBuckets.size) {
+                      const imgs = colorMap.get(s.model_code)?.bucketImages;
+                      if (imgs) {
+                        for (const b of selectedBuckets) {
+                          const u = imgs.get(b);
+                          if (u) { main = u; break; }
+                        }
+                      }
+                    }
                     return (
                       <button
                         key={s.model_code}
