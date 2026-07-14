@@ -471,7 +471,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}
                       noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
-                      onNavigate={() => navigate(SOURCE_META[it.source].href)}
+                      onNavigate={() => setSelected(it)}
                     />
                   ))}
                 </div>
