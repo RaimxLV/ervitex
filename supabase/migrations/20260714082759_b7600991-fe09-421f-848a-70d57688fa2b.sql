@@ -1,0 +1,1 @@
+ALTER VIEW public.pf_style_summary SET (security_invoker = true);

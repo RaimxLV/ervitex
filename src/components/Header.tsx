@@ -20,7 +20,7 @@ const navItems = [
 const catalogSubItems = [
   { path: "/stanley-stella", lv: "Stanley/Stella", en: "Stanley/Stella" },
   { path: "/nwg", lv: "New Wave Group", en: "New Wave Group" },
-  { path: "#", lv: "PF Concept (drīzumā)", en: "PF Concept (coming soon)", disabled: true },
+  { path: "/pf-concept", lv: "PF Concept", en: "PF Concept" },
 ];
 
 const Header = () => {
@@ -304,22 +304,16 @@ const Header = () => {
                 {item.path === "/catalog" && (
                   <div className="ml-4 mt-2 flex flex-col gap-2 border-l border-primary-foreground/10 pl-3">
                     {catalogSubItems.map((s) => (
-                      s.disabled ? (
-                        <span key={s.lv} className="text-sm text-primary-foreground/40">
-                          {lang === "lv" ? s.lv : s.en}
-                        </span>
-                      ) : (
-                        <Link
-                          key={s.path}
-                          to={s.path}
-                          onClick={() => setIsOpen(false)}
-                          className={`text-sm transition-colors ${
-                            location.pathname === s.path ? "text-accent" : "text-primary-foreground/70 hover:text-accent"
-                          }`}
-                        >
-                          {lang === "lv" ? s.lv : s.en}
-                        </Link>
-                      )
+                      <Link
+                        key={s.path}
+                        to={s.path}
+                        onClick={() => setIsOpen(false)}
+                        className={`text-sm transition-colors ${
+                          location.pathname === s.path ? "text-accent" : "text-primary-foreground/70 hover:text-accent"
+                        }`}
+                      >
+                        {lang === "lv" ? s.lv : s.en}
+                      </Link>
                     ))}
                   </div>
                 )}

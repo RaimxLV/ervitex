@@ -87,10 +87,15 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
             </Link>
           </li>
           <li>
-            <span className="flex items-center justify-between rounded-sm py-2.5 px-2 -mx-2 text-sm font-medium text-muted-foreground/60 cursor-not-allowed">
+            <Link
+              to="/pf-concept"
+              onClick={onNavigate}
+              role="menuitem"
+              className="group flex items-center justify-between rounded-sm py-2.5 px-2 -mx-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-accent"
+            >
               <span className="font-heading uppercase tracking-wide text-[13px]">PF Concept</span>
-              <span className="text-[10px] uppercase tracking-wider">{lang === "lv" ? "Drīzumā" : "Soon"}</span>
-            </span>
+              <ArrowRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+            </Link>
           </li>
         </ul>
       </div>
