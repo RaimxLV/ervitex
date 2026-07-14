@@ -338,6 +338,15 @@ async function probe(lang = "en") {
 
 // ------------------------------------------------------------------ handler
 
+// -------- Phase 2b: INGEST — accept a POST batch of raw models from client
+async function ingest(sb: SupabaseClient, models: any[]) {
+  const batches: Batches = { styles: [], variants: [], images: [] };
+  for (const m of models) mapModel(m, batches);
+  const s = batches.styles.length, v = batches.variants.length, i = batches.images.length;
+  await flushBatches(sb, batches);
+  return { received: models.length, styles: s, variants: v, images: i };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -366,6 +375,11 @@ Deno.serve(async (req) => {
       } else {
         throw new Error("process mode requires ?chunk=N or ?from=A&to=B");
       }
+    } else if (mode === "ingest") {
+      if (req.method !== "POST") throw new Error("ingest requires POST");
+      const body = await req.json();
+      if (!Array.isArray(body?.models)) throw new Error("body.models must be an array");
+      result = await ingest(sb, body.models);
     } else {
       throw new Error(`unknown mode: ${mode}`);
     }
