@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import CatalogFiltersSidebar from "@/components/catalog/CatalogFiltersSidebar";
 
 interface SummaryRow {
   product_number: string;
