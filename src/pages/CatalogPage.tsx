@@ -13,8 +13,17 @@ import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import {
   COLOR_BUCKETS,
   bucketOf,
+  getBucket,
   type ColorBucketKey,
 } from "@/lib/colorBuckets";
+
+const VALID_HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
+const sanitizeHex = (hex: string | null | undefined, bucket: ColorBucketKey | null): string | null => {
+  if (hex && VALID_HEX.test(hex.trim())) return hex.trim();
+  if (bucket && bucket !== "multi") return getBucket(bucket).hex;
+  return null;
+};
+
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null }
 
@@ -522,13 +531,16 @@ const CatalogCard = ({ item, lang, selectedBuckets }: CardProps) => {
       : item.source === "ss"
         ? resolveSsUrl(item.hover_image_url)
         : item.hover_image_url;
-  const withHex = item.colors.filter((c) => c.h);
+  const withHex = item.colors
+    .map((c) => ({ ...c, hex: sanitizeHex(c.h, c.bucket) }))
+    .filter((c) => !!c.hex);
   const swatches = withHex.slice(0, 8).map((c) => ({
-    hex: c.h,
+    hex: c.hex!,
     name: c.n || "",
     active: !!(selectedBuckets.size > 0 && c.bucket && selectedBuckets.has(c.bucket)),
   }));
   const extra = Math.max(0, withHex.length - 8);
+
 
 
   return (
