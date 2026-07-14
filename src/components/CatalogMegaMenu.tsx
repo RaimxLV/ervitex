@@ -1,20 +1,30 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, LayoutGrid } from "lucide-react";
 
 interface MegaMenuProps {
   onNavigate?: () => void;
 }
 
-const CATEGORIES: { slug: string; lv: string; en: string }[] = [
-  { slug: "t-krekli", lv: "T-krekli", en: "T-shirts" },
-  { slug: "polo-krekli", lv: "Polo krekli", en: "Polo Shirts" },
-  { slug: "virsjakas", lv: "Virsjakas", en: "Jackets" },
-  { slug: "darba-apgerbi", lv: "Darba apģērbs", en: "Workwear" },
-  { slug: "sportam", lv: "Sporta apģērbs", en: "Sportswear" },
-  { slug: "dzemperi", lv: "Džemperi & Hūdiji", en: "Sweaters & Hoodies" },
-  { slug: "cepures", lv: "Cepures", en: "Caps" },
-  { slug: "somas", lv: "Somas", en: "Bags" },
+const CATALOGS: { href: string; name: string; lv: string; en: string }[] = [
+  {
+    href: "/stanley-stella",
+    name: "Stanley/Stella",
+    lv: "Mūsu primārais partneris — organiskas dabas apģērbi.",
+    en: "Our primary partner — organic apparel.",
+  },
+  {
+    href: "/nwg",
+    name: "New Wave Group",
+    lv: "Clique, Craft, ProJob, Cutter & Buck u.c.",
+    en: "Clique, Craft, ProJob, Cutter & Buck and more.",
+  },
+  {
+    href: "/pf-concept",
+    name: "PF Concept",
+    lv: "Reklāmas priekšmeti, biroja preces, dāvanas.",
+    en: "Promotional items, office goods, gifts.",
+  },
 ];
 
 export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
@@ -24,81 +34,56 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
     <div
       role="menu"
       aria-label={lang === "lv" ? "Kataloga izvēlne" : "Catalog menu"}
-      className="grid grid-cols-1 gap-8 p-8 md:grid-cols-[1.2fr_1fr] lg:gap-12 lg:p-10"
+      className="p-8 lg:p-10"
     >
-      {/* Categories */}
-      <div>
-        <h3 className="mb-5 text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground font-heading">
-          {lang === "lv" ? "Kategorijas" : "Categories"}
-        </h3>
-        <ul className="grid grid-cols-2 gap-x-6 gap-y-1">
-          {CATEGORIES.map((c) => (
-            <li key={c.slug}>
-              <Link
-                to={`/catalog?category=${c.slug}`}
-                onClick={onNavigate}
-                role="menuitem"
-                className="group flex items-center justify-between rounded-sm py-2.5 px-2 -mx-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              >
-                <span className="font-heading uppercase tracking-wide text-[13px]">
-                  {lang === "lv" ? c.lv : c.en}
-                </span>
-                <ArrowRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <Link
-          to="/catalog"
-          onClick={onNavigate}
-          className="mt-5 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-accent hover:underline font-heading"
-        >
-          {lang === "lv" ? "Skatīt visu katalogu" : "View full catalog"}
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-      </div>
+      {/* All-in-one link */}
+      <Link
+        to="/catalog"
+        onClick={onNavigate}
+        role="menuitem"
+        className="group mb-6 flex items-center justify-between rounded-sm bg-accent px-4 py-3 text-accent-foreground transition-opacity hover:opacity-90"
+      >
+        <div className="flex items-center gap-3">
+          <LayoutGrid className="h-4 w-4" />
+          <div>
+            <div className="font-heading text-sm font-bold uppercase tracking-wider">
+              {lang === "lv" ? "Visi produkti" : "All products"}
+            </div>
+            <div className="text-[11px] opacity-80">
+              {lang === "lv"
+                ? "Meklējiet visos katalogos vienlaikus, filtrējiet pēc krāsas"
+                : "Search all catalogs at once, filter by color"}
+            </div>
+          </div>
+        </div>
+        <ArrowRight className="h-4 w-4 -translate-x-1 opacity-70 transition-transform group-hover:translate-x-0" />
+      </Link>
 
-      {/* Catalog brands */}
-      <div>
-        <h3 className="mb-5 text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground font-heading">
-          {lang === "lv" ? "Katalogi" : "Catalogs"}
-        </h3>
-        <ul className="flex flex-col gap-1">
-          <li>
+      <h3 className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground font-heading">
+        {lang === "lv" ? "Pēc piegādātāja" : "By supplier"}
+      </h3>
+      <ul className="grid grid-cols-1 gap-1 md:grid-cols-3 md:gap-3">
+        {CATALOGS.map((c) => (
+          <li key={c.href}>
             <Link
-              to="/stanley-stella"
+              to={c.href}
               onClick={onNavigate}
               role="menuitem"
-              className="group flex items-center justify-between rounded-sm py-2.5 px-2 -mx-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-accent"
+              className="group flex h-full flex-col justify-between rounded-sm border border-border p-4 transition-colors hover:border-accent hover:bg-muted"
             >
-              <span className="font-heading uppercase tracking-wide text-[13px]">Stanley/Stella</span>
-              <ArrowRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+              <div className="flex items-center justify-between">
+                <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
+                  {c.name}
+                </span>
+                <ArrowRight className="h-3.5 w-3.5 text-accent -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                {lang === "lv" ? c.lv : c.en}
+              </p>
             </Link>
           </li>
-          <li>
-            <Link
-              to="/nwg"
-              onClick={onNavigate}
-              role="menuitem"
-              className="group flex items-center justify-between rounded-sm py-2.5 px-2 -mx-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-accent"
-            >
-              <span className="font-heading uppercase tracking-wide text-[13px]">New Wave Group</span>
-              <ArrowRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/pf-concept"
-              onClick={onNavigate}
-              role="menuitem"
-              className="group flex items-center justify-between rounded-sm py-2.5 px-2 -mx-2 text-sm font-medium text-foreground transition-colors hover:bg-muted hover:text-accent"
-            >
-              <span className="font-heading uppercase tracking-wide text-[13px]">PF Concept</span>
-              <ArrowRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
-            </Link>
-          </li>
-        </ul>
-      </div>
+        ))}
+      </ul>
     </div>
   );
 }
