@@ -296,6 +296,177 @@ export type Database = {
         }
         Relationships: []
       }
+      pf_images: {
+        Row: {
+          filename: string
+          id: number
+          item_code: string
+          kind: string
+          model_code: string
+          sort_order: number | null
+          url_1600: string | null
+          url_500: string | null
+        }
+        Insert: {
+          filename: string
+          id?: number
+          item_code?: string
+          kind: string
+          model_code: string
+          sort_order?: number | null
+          url_1600?: string | null
+          url_500?: string | null
+        }
+        Update: {
+          filename?: string
+          id?: number
+          item_code?: string
+          kind?: string
+          model_code?: string
+          sort_order?: number | null
+          url_1600?: string | null
+          url_500?: string | null
+        }
+        Relationships: []
+      }
+      pf_styles: {
+        Row: {
+          attributes: Json | null
+          brand: string | null
+          category: string | null
+          category_group: string | null
+          color_count: number | null
+          country_of_origin: string | null
+          created_at: string | null
+          description: string | null
+          ext_desc: string | null
+          gender: string | null
+          item_count: number | null
+          keywords: string | null
+          last_synced_at: string | null
+          main_image: string | null
+          material: string | null
+          model_code: string
+          product_comments: string | null
+          raw: Json | null
+          simple_material: string | null
+        }
+        Insert: {
+          attributes?: Json | null
+          brand?: string | null
+          category?: string | null
+          category_group?: string | null
+          color_count?: number | null
+          country_of_origin?: string | null
+          created_at?: string | null
+          description?: string | null
+          ext_desc?: string | null
+          gender?: string | null
+          item_count?: number | null
+          keywords?: string | null
+          last_synced_at?: string | null
+          main_image?: string | null
+          material?: string | null
+          model_code: string
+          product_comments?: string | null
+          raw?: Json | null
+          simple_material?: string | null
+        }
+        Update: {
+          attributes?: Json | null
+          brand?: string | null
+          category?: string | null
+          category_group?: string | null
+          color_count?: number | null
+          country_of_origin?: string | null
+          created_at?: string | null
+          description?: string | null
+          ext_desc?: string | null
+          gender?: string | null
+          item_count?: number | null
+          keywords?: string | null
+          last_synced_at?: string | null
+          main_image?: string | null
+          material?: string | null
+          model_code?: string
+          product_comments?: string | null
+          raw?: Json | null
+          simple_material?: string | null
+        }
+        Relationships: []
+      }
+      pf_variants: {
+        Row: {
+          base_color: string | null
+          color_code: string | null
+          color_desc: string | null
+          created_at: string | null
+          ean_code: string | null
+          gender: string | null
+          hex_color: string | null
+          item_code: string
+          material: string | null
+          model_code: string
+          pms_color: string | null
+          qty_per_carton: number | null
+          raw: Json | null
+          size: string | null
+          size_grid: string | null
+          weight_gr: number | null
+        }
+        Insert: {
+          base_color?: string | null
+          color_code?: string | null
+          color_desc?: string | null
+          created_at?: string | null
+          ean_code?: string | null
+          gender?: string | null
+          hex_color?: string | null
+          item_code: string
+          material?: string | null
+          model_code: string
+          pms_color?: string | null
+          qty_per_carton?: number | null
+          raw?: Json | null
+          size?: string | null
+          size_grid?: string | null
+          weight_gr?: number | null
+        }
+        Update: {
+          base_color?: string | null
+          color_code?: string | null
+          color_desc?: string | null
+          created_at?: string | null
+          ean_code?: string | null
+          gender?: string | null
+          hex_color?: string | null
+          item_code?: string
+          material?: string | null
+          model_code?: string
+          pms_color?: string | null
+          qty_per_carton?: number | null
+          raw?: Json | null
+          size?: string | null
+          size_grid?: string | null
+          weight_gr?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pf_variants_model_code_fkey"
+            columns: ["model_code"]
+            isOneToOne: false
+            referencedRelation: "pf_style_summary"
+            referencedColumns: ["model_code"]
+          },
+          {
+            foreignKeyName: "pf_variants_model_code_fkey"
+            columns: ["model_code"]
+            isOneToOne: false
+            referencedRelation: "pf_styles"
+            referencedColumns: ["model_code"]
+          },
+        ]
+      }
       product_colors: {
         Row: {
           created_at: string
@@ -1070,6 +1241,51 @@ export type Database = {
           total_stock?: never
           usp?: string | null
           weight?: string | null
+        }
+        Relationships: []
+      }
+      pf_style_summary: {
+        Row: {
+          brand: string | null
+          category: string | null
+          category_group: string | null
+          color_count: number | null
+          description: string | null
+          ext_desc: string | null
+          gender: string | null
+          item_count: number | null
+          main_image: string | null
+          main_image_url: string | null
+          material: string | null
+          model_code: string | null
+        }
+        Insert: {
+          brand?: string | null
+          category?: string | null
+          category_group?: string | null
+          color_count?: number | null
+          description?: string | null
+          ext_desc?: string | null
+          gender?: string | null
+          item_count?: number | null
+          main_image?: string | null
+          main_image_url?: never
+          material?: string | null
+          model_code?: string | null
+        }
+        Update: {
+          brand?: string | null
+          category?: string | null
+          category_group?: string | null
+          color_count?: number | null
+          description?: string | null
+          ext_desc?: string | null
+          gender?: string | null
+          item_count?: number | null
+          main_image?: string | null
+          main_image_url?: never
+          material?: string | null
+          model_code?: string | null
         }
         Relationships: []
       }
