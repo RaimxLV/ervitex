@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import CatalogFiltersSidebar, {
   type FilterSection,
 } from "@/components/catalog/CatalogFiltersSidebar";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
+import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
+import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import {
   COLOR_BUCKETS,
   bucketOf,
