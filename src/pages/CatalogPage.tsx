@@ -4,7 +4,6 @@ import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
@@ -89,7 +88,7 @@ const PAGE_SIZE = 24;
 const SS_CDN_BASE = "https://res.cloudinary.com/www-stanleystella-com/image/upload/";
 const SS_THUMB = "f_auto,q_auto,w_600,c_fill,g_auto";
 const resolveSsUrl = (u?: string | null): string | null => {
-  if (!u) return null;
+  if (!u || u === "[object Object]") return null;
   if (/^https?:\/\//i.test(u)) {
     if (u.includes("res.cloudinary.com") && u.includes("/image/upload/")) {
       return u.replace("/image/upload/", `/image/upload/${SS_THUMB}/`);
@@ -100,7 +99,7 @@ const resolveSsUrl = (u?: string | null): string | null => {
 };
 
 const resolveImg = (item: CatalogItem): string | null => {
-  if (!item.image_url) return null;
+  if (!item.image_url || item.image_url === "[object Object]") return null;
   return item.source === "ss" ? resolveSsUrl(item.image_url) : item.image_url;
 };
 
@@ -494,7 +493,11 @@ interface CardProps {
 const CatalogCard = ({ item, lang, viewLabel }: CardProps) => {
   const img = resolveImg(item);
   const hover =
-    item.source === "ss" ? resolveSsUrl(item.hover_image_url) : item.hover_image_url;
+    item.hover_image_url === "[object Object]"
+      ? null
+      : item.source === "ss"
+        ? resolveSsUrl(item.hover_image_url)
+        : item.hover_image_url;
   const swatches = (item.color_hexes || []).slice(0, 8);
   const extra = Math.max(0, (item.color_hexes || []).length - 8);
 
@@ -526,11 +529,6 @@ const CatalogCard = ({ item, lang, viewLabel }: CardProps) => {
             <span className="font-mono text-xs">{item.id}</span>
           </div>
         )}
-        <Badge className="absolute left-2 top-2 rounded-none bg-primary px-2 py-0 font-heading text-[9px] uppercase tracking-widest text-primary-foreground">
-          {item.brand && item.brand.toLowerCase() !== SOURCE_META[item.source][lang].toLowerCase()
-            ? item.brand
-            : SOURCE_META[item.source][lang]}
-        </Badge>
       </div>
 
       <div className="space-y-1.5 p-3">

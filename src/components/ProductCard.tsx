@@ -46,9 +46,9 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
   const { lang } = useLanguage();
 
   const images = useMemo(() => {
-    const imgs = [...product.images];
+    const imgs = product.images.filter((url) => url && url !== "[object Object]");
     product.colorImageUrls?.forEach((url) => {
-      if (url && !imgs.includes(url)) imgs.push(url);
+      if (url && url !== "[object Object]" && !imgs.includes(url)) imgs.push(url);
     });
     return imgs;
   }, [product.images, product.colorImageUrls]);
@@ -150,12 +150,6 @@ const ProductCard = ({ product }: { product: ExtendedProduct }) => {
             <span className="font-heading text-xs uppercase tracking-widest">{product.brand || "Ervitex"}</span>
             <span className="font-mono text-[10px]">{product.name[lang]}</span>
           </div>
-        )}
-
-        {product.brand && (
-          <span className="absolute left-2 top-2 bg-primary px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">
-            {product.brand}
-          </span>
         )}
 
         <div className="absolute right-2 top-2 flex flex-col items-end gap-1">
