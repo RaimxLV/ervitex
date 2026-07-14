@@ -155,7 +155,7 @@ const CatalogPage = () => {
     setSearchParams(p, { replace: true });
   }, [q, sources, brands, categories, groups, genders, colors, page, setSearchParams]);
 
-  // Load data
+  // Load data (single fetch — MV is small enough)
   useEffect(() => {
     (async () => {
       const all: CatalogItem[] = [];
@@ -182,7 +182,14 @@ const CatalogPage = () => {
           const b = bucketOf(hexes[i], names[i]);
           if (b) buckets.add(b);
         }
-        return { ...it, buckets };
+        return {
+          ...it,
+          brand: normalizeText(it.brand),
+          category: normalizeCategory(it.category),
+          group_name: normalizeText(it.group_name),
+          gender: normalizeGender(it.gender),
+          buckets,
+        };
       });
       setItems(enriched);
       setLoaded(true);
