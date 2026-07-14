@@ -202,7 +202,7 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
 
 async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
   const [styleRes, variantsRes, imagesRes, skusRes] = await Promise.all([
-    supabase.from("nwg_styles").select("product_number,name,brand,category,gender,fit,fabrics,commerce_text,catalog_text,usp").eq("product_number", productNumber).maybeSingle(),
+    supabase.from("nwg_styles").select("product_number,name,brand,category,gender,fit,fabrics,commerce_text,catalog_text,usp,weight,country_of_origin,raw").eq("product_number", productNumber).maybeSingle(),
     supabase.from("nwg_variants").select("item_number,color_name,color_code,filter_color,shade_color,main_picture_url").eq("product_number", productNumber),
     supabase.from("nwg_images").select("item_number,image_url,high_res_url,large_thumbnail_url,standard_url,sort_order").eq("product_number", productNumber).order("sort_order", { ascending: true }),
     supabase.from("nwg_skus").select("item_number,size,size_sequence").eq("product_number", productNumber),
@@ -212,6 +212,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
   const variants = variantsRes.data || [];
   const images = imagesRes.data || [];
   const skus = skusRes.data || [];
+  const raw = ((style as any).raw || {}) as Record<string, any>;
 
   const NAMED_HEX: Record<string, string> = {
     black: "#000000", white: "#ffffff", grey: "#808080", gray: "#808080", red: "#e11d48",
@@ -255,37 +256,56 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
   for (const arr of sizesByItem.values()) for (const s of arr) sizeSet.set(s.s, s.seq);
   const sizes = [...sizeSet.entries()].sort((a, b) => a[1].localeCompare(b[1])).map((x) => x[0]);
 
+  // Full description: commerce + catalog + USP (preserve bullets & newlines)
+  const descBlocks = [style.commerce_text, style.catalog_text, style.usp].filter(Boolean) as string[];
+  const seen = new Set<string>();
+  const dedupedBlocks = descBlocks.filter((b) => {
+    const k = b.trim();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  const fullDesc = dedupedBlocks.join("\n\n");
+  const featureLines = lines(fullDesc).filter((l) => /^[•\-\*·▪►]/.test(l));
+
+  const specs: { label: string; value: string }[] = [];
+  addSpec(specs, "Fit", style.fit);
+  addSpec(specs, "Gender", style.gender);
+  addSpec(specs, "Category", style.category);
+  addSpec(specs, "Weight", style.weight);
+  addSpec(specs, "Country of origin", style.country_of_origin || raw.productCountryOfOrigin);
+  addSpec(specs, "Assortment", Array.isArray(raw.productAssortment) ? raw.productAssortment.join(", ") : raw.productAssortment);
+
   return {
     title: style.name || style.product_number,
     code: style.product_number,
     brand: style.brand,
     category: style.category,
     gender: style.gender,
-    shortDescription: cleanText(style.commerce_text),
-    description: [style.commerce_text, style.catalog_text, style.usp].filter(Boolean).join("\n\n") || null,
-    features: lines(style.usp),
-    material: style.fabrics || style.fit || null,
+    shortDescription: cleanText(style.commerce_text?.split(/\n/)[0]) || cleanText(style.commerce_text),
+    description: fullDesc || null,
+    features: featureLines,
+    material: style.fabrics || null,
     care: null,
-    specs: [
-      ...(style.fit ? [{ label: "Fit", value: style.fit }] : []),
-      ...(style.gender ? [{ label: "Gender", value: style.gender }] : []),
-    ],
+    specs,
     notice: null,
     sizes,
     colors,
   };
 }
 
+
 async function loadPF(modelCode: string): Promise<ProductDetail | null> {
   const [styleRes, variantsRes, imagesRes] = await Promise.all([
-    supabase.from("pf_styles").select("model_code,description,ext_desc,brand,category,category_group,gender,material,main_image").eq("model_code", modelCode).maybeSingle(),
-    supabase.from("pf_variants").select("item_code,color_code,color_desc,hex_color,size").eq("model_code", modelCode),
+    supabase.from("pf_styles").select("model_code,description,ext_desc,brand,category,category_group,gender,material,simple_material,main_image,keywords,product_comments,country_of_origin,attributes").eq("model_code", modelCode).maybeSingle(),
+    supabase.from("pf_variants").select("item_code,color_code,color_desc,hex_color,size,material,weight_gr,qty_per_carton").eq("model_code", modelCode),
     supabase.from("pf_images").select("item_code,kind,url_1600,url_500,sort_order").eq("model_code", modelCode).order("sort_order", { ascending: true }),
   ]);
   const style = styleRes.data;
   if (!style) return null;
   const variants = variantsRes.data || [];
   const images = imagesRes.data || [];
+  const attrs = ((style as any).attributes || {}) as Record<string, any>;
 
   const imgByItem = new Map<string, string[]>();
   const modelImgs: string[] = [];
@@ -304,7 +324,9 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
   const colorMap = new Map<string, { code: string; name: string; hex: string | null; itemCodes: Set<string> }>();
   const sizesByColor = new Map<string, Set<string>>();
   const sizeSet = new Set<string>();
+  let sampleVariant: any = null;
   for (const v of variants as any[]) {
+    if (!sampleVariant) sampleVariant = v;
     if (v.size) sizeSet.add(v.size);
     const key = v.color_code || v.color_desc || v.item_code;
     if (v.size) {
@@ -338,6 +360,45 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
     return a.localeCompare(b);
   });
 
+  // Build feature list: bullet-like lines in ext_desc + attribute key/values.
+  const rawFeatures = lines(style.ext_desc).filter((l) => /^[•\-\*·▪►]/.test(l) || l.length < 160);
+  // Human-readable attribute pairs (skip empty / boolean No / meta).
+  const ATTR_LABELS: Record<string, string> = {
+    pa_capacityMilliliters: "Capacity (ml)",
+    pa_materialDrinkware: "Material",
+    pa_insulationType: "Insulation",
+    pa_lidFeatures: "Lid features",
+    pa_drinkwareIntendedUse: "Intended use",
+    pa_drinkwareExtraFeatures: "Extra features",
+    pa_dishwasherSafe: "Dishwasher safe",
+    pa_microwaveSafe: "Microwave safe",
+    pa_certifications_social: "Certifications",
+    pa_bsciFactory: "BSCI factory",
+    pa_oekoStandard: "OEKO-TEX",
+    pa_umbrellaSize: "Umbrella size",
+    pa_umbrellaPersons: "Persons",
+    pa_foldedSize: "Folded size",
+    pa_openingType: "Opening",
+    pa_windproof: "Windproof",
+    pa_mainLabelType: "Label type",
+    pa_removableInfuser: "Removable infuser",
+    pa_removableTeaFilter: "Removable tea filter",
+    pa_numberOfSheets: "Sheets",
+  };
+  const specs: { label: string; value: string }[] = [];
+  addSpec(specs, "Category", style.category);
+  addSpec(specs, "Group", style.category_group);
+  addSpec(specs, "Gender", style.gender);
+  addSpec(specs, "Material", style.simple_material || sampleVariant?.material);
+  addSpec(specs, "Country of origin", style.country_of_origin);
+  if (sampleVariant?.weight_gr) addSpec(specs, "Weight", sampleVariant.weight_gr, " g");
+  if (sampleVariant?.qty_per_carton) addSpec(specs, "Qty / carton", sampleVariant.qty_per_carton);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v === null || v === undefined || v === "" || v === "No") continue;
+    const label = ATTR_LABELS[k] || k.replace(/^pa_/, "").replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
+    addSpec(specs, label, v);
+  }
+
   return {
     title: style.description || style.model_code,
     code: style.model_code,
@@ -346,18 +407,16 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
     gender: style.gender,
     shortDescription: cleanText(style.description),
     description: style.ext_desc || style.description || null,
-    features: lines(style.ext_desc),
-    material: style.material || null,
+    features: rawFeatures,
+    material: style.material || style.simple_material || null,
     care: null,
-    specs: [
-      ...(style.category_group ? [{ label: "Group", value: style.category_group }] : []),
-      ...(style.gender ? [{ label: "Gender", value: style.gender }] : []),
-    ],
-    notice: null,
+    specs,
+    notice: cleanText(style.product_comments),
     sizes,
     colors,
   };
 }
+
 
 /* ---------- Component ---------- */
 
