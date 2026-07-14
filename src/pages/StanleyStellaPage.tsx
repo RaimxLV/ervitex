@@ -101,8 +101,8 @@ const StanleyStellaPage = () => {
   const [priceSaving, setPriceSaving] = useState(false);
 
   const [q, setQ] = useState("");
-  const [category, setCategory] = useState<string>("all");
-  const [gender, setGender] = useState<string>("all");
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [selectedGenders, setSelectedGenders] = useState<Set<string>>(new Set());
   const [inStockOnly, setInStockOnly] = useState(true);
   const [page, setPage] = useState(1);
 
@@ -139,24 +139,39 @@ const StanleyStellaPage = () => {
     })();
   }, []);
 
-  const categories = useMemo(() => Array.from(new Set(rows.map((s) => s.category).filter(Boolean))).sort() as string[], [rows]);
-  const genders = useMemo(() => Array.from(new Set(rows.map((s) => s.gender).filter(Boolean))).sort() as string[], [rows]);
+  const categories = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of rows) if (r.category) counts.set(r.category, (counts.get(r.category) || 0) + 1);
+    return Array.from(counts.entries()).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+  }, [rows]);
+  const genders = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of rows) if (r.gender) counts.set(r.gender, (counts.get(r.gender) || 0) + 1);
+    return Array.from(counts.entries()).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+  }, [rows]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return rows.filter((s) => {
-      if (category !== "all" && s.category !== category) return false;
-      if (gender !== "all" && s.gender !== gender) return false;
+      if (selectedCategories.size && (!s.category || !selectedCategories.has(s.category))) return false;
+      if (selectedGenders.size && (!s.gender || !selectedGenders.has(s.gender))) return false;
       if (inStockOnly && s.total_stock <= 0) return false;
       if (needle && !`${s.name} ${s.style_code} ${s.short_description ?? ""}`.toLowerCase().includes(needle)) return false;
       return true;
     });
-  }, [rows, q, category, gender, inStockOnly]);
+  }, [rows, q, selectedCategories, selectedGenders, inStockOnly]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const slice = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  useEffect(() => { setPage(1); }, [q, category, gender, inStockOnly]);
+  useEffect(() => { setPage(1); }, [q, selectedCategories, selectedGenders, inStockOnly]);
+
+  const toggle = (set: Set<string>, setSet: (s: Set<string>) => void, v: string) => {
+    const next = new Set(set);
+    if (next.has(v)) next.delete(v); else next.add(v);
+    setSet(next);
+  };
+
 
   // Load color swatches (code+hex) for visible styles' cards
   useEffect(() => {
