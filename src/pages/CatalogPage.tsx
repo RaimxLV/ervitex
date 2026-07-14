@@ -13,8 +13,17 @@ import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import {
   COLOR_BUCKETS,
   bucketOf,
+  getBucket,
   type ColorBucketKey,
 } from "@/lib/colorBuckets";
+
+const VALID_HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
+const sanitizeHex = (hex: string | null | undefined, bucket: ColorBucketKey | null): string | null => {
+  if (hex && VALID_HEX.test(hex.trim())) return hex.trim();
+  if (bucket && bucket !== "multi") return getBucket(bucket).hex;
+  return null;
+};
+
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null }
 
