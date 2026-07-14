@@ -512,6 +512,21 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           </div>
         </div>
       </div>
+      {selected && (
+        <CatalogItemDialog
+          open={!!selected}
+          onOpenChange={(o) => !o && setSelected(null)}
+          source={selected.source}
+          id={selected.id}
+          name={selected.name}
+          brand={selected.brand}
+          category={selected.category}
+          image={selected.image_url}
+          swatches={selected.colors
+            .map((c) => ({ hex: sanitizeHex(c.h, c.bucket), name: c.n || "" }))
+            .filter((s) => !!s.hex) as { hex: string; name: string }[]}
+        />
+      )}
     </Layout>
   );
 };
