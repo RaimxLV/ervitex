@@ -1,45 +1,42 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
-import ProductCard from "@/components/ProductCard";
-import CategoryFilter from "@/components/catalog/CategoryFilter";
-import CatalogToolbar from "@/components/catalog/CatalogToolbar";
-import { useLanguage } from "@/i18n/LanguageContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/i18n/LanguageContext";
+import CatalogFiltersSidebar, {
+  type FilterSection,
+} from "@/components/catalog/CatalogFiltersSidebar";
+import {
+  COLOR_BUCKETS,
+  bucketOf,
+  type ColorBucketKey,
+} from "@/lib/colorBuckets";
 
-
-interface DBProduct {
+interface CatalogItem {
+  source: "ss" | "nwg" | "pf";
   id: string;
-  name_lv: string;
-  name_en: string;
-  description_lv: string | null;
-  description_en: string | null;
-  long_description_lv: string | null;
-  long_description_en: string | null;
-  material: string | null;
-  min_order: number | null;
-  featured: boolean | null;
-  is_new: boolean | null;
-  active: boolean | null;
-  category_id: string | null;
-  printing_techs: string[] | null;
-  retail_price: number | null;
-  wholesale_price: number | null;
+  name: string | null;
+  description: string | null;
   brand: string | null;
-  hidden_manual: boolean | null;
-  hide_when_oos: boolean | null;
-  ss_in_stock: boolean | null;
-  ss_style_code: string | null;
-  nwg_product_number: string | null;
-  product_images: { url: string; sort_order: number | null }[];
-  product_colors: { name: string; hex_code: string | null }[];
-  product_sizes: { size: string; sort_order: number | null }[];
-  categories: { slug: string; name_lv: string; name_en: string } | null;
+  category: string | null;
+  group_name: string | null;
+  gender: string | null;
+  image_url: string | null;
+  hover_image_url: string | null;
+  color_hexes: string[] | null;
+  color_names: string[] | null;
 }
 
-// Resolve Stanley/Stella Cloudinary URLs and apply catalog thumbnail transform.
+interface EnrichedItem extends CatalogItem {
+  buckets: Set<ColorBucketKey>;
+}
+
+const PAGE_SIZE = 24;
+
 const SS_CDN_BASE = "https://res.cloudinary.com/www-stanleystella-com/image/upload/";
 const SS_THUMB = "f_auto,q_auto,w_600,c_fill,g_auto";
 const resolveSsUrl = (u?: string | null): string | null => {
@@ -53,397 +50,462 @@ const resolveSsUrl = (u?: string | null): string | null => {
   return SS_CDN_BASE + SS_THUMB + "/" + u.replace(/^\/+/, "");
 };
 
-interface SsEnrichment {
-  name: string;
-  short_description: string | null;
-  images: string[];
-  colors: { name: string; hex: string | null }[];
-}
+const resolveImg = (item: CatalogItem): string | null => {
+  if (!item.image_url) return null;
+  return item.source === "ss" ? resolveSsUrl(item.image_url) : item.image_url;
+};
 
-interface DBCategory {
-  id: string;
-  slug: string;
-  name_lv: string;
-  name_en: string;
-}
+const SOURCE_META: Record<CatalogItem["source"], { lv: string; en: string; href: string }> = {
+  ss: { lv: "Stanley/Stella", en: "Stanley/Stella", href: "/stanley-stella" },
+  nwg: { lv: "New Wave Group", en: "New Wave Group", href: "/nwg" },
+  pf: { lv: "PF Concept", en: "PF Concept", href: "/pf-concept" },
+};
 
-
-
-const ITEMS_PER_PAGE = 24;
+const detailHref = (item: CatalogItem): string => SOURCE_META[item.source].href;
 
 const CatalogPage = () => {
+  const { lang } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeCategory = searchParams.get("category") || "all";
-  const activeBrand = searchParams.get("brand") || "";
-  const activeSort = searchParams.get("sort") || "newest";
-  const currentPage = parseInt(searchParams.get("page") || "1", 10);
-  const initialSearch = searchParams.get("q") || "";
-  const [search, setSearch] = useState(initialSearch);
 
-  // Sync search from URL query param
-  useEffect(() => {
-    const q = searchParams.get("q");
-    if (q && q !== search) setSearch(q);
-  }, [searchParams.get("q")]);
-  const { lang, t } = useLanguage();
-  const [dbProducts, setDbProducts] = useState<DBProduct[]>([]);
-  const [dbCategories, setDbCategories] = useState<DBCategory[]>([]);
-  const [ssEnrichment, setSsEnrichment] = useState<Map<string, SsEnrichment>>(new Map());
-  const [nwgEnrichment, setNwgEnrichment] = useState<Map<string, SsEnrichment>>(new Map());
+  const [items, setItems] = useState<EnrichedItem[]>([]);
   const [loaded, setLoaded] = useState(false);
 
+  // Filter state (URL-backed)
+  const [q, setQ] = useState(searchParams.get("q") || "");
+  const [sources, setSources] = useState<Set<string>>(
+    new Set((searchParams.get("source") || "").split(",").filter(Boolean))
+  );
+  const [brands, setBrands] = useState<Set<string>>(
+    new Set((searchParams.get("brand") || "").split(",").filter(Boolean))
+  );
+  const [categories, setCategories] = useState<Set<string>>(
+    new Set((searchParams.get("category") || "").split(",").filter(Boolean))
+  );
+  const [groups, setGroups] = useState<Set<string>>(
+    new Set((searchParams.get("group") || "").split(",").filter(Boolean))
+  );
+  const [genders, setGenders] = useState<Set<string>>(
+    new Set((searchParams.get("gender") || "").split(",").filter(Boolean))
+  );
+  const [colors, setColors] = useState<Set<string>>(
+    new Set((searchParams.get("color") || "").split(",").filter(Boolean))
+  );
+  const [page, setPage] = useState(parseInt(searchParams.get("page") || "1", 10));
+
+  // Persist filters to URL
   useEffect(() => {
-    const fetchData = async () => {
-      // Fetch all products in batches of 1000 to bypass Supabase default limit
-      const PAGE_SIZE = 1000;
-      let allProducts: DBProduct[] = [];
-      let page = 0;
-      let hasMore = true;
-      while (hasMore) {
-        const { data } = await supabase
-          .from("products")
-          .select("id, category_id, name_lv, name_en, description_lv, description_en, long_description_lv, long_description_en, material, min_order, retail_price, printing_techs, featured, is_new, active, created_at, updated_at, brand, hidden_manual, hide_when_oos, ss_in_stock, ss_style_code, nwg_product_number, product_images(url, sort_order), product_colors(name, hex_code, image_url), product_sizes(size, sort_order), categories(slug, name_lv, name_en)")
-          .eq("active", true)
-          .eq("hidden_manual", false)
-          .is("nwg_product_number", null)
-          .order("created_at", { ascending: false })
-          .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
-        const batch = ((data as unknown as DBProduct[]) || []).filter(
-          (p) => !(p.hide_when_oos && p.ss_in_stock === false)
-        );
-        allProducts = allProducts.concat(batch);
-        hasMore = (data?.length || 0) === PAGE_SIZE;
-        page++;
-      }
+    const p = new URLSearchParams();
+    if (q) p.set("q", q);
+    if (sources.size) p.set("source", [...sources].join(","));
+    if (brands.size) p.set("brand", [...brands].join(","));
+    if (categories.size) p.set("category", [...categories].join(","));
+    if (groups.size) p.set("group", [...groups].join(","));
+    if (genders.size) p.set("gender", [...genders].join(","));
+    if (colors.size) p.set("color", [...colors].join(","));
+    if (page > 1) p.set("page", String(page));
+    setSearchParams(p, { replace: true });
+  }, [q, sources, brands, categories, groups, genders, colors, page, setSearchParams]);
 
-      const { data: catData } = await supabase.from("categories").select("id, slug, name_lv, name_en").order("sort_order");
-      setDbProducts(allProducts);
-      setDbCategories(catData || []);
+  // Load data
+  useEffect(() => {
+    (async () => {
+      const all: CatalogItem[] = [];
+      const step = 1000;
+      let from = 0;
+      while (true) {
+        const { data, error } = await supabase
+          .from("catalog_items" as any)
+          .select(
+            "source,id,name,description,brand,category,group_name,gender,image_url,hover_image_url,color_hexes,color_names"
+          )
+          .range(from, from + step - 1);
+        if (error) break;
+        all.push(...((data || []) as unknown as CatalogItem[]));
+        if (!data || data.length < step) break;
+        from += step;
+      }
+      const enriched: EnrichedItem[] = all.map((it) => {
+        const buckets = new Set<ColorBucketKey>();
+        const hexes = it.color_hexes || [];
+        const names = it.color_names || [];
+        const len = Math.max(hexes.length, names.length);
+        for (let i = 0; i < len; i++) {
+          const b = bucketOf(hexes[i], names[i]);
+          if (b) buckets.add(b);
+        }
+        return { ...it, buckets };
+      });
+      setItems(enriched);
       setLoaded(true);
-
-      // Enrich Stanley/Stella products with real S/S data (images, colors, name)
-      const ssCodes = Array.from(new Set(
-        allProducts
-          .filter((p) => (p.brand || "").toLowerCase().includes("stanley") && p.ss_style_code)
-          .map((p) => p.ss_style_code as string)
-      ));
-      if (ssCodes.length) {
-        const [{ data: summary }, { data: variants }] = await Promise.all([
-          supabase.from("ss_style_summary" as any)
-            .select("style_code,name,short_description,cover_url,over_url,main_picture_url,over_picture_url")
-            .in("style_code", ssCodes),
-          supabase.from("ss_variants")
-            .select("style_code,color_code,color_name,hex_color_code,color_sequence")
-            .in("style_code", ssCodes),
-        ]);
-        const colorsByStyle = new Map<string, { name: string; hex: string | null; seq: number }[]>();
-        for (const v of (variants || []) as any[]) {
-          if (!v.color_code) continue;
-          const arr = colorsByStyle.get(v.style_code) || [];
-          if (!arr.some((c) => c.name === (v.color_name || v.color_code))) {
-            arr.push({ name: v.color_name || v.color_code, hex: v.hex_color_code || null, seq: v.color_sequence ?? 0 });
-            colorsByStyle.set(v.style_code, arr);
-          }
-        }
-        const map = new Map<string, SsEnrichment>();
-        for (const s of (summary || []) as any[]) {
-          const cover = resolveSsUrl(s.cover_url || s.main_picture_url);
-          const over = resolveSsUrl(s.over_url || s.over_picture_url);
-          const imgs = [cover, over].filter((x): x is string => !!x);
-          const cols = (colorsByStyle.get(s.style_code) || []).sort((a, b) => a.seq - b.seq);
-          map.set(s.style_code, {
-            name: s.name || s.style_code,
-            short_description: s.short_description || null,
-            images: imgs,
-            colors: cols.map(({ name, hex }) => ({ name, hex })),
-          });
-        }
-        setSsEnrichment(map);
-      }
-
-      // NWG enrichment: LEFT JOIN nwg_style_summary + nwg_variants
-      const nwgNums = Array.from(new Set(
-        allProducts
-          .filter((p) => p.nwg_product_number)
-          .map((p) => p.nwg_product_number as string)
-      ));
-      if (nwgNums.length) {
-        const [{ data: nSummary }, { data: nVariants }] = await Promise.all([
-          supabase.from("nwg_style_summary" as any)
-            .select("product_number,name,commerce_text,main_picture_url,hover_picture_url")
-            .in("product_number", nwgNums),
-          supabase.from("nwg_variants")
-            .select("product_number,color_name,color_code,web_color,shade_color,main_picture_url")
-            .in("product_number", nwgNums),
-        ]);
-        const nColorsByStyle = new Map<string, { name: string; hex: string | null }[]>();
-        for (const v of (nVariants || []) as any[]) {
-          const name = v.color_name || v.color_code;
-          if (!name) continue;
-          const hex = (v.web_color?.[0] ? (String(v.web_color[0]).startsWith("#") ? v.web_color[0] : `#${v.web_color[0]}`) : (v.shade_color?.startsWith("#") ? v.shade_color : null));
-          const arr = nColorsByStyle.get(v.product_number) || [];
-          if (!arr.some((c) => c.name === name)) {
-            arr.push({ name, hex });
-            nColorsByStyle.set(v.product_number, arr);
-          }
-        }
-        const nMap = new Map<string, SsEnrichment>();
-        for (const s of (nSummary || []) as any[]) {
-          const imgs = [s.main_picture_url, s.hover_picture_url].filter((u: string | null): u is string => !!u);
-          nMap.set(s.product_number, {
-            name: s.name || s.product_number,
-            short_description: s.commerce_text || null,
-            images: imgs,
-            colors: nColorsByStyle.get(s.product_number) || [],
-          });
-        }
-        setNwgEnrichment(nMap);
-      }
-    };
-    fetchData();
+    })();
   }, []);
 
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [q, sources, brands, categories, groups, genders, colors]);
 
-  const normalizedProducts = useMemo(() => {
-    if (dbProducts.length > 0) {
-      return dbProducts.map((p) => {
-        const ss = p.ss_style_code ? ssEnrichment.get(p.ss_style_code) : undefined;
-        const nwg = p.nwg_product_number ? nwgEnrichment.get(p.nwg_product_number) : undefined;
-        const enrich = ss || nwg;
-        const baseImages = p.product_images.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((i) => i.url);
-        const baseColors = p.product_colors.map((c) => c.name);
-        const baseHex = p.product_colors.map((c) => c.hex_code);
-        const isNwg = !!p.nwg_product_number;
-        return {
-          id: p.id,
-          name: {
-            lv: enrich?.name || p.name_lv,
-            en: enrich?.name || p.name_en,
-          },
-          category: p.categories?.slug || "",
-          description: {
-            lv: enrich?.short_description || p.description_lv || "",
-            en: enrich?.short_description || p.description_en || "",
-          },
-          longDescription: { lv: p.long_description_lv || "", en: p.long_description_en || "" },
-          material: p.material || undefined,
-          colors: enrich?.colors.length ? enrich.colors.map((c) => c.name) : baseColors,
-          colorHexCodes: enrich?.colors.length ? enrich.colors.map((c) => c.hex) : baseHex,
-          colorImageUrls: enrich?.colors.length ? enrich.colors.map(() => null) : p.product_colors.map((c: any) => c.image_url || null),
-          sizes: p.product_sizes.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map((s) => s.size),
-          minOrder: p.min_order || undefined,
-          images: enrich?.images.length ? enrich.images : baseImages,
-          featured: p.featured || false,
-          new: p.is_new || false,
-          printingTechs: p.printing_techs || [],
-          brand: p.brand || "",
-          // NWG pricing intentionally hidden site-wide until markup rules are defined
-          retailPrice: isNwg ? 0 : (p.retail_price || 0),
-        };
-      });
-    }
-    return [];
-  }, [dbProducts, ssEnrichment, nwgEnrichment]);
-
-
-
-  const cats = useMemo(() => {
-    return dbCategories.map((c) => ({ id: c.slug, name: { lv: c.name_lv, en: c.name_en } }));
-  }, [dbCategories]);
-
-  const brands = useMemo(() => {
-    const set = new Set(normalizedProducts.map((p) => p.brand).filter(Boolean) as string[]);
-    // Stanley/Stella ir mūsu primārais piegādātājs — vienmēr pirmais filtros
-    const PRIMARY = ["Stanley/Stella", "Stanley & Stella", "Stanley Stella"];
-    const all = Array.from(set);
-    const primary = PRIMARY.filter((b) => all.some((x) => x.toLowerCase() === b.toLowerCase()))
-      .map((b) => all.find((x) => x.toLowerCase() === b.toLowerCase()) as string);
-    const rest = all.filter((b) => !primary.includes(b)).sort();
-    return [...primary, ...rest];
-  }, [normalizedProducts]);
-
-  const filteredProducts = useMemo(() => {
-    return normalizedProducts.filter((p) => {
-      const matchCategory = activeCategory === "all" || p.category === activeCategory;
-      const matchBrand = !activeBrand || p.brand === activeBrand;
-      const matchSearch =
-        !search ||
-        p.name[lang].toLowerCase().includes(search.toLowerCase()) ||
-        p.description[lang].toLowerCase().includes(search.toLowerCase()) ||
-        p.material?.toLowerCase().includes(search.toLowerCase());
-      return matchCategory && matchSearch && matchBrand;
-    });
-  }, [activeCategory, activeBrand, search, lang, normalizedProducts]);
-
-  const sortedProducts = useMemo(() => {
-    const arr = [...filteredProducts];
-    switch (activeSort) {
-      case "name-asc":
-        return arr.sort((a, b) => a.name[lang].localeCompare(b.name[lang], lang));
-      case "name-desc":
-        return arr.sort((a, b) => b.name[lang].localeCompare(a.name[lang], lang));
-      case "price-asc":
-        return arr.sort((a, b) => a.retailPrice - b.retailPrice);
-      case "price-desc":
-        return arr.sort((a, b) => b.retailPrice - a.retailPrice);
-      case "newest":
-      default:
-        return arr;
-    }
-  }, [filteredProducts, activeSort, lang]);
-
-  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / ITEMS_PER_PAGE));
-  const safeCurrentPage = Math.min(currentPage, totalPages);
-  const paginatedProducts = useMemo(() => {
-    const start = (safeCurrentPage - 1) * ITEMS_PER_PAGE;
-    return sortedProducts.slice(start, start + ITEMS_PER_PAGE);
-  }, [sortedProducts, safeCurrentPage]);
-
-  const updateParam = (key: string, val: string) => {
-    const p = new URLSearchParams(searchParams);
-    val ? p.set(key, val) : p.delete(key);
-    if (key !== "page") p.delete("page"); // reset page on filter change
-    setSearchParams(p);
+  const toggle = (set: Set<string>, setter: (s: Set<string>) => void) => (v: string) => {
+    const next = new Set(set);
+    next.has(v) ? next.delete(v) : next.add(v);
+    setter(next);
   };
 
-  const goToPage = useCallback((page: number) => {
-    const p = new URLSearchParams(searchParams);
-    page > 1 ? p.set("page", String(page)) : p.delete("page");
-    setSearchParams(p);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [searchParams, setSearchParams]);
+  const t = useMemo(
+    () => ({
+      title: lang === "lv" ? "Katalogs" : "Catalog",
+      subtitle:
+        lang === "lv"
+          ? "Meklējiet visos trīs mūsu piegādātāju katalogos vienuviet"
+          : "Search across all three of our supplier catalogs at once",
+      search: lang === "lv" ? "Meklēt modeli, kodu vai zīmolu…" : "Search model, code or brand…",
+      results: lang === "lv" ? "rezultāti" : "results",
+      clearAll: lang === "lv" ? "Notīrīt filtrus" : "Clear filters",
+      source: lang === "lv" ? "Katalogs" : "Catalog",
+      brand: lang === "lv" ? "Zīmols" : "Brand",
+      category: lang === "lv" ? "Kategorija" : "Category",
+      group: lang === "lv" ? "Grupa" : "Group",
+      gender: lang === "lv" ? "Dzimums" : "Gender",
+      color: lang === "lv" ? "Krāsa" : "Color",
+      empty: lang === "lv" ? "Nav atrasts neviens produkts" : "No products found",
+      view: lang === "lv" ? "Skatīt" : "View",
+      prev: lang === "lv" ? "Iepriekšējā" : "Previous",
+      next: lang === "lv" ? "Nākamā" : "Next",
+    }),
+    [lang]
+  );
 
-  const handleCategorySelect = (slug: string) => {
-    const p = new URLSearchParams(searchParams);
-    slug === "all" ? p.delete("category") : p.set("category", slug);
-    p.delete("page");
-    setSearchParams(p);
+  // Cascading filter: each facet counts items filtered by *other* facets.
+  const passesExcept = (it: EnrichedItem, except: string, extraQ = q) => {
+    if (extraQ) {
+      const needle = extraQ.toLowerCase();
+      const hay = `${it.name || ""} ${it.id} ${it.brand || ""} ${it.description || ""}`.toLowerCase();
+      if (!hay.includes(needle)) return false;
+    }
+    if (except !== "source" && sources.size && !sources.has(it.source)) return false;
+    if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
+    if (except !== "category" && categories.size && (!it.category || !categories.has(it.category))) return false;
+    if (except !== "group" && groups.size && (!it.group_name || !groups.has(it.group_name))) return false;
+    if (except !== "gender" && genders.size && (!it.gender || !genders.has(it.gender))) return false;
+    if (except !== "color" && colors.size) {
+      let ok = false;
+      for (const c of colors) if (it.buckets.has(c as ColorBucketKey)) { ok = true; break; }
+      if (!ok) return false;
+    }
+    return true;
   };
+
+  const facet = useCallback(
+    (key: string, pick: (it: EnrichedItem) => string | null | undefined) => {
+      const counts = new Map<string, number>();
+      for (const it of items) {
+        if (!passesExcept(it, key)) continue;
+        const v = pick(it);
+        if (!v) continue;
+        counts.set(v, (counts.get(v) || 0) + 1);
+      }
+      return Array.from(counts.entries())
+        .map(([label, count]) => ({ label, count }))
+        .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+    },
+    [items, q, sources, brands, categories, groups, genders, colors]
+  );
+
+  const sourceItems = useMemo(() => {
+    const order: CatalogItem["source"][] = ["ss", "nwg", "pf"];
+    return order
+      .map((s) => ({
+        label: SOURCE_META[s][lang as "lv" | "en"],
+        count: items.filter((it) => it.source === s && passesExcept({ ...it }, "source")).length,
+        value: s,
+      }))
+      .filter((x) => x.count > 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
+
+  const brandItems = useMemo(() => facet("brand", (it) => it.brand), [facet]);
+  const categoryItems = useMemo(() => facet("category", (it) => it.category), [facet]);
+  const groupItems = useMemo(() => facet("group", (it) => it.group_name), [facet]);
+  const genderItems = useMemo(() => facet("gender", (it) => it.gender), [facet]);
+
+  const colorItems = useMemo(() => {
+    const counts = new Map<ColorBucketKey, number>();
+    for (const it of items) {
+      if (!passesExcept(it, "color")) continue;
+      for (const b of it.buckets) counts.set(b, (counts.get(b) || 0) + 1);
+    }
+    return COLOR_BUCKETS.map((b) => ({
+      key: b.key,
+      label: lang === "lv" ? b.lv : b.en,
+      count: counts.get(b.key) || 0,
+      hex: b.hex,
+    })).filter((x) => x.count > 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
+
+  const filtered = useMemo(
+    () => items.filter((it) => passesExcept(it, "__none__")),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [items, q, sources, brands, categories, groups, genders, colors]
+  );
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginated = useMemo(
+    () => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [filtered, safePage]
+  );
+
+  const clearAll = () => {
+    setQ("");
+    setSources(new Set());
+    setBrands(new Set());
+    setCategories(new Set());
+    setGroups(new Set());
+    setGenders(new Set());
+    setColors(new Set());
+  };
+
+  const filterSections: FilterSection[] = [
+    {
+      key: "source",
+      title: t.source,
+      items: sourceItems.map((s) => ({ label: s.label, count: s.count })),
+      selected: new Set(
+        [...sources].map((k) => SOURCE_META[k as CatalogItem["source"]]?.[lang as "lv" | "en"] || k)
+      ),
+      onToggle: (label) => {
+        const key = (Object.keys(SOURCE_META) as CatalogItem["source"][]).find(
+          (k) => SOURCE_META[k][lang as "lv" | "en"] === label
+        );
+        if (key) toggle(sources, setSources)(key);
+      },
+    },
+    {
+      key: "color",
+      title: t.color,
+      items: colorItems.map((c) => ({ label: c.label, count: c.count })),
+      selected: new Set(
+        [...colors]
+          .map((k) => {
+            const b = COLOR_BUCKETS.find((x) => x.key === k);
+            return b ? (lang === "lv" ? b.lv : b.en) : null;
+          })
+          .filter(Boolean) as string[]
+      ),
+      onToggle: (label) => {
+        const b = COLOR_BUCKETS.find((x) => (lang === "lv" ? x.lv : x.en) === label);
+        if (b) toggle(colors, setColors)(b.key);
+      },
+    },
+    {
+      key: "group",
+      title: t.group,
+      items: groupItems,
+      selected: groups,
+      onToggle: toggle(groups, setGroups),
+    },
+    {
+      key: "category",
+      title: t.category,
+      items: categoryItems,
+      selected: categories,
+      onToggle: toggle(categories, setCategories),
+    },
+    {
+      key: "brand",
+      title: t.brand,
+      items: brandItems,
+      selected: brands,
+      onToggle: toggle(brands, setBrands),
+    },
+    {
+      key: "gender",
+      title: t.gender,
+      items: genderItems,
+      selected: genders,
+      onToggle: toggle(genders, setGenders),
+    },
+  ];
 
   return (
     <Layout>
       <div className="container px-4 py-8 md:py-14">
-        {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground md:text-4xl">
-            {t("catalog.title")}
+            {t.title}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t("catalog.subtitle")}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p>
         </div>
 
-        {/* Mobile category ribbon */}
-        <div className="mb-6 md:hidden">
-          <CategoryFilter categories={cats} activeCategory={activeCategory} onSelect={handleCategorySelect} />
-        </div>
-
-        {/* Desktop: sidebar + content */}
-        <div className="flex gap-8">
-          {/* Sidebar — desktop only */}
-          <aside className="hidden w-64 shrink-0 md:block">
-            <CategoryFilter categories={cats} activeCategory={activeCategory} onSelect={handleCategorySelect} />
-          </aside>
-
-          {/* Main content */}
-          <div className="min-w-0 flex-1">
-            <CatalogToolbar
-              search={search}
-              onSearchChange={setSearch}
-              activeSort={activeSort}
-              onSortChange={(val) => updateParam("sort", val)}
-              activeBrand={activeBrand}
-              onBrandChange={(val) => updateParam("brand", activeBrand === val ? "" : val)}
-              brands={brands}
-              resultCount={sortedProducts.length}
+        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="relative w-full md:max-w-xl">
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t.search}
+              className="h-11"
             />
+          </div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+            {filtered.length.toLocaleString(lang === "lv" ? "lv-LV" : "en-US")} {t.results}
+          </div>
+        </div>
 
+        <div className="flex flex-col gap-8 md:flex-row">
+          <div className="md:w-72 md:shrink-0">
+            <CatalogFiltersSidebar
+              sections={filterSections}
+              onClearAll={clearAll}
+              heading={lang === "lv" ? "Filtri" : "Filters"}
+            />
+          </div>
+
+          <div className="min-w-0 flex-1">
             {!loaded ? (
-              <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
                 {Array.from({ length: 12 }).map((_, i) => (
                   <div key={i} className="overflow-hidden border border-border bg-card">
-                    <Skeleton className="aspect-square w-full" />
-                    <div className="p-3 space-y-2">
+                    <Skeleton className="aspect-[3/4] w-full" />
+                    <div className="space-y-2 p-3">
                       <Skeleton className="h-3 w-3/4" />
                       <Skeleton className="h-3 w-1/2" />
-                      <Skeleton className="h-4 w-1/3 mt-2" />
                     </div>
                   </div>
                 ))}
               </div>
-            ) : (
-            <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
-              {paginatedProducts.map((product) => (
-                <ProductCard key={product.id} product={product as any} />
-              ))}
-            </div>
-            )}
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={safeCurrentPage <= 1}
-                  onClick={() => goToPage(safeCurrentPage - 1)}
-                  className="font-heading text-xs uppercase tracking-wider min-w-0 px-2 sm:px-3"
-                >
-                  <span className="hidden sm:inline">← {lang === "lv" ? "Iepriekšējā" : "Previous"}</span>
-                  <span className="sm:hidden">←</span>
-                </Button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - safeCurrentPage) <= 1)
-                  .reduce<(number | "ellipsis")[]>((acc, p, idx, arr) => {
-                    if (idx > 0 && p - (arr[idx - 1]) > 1) acc.push("ellipsis");
-                    acc.push(p);
-                    return acc;
-                  }, [])
-                  .map((item, idx) =>
-                    item === "ellipsis" ? (
-                      <span key={`e-${idx}`} className="px-0.5 text-muted-foreground">…</span>
-                    ) : (
-                      <Button
-                        key={item}
-                        variant={item === safeCurrentPage ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => goToPage(item)}
-                        className="font-heading min-w-[2rem] sm:min-w-[2.25rem] text-xs px-1.5 sm:px-2"
-                      >
-                        {item}
-                      </Button>
-                    )
-                  )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={safeCurrentPage >= totalPages}
-                  onClick={() => goToPage(safeCurrentPage + 1)}
-                  className="font-heading text-xs uppercase tracking-wider min-w-0 px-2 sm:px-3"
-                >
-                  <span className="hidden sm:inline">{lang === "lv" ? "Nākamā" : "Next"} →</span>
-                  <span className="sm:hidden">→</span>
-                </Button>
-              </div>
-            )}
-
-            {sortedProducts.length === 0 && loaded && (
+            ) : filtered.length === 0 ? (
               <div className="py-20 text-center">
-                <p className="text-lg text-muted-foreground">{t("catalog.noResults")}</p>
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={() => {
-                    setSearch("");
-                    setSearchParams({});
-                  }}
-                >
-                  {t("catalog.clearFilters")}
+                <p className="text-lg text-muted-foreground">{t.empty}</p>
+                <Button variant="outline" className="mt-4" onClick={clearAll}>
+                  {t.clearAll}
                 </Button>
               </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+                  {paginated.map((it) => (
+                    <CatalogCard key={`${it.source}-${it.id}`} item={it} lang={lang} viewLabel={t.view} />
+                  ))}
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="mt-8 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={safePage <= 1}
+                      onClick={() => {
+                        setPage(safePage - 1);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="font-heading text-xs uppercase tracking-wider"
+                    >
+                      ← {t.prev}
+                    </Button>
+                    <span className="px-3 text-sm text-muted-foreground">
+                      {safePage} / {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={safePage >= totalPages}
+                      onClick={() => {
+                        setPage(safePage + 1);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      className="font-heading text-xs uppercase tracking-wider"
+                    >
+                      {t.next} →
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
       </div>
     </Layout>
+  );
+};
+
+interface CardProps {
+  item: EnrichedItem;
+  lang: "lv" | "en";
+  viewLabel: string;
+}
+
+const CatalogCard = ({ item, lang, viewLabel }: CardProps) => {
+  const img = resolveImg(item);
+  const hover =
+    item.source === "ss" ? resolveSsUrl(item.hover_image_url) : item.hover_image_url;
+  const swatches = (item.color_hexes || []).slice(0, 8);
+  const extra = Math.max(0, (item.color_hexes || []).length - 8);
+
+  return (
+    <Link
+      to={detailHref(item)}
+      className="group block overflow-hidden border border-border bg-card text-left transition-colors hover:border-accent"
+    >
+      <div className="relative aspect-[3/4] overflow-hidden bg-white">
+        {img ? (
+          <>
+            <img
+              src={img}
+              alt={item.name || item.id}
+              loading="lazy"
+              className={`absolute inset-0 h-full w-full scale-[1.08] object-contain object-center p-1 transition-opacity duration-500 ${hover ? "group-hover:opacity-0" : ""}`}
+            />
+            {hover && (
+              <img
+                src={hover}
+                alt=""
+                loading="lazy"
+                className="absolute inset-0 h-full w-full scale-[1.08] object-contain object-center p-1 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              />
+            )}
+          </>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/50">
+            <span className="font-mono text-xs">{item.id}</span>
+          </div>
+        )}
+        <Badge className="absolute left-2 top-2 rounded-none bg-primary px-2 py-0 font-heading text-[9px] uppercase tracking-widest text-primary-foreground">
+          {SOURCE_META[item.source][lang]}
+        </Badge>
+        {item.brand && (
+          <span className="absolute right-2 top-2 max-w-[60%] truncate bg-background/90 px-1.5 py-0.5 text-right font-heading text-[9px] font-bold uppercase tracking-wider text-foreground">
+            {item.brand}
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-1.5 p-3">
+        <h3 className="line-clamp-1 font-heading text-sm font-bold uppercase tracking-wide transition-colors group-hover:text-accent">
+          {item.name || item.id}
+        </h3>
+        {item.description && (
+          <p className="line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
+        )}
+        {swatches.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1 pt-1">
+            {swatches.map((hex, i) => (
+              <span
+                key={`${hex}-${i}`}
+                className="h-3 w-3 rounded-full border border-border"
+                style={{ backgroundColor: hex.startsWith("#") && hex.length === 7 ? hex : "#ccc" }}
+              />
+            ))}
+            {extra > 0 && (
+              <span className="text-[10px] text-muted-foreground">+{extra}</span>
+            )}
+          </div>
+        )}
+        <p className="pt-1 font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {viewLabel} →
+        </p>
+      </div>
+    </Link>
   );
 };
 
