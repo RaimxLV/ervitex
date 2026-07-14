@@ -30,7 +30,7 @@ const sanitizeHex = (hex: string | null | undefined, bucket: ColorBucketKey | nu
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null }
 
-export type CatalogSource = "ss" | "nwg" | "pf";
+
 
 interface CatalogItem {
   source: CatalogSource;
