@@ -183,7 +183,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         let query = supabase
           .from("catalog_items" as any)
           .select(
-            "source,id,name,description,brand,category,group_name,gender,image_url,hover_image_url,colors"
+            "source,id,name,brand,category,group_name,gender,image_url,hover_image_url,colors"
           );
         if (lockedSource) query = query.eq("source", lockedSource);
         const { data, error } = await query.range(from, from + step - 1);
