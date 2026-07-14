@@ -202,7 +202,7 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
 
 async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
   const [styleRes, variantsRes, imagesRes, skusRes] = await Promise.all([
-    supabase.from("nwg_styles").select("product_number,name,brand,category,gender,fit,fabrics,commerce_text,catalog_text,usp").eq("product_number", productNumber).maybeSingle(),
+    supabase.from("nwg_styles").select("product_number,name,brand,category,gender,fit,fabrics,commerce_text,catalog_text,usp,weight,country_of_origin,raw").eq("product_number", productNumber).maybeSingle(),
     supabase.from("nwg_variants").select("item_number,color_name,color_code,filter_color,shade_color,main_picture_url").eq("product_number", productNumber),
     supabase.from("nwg_images").select("item_number,image_url,high_res_url,large_thumbnail_url,standard_url,sort_order").eq("product_number", productNumber).order("sort_order", { ascending: true }),
     supabase.from("nwg_skus").select("item_number,size,size_sequence").eq("product_number", productNumber),
@@ -212,6 +212,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
   const variants = variantsRes.data || [];
   const images = imagesRes.data || [];
   const skus = skusRes.data || [];
+  const raw = ((style as any).raw || {}) as Record<string, any>;
 
   const NAMED_HEX: Record<string, string> = {
     black: "#000000", white: "#ffffff", grey: "#808080", gray: "#808080", red: "#e11d48",
@@ -255,26 +256,44 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
   for (const arr of sizesByItem.values()) for (const s of arr) sizeSet.set(s.s, s.seq);
   const sizes = [...sizeSet.entries()].sort((a, b) => a[1].localeCompare(b[1])).map((x) => x[0]);
 
+  // Full description: commerce + catalog + USP (preserve bullets & newlines)
+  const descBlocks = [style.commerce_text, style.catalog_text, style.usp].filter(Boolean) as string[];
+  const seen = new Set<string>();
+  const dedupedBlocks = descBlocks.filter((b) => {
+    const k = b.trim();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  const fullDesc = dedupedBlocks.join("\n\n");
+  const featureLines = lines(fullDesc).filter((l) => /^[•\-\*·▪►]/.test(l));
+
+  const specs: { label: string; value: string }[] = [];
+  addSpec(specs, "Fit", style.fit);
+  addSpec(specs, "Gender", style.gender);
+  addSpec(specs, "Category", style.category);
+  addSpec(specs, "Weight", style.weight);
+  addSpec(specs, "Country of origin", style.country_of_origin || raw.productCountryOfOrigin);
+  addSpec(specs, "Assortment", Array.isArray(raw.productAssortment) ? raw.productAssortment.join(", ") : raw.productAssortment);
+
   return {
     title: style.name || style.product_number,
     code: style.product_number,
     brand: style.brand,
     category: style.category,
     gender: style.gender,
-    shortDescription: cleanText(style.commerce_text),
-    description: [style.commerce_text, style.catalog_text, style.usp].filter(Boolean).join("\n\n") || null,
-    features: lines(style.usp),
-    material: style.fabrics || style.fit || null,
+    shortDescription: cleanText(style.commerce_text?.split(/\n/)[0]) || cleanText(style.commerce_text),
+    description: fullDesc || null,
+    features: featureLines,
+    material: style.fabrics || null,
     care: null,
-    specs: [
-      ...(style.fit ? [{ label: "Fit", value: style.fit }] : []),
-      ...(style.gender ? [{ label: "Gender", value: style.gender }] : []),
-    ],
+    specs,
     notice: null,
     sizes,
     colors,
   };
 }
+
 
 async function loadPF(modelCode: string): Promise<ProductDetail | null> {
   const [styleRes, variantsRes, imagesRes] = await Promise.all([
