@@ -387,32 +387,27 @@ const StanleyStellaPage = () => {
       </section>
 
       <section className="border-b border-border bg-card">
-        <div className="container grid gap-3 px-4 py-4 md:grid-cols-[1fr_180px_180px_auto_auto]">
-          <Input placeholder={t.search} value={q} onChange={(e) => setQ(e.target.value)} />
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger><SelectValue placeholder={t.category} /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t.category}: {t.all}</SelectItem>
-              {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={gender} onValueChange={setGender}>
-            <SelectTrigger><SelectValue placeholder={t.gender} /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t.gender}: {t.all}</SelectItem>
-              {genders.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
-            </SelectContent>
-          </Select>
+        <div className="container flex flex-wrap items-center gap-3 px-4 py-4">
+          <Input className="max-w-md flex-1" placeholder={t.search} value={q} onChange={(e) => setQ(e.target.value)} />
           <label className="flex items-center gap-2 text-sm">
             <Checkbox checked={inStockOnly} onCheckedChange={(v) => setInStockOnly(!!v)} />
             {t.inStock}
           </label>
-          <span className="self-center text-xs text-muted-foreground">{filtered.length} {t.results}</span>
+          <span className="ml-auto text-xs text-muted-foreground">{filtered.length} {t.results}</span>
         </div>
       </section>
 
       <section className="bg-background">
-        <div className="container px-4 py-8">
+        <div className="container grid gap-6 px-4 py-8 lg:grid-cols-[260px_1fr]">
+          <CatalogFiltersSidebar
+            onClearAll={() => { setSelectedCategories(new Set()); setSelectedGenders(new Set()); }}
+            sections={[
+              { key: "category", title: t.category, items: categories, selected: selectedCategories, onToggle: (v) => toggle(selectedCategories, setSelectedCategories, v) },
+              { key: "gender", title: t.gender, items: genders, selected: selectedGenders, onToggle: (v) => toggle(selectedGenders, setSelectedGenders, v) },
+            ]}
+          />
+          <div>
+
           {!loaded ? (
             <div className="grid grid-cols-2 gap-2.5 sm:gap-5 xl:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
