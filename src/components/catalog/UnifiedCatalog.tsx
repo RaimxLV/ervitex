@@ -253,7 +253,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const passesExcept = (it: EnrichedItem, except: string, extraQ = q) => {
     if (extraQ) {
       const needle = extraQ.toLowerCase();
-      const hay = `${it.name || ""} ${it.id} ${it.brand || ""} ${it.description || ""}`.toLowerCase();
+      const hay = `${it.name || ""} ${it.id} ${it.brand || ""}`.toLowerCase();
       if (!hay.includes(needle)) return false;
     }
     if (!lockedSource && except !== "source" && sources.size && !sources.has(it.source)) return false;
