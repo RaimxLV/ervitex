@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
+import CatalogFiltersSidebar from "@/components/catalog/CatalogFiltersSidebar";
 
 interface SummaryRow {
   model_code: string;
@@ -193,26 +194,6 @@ const PfConceptPage = () => {
     ? { search: "Meklēt modeli vai kodu", brand: "Zīmols", group: "Grupa", category: "Kategorija", results: "rezultāti", contact: "Pieprasīt cenu", noResults: "Nav rezultātu", noImage: "Bez attēla", colour: "Krāsa", description: "Apraksts", material: "Materiāls", size: "Izmērs", askPrice: "Pieprasīt cenu šim modelim", filters: "Filtri", clear: "Notīrīt", partner: "PF Concept – oficiāls partneris" }
     : { search: "Search model or code", brand: "Brand", group: "Group", category: "Category", results: "results", contact: "Request a Quote", noResults: "No results", noImage: "No image", colour: "Colour", description: "Description", material: "Material", size: "Size", askPrice: "Request a quote for this model", filters: "Filters", clear: "Clear", partner: "PF Concept – official partner" };
 
-  const FilterGroup = ({ title, items, selected, onToggle }: { title: string; items: { label: string; count: number }[]; selected: Set<string>; onToggle: (v: string) => void }) => (
-    <div className="border-b border-border pb-4">
-      <h3 className="mb-2 font-heading text-xs font-bold uppercase tracking-wider">{title}</h3>
-      <div className="max-h-72 overflow-y-auto pr-1">
-        <ul className="space-y-1">
-          {items.length === 0 && <li className="text-[11px] text-muted-foreground">—</li>}
-          {items.map((it) => (
-            <li key={it.label}>
-              <label className="flex cursor-pointer items-center gap-2 text-sm hover:text-accent">
-                <Checkbox checked={selected.has(it.label)} onCheckedChange={() => onToggle(it.label)} />
-                <span className="flex-1">{it.label}</span>
-                <span className="text-[10px] text-muted-foreground">{it.count}</span>
-              </label>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-
   return (
     <Layout>
       <section className="border-b border-border bg-primary text-primary-foreground">
@@ -236,21 +217,15 @@ const PfConceptPage = () => {
       </section>
 
       <section className="bg-background">
-        <div className="container grid gap-6 px-4 py-8 lg:grid-cols-[240px_1fr]">
-          <aside className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-heading text-sm font-bold uppercase tracking-wider">{t.filters}</h2>
-              {(selectedBrands.size || selectedGroups.size || selectedCategories.size) > 0 && (
-                <button
-                  onClick={() => { setSelectedBrands(new Set()); setSelectedGroups(new Set()); setSelectedCategories(new Set()); }}
-                  className="text-[11px] uppercase tracking-wider text-muted-foreground underline-offset-4 hover:underline"
-                >{t.clear}</button>
-              )}
-            </div>
-            <FilterGroup title={t.group} items={groups} selected={selectedGroups} onToggle={(v) => toggle(selectedGroups, setSelectedGroups, v)} />
-            <FilterGroup title={t.category} items={categories} selected={selectedCategories} onToggle={(v) => toggle(selectedCategories, setSelectedCategories, v)} />
-            <FilterGroup title={t.brand} items={brands} selected={selectedBrands} onToggle={(v) => toggle(selectedBrands, setSelectedBrands, v)} />
-          </aside>
+        <div className="container grid gap-6 px-4 py-8 lg:grid-cols-[260px_1fr]">
+          <CatalogFiltersSidebar
+            onClearAll={() => { setSelectedBrands(new Set()); setSelectedGroups(new Set()); setSelectedCategories(new Set()); }}
+            sections={[
+              { key: "group", title: t.group, items: groups, selected: selectedGroups, onToggle: (v) => toggle(selectedGroups, setSelectedGroups, v) },
+              { key: "category", title: t.category, items: categories, selected: selectedCategories, onToggle: (v) => toggle(selectedCategories, setSelectedCategories, v) },
+              { key: "brand", title: t.brand, items: brands, selected: selectedBrands, onToggle: (v) => toggle(selectedBrands, setSelectedBrands, v) },
+            ]}
+          />
 
           <div>
             {!loaded ? (

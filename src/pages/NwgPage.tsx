@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import CatalogFiltersSidebar from "@/components/catalog/CatalogFiltersSidebar";
 
 interface SummaryRow {
   product_number: string;
@@ -336,28 +337,6 @@ const NwgPage = () => {
     ? { search: "Meklēt modeli vai kodu", brand: "Zīmols", category: "Kategorija", gender: "Dzimums", inStock: "Tikai noliktavā", results: "rezultāti", contact: "Pieprasīt cenu", noResults: "Nav rezultātu", noImage: "Bez attēla", colour: "Krāsa", description: "Apraksts", composition: "Sastāvs", fit: "Piegriezums", weight: "Svars", size: "Izmērs", stock: "Noliktavā", askPrice: "Pieprasīt cenu šim modelim", filters: "Filtri", clear: "Notīrīt", partner: "New Wave Group – oficiāls partneris" }
     : { search: "Search model or code", brand: "Brand", category: "Category", gender: "Gender", inStock: "In stock only", results: "results", contact: "Request a Quote", noResults: "No results", noImage: "No image", colour: "Colour", description: "Description", composition: "Composition", fit: "Fit", weight: "Weight", size: "Size", stock: "In stock", askPrice: "Request a quote for this model", filters: "Filters", clear: "Clear", partner: "New Wave Group – official partner" };
 
-  const FilterGroup = ({ title, items, selected, onToggle }: { title: string; items: { label: string; count: number }[]; selected: Set<string>; onToggle: (v: string) => void }) => (
-    <div className="border-b border-border pb-4">
-      <h3 className="mb-2 font-heading text-xs font-bold uppercase tracking-wider">{title}</h3>
-      <div className="max-h-72 overflow-y-auto pr-1">
-        <ul className="space-y-1">
-          {items.length === 0 && (
-            <li className="text-[11px] text-muted-foreground">—</li>
-          )}
-          {items.map((it) => (
-            <li key={it.label}>
-              <label className="flex cursor-pointer items-center gap-2 text-sm hover:text-accent">
-                <Checkbox checked={selected.has(it.label)} onCheckedChange={() => onToggle(it.label)} />
-                <span className="flex-1">{it.label}</span>
-                <span className="text-[10px] text-muted-foreground">{it.count}</span>
-              </label>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-
   return (
     <Layout>
       <section className="border-b border-border bg-primary text-primary-foreground">
@@ -385,21 +364,15 @@ const NwgPage = () => {
       </section>
 
       <section className="bg-background">
-        <div className="container grid gap-6 px-4 py-8 lg:grid-cols-[240px_1fr]">
-          <aside className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-heading text-sm font-bold uppercase tracking-wider">{t.filters}</h2>
-              {(selectedBrands.size || selectedCategories.size || selectedGenders.size) > 0 && (
-                <button
-                  onClick={() => { setSelectedBrands(new Set()); setSelectedCategories(new Set()); setSelectedGenders(new Set()); }}
-                  className="text-[11px] uppercase tracking-wider text-muted-foreground underline-offset-4 hover:underline"
-                >{t.clear}</button>
-              )}
-            </div>
-            <FilterGroup title={t.brand} items={brands} selected={selectedBrands} onToggle={(v) => toggle(selectedBrands, setSelectedBrands, v)} />
-            <FilterGroup title={t.gender} items={genders} selected={selectedGenders} onToggle={(v) => toggle(selectedGenders, setSelectedGenders, v)} />
-            <FilterGroup title={t.category} items={categories} selected={selectedCategories} onToggle={(v) => toggle(selectedCategories, setSelectedCategories, v)} />
-          </aside>
+        <div className="container grid gap-6 px-4 py-8 lg:grid-cols-[260px_1fr]">
+          <CatalogFiltersSidebar
+            onClearAll={() => { setSelectedBrands(new Set()); setSelectedCategories(new Set()); setSelectedGenders(new Set()); }}
+            sections={[
+              { key: "brand", title: t.brand, items: brands, selected: selectedBrands, onToggle: (v) => toggle(selectedBrands, setSelectedBrands, v) },
+              { key: "gender", title: t.gender, items: genders, selected: selectedGenders, onToggle: (v) => toggle(selectedGenders, setSelectedGenders, v) },
+              { key: "category", title: t.category, items: categories, selected: selectedCategories, onToggle: (v) => toggle(selectedCategories, setSelectedCategories, v) },
+            ]}
+          />
 
           <div>
             {!loaded ? (
