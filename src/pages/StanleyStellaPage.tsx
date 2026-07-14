@@ -489,8 +489,10 @@ const StanleyStellaPage = () => {
               )}
             </>
           )}
+          </div>
         </div>
       </section>
+
 
       <Dialog open={!!openStyle} onOpenChange={(o) => !o && setOpenStyle(null)}>
         <DialogContent className="max-w-6xl max-h-[92vh] overflow-y-auto bg-background p-0">
