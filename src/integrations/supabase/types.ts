@@ -1145,6 +1145,24 @@ export type Database = {
       }
     }
     Views: {
+      catalog_items: {
+        Row: {
+          brand: string | null
+          category: string | null
+          color_hexes: string[] | null
+          color_names: string[] | null
+          description: string | null
+          gender: string | null
+          group_name: string | null
+          hover_image_url: string | null
+          id: string | null
+          image_url: string | null
+          name: string | null
+          sort_order: number | null
+          source: string | null
+        }
+        Relationships: []
+      }
       nwg_skus_public: {
         Row: {
           active: boolean | null
