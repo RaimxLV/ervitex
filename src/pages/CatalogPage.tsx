@@ -531,13 +531,16 @@ const CatalogCard = ({ item, lang, selectedBuckets }: CardProps) => {
       : item.source === "ss"
         ? resolveSsUrl(item.hover_image_url)
         : item.hover_image_url;
-  const withHex = item.colors.filter((c) => c.h);
+  const withHex = item.colors
+    .map((c) => ({ ...c, hex: sanitizeHex(c.h, c.bucket) }))
+    .filter((c) => !!c.hex);
   const swatches = withHex.slice(0, 8).map((c) => ({
-    hex: c.h,
+    hex: c.hex!,
     name: c.n || "",
     active: !!(selectedBuckets.size > 0 && c.bucket && selectedBuckets.has(c.bucket)),
   }));
   const extra = Math.max(0, withHex.length - 8);
+
 
 
   return (
