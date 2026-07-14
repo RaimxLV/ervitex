@@ -121,11 +121,7 @@ const resolveImgUrl = (source: CatalogSource, u: string | null): string | null =
   return source === "ss" ? resolveSsUrl(u) : u;
 };
 
-export const SOURCE_META: Record<CatalogSource, { label: string; href: string; code: string }> = {
-  ss: { label: "Stanley/Stella", href: "/stanley-stella", code: "S/S" },
-  nwg: { label: "New Wave Group", href: "/nwg", code: "NWG" },
-  pf: { label: "PF Concept", href: "/pf-concept", code: "PFC" },
-};
+/* -------------------- component -------------------- */
 
 /* -------------------- component -------------------- */
 
