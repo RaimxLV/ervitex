@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import CatalogFiltersSidebar, {
   type FilterSection,
 } from "@/components/catalog/CatalogFiltersSidebar";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
+import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
+import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import {
   COLOR_BUCKETS,
   bucketOf,
@@ -28,7 +30,7 @@ const sanitizeHex = (hex: string | null | undefined, bucket: ColorBucketKey | nu
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null }
 
-export type CatalogSource = "ss" | "nwg" | "pf";
+
 
 interface CatalogItem {
   source: CatalogSource;
@@ -119,11 +121,7 @@ const resolveImgUrl = (source: CatalogSource, u: string | null): string | null =
   return source === "ss" ? resolveSsUrl(u) : u;
 };
 
-export const SOURCE_META: Record<CatalogSource, { label: string; href: string; code: string }> = {
-  ss: { label: "Stanley/Stella", href: "/stanley-stella", code: "S/S" },
-  nwg: { label: "New Wave Group", href: "/nwg", code: "NWG" },
-  pf: { label: "PF Concept", href: "/pf-concept", code: "PFC" },
-};
+/* -------------------- component -------------------- */
 
 /* -------------------- component -------------------- */
 
@@ -137,10 +135,10 @@ interface Props {
 const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const { lang } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const [items, setItems] = useState<EnrichedItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [selected, setSelected] = useState<EnrichedItem | null>(null);
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(
@@ -185,7 +183,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         let query = supabase
           .from("catalog_items" as any)
           .select(
-            "source,id,name,description,brand,category,group_name,gender,image_url,hover_image_url,colors"
+            "source,id,name,brand,category,group_name,gender,image_url,hover_image_url,colors"
           );
         if (lockedSource) query = query.eq("source", lockedSource);
         const { data, error } = await query.range(from, from + step - 1);
@@ -255,7 +253,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const passesExcept = (it: EnrichedItem, except: string, extraQ = q) => {
     if (extraQ) {
       const needle = extraQ.toLowerCase();
-      const hay = `${it.name || ""} ${it.id} ${it.brand || ""} ${it.description || ""}`.toLowerCase();
+      const hay = `${it.name || ""} ${it.id} ${it.brand || ""}`.toLowerCase();
       if (!hay.includes(needle)) return false;
     }
     if (!lockedSource && except !== "source" && sources.size && !sources.has(it.source)) return false;
@@ -473,7 +471,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}
                       noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
-                      onNavigate={() => navigate(SOURCE_META[it.source].href)}
+                      onNavigate={() => setSelected(it)}
                     />
                   ))}
                 </div>
@@ -514,6 +512,21 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           </div>
         </div>
       </div>
+      {selected && (
+        <CatalogItemDialog
+          open={!!selected}
+          onOpenChange={(o) => !o && setSelected(null)}
+          source={selected.source}
+          id={selected.id}
+          name={selected.name}
+          brand={selected.brand}
+          category={selected.category}
+          image={selected.image_url}
+          swatches={selected.colors
+            .map((c) => ({ hex: sanitizeHex(c.h, c.bucket), name: c.n || "" }))
+            .filter((s) => !!s.hex) as { hex: string; name: string }[]}
+        />
+      )}
     </Layout>
   );
 };
