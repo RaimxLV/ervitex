@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,11 +9,14 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
   type FilterSection,
 } from "@/components/catalog/CatalogFiltersSidebar";
+import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import {
   COLOR_BUCKETS,
   bucketOf,
   type ColorBucketKey,
 } from "@/lib/colorBuckets";
+
+interface ColorEntry { h: string | null; n: string | null; u: string | null }
 
 interface CatalogItem {
   source: "ss" | "nwg" | "pf";
@@ -26,11 +29,12 @@ interface CatalogItem {
   gender: string | null;
   image_url: string | null;
   hover_image_url: string | null;
-  color_hexes: string[] | null;
-  color_names: string[] | null;
+  colors: ColorEntry[] | null;
 }
 
-interface EnrichedItem extends CatalogItem {
+interface EnrichedColor extends ColorEntry { bucket: ColorBucketKey | null }
+interface EnrichedItem extends Omit<CatalogItem, "colors"> {
+  colors: EnrichedColor[];
   buckets: Set<ColorBucketKey>;
 }
 
@@ -164,7 +168,7 @@ const CatalogPage = () => {
         const { data, error } = await supabase
           .from("catalog_items" as any)
           .select(
-            "source,id,name,description,brand,category,group_name,gender,image_url,hover_image_url,color_hexes,color_names"
+            "source,id,name,description,brand,category,group_name,gender,image_url,hover_image_url,colors"
           )
           .range(from, from + step - 1);
         if (error) break;
@@ -174,19 +178,19 @@ const CatalogPage = () => {
       }
       const enriched: EnrichedItem[] = all.map((it) => {
         const buckets = new Set<ColorBucketKey>();
-        const hexes = it.color_hexes || [];
-        const names = it.color_names || [];
-        const len = Math.max(hexes.length, names.length);
-        for (let i = 0; i < len; i++) {
-          const b = bucketOf(hexes[i], names[i]);
-          if (b) buckets.add(b);
-        }
+        const raw = (it.colors || []) as ColorEntry[];
+        const colorList: EnrichedColor[] = raw.map((c) => {
+          const bucket = bucketOf(c.h, c.n);
+          if (bucket) buckets.add(bucket);
+          return { ...c, bucket };
+        });
         return {
           ...it,
           brand: normalizeText(it.brand),
           category: normalizeCategory(it.category),
           group_name: normalizeText(it.group_name),
           gender: normalizeGender(it.gender),
+          colors: colorList,
           buckets,
         };
       });
@@ -440,7 +444,12 @@ const CatalogPage = () => {
               <>
                 <div className="grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
                   {paginated.map((it) => (
-                    <CatalogCard key={`${it.source}-${it.id}`} item={it} lang={lang} viewLabel={t.view} />
+                    <CatalogCard
+                      key={`${it.source}-${it.id}`}
+                      item={it}
+                      lang={lang}
+                      selectedBuckets={colors as Set<ColorBucketKey>}
+                    />
                   ))}
                 </div>
 
@@ -487,77 +496,57 @@ const CatalogPage = () => {
 interface CardProps {
   item: EnrichedItem;
   lang: "lv" | "en";
-  viewLabel: string;
+  selectedBuckets: Set<ColorBucketKey>;
 }
 
-const CatalogCard = ({ item, lang, viewLabel }: CardProps) => {
-  const img = resolveImg(item);
-  const hover =
-    item.hover_image_url === "[object Object]"
+const CatalogCard = ({ item, lang, selectedBuckets }: CardProps) => {
+  const navigate = useNavigate();
+  // If a color filter is active, prefer the image of the matching variant.
+  let matchedImg: string | null = null;
+  if (selectedBuckets.size > 0) {
+    for (const c of item.colors) {
+      if (c.bucket && selectedBuckets.has(c.bucket) && c.u) {
+        matchedImg = c.u;
+        break;
+      }
+    }
+  }
+  const rawImg = matchedImg ?? item.image_url;
+  const img = rawImg && rawImg !== "[object Object]"
+    ? (item.source === "ss" ? resolveSsUrl(rawImg) : rawImg)
+    : null;
+  const hover = matchedImg
+    ? null
+    : item.hover_image_url === "[object Object]" || !item.hover_image_url
       ? null
       : item.source === "ss"
         ? resolveSsUrl(item.hover_image_url)
         : item.hover_image_url;
-  const swatches = (item.color_hexes || []).slice(0, 8);
-  const extra = Math.max(0, (item.color_hexes || []).length - 8);
+  const swatches = item.colors
+    .filter((c) => c.h)
+    .slice(0, 8)
+    .map((c) => ({ hex: c.h, name: c.n || "" }));
+  const extra = Math.max(0, item.colors.filter((c) => c.h).length - 8);
 
   return (
-    <Link
-      to={detailHref(item)}
-      className="group block overflow-hidden border border-border bg-card text-left transition-colors hover:border-accent"
-    >
-      <div className="relative aspect-[3/4] overflow-hidden bg-white">
-        {img ? (
-          <>
-            <img
-              src={img}
-              alt={item.name || item.id}
-              loading="lazy"
-              className={`absolute inset-0 h-full w-full scale-[1.08] object-contain object-center p-1 transition-opacity duration-500 ${hover ? "group-hover:opacity-0" : ""}`}
-            />
-            {hover && (
-              <img
-                src={hover}
-                alt=""
-                loading="lazy"
-                className="absolute inset-0 h-full w-full scale-[1.08] object-contain object-center p-1 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-              />
-            )}
-          </>
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/50">
-            <span className="font-mono text-xs">{item.id}</span>
-          </div>
-        )}
-      </div>
-
-      <div className="space-y-1.5 p-3">
-        <h3 className="line-clamp-1 font-heading text-sm font-bold uppercase tracking-wide transition-colors group-hover:text-accent">
-          {item.name || item.id}
-        </h3>
-        {item.description && (
-          <p className="line-clamp-2 text-xs text-muted-foreground">{item.description}</p>
-        )}
-        {swatches.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1 pt-1">
-            {swatches.map((hex, i) => (
-              <span
-                key={`${hex}-${i}`}
-                className="h-3 w-3 rounded-full border border-border"
-                style={{ backgroundColor: hex.startsWith("#") && hex.length === 7 ? hex : "#ccc" }}
-              />
-            ))}
-            {extra > 0 && (
-              <span className="text-[10px] text-muted-foreground">+{extra}</span>
-            )}
-          </div>
-        )}
-        <p className="pt-1 font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          {viewLabel} →
+    <CatalogModelCard
+      onClick={() => navigate(detailHref(item))}
+      image={img}
+      hoverImage={hover}
+      imageAlt={item.name || item.id}
+      title={item.name || item.id}
+      subtitle={item.description}
+      swatches={swatches}
+      extraSwatches={extra}
+      noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
+      price={
+        <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {lang === "lv" ? "Cena pēc pieprasījuma" : "Request quote"}
         </p>
-      </div>
-    </Link>
+      }
+    />
   );
 };
+
 
 export default CatalogPage;

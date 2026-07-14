@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar from "@/components/catalog/CatalogFiltersSidebar";
+import { COLOR_BUCKETS, bucketOf, type ColorBucketKey } from "@/lib/colorBuckets";
 
 interface SummaryRow {
   model_code: string;
@@ -56,6 +57,9 @@ const PfConceptPage = () => {
   const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(new Set());
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [selectedGenders, setSelectedGenders] = useState<Set<string>>(new Set());
+  const [selectedBuckets, setSelectedBuckets] = useState<Set<ColorBucketKey>>(new Set());
+  const [colorMap, setColorMap] = useState<Map<string, { buckets: Set<ColorBucketKey>; bucketImages: Map<ColorBucketKey, string> }>>(new Map());
   const [page, setPage] = useState(1);
 
   const [cardVariants, setCardVariants] = useState<Map<string, VariantRow[]>>(new Map());
@@ -86,6 +90,38 @@ const PfConceptPage = () => {
       }
       setRows(all);
       setLoaded(true);
+    })();
+  }, []);
+
+  // Per-color bucket data from unified catalog for color filter + image swap.
+  useEffect(() => {
+    (async () => {
+      const rows: any[] = [];
+      const step = 1000; let from = 0;
+      while (true) {
+        const { data, error } = await supabase
+          .from("catalog_items" as any)
+          .select("id,colors")
+          .eq("source", "pf")
+          .range(from, from + step - 1);
+        if (error || !data) break;
+        rows.push(...data);
+        if (data.length < step) break;
+        from += step;
+      }
+      const m = new Map<string, { buckets: Set<ColorBucketKey>; bucketImages: Map<ColorBucketKey, string> }>();
+      for (const row of rows) {
+        const buckets = new Set<ColorBucketKey>();
+        const bucketImages = new Map<ColorBucketKey, string>();
+        for (const c of (row.colors || []) as { h: string | null; n: string | null; u: string | null }[]) {
+          const b = bucketOf(c.h, c.n);
+          if (!b) continue;
+          buckets.add(b);
+          if (c.u && !bucketImages.has(b)) bucketImages.set(b, c.u);
+        }
+        m.set(row.id, { buckets, bucketImages });
+      }
+      setColorMap(m);
     })();
   }, []);
 
