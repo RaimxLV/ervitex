@@ -419,7 +419,7 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
 
 
 async function loadBB(styleCode: string): Promise<ProductDetail | null> {
-  const [styleRes, variantsRes, imagesRes, pricesRes] = await Promise.all([
+  const [styleRes, variantsRes, imagesRes] = await Promise.all([
     supabase.from("bb_styles").select("style_code,brand,name,description,category,gender,features").eq("style_code", styleCode).maybeSingle(),
     supabase.from("bb_variants").select("sku,color_name,color_hex,size").eq("style_code", styleCode),
     supabase.from("bb_images").select("color_name,url,is_primary,sort_order").eq("style_code", styleCode).order("sort_order", { ascending: true }),
