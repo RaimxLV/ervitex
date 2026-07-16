@@ -328,26 +328,56 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     "Sweaters": "Džemperi", "Jackets": "Virsjakas", "Caps & Hats": "Cepures",
     "Beanies": "Adītas cepures", "Bags": "Somas", "Backpacks": "Mugursomas",
     "Shorts": "Šorti", "Trousers": "Bikses", "Bottoms": "Apakšdaļas", "Tops": "Augšdaļas",
+    "Ballpoint Pens": "Pildspalvas", "Water Bottles": "Ūdens pudeles",
+    "Hard Cover Notebooks": "Cietvāku bloknoti", "Notebooks": "Bloknoti",
+    "Insulated Mugs": "Termokrūzes", "Mugs": "Krūzes",
+    "Shopping & Tote Bags": "Iepirkumu somas", "Tote Bags": "Iepirkumu somas",
+    "Home Accessories": "Mājas aksesuāri", "Sports Bottles": "Sporta pudeles",
+    "Cables": "Kabeļi", "Power Banks": "Ārējie akumulatori",
+    "Umbrellas": "Lietussargi", "Keychains": "Atslēgu piekariņi",
+    "Wireless Chargers": "Bezvadu lādētāji", "Chargers": "Lādētāji",
+    "Speakers": "Skaļruņi", "Headphones": "Austiņas", "Earbuds": "Austiņas",
+    "Pens": "Pildspalvas", "Pencils": "Zīmuļi", "Lanyards": "Kakla lentes",
+    "Raincoats": "Lietusmēteļi", "Vests": "Vestes", "Aprons": "Priekšauti",
+    "Socks": "Zeķes", "Gloves": "Cimdi", "Scarves": "Šalles",
+    "Tumblers": "Termokrūzes", "Bottles": "Pudeles", "Coasters": "Paliktņi",
+    "Cutlery": "Galda piederumi", "Lunch Boxes": "Pusdienu kastes",
+    "Tools": "Instrumenti", "Torches": "Lukturi", "Flashlights": "Lukturi",
+    "Wallets": "Maki", "Cardholders": "Karšu turētāji",
+    "Office": "Birojs", "Travel": "Ceļojumi", "Outdoor": "Āra aktivitātes",
+    "Tech": "Tehnoloģijas", "Electronics": "Elektronika",
+    "Drinkware": "Trauki", "Writing": "Rakstāmpiederumi",
   };
   const GENDER_LV: Record<string, string> = {
     "Men": "Vīriešu", "Women": "Sieviešu", "Kids": "Bērnu", "Baby": "Zīdaiņu", "Unisex": "Unisex",
   };
-  const localize = (map: Record<string, string>) => (raw: string | null | undefined) => {
-    if (!raw) return raw ?? null;
-    if (lang === "lv") return map[raw] || raw;
-    return raw;
+  const GROUP_LV: Record<string, string> = {
+    "Apparel": "Apģērbi", "Bags": "Somas", "Drinkware": "Trauki",
+    "Writing Instruments": "Rakstāmpiederumi", "Technology": "Tehnoloģijas",
+    "Office": "Birojs", "Travel": "Ceļojumi", "Outdoor & Sports": "Āra & sports",
+    "Home & Living": "Mājai", "Tools": "Instrumenti", "Headwear": "Galvassegas",
+    "Accessories": "Aksesuāri", "Gifts": "Dāvanas",
+  };
+  const looksLatvian = (s: string) => /[āčēģīķļņōŗšūž]/i.test(s);
+  const localize = (map: Record<string, string>) => (raw: string): string => {
+    if (lang !== "lv") return raw;
+    return map[raw] || raw;
   };
   const catLoc = localize(CATEGORY_LV);
   const genLoc = localize(GENDER_LV);
+  const grpLoc = localize(GROUP_LV);
 
   const brandItems = useMemo(() => facet("brand", (it) => it.brand), [facet]);
   const categoryItems = useMemo(
-    () => facet("category", (it) => it.category).map((x) => ({ ...x, label: catLoc(x.label) as string })),
+    () => facet("category", (it) => it.category).map((x) => ({ value: x.label, label: catLoc(x.label), count: x.count })),
     [facet, lang]
   );
-  const groupItems = useMemo(() => facet("group", (it) => it.group_name), [facet]);
+  const groupItems = useMemo(
+    () => facet("group", (it) => it.group_name).map((x) => ({ value: x.label, label: grpLoc(x.label), count: x.count })),
+    [facet, lang]
+  );
   const genderItems = useMemo(
-    () => facet("gender", (it) => it.gender).map((x) => ({ ...x, label: genLoc(x.label) as string })),
+    () => facet("gender", (it) => it.gender).map((x) => ({ value: x.label, label: genLoc(x.label), count: x.count })),
     [facet, lang]
   );
 
