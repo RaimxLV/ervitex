@@ -35,7 +35,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
         ref={ref}
         type="button"
         onClick={onClick}
-        className="group flex h-full flex-col overflow-hidden border border-border bg-card text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
+        className="group flex h-full flex-col overflow-hidden border border-border bg-white text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
       >
         <div className="relative aspect-[3/4] overflow-hidden bg-white">
           {image ? (
@@ -45,14 +45,14 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
                 alt={imageAlt}
                 loading="lazy"
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                className={`absolute inset-0 h-full w-full object-contain p-2 transition-opacity duration-500 ${hoverImage ? "group-hover:opacity-0" : ""}`}
+                className={`absolute inset-0 h-full w-full scale-[1.08] object-contain transition-opacity duration-500 ${hoverImage ? "group-hover:opacity-0" : ""}`}
               />
               {hoverImage && (
                 <img
                   src={hoverImage}
                   alt=""
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-contain p-2 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  className="absolute inset-0 h-full w-full scale-[1.08] object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 />
               )}
             </>
