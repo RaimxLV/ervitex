@@ -590,9 +590,11 @@ interface CardProps {
   requestLabel: string;
   noImageLabel: string;
   onNavigate: () => void;
+  priceInfo?: { price: number; currency: string };
+  fromLabel?: string;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate }: CardProps) => {
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel }: CardProps) => {
   let matchedImg: string | null = null;
   if (selectedBuckets.size > 0) {
     for (const c of item.colors) {
