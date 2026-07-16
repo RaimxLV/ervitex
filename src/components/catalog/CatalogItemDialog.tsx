@@ -423,7 +423,6 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
     supabase.from("bb_styles").select("style_code,brand,name,description,category,gender,features").eq("style_code", styleCode).maybeSingle(),
     supabase.from("bb_variants").select("sku,color_name,color_hex,size").eq("style_code", styleCode),
     supabase.from("bb_images").select("color_name,url,is_primary,sort_order").eq("style_code", styleCode).order("sort_order", { ascending: true }),
-    supabase.from("bb_prices").select("sku,retail_price,currency").eq("style_code", styleCode as any).then((r) => r).catch(() => ({ data: [] as any[] })),
   ]);
   const style = styleRes.data;
   if (!style) return null;
