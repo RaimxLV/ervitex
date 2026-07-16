@@ -10,7 +10,8 @@ export interface FilterSection {
   key: string;
   /** Localized section title */
   title: string;
-  items: { label: string; count: number }[];
+  /** Items. `value` optional — if omitted, `label` is used both to display and toggle. */
+  items: { label: string; count: number; value?: string }[];
   selected: Set<string>;
   onToggle: (value: string) => void;
   /** When true, section behaves as single-select (radio-like) */
@@ -136,13 +137,14 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading }: Pro
                       </li>
                     )}
                     {filtered.map((it) => {
-                      const isSelected = section.selected.has(it.label);
+                      const val = it.value ?? it.label;
+                      const isSelected = section.selected.has(val);
                       return (
-                        <li key={it.label}>
+                        <li key={val}>
                           <label className="flex cursor-pointer items-center gap-2 rounded-sm px-1 py-0.5 text-sm hover:bg-muted">
                             <Checkbox
                               checked={isSelected}
-                              onCheckedChange={() => section.onToggle(it.label)}
+                              onCheckedChange={() => section.onToggle(val)}
                               aria-label={it.label}
                             />
                             <span
