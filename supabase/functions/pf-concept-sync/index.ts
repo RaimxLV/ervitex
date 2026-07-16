@@ -336,6 +336,58 @@ async function probe(lang = "en") {
   return { ok: res.ok, status: res.status, sample: text.slice(0, 400) };
 }
 
+// ------------------------------------------------------------------ price feed
+
+async function syncPrices(sb: SupabaseClient) {
+  const token = Deno.env.get("PF_FEED_TOKEN");
+  if (!token) throw new Error("PF_FEED_TOKEN not set");
+  const url = `http://www.pfconcept.com/portal/datafeed/pricefeed_${token}_v3.json`;
+  const res = await fetch(url);
+  if (!res.ok || !res.body) throw new Error(`pricefeed fetch ${res.status}`);
+
+  const rows: any[] = [];
+  let currentItem: any = null;
+
+  const parser = new JSONParser({
+    stringBufferSize: 64 * 1024,
+    paths: ["$..item"],
+  });
+  parser.onValue = ({ value }) => {
+    const v: any = value;
+    if (!v || typeof v !== "object") return;
+    // Some feeds nest another {item: ...}; unwrap once
+    const it = (v as any).item && !(v as any).itemCode ? (v as any).item : v;
+    const item_code = toStr(it.itemCode) || toStr(it.itemcode) || toStr(it.code);
+    if (!item_code) return;
+    const price = toNum(it.price) ?? toNum(it.netPrice) ?? toNum(it.customerPrice);
+    const list_price = toNum(it.listPrice) ?? toNum(it.grossPrice) ?? null;
+    const currency = toStr(it.currency) ?? toStr(it.curr) ?? "EUR";
+    if (price === null && list_price === null) return;
+    rows.push({ item_code, price, list_price, currency, updated_at: new Date().toISOString() });
+  };
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    parser.write(decoder.decode(value, { stream: true }));
+  }
+  parser.end();
+
+  const upserted = await chunkUpsert(sb, "pf_prices", rows, "item_code", 500);
+  return { parsed: rows.length, upserted };
+}
+
+async function probePrices() {
+  const token = Deno.env.get("PF_FEED_TOKEN");
+  if (!token) throw new Error("PF_FEED_TOKEN not set");
+  const url = `http://www.pfconcept.com/portal/datafeed/pricefeed_${token}_v3.json`;
+  const res = await fetch(url, { headers: { Range: "bytes=0-8000" } });
+  const text = await res.text();
+  return { ok: res.ok, status: res.status, sample: text.slice(0, 4000) };
+}
+
 // ------------------------------------------------------------------ handler
 
 // -------- Phase 2b: INGEST — accept a POST batch of raw models from client
@@ -375,6 +427,10 @@ Deno.serve(async (req) => {
       } else {
         throw new Error("process mode requires ?chunk=N or ?from=A&to=B");
       }
+    } else if (mode === "prices") {
+      result = await syncPrices(sb);
+    } else if (mode === "probe_prices") {
+      result = await probePrices();
     } else if (mode === "ingest") {
       if (req.method !== "POST") throw new Error("ingest requires POST");
       const body = await req.json();

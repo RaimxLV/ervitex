@@ -329,6 +329,30 @@ export type Database = {
         }
         Relationships: []
       }
+      pf_prices: {
+        Row: {
+          currency: string | null
+          item_code: string
+          list_price: number | null
+          price: number | null
+          updated_at: string
+        }
+        Insert: {
+          currency?: string | null
+          item_code: string
+          list_price?: number | null
+          price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          currency?: string | null
+          item_code?: string
+          list_price?: number | null
+          price?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pf_styles: {
         Row: {
           attributes: Json | null
@@ -1262,6 +1286,30 @@ export type Database = {
           weight?: string | null
         }
         Relationships: []
+      }
+      pf_retail_prices: {
+        Row: {
+          currency: string | null
+          item_code: string | null
+          model_code: string | null
+          retail_price: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pf_variants_model_code_fkey"
+            columns: ["model_code"]
+            isOneToOne: false
+            referencedRelation: "pf_style_summary"
+            referencedColumns: ["model_code"]
+          },
+          {
+            foreignKeyName: "pf_variants_model_code_fkey"
+            columns: ["model_code"]
+            isOneToOne: false
+            referencedRelation: "pf_styles"
+            referencedColumns: ["model_code"]
+          },
+        ]
       }
       pf_style_summary: {
         Row: {

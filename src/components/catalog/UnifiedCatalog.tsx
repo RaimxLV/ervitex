@@ -139,6 +139,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [items, setItems] = useState<EnrichedItem[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<EnrichedItem | null>(null);
+  const [pfPrices, setPfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(
@@ -212,6 +213,29 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       });
       setItems(enriched);
       setLoaded(true);
+
+      // Load PF retail prices → min per model_code
+      if (!lockedSource || lockedSource === "pf") {
+        const priceMap = new Map<string, { price: number; currency: string }>();
+        let pfrom = 0;
+        while (true) {
+          const { data, error } = await supabase
+            .from("pf_retail_prices" as any)
+            .select("model_code,retail_price,currency")
+            .range(pfrom, pfrom + 999);
+          if (error || !data) break;
+          for (const r of data as any[]) {
+            const mc = r.model_code as string;
+            const p = Number(r.retail_price);
+            if (!mc || !Number.isFinite(p) || p <= 0) continue;
+            const cur = priceMap.get(mc);
+            if (!cur || p < cur.price) priceMap.set(mc, { price: p, currency: r.currency || "EUR" });
+          }
+          if (data.length < 1000) break;
+          pfrom += 1000;
+        }
+        setPfPrices(priceMap);
+      }
     })();
   }, [lockedSource]);
 
@@ -495,6 +519,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}
                       noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
+                      priceInfo={it.source === "pf" ? pfPrices.get(it.id) : undefined}
+                      fromLabel={lang === "lv" ? "no" : "from"}
                       onNavigate={() => setSelected(it)}
                     />
                   ))}
@@ -564,9 +590,11 @@ interface CardProps {
   requestLabel: string;
   noImageLabel: string;
   onNavigate: () => void;
+  priceInfo?: { price: number; currency: string };
+  fromLabel?: string;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate }: CardProps) => {
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel }: CardProps) => {
   let matchedImg: string | null = null;
   if (selectedBuckets.size > 0) {
     for (const c of item.colors) {
@@ -603,9 +631,18 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       extraSwatches={extra}
       noImageLabel={noImageLabel}
       price={
-        <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          {requestLabel}
-        </p>
+        priceInfo ? (
+          <p className="font-heading text-sm font-bold text-foreground">
+            <span className="mr-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {fromLabel}
+            </span>
+            {priceInfo.price.toFixed(2)} {priceInfo.currency}
+          </p>
+        ) : (
+          <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {requestLabel}
+          </p>
+        )
       }
     />
   );
