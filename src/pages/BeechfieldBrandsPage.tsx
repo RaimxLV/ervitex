@@ -63,6 +63,7 @@ const BeechfieldBrandsPage = () => {
 
   const [models, setModels] = useState<ModelCard[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [selected, setSelected] = useState<ModelCard | null>(null);
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [brands, setBrands] = useState<Set<string>>(new Set((searchParams.get("brand") || "").split(",").filter(Boolean)));
