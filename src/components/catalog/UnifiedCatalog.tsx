@@ -28,7 +28,7 @@ const sanitizeHex = (hex: string | null | undefined, bucket: ColorBucketKey | nu
   return null;
 };
 
-interface ColorEntry { h: string | null; n: string | null; u: string | null }
+interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
 
 
 
@@ -312,7 +312,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const sourceItems = useMemo(() => {
     if (lockedSource) return [];
-    const order: CatalogSource[] = ["ss", "nwg", "pf"];
+    const order: CatalogSource[] = ["ss", "nwg", "pf", "bb"];
     return order
       .map((s) => ({
         label: SOURCE_META[s].label,
@@ -439,9 +439,19 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   filterSections.push(
     {
+      key: "brand",
+      title: t.brand,
+      items: brandItems,
+      selected: brands,
+      onToggle: toggle(brands, setBrands),
+    },
+    {
       key: "color",
       title: t.color,
-      items: colorItems.map((c) => ({ label: c.label, count: c.count })),
+      items: colorItems.map((c) => {
+        const b = COLOR_BUCKETS.find((x) => x.key === c.key);
+        return { label: c.label, count: c.count, swatch: b?.hex ?? null };
+      }),
       selected: new Set(
         [...colors]
           .map((k) => {
@@ -468,13 +478,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       items: genderItems,
       selected: genders,
       onToggle: toggle(genders, setGenders),
-    },
-    {
-      key: "brand",
-      title: t.brand,
-      items: brandItems,
-      selected: brands,
-      onToggle: toggle(brands, setBrands),
     },
     {
       key: "group",
@@ -625,27 +628,32 @@ interface CardProps {
 }
 
 const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel }: CardProps) => {
-  let matchedImg: string | null = null;
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
+  // Filter-driven initial match
+  let filterMatchIdx = -1;
   if (selectedBuckets.size > 0) {
-    for (const c of item.colors) {
-      if (c.bucket && selectedBuckets.has(c.bucket) && c.u) {
-        matchedImg = c.u;
-        break;
-      }
-    }
+    filterMatchIdx = item.colors.findIndex((c) => c.bucket && selectedBuckets.has(c.bucket));
   }
+  const effectiveIdx = activeIdx ?? (filterMatchIdx >= 0 ? filterMatchIdx : null);
+  const active = effectiveIdx !== null ? item.colors[effectiveIdx] : null;
+
+  const matchedImg = active?.u || null;
   const img = resolveImgUrl(item.source, matchedImg ?? item.image_url);
   const hover = matchedImg ? null : resolveImgUrl(item.source, item.hover_image_url);
 
   const withHex = item.colors
-    .map((c) => ({ ...c, hex: sanitizeHex(c.h, c.bucket) }))
+    .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c.h, c.bucket) }))
     .filter((c) => !!c.hex);
   const swatches = withHex.slice(0, 8).map((c) => ({
     hex: c.hex!,
     name: c.n || "",
-    active: !!(selectedBuckets.size > 0 && c.bucket && selectedBuckets.has(c.bucket)),
+    active: effectiveIdx !== null && c.idx === effectiveIdx,
+    onSelect: () => setActiveIdx(c.idx === activeIdx ? null : c.idx),
   }));
   const extra = Math.max(0, withHex.length - 8);
+
+  const displayCode = active?.c || item.id;
 
   return (
     <CatalogModelCard
@@ -653,10 +661,10 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       image={img}
       hoverImage={hover}
       imageAlt={item.name || item.id}
-      code={item.id}
-      brandBadge={SOURCE_META[item.source].label}
+      code={displayCode}
+      brandBadge={item.brand || SOURCE_META[item.source].label}
       title={item.name || item.id}
-      subtitle={item.description}
+      subtitle={active?.n || item.description}
       swatches={swatches}
       extraSwatches={extra}
       noImageLabel={noImageLabel}
