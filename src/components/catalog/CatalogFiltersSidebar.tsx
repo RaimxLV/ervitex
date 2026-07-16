@@ -139,6 +139,9 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading }: Pro
                     {filtered.map((it) => {
                       const val = it.value ?? it.label;
                       const isSelected = section.selected.has(val);
+                      const sw = it.swatch;
+                      const isGradient = !!sw && sw.includes("gradient");
+                      const isLight = !!sw && !isGradient && /^#([efEF][0-9a-fA-F]{5}|[fF]{3})$/.test(sw);
                       return (
                         <li key={val}>
                           <label className="flex cursor-pointer items-center gap-2 rounded-sm px-1 py-0.5 text-sm hover:bg-muted">
@@ -147,6 +150,16 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading }: Pro
                               onCheckedChange={() => section.onToggle(val)}
                               aria-label={it.label}
                             />
+                            {sw && (
+                              <span
+                                aria-hidden
+                                className={cn(
+                                  "inline-block h-4 w-4 shrink-0 rounded-full",
+                                  isLight ? "border border-neutral-500" : "border border-black/20"
+                                )}
+                                style={isGradient ? { backgroundImage: sw } : { backgroundColor: sw }}
+                              />
+                            )}
                             <span
                               className={cn(
                                 "flex-1 truncate",
