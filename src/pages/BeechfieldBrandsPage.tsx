@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, { type FilterSection } from "@/components/catalog/CatalogFiltersSidebar";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
+import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { COLOR_BUCKETS, bucketOf, type ColorBucketKey } from "@/lib/colorBuckets";
 
 interface StyleRow {
@@ -62,6 +63,7 @@ const BeechfieldBrandsPage = () => {
 
   const [models, setModels] = useState<ModelCard[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [selected, setSelected] = useState<ModelCard | null>(null);
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [brands, setBrands] = useState<Set<string>>(new Set((searchParams.get("brand") || "").split(",").filter(Boolean)));
@@ -333,7 +335,7 @@ const BeechfieldBrandsPage = () => {
                     return (
                       <CatalogModelCard
                         key={m.style_code}
-                        onClick={() => { /* detail dialog can be wired later */ }}
+                        onClick={() => setSelected(m)}
                         image={img}
                         hoverImage={m.hover}
                         imageAlt={m.name}
@@ -375,6 +377,20 @@ const BeechfieldBrandsPage = () => {
           </div>
         </div>
       </div>
+      {selected && (
+        <CatalogItemDialog
+          open={!!selected}
+          onOpenChange={(o) => !o && setSelected(null)}
+          source="bb"
+          id={selected.style_code}
+          name={selected.name}
+          brand={selected.brand}
+          category={selected.category}
+          image={selected.image}
+          swatches={selected.colors.filter((c) => c.hex).map((c) => ({ hex: c.hex, name: c.name || "" }))}
+          descriptionFallback={selected.description}
+        />
+      )}
     </Layout>
   );
 };
