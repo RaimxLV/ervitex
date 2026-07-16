@@ -628,27 +628,32 @@ interface CardProps {
 }
 
 const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel }: CardProps) => {
-  let matchedImg: string | null = null;
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
+  // Filter-driven initial match
+  let filterMatchIdx = -1;
   if (selectedBuckets.size > 0) {
-    for (const c of item.colors) {
-      if (c.bucket && selectedBuckets.has(c.bucket) && c.u) {
-        matchedImg = c.u;
-        break;
-      }
-    }
+    filterMatchIdx = item.colors.findIndex((c) => c.bucket && selectedBuckets.has(c.bucket));
   }
+  const effectiveIdx = activeIdx ?? (filterMatchIdx >= 0 ? filterMatchIdx : null);
+  const active = effectiveIdx !== null ? item.colors[effectiveIdx] : null;
+
+  const matchedImg = active?.u || null;
   const img = resolveImgUrl(item.source, matchedImg ?? item.image_url);
   const hover = matchedImg ? null : resolveImgUrl(item.source, item.hover_image_url);
 
   const withHex = item.colors
-    .map((c) => ({ ...c, hex: sanitizeHex(c.h, c.bucket) }))
+    .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c.h, c.bucket) }))
     .filter((c) => !!c.hex);
   const swatches = withHex.slice(0, 8).map((c) => ({
     hex: c.hex!,
     name: c.n || "",
-    active: !!(selectedBuckets.size > 0 && c.bucket && selectedBuckets.has(c.bucket)),
+    active: effectiveIdx !== null && c.idx === effectiveIdx,
+    onSelect: () => setActiveIdx(c.idx === activeIdx ? null : c.idx),
   }));
   const extra = Math.max(0, withHex.length - 8);
+
+  const displayCode = active?.c || item.id;
 
   return (
     <CatalogModelCard
@@ -656,10 +661,10 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       image={img}
       hoverImage={hover}
       imageAlt={item.name || item.id}
-      code={item.id}
-      brandBadge={SOURCE_META[item.source].label}
+      code={displayCode}
+      brandBadge={item.brand || SOURCE_META[item.source].label}
       title={item.name || item.id}
-      subtitle={item.description}
+      subtitle={active?.n || item.description}
       swatches={swatches}
       extraSwatches={extra}
       noImageLabel={noImageLabel}
