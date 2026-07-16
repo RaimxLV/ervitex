@@ -582,12 +582,12 @@ const CatalogItemDialog = ({
       <DialogContent className="max-w-6xl max-h-[92vh] overflow-y-auto bg-background p-0">
         <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
           <div className="space-y-3">
-            <div className="aspect-[3/4] w-full overflow-hidden bg-muted">
+            <div className="aspect-square md:aspect-[4/5] max-h-[70vh] w-full overflow-hidden bg-white flex items-center justify-center">
               {mainImg ? (
                 <img
                   src={mainImg}
                   alt={currentColor?.name || detail?.title || id}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
                 />
               ) : loading ? (
@@ -605,9 +605,9 @@ const CatalogItemDialog = ({
                     key={u + i}
                     type="button"
                     onClick={() => setImgIndex(i)}
-                    className={`aspect-square overflow-hidden border-2 ${i === imgIndex ? "border-accent" : "border-transparent hover:border-border"} bg-muted`}
+                    className={`aspect-square overflow-hidden border-2 ${i === imgIndex ? "border-accent" : "border-transparent hover:border-border"} bg-white flex items-center justify-center`}
                   >
-                    <img src={u} alt="" className="h-full w-full object-cover" loading="lazy" />
+                    <img src={u} alt="" className="h-full w-full object-contain" loading="lazy" />
                   </button>
                 ))}
               </div>
