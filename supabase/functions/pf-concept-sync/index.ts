@@ -427,6 +427,10 @@ Deno.serve(async (req) => {
       } else {
         throw new Error("process mode requires ?chunk=N or ?from=A&to=B");
       }
+    } else if (mode === "prices") {
+      result = await syncPrices(sb);
+    } else if (mode === "probe_prices") {
+      result = await probePrices();
     } else if (mode === "ingest") {
       if (req.method !== "POST") throw new Error("ingest requires POST");
       const body = await req.json();
