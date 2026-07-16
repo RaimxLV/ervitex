@@ -526,7 +526,7 @@ const CatalogItemDialog = ({
     setActiveColor(null);
     setImgIndex(0);
     (async () => {
-      const loader = source === "ss" ? loadSS : source === "nwg" ? loadNWG : loadPF;
+      const loader = source === "ss" ? loadSS : source === "nwg" ? loadNWG : source === "bb" ? loadBB : loadPF;
       const d = await loader(id).catch(() => null);
       if (cancelled) return;
       setDetail(d);
