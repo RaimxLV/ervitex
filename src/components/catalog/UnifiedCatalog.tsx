@@ -213,6 +213,29 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       });
       setItems(enriched);
       setLoaded(true);
+
+      // Load PF retail prices → min per model_code
+      if (!lockedSource || lockedSource === "pf") {
+        const priceMap = new Map<string, { price: number; currency: string }>();
+        let pfrom = 0;
+        while (true) {
+          const { data, error } = await supabase
+            .from("pf_retail_prices" as any)
+            .select("model_code,retail_price,currency")
+            .range(pfrom, pfrom + 999);
+          if (error || !data) break;
+          for (const r of data as any[]) {
+            const mc = r.model_code as string;
+            const p = Number(r.retail_price);
+            if (!mc || !Number.isFinite(p) || p <= 0) continue;
+            const cur = priceMap.get(mc);
+            if (!cur || p < cur.price) priceMap.set(mc, { price: p, currency: r.currency || "EUR" });
+          }
+          if (data.length < 1000) break;
+          pfrom += 1000;
+        }
+        setPfPrices(priceMap);
+      }
     })();
   }, [lockedSource]);
 
