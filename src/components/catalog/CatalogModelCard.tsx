@@ -122,20 +122,22 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
           {swatches && swatches.length > 0 && (
             <div className="flex flex-wrap items-center gap-1 pt-1">
               {swatches.slice(0, 8).map((s, i) => {
-                const raw = (s.hex || "").trim();
-                const bg = raw.length >= 4 ? raw : "#ccc";
-                // Detect near-white / very light swatches so we can give them a
-                // stronger dark border — otherwise they disappear on the white
-                // card background and the whole row of swatches looks "empty".
-                let isLight = false;
-                const hx = bg.replace("#", "");
-                if (hx.length === 6 && /^[0-9a-fA-F]{6}$/.test(hx)) {
+                const hexes = displayHexes(s.name, s.hex);
+                const primary = hexes[0];
+                const secondary = hexes[1];
+                const isLightHex = (bg: string) => {
+                  const hx = bg.replace("#", "");
+                  if (hx.length !== 6 || !/^[0-9a-fA-F]{6}$/.test(hx)) return false;
                   const r = parseInt(hx.slice(0, 2), 16);
                   const g = parseInt(hx.slice(2, 4), 16);
                   const b = parseInt(hx.slice(4, 6), 16);
-                  isLight = (r * 299 + g * 587 + b * 114) / 1000 > 225;
-                }
+                  return (r * 299 + g * 587 + b * 114) / 1000 > 225;
+                };
+                const isLight = isLightHex(primary) && (!secondary || isLightHex(secondary));
                 const clickable = !!s.onSelect;
+                const bgStyle: React.CSSProperties = secondary
+                  ? { background: `linear-gradient(90deg, ${primary} 0 50%, ${secondary} 50% 100%)` }
+                  : { backgroundColor: primary };
                 return (
                   <span
                     key={`${s.name}-${i}`}
@@ -154,7 +156,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
                           ? "border border-neutral-500"
                           : "border border-black/20"
                     } ${clickable ? "cursor-pointer hover:scale-110" : ""}`}
-                    style={{ backgroundColor: bg }}
+                    style={bgStyle}
                   />
                 );
               })}
