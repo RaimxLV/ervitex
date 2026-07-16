@@ -126,6 +126,13 @@ const chunk = <T,>(arr: T[], n: number): T[][] => {
   return out;
 };
 
+const BRAND_KEYS = [
+  { key: "beechfield", label: "Beechfield" },
+  { key: "bagbase", label: "Bagbase" },
+  { key: "quadra", label: "Quadra" },
+  { key: "westfordmill", label: "Westford Mill" },
+] as const;
+
 const AdminBeechfieldImport = () => {
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
@@ -135,6 +142,42 @@ const AdminBeechfieldImport = () => {
   const [preview, setPreview] = useState<ParsedRow[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [scraping, setScraping] = useState<string | null>(null);
+  const [scrapeStatus, setScrapeStatus] = useState<Record<string, string>>({});
+
+  const scrapeBrand = async (brand: string, label: string) => {
+    setScraping(brand);
+    setScrapeStatus((s) => ({ ...s, [brand]: "Sāk…" }));
+    try {
+      let offset = 0;
+      let total = 0;
+      let processedTotal = 0;
+      // Loop until done — each call handles ~15 URLs
+      // Safeguard: max 200 iterations (~3000 URLs)
+      for (let i = 0; i < 200; i++) {
+        const { data, error } = await supabase.functions.invoke("beechfield-sync", {
+          body: { brand, offset, limit: 15 },
+        });
+        if (error) throw new Error(error.message);
+        if (!data || data.error) throw new Error(data?.error || "Sync failed");
+        total = data.total;
+        processedTotal += data.processed;
+        offset = data.next_offset;
+        setScrapeStatus((s) => ({
+          ...s,
+          [brand]: `${offset} / ${total} URL · saglabāti ${processedTotal}`,
+        }));
+        if (data.done) break;
+      }
+      setScrapeStatus((s) => ({ ...s, [brand]: `✓ Pabeigts · ${processedTotal} produkti no ${total} URL` }));
+      toast({ title: `${label} imports pabeigts`, description: `${processedTotal} produkti saglabāti.` });
+    } catch (e: any) {
+      setScrapeStatus((s) => ({ ...s, [brand]: `✗ ${e.message}` }));
+      toast({ title: `Kļūda: ${label}`, description: e.message, variant: "destructive" });
+    } finally {
+      setScraping(null);
+    }
+  };
 
   const handleFile = async (f: File) => {
     setFile(f);
