@@ -631,9 +631,18 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       extraSwatches={extra}
       noImageLabel={noImageLabel}
       price={
-        <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          {requestLabel}
-        </p>
+        priceInfo ? (
+          <p className="font-heading text-sm font-bold text-foreground">
+            <span className="mr-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {fromLabel}
+            </span>
+            {priceInfo.price.toFixed(2)} {priceInfo.currency}
+          </p>
+        ) : (
+          <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {requestLabel}
+          </p>
+        )
       }
     />
   );
