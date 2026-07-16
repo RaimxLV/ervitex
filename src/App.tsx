@@ -63,6 +63,7 @@ const App = () => (
               <Route path="/admin/quotes" element={<ProtectedRoute><AdminQuotes /></ProtectedRoute>} />
               <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
               <Route path="/admin/translate" element={<ProtectedRoute><AdminTranslate /></ProtectedRoute>} />
+              <Route path="/admin/beechfield-import" element={<ProtectedRoute><AdminBeechfieldImport /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
