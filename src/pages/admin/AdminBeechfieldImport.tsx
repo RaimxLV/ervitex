@@ -345,6 +345,44 @@ const AdminBeechfieldImport = () => {
           </p>
         </div>
 
+        {/* Web scrape section */}
+        <Card className="border-accent/40 p-6">
+          <div className="flex items-center gap-2">
+            <Globe className="h-5 w-5 text-accent" />
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Importēt no ražotāju mājaslapām</h2>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Ielādē pilnu katalogu (nosaukumi, apraksti, krāsas, bildes) tieši no oficiālajām lapām. Cenas pievienosim pēc tam ar Excel.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {BRAND_KEYS.map((b) => (
+              <div key={b.key} className="rounded-sm border border-border p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-heading text-sm font-bold">{b.label}</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!!scraping}
+                    onClick={() => scrapeBrand(b.key, b.label)}
+                  >
+                    {scraping === b.key ? (
+                      <><Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> Sinhronizē…</>
+                    ) : (
+                      "Sinhronizēt"
+                    )}
+                  </Button>
+                </div>
+                {scrapeStatus[b.key] && (
+                  <p className="mt-2 text-xs text-muted-foreground">{scrapeStatus[b.key]}</p>
+                )}
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            Katrs zīmols ~130–260 produkti. Sinhronizācija aizņem 5–15 min. Šo lapu var atstāt atvērtu.
+          </p>
+        </Card>
+
         <Card className="p-6">
           <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Excel kolonnu formāts</h2>
           <div className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
