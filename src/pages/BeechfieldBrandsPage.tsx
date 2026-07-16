@@ -377,6 +377,20 @@ const BeechfieldBrandsPage = () => {
           </div>
         </div>
       </div>
+      {selected && (
+        <CatalogItemDialog
+          open={!!selected}
+          onOpenChange={(o) => !o && setSelected(null)}
+          source="bb"
+          id={selected.style_code}
+          name={selected.name}
+          brand={selected.brand}
+          category={selected.category}
+          image={selected.image}
+          swatches={selected.colors.filter((c) => c.hex).map((c) => ({ hex: c.hex, name: c.name || "" }))}
+          descriptionFallback={selected.description}
+        />
+      )}
     </Layout>
   );
 };
