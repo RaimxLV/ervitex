@@ -298,10 +298,34 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, lang, q, sources, brands, categories, groups, genders, colors, lockedSource]);
 
+  // ── LV translations for facet values ──
+  const CATEGORY_LV: Record<string, string> = {
+    "T-shirts": "T-krekli", "Polos": "Polo krekli", "Hoodies": "Jakas ar kapuci",
+    "Sweaters": "Džemperi", "Jackets": "Virsjakas", "Caps & Hats": "Cepures",
+    "Beanies": "Adītas cepures", "Bags": "Somas", "Backpacks": "Mugursomas",
+    "Shorts": "Šorti", "Trousers": "Bikses", "Bottoms": "Apakšdaļas", "Tops": "Augšdaļas",
+  };
+  const GENDER_LV: Record<string, string> = {
+    "Men": "Vīriešu", "Women": "Sieviešu", "Kids": "Bērnu", "Baby": "Zīdaiņu", "Unisex": "Unisex",
+  };
+  const localize = (map: Record<string, string>) => (raw: string | null | undefined) => {
+    if (!raw) return raw ?? null;
+    if (lang === "lv") return map[raw] || raw;
+    return raw;
+  };
+  const catLoc = localize(CATEGORY_LV);
+  const genLoc = localize(GENDER_LV);
+
   const brandItems = useMemo(() => facet("brand", (it) => it.brand), [facet]);
-  const categoryItems = useMemo(() => facet("category", (it) => it.category), [facet]);
+  const categoryItems = useMemo(
+    () => facet("category", (it) => it.category).map((x) => ({ ...x, label: catLoc(x.label) as string })),
+    [facet, lang]
+  );
   const groupItems = useMemo(() => facet("group", (it) => it.group_name), [facet]);
-  const genderItems = useMemo(() => facet("gender", (it) => it.gender), [facet]);
+  const genderItems = useMemo(
+    () => facet("gender", (it) => it.gender).map((x) => ({ ...x, label: genLoc(x.label) as string })),
+    [facet, lang]
+  );
 
   const colorItems = useMemo(() => {
     const counts = new Map<ColorBucketKey, number>();
