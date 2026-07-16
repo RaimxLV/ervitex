@@ -11,6 +11,8 @@ import CatalogPage from "./pages/CatalogPage.tsx";
 import StanleyStellaPage from "./pages/StanleyStellaPage.tsx";
 import NwgPage from "./pages/NwgPage.tsx";
 import PfConceptPage from "./pages/PfConceptPage.tsx";
+import BeechfieldBrandsPage from "./pages/BeechfieldBrandsPage.tsx";
+import AdminBeechfieldImport from "./pages/admin/AdminBeechfieldImport.tsx";
 import ProductDetailPage from "./pages/ProductDetailPage.tsx";
 import ServicesPage from "./pages/ServicesPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
