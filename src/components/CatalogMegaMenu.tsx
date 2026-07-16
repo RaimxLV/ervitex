@@ -75,6 +75,7 @@ const SUPPLIERS = [
   { href: "/stanley-stella", name: "Stanley/Stella" },
   { href: "/nwg", name: "New Wave Group" },
   { href: "/pf-concept", name: "PF Concept" },
+  { href: "/beechfield-brands", name: "Beechfield Brands" },
 ];
 
 const buildHref = (cats: string[]) =>
