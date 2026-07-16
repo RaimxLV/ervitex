@@ -14,6 +14,168 @@ export type Database = {
   }
   public: {
     Tables: {
+      bb_images: {
+        Row: {
+          color_name: string | null
+          created_at: string
+          id: string
+          is_primary: boolean
+          sort_order: number
+          style_code: string
+          url: string
+        }
+        Insert: {
+          color_name?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          sort_order?: number
+          style_code: string
+          url: string
+        }
+        Update: {
+          color_name?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          sort_order?: number
+          style_code?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bb_images_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "bb_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
+      bb_prices: {
+        Row: {
+          currency: string
+          retail_price: number
+          sku: string
+          updated_at: string
+        }
+        Insert: {
+          currency?: string
+          retail_price: number
+          sku: string
+          updated_at?: string
+        }
+        Update: {
+          currency?: string
+          retail_price?: number
+          sku?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bb_prices_sku_fkey"
+            columns: ["sku"]
+            isOneToOne: true
+            referencedRelation: "bb_variants"
+            referencedColumns: ["sku"]
+          },
+        ]
+      }
+      bb_styles: {
+        Row: {
+          active: boolean
+          brand: string
+          care: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          features: Json | null
+          gender: string | null
+          material: string | null
+          name: string
+          sizes: string[] | null
+          style_code: string
+          sub_category: string | null
+          updated_at: string
+          weight: string | null
+        }
+        Insert: {
+          active?: boolean
+          brand: string
+          care?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          gender?: string | null
+          material?: string | null
+          name: string
+          sizes?: string[] | null
+          style_code: string
+          sub_category?: string | null
+          updated_at?: string
+          weight?: string | null
+        }
+        Update: {
+          active?: boolean
+          brand?: string
+          care?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          gender?: string | null
+          material?: string | null
+          name?: string
+          sizes?: string[] | null
+          style_code?: string
+          sub_category?: string | null
+          updated_at?: string
+          weight?: string | null
+        }
+        Relationships: []
+      }
+      bb_variants: {
+        Row: {
+          active: boolean
+          color_hex: string | null
+          color_name: string | null
+          created_at: string
+          size: string | null
+          sku: string
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          color_hex?: string | null
+          color_name?: string | null
+          created_at?: string
+          size?: string | null
+          sku: string
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          color_hex?: string | null
+          color_name?: string | null
+          created_at?: string
+          size?: string | null
+          sku?: string
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bb_variants_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "bb_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string

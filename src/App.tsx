@@ -11,6 +11,8 @@ import CatalogPage from "./pages/CatalogPage.tsx";
 import StanleyStellaPage from "./pages/StanleyStellaPage.tsx";
 import NwgPage from "./pages/NwgPage.tsx";
 import PfConceptPage from "./pages/PfConceptPage.tsx";
+import BeechfieldBrandsPage from "./pages/BeechfieldBrandsPage.tsx";
+import AdminBeechfieldImport from "./pages/admin/AdminBeechfieldImport.tsx";
 import ProductDetailPage from "./pages/ProductDetailPage.tsx";
 import ServicesPage from "./pages/ServicesPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
@@ -46,6 +48,7 @@ const App = () => (
               <Route path="/stanley-stella" element={<StanleyStellaPage />} />
               <Route path="/nwg" element={<NwgPage />} />
               <Route path="/pf-concept" element={<PfConceptPage />} />
+              <Route path="/beechfield-brands" element={<BeechfieldBrandsPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/about" element={<AboutPage />} />
@@ -60,6 +63,7 @@ const App = () => (
               <Route path="/admin/quotes" element={<ProtectedRoute><AdminQuotes /></ProtectedRoute>} />
               <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
               <Route path="/admin/translate" element={<ProtectedRoute><AdminTranslate /></ProtectedRoute>} />
+              <Route path="/admin/beechfield-import" element={<ProtectedRoute><AdminBeechfieldImport /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
