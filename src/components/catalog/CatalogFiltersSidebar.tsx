@@ -137,13 +137,14 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading }: Pro
                       </li>
                     )}
                     {filtered.map((it) => {
-                      const isSelected = section.selected.has(it.label);
+                      const val = it.value ?? it.label;
+                      const isSelected = section.selected.has(val);
                       return (
-                        <li key={it.label}>
+                        <li key={val}>
                           <label className="flex cursor-pointer items-center gap-2 rounded-sm px-1 py-0.5 text-sm hover:bg-muted">
                             <Checkbox
                               checked={isSelected}
-                              onCheckedChange={() => section.onToggle(it.label)}
+                              onCheckedChange={() => section.onToggle(val)}
                               aria-label={it.label}
                             />
                             <span
