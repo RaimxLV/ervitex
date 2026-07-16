@@ -48,6 +48,7 @@ const App = () => (
               <Route path="/stanley-stella" element={<StanleyStellaPage />} />
               <Route path="/nwg" element={<NwgPage />} />
               <Route path="/pf-concept" element={<PfConceptPage />} />
+              <Route path="/beechfield-brands" element={<BeechfieldBrandsPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/about" element={<AboutPage />} />
