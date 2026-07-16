@@ -10,7 +10,8 @@ export interface FilterSection {
   key: string;
   /** Localized section title */
   title: string;
-  items: { label: string; count: number }[];
+  /** Items. `value` optional — if omitted, `label` is used both to display and toggle. */
+  items: { label: string; count: number; value?: string }[];
   selected: Set<string>;
   onToggle: (value: string) => void;
   /** When true, section behaves as single-select (radio-like) */
