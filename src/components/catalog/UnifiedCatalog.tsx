@@ -312,7 +312,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const sourceItems = useMemo(() => {
     if (lockedSource) return [];
-    const order: CatalogSource[] = ["ss", "nwg", "pf"];
+    const order: CatalogSource[] = ["ss", "nwg", "pf", "bb"];
     return order
       .map((s) => ({
         label: SOURCE_META[s].label,
