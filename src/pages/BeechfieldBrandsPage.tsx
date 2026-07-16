@@ -335,7 +335,7 @@ const BeechfieldBrandsPage = () => {
                     return (
                       <CatalogModelCard
                         key={m.style_code}
-                        onClick={() => { /* detail dialog can be wired later */ }}
+                        onClick={() => setSelected(m)}
                         image={img}
                         hoverImage={m.hover}
                         imageAlt={m.name}
