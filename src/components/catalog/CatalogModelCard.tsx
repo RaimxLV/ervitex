@@ -1,5 +1,43 @@
 import { forwardRef } from "react";
 import type { ReactNode } from "react";
+import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
+
+/**
+ * Given a color name like "Black/Lime Green" and an optional stored hex,
+ * return 1 or 2 display hexes so multi-tone products don't show as a single
+ * flat swatch. Falls back to name-based bucket lookup when the stored hex is
+ * missing or clearly generic.
+ */
+function displayHexes(name: string, hex?: string | null): string[] {
+  const parts = (name || "")
+    .split(/[\/&+]|\s-\s/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  const hexFromName = (n: string): string | null => {
+    const b = bucketFromName(n);
+    return b ? getBucket(b).hex : null;
+  };
+  if (parts.length >= 2) {
+    const a = hexFromName(parts[0]) || hex || null;
+    const b = hexFromName(parts[1]) || hex || null;
+    if (a && b && a.toLowerCase() !== b.toLowerCase()) return [a, b];
+  }
+  const provided = (hex || "").trim();
+  if (provided && provided.length >= 4) {
+    // Sanity check: if provided hex doesn't match the name bucket at all,
+    // prefer the name-based hex (e.g. "Lime Green" stored as #000000).
+    const nameBucket = bucketFromName(name);
+    const hexBucket = bucketFromHex(provided);
+    if (nameBucket && hexBucket && nameBucket !== hexBucket) {
+      const fromName = hexFromName(name);
+      if (fromName) return [fromName];
+    }
+    return [provided];
+  }
+  const fromName = hexFromName(name);
+  return fromName ? [fromName] : ["#ccc"];
+}
+
 
 export interface CatalogModelCardProps {
   onClick?: () => void;
