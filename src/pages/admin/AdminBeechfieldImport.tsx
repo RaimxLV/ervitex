@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileSpreadsheet, CheckCircle2, AlertCircle } from "lucide-react";
+import { Upload, FileSpreadsheet, CheckCircle2, AlertCircle, Globe, Loader2 } from "lucide-react";
 
 /**
  * Excel import for Beechfield Brands (Beechfield, Bagbase, Quadra, Westford Mill).
@@ -126,6 +126,13 @@ const chunk = <T,>(arr: T[], n: number): T[][] => {
   return out;
 };
 
+const BRAND_KEYS = [
+  { key: "beechfield", label: "Beechfield" },
+  { key: "bagbase", label: "Bagbase" },
+  { key: "quadra", label: "Quadra" },
+  { key: "westfordmill", label: "Westford Mill" },
+] as const;
+
 const AdminBeechfieldImport = () => {
   const { toast } = useToast();
   const [file, setFile] = useState<File | null>(null);
@@ -135,6 +142,42 @@ const AdminBeechfieldImport = () => {
   const [preview, setPreview] = useState<ParsedRow[]>([]);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [scraping, setScraping] = useState<string | null>(null);
+  const [scrapeStatus, setScrapeStatus] = useState<Record<string, string>>({});
+
+  const scrapeBrand = async (brand: string, label: string) => {
+    setScraping(brand);
+    setScrapeStatus((s) => ({ ...s, [brand]: "Sāk…" }));
+    try {
+      let offset = 0;
+      let total = 0;
+      let processedTotal = 0;
+      // Loop until done — each call handles ~15 URLs
+      // Safeguard: max 200 iterations (~3000 URLs)
+      for (let i = 0; i < 200; i++) {
+        const { data, error } = await supabase.functions.invoke("beechfield-sync", {
+          body: { brand, offset, limit: 15 },
+        });
+        if (error) throw new Error(error.message);
+        if (!data || data.error) throw new Error(data?.error || "Sync failed");
+        total = data.total;
+        processedTotal += data.processed;
+        offset = data.next_offset;
+        setScrapeStatus((s) => ({
+          ...s,
+          [brand]: `${offset} / ${total} URL · saglabāti ${processedTotal}`,
+        }));
+        if (data.done) break;
+      }
+      setScrapeStatus((s) => ({ ...s, [brand]: `✓ Pabeigts · ${processedTotal} produkti no ${total} URL` }));
+      toast({ title: `${label} imports pabeigts`, description: `${processedTotal} produkti saglabāti.` });
+    } catch (e: any) {
+      setScrapeStatus((s) => ({ ...s, [brand]: `✗ ${e.message}` }));
+      toast({ title: `Kļūda: ${label}`, description: e.message, variant: "destructive" });
+    } finally {
+      setScraping(null);
+    }
+  };
 
   const handleFile = async (f: File) => {
     setFile(f);
@@ -301,6 +344,44 @@ const AdminBeechfieldImport = () => {
             Augšupielādē Excel/CSV failu ar produktiem un cenām. Katalogs — Beechfield, Bagbase, Quadra, Westford Mill.
           </p>
         </div>
+
+        {/* Web scrape section */}
+        <Card className="border-accent/40 p-6">
+          <div className="flex items-center gap-2">
+            <Globe className="h-5 w-5 text-accent" />
+            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Importēt no ražotāju mājaslapām</h2>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Ielādē pilnu katalogu (nosaukumi, apraksti, krāsas, bildes) tieši no oficiālajām lapām. Cenas pievienosim pēc tam ar Excel.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {BRAND_KEYS.map((b) => (
+              <div key={b.key} className="rounded-sm border border-border p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-heading text-sm font-bold">{b.label}</span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!!scraping}
+                    onClick={() => scrapeBrand(b.key, b.label)}
+                  >
+                    {scraping === b.key ? (
+                      <><Loader2 className="mr-1.5 h-3 w-3 animate-spin" /> Sinhronizē…</>
+                    ) : (
+                      "Sinhronizēt"
+                    )}
+                  </Button>
+                </div>
+                {scrapeStatus[b.key] && (
+                  <p className="mt-2 text-xs text-muted-foreground">{scrapeStatus[b.key]}</p>
+                )}
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            Katrs zīmols ~130–260 produkti. Sinhronizācija aizņem 5–15 min. Šo lapu var atstāt atvērtu.
+          </p>
+        </Card>
 
         <Card className="p-6">
           <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Excel kolonnu formāts</h2>
