@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, { type FilterSection } from "@/components/catalog/CatalogFiltersSidebar";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
+import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { COLOR_BUCKETS, bucketOf, type ColorBucketKey } from "@/lib/colorBuckets";
 
 interface StyleRow {
