@@ -418,6 +418,96 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
 }
 
 
+async function loadBB(styleCode: string): Promise<ProductDetail | null> {
+  const [styleRes, variantsRes, imagesRes, pricesRes] = await Promise.all([
+    supabase.from("bb_styles").select("style_code,brand,name,description,category,gender,features").eq("style_code", styleCode).maybeSingle(),
+    supabase.from("bb_variants").select("sku,color_name,color_hex,size").eq("style_code", styleCode),
+    supabase.from("bb_images").select("color_name,url,is_primary,sort_order").eq("style_code", styleCode).order("sort_order", { ascending: true }),
+    supabase.from("bb_prices").select("sku,retail_price,currency").eq("style_code", styleCode as any).then((r) => r).catch(() => ({ data: [] as any[] })),
+  ]);
+  const style = styleRes.data;
+  if (!style) return null;
+  const variants = variantsRes.data || [];
+  const images = imagesRes.data || [];
+
+  // Group images: by color_name and shared (null)
+  const imgByColor = new Map<string, string[]>();
+  const shared: string[] = [];
+  for (const im of images as any[]) {
+    if (!im.url) continue;
+    const key = (im.color_name || "").toLowerCase();
+    if (key) {
+      if (!imgByColor.has(key)) imgByColor.set(key, []);
+      imgByColor.get(key)!.push(im.url);
+    } else {
+      shared.push(im.url);
+    }
+  }
+
+  // Unique colors + sizes per color
+  const colorOrder: string[] = [];
+  const colorInfo = new Map<string, { name: string; hex: string | null }>();
+  const sizesByColor = new Map<string, Set<string>>();
+  const allSizes = new Set<string>();
+  for (const v of variants as any[]) {
+    const name = v.color_name || "";
+    const key = name.toLowerCase();
+    if (name && !colorInfo.has(key)) {
+      colorInfo.set(key, { name, hex: cleanHex(v.color_hex) });
+      colorOrder.push(key);
+    }
+    if (v.size) {
+      allSizes.add(v.size);
+      if (key) {
+        if (!sizesByColor.has(key)) sizesByColor.set(key, new Set());
+        sizesByColor.get(key)!.add(v.size);
+      }
+    }
+  }
+
+  const colors: ColorDetail[] = colorOrder.map((key) => {
+    const info = colorInfo.get(key)!;
+    const imgs = imgByColor.get(key) || [];
+    return {
+      code: info.name,
+      name: info.name,
+      hex: info.hex,
+      images: imgs.length ? imgs : shared,
+      sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes),
+    };
+  });
+
+  // If no colors at all, still expose one "default" color with shared imgs
+  if (colors.length === 0 && shared.length) {
+    colors.push({ code: "default", name: style.name, hex: null, images: shared, sizes: uniqueSortedSizes(allSizes) });
+  }
+
+  const featureArr = Array.isArray((style as any).features) ? ((style as any).features as string[]) : [];
+
+  const specs: { label: string; value: string }[] = [];
+  addSpec(specs, "Brand", style.brand);
+  addSpec(specs, "Category", style.category);
+  addSpec(specs, "Gender", (style as any).gender);
+
+  return {
+    title: style.name,
+    code: style.style_code,
+    brand: style.brand,
+    category: style.category,
+    gender: (style as any).gender || null,
+    shortDescription: cleanText(style.description),
+    description: cleanText(style.description),
+    features: featureArr,
+    material: null,
+    care: null,
+    specs,
+    notice: null,
+    sizes: uniqueSortedSizes(allSizes),
+    colors,
+  };
+}
+
+
 /* ---------- Component ---------- */
 
 const CatalogItemDialog = ({
