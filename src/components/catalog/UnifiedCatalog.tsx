@@ -519,6 +519,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}
                       noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
+                      priceInfo={it.source === "pf" ? pfPrices.get(it.id) : undefined}
+                      fromLabel={lang === "lv" ? "no" : "from"}
                       onNavigate={() => setSelected(it)}
                     />
                   ))}
