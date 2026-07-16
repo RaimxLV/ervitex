@@ -28,7 +28,7 @@ const sanitizeHex = (hex: string | null | undefined, bucket: ColorBucketKey | nu
   return null;
 };
 
-interface ColorEntry { h: string | null; n: string | null; u: string | null }
+interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
 
 
 
