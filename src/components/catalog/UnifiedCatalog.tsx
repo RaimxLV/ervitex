@@ -439,9 +439,19 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   filterSections.push(
     {
+      key: "brand",
+      title: t.brand,
+      items: brandItems,
+      selected: brands,
+      onToggle: toggle(brands, setBrands),
+    },
+    {
       key: "color",
       title: t.color,
-      items: colorItems.map((c) => ({ label: c.label, count: c.count })),
+      items: colorItems.map((c) => {
+        const b = COLOR_BUCKETS.find((x) => x.key === c.key);
+        return { label: c.label, count: c.count, swatch: b?.hex ?? null };
+      }),
       selected: new Set(
         [...colors]
           .map((k) => {
@@ -468,13 +478,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       items: genderItems,
       selected: genders,
       onToggle: toggle(genders, setGenders),
-    },
-    {
-      key: "brand",
-      title: t.brand,
-      items: brandItems,
-      selected: brands,
-      onToggle: toggle(brands, setBrands),
     },
     {
       key: "group",
