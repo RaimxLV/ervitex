@@ -21,6 +21,7 @@ const catalogSubItems = [
   { path: "/stanley-stella", lv: "Stanley/Stella", en: "Stanley/Stella" },
   { path: "/nwg", lv: "New Wave Group", en: "New Wave Group" },
   { path: "/pf-concept", lv: "PF Concept", en: "PF Concept" },
+  { path: "/beechfield-brands", lv: "Beechfield Brands", en: "Beechfield Brands" },
 ];
 
 const Header = () => {
