@@ -665,7 +665,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const hover = matchedImg ? null : resolveImgUrl(item.source, item.hover_image_url);
 
   const withHex = item.colors
-    .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c.h, c.bucket) }))
+    .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c.h, c.bucket, c.n) }))
     .filter((c) => !!c.hex);
   const swatches = withHex.slice(0, 8).map((c) => ({
     hex: c.hex!,
