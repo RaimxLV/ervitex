@@ -628,7 +628,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           category={selected.category}
           image={selected.image_url}
           swatches={selected.colors
-            .map((c) => ({ hex: sanitizeHex(c.h, c.bucket), name: c.n || "" }))
+            .map((c) => ({ hex: sanitizeHex(c.h, c.bucket, c.n), name: c.n || "" }))
             .filter((s) => !!s.hex) as { hex: string; name: string }[]}
         />
       )}
