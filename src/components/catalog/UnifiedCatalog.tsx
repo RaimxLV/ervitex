@@ -22,10 +22,32 @@ import {
 /* -------------------- helpers -------------------- */
 
 const VALID_HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
-const sanitizeHex = (hex: string | null | undefined, bucket: ColorBucketKey | null): string | null => {
-  if (hex && VALID_HEX.test(hex.trim())) return hex.trim();
-  if (bucket && bucket !== "multi") return getBucket(bucket).hex;
-  return null;
+// Placeholder hexes that partner feeds use as "unknown" fillers. Whenever we
+// see one of these AND the name gives us a real bucket, prefer the canonical
+// palette hex so swatches don't collapse into a wall of grey/black dots.
+const PLACEHOLDER_HEX = new Set([
+  "#000000", "#8a8a8a", "#888888", "#808080", "#999999",
+  "#cccccc", "#c8c8c8", "#b3b3b3", "#3f3f42",
+]);
+const sanitizeHex = (
+  hex: string | null | undefined,
+  bucket: ColorBucketKey | null,
+  name?: string | null,
+): string | null => {
+  const raw = (hex ?? "").trim().toLowerCase();
+  const valid = raw && VALID_HEX.test(raw) ? raw : null;
+  // If the stored hex is a known placeholder OR its color family disagrees
+  // with the name-derived bucket, fall back to the palette hex.
+  if (bucket && bucket !== "multi") {
+    if (!valid) return getBucket(bucket).hex;
+    if (PLACEHOLDER_HEX.has(valid)) {
+      // For combo names like "Black/Lime Green" keep the raw hex so the card's
+      // split-swatch renderer can build a two-tone circle from the name parts.
+      const isCombo = /[\/&+]| - /.test(name || "");
+      if (!isCombo) return getBucket(bucket).hex;
+    }
+  }
+  return valid;
 };
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
