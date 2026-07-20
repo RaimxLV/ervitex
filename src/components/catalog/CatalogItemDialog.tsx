@@ -805,12 +805,12 @@ const CatalogItemDialog = ({
             <DialogHeader className="space-y-4">
               {/* Meta row: code + supplier on left, brand on right */}
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
-                <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-                  <span className="font-mono font-semibold text-foreground">
-                    {label.code}: <span className="text-accent">{displayCode}</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-2 rounded bg-primary px-3 py-1.5 font-mono text-base font-bold uppercase tracking-wider text-primary-foreground">
+                    <span className="text-[10px] font-semibold uppercase tracking-widest opacity-70">{label.code}</span>
+                    {displayCode}
                   </span>
-                  <span className="text-border">|</span>
-                  <span>
+                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
                     {label.supplier}:{" "}
                     <Link
                       to={SOURCE_META[source].href}
