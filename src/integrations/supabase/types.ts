@@ -515,6 +515,30 @@ export type Database = {
         }
         Relationships: []
       }
+      pf_public_retail_prices: {
+        Row: {
+          currency: string
+          item_code: string
+          model_code: string
+          retail_price: number
+          updated_at: string
+        }
+        Insert: {
+          currency?: string
+          item_code: string
+          model_code: string
+          retail_price: number
+          updated_at?: string
+        }
+        Update: {
+          currency?: string
+          item_code?: string
+          model_code?: string
+          retail_price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pf_styles: {
         Row: {
           attributes: Json | null
