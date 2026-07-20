@@ -1542,6 +1542,14 @@ export type Database = {
         }
         Relationships: []
       }
+      ss_public_retail_prices: {
+        Row: {
+          currency: string | null
+          retail_price: number | null
+          style_code: string | null
+        }
+        Relationships: []
+      }
       ss_style_summary: {
         Row: {
           archived: boolean | null
