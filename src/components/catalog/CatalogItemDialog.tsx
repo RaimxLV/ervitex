@@ -107,6 +107,46 @@ const isLightHex = (hex?: string | null) => {
   return (r * 299 + g * 587 + b * 114) / 1000 > 225;
 };
 
+/** Canonical color-name -> hex mapping used as swatch fallback when supplier hex is missing */
+const NAME_HEX_MAP: Record<string, string> = {
+  black: "#000000", jetblack: "#000000", deepblack: "#000000", offblack: "#1a1a1a",
+  white: "#ffffff", offwhite: "#f5f2ea", cream: "#f5efe0", natural: "#efe7d2", ecru: "#e8ddc4", ivory: "#fffff0",
+  grey: "#8a8a8a", gray: "#8a8a8a", lightgrey: "#c9c9c9", lightgray: "#c9c9c9",
+  darkgrey: "#4a4a4a", darkgray: "#4a4a4a", heathergrey: "#b0b0b0", melangegrey: "#a0a0a0",
+  charcoal: "#3f3f3f", anthracite: "#333333", graphite: "#3a3a3a", silver: "#c0c0c0",
+  red: "#e11d48", darkred: "#8b0000", burgundy: "#6d0f1a", wine: "#722f37", cardinal: "#c41e3a",
+  pink: "#ec4899", lightpink: "#f9c9d6", hotpink: "#ff69b4", fuchsia: "#d3287d", magenta: "#c8117a", rose: "#e75480", coral: "#ff7f50",
+  orange: "#f97316", darkorange: "#c2410c", peach: "#ffcba4",
+  yellow: "#eab308", lightyellow: "#fff59d", gold: "#d4af37", mustard: "#c9a94a",
+  green: "#16a34a", darkgreen: "#14532d", lightgreen: "#8bc34a", limegreen: "#a3e635", lime: "#a3e635",
+  olive: "#6b8e23", forest: "#228b22", kellygreen: "#4cbb17", bottlegreen: "#0b3d20", mint: "#98d8b1", khaki: "#c3b091", army: "#4b5320",
+  blue: "#2563eb", lightblue: "#93c5fd", darkblue: "#1e3a8a", navy: "#1e3a8a", royalblue: "#1e40af",
+  skyblue: "#87ceeb", turquoise: "#40e0d0", teal: "#0d9488", petrol: "#0d5c63", cobalt: "#0047ab",
+  purple: "#7c3aed", violet: "#8b5cf6", lavender: "#b399d4", plum: "#8e4585", lilac: "#c8a2c8",
+  brown: "#78350f", darkbrown: "#4a2c17", lightbrown: "#a0522d", chocolate: "#5d3a1a",
+  tan: "#d2b48c", camel: "#c19a6b", sand: "#c2b280", beige: "#d6c9a8", stone: "#a99a86",
+  denim: "#556b8d", indigo: "#4b0082",
+  transparent: "#f4f4f4", multi: "#d0d0d0", multicolor: "#d0d0d0", assorted: "#d0d0d0",
+};
+
+const canonName = (n?: string | null) => (n || "").toLowerCase().replace(/[^a-z]/g, "");
+
+/** Resolve a display hex, preferring supplier value, otherwise a canonical color-name mapping */
+const resolveHex = (hex?: string | null, name?: string | null): string => {
+  const clean = cleanHex(hex);
+  if (clean) return clean;
+  const key = canonName(name);
+  if (key && NAME_HEX_MAP[key]) return NAME_HEX_MAP[key];
+  // try longest-substring match for compound names like "heather melange grey"
+  if (key) {
+    const found = Object.keys(NAME_HEX_MAP)
+      .filter((k) => key.includes(k))
+      .sort((a, b) => b.length - a.length)[0];
+    if (found) return NAME_HEX_MAP[found];
+  }
+  return "#e5e5e5";
+};
+
 async function loadSS(styleCode: string): Promise<ProductDetail | null> {
   const [styleRes, variantsRes, imagesRes] = await Promise.all([
     supabase
@@ -627,7 +667,62 @@ const CatalogItemDialog = ({
 
   const mainImg = gallery[imgIndex] || gallery[0] || image;
   const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : detail?.sizes || [];
-  const descriptionLines = detail?.features.length ? detail.features : lines(detail?.description || descriptionFallback);
+  const rawDescriptionLines = detail?.features.length ? detail.features : lines(detail?.description || descriptionFallback);
+  const rawMaterial = detail?.material || null;
+  const rawCare = detail?.care || null;
+  const rawShort = detail?.shortDescription || descriptionFallback || null;
+
+  // On-demand LV auto-translation (cached in sessionStorage per model+lang)
+  const [translated, setTranslated] = useState<{
+    short: string | null;
+    lines: string[];
+    material: string | null;
+    care: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    setTranslated(null);
+    if (lang !== "lv" || !detail) return;
+    const items: string[] = [];
+    const push = (s: string | null) => { items.push(s || ""); };
+    push(rawShort);
+    const linesStart = items.length;
+    for (const l of rawDescriptionLines) push(l);
+    const linesEnd = items.length;
+    push(rawMaterial);
+    push(rawCare);
+    const nonEmpty = items.some((x) => x && /[a-zA-Z]/.test(x));
+    if (!nonEmpty) return;
+    const cacheKey = `xlat:${source}:${id}:lv:v2`;
+    const cached = typeof sessionStorage !== "undefined" ? sessionStorage.getItem(cacheKey) : null;
+    if (cached) {
+      try { setTranslated(JSON.parse(cached)); return; } catch { /* ignore */ }
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("translate-text", {
+          body: { texts: items, target: "lv" },
+        });
+        if (cancelled || error || !data?.translations) return;
+        const out = data.translations as string[];
+        const result = {
+          short: out[0] || null,
+          lines: out.slice(linesStart, linesEnd).filter(Boolean),
+          material: out[linesEnd] || null,
+          care: out[linesEnd + 1] || null,
+        };
+        setTranslated(result);
+        try { sessionStorage.setItem(cacheKey, JSON.stringify(result)); } catch { /* ignore */ }
+      } catch { /* ignore */ }
+    })();
+    return () => { cancelled = true; };
+  }, [lang, detail, source, id]);
+
+  const shortDescription = translated?.short || rawShort;
+  const descriptionLines = translated?.lines.length ? translated.lines : rawDescriptionLines;
+  const materialText = translated?.material || rawMaterial;
+  const careText = translated?.care || rawCare;
   const label = {
     lv: {
       description: "Apraksts",
@@ -753,9 +848,8 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {(detail?.shortDescription || descriptionFallback) && (
-                <p className="text-base text-muted-foreground">{detail?.shortDescription || descriptionFallback}</p>
-              )}
+              {shortDescription && (
+                <p className="text-base text-muted-foreground">{shortDescription}</p>)}
             </DialogHeader>
 
               {loading && !detail && (
@@ -768,11 +862,14 @@ const CatalogItemDialog = ({
 
               {priceInfo && (
                 <div className="flex items-baseline gap-2 border-y border-border py-3">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    {lang === "lv" ? "Sākot no" : "From"}
+                  </span>
                   <span className="font-heading text-3xl font-black text-accent">
                     €{priceInfo.price.toFixed(2)}
                   </span>
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {lang === "lv" ? "ar PVN · no" : "incl. VAT · from"}
+                    {lang === "lv" ? "ar PVN" : "incl. VAT"}
                   </span>
                 </div>
               )}
@@ -810,7 +907,7 @@ const CatalogItemDialog = ({
                   <div className="flex flex-wrap gap-1.5">
                     {detail!.colors.map((c) => {
                       const isActive = c.code === activeColor;
-                      const hex = c.hex || "#e5e5e5";
+                      const hex = resolveHex(c.hex, c.name);
                       return (
                         <button
                           key={c.code}
@@ -847,19 +944,19 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {detail?.material && (
+              {materialText && (
                 <div>
                   <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">
                     {label.composition}
                   </h4>
-                  <p className="text-sm text-foreground/85">{detail.material}</p>
+                  <p className="text-sm text-foreground/85">{materialText}</p>
                 </div>
               )}
 
-              {detail?.care && (
+              {careText && (
                 <div>
                   <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.care}</h4>
-                  <p className="whitespace-pre-line text-sm text-foreground/90">{detail.care}</p>
+                  <p className="whitespace-pre-line text-sm text-foreground/90">{careText}</p>
                 </div>
               )}
 
