@@ -805,12 +805,12 @@ const CatalogItemDialog = ({
             <DialogHeader className="space-y-4">
               {/* Meta row: code + supplier on left, brand on right */}
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
-                <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-                  <span className="font-mono font-semibold text-foreground">
-                    {label.code}: <span className="text-accent">{displayCode}</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="inline-flex items-center gap-2 rounded bg-primary px-3 py-1.5 font-mono text-base font-bold uppercase tracking-wider text-primary-foreground">
+                    <span className="text-[10px] font-semibold uppercase tracking-widest opacity-70">{label.code}</span>
+                    {displayCode}
                   </span>
-                  <span className="text-border">|</span>
-                  <span>
+                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
                     {label.supplier}:{" "}
                     <Link
                       to={SOURCE_META[source].href}
@@ -861,16 +861,23 @@ const CatalogItemDialog = ({
               )}
 
               {priceInfo && (
-                <div className="flex items-baseline gap-2 border-y border-border py-3">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {lang === "lv" ? "Sākot no" : "From"}
-                  </span>
-                  <span className="font-heading text-3xl font-black text-accent">
-                    €{priceInfo.price.toFixed(2)}
-                  </span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {lang === "lv" ? "ar PVN" : "incl. VAT"}
-                  </span>
+                <div className="flex flex-col gap-1 border-y border-border py-3">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-heading text-xl font-semibold text-muted-foreground">
+                      €{priceInfo.price.toFixed(2)}
+                    </span>
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                      {lang === "lv" ? "bez PVN" : "excl. VAT"}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-heading text-3xl font-black text-foreground">
+                      €{(priceInfo.price * 1.21).toFixed(2)}
+                    </span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-foreground">
+                      {lang === "lv" ? "ar PVN" : "incl. VAT"}
+                    </span>
+                  </div>
                 </div>
               )}
 

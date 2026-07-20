@@ -100,7 +100,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
             </div>
           )}
           {code && (
-            <span className="absolute left-2 top-2 bg-primary px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary-foreground">
+            <span className="absolute left-2 top-2 bg-primary px-2.5 py-1 font-mono text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-sm">
               {code}
             </span>
           )}
