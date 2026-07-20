@@ -636,11 +636,16 @@ const CatalogItemDialog = ({
       setDetail(d);
       setActiveColor(d?.colors[0]?.code ?? null);
       setLoading(false);
-      if (source === "pf") {
+      if (source === "pf" || source === "ss" || source === "bb") {
+        const table =
+          source === "pf" ? "pf_public_retail_prices"
+          : source === "ss" ? "ss_public_retail_prices"
+          : "bb_public_retail_prices";
+        const keyCol = source === "pf" ? "model_code" : "style_code";
         const { data } = await supabase
-          .from("pf_public_retail_prices" as any)
+          .from(table as any)
           .select("retail_price,currency")
-          .eq("model_code", id)
+          .eq(keyCol, id)
           .order("retail_price", { ascending: true })
           .limit(1)
           .maybeSingle();
