@@ -1065,6 +1065,27 @@ export type Database = {
         }
         Relationships: []
       }
+      ss_public_retail_prices: {
+        Row: {
+          currency: string
+          retail_price: number
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          currency?: string
+          retail_price: number
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          currency?: string
+          retail_price?: number
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ss_sizes: {
         Row: {
           code: string
@@ -1601,6 +1622,7 @@ export type Database = {
         Returns: boolean
       }
       refresh_catalog_items_mv: { Args: never; Returns: undefined }
+      refresh_ss_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
     }
     Enums: {

@@ -162,6 +162,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<EnrichedItem | null>(null);
   const [pfPrices, setPfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
+  const [ssPrices, setSsPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(() => {
@@ -258,6 +259,28 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           pfrom += 1000;
         }
         setPfPrices(priceMap);
+      }
+
+      // Load SS public retail prices → per style_code
+      if (!lockedSource || lockedSource === "ss") {
+        const ssMap = new Map<string, { price: number; currency: string }>();
+        let sfrom = 0;
+        while (true) {
+          const { data, error } = await supabase
+            .from("ss_public_retail_prices" as any)
+            .select("style_code,retail_price,currency")
+            .range(sfrom, sfrom + 999);
+          if (error || !data) break;
+          for (const r of data as any[]) {
+            const sc = r.style_code as string;
+            const p = Number(r.retail_price);
+            if (!sc || !Number.isFinite(p) || p <= 0) continue;
+            ssMap.set(sc, { price: p, currency: r.currency || "EUR" });
+          }
+          if (data.length < 1000) break;
+          sfrom += 1000;
+        }
+        setSsPrices(ssMap);
       }
     })();
   }, [lockedSource]);
@@ -604,7 +627,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}
                       noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
-                      priceInfo={it.source === "pf" ? pfPrices.get(it.id) : undefined}
+                      priceInfo={
+                        it.source === "pf"
+                          ? pfPrices.get(it.id)
+                          : it.source === "ss"
+                          ? ssPrices.get(it.id)
+                          : undefined
+                      }
                       fromLabel={lang === "lv" ? "no" : "from"}
                       onNavigate={() => setSelected(it)}
                     />
