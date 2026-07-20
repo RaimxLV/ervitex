@@ -343,37 +343,55 @@ async function syncPrices(sb: SupabaseClient) {
   if (!token) throw new Error("PF_FEED_TOKEN not set");
   const url = `http://www.pfconcept.com/portal/datafeed/pricefeed_${token}_v3.json`;
   const res = await fetch(url);
-  if (!res.ok || !res.body) throw new Error(`pricefeed fetch ${res.status}`);
+  if (!res.ok) throw new Error(`pricefeed fetch ${res.status}`);
+  const feed: any = await res.json();
 
+  // Structure: PFCPriceFeed.priceInfo[].models[].model[].items[].item[]{itemcode,currency,scales[].scale[]{priceBar,nettPrice},promotion[].scales[].scale[]{priceBar,standardPrice}}
   const rows: any[] = [];
-  let currentItem: any = null;
+  const now = new Date().toISOString();
 
-  const parser = new JSONParser({
-    stringBufferSize: 64 * 1024,
-    paths: ["$..item"],
-  });
-  parser.onValue = ({ value }) => {
-    const v: any = value;
-    if (!v || typeof v !== "object") return;
-    // Some feeds nest another {item: ...}; unwrap once
-    const it = (v as any).item && !(v as any).itemCode ? (v as any).item : v;
-    const item_code = toStr(it.itemCode) || toStr(it.itemcode) || toStr(it.code);
-    if (!item_code) return;
-    const price = toNum(it.price) ?? toNum(it.netPrice) ?? toNum(it.customerPrice);
-    const list_price = toNum(it.listPrice) ?? toNum(it.grossPrice) ?? null;
-    const currency = toStr(it.currency) ?? toStr(it.curr) ?? "EUR";
-    if (price === null && list_price === null) return;
-    rows.push({ item_code, price, list_price, currency, updated_at: new Date().toISOString() });
+  const pickLowestScale = (scales: any): { bar: number; val: number } | null => {
+    const arr = Array.isArray(scales) ? scales : (scales ? [scales] : []);
+    let best: { bar: number; val: number } | null = null;
+    for (const s of arr) {
+      const inner = s?.scale;
+      const list = Array.isArray(inner) ? inner : (inner ? [inner] : []);
+      for (const sc of list) {
+        const bar = toInt(sc?.priceBar) ?? 1;
+        const val = toNum(sc?.nettPrice) ?? toNum(sc?.standardPrice);
+        if (val === null) continue;
+        if (!best || bar < best.bar) best = { bar, val };
+      }
+    }
+    return best;
   };
 
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    parser.write(decoder.decode(value, { stream: true }));
+  const priceInfoArr = Array.isArray(feed?.PFCPriceFeed?.priceInfo)
+    ? feed.PFCPriceFeed.priceInfo
+    : (feed?.PFCPriceFeed?.priceInfo ? [feed.PFCPriceFeed.priceInfo] : []);
+  for (const pi of priceInfoArr) {
+    const modelsWrap = Array.isArray(pi?.models) ? pi.models : (pi?.models ? [pi.models] : []);
+    for (const mw of modelsWrap) {
+      const models = Array.isArray(mw?.model) ? mw.model : (mw?.model ? [mw.model] : []);
+      for (const m of models) {
+        const itemsWrap = Array.isArray(m?.items) ? m.items : (m?.items ? [m.items] : []);
+        for (const iw of itemsWrap) {
+          const items = Array.isArray(iw?.item) ? iw.item : (iw?.item ? [iw.item] : []);
+          for (const it of items) {
+            const item_code = toStr(it?.itemcode) || toStr(it?.itemCode);
+            if (!item_code) continue;
+            const currency = toStr(it?.currency) ?? "EUR";
+            const nett = pickLowestScale(it?.scales);
+            const promo = pickLowestScale(it?.promotion?.[0]?.scales ?? it?.promotion?.scales);
+            const price = nett?.val ?? null;
+            const list_price = promo?.val ?? null;
+            if (price === null && list_price === null) continue;
+            rows.push({ item_code, price, list_price, currency, updated_at: now });
+          }
+        }
+      }
+    }
   }
-  parser.end();
 
   const upserted = await chunkUpsert(sb, "pf_prices", rows, "item_code", 500);
   return { parsed: rows.length, upserted };
