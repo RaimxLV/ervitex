@@ -334,16 +334,16 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   );
 
   const sourceItems = useMemo(() => {
-    if (lockedSource) return [];
     const order: CatalogSource[] = ["ss", "nwg", "pf", "bb"];
     return order
       .map((s) => ({
         label: SOURCE_META[s].label,
+        value: s,
         count: items.filter((it) => it.source === s && passesExcept(it, "source")).length,
       }))
       .filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, lang, q, sources, brands, categories, groups, genders, colors, lockedSource]);
+  }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
 
   // ── LV translations for facet values ──
   const CATEGORY_LV: Record<string, string> = {
