@@ -579,6 +579,7 @@ const CatalogItemDialog = ({
   const [loading, setLoading] = useState(false);
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [imgIndex, setImgIndex] = useState(0);
+  const [priceInfo, setPriceInfo] = useState<{ price: number; currency: string } | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -587,6 +588,7 @@ const CatalogItemDialog = ({
     setDetail(null);
     setActiveColor(null);
     setImgIndex(0);
+    setPriceInfo(null);
     (async () => {
       const loader = source === "ss" ? loadSS : source === "nwg" ? loadNWG : source === "bb" ? loadBB : loadPF;
       const d = await loader(id).catch(() => null);
@@ -594,6 +596,19 @@ const CatalogItemDialog = ({
       setDetail(d);
       setActiveColor(d?.colors[0]?.code ?? null);
       setLoading(false);
+      if (source === "pf") {
+        const { data } = await supabase
+          .from("pf_public_retail_prices" as any)
+          .select("retail_price,currency")
+          .eq("model_code", id)
+          .order("retail_price", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        if (!cancelled && data) {
+          const anyData = data as any;
+          setPriceInfo({ price: Number(anyData.retail_price), currency: anyData.currency || "EUR" });
+        }
+      }
     })();
     return () => { cancelled = true; };
   }, [open, source, id]);
