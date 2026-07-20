@@ -759,7 +759,14 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   }));
   const extra = Math.max(0, withHex.length - 8);
 
-  const displayCode = active?.c || item.id;
+  // Strip trailing size code from Stanley/Stella per-color SKU
+  // (e.g. STBU274C0021L → STBU274-C002)
+  const formatCode = (raw: string): string => {
+    if (item.source !== "ss") return raw;
+    const m = raw.match(/^([A-Z]+\d+)C(\d{3,4})/i);
+    return m ? `${m[1]}-C${m[2]}` : raw;
+  };
+  const displayCode = formatCode(active?.c || item.id);
 
   return (
     <CatalogModelCard
