@@ -443,20 +443,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const filterSections: FilterSection[] = [];
 
-  if (!lockedSource && sourceItems.length > 0) {
+  if (sourceItems.length > 0) {
     filterSections.push({
       key: "source",
       title: t.source,
       items: sourceItems,
-      selected: new Set(
-        [...sources].map((k) => SOURCE_META[k as CatalogSource]?.label || k)
-      ),
-      onToggle: (label) => {
-        const key = (Object.keys(SOURCE_META) as CatalogSource[]).find(
-          (k) => SOURCE_META[k].label === label
-        );
-        if (key) toggle(sources, setSources)(key);
-      },
+      selected: sources,
+      onToggle: toggle(sources, setSources),
     });
   }
 
