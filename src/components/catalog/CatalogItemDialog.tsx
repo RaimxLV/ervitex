@@ -861,16 +861,23 @@ const CatalogItemDialog = ({
               )}
 
               {priceInfo && (
-                <div className="flex items-baseline gap-2 border-y border-border py-3">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {lang === "lv" ? "Sākot no" : "From"}
-                  </span>
-                  <span className="font-heading text-3xl font-black text-accent">
-                    €{priceInfo.price.toFixed(2)}
-                  </span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {lang === "lv" ? "ar PVN" : "incl. VAT"}
-                  </span>
+                <div className="flex flex-col gap-1 border-y border-border py-3">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-heading text-xl font-semibold text-muted-foreground">
+                      €{priceInfo.price.toFixed(2)}
+                    </span>
+                    <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                      {lang === "lv" ? "bez PVN" : "excl. VAT"}
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-heading text-3xl font-black text-foreground">
+                      €{(priceInfo.price * 1.21).toFixed(2)}
+                    </span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-foreground">
+                      {lang === "lv" ? "ar PVN" : "incl. VAT"}
+                    </span>
+                  </div>
                 </div>
               )}
 
