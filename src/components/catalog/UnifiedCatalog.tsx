@@ -164,9 +164,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [pfPrices, setPfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
 
   const [q, setQ] = useState(searchParams.get("q") || "");
-  const [sources, setSources] = useState<Set<string>>(
-    new Set((searchParams.get("source") || "").split(",").filter(Boolean))
-  );
+  const [sources, setSources] = useState<Set<string>>(() => {
+    const fromUrl = new Set((searchParams.get("source") || "").split(",").filter(Boolean));
+    if (fromUrl.size) return fromUrl;
+    return lockedSource ? new Set([lockedSource]) : new Set();
+  });
   const [brands, setBrands] = useState<Set<string>>(
     new Set((searchParams.get("brand") || "").split(",").filter(Boolean))
   );
@@ -187,7 +189,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   useEffect(() => {
     const p = new URLSearchParams();
     if (q) p.set("q", q);
-    if (!lockedSource && sources.size) p.set("source", [...sources].join(","));
+    if (sources.size) p.set("source", [...sources].join(","));
     if (brands.size) p.set("brand", [...brands].join(","));
     if (categories.size) p.set("category", [...categories].join(","));
     if (groups.size) p.set("group", [...groups].join(","));
@@ -195,7 +197,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (colors.size) p.set("color", [...colors].join(","));
     if (page > 1) p.set("page", String(page));
     setSearchParams(p, { replace: true });
-  }, [q, sources, brands, categories, groups, genders, colors, page, setSearchParams, lockedSource]);
+  }, [q, sources, brands, categories, groups, genders, colors, page, setSearchParams]);
 
   useEffect(() => {
     (async () => {
@@ -203,12 +205,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       const step = 1000;
       let from = 0;
       while (true) {
-        let query = supabase
+        const query = supabase
           .from("catalog_items" as any)
           .select(
             "source,id,name,brand,category,group_name,gender,image_url,hover_image_url,colors"
           );
-        if (lockedSource) query = query.eq("source", lockedSource);
         const { data, error } = await query.range(from, from + step - 1);
         if (error) break;
         all.push(...((data || []) as unknown as CatalogItem[]));
@@ -302,7 +303,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       const hay = `${it.name || ""} ${it.id} ${it.brand || ""}`.toLowerCase();
       if (!hay.includes(needle)) return false;
     }
-    if (!lockedSource && except !== "source" && sources.size && !sources.has(it.source)) return false;
+    if (except !== "source" && sources.size && !sources.has(it.source)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
     if (except !== "category" && categories.size && (!it.category || !categories.has(it.category))) return false;
     if (except !== "group" && groups.size && (!it.group_name || !groups.has(it.group_name))) return false;
@@ -333,16 +334,16 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   );
 
   const sourceItems = useMemo(() => {
-    if (lockedSource) return [];
     const order: CatalogSource[] = ["ss", "nwg", "pf", "bb"];
     return order
       .map((s) => ({
         label: SOURCE_META[s].label,
+        value: s,
         count: items.filter((it) => it.source === s && passesExcept(it, "source")).length,
       }))
       .filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, lang, q, sources, brands, categories, groups, genders, colors, lockedSource]);
+  }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
 
   // ── LV translations for facet values ──
   const CATEGORY_LV: Record<string, string> = {
@@ -350,13 +351,16 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     "Sweaters": "Džemperi", "Jackets": "Virsjakas", "Caps & Hats": "Cepures",
     "Beanies": "Adītas cepures", "Bags": "Somas", "Backpacks": "Mugursomas",
     "Shorts": "Šorti", "Trousers": "Bikses", "Bottoms": "Apakšdaļas", "Tops": "Augšdaļas",
-    "Ballpoint Pens": "Pildspalvas", "Water Bottles": "Ūdens pudeles",
-    "Hard Cover Notebooks": "Cietvāku bloknoti", "Notebooks": "Bloknoti",
-    "Insulated Mugs": "Termokrūzes", "Mugs": "Krūzes",
+    "Ballpoint Pens": "Lodīšu pildspalvas", "Water Bottles": "Ūdens pudeles",
+    "Hard Cover Notebooks": "Cietvāku bloknoti", "Soft Cover Notebooks": "Mīkstvāku bloknoti",
+    "Notebooks": "Bloknoti", "Notepads": "Bloknoti",
+    "Insulated Mugs": "Termokrūzes", "Mugs": "Krūzes", "Standard Mugs": "Standarta krūzes",
+    "Travel Mugs": "Ceļojumu krūzes",
     "Shopping & Tote Bags": "Iepirkumu somas", "Tote Bags": "Iepirkumu somas",
     "Home Accessories": "Mājas aksesuāri", "Sports Bottles": "Sporta pudeles",
     "Cables": "Kabeļi", "Power Banks": "Ārējie akumulatori",
     "Umbrellas": "Lietussargi", "Keychains": "Atslēgu piekariņi",
+    "Keychains & Keyrings": "Atslēgu piekariņi",
     "Wireless Chargers": "Bezvadu lādētāji", "Chargers": "Lādētāji",
     "Speakers": "Skaļruņi", "Headphones": "Austiņas", "Earbuds": "Austiņas",
     "Pens": "Pildspalvas", "Pencils": "Zīmuļi", "Lanyards": "Kakla lentes",
@@ -369,17 +373,50 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     "Office": "Birojs", "Travel": "Ceļojumi", "Outdoor": "Āra aktivitātes",
     "Tech": "Tehnoloģijas", "Electronics": "Elektronika",
     "Drinkware": "Trauki", "Writing": "Rakstāmpiederumi",
+    // extended
+    "Interior": "Interjers", "Glassware": "Stikla trauki", "Kitchen": "Virtuve",
+    "Kitchenware": "Virtuves piederumi", "Headwear": "Galvassegas",
+    "Accessories": "Aksesuāri", "Shoes": "Apavi", "Sets": "Komplekti",
+    "Gift Sets": "Dāvanu komplekti", "Vases": "Vāzes", "Travel Bags": "Ceļojumu somas",
+    "Cooler Bags": "Termosomas", "Insulated Bottles": "Termopudeles",
+    "Travel Accessories": "Ceļojumu aksesuāri", "Laptop Backpacks": "Datora mugursomas",
+    "Sticky Notes": "Līmlapiņas", "Bedroom": "Guļamistaba",
+    "Drawstring Bags": "Auklas somas", "Sports Bags": "Sporta somas",
+    "Towels": "Dvieļi", "Shirts": "Krekli",
+    "Crew neck sweatshirts": "Džemperi ar apaļu izgriezumu",
+    "Hoodie sweatshirts": "Jakas ar kapuci",
+    "Personal Care": "Personīgā aprūpe", "Fitness & Sport": "Fitness & sports",
+    "Sunglasses": "Saulesbrilles", "Computer Accessories": "Datoru aksesuāri",
+    "Serving Boards & Sets": "Servēšanas dēļi", "Bodywarmers": "Vestes",
+    "Toiletry Bags": "Kosmētikas somas", "Stands & Holders": "Statīvi & turētāji",
+    "Non Padded Jacket": "Vieglas virsjakas", "Bar glass": "Bāra glāzes",
+    "Blankets": "Segas", "Rollerball Pens": "Rollera pildspalvas",
+    "Car Accessories": "Auto aksesuāri", "Portfolios": "Mapes",
+    "Laptop & Tablet Bags": "Datoru & planšetu somas",
+    "Display": "Displeji", "Wine Accessories": "Vīna aksesuāri",
+    "Colouring Sets": "Krāsošanas komplekti", "Gadgets": "Gadžeti",
+    "Other Pens & Writing Accessories": "Citi rakstāmpiederumi",
+    "Business Bags": "Biznesa somas", "Shorts & Trousers": "Šorti & bikses",
+    "Workwear": "Darba apģērbs", "Textiles": "Tekstils",
+    "Safety": "Drošība", "Catalogues": "Katalogi", "Bathroom": "Vannasistaba",
+    "Pants": "Bikses", "Serving platter": "Servēšanas šķīvji",
+    "Health & Personal Care": "Veselība & aprūpe",
+    "Tools & Car Accessories": "Instrumenti & auto",
+    "Sports & Leisure": "Sports & atpūta", "Giveaways": "Reklāmas dāvanas",
+    "Toys & Games": "Rotaļlietas & spēles", "Games & Play": "Spēles",
+    "Serving tool": "Servēšanas piederumi", "Coverall": "Kombinezoni",
+    "Body": "Ķermenim", "Sweater": "Džemperis", "Sweatshirts": "Džemperi",
+    "Tees": "T-krekli", "Training Set": "Treniņu komplekti",
+    "Training pants": "Treniņu bikses", "Gift Cards": "Dāvanu kartes",
+    "Health & Hygiene": "Veselība & higiēna", "Home & Kitchen": "Mājai & virtuvei",
+    "Pens & Writing": "Pildspalvas & rakstāmpiederumi",
+    "Notebooks & Paper Products": "Bloknoti & papīra izstrādājumi",
+    "Clothing": "Apģērbs",
   };
   const GENDER_LV: Record<string, string> = {
     "Men": "Vīriešu", "Women": "Sieviešu", "Kids": "Bērnu", "Baby": "Zīdaiņu", "Unisex": "Unisex",
   };
-  const GROUP_LV: Record<string, string> = {
-    "Apparel": "Apģērbi", "Bags": "Somas", "Drinkware": "Trauki",
-    "Writing Instruments": "Rakstāmpiederumi", "Technology": "Tehnoloģijas",
-    "Office": "Birojs", "Travel": "Ceļojumi", "Outdoor & Sports": "Āra & sports",
-    "Home & Living": "Mājai", "Tools": "Instrumenti", "Headwear": "Galvassegas",
-    "Accessories": "Aksesuāri", "Gifts": "Dāvanas",
-  };
+  const GROUP_LV: Record<string, string> = CATEGORY_LV; // reuse same map, keys overlap
   const looksLatvian = (s: string) => /[āčēģīķļņōŗšūž]/i.test(s);
   const localize = (map: Record<string, string>) => (raw: string): string => {
     if (lang !== "lv") return raw;
@@ -442,20 +479,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const filterSections: FilterSection[] = [];
 
-  if (!lockedSource && sourceItems.length > 0) {
+  if (sourceItems.length > 0) {
     filterSections.push({
       key: "source",
       title: t.source,
       items: sourceItems,
-      selected: new Set(
-        [...sources].map((k) => SOURCE_META[k as CatalogSource]?.label || k)
-      ),
-      onToggle: (label) => {
-        const key = (Object.keys(SOURCE_META) as CatalogSource[]).find(
-          (k) => SOURCE_META[k].label === label
-        );
-        if (key) toggle(sources, setSources)(key);
-      },
+      selected: sources,
+      onToggle: toggle(sources, setSources),
     });
   }
 
