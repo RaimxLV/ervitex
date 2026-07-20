@@ -164,9 +164,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [pfPrices, setPfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
 
   const [q, setQ] = useState(searchParams.get("q") || "");
-  const [sources, setSources] = useState<Set<string>>(
-    new Set((searchParams.get("source") || "").split(",").filter(Boolean))
-  );
+  const [sources, setSources] = useState<Set<string>>(() => {
+    const fromUrl = new Set((searchParams.get("source") || "").split(",").filter(Boolean));
+    if (fromUrl.size) return fromUrl;
+    return lockedSource ? new Set([lockedSource]) : new Set();
+  });
   const [brands, setBrands] = useState<Set<string>>(
     new Set((searchParams.get("brand") || "").split(",").filter(Boolean))
   );
@@ -187,7 +189,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   useEffect(() => {
     const p = new URLSearchParams();
     if (q) p.set("q", q);
-    if (!lockedSource && sources.size) p.set("source", [...sources].join(","));
+    if (sources.size) p.set("source", [...sources].join(","));
     if (brands.size) p.set("brand", [...brands].join(","));
     if (categories.size) p.set("category", [...categories].join(","));
     if (groups.size) p.set("group", [...groups].join(","));
@@ -195,7 +197,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (colors.size) p.set("color", [...colors].join(","));
     if (page > 1) p.set("page", String(page));
     setSearchParams(p, { replace: true });
-  }, [q, sources, brands, categories, groups, genders, colors, page, setSearchParams, lockedSource]);
+  }, [q, sources, brands, categories, groups, genders, colors, page, setSearchParams]);
 
   useEffect(() => {
     (async () => {
