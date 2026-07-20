@@ -853,7 +853,7 @@ const CatalogItemDialog = ({
                   <div className="flex flex-wrap gap-1.5">
                     {detail!.colors.map((c) => {
                       const isActive = c.code === activeColor;
-                      const hex = c.hex || "#e5e5e5";
+                      const hex = resolveHex(c.hex, c.name);
                       return (
                         <button
                           key={c.code}
