@@ -83,14 +83,14 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
                 alt={imageAlt}
                 loading="lazy"
                 onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                className={`absolute inset-0 h-full w-full scale-[1.08] object-contain transition-opacity duration-500 ${hoverImage ? "group-hover:opacity-0" : ""}`}
+                className={`absolute inset-0 h-full w-full object-contain p-2 transition-opacity duration-500 ${hoverImage ? "group-hover:opacity-0" : ""}`}
               />
               {hoverImage && (
                 <img
                   src={hoverImage}
                   alt=""
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full scale-[1.08] object-contain opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  className="absolute inset-0 h-full w-full object-contain p-2 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 />
               )}
             </>
