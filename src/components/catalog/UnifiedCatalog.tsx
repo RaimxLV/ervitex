@@ -163,6 +163,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [selected, setSelected] = useState<EnrichedItem | null>(null);
   const [pfPrices, setPfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
   const [ssPrices, setSsPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
+  const [bbPrices, setBbPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(() => {
