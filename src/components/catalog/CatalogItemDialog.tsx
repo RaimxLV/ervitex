@@ -507,6 +507,68 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
 }
 
 
+/* ---------- i18n for spec labels & values ---------- */
+
+const SPEC_LABEL_I18N: Record<string, { lv: string; en: string }> = {
+  Fit: { lv: "Piegriezums", en: "Fit" },
+  Weight: { lv: "Svars", en: "Weight" },
+  Neckline: { lv: "Apkakle", en: "Neckline" },
+  Sleeve: { lv: "Piedurknes", en: "Sleeve" },
+  Category: { lv: "Kategorija", en: "Category" },
+  Group: { lv: "Grupa", en: "Group" },
+  Type: { lv: "Tips", en: "Type" },
+  Gender: { lv: "Dzimums", en: "Gender" },
+  Segment: { lv: "Segments", en: "Segment" },
+  Brand: { lv: "Zīmols", en: "Brand" },
+  Material: { lv: "Materiāls", en: "Material" },
+  "Country of origin": { lv: "Izcelsmes valsts", en: "Country of origin" },
+  Assortment: { lv: "Sortiments", en: "Assortment" },
+  "Qty / carton": { lv: "Skaits kastē", en: "Qty / carton" },
+  "Capacity (ml)": { lv: "Tilpums (ml)", en: "Capacity (ml)" },
+  Insulation: { lv: "Izolācija", en: "Insulation" },
+  "Lid features": { lv: "Vāciņa īpašības", en: "Lid features" },
+  "Intended use": { lv: "Pielietojums", en: "Intended use" },
+  "Extra features": { lv: "Papildu īpašības", en: "Extra features" },
+  "Dishwasher safe": { lv: "Trauku mazgājamā", en: "Dishwasher safe" },
+  "Microwave safe": { lv: "Mikroviļņu drošs", en: "Microwave safe" },
+  Certifications: { lv: "Sertifikāti", en: "Certifications" },
+  "BSCI factory": { lv: "BSCI rūpnīca", en: "BSCI factory" },
+  "OEKO-TEX": { lv: "OEKO-TEX", en: "OEKO-TEX" },
+  "Umbrella size": { lv: "Lietussarga izmērs", en: "Umbrella size" },
+  Persons: { lv: "Personas", en: "Persons" },
+  "Folded size": { lv: "Salocīts izmērs", en: "Folded size" },
+  Opening: { lv: "Atvēršana", en: "Opening" },
+  Windproof: { lv: "Vējdrošs", en: "Windproof" },
+  "Label type": { lv: "Etiķetes tips", en: "Label type" },
+  "Removable infuser": { lv: "Noņemams sietiņš", en: "Removable infuser" },
+  "Removable tea filter": { lv: "Noņemams tējas filtrs", en: "Removable tea filter" },
+  Sheets: { lv: "Lapas", en: "Sheets" },
+};
+
+const VALUE_I18N_LV: Record<string, string> = {
+  // gender
+  men: "Vīriešiem", man: "Vīriešiem", male: "Vīriešiem", mens: "Vīriešiem",
+  women: "Sievietēm", woman: "Sievietēm", female: "Sievietēm", womens: "Sievietēm", ladies: "Sievietēm",
+  unisex: "Unisex", kids: "Bērniem", children: "Bērniem", junior: "Bērniem", juniors: "Bērniem", baby: "Zīdaiņiem",
+  // fit
+  "regular fit": "Klasisks piegriezums", "slim fit": "Pieguļošs piegriezums", "oversized fit": "Brīvs piegriezums",
+  "relaxed fit": "Brīvs piegriezums", straight: "Taisns", loose: "Brīvs",
+  // yes/no
+  yes: "Jā", no: "Nē", true: "Jā", false: "Nē",
+};
+
+const translateValue = (value: string, lang: "lv" | "en") => {
+  if (lang !== "lv") return value;
+  const key = value.toLowerCase().trim();
+  return VALUE_I18N_LV[key] || value;
+};
+
+const translateLabel = (label: string, lang: "lv" | "en") => {
+  const entry = SPEC_LABEL_I18N[label];
+  if (entry) return entry[lang];
+  return label;
+};
+
 /* ---------- Component ---------- */
 
 const CatalogItemDialog = ({
@@ -544,7 +606,6 @@ const CatalogItemDialog = ({
   const gallery = useMemo(() => {
     if (!currentColor) return image ? [image] : [];
     if (currentColor.images.length) return currentColor.images;
-    // pull from any other color if empty
     for (const c of detail?.colors || []) if (c.images.length) return c.images.slice(0, 1);
     return image ? [image] : [];
   }, [currentColor, detail, image]);
@@ -563,6 +624,8 @@ const CatalogItemDialog = ({
       request: "Pieprasīt cenu šim modelim",
       noImage: "Bez attēla",
       allColors: "Visas krāsas",
+      code: "Kods",
+      supplier: "Piegādātājs",
     },
     en: {
       description: "Description",
@@ -574,8 +637,22 @@ const CatalogItemDialog = ({
       request: "Request a quote for this model",
       noImage: "No image",
       allColors: "All colours",
+      code: "Code",
+      supplier: "Supplier",
     },
   }[lang];
+
+  // Resolve brand for display: hide "Unbranded" / empty
+  const rawBrand = (detail?.brand || brand || "").trim();
+  const displayBrand = rawBrand && rawBrand.toLowerCase() !== "unbranded" ? rawBrand : null;
+  const displayCode = detail?.code || id;
+  const displayCategory = detail?.category || category;
+
+  // Filter out redundant specs (already shown as top pills) and translate them
+  const filteredSpecs = (detail?.specs || []).filter((s) => {
+    const l = s.label.toLowerCase();
+    return l !== "brand"; // brand is shown as a pill
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -615,35 +692,56 @@ const CatalogItemDialog = ({
           </div>
 
           <div className="space-y-6">
-          <DialogHeader>
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline" className="font-mono text-[10px] uppercase">
-                {detail?.code || id}
-              </Badge>
-              <Badge className="text-[10px] uppercase">{SOURCE_META[source].label}</Badge>
-              {(detail?.brand || brand) && (
-                <Badge variant="secondary" className="text-[10px] uppercase">
-                  {detail?.brand || brand}
-                </Badge>
+            <DialogHeader className="space-y-4">
+              {/* Meta row: code + supplier on left, brand on right */}
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
+                <div className="flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <span className="font-mono font-semibold text-foreground">
+                    {label.code}: <span className="text-accent">{displayCode}</span>
+                  </span>
+                  <span className="text-border">|</span>
+                  <span>
+                    {label.supplier}:{" "}
+                    <Link
+                      to={SOURCE_META[source].href}
+                      className="font-semibold text-foreground hover:text-accent"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {SOURCE_META[source].label}
+                    </Link>
+                  </span>
+                </div>
+                {displayBrand && (
+                  <span className="rounded-full bg-foreground px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-widest text-background">
+                    {displayBrand}
+                  </span>
+                )}
+              </div>
+
+              <DialogTitle className="font-heading text-3xl font-black uppercase tracking-wide">
+                {detail?.title || name || id}
+              </DialogTitle>
+
+              {/* Contextual tags */}
+              {(displayCategory || detail?.gender) && (
+                <div className="flex flex-wrap gap-1.5">
+                  {displayCategory && (
+                    <Badge variant="secondary" className="rounded-sm text-[10px] font-medium uppercase tracking-wider">
+                      {displayCategory}
+                    </Badge>
+                  )}
+                  {detail?.gender && (
+                    <Badge variant="outline" className="rounded-sm text-[10px] font-medium uppercase tracking-wider">
+                      {translateValue(detail.gender, lang)}
+                    </Badge>
+                  )}
+                </div>
               )}
-              {(detail?.category || category) && (
-                <Badge variant="outline" className="text-[10px] uppercase">
-                  {detail?.category || category}
-                </Badge>
+
+              {(detail?.shortDescription || descriptionFallback) && (
+                <p className="text-base text-muted-foreground">{detail?.shortDescription || descriptionFallback}</p>
               )}
-              {detail?.gender && (
-                <Badge variant="outline" className="text-[10px] uppercase">
-                  {detail.gender}
-                </Badge>
-              )}
-            </div>
-            <DialogTitle className="mt-1 font-heading text-3xl font-black uppercase tracking-wide">
-              {detail?.title || name || id}
-            </DialogTitle>
-            {(detail?.shortDescription || descriptionFallback) && (
-              <p className="text-base text-muted-foreground">{detail?.shortDescription || descriptionFallback}</p>
-            )}
-          </DialogHeader>
+            </DialogHeader>
 
               {loading && !detail && (
                 <div className="space-y-2">
@@ -653,14 +751,23 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {(detail?.specs.length ?? 0) > 0 && (
-                <div className="flex flex-wrap gap-x-8 gap-y-2 border-y border-border py-3 text-sm">
-                  {detail!.specs.map((s) => (
-                    <div key={`${s.label}-${s.value}`}>
-                      <span className="font-semibold">{s.label}: </span>
-                      <span className="text-muted-foreground">{s.value}</span>
-                    </div>
-                  ))}
+              {filteredSpecs.length > 0 && (
+                <div>
+                  <h4 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider">
+                    {label.specifications}
+                  </h4>
+                  <dl className="grid grid-cols-1 gap-x-6 gap-y-3 rounded-md border border-border bg-muted/30 p-4 sm:grid-cols-2">
+                    {filteredSpecs.map((s) => (
+                      <div key={`${s.label}-${s.value}`} className="flex flex-col">
+                        <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          {translateLabel(s.label, lang)}
+                        </dt>
+                        <dd className="mt-0.5 text-sm text-foreground">
+                          {translateValue(s.value, lang)}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
                 </div>
               )}
 
@@ -750,7 +857,6 @@ const CatalogItemDialog = ({
                 <p className="border-t border-border pt-4 text-sm text-muted-foreground">{detail.notice}</p>
               )}
 
-              {/* Loading fallback swatches */}
               {!detail && !loading && swatches && swatches.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {swatches.map((s, i) => (
@@ -766,3 +872,4 @@ const CatalogItemDialog = ({
 };
 
 export default CatalogItemDialog;
+
