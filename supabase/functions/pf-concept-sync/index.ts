@@ -402,7 +402,7 @@ async function syncPrices(sb: SupabaseClient) {
         .map((r) => ({
           item_code: r.item_code,
           model_code: String(r.item_code).slice(0, 6),
-          retail_price: Number((Number(r.price) * (Number(Deno.env.get("PF_MARKUP") || "1.0165")) * 1.0165).toFixed(2)),
+          retail_price: Number((Number(r.price) * Number(Deno.env.get("PF_MARKUP") || "1.0165")).toFixed(2)),
           currency: r.currency || "EUR",
           updated_at: now,
         })),
