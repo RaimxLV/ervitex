@@ -722,12 +722,20 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       noImageLabel={noImageLabel}
       price={
         priceInfo ? (
-          <p className="font-heading text-sm font-bold text-foreground">
-            <span className="mr-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              {fromLabel}
-            </span>
-            {priceInfo.price.toFixed(2)} {priceInfo.currency}
-          </p>
+          <div className="flex flex-col gap-0.5 leading-tight">
+            <p className="font-heading text-sm font-semibold text-muted-foreground">
+              €{priceInfo.price.toFixed(2)}
+              <span className="ml-1 text-[10px] font-medium uppercase tracking-wider">
+                {lang === "lv" ? "bez PVN" : "excl. VAT"}
+              </span>
+            </p>
+            <p className="font-heading text-base font-black text-foreground">
+              €{(priceInfo.price * 1.21).toFixed(2)}
+              <span className="ml-1 text-[10px] font-bold uppercase tracking-wider">
+                {lang === "lv" ? "ar PVN" : "incl. VAT"}
+              </span>
+            </p>
+          </div>
         ) : (
           <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {requestLabel}
