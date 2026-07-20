@@ -226,7 +226,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         });
         return {
           ...it,
-          brand: normalizeText(it.brand),
+          brand: (() => { const b = normalizeText(it.brand); return b && b.toLowerCase() !== "unbranded" ? b : null; })(),
           category: normalizeCategory(it.category),
           group_name: normalizeText(it.group_name),
           gender: normalizeGender(it.gender),
@@ -714,7 +714,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       hoverImage={hover}
       imageAlt={item.name || item.id}
       code={displayCode}
-      brandBadge={item.brand || SOURCE_META[item.source].label}
+      brandBadge={item.brand && item.brand.toLowerCase() !== "unbranded" ? item.brand : SOURCE_META[item.source].label}
       title={item.name || item.id}
       subtitle={active?.n || item.description}
       swatches={swatches}

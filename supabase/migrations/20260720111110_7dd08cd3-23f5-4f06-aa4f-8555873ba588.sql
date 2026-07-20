@@ -1,0 +1,1 @@
+GRANT SELECT ON public.pf_retail_prices TO anon, authenticated;
