@@ -394,7 +394,22 @@ async function syncPrices(sb: SupabaseClient) {
   }
 
   const upserted = await chunkUpsert(sb, "pf_prices", rows, "item_code", 500);
-  return { parsed: rows.length, upserted };
+  const { error: publishError, count: published } = await sb
+    .from("pf_public_retail_prices")
+    .upsert(
+      rows
+        .filter((r) => r.price !== null && r.price > 0)
+        .map((r) => ({
+          item_code: r.item_code,
+          model_code: String(r.item_code).slice(0, 6),
+          retail_price: Number((Number(r.price) * (Number(Deno.env.get("PF_MARKUP") || "1.0165")) * 1.0165).toFixed(2)),
+          currency: r.currency || "EUR",
+          updated_at: now,
+        })),
+      { onConflict: "item_code", count: "exact" },
+    );
+  if (publishError) throw new Error(`pf_public_retail_prices upsert: ${publishError.message}`);
+  return { parsed: rows.length, upserted, published };
 }
 
 async function probePrices() {

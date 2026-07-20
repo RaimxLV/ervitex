@@ -237,13 +237,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       setItems(enriched);
       setLoaded(true);
 
-      // Load PF retail prices → min per model_code
+      // Load PF public retail prices → min per model_code
       if (!lockedSource || lockedSource === "pf") {
         const priceMap = new Map<string, { price: number; currency: string }>();
         let pfrom = 0;
         while (true) {
           const { data, error } = await supabase
-            .from("pf_retail_prices" as any)
+            .from("pf_public_retail_prices" as any)
             .select("model_code,retail_price,currency")
             .range(pfrom, pfrom + 999);
           if (error || !data) break;
