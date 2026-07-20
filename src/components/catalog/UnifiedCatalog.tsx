@@ -163,6 +163,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [selected, setSelected] = useState<EnrichedItem | null>(null);
   const [pfPrices, setPfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
   const [ssPrices, setSsPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
+  const [bbPrices, setBbPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(() => {
@@ -281,6 +282,28 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           sfrom += 1000;
         }
         setSsPrices(ssMap);
+      }
+
+      // Load BB public retail prices → per style_code
+      if (!lockedSource || lockedSource === "bb") {
+        const bbMap = new Map<string, { price: number; currency: string }>();
+        let bfrom = 0;
+        while (true) {
+          const { data, error } = await supabase
+            .from("bb_public_retail_prices" as any)
+            .select("style_code,retail_price,currency")
+            .range(bfrom, bfrom + 999);
+          if (error || !data) break;
+          for (const r of data as any[]) {
+            const sc = r.style_code as string;
+            const p = Number(r.retail_price);
+            if (!sc || !Number.isFinite(p) || p <= 0) continue;
+            bbMap.set(sc, { price: p, currency: r.currency || "EUR" });
+          }
+          if (data.length < 1000) break;
+          bfrom += 1000;
+        }
+        setBbPrices(bbMap);
       }
     })();
   }, [lockedSource]);
@@ -632,6 +655,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                           ? pfPrices.get(it.id)
                           : it.source === "ss"
                           ? ssPrices.get(it.id)
+                          : it.source === "bb"
+                          ? bbPrices.get(it.id)
                           : undefined
                       }
                       fromLabel={lang === "lv" ? "no" : "from"}

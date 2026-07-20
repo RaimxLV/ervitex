@@ -1376,6 +1376,22 @@ export type Database = {
       }
     }
     Views: {
+      bb_public_retail_prices: {
+        Row: {
+          currency: string | null
+          retail_price: number | null
+          style_code: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bb_variants_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "bb_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
       catalog_items: {
         Row: {
           brand: string | null
