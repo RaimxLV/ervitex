@@ -99,18 +99,23 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
               {noImageLabel}
             </div>
           )}
-          {code && (
-            <span className="absolute left-2 top-2 bg-primary px-2.5 py-1 font-mono text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-sm">
-              {code}
-            </span>
-          )}
-          {brandBadge && (
-            <span className="absolute right-2 top-2 bg-background/90 px-2 py-0.5 font-heading text-[10px] font-bold uppercase tracking-wider">
-              {brandBadge}
-            </span>
-          )}
           {topRight}
         </div>
+
+        {(code || brandBadge) && (
+          <div className="flex items-stretch border-t border-border bg-primary text-primary-foreground">
+            {code && (
+              <span className="flex-1 truncate px-3 py-1.5 font-mono text-sm font-bold uppercase tracking-wider">
+                {code}
+              </span>
+            )}
+            {brandBadge && (
+              <span className="flex items-center border-l border-primary-foreground/20 px-2.5 py-1.5 font-heading text-[10px] font-bold uppercase tracking-wider">
+                {brandBadge}
+              </span>
+            )}
+          </div>
+        )}
 
         <div className="flex flex-1 flex-col gap-1.5 p-3">
           <h3 className="line-clamp-1 font-heading text-sm font-bold uppercase tracking-wide transition-colors group-hover:text-accent">
