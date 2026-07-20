@@ -291,9 +291,14 @@ async function syncAssortments(sb: SupabaseClient) {
   return collected.length;
 }
 
+// NWG productSearch caps pagination around ~10 000 results per query.
+// To crawl the full catalog we shard the search across many narrow queries
+// (single letters/digits) and dedupe by product_number.
+const DEFAULT_SHARDS = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
+
 async function syncStyles(
   sb: SupabaseClient,
-  opts: { maxPages?: number; startPage?: number; query?: string } = {},
+  opts: { maxPages?: number; startPage?: number; query?: string; shards?: string[] } = {},
 ) {
   const seen = new Set<string>();
   let styles: any[] = [];
@@ -301,53 +306,57 @@ async function syncStyles(
   let skus: any[] = [];
   let images: any[] = [];
 
-  const q = opts.query ?? "*";
+  const flush = async () => {
+    if (styles.length)   await chunkUpsert(sb, "nwg_styles", styles, "product_number", 200);
+    if (variants.length) await chunkUpsert(sb, "nwg_variants", variants, "item_number");
+    if (skus.length)     await chunkUpsert(sb, "nwg_skus", skus, "sku");
+    if (images.length)   await chunkUpsert(sb, "nwg_images", images, "product_number,item_number,resource_file_id,picture_angle");
+    styles = []; variants = []; skus = []; images = [];
+  };
+
+  const shards = opts.query ? [opts.query] : (opts.shards ?? DEFAULT_SHARDS);
   const startPage = Math.max(1, opts.startPage ?? 1);
-  const maxPages = opts.maxPages ?? 30; // conservative per-invocation cap
-  let page = startPage;
-  const endPage = startPage + maxPages - 1;
-  let totalCount = 0;
+  const maxPages = opts.maxPages ?? 100; // per-shard cap (NWG hard-limit ~100)
   let pagesFetched = 0;
+  const perShard: Record<string, { pages: number; count: number }> = {};
 
-  while (page <= endPage) {
-    let data: any;
-    try {
-      data = await gql<any>(Q_PRODUCT_SEARCH, { lang: LANG, q, page, size: PAGE_SIZE });
-    } catch (e) {
-      if (page === 1) throw e;
-      console.error(`productSearch page ${page} failed: ${(e as Error).message}`);
-      break;
-    }
-    const rows = data.productSearch?.result ?? [];
-    totalCount = data.productSearch?.count ?? totalCount;
-    if (!rows.length) break;
-    for (const r of rows) {
-      const m = mapProduct(r, seen);
-      if (m.style) styles.push(m.style);
-      variants.push(...m.variants);
-      skus.push(...m.skus);
-      images.push(...m.images);
-    }
-    pagesFetched++;
+  for (const shard of shards) {
+    let page = startPage;
+    const endPage = startPage + maxPages - 1;
+    let shardCount = 0;
+    let shardPages = 0;
+    while (page <= endPage) {
+      let data: any;
+      try {
+        data = await gql<any>(Q_PRODUCT_SEARCH, { lang: LANG, q: shard, page, size: PAGE_SIZE });
+      } catch (e) {
+        console.error(`shard "${shard}" page ${page} failed: ${(e as Error).message}`);
+        break;
+      }
+      const rows = data.productSearch?.result ?? [];
+      shardCount = data.productSearch?.count ?? shardCount;
+      if (!rows.length) break;
+      for (const r of rows) {
+        const m = mapProduct(r, seen);
+        if (m.style) styles.push(m.style);
+        variants.push(...m.variants);
+        skus.push(...m.skus);
+        images.push(...m.images);
+      }
+      pagesFetched++;
+      shardPages++;
 
-    if (styles.length >= 300 || variants.length >= 1500 || images.length >= 4000) {
-      if (styles.length)  await chunkUpsert(sb, "nwg_styles", styles, "product_number", 200);
-      if (variants.length) await chunkUpsert(sb, "nwg_variants", variants, "item_number");
-      if (skus.length)     await chunkUpsert(sb, "nwg_skus", skus, "sku");
-      if (images.length)   await chunkUpsert(sb, "nwg_images", images, "product_number,item_number,resource_file_id,picture_angle");
-      styles = []; variants = []; skus = []; images = [];
+      if (styles.length >= 300 || variants.length >= 1500 || images.length >= 4000) {
+        await flush();
+      }
+      if (rows.length < PAGE_SIZE) break;
+      page++;
     }
-
-    if (rows.length < PAGE_SIZE) break;
-    page++;
+    perShard[shard] = { pages: shardPages, count: shardCount };
+    await flush();
   }
 
-  if (styles.length)   await chunkUpsert(sb, "nwg_styles", styles, "product_number", 200);
-  if (variants.length) await chunkUpsert(sb, "nwg_variants", variants, "item_number");
-  if (skus.length)     await chunkUpsert(sb, "nwg_skus", skus, "sku");
-  if (images.length)   await chunkUpsert(sb, "nwg_images", images, "product_number,item_number,resource_file_id,picture_angle");
-
-  return { pages_fetched: pagesFetched, start_page: startPage, end_page: page - 1, total_count: totalCount, unique_styles: seen.size };
+  return { pages_fetched: pagesFetched, unique_styles: seen.size, shards: perShard };
 }
 
 
@@ -378,6 +387,8 @@ Deno.serve(async (req) => {
   const startPage = url.searchParams.get("startPage");
   const q = url.searchParams.get("q") || undefined;
 
+  const shardsParam = url.searchParams.get("shards");
+
   const logId = await startLog(sb, `nwg:${mode}`);
   const result: Record<string, unknown> = {};
 
@@ -389,6 +400,7 @@ Deno.serve(async (req) => {
         maxPages: maxPages ? Number(maxPages) : undefined,
         startPage: startPage ? Number(startPage) : undefined,
         query: q,
+        shards: shardsParam ? shardsParam.split(",").map((s) => s.trim()).filter(Boolean) : undefined,
       });
     }
 
