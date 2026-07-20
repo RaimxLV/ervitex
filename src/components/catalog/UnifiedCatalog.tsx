@@ -655,6 +655,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                           ? pfPrices.get(it.id)
                           : it.source === "ss"
                           ? ssPrices.get(it.id)
+                          : it.source === "bb"
+                          ? bbPrices.get(it.id)
                           : undefined
                       }
                       fromLabel={lang === "lv" ? "no" : "from"}
