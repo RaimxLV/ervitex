@@ -944,19 +944,19 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {detail?.material && (
+              {materialText && (
                 <div>
                   <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">
                     {label.composition}
                   </h4>
-                  <p className="text-sm text-foreground/85">{detail.material}</p>
+                  <p className="text-sm text-foreground/85">{materialText}</p>
                 </div>
               )}
 
-              {detail?.care && (
+              {careText && (
                 <div>
                   <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.care}</h4>
-                  <p className="whitespace-pre-line text-sm text-foreground/90">{detail.care}</p>
+                  <p className="whitespace-pre-line text-sm text-foreground/90">{careText}</p>
                 </div>
               )}
 
