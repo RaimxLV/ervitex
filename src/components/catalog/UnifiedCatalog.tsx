@@ -226,7 +226,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         });
         return {
           ...it,
-          brand: normalizeText(it.brand),
+          brand: (() => { const b = normalizeText(it.brand); return b && b.toLowerCase() !== "unbranded" ? b : null; })(),
           category: normalizeCategory(it.category),
           group_name: normalizeText(it.group_name),
           gender: normalizeGender(it.gender),
