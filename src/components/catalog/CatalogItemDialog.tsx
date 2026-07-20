@@ -848,9 +848,8 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {(detail?.shortDescription || descriptionFallback) && (
-                <p className="text-base text-muted-foreground">{detail?.shortDescription || descriptionFallback}</p>
-              )}
+              {shortDescription && (
+                <p className="text-base text-muted-foreground">{shortDescription}</p>)}
             </DialogHeader>
 
               {loading && !detail && (
