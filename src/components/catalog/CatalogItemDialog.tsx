@@ -667,7 +667,62 @@ const CatalogItemDialog = ({
 
   const mainImg = gallery[imgIndex] || gallery[0] || image;
   const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : detail?.sizes || [];
-  const descriptionLines = detail?.features.length ? detail.features : lines(detail?.description || descriptionFallback);
+  const rawDescriptionLines = detail?.features.length ? detail.features : lines(detail?.description || descriptionFallback);
+  const rawMaterial = detail?.material || null;
+  const rawCare = detail?.care || null;
+  const rawShort = detail?.shortDescription || descriptionFallback || null;
+
+  // On-demand LV auto-translation (cached in sessionStorage per model+lang)
+  const [translated, setTranslated] = useState<{
+    short: string | null;
+    lines: string[];
+    material: string | null;
+    care: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    setTranslated(null);
+    if (lang !== "lv" || !detail) return;
+    const items: string[] = [];
+    const push = (s: string | null) => { items.push(s || ""); };
+    push(rawShort);
+    const linesStart = items.length;
+    for (const l of rawDescriptionLines) push(l);
+    const linesEnd = items.length;
+    push(rawMaterial);
+    push(rawCare);
+    const nonEmpty = items.some((x) => x && /[a-zA-Z]/.test(x));
+    if (!nonEmpty) return;
+    const cacheKey = `xlat:${source}:${id}:lv:v2`;
+    const cached = typeof sessionStorage !== "undefined" ? sessionStorage.getItem(cacheKey) : null;
+    if (cached) {
+      try { setTranslated(JSON.parse(cached)); return; } catch { /* ignore */ }
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("translate-text", {
+          body: { texts: items, target: "lv" },
+        });
+        if (cancelled || error || !data?.translations) return;
+        const out = data.translations as string[];
+        const result = {
+          short: out[0] || null,
+          lines: out.slice(linesStart, linesEnd).filter(Boolean),
+          material: out[linesEnd] || null,
+          care: out[linesEnd + 1] || null,
+        };
+        setTranslated(result);
+        try { sessionStorage.setItem(cacheKey, JSON.stringify(result)); } catch { /* ignore */ }
+      } catch { /* ignore */ }
+    })();
+    return () => { cancelled = true; };
+  }, [lang, detail, source, id]);
+
+  const shortDescription = translated?.short || rawShort;
+  const descriptionLines = translated?.lines.length ? translated.lines : rawDescriptionLines;
+  const materialText = translated?.material || rawMaterial;
+  const careText = translated?.care || rawCare;
   const label = {
     lv: {
       description: "Apraksts",
