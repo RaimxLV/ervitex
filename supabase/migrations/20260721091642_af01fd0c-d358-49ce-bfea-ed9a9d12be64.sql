@@ -1,0 +1,1 @@
+REFRESH MATERIALIZED VIEW private.catalog_items_mv;
