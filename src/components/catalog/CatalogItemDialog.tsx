@@ -710,6 +710,34 @@ const CatalogItemDialog = ({
   const [imgIndex, setImgIndex] = useState(0);
   const [priceInfo, setPriceInfo] = useState<{ price: number; currency: string } | null>(null);
 
+  const fallbackDetail = useMemo<ProductDetail>(() => ({
+    title: name || id,
+    code: id,
+    brand,
+    category,
+    gender: null,
+    shortDescription: cleanText(descriptionFallback),
+    description: cleanText(descriptionFallback),
+    features: [],
+    material: null,
+    care: null,
+    specs: [
+      ...(brand ? [{ label: "Brand", value: brand }] : []),
+      ...(category ? [{ label: "Category", value: category }] : []),
+    ],
+    notice: null,
+    sizes: [],
+    colors: (swatches || []).map((s, i) => ({
+      code: `${s.name || "color"}-${i}`,
+      name: s.name || `${lang === "lv" ? "Krāsa" : "Color"} ${i + 1}`,
+      hex: s.hex,
+      images: image ? [image] : [],
+      sizes: [],
+    })),
+  }), [name, id, brand, category, descriptionFallback, swatches, image, lang]);
+
+  const displayDetail = detail || fallbackDetail;
+
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
@@ -749,23 +777,23 @@ const CatalogItemDialog = ({
   }, [open, source, id]);
 
   const currentColor = useMemo(
-    () => detail?.colors.find((c) => c.code === activeColor) || detail?.colors[0] || null,
-    [detail, activeColor]
+    () => displayDetail.colors.find((c) => c.code === activeColor) || displayDetail.colors[0] || null,
+    [displayDetail, activeColor]
   );
 
   const gallery = useMemo(() => {
     if (!currentColor) return image ? [image] : [];
     if (currentColor.images.length) return currentColor.images;
-    for (const c of detail?.colors || []) if (c.images.length) return c.images.slice(0, 1);
+    for (const c of displayDetail.colors || []) if (c.images.length) return c.images.slice(0, 1);
     return image ? [image] : [];
-  }, [currentColor, detail, image]);
+  }, [currentColor, displayDetail, image]);
 
   const mainImg = gallery[imgIndex] || gallery[0] || image;
-  const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : detail?.sizes || [];
-  const rawDescriptionLines = detail?.features.length ? detail.features : lines(detail?.description || descriptionFallback);
-  const rawMaterial = detail?.material || null;
-  const rawCare = detail?.care || null;
-  const rawShort = detail?.shortDescription || descriptionFallback || null;
+  const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : displayDetail.sizes || [];
+  const rawDescriptionLines = displayDetail.features.length ? displayDetail.features : lines(displayDetail.description || descriptionFallback);
+  const rawMaterial = displayDetail.material || null;
+  const rawCare = displayDetail.care || null;
+  const rawShort = displayDetail.shortDescription || descriptionFallback || null;
 
   // On-demand LV auto-translation (cached in sessionStorage per model+lang)
   const [translated, setTranslated] = useState<{
