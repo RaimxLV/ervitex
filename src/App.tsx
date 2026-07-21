@@ -12,6 +12,7 @@ import StanleyStellaPage from "./pages/StanleyStellaPage.tsx";
 import NwgPage from "./pages/NwgPage.tsx";
 import PfConceptPage from "./pages/PfConceptPage.tsx";
 import BeechfieldBrandsPage from "./pages/BeechfieldBrandsPage.tsx";
+import MalfiniPage from "./pages/MalfiniPage.tsx";
 import AdminBeechfieldImport from "./pages/admin/AdminBeechfieldImport.tsx";
 import ProductDetailPage from "./pages/ProductDetailPage.tsx";
 import ServicesPage from "./pages/ServicesPage.tsx";
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/nwg" element={<NwgPage />} />
               <Route path="/pf-concept" element={<PfConceptPage />} />
               <Route path="/beechfield-brands" element={<BeechfieldBrandsPage />} />
+              <Route path="/malfini" element={<MalfiniPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/about" element={<AboutPage />} />

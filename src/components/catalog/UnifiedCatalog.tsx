@@ -164,6 +164,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [pfPrices, setPfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
   const [ssPrices, setSsPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
   const [bbPrices, setBbPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
+  const [mfPrices, setMfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(() => {
@@ -305,6 +306,28 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         }
         setBbPrices(bbMap);
       }
+
+      // Load MF public retail prices → per style_code
+      if (!lockedSource || lockedSource === "mf") {
+        const mfMap = new Map<string, { price: number; currency: string }>();
+        let mfrom = 0;
+        while (true) {
+          const { data, error } = await supabase
+            .from("mf_public_retail_prices" as any)
+            .select("style_code,retail_price,currency")
+            .range(mfrom, mfrom + 999);
+          if (error || !data) break;
+          for (const r of data as any[]) {
+            const sc = r.style_code as string;
+            const p = Number(r.retail_price);
+            if (!sc || !Number.isFinite(p) || p <= 0) continue;
+            mfMap.set(sc, { price: p, currency: r.currency || "EUR" });
+          }
+          if (data.length < 1000) break;
+          mfrom += 1000;
+        }
+        setMfPrices(mfMap);
+      }
     })();
   }, [lockedSource]);
 
@@ -380,7 +403,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   );
 
   const sourceItems = useMemo(() => {
-    const order: CatalogSource[] = ["ss", "nwg", "pf", "bb"];
+    const order: CatalogSource[] = ["ss", "nwg", "pf", "bb", "mf"];
     return order
       .map((s) => ({
         label: SOURCE_META[s].label,
@@ -657,6 +680,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                           ? ssPrices.get(it.id)
                           : it.source === "bb"
                           ? bbPrices.get(it.id)
+                          : it.source === "mf"
+                          ? mfPrices.get(it.id)
                           : undefined
                       }
                       fromLabel={lang === "lv" ? "no" : "from"}
