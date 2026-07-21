@@ -181,7 +181,11 @@ Deno.serve(async (req) => {
     await admin.rpc("refresh_mf_public_retail_prices");
 
     log("Refreshing catalog materialized view…");
-    await admin.rpc("refresh_catalog_items_mv").catch((e) => log(`mv refresh warning: ${e.message}`));
+    try {
+      await admin.rpc("refresh_catalog_items_mv");
+    } catch (e) {
+      log(`mv refresh warning: ${e instanceof Error ? e.message : String(e)}`);
+    }
 
     const summary = {
       ok: true,
@@ -193,22 +197,26 @@ Deno.serve(async (req) => {
       started,
       finished: new Date().toISOString(),
     };
-    await admin.from("sync_logs").insert({
-      source: "malfini",
-      status: "success",
-      details: summary,
-    }).catch(() => {});
+    try {
+      await admin.from("sync_logs").insert({
+        source: "malfini",
+        status: "success",
+        details: summary,
+      });
+    } catch (_) { /* ignore */ }
     return new Response(JSON.stringify(summary), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[malfini-sync] ERROR", msg);
-    await admin.from("sync_logs").insert({
-      source: "malfini",
-      status: "error",
-      details: { error: msg },
-    }).catch(() => {});
+    try {
+      await admin.from("sync_logs").insert({
+        source: "malfini",
+        status: "error",
+        details: { error: msg },
+      });
+    } catch (_) { /* ignore */ }
     return new Response(JSON.stringify({ ok: false, error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
