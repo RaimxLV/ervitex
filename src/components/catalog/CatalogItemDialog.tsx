@@ -1026,11 +1026,6 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              <Button asChild size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link to={`/contact?style=${encodeURIComponent(detail?.code || id)}${currentColor ? `&color=${encodeURIComponent(currentColor.code)}` : ""}`}>
-                  {label.request}
-                </Link>
-              </Button>
 
               {descriptionLines.length > 0 && (
                 <div>
