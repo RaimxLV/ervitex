@@ -76,8 +76,11 @@ const RequestPage = () => {
           upsert: false,
         });
         if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from("quote-attachments").getPublicUrl(path);
-        uploadedUrls.push(pub.publicUrl);
+        const { data: signed, error: signErr } = await supabase.storage
+          .from("quote-attachments")
+          .createSignedUrl(path, 60 * 60 * 24 * 30);
+        if (signErr) throw signErr;
+        uploadedUrls.push(signed.signedUrl);
       }
 
       const pm = PROJECT_MANAGERS.find((p) => p.slug === selectedPm);
