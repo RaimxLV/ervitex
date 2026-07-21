@@ -76,6 +76,7 @@ const SUPPLIERS = [
   { href: "/nwg", name: "New Wave Group" },
   { href: "/pf-concept", name: "PF Concept" },
   { href: "/beechfield-brands", name: "Beechfield Brands" },
+  { href: "/malfini", name: "Malfini" },
 ];
 
 const buildHref = (cats: string[]) =>
