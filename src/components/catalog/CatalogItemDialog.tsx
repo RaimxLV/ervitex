@@ -1073,7 +1073,7 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {detail && visibleSizes.length > 0 && (
+              {detail && (
                 <AddToQuoteBlock
                   source={source}
                   productId={id}
