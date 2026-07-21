@@ -172,7 +172,10 @@ Deno.serve(async (req) => {
       if (error) throw new Error(`mf_images insert: ${error.message}`);
     }
     await upsertChunked("mf_prices", priceRows, "sku");
-    if (stockRows.length) await upsertChunked("mf_stock", stockRows, "sku");
+    const knownSkus = new Set(variantRows.map((v) => v.sku));
+    const filteredStock = stockRows.filter((s) => knownSkus.has(s.sku));
+    log(`Stock after FK filter: ${filteredStock.length} / ${stockRows.length}`);
+    if (filteredStock.length) await upsertChunked("mf_stock", filteredStock, "sku");
 
     log("Refreshing public retail prices…");
     await admin.rpc("refresh_mf_public_retail_prices");
