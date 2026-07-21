@@ -215,6 +215,248 @@ export type Database = {
         }
         Relationships: []
       }
+      mf_images: {
+        Row: {
+          color_code: string | null
+          created_at: string
+          id: number
+          sort_order: number | null
+          style_code: string
+          url: string
+          view_code: string | null
+        }
+        Insert: {
+          color_code?: string | null
+          created_at?: string
+          id?: number
+          sort_order?: number | null
+          style_code: string
+          url: string
+          view_code?: string | null
+        }
+        Update: {
+          color_code?: string | null
+          created_at?: string
+          id?: number
+          sort_order?: number | null
+          style_code?: string
+          url?: string
+          view_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_images_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "mf_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
+      mf_prices: {
+        Row: {
+          currency: string | null
+          retail_price: number | null
+          sku: string
+          suggested_retail_price: number | null
+          updated_at: string
+          wholesale_price: number | null
+        }
+        Insert: {
+          currency?: string | null
+          retail_price?: number | null
+          sku: string
+          suggested_retail_price?: number | null
+          updated_at?: string
+          wholesale_price?: number | null
+        }
+        Update: {
+          currency?: string | null
+          retail_price?: number | null
+          sku?: string
+          suggested_retail_price?: number | null
+          updated_at?: string
+          wholesale_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_prices_sku_fkey"
+            columns: ["sku"]
+            isOneToOne: true
+            referencedRelation: "mf_variants"
+            referencedColumns: ["sku"]
+          },
+        ]
+      }
+      mf_public_retail_prices: {
+        Row: {
+          currency: string
+          retail_price: number
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          currency?: string
+          retail_price: number
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          currency?: string
+          retail_price?: number
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mf_stock: {
+        Row: {
+          as_of_date: string | null
+          quantity: number
+          sku: string
+          updated_at: string
+        }
+        Insert: {
+          as_of_date?: string | null
+          quantity?: number
+          sku: string
+          updated_at?: string
+        }
+        Update: {
+          as_of_date?: string | null
+          quantity?: number
+          sku?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_stock_sku_fkey"
+            columns: ["sku"]
+            isOneToOne: true
+            referencedRelation: "mf_variants"
+            referencedColumns: ["sku"]
+          },
+        ]
+      }
+      mf_styles: {
+        Row: {
+          alternatives: Json | null
+          category_code: string | null
+          category_name: string | null
+          created_at: string
+          description: string | null
+          gender: string | null
+          gender_code: string | null
+          hidden_by_admin: boolean
+          name: string | null
+          product_card_pdf: string | null
+          published: boolean
+          raw: Json | null
+          size_chart_pdf: string | null
+          specification: string | null
+          style_code: string
+          subtitle: string | null
+          trademark: string | null
+          type: string | null
+          updated_at: string
+        }
+        Insert: {
+          alternatives?: Json | null
+          category_code?: string | null
+          category_name?: string | null
+          created_at?: string
+          description?: string | null
+          gender?: string | null
+          gender_code?: string | null
+          hidden_by_admin?: boolean
+          name?: string | null
+          product_card_pdf?: string | null
+          published?: boolean
+          raw?: Json | null
+          size_chart_pdf?: string | null
+          specification?: string | null
+          style_code: string
+          subtitle?: string | null
+          trademark?: string | null
+          type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alternatives?: Json | null
+          category_code?: string | null
+          category_name?: string | null
+          created_at?: string
+          description?: string | null
+          gender?: string | null
+          gender_code?: string | null
+          hidden_by_admin?: boolean
+          name?: string | null
+          product_card_pdf?: string | null
+          published?: boolean
+          raw?: Json | null
+          size_chart_pdf?: string | null
+          specification?: string | null
+          style_code?: string
+          subtitle?: string | null
+          trademark?: string | null
+          type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      mf_variants: {
+        Row: {
+          attributes: Json | null
+          color_code: string | null
+          color_icon_link: string | null
+          color_name: string | null
+          created_at: string
+          ean: string | null
+          size: string | null
+          size_code: string | null
+          size_name: string | null
+          sku: string
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          attributes?: Json | null
+          color_code?: string | null
+          color_icon_link?: string | null
+          color_name?: string | null
+          created_at?: string
+          ean?: string | null
+          size?: string | null
+          size_code?: string | null
+          size_name?: string | null
+          sku: string
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          attributes?: Json | null
+          color_code?: string | null
+          color_icon_link?: string | null
+          color_name?: string | null
+          created_at?: string
+          ean?: string | null
+          size?: string | null
+          size_code?: string | null
+          size_name?: string | null
+          sku?: string
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mf_variants_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "mf_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
       nwg_assortments: {
         Row: {
           created_at: string | null
@@ -1638,6 +1880,7 @@ export type Database = {
         Returns: boolean
       }
       refresh_catalog_items_mv: { Args: never; Returns: undefined }
+      refresh_mf_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
     }
