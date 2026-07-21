@@ -876,13 +876,13 @@ const CatalogItemDialog = ({
   }[lang];
 
   // Resolve brand for display: hide "Unbranded" / empty
-  const rawBrand = (detail?.brand || brand || "").trim();
+  const rawBrand = (displayDetail.brand || brand || "").trim();
   const displayBrand = rawBrand && rawBrand.toLowerCase() !== "unbranded" ? rawBrand : null;
-  const displayCode = detail?.code || id;
-  const displayCategory = detail?.category || category;
+  const displayCode = displayDetail.code || id;
+  const displayCategory = displayDetail.category || category;
 
   // Filter out redundant specs (already shown as top pills) and translate them
-  const filteredSpecs = (detail?.specs || []).filter((s) => {
+  const filteredSpecs = (displayDetail.specs || []).filter((s) => {
     const l = s.label.toLowerCase();
     return l !== "brand"; // brand is shown as a pill
   });
@@ -896,7 +896,7 @@ const CatalogItemDialog = ({
               {mainImg ? (
                 <img
                   src={mainImg}
-                  alt={currentColor?.name || detail?.title || id}
+                  alt={currentColor?.name || displayDetail.title || id}
                   className="h-full w-full object-contain"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
                 />
@@ -952,20 +952,20 @@ const CatalogItemDialog = ({
               </div>
 
               <DialogTitle className="font-heading text-3xl font-black uppercase tracking-wide">
-                {detail?.title || name || id}
+                {displayDetail.title || name || id}
               </DialogTitle>
 
               {/* Contextual tags */}
-              {(displayCategory || detail?.gender) && (
+              {(displayCategory || displayDetail.gender) && (
                 <div className="flex flex-wrap gap-1.5">
                   {displayCategory && (
                     <Badge variant="secondary" className="rounded-sm text-[10px] font-medium uppercase tracking-wider">
                       {displayCategory}
                     </Badge>
                   )}
-                  {detail?.gender && (
+                  {displayDetail.gender && (
                     <Badge variant="outline" className="rounded-sm text-[10px] font-medium uppercase tracking-wider">
-                      {translateValue(detail.gender, lang)}
+                      {translateValue(displayDetail.gender, lang)}
                     </Badge>
                   )}
                 </div>
@@ -1024,18 +1024,18 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {(detail?.colors.length ?? 0) > 0 && (
+              {displayDetail.colors.length > 0 && (
                 <div>
                   <div className="mb-2 flex items-baseline justify-between">
                     <h4 className="font-heading text-sm font-bold uppercase tracking-wider">
-                      {label.colors} ({detail!.colors.length})
+                      {label.colors} ({displayDetail.colors.length})
                     </h4>
                     <span className="text-xs text-muted-foreground">
                       {currentColor ? `${currentColor.name} - ${currentColor.code}` : label.allColors}
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
-                    {detail!.colors.map((c) => {
+                    {displayDetail.colors.map((c) => {
                       const isActive = c.code === activeColor;
                       const hex = resolveHex(c.hex, c.name);
                       return (
@@ -1101,11 +1101,11 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {detail && (
+              {!loading && (
                 <AddToQuoteBlock
                   source={source}
                   productId={id}
-                  name={detail?.title || name || id}
+                  name={displayDetail.title || name || id}
                   code={displayCode}
                   brand={displayBrand}
                   image={mainImg || null}
@@ -1116,16 +1116,8 @@ const CatalogItemDialog = ({
                 />
               )}
 
-              {detail?.notice && (
-                <p className="border-t border-border pt-4 text-sm text-muted-foreground">{detail.notice}</p>
-              )}
-
-              {!detail && !loading && swatches && swatches.length > 0 && (
-                <div className="flex flex-wrap gap-1.5">
-                  {swatches.map((s, i) => (
-                    <span key={i} title={s.name} className="inline-block h-6 w-6 rounded-full border border-black/20" style={{ backgroundColor: s.hex || "#ccc" }} />
-                  ))}
-                </div>
+              {displayDetail.notice && (
+                <p className="border-t border-border pt-4 text-sm text-muted-foreground">{displayDetail.notice}</p>
               )}
             </div>
         </div>
