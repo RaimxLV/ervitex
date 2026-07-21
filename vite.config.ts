@@ -4,8 +4,11 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
+const githubRepoName = process.env.GITHUB_REPOSITORY?.split("/")[1] || "";
+const githubPagesBase = githubRepoName && !githubRepoName.endsWith(".github.io") ? `/${githubRepoName}/` : "/";
+
 export default defineConfig(({ mode }) => ({
-  base: mode === "production" && process.env.GITHUB_ACTIONS ? "/ervitex/" : "/",
+  base: mode === "production" && process.env.GITHUB_ACTIONS ? githubPagesBase : "/",
   server: {
     host: "::",
     port: 8080,
