@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
+import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
+
 
 interface Props {
   open: boolean;
