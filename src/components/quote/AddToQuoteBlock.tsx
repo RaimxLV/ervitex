@@ -112,17 +112,9 @@ const AddToQuoteBlock = ({
   return (
     <div className="rounded-md border-2 border-accent/60 bg-accent/5 p-4 space-y-4">
       <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="font-heading text-sm font-black uppercase tracking-wider text-foreground">
-            {t("Pievieno pieprasījumam", "Add to request")}
-          </p>
-          <p className="text-[11px] text-muted-foreground">
-            {t(
-              "Ievadi skaitu — automātiski saglabājas. Vari mainīt krāsu un pievienot vēl.",
-              "Type quantities — saved automatically. Switch color and add more.",
-            )}
-          </p>
-        </div>
+        <p className="font-heading text-sm font-black uppercase tracking-wider text-foreground">
+          {t("Pievieno pieprasījumam", "Add to request")}
+        </p>
         {flash && (
           <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
             <Check className="h-3 w-3" /> {t("Saglabāts", "Saved")}
