@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Public read quote attachments" ON storage.objects;

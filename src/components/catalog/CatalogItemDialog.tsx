@@ -7,6 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
+import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
+
 
 interface Props {
   open: boolean;
@@ -1060,21 +1062,19 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              {visibleSizes.length > 0 && (
-                <div>
-                  <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.sizes}</h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {visibleSizes.map((s) => (
-                      <span
-                        key={s}
-                        className="min-w-[2.25rem] rounded-sm border border-border px-2 py-1 text-center text-xs font-medium text-foreground"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <AddToQuoteBlock
+                source={source}
+                productId={id}
+                name={detail?.title || name || id}
+                code={displayCode}
+                brand={displayBrand}
+                image={mainImg || null}
+                colorCode={currentColor?.code || null}
+                colorName={currentColor?.name || null}
+                colorHex={currentColor ? resolveHex(currentColor.hex, currentColor.name) : null}
+                sizes={visibleSizes}
+              />
+
 
               {detail?.notice && (
                 <p className="border-t border-border pt-4 text-sm text-muted-foreground">{detail.notice}</p>

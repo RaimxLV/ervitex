@@ -1127,37 +1127,61 @@ export type Database = {
       }
       quote_requests: {
         Row: {
+          assigned_pm_email: string | null
+          assigned_pm_name: string | null
           company: string | null
           created_at: string
+          deadline: string | null
           email: string
+          file_urls: string[]
           id: string
+          items: Json
           message: string | null
           name: string
           phone: string | null
+          print_colors: string | null
+          print_method: string | null
+          print_placement: string | null
           product_id: string | null
           status: string
           updated_at: string
         }
         Insert: {
+          assigned_pm_email?: string | null
+          assigned_pm_name?: string | null
           company?: string | null
           created_at?: string
+          deadline?: string | null
           email: string
+          file_urls?: string[]
           id?: string
+          items?: Json
           message?: string | null
           name: string
           phone?: string | null
+          print_colors?: string | null
+          print_method?: string | null
+          print_placement?: string | null
           product_id?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
+          assigned_pm_email?: string | null
+          assigned_pm_name?: string | null
           company?: string | null
           created_at?: string
+          deadline?: string | null
           email?: string
+          file_urls?: string[]
           id?: string
+          items?: Json
           message?: string | null
           name?: string
           phone?: string | null
+          print_colors?: string | null
+          print_method?: string | null
+          print_placement?: string | null
           product_id?: string | null
           status?: string
           updated_at?: string
