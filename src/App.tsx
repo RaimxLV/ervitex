@@ -42,6 +42,7 @@ const App = () => (
     <TooltipProvider>
       <LanguageProvider>
         <AuthProvider>
+          <QuoteCartProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter basename={routerBase}>
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/beechfield-brands" element={<BeechfieldBrandsPage />} />
               <Route path="/malfini" element={<MalfiniPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
+              <Route path="/request" element={<RequestPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
@@ -71,8 +73,11 @@ const App = () => (
               <Route path="/admin/beechfield-import" element={<ProtectedRoute><AdminBeechfieldImport /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <QuoteCartButton />
           </BrowserRouter>
+          </QuoteCartProvider>
         </AuthProvider>
+
       </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
