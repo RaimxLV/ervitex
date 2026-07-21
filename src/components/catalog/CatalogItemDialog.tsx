@@ -546,6 +546,93 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
   };
 }
 
+async function loadMF(styleCode: string): Promise<ProductDetail | null> {
+  const [styleRes, variantsRes, imagesRes] = await Promise.all([
+    supabase.from("mf_styles").select("style_code,name,trademark,category_name,gender,subtitle,specification,description").eq("style_code", styleCode).maybeSingle(),
+    supabase.from("mf_variants").select("sku,color_code,color_name,color_icon_link,size,size_name,attributes").eq("style_code", styleCode),
+    supabase.from("mf_images").select("color_code,view_code,url,sort_order").eq("style_code", styleCode).order("sort_order", { ascending: true }),
+  ]);
+  const style: any = styleRes.data;
+  if (!style) return null;
+  const variants: any[] = variantsRes.data || [];
+  const images: any[] = imagesRes.data || [];
+
+  const imgByColor = new Map<string, string[]>();
+  const shared: string[] = [];
+  for (const im of images) {
+    if (!im.url) continue;
+    const key = (im.color_code || "").toString();
+    if (key) {
+      if (!imgByColor.has(key)) imgByColor.set(key, []);
+      imgByColor.get(key)!.push(im.url);
+    } else shared.push(im.url);
+  }
+
+  const colorOrder: string[] = [];
+  const colorInfo = new Map<string, { name: string; icon: string | null }>();
+  const sizesByColor = new Map<string, Set<string>>();
+  const allSizes = new Set<string>();
+  let firstAttrs: any[] | null = null;
+  for (const v of variants) {
+    const key = (v.color_code || "").toString();
+    if (key && !colorInfo.has(key)) {
+      colorInfo.set(key, { name: v.color_name || key, icon: v.color_icon_link || null });
+      colorOrder.push(key);
+    }
+    if (!firstAttrs && Array.isArray(v.attributes)) firstAttrs = v.attributes;
+    const sz = v.size_name || v.size;
+    if (sz) {
+      allSizes.add(sz);
+      if (key) {
+        if (!sizesByColor.has(key)) sizesByColor.set(key, new Set());
+        sizesByColor.get(key)!.add(sz);
+      }
+    }
+  }
+
+  const colors: ColorDetail[] = colorOrder.map((key) => {
+    const info = colorInfo.get(key)!;
+    const imgs = imgByColor.get(key) || [];
+    return {
+      code: key,
+      name: info.name,
+      hex: null,
+      images: imgs.length ? imgs : shared,
+      sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes),
+    };
+  });
+  if (colors.length === 0 && shared.length) {
+    colors.push({ code: "default", name: style.name, hex: null, images: shared, sizes: uniqueSortedSizes(allSizes) });
+  }
+
+  const specs: { label: string; value: string }[] = [];
+  addSpec(specs, "Brand", style.trademark);
+  addSpec(specs, "Category", style.category_name);
+  addSpec(specs, "Gender", style.gender);
+  if (firstAttrs) {
+    for (const a of firstAttrs) {
+      if (a?.title && a?.text) addSpec(specs, a.title, a.text);
+    }
+  }
+
+  return {
+    title: style.name,
+    code: style.style_code,
+    brand: style.trademark,
+    category: style.category_name,
+    gender: style.gender,
+    shortDescription: cleanText(style.subtitle),
+    description: cleanText(style.description) || cleanText(style.specification),
+    features: [],
+    material: null,
+    care: null,
+    specs,
+    notice: null,
+    sizes: uniqueSortedSizes(allSizes),
+    colors,
+  };
+}
+
 
 /* ---------- i18n for spec labels & values ---------- */
 
