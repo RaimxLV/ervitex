@@ -636,11 +636,12 @@ const CatalogItemDialog = ({
       setDetail(d);
       setActiveColor(d?.colors[0]?.code ?? null);
       setLoading(false);
-      if (source === "pf" || source === "ss" || source === "bb") {
+      if (source === "pf" || source === "ss" || source === "bb" || source === "mf") {
         const table =
           source === "pf" ? "pf_public_retail_prices"
           : source === "ss" ? "ss_public_retail_prices"
-          : "bb_public_retail_prices";
+          : source === "bb" ? "bb_public_retail_prices"
+          : "mf_public_retail_prices";
         const keyCol = source === "pf" ? "model_code" : "style_code";
         const { data } = await supabase
           .from(table as any)
