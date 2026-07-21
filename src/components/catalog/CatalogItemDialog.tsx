@@ -1078,20 +1078,20 @@ const CatalogItemDialog = ({
                 </div>
               )}
 
-              <AddToQuoteBlock
-                source={source}
-                productId={id}
-                name={detail?.title || name || id}
-                code={displayCode}
-                brand={displayBrand}
-                image={mainImg || null}
-                colorCode={currentColor?.code || null}
-                colorName={currentColor?.name || null}
-                colorHex={currentColor ? resolveHex(currentColor.hex, currentColor.name) : null}
-                sizes={visibleSizes}
-              />
-
-
+              {detail && visibleSizes.length > 0 && (
+                <AddToQuoteBlock
+                  source={source}
+                  productId={id}
+                  name={detail?.title || name || id}
+                  code={displayCode}
+                  brand={displayBrand}
+                  image={mainImg || null}
+                  colorCode={currentColor?.code || null}
+                  colorName={currentColor?.name || null}
+                  colorHex={currentColor ? resolveHex(currentColor.hex, currentColor.name) : null}
+                  sizes={visibleSizes}
+                />
+              )}
 
               {detail?.notice && (
                 <p className="border-t border-border pt-4 text-sm text-muted-foreground">{detail.notice}</p>
