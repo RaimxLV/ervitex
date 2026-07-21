@@ -22,6 +22,7 @@ const catalogSubItems = [
   { path: "/nwg", lv: "New Wave Group", en: "New Wave Group" },
   { path: "/pf-concept", lv: "PF Concept", en: "PF Concept" },
   { path: "/beechfield-brands", lv: "Beechfield Brands", en: "Beechfield Brands" },
+  { path: "/malfini", lv: "Malfini", en: "Malfini" },
 ];
 
 const Header = () => {
