@@ -717,7 +717,7 @@ const CatalogItemDialog = ({
     setImgIndex(0);
     setPriceInfo(null);
     (async () => {
-      const loader = source === "ss" ? loadSS : source === "nwg" ? loadNWG : source === "bb" ? loadBB : loadPF;
+      const loader = source === "ss" ? loadSS : source === "nwg" ? loadNWG : source === "bb" ? loadBB : source === "mf" ? loadMF : loadPF;
       const d = await loader(id).catch(() => null);
       if (cancelled) return;
       setDetail(d);
