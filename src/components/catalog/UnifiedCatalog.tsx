@@ -208,11 +208,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       const step = 1000;
       let from = 0;
       while (true) {
-        const query = supabase
+        let query = supabase
           .from("catalog_items" as any)
           .select(
             "source,id,name,brand,category,group_name,gender,image_url,hover_image_url,colors"
           );
+        if (lockedSource) query = query.eq("source", lockedSource);
         const { data, error } = await query.range(from, from + step - 1);
         if (error) break;
         all.push(...((data || []) as unknown as CatalogItem[]));
