@@ -7,7 +7,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { request_id } = await req.json();
+    const { request_id, file_urls: uploadedPaths } = await req.json();
     if (!request_id) {
       return new Response(JSON.stringify({ error: "request_id required" }), {
         status: 400,
@@ -19,6 +19,14 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    // If the client uploaded attachments after inserting the request, persist them now
+    if (Array.isArray(uploadedPaths) && uploadedPaths.length > 0) {
+      const clean = uploadedPaths.filter((p: unknown): p is string => typeof p === "string" && !!p).slice(0, 20);
+      if (clean.length > 0) {
+        await supabase.from("quote_requests").update({ file_urls: clean }).eq("id", request_id);
+      }
+    }
 
     const { data: quote, error } = await supabase
       .from("quote_requests")
