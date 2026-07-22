@@ -66,19 +66,6 @@ const RequestPage = () => {
 
     setSending(true);
     try {
-      // Upload files to storage — store paths only; signed URLs are generated server-side
-      const uploadedPaths: string[] = [];
-      for (const f of files) {
-        const safeName = f.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const path = `${crypto.randomUUID()}-${safeName}`;
-        const { error: upErr } = await supabase.storage.from("quote-attachments").upload(path, f, {
-          contentType: f.type || "application/octet-stream",
-          upsert: false,
-        });
-        if (upErr) throw upErr;
-        uploadedPaths.push(path);
-      }
-
       const pm = PROJECT_MANAGERS.find((p) => p.slug === selectedPm);
       const assignedEmail = pm?.email || OFFICE_EMAIL;
       const assignedName = pm?.name || (lang === "lv" ? "Ervitex birojs" : "Ervitex office");
@@ -91,7 +78,8 @@ const RequestPage = () => {
       // to quote_requests just to get the saved row id back.
       const requestId = crypto.randomUUID();
 
-      // Insert into DB (also visible in admin panel)
+      // Insert the quote request FIRST so storage uploads can be tied back to it
+      // (RLS on quote-attachments requires the object path to reference an existing request).
       const { error: insErr } = await supabase
         .from("quote_requests")
         .insert({
@@ -106,16 +94,30 @@ const RequestPage = () => {
           print_placement: print.placement || null,
           print_colors: print.colors || null,
           deadline: print.deadline || null,
-          file_urls: uploadedPaths,
+          file_urls: [],
           assigned_pm_email: assignedEmail,
           assigned_pm_name: assignedName,
         });
       if (insErr) throw insErr;
 
-      // Trigger email send (non-blocking on failure — DB row is safety net)
+      // Upload attachments under "<requestId>/<filename>" so RLS binds them to this request
+      const uploadedPaths: string[] = [];
+      for (const f of files) {
+        const safeName = f.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+        const path = `${requestId}/${crypto.randomUUID()}-${safeName}`;
+        const { error: upErr } = await supabase.storage.from("quote-attachments").upload(path, f, {
+          contentType: f.type || "application/octet-stream",
+          upsert: false,
+        });
+        if (upErr) throw upErr;
+        uploadedPaths.push(path);
+      }
+
+      // Trigger email send (non-blocking on failure — DB row is safety net).
+      // The edge function (service role) will patch file_urls onto the request.
       try {
         await supabase.functions.invoke("send-quote-request", {
-          body: { request_id: requestId },
+          body: { request_id: requestId, file_urls: uploadedPaths },
         });
       } catch (mailErr) {
         console.warn("Email send failed, but request stored", mailErr);
