@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Minus, Plus, ClipboardList, Trash2 } from "lucide-react";
+import { Check, Minus, Plus, ClipboardList, Trash2, Plus as PlusIcon } from "lucide-react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -17,10 +17,11 @@ interface Props {
   colorName: string | null;
   colorHex: string | null;
   sizes: string[];
+  onClose?: () => void;
 }
 
 const AddToQuoteBlock = ({
-  source, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes,
+  source, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes, onClose,
 }: Props) => {
   const { items, add, updateQty, remove } = useQuoteCart();
   const { lang } = useLanguage();
