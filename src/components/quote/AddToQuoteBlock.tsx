@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Minus, Plus, ClipboardList, Trash2 } from "lucide-react";
+import { Check, Minus, Plus, ClipboardList, Trash2, Plus as PlusIcon } from "lucide-react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -17,10 +17,11 @@ interface Props {
   colorName: string | null;
   colorHex: string | null;
   sizes: string[];
+  onClose?: () => void;
 }
 
 const AddToQuoteBlock = ({
-  source, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes,
+  source, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes, onClose,
 }: Props) => {
   const { items, add, updateQty, remove } = useQuoteCart();
   const { lang } = useLanguage();
@@ -242,24 +243,37 @@ const AddToQuoteBlock = ({
         </div>
       )}
 
-      {/* Totals + go-to-request CTA */}
-      <div className="flex flex-col gap-2 border-t border-accent/30 pt-3 sm:flex-row sm:items-center sm:justify-between">
+      {/* Totals + actions */}
+      <div className="flex flex-col gap-2 border-t border-accent/30 pt-3">
         <div className="text-xs">
           <span className="text-muted-foreground">{t("Šai precei kopā:", "Total for this item:")}</span>{" "}
           <span className="font-heading text-base font-black">{totalForProduct}</span>{" "}
           <span className="text-muted-foreground">{t("gab.", "pcs")}</span>
         </div>
-        <Button
-          asChild
-          size="sm"
-          disabled={totalForProduct === 0}
-          className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest"
-        >
-          <Link to="/request">
-            <ClipboardList className="mr-2 h-4 w-4" />
-            {t("Uz pieprasījumu", "Go to request")}
-          </Link>
-        </Button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button
+            type="button"
+            size="sm"
+            disabled={totalForProduct === 0}
+            onClick={() => onClose?.()}
+            className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest"
+          >
+            <PlusIcon className="mr-2 h-4 w-4" />
+            {t("Pievienot pieprasījuma sarakstam", "Add to request list")}
+          </Button>
+          <Button
+            asChild
+            size="sm"
+            variant="outline"
+            disabled={totalForProduct === 0}
+            className="font-heading text-xs uppercase tracking-widest"
+          >
+            <Link to="/request">
+              <ClipboardList className="mr-2 h-4 w-4" />
+              {t("Uz pieprasījumu", "Go to request")}
+            </Link>
+          </Button>
+        </div>
       </div>
     </div>
   );

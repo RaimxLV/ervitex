@@ -1,7 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const OFFICE_BCC = "birojs@ervitex.lv";
+const OFFICE_EMAIL = "birojs@ervitex.lv";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -20,7 +20,6 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // If the client uploaded attachments after inserting the request, persist them now
     if (Array.isArray(uploadedPaths) && uploadedPaths.length > 0) {
       const clean = uploadedPaths.filter((p: unknown): p is string => typeof p === "string" && !!p).slice(0, 20);
       if (clean.length > 0) {
@@ -53,19 +52,13 @@ Deno.serve(async (req) => {
       if (signed?.signedUrl) signedUrls.push(signed.signedUrl);
     }
 
-    const primaryTo = quote.assigned_pm_email || OFFICE_BCC;
-    const recipients = Array.from(
-      new Set([primaryTo, OFFICE_BCC].filter(Boolean).map((r: string) => r.toLowerCase())),
-    );
-
-    const templateData = {
+    const baseData = {
       name: quote.name,
       email: quote.email,
       phone: quote.phone || "",
       company: quote.company || "",
       message: quote.message || "",
       items: Array.isArray(quote.items) ? quote.items : [],
-      files: signedUrls,
       print_method: quote.print_method || "",
       print_placement: quote.print_placement || "",
       print_colors: quote.print_colors || "",
@@ -73,17 +66,33 @@ Deno.serve(async (req) => {
       submittedAt: new Date().toLocaleString("lv-LV"),
     };
 
-    const results: Array<{ to: string; ok: boolean; error?: string }> = [];
-    for (const to of recipients) {
-      const { error: txErr } = await supabase.functions.invoke("send-transactional-email", {
+    const results: Array<{ to: string; template: string; ok: boolean; error?: string }> = [];
+
+    // 1) Internal notification to office — with Reply-To set to the customer so
+    //    staff can just hit "Reply" in their inbox.
+    const { error: officeErr } = await supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "quote-request",
+        recipientEmail: OFFICE_EMAIL,
+        replyTo: quote.email,
+        idempotencyKey: `quote-${quote.id}-office`,
+        templateData: { ...baseData, files: signedUrls },
+      },
+    });
+    results.push({ to: OFFICE_EMAIL, template: "quote-request", ok: !officeErr, error: officeErr?.message });
+
+    // 2) Auto-confirmation to the customer (no attachments/staff-only notes)
+    if (quote.email) {
+      const { error: custErr } = await supabase.functions.invoke("send-transactional-email", {
         body: {
-          templateName: "quote-request",
-          recipientEmail: to,
-          idempotencyKey: `quote-${quote.id}-${to}`,
-          templateData,
+          templateName: "quote-confirmation",
+          recipientEmail: quote.email,
+          replyTo: OFFICE_EMAIL,
+          idempotencyKey: `quote-${quote.id}-customer`,
+          templateData: baseData,
         },
       });
-      results.push({ to, ok: !txErr, error: txErr?.message });
+      results.push({ to: quote.email, template: "quote-confirmation", ok: !custErr, error: custErr?.message });
     }
 
     const delivered = results.some(r => r.ok);

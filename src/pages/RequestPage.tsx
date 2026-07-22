@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
-import { Trash2, Upload, Send, X, Users } from "lucide-react";
+import { OFFICE_EMAIL } from "@/data/projectManagers";
+import { Trash2, Upload, Send, X, ArrowLeft } from "lucide-react";
 
 const MAX_FILES = 10;
 const MAX_FILE_MB = 15;
@@ -21,7 +21,6 @@ const RequestPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const [selectedPm, setSelectedPm] = useState<string>("any");
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "" });
   const [print, setPrint] = useState({ method: "", placement: "", colors: "", deadline: "", notes: "" });
   const [files, setFiles] = useState<File[]>([]);
@@ -66,9 +65,8 @@ const RequestPage = () => {
 
     setSending(true);
     try {
-      const pm = PROJECT_MANAGERS.find((p) => p.slug === selectedPm);
-      const assignedEmail = pm?.email || OFFICE_EMAIL;
-      const assignedName = pm?.name || (lang === "lv" ? "Ervitex birojs" : "Ervitex office");
+      const assignedEmail = OFFICE_EMAIL;
+      const assignedName = lang === "lv" ? "Ervitex birojs" : "Ervitex office";
 
       const messageParts: string[] = [];
       if (print.notes) messageParts.push(print.notes);
@@ -139,13 +137,21 @@ const RequestPage = () => {
   return (
     <Layout>
       <div className="container mx-auto max-w-5xl px-4 py-10 sm:py-16">
-        <div className="mb-8">
-          <h1 className="font-heading text-3xl sm:text-4xl font-black uppercase tracking-tight">
-            {t("Mans pieprasījums", "My request")}
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {t("Pārbaudi preces, izvēlies projekta vadītāju un nosūti pieprasījumu.", "Review items, pick your project manager and send the request.")}
-          </p>
+        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="font-heading text-3xl sm:text-4xl font-black uppercase tracking-tight">
+              {t("Mans pieprasījums", "My request")}
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t("Pārbaudi preces un nosūti pieprasījumu — mēs sazināsimies tuvākajā laikā.", "Review items and send the request — we'll get back to you shortly.")}
+            </p>
+          </div>
+          <Button asChild variant="outline" size="sm" className="font-heading text-xs uppercase tracking-widest">
+            <Link to="/catalog">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t("Atgriezties katalogā", "Back to catalog")}
+            </Link>
+          </Button>
         </div>
 
         {items.length === 0 ? (
@@ -319,44 +325,6 @@ const RequestPage = () => {
                 </div>
               </section>
 
-              {/* PM selection */}
-              <section className="rounded-md border border-border bg-card p-4 sm:p-6 space-y-3">
-                <h2 className="font-heading text-lg font-black uppercase tracking-wide">
-                  {t("Projekta vadītājs", "Project manager")}
-                </h2>
-                <p className="text-xs text-muted-foreground">
-                  {t("Izvēlies, kuram nosūtīt Tavu pieprasījumu.", "Pick who to send your request to.")}
-                </p>
-                <div className="space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPm("any")}
-                    className={`flex w-full items-center gap-3 rounded-md border p-2.5 text-left transition-colors ${selectedPm === "any" ? "border-accent bg-accent/10" : "border-border hover:border-accent/60"}`}
-                  >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                      <Users className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold">{t("Jebkurš pieejamais", "Any available")}</p>
-                      <p className="text-xs text-muted-foreground truncate">{OFFICE_EMAIL}</p>
-                    </div>
-                  </button>
-                  {PROJECT_MANAGERS.map((pm) => (
-                    <button
-                      key={pm.slug}
-                      type="button"
-                      onClick={() => setSelectedPm(pm.slug)}
-                      className={`flex w-full items-center gap-3 rounded-md border p-2.5 text-left transition-colors ${selectedPm === pm.slug ? "border-accent bg-accent/10" : "border-border hover:border-accent/60"}`}
-                    >
-                      <img src={pm.photo} alt={pm.name} className="h-10 w-10 rounded-full object-cover" />
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold truncate">{pm.name}</p>
-                        <p className="text-[11px] text-muted-foreground truncate">{pm.title[lang]}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </section>
 
               <Button
                 type="submit"

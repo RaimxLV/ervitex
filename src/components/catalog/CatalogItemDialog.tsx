@@ -1128,6 +1128,7 @@ const CatalogItemDialog = ({
                   colorName={currentColor?.name || null}
                   colorHex={currentColor ? resolveHex(currentColor.hex, currentColor.name) : null}
                   sizes={visibleSizes}
+                  onClose={() => onOpenChange(false)}
                 />
               )}
 
