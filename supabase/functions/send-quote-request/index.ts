@@ -30,11 +30,11 @@ const buildEmail = (q: any) => {
 
   const totalQty = items.reduce((s, it) => s + (Number(it.qty) || 0), 0);
 
-  const files: string[] = Array.isArray(q.file_urls) ? q.file_urls : [];
+  const files: string[] = Array.isArray(q._signed_file_urls) ? q._signed_file_urls : (Array.isArray(q.file_urls) ? q.file_urls : []);
   const filesHtml = files.length
     ? `<h3 style="font-size:14px;margin:20px 0 6px;">Pievienotie faili</h3>
        <ul style="padding-left:18px;font-size:13px;">
-         ${files.map((u) => `<li><a href="${escapeHtml(u)}">${escapeHtml(u.split("/").pop() || u)}</a></li>`).join("")}
+         ${files.map((u) => `<li><a href="${escapeHtml(u)}">${escapeHtml((u.split("?")[0] || u).split("/").pop() || u)}</a></li>`).join("")}
        </ul>`
     : "";
 
