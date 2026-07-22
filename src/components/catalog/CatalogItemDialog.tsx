@@ -298,7 +298,10 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
   for (const arr of sizesByItem.values()) for (const s of arr) sizeSet.set(s.s, s.seq);
   const sizes = [...sizeSet.entries()].sort((a, b) => a[1].localeCompare(b[1])).map((x) => x[0]);
 
-  // Full description: commerce + catalog + USP (preserve bullets & newlines)
+  // Full description: commerce + catalog + USP (preserve bullets & newlines).
+  // NWG API leaves these null for a large portion of the catalog, so compose
+  // a graceful fallback from whatever product metadata is available instead
+  // of leaving the dialog blank.
   const descBlocks = [style.commerce_text, style.catalog_text, style.usp].filter(Boolean) as string[];
   const seen = new Set<string>();
   const dedupedBlocks = descBlocks.filter((b) => {
@@ -307,7 +310,19 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     seen.add(k);
     return true;
   });
-  const fullDesc = dedupedBlocks.join("\n\n");
+  let fullDesc = dedupedBlocks.join("\n\n");
+  if (!fullDesc) {
+    const parts: string[] = [];
+    if (style.name) parts.push(`• ${style.name}`);
+    if (style.brand) parts.push(`• Brand: ${style.brand}`);
+    if (style.category) parts.push(`• Category: ${style.category}`);
+    if (style.gender) parts.push(`• Gender: ${style.gender}`);
+    if (style.fit) parts.push(`• Fit: ${style.fit}`);
+    if (style.fabrics) parts.push(`• Material: ${style.fabrics}`);
+    if (style.weight) parts.push(`• Weight: ${style.weight}`);
+    if (style.country_of_origin) parts.push(`• Country of origin: ${style.country_of_origin}`);
+    fullDesc = parts.join("\n");
+  }
   const featureLines = lines(fullDesc).filter((l) => /^[•\-\*·▪►]/.test(l));
 
   const specs: { label: string; value: string }[] = [];
