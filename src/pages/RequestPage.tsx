@@ -65,9 +65,8 @@ const RequestPage = () => {
 
     setSending(true);
     try {
-      const pm = PROJECT_MANAGERS.find((p) => p.slug === selectedPm);
-      const assignedEmail = pm?.email || OFFICE_EMAIL;
-      const assignedName = pm?.name || (lang === "lv" ? "Ervitex birojs" : "Ervitex office");
+      const assignedEmail = OFFICE_EMAIL;
+      const assignedName = lang === "lv" ? "Ervitex birojs" : "Ervitex office";
 
       const messageParts: string[] = [];
       if (print.notes) messageParts.push(print.notes);
