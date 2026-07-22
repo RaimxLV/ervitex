@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
-import { Trash2, Upload, Send, X, Users } from "lucide-react";
+import { OFFICE_EMAIL } from "@/data/projectManagers";
+import { Trash2, Upload, Send, X, ArrowLeft } from "lucide-react";
 
 const MAX_FILES = 10;
 const MAX_FILE_MB = 15;
@@ -21,7 +21,6 @@ const RequestPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const [selectedPm, setSelectedPm] = useState<string>("any");
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "" });
   const [print, setPrint] = useState({ method: "", placement: "", colors: "", deadline: "", notes: "" });
   const [files, setFiles] = useState<File[]>([]);
