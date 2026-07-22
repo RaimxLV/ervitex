@@ -325,46 +325,8 @@ const RequestPage = () => {
                 </div>
               </section>
 
-              {/* PM selection */}
-              <section className="rounded-md border border-border bg-card p-4 sm:p-6 space-y-3">
-                <h2 className="font-heading text-lg font-black uppercase tracking-wide">
-                  {t("Projekta vadītājs", "Project manager")}
-                </h2>
-                <p className="text-xs text-muted-foreground">
-                  {t("Izvēlies, kuram nosūtīt Tavu pieprasījumu.", "Pick who to send your request to.")}
-                </p>
-                <div className="space-y-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPm("any")}
-                    className={`flex w-full items-center gap-3 rounded-md border p-2.5 text-left transition-colors ${selectedPm === "any" ? "border-accent bg-accent/10" : "border-border hover:border-accent/60"}`}
-                  >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                      <Users className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold">{t("Jebkurš pieejamais", "Any available")}</p>
-                      <p className="text-xs text-muted-foreground truncate">{OFFICE_EMAIL}</p>
-                    </div>
-                  </button>
-                  {PROJECT_MANAGERS.map((pm) => (
-                    <button
-                      key={pm.slug}
-                      type="button"
-                      onClick={() => setSelectedPm(pm.slug)}
-                      className={`flex w-full items-center gap-3 rounded-md border p-2.5 text-left transition-colors ${selectedPm === pm.slug ? "border-accent bg-accent/10" : "border-border hover:border-accent/60"}`}
-                    >
-                      <img src={pm.photo} alt={pm.name} className="h-10 w-10 rounded-full object-cover" />
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold truncate">{pm.name}</p>
-                        <p className="text-[11px] text-muted-foreground truncate">{pm.title[lang]}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </section>
 
-              <Button
+
                 type="submit"
                 disabled={sending || items.length === 0}
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest h-12"
