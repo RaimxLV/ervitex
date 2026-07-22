@@ -66,8 +66,8 @@ const RequestPage = () => {
 
     setSending(true);
     try {
-      // Upload files to storage
-      const uploadedUrls: string[] = [];
+      // Upload files to storage — store paths only; signed URLs are generated server-side
+      const uploadedPaths: string[] = [];
       for (const f of files) {
         const safeName = f.name.replace(/[^a-zA-Z0-9._-]/g, "_");
         const path = `${crypto.randomUUID()}-${safeName}`;
@@ -76,11 +76,7 @@ const RequestPage = () => {
           upsert: false,
         });
         if (upErr) throw upErr;
-        const { data: signed, error: signErr } = await supabase.storage
-          .from("quote-attachments")
-          .createSignedUrl(path, 60 * 60 * 24 * 30);
-        if (signErr) throw signErr;
-        uploadedUrls.push(signed.signedUrl);
+        uploadedPaths.push(path);
       }
 
       const pm = PROJECT_MANAGERS.find((p) => p.slug === selectedPm);
@@ -105,7 +101,7 @@ const RequestPage = () => {
           print_placement: print.placement || null,
           print_colors: print.colors || null,
           deadline: print.deadline || null,
-          file_urls: uploadedUrls,
+          file_urls: uploadedPaths,
           assigned_pm_email: assignedEmail,
           assigned_pm_name: assignedName,
         })
