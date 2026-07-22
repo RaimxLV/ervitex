@@ -87,10 +87,15 @@ const RequestPage = () => {
       if (print.notes) messageParts.push(print.notes);
       const message = messageParts.join("\n\n").slice(0, 9800);
 
+      // Generate the request id client-side so anonymous users don't need public read access
+      // to quote_requests just to get the saved row id back.
+      const requestId = crypto.randomUUID();
+
       // Insert into DB (also visible in admin panel)
-      const { data: inserted, error: insErr } = await supabase
+      const { error: insErr } = await supabase
         .from("quote_requests")
         .insert({
+          id: requestId,
           name: form.name.trim(),
           email: form.email.trim(),
           phone: form.phone.trim() || null,
@@ -104,15 +109,13 @@ const RequestPage = () => {
           file_urls: uploadedPaths,
           assigned_pm_email: assignedEmail,
           assigned_pm_name: assignedName,
-        })
-        .select("id")
-        .single();
+        });
       if (insErr) throw insErr;
 
       // Trigger email send (non-blocking on failure — DB row is safety net)
       try {
         await supabase.functions.invoke("send-quote-request", {
-          body: { request_id: inserted!.id },
+          body: { request_id: requestId },
         });
       } catch (mailErr) {
         console.warn("Email send failed, but request stored", mailErr);
