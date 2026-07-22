@@ -101,7 +101,7 @@ const RequestPage = () => {
           print_placement: print.placement || null,
           print_colors: print.colors || null,
           deadline: print.deadline || null,
-          file_urls: uploadedUrls,
+          file_urls: uploadedPaths,
           assigned_pm_email: assignedEmail,
           assigned_pm_name: assignedName,
         })
