@@ -119,6 +119,19 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Convert stored paths -> 30-day signed URLs (paths are stored, not URLs)
+    const rawFiles: string[] = Array.isArray(quote.file_urls) ? quote.file_urls : [];
+    const signedUrls: string[] = [];
+    for (const entry of rawFiles) {
+      if (typeof entry !== "string" || !entry) continue;
+      if (/^https?:\/\//i.test(entry)) { signedUrls.push(entry); continue; }
+      const { data: signed } = await supabase.storage
+        .from("quote-attachments")
+        .createSignedUrl(entry, 60 * 60 * 24 * 30);
+      if (signed?.signedUrl) signedUrls.push(signed.signedUrl);
+    }
+    (quote as any)._signed_file_urls = signedUrls;
+
     const to = quote.assigned_pm_email || OFFICE_BCC;
     const subject = `[Ervitex pieprasījums] ${quote.name}${quote.company ? " · " + quote.company : ""}`;
     const html = buildEmail(quote);
