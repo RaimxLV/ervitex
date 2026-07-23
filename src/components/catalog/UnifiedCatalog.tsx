@@ -668,8 +668,24 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               className="h-11"
             />
           </div>
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">
-            {filtered.length.toLocaleString(lang === "lv" ? "lv-LV" : "en-US")} {t.results}
+          <div className="flex items-center gap-3">
+            <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              {lang === "lv" ? "Kārtot" : "Sort"}
+            </label>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="h-9 rounded-md border border-border bg-background px-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              <option value="featured">{lang === "lv" ? "Ieteiktie" : "Featured"}</option>
+              <option value="az">{lang === "lv" ? "Nosaukums A–Z" : "Name A–Z"}</option>
+              <option value="za">{lang === "lv" ? "Nosaukums Z–A" : "Name Z–A"}</option>
+              <option value="price_asc">{lang === "lv" ? "Cena: zemākā vispirms" : "Price: low to high"}</option>
+              <option value="price_desc">{lang === "lv" ? "Cena: augstākā vispirms" : "Price: high to low"}</option>
+            </select>
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">
+              {filtered.length.toLocaleString(lang === "lv" ? "lv-LV" : "en-US")} {t.results}
+            </div>
           </div>
         </div>
 
