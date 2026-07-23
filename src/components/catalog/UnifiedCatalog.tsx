@@ -195,6 +195,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [colors, setColors] = useState<Set<string>>(
     new Set((searchParams.get("color") || "").split(",").filter(Boolean))
   );
+  const [sort, setSort] = useState<string>(searchParams.get("sort") || "featured");
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
   useEffect(() => {
@@ -206,9 +207,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (groups.size) p.set("group", [...groups].join(","));
     if (genders.size) p.set("gender", [...genders].join(","));
     if (colors.size) p.set("color", [...colors].join(","));
+    if (sort && sort !== "featured") p.set("sort", sort);
     if (page > 1) p.set("page", String(page));
     setSearchParams(p, { replace: true });
-  }, [q, sources, brands, categories, groups, genders, colors, page, setSearchParams]);
+  }, [q, sources, brands, categories, groups, genders, colors, sort, page, setSearchParams]);
 
   useEffect(() => {
     (async () => {
