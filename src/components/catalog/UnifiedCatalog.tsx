@@ -75,22 +75,30 @@ interface EnrichedItem extends Omit<CatalogItem, "colors"> {
 }
 
 const GENDER_MAP: Record<string, string | null> = {
-  male: "Men", men: "Men", mens: "Men", "men's": "Men",
-  female: "Women", women: "Women", womens: "Women", "women's": "Women", ladies: "Women",
+  male: "Men", men: "Men", mens: "Men", man: "Men", gents: "Men", gentlemen: "Men",
+  female: "Women", women: "Women", womens: "Women", woman: "Women", ladies: "Women", lady: "Women",
   junior: "Kids", juniors: "Kids", kid: "Kids", kids: "Kids",
-  children: "Kids", child: "Kids", youth: "Kids",
-  baby: "Baby", babies: "Baby", infant: "Baby",
-  unisex: "Unisex", adult: "Unisex",
-  none: "", "-": "", accessories: "",
+  children: "Kids", child: "Kids", youth: "Kids", boys: "Kids", girls: "Kids",
+  "menskids": "Kids", "womenskids": "Kids",
+  baby: "Baby", babies: "Baby", infant: "Baby", infants: "Baby", toddler: "Baby",
+  unisex: "Unisex", adult: "Unisex", adults: "Unisex", uni: "Unisex",
+  "unisexkids": "Unisex",
+  none: "", "-": "", "": "", accessories: "",
+  nezadano: "", neznamo: "", unknown: "",
 };
 const normalizeGender = (raw?: string | null): string | null => {
   if (!raw) return null;
-  const key = raw.trim().toLowerCase();
+  // Strip apostrophes/punctuation/spaces so "Men's", "Men´s", "Men's/Kids" all collapse.
+  const key = raw
+    .trim()
+    .toLowerCase()
+    .replace(/['’`´]/g, "")
+    .replace(/[\s._\-\/&+]+/g, "");
   if (key in GENDER_MAP) {
     const v = GENDER_MAP[key];
     return v === "" ? null : v;
   }
-  return raw.trim();
+  return null; // drop unknown values instead of leaking raw feed labels
 };
 
 const CATEGORY_MAP: Record<string, string> = {
