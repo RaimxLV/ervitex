@@ -75,22 +75,30 @@ interface EnrichedItem extends Omit<CatalogItem, "colors"> {
 }
 
 const GENDER_MAP: Record<string, string | null> = {
-  male: "Men", men: "Men", mens: "Men", "men's": "Men",
-  female: "Women", women: "Women", womens: "Women", "women's": "Women", ladies: "Women",
+  male: "Men", men: "Men", mens: "Men", man: "Men", gents: "Men", gentlemen: "Men",
+  female: "Women", women: "Women", womens: "Women", woman: "Women", ladies: "Women", lady: "Women",
   junior: "Kids", juniors: "Kids", kid: "Kids", kids: "Kids",
-  children: "Kids", child: "Kids", youth: "Kids",
-  baby: "Baby", babies: "Baby", infant: "Baby",
-  unisex: "Unisex", adult: "Unisex",
-  none: "", "-": "", accessories: "",
+  children: "Kids", child: "Kids", youth: "Kids", boys: "Kids", girls: "Kids",
+  "menskids": "Kids", "womenskids": "Kids",
+  baby: "Baby", babies: "Baby", infant: "Baby", infants: "Baby", toddler: "Baby",
+  unisex: "Unisex", adult: "Unisex", adults: "Unisex", uni: "Unisex",
+  "unisexkids": "Unisex",
+  none: "", "-": "", "": "", accessories: "",
+  nezadano: "", neznamo: "", unknown: "",
 };
 const normalizeGender = (raw?: string | null): string | null => {
   if (!raw) return null;
-  const key = raw.trim().toLowerCase();
+  // Strip apostrophes/punctuation/spaces so "Men's", "Men´s", "Men's/Kids" all collapse.
+  const key = raw
+    .trim()
+    .toLowerCase()
+    .replace(/['’`´]/g, "")
+    .replace(/[\s._\-\/&+]+/g, "");
   if (key in GENDER_MAP) {
     const v = GENDER_MAP[key];
     return v === "" ? null : v;
   }
-  return raw.trim();
+  return null; // drop unknown values instead of leaking raw feed labels
 };
 
 const CATEGORY_MAP: Record<string, string> = {
@@ -187,6 +195,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [colors, setColors] = useState<Set<string>>(
     new Set((searchParams.get("color") || "").split(",").filter(Boolean))
   );
+  const [sort, setSort] = useState<string>(searchParams.get("sort") || "featured");
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
   useEffect(() => {
@@ -198,9 +207,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (groups.size) p.set("group", [...groups].join(","));
     if (genders.size) p.set("gender", [...genders].join(","));
     if (colors.size) p.set("color", [...colors].join(","));
+    if (sort && sort !== "featured") p.set("sort", sort);
     if (page > 1) p.set("page", String(page));
     setSearchParams(p, { replace: true });
-  }, [q, sources, brands, categories, groups, genders, colors, page, setSearchParams]);
+  }, [q, sources, brands, categories, groups, genders, colors, sort, page, setSearchParams]);
 
   useEffect(() => {
     (async () => {
@@ -334,7 +344,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   useEffect(() => {
     setPage(1);
-  }, [q, sources, brands, categories, groups, genders, colors]);
+  }, [q, sources, brands, categories, groups, genders, colors, sort]);
 
   const toggle = (set: Set<string>, setter: (s: Set<string>) => void) => (v: string) => {
     const next = new Set(set);
@@ -524,11 +534,40 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
 
-  const filtered = useMemo(
-    () => items.filter((it) => passesExcept(it, "__none__")),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items, q, sources, brands, categories, groups, genders, colors]
+  const priceOf = useCallback(
+    (it: EnrichedItem): number | null => {
+      const p =
+        it.source === "pf" ? pfPrices.get(it.id) :
+        it.source === "ss" ? ssPrices.get(it.id) :
+        it.source === "bb" ? bbPrices.get(it.id) :
+        it.source === "mf" ? mfPrices.get(it.id) :
+        undefined;
+      return p ? p.price : null;
+    },
+    [pfPrices, ssPrices, bbPrices, mfPrices]
   );
+
+  const filtered = useMemo(() => {
+    const base = items.filter((it) => passesExcept(it, "__none__"));
+    const cmpName = (a: EnrichedItem, b: EnrichedItem) =>
+      (a.name || a.id).localeCompare(b.name || b.id, lang === "lv" ? "lv" : "en", { sensitivity: "base" });
+    if (sort === "az") return [...base].sort(cmpName);
+    if (sort === "za") return [...base].sort((a, b) => cmpName(b, a));
+    if (sort === "price_asc" || sort === "price_desc") {
+      const dir = sort === "price_asc" ? 1 : -1;
+      return [...base].sort((a, b) => {
+        const pa = priceOf(a);
+        const pb = priceOf(b);
+        // items without price go to the end regardless of direction
+        if (pa == null && pb == null) return cmpName(a, b);
+        if (pa == null) return 1;
+        if (pb == null) return -1;
+        return (pa - pb) * dir || cmpName(a, b);
+      });
+    }
+    return base;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, q, sources, brands, categories, groups, genders, colors, sort, priceOf, lang]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -629,8 +668,24 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               className="h-11"
             />
           </div>
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">
-            {filtered.length.toLocaleString(lang === "lv" ? "lv-LV" : "en-US")} {t.results}
+          <div className="flex items-center gap-3">
+            <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              {lang === "lv" ? "Kārtot" : "Sort"}
+            </label>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="h-9 rounded-md border border-border bg-background px-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent"
+            >
+              <option value="featured">{lang === "lv" ? "Ieteiktie" : "Featured"}</option>
+              <option value="az">{lang === "lv" ? "Nosaukums A–Z" : "Name A–Z"}</option>
+              <option value="za">{lang === "lv" ? "Nosaukums Z–A" : "Name Z–A"}</option>
+              <option value="price_asc">{lang === "lv" ? "Cena: zemākā vispirms" : "Price: low to high"}</option>
+              <option value="price_desc">{lang === "lv" ? "Cena: augstākā vispirms" : "Price: high to low"}</option>
+            </select>
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">
+              {filtered.length.toLocaleString(lang === "lv" ? "lv-LV" : "en-US")} {t.results}
+            </div>
           </div>
         </div>
 
