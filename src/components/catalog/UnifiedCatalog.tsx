@@ -534,11 +534,40 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
 
-  const filtered = useMemo(
-    () => items.filter((it) => passesExcept(it, "__none__")),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items, q, sources, brands, categories, groups, genders, colors]
+  const priceOf = useCallback(
+    (it: EnrichedItem): number | null => {
+      const p =
+        it.source === "pf" ? pfPrices.get(it.id) :
+        it.source === "ss" ? ssPrices.get(it.id) :
+        it.source === "bb" ? bbPrices.get(it.id) :
+        it.source === "mf" ? mfPrices.get(it.id) :
+        undefined;
+      return p ? p.price : null;
+    },
+    [pfPrices, ssPrices, bbPrices, mfPrices]
   );
+
+  const filtered = useMemo(() => {
+    const base = items.filter((it) => passesExcept(it, "__none__"));
+    const cmpName = (a: EnrichedItem, b: EnrichedItem) =>
+      (a.name || a.id).localeCompare(b.name || b.id, lang === "lv" ? "lv" : "en", { sensitivity: "base" });
+    if (sort === "az") return [...base].sort(cmpName);
+    if (sort === "za") return [...base].sort((a, b) => cmpName(b, a));
+    if (sort === "price_asc" || sort === "price_desc") {
+      const dir = sort === "price_asc" ? 1 : -1;
+      return [...base].sort((a, b) => {
+        const pa = priceOf(a);
+        const pb = priceOf(b);
+        // items without price go to the end regardless of direction
+        if (pa == null && pb == null) return cmpName(a, b);
+        if (pa == null) return 1;
+        if (pb == null) return -1;
+        return (pa - pb) * dir || cmpName(a, b);
+      });
+    }
+    return base;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, q, sources, brands, categories, groups, genders, colors, sort, priceOf, lang]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
