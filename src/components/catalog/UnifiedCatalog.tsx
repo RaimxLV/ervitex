@@ -344,7 +344,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   useEffect(() => {
     setPage(1);
-  }, [q, sources, brands, categories, groups, genders, colors]);
+  }, [q, sources, brands, categories, groups, genders, colors, sort]);
 
   const toggle = (set: Set<string>, setter: (s: Set<string>) => void) => (v: string) => {
     const next = new Set(set);
