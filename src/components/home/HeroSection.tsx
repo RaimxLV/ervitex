@@ -125,8 +125,8 @@ const HeroSection = () => {
           {/* Subtitle */}
           <p className="mt-6 max-w-md text-sm leading-relaxed text-primary-foreground/50 md:text-base">
             {lang === "lv"
-              ? "Ervitex — Jūsu partneris tekstila apstrādē kopš 2003. gada. Profesionāla pieredze, precizitāte un pārbaudītas tehnoloģijas."
-              : "Ervitex — Your textile partner since 2003. Professional expertise, precision, and proven technologies."}
+              ? "Ervitex — Jūsu uzticamais partneris promo apģērbu un apdrukas pakalpojumos kopš 2003. gada. Profesionalitāte, pieredze, precizitāte un pārbaudītas tehnoloģijas."
+              : "Ervitex — Your trusted partner in promotional apparel and printing services since 2003. Professionalism, experience, precision, and proven technologies."}
           </p>
 
           {/* CTA */}
