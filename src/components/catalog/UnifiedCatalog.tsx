@@ -470,13 +470,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     [items, q, sources, brands, categories, groups, genders, colors]
   );
 
+  // "Ražotājs" facet — virtual manufacturer taxonomy (see MANUFACTURERS above).
   const sourceItems = useMemo(() => {
-    const order: CatalogSource[] = ["ss", "nwg", "pf", "bb", "mf"];
-    return order
-      .map((s) => ({
-        label: SOURCE_META[s].label,
-        value: s,
-        count: items.filter((it) => it.source === s && passesExcept(it, "source")).length,
+    return MANUFACTURERS
+      .map((m) => ({
+        label: m.label,
+        value: m.key,
+        count: items.filter((it) => it.manufacturer === m.key && passesExcept(it, "source")).length,
       }))
       .filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
