@@ -653,11 +653,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   filterSections.push(
     {
-      key: "brand",
-      title: t.brand,
-      items: brandItems,
-      selected: brands,
-      onToggle: toggle(brands, setBrands),
+      key: "category",
+      title: t.category,
+      items: categoryItems,
+      selected: categories,
+      onToggle: toggle(categories, setCategories),
     },
     {
       key: "color",
@@ -680,11 +680,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       },
     },
     {
-      key: "category",
-      title: t.category,
-      items: categoryItems,
-      selected: categories,
-      onToggle: toggle(categories, setCategories),
+      key: "brand",
+      title: t.brand,
+      items: brandItems,
+      selected: brands,
+      onToggle: toggle(brands, setBrands),
     },
     {
       key: "gender",
