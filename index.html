@@ -99,6 +99,33 @@
           }
         } catch (e) {}
       })();
+      // Cross-browser build-version check. Firefox/Safari cache HTML aggressively
+      // and ignore <meta http-equiv="Cache-Control">, so we fetch a tiny
+      // version.json with no-store and force a hard reload if it changed.
+      (function () {
+        try {
+          var base = '%BASE_URL%';
+          var url = base + 'version.json?_=' + Date.now();
+          var STORAGE_KEY = 'ex-build-version';
+          var RELOAD_GUARD = 'ex-build-version-reloaded';
+          fetch(url, { cache: 'no-store', credentials: 'omit' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+              if (!data || !data.version) return;
+              var current = localStorage.getItem(STORAGE_KEY);
+              if (current === data.version) {
+                sessionStorage.removeItem(RELOAD_GUARD);
+                return;
+              }
+              localStorage.setItem(STORAGE_KEY, data.version);
+              if (!current) return; // first visit, nothing to reload
+              if (sessionStorage.getItem(RELOAD_GUARD)) return; // avoid loops
+              sessionStorage.setItem(RELOAD_GUARD, '1');
+              location.reload();
+            })
+            .catch(function () {});
+        } catch (e) {}
+      })();
     </script>
 
 
