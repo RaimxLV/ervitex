@@ -113,7 +113,7 @@ const Header = () => {
                 >
                   <Link
                     to={item.path}
-                    onFocus={openMega}
+                    onFocus={openMegaImmediate}
                     aria-haspopup="menu"
                     aria-expanded={megaOpen}
                     className={`flex items-center gap-1 text-sm font-medium uppercase transition-colors hover:text-accent ${
