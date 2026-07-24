@@ -38,27 +38,15 @@ const Header = () => {
   const { lang, setLang, t } = useLanguage();
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
-
-  // Delay opening so incidental mouse traversal across the header does not
-  // trigger the mega menu. Closing has a shorter delay so the panel feels
-  // responsive when leaving.
-  const openMega = () => {
-    if (megaTimer.current) window.clearTimeout(megaTimer.current);
-    megaTimer.current = window.setTimeout(() => setMegaOpen(true), 260);
-  };
-  const openMegaImmediate = () => {
-    if (megaTimer.current) window.clearTimeout(megaTimer.current);
-    setMegaOpen(true);
-  };
-  const closeMegaSoon = () => {
-    if (megaTimer.current) window.clearTimeout(megaTimer.current);
-    megaTimer.current = window.setTimeout(() => setMegaOpen(false), 140);
-  };
+  const megaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
         setShareOpen(false);
+      }
+      if (megaRef.current && !megaRef.current.contains(e.target as Node)) {
+        setMegaOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
