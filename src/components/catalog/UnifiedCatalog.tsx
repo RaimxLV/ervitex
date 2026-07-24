@@ -412,11 +412,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const t = useMemo(
     () => ({
       title: title ?? (lang === "lv" ? "Katalogs" : "Catalog"),
-      subtitle:
-        subtitle ??
-        (lang === "lv"
-          ? "Meklējiet visos mūsu piegādātāju katalogos vienuviet"
-          : "Search across all our supplier catalogs at once"),
+      subtitle: subtitle ?? "",
       search: lang === "lv" ? "Meklēt modeli, kodu vai zīmolu…" : "Search model, code or brand…",
       results: lang === "lv" ? "rezultāti" : "results",
       clearAll: lang === "lv" ? "Notīrīt filtrus" : "Clear filters",
