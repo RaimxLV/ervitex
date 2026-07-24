@@ -35,7 +35,29 @@ jobs:
         run: test -f dist/index.html
 
       - name: SPA fallback
-        run: cp dist/index.html dist/404.html
+        run: |
+          repo="/${GITHUB_REPOSITORY#*/}"
+          cat > dist/404.html <<'EOF'
+          <!doctype html>
+          <html lang="lv">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>Ervitex</title>
+              <script>
+                (function () {
+                  var repo = '__REPO_BASE__';
+                  var path = window.location.pathname;
+                  var relative = path.indexOf(repo + '/') === 0 ? path.slice(repo.length) : '/';
+                  var target = repo + '/?gh-path=' + encodeURIComponent(relative + window.location.search + window.location.hash);
+                  window.location.replace(target);
+                })();
+              </script>
+            </head>
+            <body></body>
+          </html>
+          EOF
+          sed -i "s|__REPO_BASE__|$repo|g" dist/404.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -7,27 +7,46 @@
     <meta name="description" content="Ervitex is a leading wholesale clothing and accessories supplier in Latvia, offering professional screen printing, embroidery, and sublimation services.">
     <meta name="author" content="SIA Ervitex" />
     <meta name="robots" content="noindex, nofollow" />
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="%BASE_URL%manifest.json" />
     <meta name="theme-color" content="#0d0d0d" />
-    <link rel="icon" href="/ex_mini.svg" type="image/svg+xml" />
+    <link rel="icon" href="%BASE_URL%ex_mini.svg" type="image/svg+xml" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <script>
-      // One-time cleanup: remove legacy Service Workers and caches that keep
-      // serving stale bundles to returning visitors (incognito is unaffected
-      // because it never registered them). Runs once per browser.
+      // GitHub Pages SPA redirect: /ervitex/catalog first lands on 404.html,
+      // then returns here with a saved path. Restore it before React mounts.
       (function () {
         try {
-          var KEY = 'ex-sw-cleanup-v3';
+          var params = new URLSearchParams(location.search);
+          var ghPath = params.get('gh-path');
+          if (!ghPath) return;
+          var base = '%BASE_URL%';
+          var cleanBase = base.replace(/\/$/, '');
+          var target = cleanBase + ghPath;
+          history.replaceState(null, '', target);
+        } catch (e) {}
+      })();
+      // One-time cleanup: remove legacy app-shell Service Workers/caches that
+      // can keep serving stale GitHub Pages bundles to returning visitors.
+      (function () {
+        try {
+          var KEY = 'ex-sw-cleanup-v4';
           if (localStorage.getItem(KEY)) return;
           var didWork = false;
+          var appSwPattern = /\/(sw|service-worker)\.js(?:$|[?#])/;
+          function isAppCache(name) {
+            return /(^|-)precache-v\d+-|(^|-)runtime-|(^|-)googleAnalytics-/.test(name) || /^workbox-/.test(name);
+          }
           if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function (regs) {
-              regs.forEach(function (r) { didWork = true; r.unregister(); });
+              regs.forEach(function (r) {
+                var url = (r.active && r.active.scriptURL) || (r.waiting && r.waiting.scriptURL) || (r.installing && r.installing.scriptURL) || '';
+                if (appSwPattern.test(url)) { didWork = true; r.unregister(); }
+              });
               if (window.caches && caches.keys) {
                 return caches.keys().then(function (keys) {
-                  return Promise.all(keys.map(function (k) { didWork = true; return caches.delete(k); }));
+                  return Promise.all(keys.filter(isAppCache).map(function (k) { didWork = true; return caches.delete(k); }));
                 });
               }
             }).then(function () {

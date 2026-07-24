@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -719,6 +719,7 @@ const CatalogItemDialog = ({
   open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback,
 }: Props) => {
   const { lang } = useLanguage();
+  const placeholderSrc = `${import.meta.env.BASE_URL}placeholder.svg`;
   const [detail, setDetail] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeColor, setActiveColor] = useState<string | null>(null);
@@ -913,7 +914,7 @@ const CatalogItemDialog = ({
                   src={mainImg}
                   alt={currentColor?.name || displayDetail.title || id}
                   className="h-full w-full object-contain"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholderSrc; }}
                 />
               ) : loading ? (
                 <Skeleton className="h-full w-full" />
@@ -941,6 +942,9 @@ const CatalogItemDialog = ({
 
           <div className="space-y-6">
             <DialogHeader className="space-y-4">
+              <DialogDescription className="sr-only">
+                {displayDetail.title || name || id}
+              </DialogDescription>
               {/* Meta row: code + supplier on left, brand on right */}
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
                 <div className="flex flex-wrap items-center gap-3">
