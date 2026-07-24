@@ -420,7 +420,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       search: lang === "lv" ? "Meklēt modeli, kodu vai zīmolu…" : "Search model, code or brand…",
       results: lang === "lv" ? "rezultāti" : "results",
       clearAll: lang === "lv" ? "Notīrīt filtrus" : "Clear filters",
-      source: lang === "lv" ? "Piegādātājs" : "Supplier",
+      source: lang === "lv" ? "Ražotājs" : "Manufacturer",
       brand: lang === "lv" ? "Zīmols" : "Brand",
       category: lang === "lv" ? "Kategorija" : "Category",
       group: lang === "lv" ? "Grupa" : "Group",
