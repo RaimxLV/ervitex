@@ -83,7 +83,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-primary/80 backdrop-blur-md text-primary-foreground">
+    <header className="sticky top-0 z-50 bg-primary/95 backdrop-blur-md text-primary-foreground">
       <div className="relative flex h-16 items-center justify-between px-4 sm:px-6 md:h-20">
         <Link to="/" className="flex items-center gap-2 sm:gap-3">
           <img src={ervitexLogo} alt="Ervitex" className="h-8 w-auto md:h-10" />
