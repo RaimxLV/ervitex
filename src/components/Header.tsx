@@ -318,9 +318,6 @@ const Header = () => {
                 )}
               </div>
             ))}
-            <Button asChild className="mt-2 w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              <Link to="/contact" onClick={() => setIsOpen(false)}>{t("header.quote")}</Link>
-            </Button>
           </nav>
         </div>
       )}
