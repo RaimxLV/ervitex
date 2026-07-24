@@ -440,7 +440,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       const hay = `${it.name || ""} ${it.id} ${it.brand || ""}`.toLowerCase();
       if (!hay.includes(needle)) return false;
     }
-    if (except !== "source" && sources.size && !sources.has(it.source)) return false;
+    if (except !== "source" && sources.size && !sources.has(it.manufacturer)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
     if (except !== "category" && categories.size && (!it.category || !categories.has(it.category))) return false;
     if (except !== "group" && groups.size && (!it.group_name || !groups.has(it.group_name))) return false;
