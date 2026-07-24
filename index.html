@@ -31,24 +31,65 @@
       // can keep serving stale GitHub Pages bundles to returning visitors.
       (function () {
         try {
-          var KEY = 'ex-sw-cleanup-v4';
+          var KEY = 'ex-sw-cleanup-v5';
           if (localStorage.getItem(KEY)) return;
           var didWork = false;
+          var base = '%BASE_URL%';
+          var cleanBase = base === '/' ? '/' : base.replace(/\/$/, '/');
+          var appScope = location.origin + cleanBase;
           var appSwPattern = /\/(sw|service-worker)\.js(?:$|[?#])/;
-          function isAppCache(name) {
-            return /(^|-)precache-v\d+-|(^|-)runtime-|(^|-)googleAnalytics-/.test(name) || /^workbox-/.test(name);
+          function isLikelyAppCacheName(name) {
+            return /(^|-)precache-v\d+-|(^|-)runtime-|(^|-)googleAnalytics-/.test(name) || /^workbox-/.test(name) || name.indexOf(cleanBase) !== -1 || name.indexOf('ervitex') !== -1;
+          }
+          function cacheContainsAppFiles(name) {
+            if (!window.caches || !caches.open) return Promise.resolve(false);
+            return caches.open(name).then(function (cache) {
+              return cache.keys().then(function (requests) {
+                return requests.some(function (request) {
+                  return request.url.indexOf(appScope) === 0;
+                });
+              });
+            }).catch(function () { return false; });
           }
           if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function (regs) {
-              regs.forEach(function (r) {
+              return Promise.all(regs.map(function (r) {
                 var url = (r.active && r.active.scriptURL) || (r.waiting && r.waiting.scriptURL) || (r.installing && r.installing.scriptURL) || '';
-                if (appSwPattern.test(url)) { didWork = true; r.unregister(); }
-              });
+                if (appSwPattern.test(url) || r.scope.indexOf(appScope) === 0) { didWork = true; return r.unregister(); }
+                return Promise.resolve(false);
+              }));
+            }).then(function () {
+              if (navigator.serviceWorker.controller) {
+                didWork = true;
+                navigator.serviceWorker.addEventListener('controllerchange', function () { location.reload(); }, { once: true });
+              }
+              if (navigator.serviceWorker.ready) {
+                navigator.serviceWorker.ready.then(function (registration) { return registration.update(); }).catch(function () {});
+              }
               if (window.caches && caches.keys) {
                 return caches.keys().then(function (keys) {
-                  return Promise.all(keys.filter(isAppCache).map(function (k) { didWork = true; return caches.delete(k); }));
+                  return Promise.all(keys.map(function (key) {
+                    if (isLikelyAppCacheName(key)) { didWork = true; return caches.delete(key); }
+                    return cacheContainsAppFiles(key).then(function (containsAppFiles) {
+                      if (containsAppFiles) { didWork = true; return caches.delete(key); }
+                      return false;
+                    });
+                  }));
                 });
               }
+            }).then(function () {
+              localStorage.setItem(KEY, '1');
+              if (didWork) location.reload();
+            }).catch(function () { localStorage.setItem(KEY, '1'); });
+          } else if (window.caches && caches.keys) {
+            caches.keys().then(function (keys) {
+              return Promise.all(keys.map(function (key) {
+                if (isLikelyAppCacheName(key)) { didWork = true; return caches.delete(key); }
+                return cacheContainsAppFiles(key).then(function (containsAppFiles) {
+                  if (containsAppFiles) { didWork = true; return caches.delete(key); }
+                  return false;
+                });
+              }));
             }).then(function () {
               localStorage.setItem(KEY, '1');
               if (didWork) location.reload();
