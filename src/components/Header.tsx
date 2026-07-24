@@ -31,34 +31,22 @@ const Header = () => {
   const [searchValue, setSearchValue] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
-  const megaTimer = useRef<number | null>(null);
+  
   const shareRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { lang, setLang, t } = useLanguage();
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
-
-  // Delay opening so incidental mouse traversal across the header does not
-  // trigger the mega menu. Closing has a shorter delay so the panel feels
-  // responsive when leaving.
-  const openMega = () => {
-    if (megaTimer.current) window.clearTimeout(megaTimer.current);
-    megaTimer.current = window.setTimeout(() => setMegaOpen(true), 260);
-  };
-  const openMegaImmediate = () => {
-    if (megaTimer.current) window.clearTimeout(megaTimer.current);
-    setMegaOpen(true);
-  };
-  const closeMegaSoon = () => {
-    if (megaTimer.current) window.clearTimeout(megaTimer.current);
-    megaTimer.current = window.setTimeout(() => setMegaOpen(false), 140);
-  };
+  const megaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
         setShareOpen(false);
+      }
+      if (megaRef.current && !megaRef.current.contains(e.target as Node)) {
+        setMegaOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -105,15 +93,10 @@ const Header = () => {
             const active = location.pathname === item.path;
             if (isCatalog) {
               return (
-                <div
-                  key={item.path}
-                  className="relative"
-                  onMouseEnter={openMega}
-                  onMouseLeave={closeMegaSoon}
-                >
-                  <Link
-                    to={item.path}
-                    onFocus={openMegaImmediate}
+                <div key={item.path} className="relative" ref={megaRef}>
+                  <button
+                    type="button"
+                    onClick={() => setMegaOpen((v) => !v)}
                     aria-haspopup="menu"
                     aria-expanded={megaOpen}
                     className={`flex items-center gap-1 text-sm font-medium uppercase transition-colors hover:text-accent ${
@@ -125,7 +108,7 @@ const Header = () => {
                       className={`h-3.5 w-3.5 transition-transform duration-200 ${megaOpen ? "rotate-180" : ""}`}
                       strokeWidth={2}
                     />
-                  </Link>
+                  </button>
                 </div>
               );
             }
@@ -268,8 +251,6 @@ const Header = () => {
             ? "pointer-events-auto opacity-100 translate-y-0"
             : "pointer-events-none opacity-0 -translate-y-2"
         }`}
-        onMouseEnter={openMegaImmediate}
-        onMouseLeave={closeMegaSoon}
       >
         <div className="border-t border-border bg-background text-foreground shadow-2xl shadow-primary/30">
           <div className="container">
