@@ -259,9 +259,14 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(() => {
+    // lockedSource already restricts the database query by supplier. Do not
+    // also seed the virtual "Ražotājs" filter with the raw supplier key:
+    // NWG products are mapped to Craft/Clique/ProJob/Cutter & Buck, so
+    // `source=nwg` filters every NWG card out and leaves the page empty.
+    if (lockedSource) return new Set();
     const fromUrl = new Set((searchParams.get("source") || "").split(",").filter(Boolean));
     if (fromUrl.size) return fromUrl;
-    return lockedSource ? new Set([lockedSource]) : new Set();
+    return new Set();
   });
   const [brands, setBrands] = useState<Set<string>>(
     new Set((searchParams.get("brand") || "").split(",").filter(Boolean))
