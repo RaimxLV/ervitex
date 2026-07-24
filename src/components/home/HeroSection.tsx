@@ -127,19 +127,19 @@ const HeroSection = () => {
             {lang === "lv" ? (
               <>
                 <span className="block font-heading font-bold uppercase tracking-wide text-primary-foreground">
-                  Ervitex — Jūsu uzticamais partneris promo apģērbu un apdrukas pakalpojumos kopš 2003. gada
+                  ERVITEX — JŪSU UZTICAMAIS PARTNERIS PROMO APĢĒRBU UN APDRUKAS PAKALPOJUMOS<br />KOPŠ 2003. GADA
                 </span>
                 <span className="mt-2 block">
-                  Profesionalitāte, pieredze, precizitāte un pārbaudītas tehnoloģijas.
+                  Profesionalitāte, pieredze, precizitāte<br />un pārbaudītas tehnoloģijas.
                 </span>
               </>
             ) : (
               <>
                 <span className="block font-heading font-bold uppercase tracking-wide text-primary-foreground">
-                  Ervitex — Your trusted partner in promotional apparel and printing services since 2003
+                  ERVITEX — YOUR TRUSTED PARTNER IN PROMOTIONAL APPAREL AND PRINTING SERVICES<br />SINCE 2003
                 </span>
                 <span className="mt-2 block">
-                  Professionalism, experience, precision, and proven technologies.
+                  Professionalism, experience, precision<br />and proven technologies.
                 </span>
               </>
             )}
