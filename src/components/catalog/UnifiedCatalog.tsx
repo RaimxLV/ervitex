@@ -580,10 +580,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     "Pens & Writing": "Pildspalvas & rakstāmpiederumi",
     "Notebooks & Paper Products": "Bloknoti & papīra izstrādājumi",
     "Clothing": "Apģērbs",
-  };
-    "Pens & Writing": "Pildspalvas & rakstāmpiederumi",
-    "Notebooks & Paper Products": "Bloknoti & papīra izstrādājumi",
-    "Clothing": "Apģērbs",
     // Extra consolidations & missing English leftovers
     "Sweets": "Saldumi", "Safety Footwear": "Darba apavi",
     "Food & Beverages": "Pārtika & dzērieni",
