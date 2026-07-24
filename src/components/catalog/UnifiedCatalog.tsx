@@ -102,6 +102,25 @@ const MANUFACTURER_ORDER: Record<string, number> = Object.fromEntries(
 const MANUFACTURER_LABEL: Record<string, string> = Object.fromEntries(
   MANUFACTURERS.map((m) => [m.key, m.label]),
 );
+const parseManufacturerFilter = (rawValue: string | null): Set<string> => {
+  const parsed = new Set<string>();
+  for (const raw of (rawValue || "").split(",")) {
+    const token = raw.trim().toLowerCase();
+    if (!token) continue;
+    if (token === "nwg" || token === "new-wave-group" || token === "new wave group") {
+      parsed.add("nwg-craft");
+      parsed.add("nwg-clique");
+      parsed.add("nwg-projob");
+      parsed.add("nwg-cutter");
+      continue;
+    }
+    if (token === "stanley-stella" || token === "stanley/stella") parsed.add("ss");
+    else if (token === "pf-concept" || token === "pf concept") parsed.add("pf");
+    else if (token === "beechfield-brands" || token === "beechfield brands") parsed.add("bb");
+    else if (MANUFACTURER_LABEL[token]) parsed.add(token);
+  }
+  return parsed;
+};
 const manufacturerOf = (source: CatalogSource, brand: string | null): string | null => {
   const b = (brand || "").toLowerCase();
   if (source === "ss") return "ss";
@@ -264,7 +283,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     // NWG products are mapped to Craft/Clique/ProJob/Cutter & Buck, so
     // `source=nwg` filters every NWG card out and leaves the page empty.
     if (lockedSource) return new Set();
-    const fromUrl = new Set((searchParams.get("source") || "").split(",").filter(Boolean));
+    const fromUrl = parseManufacturerFilter(searchParams.get("source"));
     if (fromUrl.size) return fromUrl;
     return new Set();
   });
