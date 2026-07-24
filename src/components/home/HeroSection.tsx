@@ -124,9 +124,25 @@ const HeroSection = () => {
 
           {/* Subtitle */}
           <p className="mt-6 max-w-md text-sm leading-relaxed text-primary-foreground/50 md:text-base">
-            {lang === "lv"
-              ? "Ervitex — Jūsu uzticamais partneris promo apģērbu un apdrukas pakalpojumos kopš 2003. gada. Profesionalitāte, pieredze, precizitāte un pārbaudītas tehnoloģijas."
-              : "Ervitex — Your trusted partner in promotional apparel and printing services since 2003. Professionalism, experience, precision, and proven technologies."}
+            {lang === "lv" ? (
+              <>
+                <span className="block font-heading font-bold uppercase tracking-wide text-primary-foreground">
+                  Ervitex — Jūsu uzticamais partneris promo apģērbu un apdrukas pakalpojumos kopš 2003. gada
+                </span>
+                <span className="mt-2 block">
+                  Profesionalitāte, pieredze, precizitāte un pārbaudītas tehnoloģijas.
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="block font-heading font-bold uppercase tracking-wide text-primary-foreground">
+                  Ervitex — Your trusted partner in promotional apparel and printing services since 2003
+                </span>
+                <span className="mt-2 block">
+                  Professionalism, experience, precision, and proven technologies.
+                </span>
+              </>
+            )}
           </p>
 
           {/* CTA */}
