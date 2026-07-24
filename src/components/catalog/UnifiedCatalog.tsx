@@ -671,6 +671,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       (a.name || a.id).localeCompare(b.name || b.id, lang === "lv" ? "lv" : "en", { sensitivity: "base" });
     if (sort === "az") return [...base].sort(cmpName);
     if (sort === "za") return [...base].sort((a, b) => cmpName(b, a));
+    if (sort === "newest") {
+      return [...base].sort((a, b) =>
+        (b.id || "").localeCompare(a.id || "", "en", { numeric: true, sensitivity: "base" })
+      );
+    }
     if (sort === "price_asc" || sort === "price_desc") {
       const dir = sort === "price_asc" ? 1 : -1;
       return [...base].sort((a, b) => {
@@ -789,6 +794,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               className="h-9 rounded-md border border-border bg-background px-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent"
             >
               <option value="featured">{lang === "lv" ? "Ieteiktie" : "Featured"}</option>
+              <option value="newest">{lang === "lv" ? "Pēc jaunākā" : "Newest"}</option>
               <option value="az">{lang === "lv" ? "Nosaukums A–Z" : "Name A–Z"}</option>
               <option value="za">{lang === "lv" ? "Nosaukums Z–A" : "Name Z–A"}</option>
               <option value="price_asc">{lang === "lv" ? "Cena: zemākā vispirms" : "Price: low to high"}</option>
