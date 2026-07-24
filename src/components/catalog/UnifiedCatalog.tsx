@@ -72,7 +72,55 @@ interface EnrichedColor extends ColorEntry { bucket: ColorBucketKey | null }
 interface EnrichedItem extends Omit<CatalogItem, "colors"> {
   colors: EnrichedColor[];
   buckets: Set<ColorBucketKey>;
+  manufacturer: string;
 }
+
+/**
+ * Virtual "Ražotājs" (manufacturer) taxonomy. It unifies:
+ *  - Stanley/Stella (its own source)
+ *  - Selected NWG brands (Craft / Clique / ProJob / Cutter & Buck) — other NWG
+ *    items are dropped from the catalog because we don't sell them.
+ *  - PF Concept split: Elevate + Roly become standalone manufacturers, the
+ *    remaining PF items live under "Prezentmateriāli".
+ *  - Beechfield Brands, Malfini.
+ */
+const MANUFACTURERS: { key: string; label: string }[] = [
+  { key: "ss", label: "Stanley/Stella" },
+  { key: "nwg-craft", label: "Craft" },
+  { key: "nwg-clique", label: "Clique" },
+  { key: "nwg-projob", label: "ProJob" },
+  { key: "nwg-cutter", label: "Cutter & Buck" },
+  { key: "pf-elevate", label: "Elevate" },
+  { key: "pf-roly", label: "Roly" },
+  { key: "pf", label: "Prezentmateriāli" },
+  { key: "bb", label: "Beechfield Brands" },
+  { key: "mf", label: "Malfini" },
+];
+const MANUFACTURER_ORDER: Record<string, number> = Object.fromEntries(
+  MANUFACTURERS.map((m, i) => [m.key, i]),
+);
+const MANUFACTURER_LABEL: Record<string, string> = Object.fromEntries(
+  MANUFACTURERS.map((m) => [m.key, m.label]),
+);
+const manufacturerOf = (source: CatalogSource, brand: string | null): string | null => {
+  const b = (brand || "").toLowerCase();
+  if (source === "ss") return "ss";
+  if (source === "nwg") {
+    if (b.includes("craft")) return "nwg-craft";
+    if (b.includes("clique")) return "nwg-clique";
+    if (b.replace(/\s+/g, "").includes("projob")) return "nwg-projob";
+    if (b.includes("cutter")) return "nwg-cutter";
+    return null;
+  }
+  if (source === "pf") {
+    if (b.includes("elevate")) return "pf-elevate";
+    if (b === "roly" || b.startsWith("roly ") || b.includes(" roly")) return "pf-roly";
+    return "pf";
+  }
+  if (source === "bb") return "bb";
+  if (source === "mf") return "mf";
+  return null;
+};
 
 const GENDER_MAP: Record<string, string | null> = {
   male: "Men", men: "Men", mens: "Men", man: "Men", gents: "Men", gentlemen: "Men",
@@ -230,24 +278,33 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         if (!data || data.length < step) break;
         from += step;
       }
-      const enriched: EnrichedItem[] = all.map((it) => {
-        const buckets = new Set<ColorBucketKey>();
-        const raw = (it.colors || []) as ColorEntry[];
-        const colorList: EnrichedColor[] = raw.map((c) => {
-          const bucket = bucketOf(c.h, c.n);
-          if (bucket) buckets.add(bucket);
-          return { ...c, bucket };
-        });
-        return {
-          ...it,
-          brand: (() => { const b = normalizeText(it.brand); return b && b.toLowerCase() !== "unbranded" ? b : null; })(),
-          category: normalizeCategory(it.category),
-          group_name: normalizeText(it.group_name),
-          gender: normalizeGender(it.gender),
-          colors: colorList,
-          buckets,
-        };
-      });
+      const enriched: EnrichedItem[] = all
+        .map((it) => {
+          const buckets = new Set<ColorBucketKey>();
+          const raw = (it.colors || []) as ColorEntry[];
+          const colorList: EnrichedColor[] = raw.map((c) => {
+            const bucket = bucketOf(c.h, c.n);
+            if (bucket) buckets.add(bucket);
+            return { ...c, bucket };
+          });
+          const brand = (() => {
+            const b = normalizeText(it.brand);
+            return b && b.toLowerCase() !== "unbranded" ? b : null;
+          })();
+          const manufacturer = manufacturerOf(it.source, brand);
+          if (!manufacturer) return null;
+          return {
+            ...it,
+            brand,
+            category: normalizeCategory(it.category),
+            group_name: normalizeText(it.group_name),
+            gender: normalizeGender(it.gender),
+            colors: colorList,
+            buckets,
+            manufacturer,
+          } as EnrichedItem;
+        })
+        .filter((x): x is EnrichedItem => x !== null);
       setItems(enriched);
       setLoaded(true);
 
@@ -355,15 +412,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const t = useMemo(
     () => ({
       title: title ?? (lang === "lv" ? "Katalogs" : "Catalog"),
-      subtitle:
-        subtitle ??
-        (lang === "lv"
-          ? "Meklējiet visos mūsu piegādātāju katalogos vienuviet"
-          : "Search across all our supplier catalogs at once"),
+      subtitle: subtitle ?? "",
       search: lang === "lv" ? "Meklēt modeli, kodu vai zīmolu…" : "Search model, code or brand…",
       results: lang === "lv" ? "rezultāti" : "results",
       clearAll: lang === "lv" ? "Notīrīt filtrus" : "Clear filters",
-      source: lang === "lv" ? "Piegādātājs" : "Supplier",
+      source: lang === "lv" ? "Ražotājs" : "Manufacturer",
       brand: lang === "lv" ? "Zīmols" : "Brand",
       category: lang === "lv" ? "Kategorija" : "Category",
       group: lang === "lv" ? "Grupa" : "Group",
@@ -383,7 +436,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       const hay = `${it.name || ""} ${it.id} ${it.brand || ""}`.toLowerCase();
       if (!hay.includes(needle)) return false;
     }
-    if (except !== "source" && sources.size && !sources.has(it.source)) return false;
+    if (except !== "source" && sources.size && !sources.has(it.manufacturer)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
     if (except !== "category" && categories.size && (!it.category || !categories.has(it.category))) return false;
     if (except !== "group" && groups.size && (!it.group_name || !groups.has(it.group_name))) return false;
@@ -413,13 +466,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     [items, q, sources, brands, categories, groups, genders, colors]
   );
 
+  // "Ražotājs" facet — virtual manufacturer taxonomy (see MANUFACTURERS above).
   const sourceItems = useMemo(() => {
-    const order: CatalogSource[] = ["ss", "nwg", "pf", "bb", "mf"];
-    return order
-      .map((s) => ({
-        label: SOURCE_META[s].label,
-        value: s,
-        count: items.filter((it) => it.source === s && passesExcept(it, "source")).length,
+    return MANUFACTURERS
+      .map((m) => ({
+        label: m.label,
+        value: m.key,
+        count: items.filter((it) => it.manufacturer === m.key && passesExcept(it, "source")).length,
       }))
       .filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -600,11 +653,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   filterSections.push(
     {
-      key: "brand",
-      title: t.brand,
-      items: brandItems,
-      selected: brands,
-      onToggle: toggle(brands, setBrands),
+      key: "category",
+      title: t.category,
+      items: categoryItems,
+      selected: categories,
+      onToggle: toggle(categories, setCategories),
     },
     {
       key: "color",
@@ -627,11 +680,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       },
     },
     {
-      key: "category",
-      title: t.category,
-      items: categoryItems,
-      selected: categories,
-      onToggle: toggle(categories, setCategories),
+      key: "brand",
+      title: t.brand,
+      items: brandItems,
+      selected: brands,
+      onToggle: toggle(brands, setBrands),
     },
     {
       key: "gender",
@@ -656,7 +709,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           <h1 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground md:text-4xl">
             {t.title}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p>
+          {t.subtitle ? <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p> : null}
         </div>
 
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
