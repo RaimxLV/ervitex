@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const brands = [
-  "Malfini", "Clique", "James & Nicholson", "Fruit of the Loom",
-  "Gildan", "B&C", "Russell", "SOL'S", "Stedman", "Bella+Canvas",
+  "Stanley/Stella", "Craft", "Clique", "ProJob", "Cutter & Buck",
+  "Elevate", "Roly", "Beechfield Brands", "Malfini", "Prezentmateriāli",
 ];
 
 const TrustedBrands = () => {

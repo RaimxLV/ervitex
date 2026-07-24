@@ -83,7 +83,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-primary/80 backdrop-blur-md text-primary-foreground">
+    <header className="sticky top-0 z-50 bg-primary/95 backdrop-blur-md text-primary-foreground">
       <div className="relative flex h-16 items-center justify-between px-4 sm:px-6 md:h-20">
         <Link to="/" className="flex items-center gap-2 sm:gap-3">
           <img src={ervitexLogo} alt="Ervitex" className="h-8 w-auto md:h-10" />
@@ -227,9 +227,6 @@ const Header = () => {
             <Phone className="h-4 w-4" strokeWidth={1.5} />
             +371 678 18282
           </a>
-          <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link to="/contact">{t("header.quote")}</Link>
-          </Button>
         </div>
 
         {/* Mobile controls */}
@@ -321,9 +318,6 @@ const Header = () => {
                 )}
               </div>
             ))}
-            <Button asChild className="mt-2 w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              <Link to="/contact" onClick={() => setIsOpen(false)}>{t("header.quote")}</Link>
-            </Button>
           </nav>
         </div>
       )}
