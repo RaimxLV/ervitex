@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -942,6 +942,9 @@ const CatalogItemDialog = ({
 
           <div className="space-y-6">
             <DialogHeader className="space-y-4">
+              <DialogDescription className="sr-only">
+                {displayDetail.title || name || id}
+              </DialogDescription>
               {/* Meta row: code + supplier on left, brand on right */}
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
                 <div className="flex flex-wrap items-center gap-3">
