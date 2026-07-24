@@ -757,13 +757,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       items: genderItems,
       selected: genders,
       onToggle: toggle(genders, setGenders),
-    },
-    {
-      key: "group",
-      title: t.group,
-      items: groupItems,
-      selected: groups,
-      onToggle: toggle(groups, setGroups),
     }
   );
 
