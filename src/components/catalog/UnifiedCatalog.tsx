@@ -72,7 +72,55 @@ interface EnrichedColor extends ColorEntry { bucket: ColorBucketKey | null }
 interface EnrichedItem extends Omit<CatalogItem, "colors"> {
   colors: EnrichedColor[];
   buckets: Set<ColorBucketKey>;
+  manufacturer: string;
 }
+
+/**
+ * Virtual "Ražotājs" (manufacturer) taxonomy. It unifies:
+ *  - Stanley/Stella (its own source)
+ *  - Selected NWG brands (Craft / Clique / ProJob / Cutter & Buck) — other NWG
+ *    items are dropped from the catalog because we don't sell them.
+ *  - PF Concept split: Elevate + Roly become standalone manufacturers, the
+ *    remaining PF items live under "Prezentmateriāli".
+ *  - Beechfield Brands, Malfini.
+ */
+const MANUFACTURERS: { key: string; label: string }[] = [
+  { key: "ss", label: "Stanley/Stella" },
+  { key: "nwg-craft", label: "Craft" },
+  { key: "nwg-clique", label: "Clique" },
+  { key: "nwg-projob", label: "ProJob" },
+  { key: "nwg-cutter", label: "Cutter & Buck" },
+  { key: "pf-elevate", label: "Elevate" },
+  { key: "pf-roly", label: "Roly" },
+  { key: "pf", label: "Prezentmateriāli" },
+  { key: "bb", label: "Beechfield Brands" },
+  { key: "mf", label: "Malfini" },
+];
+const MANUFACTURER_ORDER: Record<string, number> = Object.fromEntries(
+  MANUFACTURERS.map((m, i) => [m.key, i]),
+);
+const MANUFACTURER_LABEL: Record<string, string> = Object.fromEntries(
+  MANUFACTURERS.map((m) => [m.key, m.label]),
+);
+const manufacturerOf = (source: CatalogSource, brand: string | null): string | null => {
+  const b = (brand || "").toLowerCase();
+  if (source === "ss") return "ss";
+  if (source === "nwg") {
+    if (b.includes("craft")) return "nwg-craft";
+    if (b.includes("clique")) return "nwg-clique";
+    if (b.replace(/\s+/g, "").includes("projob")) return "nwg-projob";
+    if (b.includes("cutter")) return "nwg-cutter";
+    return null;
+  }
+  if (source === "pf") {
+    if (b.includes("elevate")) return "pf-elevate";
+    if (b === "roly" || b.startsWith("roly ") || b.includes(" roly")) return "pf-roly";
+    return "pf";
+  }
+  if (source === "bb") return "bb";
+  if (source === "mf") return "mf";
+  return null;
+};
 
 const GENDER_MAP: Record<string, string | null> = {
   male: "Men", men: "Men", mens: "Men", man: "Men", gents: "Men", gentlemen: "Men",
