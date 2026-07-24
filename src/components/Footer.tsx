@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, Lock, ShieldCheck, Share2, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Lock, ShieldCheck, Share2, MessageCircle, Clock, Building2, Calculator } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ervitexLogo from "@/assets/ervitex-logo-2.svg";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 
-const SW = 1.2;
+const SW = 1.5;
 
 const SHARE_URL = "https://www.ervitex.lv";
 const SHARE_TEXT = "Ervitex – apģērbu personalizācija un vairumtirdzniecība";
@@ -43,28 +43,98 @@ const Footer = () => {
 
   return (
     <footer className="border-t border-border bg-primary text-primary-foreground">
-      <div className="container py-8 md:py-16">
+      <div className="container py-12 md:py-16">
         {/* Logo */}
-        <div className="mb-8 text-center">
-          <div className="flex items-center justify-center gap-3">
-            <img src={ervitexLogo} alt="Ervitex" className="h-7 w-auto" />
-            <span className="h-5 w-px bg-primary-foreground/20" />
-            <img src={stellaLogo} alt="Stanley/Stella Dealer" className="h-3.5 w-auto opacity-50" />
+        <div className="mb-10 text-center">
+          <div className="flex items-center justify-center gap-4">
+            <img src={ervitexLogo} alt="Ervitex" className="h-9 w-auto" />
+            <span className="h-6 w-px bg-primary-foreground/25" />
+            <img src={stellaLogo} alt="Stanley/Stella Dealer" className="h-4 w-auto opacity-60" />
           </div>
-          <p className="mt-2 text-xs text-primary-foreground/50">
+          <p className="mt-3 text-sm text-primary-foreground/60">
             {lang === "lv" ? "Jūsu uzticamais apģērbu partneris" : "Your trusted apparel partner"}
           </p>
         </div>
 
-        {/* Columns — block centered, text left-aligned */}
-        <div className="mx-auto max-w-4xl">
-          <div className="grid grid-cols-2 gap-x-10 gap-y-6 md:grid-cols-4">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-12">
+            {/* Contact block – largest, primary */}
+            <div className="md:col-span-6 space-y-5">
+              <h4 className="font-heading text-xs font-bold uppercase tracking-widest text-accent">
+                {t("footer.contact")}
+              </h4>
+
+              <div className="space-y-4 text-sm leading-relaxed text-primary-foreground/85">
+                <div className="flex items-start gap-3">
+                  <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                  <div>
+                    <div className="font-semibold text-primary-foreground">
+                      {lang === "lv" ? "Braslas Biznesa Centrs" : "Braslas Business Center"}
+                    </div>
+                    <div className="text-primary-foreground/70">
+                      {lang === "lv" ? "Ieeja “D”, 2. stāvs" : "Entrance “D”, 2nd floor"}
+                    </div>
+                    <div className="text-primary-foreground/70">Braslas iela 29, Rīga, LV-1084</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Building2 className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                  <div className="text-primary-foreground/70">
+                    {lang === "lv" ? "Reģ. Nr." : "Reg. No."} <span className="text-primary-foreground">LV40002074377</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Mail className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                  <a href="mailto:birojs@ervitex.lv" className="hover:text-accent transition-colors">
+                    birojs@ervitex.lv
+                  </a>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Phone className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <a href="tel:+37167543384" className="hover:text-accent transition-colors">+371 67543384</a>
+                    <span className="text-primary-foreground/30">·</span>
+                    <a href="tel:+37167436896" className="hover:text-accent transition-colors">+371 67436896</a>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Calculator className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                  <div>
+                    <span className="text-primary-foreground/70">{lang === "lv" ? "Grāmatvedība:" : "Accounting:"}</span>{" "}
+                    <a href="tel:+37167552540" className="hover:text-accent transition-colors">+371 67552540</a>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <Clock className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                  <div className="space-y-0.5">
+                    <div className="font-semibold text-primary-foreground">
+                      {lang === "lv" ? "Darba laiks" : "Working hours"}
+                    </div>
+                    <div className="text-primary-foreground/70">
+                      {lang === "lv" ? "P. – C." : "Mon – Thu"}: <span className="text-primary-foreground">9:00 – 17:30</span>
+                    </div>
+                    <div className="text-primary-foreground/70">
+                      {lang === "lv" ? "Pk." : "Fri"}: <span className="text-primary-foreground">9:00 – 16:00</span>
+                    </div>
+                    <div className="text-primary-foreground/70">
+                      {lang === "lv" ? "Sest., Sv." : "Sat, Sun"}: <span className="text-primary-foreground">{lang === "lv" ? "Slēgts" : "Closed"}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Navigation */}
-            <div className="space-y-2">
-              <h4 className="font-heading text-[10px] font-bold uppercase text-primary-foreground/35">
+            <div className="md:col-span-3 space-y-4">
+              <h4 className="font-heading text-xs font-bold uppercase tracking-widest text-accent">
                 {t("footer.navigation")}
               </h4>
-              <nav className="flex flex-col gap-1.5">
+              <nav className="flex flex-col gap-2.5 text-sm">
                 {[
                   { key: "nav.home" as const, path: "/" },
                   { key: "nav.catalog" as const, path: "/catalog" },
@@ -72,85 +142,66 @@ const Footer = () => {
                   { key: "nav.about" as const, path: "/about" },
                   { key: "nav.contact" as const, path: "/contact" },
                 ].map((item) => (
-                  <Link key={item.path} to={item.path} className="text-xs text-primary-foreground/55 transition-colors hover:text-accent">
+                  <Link key={item.path} to={item.path} className="text-primary-foreground/75 transition-colors hover:text-accent">
                     {t(item.key)}
                   </Link>
                 ))}
               </nav>
             </div>
 
-            {/* Services */}
-            <div className="space-y-2">
-              <h4 className="font-heading text-[10px] font-bold uppercase text-primary-foreground/35">
-                {t("footer.services")}
-              </h4>
-              <nav className="flex flex-col gap-1.5">
-                {[
-                  { lv: "Sietspiede", en: "Screen Printing" },
-                  { lv: "Izšūšana", en: "Embroidery" },
-                  { lv: "Sublimācija", en: "Sublimation" },
-                  { lv: "DTF druka", en: "DTF Printing" },
-                  { lv: "Termodruka", en: "Heat Transfer" },
-                ].map((s) => (
-                  <span key={s.en} className="text-xs text-primary-foreground/55">
-                    {lang === "lv" ? s.lv : s.en}
-                  </span>
-                ))}
-              </nav>
-            </div>
-
-            {/* Contact */}
-            <div className="space-y-2">
-              <h4 className="font-heading text-[10px] font-bold uppercase text-primary-foreground/35">
-                {t("footer.contact")}
-              </h4>
-              <div className="flex flex-col gap-2">
-                <a href="tel:+37167818282" className="inline-flex items-center gap-2 text-xs text-primary-foreground/55 hover:text-accent transition-colors">
-                  <Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={SW} /> +371 678 18282
-                </a>
-                <a href="mailto:info@ervitex.lv" className="inline-flex items-center gap-2 text-xs text-primary-foreground/55 hover:text-accent transition-colors">
-                  <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={SW} /> info@ervitex.lv
-                </a>
-                <span className="inline-flex items-center gap-2 text-xs text-primary-foreground/55">
-                  <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={SW} /> Rīga, Latvia
-                </span>
+            {/* Services + Social */}
+            <div className="md:col-span-3 space-y-8">
+              <div className="space-y-4">
+                <h4 className="font-heading text-xs font-bold uppercase tracking-widest text-accent">
+                  {t("footer.services")}
+                </h4>
+                <ul className="flex flex-col gap-2.5 text-sm text-primary-foreground/75">
+                  {[
+                    { lv: "Sietspiede", en: "Screen Printing" },
+                    { lv: "Izšūšana", en: "Embroidery" },
+                    { lv: "Sublimācija", en: "Sublimation" },
+                    { lv: "DTF druka", en: "DTF Printing" },
+                    { lv: "Termodruka", en: "Heat Transfer" },
+                  ].map((s) => (
+                    <li key={s.en}>{lang === "lv" ? s.lv : s.en}</li>
+                  ))}
+                </ul>
               </div>
-            </div>
 
-            {/* Social */}
-            <div className="space-y-2">
-              <h4 className="font-heading text-[10px] font-bold uppercase text-primary-foreground/35">
-                {lang === "lv" ? "Sekojiet mums" : "Follow us"}
-              </h4>
-              <div className="flex items-center gap-3">
-                {socials.map((s) => (
+              <div className="space-y-4">
+                <h4 className="font-heading text-xs font-bold uppercase tracking-widest text-accent">
+                  {lang === "lv" ? "Sekojiet mums" : "Follow us"}
+                </h4>
+                <div className="flex items-center gap-2.5">
+                  {socials.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={s.label}
+                      className="flex h-10 w-10 items-center justify-center rounded-sm border border-primary-foreground/15 text-primary-foreground/70 transition-all hover:border-accent hover:text-accent"
+                    >
+                      <s.Icon className="h-4 w-4" />
+                    </a>
+                  ))}
                   <a
-                    key={s.label}
-                    href={s.href}
+                    href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={s.label}
-                    className="flex h-8 w-8 items-center justify-center rounded-sm border border-primary-foreground/10 text-primary-foreground/50 transition-all hover:border-accent/50 hover:text-accent"
+                    aria-label="WhatsApp"
+                    className="flex h-10 w-10 items-center justify-center rounded-sm border border-primary-foreground/15 text-primary-foreground/70 transition-all hover:border-accent hover:text-accent"
                   >
-                    <s.Icon className="h-4 w-4" />
+                    <MessageCircle className="h-4 w-4" strokeWidth={SW} />
                   </a>
-                ))}
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="WhatsApp"
-                  className="flex h-8 w-8 items-center justify-center rounded-sm border border-primary-foreground/10 text-primary-foreground/50 transition-all hover:border-accent/50 hover:text-accent"
-                >
-                  <MessageCircle className="h-4 w-4" strokeWidth={SW} />
-                </a>
-                <button
-                  onClick={handleShare}
-                  aria-label="Share"
-                  className="flex h-8 w-8 items-center justify-center rounded-sm border border-primary-foreground/10 text-primary-foreground/50 transition-all hover:border-accent/50 hover:text-accent"
-                >
-                  <Share2 className="h-4 w-4" strokeWidth={SW} />
-                </button>
+                  <button
+                    onClick={handleShare}
+                    aria-label="Share"
+                    className="flex h-10 w-10 items-center justify-center rounded-sm border border-primary-foreground/15 text-primary-foreground/70 transition-all hover:border-accent hover:text-accent"
+                  >
+                    <Share2 className="h-4 w-4" strokeWidth={SW} />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -159,31 +210,31 @@ const Footer = () => {
 
       {/* OEKO-TEX badge */}
       <div className="border-t border-primary-foreground/10 bg-primary">
-        <div className="container flex items-center justify-center gap-2 py-3">
+        <div className="container flex items-center justify-center gap-2 py-4">
           <ShieldCheck className="h-4 w-4 text-accent" strokeWidth={SW} />
-          <span className="text-[10px] font-heading uppercase text-primary-foreground/40 tracking-wide">OEKO-TEX® Standard 100</span>
+          <span className="text-[11px] font-heading uppercase text-primary-foreground/55 tracking-widest">OEKO-TEX® Standard 100</span>
         </div>
       </div>
 
       <div className="border-t border-primary-foreground/10 bg-primary">
-        <div className="container flex flex-col items-center justify-center gap-2 py-4 text-center">
-          <div className="flex items-center gap-3 flex-wrap justify-center">
-            <span className="text-[10px] text-primary-foreground/25">
+        <div className="container flex flex-col items-center justify-center gap-2 py-5 text-center">
+          <div className="flex items-center gap-3 flex-wrap justify-center text-xs">
+            <span className="text-primary-foreground/50">
               © {new Date().getFullYear()} SIA Ervitex. {t("footer.rights")}
             </span>
-            <span className="flex items-center gap-2 text-[10px] text-primary-foreground/20">
+            <span className="flex items-center gap-2 text-primary-foreground/45">
               <span>·</span>
-              <Link to="/privacy" className="hover:text-accent/60 transition-colors">
+              <Link to="/privacy" className="hover:text-accent transition-colors">
                 {lang === "lv" ? "Privātuma politika" : "Privacy Policy"}
               </Link>
               <span>·</span>
-              <Link to="/terms" className="hover:text-accent/60 transition-colors">
+              <Link to="/terms" className="hover:text-accent transition-colors">
                 {lang === "lv" ? "Lietošanas noteikumi" : "Terms of Service"}
               </Link>
               <span>·</span>
               <Link
                 to="/login"
-                className="inline-flex items-center gap-1 hover:text-accent/60 transition-colors"
+                className="inline-flex items-center gap-1 hover:text-accent transition-colors"
                 aria-label="Admin access"
               >
                 <Lock className="h-3 w-3" strokeWidth={SW} />
