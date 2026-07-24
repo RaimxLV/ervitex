@@ -39,13 +39,20 @@ const Header = () => {
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
+  // Delay opening so incidental mouse traversal across the header does not
+  // trigger the mega menu. Closing has a shorter delay so the panel feels
+  // responsive when leaving.
   const openMega = () => {
+    if (megaTimer.current) window.clearTimeout(megaTimer.current);
+    megaTimer.current = window.setTimeout(() => setMegaOpen(true), 260);
+  };
+  const openMegaImmediate = () => {
     if (megaTimer.current) window.clearTimeout(megaTimer.current);
     setMegaOpen(true);
   };
   const closeMegaSoon = () => {
     if (megaTimer.current) window.clearTimeout(megaTimer.current);
-    megaTimer.current = window.setTimeout(() => setMegaOpen(false), 120);
+    megaTimer.current = window.setTimeout(() => setMegaOpen(false), 140);
   };
 
   useEffect(() => {
