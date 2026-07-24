@@ -709,7 +709,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           <h1 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground md:text-4xl">
             {t.title}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p>
+          {t.subtitle ? <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p> : null}
         </div>
 
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
