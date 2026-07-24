@@ -227,9 +227,6 @@ const Header = () => {
             <Phone className="h-4 w-4" strokeWidth={1.5} />
             +371 678 18282
           </a>
-          <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link to="/contact">{t("header.quote")}</Link>
-          </Button>
         </div>
 
         {/* Mobile controls */}
