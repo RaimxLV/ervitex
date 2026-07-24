@@ -43,9 +43,9 @@ const Footer = () => {
 
   return (
     <footer className="border-t border-border bg-primary text-primary-foreground">
-      <div className="container py-14 md:py-20">
+      <div className="container py-16 md:py-24">
         {/* 4 columns */}
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-x-12 gap-y-14 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-16 xl:gap-x-24">
           {/* Col 1 — Logo + socials */}
           <div className="space-y-6">
             <Link to="/" className="flex items-center gap-3">
