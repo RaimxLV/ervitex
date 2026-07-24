@@ -31,7 +31,7 @@ const Header = () => {
   const [searchValue, setSearchValue] = useState("");
   const [shareOpen, setShareOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
-  const megaTimer = useRef<number | null>(null);
+  
   const shareRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
