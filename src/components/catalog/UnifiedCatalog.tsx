@@ -150,19 +150,54 @@ const normalizeGender = (raw?: string | null): string | null => {
 };
 
 const CATEGORY_MAP: Record<string, string> = {
+  // T-shirts family
   "t-shirt": "T-shirts", "tshirt": "T-shirts", "tshirts": "T-shirts", "t-shirts": "T-shirts",
-  "polo": "Polos", "polos": "Polos",
-  "hoodie": "Hoodies", "hoodies": "Hoodies",
+  "tees": "T-shirts", "tank tops": "T-shirts",
+  // Polos
+  "polo": "Polos", "polos": "Polos", "polo shirts": "Polos", "polo shirt": "Polos",
+  // Hoodies
+  "hoodie": "Hoodies", "hoodies": "Hoodies", "hoodie sweatshirts": "Hoodies",
+  // Sweaters / sweatshirts / fleece
   "sweater": "Sweaters", "sweaters": "Sweaters",
   "sweatshirt": "Sweaters", "sweatshirts": "Sweaters",
-  "jacket": "Jackets", "jackets": "Jackets",
+  "crew neck sweatshirts": "Sweaters", "zip-thru sweatshirts": "Sweaters",
+  "fleece": "Sweaters", "terry": "Sweaters",
+  // Jackets
+  "jacket": "Jackets", "jackets": "Jackets", "jackets-vests": "Jackets",
+  "non padded jacket": "Jackets", "light padded jacket": "Jackets", "padded jacket": "Jackets",
+  // Vests
+  "vest": "Vests", "vests": "Vests", "bodywarmers": "Vests", "safety vests": "Vests",
+  // Caps / hats / beanies
   "cap": "Caps & Hats", "caps": "Caps & Hats", "hat": "Caps & Hats", "hats": "Caps & Hats",
   "caps & hats": "Caps & Hats", "headwear": "Caps & Hats",
-  "beanie": "Beanies", "beanies": "Beanies",
+  "beanie": "Caps & Hats", "beanies": "Caps & Hats",
+  // Bags
   "bag": "Bags", "bags": "Bags",
-  "backpack": "Backpacks", "backpacks": "Backpacks",
+  "shopping & tote bags": "Tote Bags", "tote bags": "Tote Bags", "cotton bags": "Tote Bags",
+  "backpack": "Backpacks", "backpacks": "Backpacks", "laptop backpacks": "Backpacks",
+  // Shorts / trousers
   "short": "Shorts", "shorts": "Shorts",
   "trouser": "Trousers", "trousers": "Trousers", "pant": "Trousers", "pants": "Trousers",
+  "trousers-shorts": "Trousers", "shorts & trousers": "Trousers", "training pants": "Trousers",
+  // Bottles / mugs
+  "bottle": "Bottles", "bottles": "Bottles",
+  "water bottles": "Bottles", "insulated bottles": "Bottles",
+  "sports bottles": "Bottles", "infuser bottles": "Bottles",
+  "mug": "Mugs", "mugs": "Mugs", "standard mugs": "Mugs",
+  "insulated mugs": "Mugs", "travel mugs": "Mugs", "cups": "Mugs",
+  // Notebooks
+  "notebook": "Notebooks", "notebooks": "Notebooks", "notepad": "Notebooks", "notepads": "Notebooks",
+  "hard cover notebooks": "Notebooks", "soft cover notebooks": "Notebooks", "sketchbooks": "Notebooks",
+  // Keychains
+  "keychain": "Keychains & Keyrings", "keychains": "Keychains & Keyrings",
+  "keychains & keyrings": "Keychains & Keyrings",
+  // Umbrellas
+  "umbrella": "Umbrellas", "umbrellas": "Umbrellas",
+  "standard umbrellas": "Umbrellas", "folding umbrellas": "Umbrellas",
+  "golf umbrellas": "Umbrellas", "storm umbrellas": "Umbrellas",
+  // Audio
+  "headphones": "Headphones", "earbuds": "Headphones",
+  // Bottoms / Tops passthroughs
   "bottom": "Bottoms", "bottoms": "Bottoms",
   "top": "Tops", "tops": "Tops",
 };
@@ -545,6 +580,36 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     "Pens & Writing": "Pildspalvas & rakstāmpiederumi",
     "Notebooks & Paper Products": "Bloknoti & papīra izstrādājumi",
     "Clothing": "Apģērbs",
+    // Extra consolidations & missing English leftovers
+    "Sweets": "Saldumi", "Safety Footwear": "Darba apavi",
+    "Food & Beverages": "Pārtika & dzērieni",
+    "Promotional materials": "Reklāmas materiāli",
+    "Lip Balms": "Lūpu balzāmi", "Glasses & Carafes": "Glāzes & karafes",
+    "Lamps": "Lampas", "Bottle Openers & Accessories": "Pudeļu atverēji",
+    "USB Flash Drives": "USB atmiņas", "Indoor Games": "Iekštelpu spēles",
+    "Multitools": "Multi-instrumenti", "Fountain Pens": "Tintes pildspalvas",
+    "Planners": "Plānotāji", "First Aid Kits": "Pirmās palīdzības komplekti",
+    "Tool Sets": "Instrumentu komplekti",
+    "Telephone & Tablet Accessories": "Telefonu & planšetu aksesuāri",
+    "Conference Bags": "Konferenču somas", "Wireless Charging": "Bezvadu lādēšana",
+    "Smartwatches": "Viedpulksteņi", "Reflective Items": "Atstarojoši priekšmeti",
+    "Badge Holders": "Kartes turētāji", "Cycling Accessories": "Riteņbraukšanas aksesuāri",
+    "Beach Items": "Pludmales priekšmeti", "OUTLET": "Izpārdošana",
+    "Outdoor Items": "Āra priekšmeti", "USB Hubs": "USB centrmezgli",
+    "Stress Balls": "Stresa bumbiņas", "Outdoor Games": "Āra spēles",
+    "Trolleys & Suitcases": "Koferi & čemodāni", "BBQ Accessories": "Grila aksesuāri",
+    "Markers": "Marķieri", "Sport & Gym Bags": "Sporta somas",
+    "Sailor Bags": "Jūrnieku somas", "Kitchen & Home": "Virtuve & mājas",
+    "Additional assortment": "Papildu sortiments",
+    "Pocket Knives": "Kabatas naži", "Greeting Cards": "Apsveikuma kartītes",
+    "Wallets & Card Wallets": "Maki", "Measuring Tapes": "Mērlentes",
+    "Wellness & Manicure Sets": "Wellness komplekti",
+    "Glasses": "Glāzes", "Desk Pads": "Galda paliktņi",
+    "Kitchen Linen": "Virtuves lini", "Rain Ponchos": "Lietus ponči",
+    "Cameras": "Kameras", "Picnic Accessories": "Piknika aksesuāri",
+    "Cases": "Futrāļi", "Bodies": "Bodiji", "Bib": "Priekšauti bērniem",
+    "Wristbands": "Aproces", "Chef's Knives": "Šefpavāra naži",
+    "Foldable Bags": "Salokāmas somas", "Messenger & Shoulder Bags": "Plecu somas",
   };
   const GENDER_LV: Record<string, string> = {
     "Men": "Vīriešu", "Women": "Sieviešu", "Kids": "Bērnu", "Baby": "Zīdaiņu", "Unisex": "Unisex",
@@ -692,13 +757,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       items: genderItems,
       selected: genders,
       onToggle: toggle(genders, setGenders),
-    },
-    {
-      key: "group",
-      title: t.group,
-      items: groupItems,
-      selected: groups,
-      onToggle: toggle(groups, setGroups),
     }
   );
 
