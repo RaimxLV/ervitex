@@ -150,19 +150,54 @@ const normalizeGender = (raw?: string | null): string | null => {
 };
 
 const CATEGORY_MAP: Record<string, string> = {
+  // T-shirts family
   "t-shirt": "T-shirts", "tshirt": "T-shirts", "tshirts": "T-shirts", "t-shirts": "T-shirts",
-  "polo": "Polos", "polos": "Polos",
-  "hoodie": "Hoodies", "hoodies": "Hoodies",
+  "tees": "T-shirts", "tank tops": "T-shirts",
+  // Polos
+  "polo": "Polos", "polos": "Polos", "polo shirts": "Polos", "polo shirt": "Polos",
+  // Hoodies
+  "hoodie": "Hoodies", "hoodies": "Hoodies", "hoodie sweatshirts": "Hoodies",
+  // Sweaters / sweatshirts / fleece
   "sweater": "Sweaters", "sweaters": "Sweaters",
   "sweatshirt": "Sweaters", "sweatshirts": "Sweaters",
-  "jacket": "Jackets", "jackets": "Jackets",
+  "crew neck sweatshirts": "Sweaters", "zip-thru sweatshirts": "Sweaters",
+  "fleece": "Sweaters", "terry": "Sweaters",
+  // Jackets
+  "jacket": "Jackets", "jackets": "Jackets", "jackets-vests": "Jackets",
+  "non padded jacket": "Jackets", "light padded jacket": "Jackets", "padded jacket": "Jackets",
+  // Vests
+  "vest": "Vests", "vests": "Vests", "bodywarmers": "Vests", "safety vests": "Vests",
+  // Caps / hats / beanies
   "cap": "Caps & Hats", "caps": "Caps & Hats", "hat": "Caps & Hats", "hats": "Caps & Hats",
   "caps & hats": "Caps & Hats", "headwear": "Caps & Hats",
-  "beanie": "Beanies", "beanies": "Beanies",
+  "beanie": "Caps & Hats", "beanies": "Caps & Hats",
+  // Bags
   "bag": "Bags", "bags": "Bags",
-  "backpack": "Backpacks", "backpacks": "Backpacks",
+  "shopping & tote bags": "Tote Bags", "tote bags": "Tote Bags", "cotton bags": "Tote Bags",
+  "backpack": "Backpacks", "backpacks": "Backpacks", "laptop backpacks": "Backpacks",
+  // Shorts / trousers
   "short": "Shorts", "shorts": "Shorts",
   "trouser": "Trousers", "trousers": "Trousers", "pant": "Trousers", "pants": "Trousers",
+  "trousers-shorts": "Trousers", "shorts & trousers": "Trousers", "training pants": "Trousers",
+  // Bottles / mugs
+  "bottle": "Bottles", "bottles": "Bottles",
+  "water bottles": "Bottles", "insulated bottles": "Bottles",
+  "sports bottles": "Bottles", "infuser bottles": "Bottles",
+  "mug": "Mugs", "mugs": "Mugs", "standard mugs": "Mugs",
+  "insulated mugs": "Mugs", "travel mugs": "Mugs", "cups": "Mugs",
+  // Notebooks
+  "notebook": "Notebooks", "notebooks": "Notebooks", "notepad": "Notebooks", "notepads": "Notebooks",
+  "hard cover notebooks": "Notebooks", "soft cover notebooks": "Notebooks", "sketchbooks": "Notebooks",
+  // Keychains
+  "keychain": "Keychains & Keyrings", "keychains": "Keychains & Keyrings",
+  "keychains & keyrings": "Keychains & Keyrings",
+  // Umbrellas
+  "umbrella": "Umbrellas", "umbrellas": "Umbrellas",
+  "standard umbrellas": "Umbrellas", "folding umbrellas": "Umbrellas",
+  "golf umbrellas": "Umbrellas", "storm umbrellas": "Umbrellas",
+  // Audio
+  "headphones": "Headphones", "earbuds": "Headphones",
+  // Bottoms / Tops passthroughs
   "bottom": "Bottoms", "bottoms": "Bottoms",
   "top": "Tops", "tops": "Tops",
 };
