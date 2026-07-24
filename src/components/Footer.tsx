@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, Lock, ShieldCheck, Share2, MessageCircle, Clock, Building2, Calculator } from "lucide-react";
+import { Mail, Phone, MapPin, Lock, ShieldCheck, Share2, MessageCircle, Clock, Calculator } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ervitexLogo from "@/assets/ervitex-logo-2.svg";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
@@ -44,67 +44,6 @@ const Footer = () => {
   return (
     <footer className="border-t border-border bg-primary text-primary-foreground">
       <div className="container py-14 md:py-20">
-        {/* Contact strip */}
-        <div className="mb-12 grid grid-cols-1 gap-6 border-b border-primary-foreground/10 pb-10 md:grid-cols-2 lg:grid-cols-4">
-          <div className="flex items-start gap-3">
-            <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
-            <div className="text-[15px] leading-relaxed">
-              <div className="font-semibold">
-                {lang === "lv" ? "Braslas Biznesa Centrs" : "Braslas Business Center"}
-              </div>
-              <div className="text-primary-foreground/70">
-                {lang === "lv" ? "Ieeja “D”, 2. stāvs" : "Entrance “D”, 2nd floor"}
-              </div>
-              <div className="text-primary-foreground/70">Braslas iela 29, Rīga, LV-1084</div>
-              <div className="mt-1 text-primary-foreground/60">
-                {lang === "lv" ? "Reģ. Nr." : "Reg. No."} LV40002074377
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <Mail className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
-            <div className="text-[15px] leading-relaxed">
-              <a href="mailto:birojs@ervitex.lv" className="font-semibold hover:text-accent transition-colors">
-                birojs@ervitex.lv
-              </a>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <Phone className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
-            <div className="text-[15px] leading-relaxed">
-              <a href="tel:+37167543384" className="block hover:text-accent transition-colors">+371 67543384</a>
-              <a href="tel:+37167436896" className="block hover:text-accent transition-colors">+371 67436896</a>
-              <div className="mt-1 text-primary-foreground/70">
-                <Calculator className="mr-1 inline h-3.5 w-3.5" strokeWidth={SW} />
-                <a href="tel:+37167552540" className="hover:text-accent transition-colors">+371 67552540</a>
-                <span className="ml-1 text-primary-foreground/50">
-                  ({lang === "lv" ? "grāmatvedība" : "accounting"})
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3">
-            <Clock className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
-            <div className="text-[15px] leading-relaxed">
-              <div className="font-semibold">
-                {lang === "lv" ? "Darba laiks" : "Working hours"}
-              </div>
-              <div className="text-primary-foreground/75">
-                {lang === "lv" ? "P. – C." : "Mon – Thu"}: 9:00 – 17:30
-              </div>
-              <div className="text-primary-foreground/75">
-                {lang === "lv" ? "Pk." : "Fri"}: 9:00 – 16:00
-              </div>
-              <div className="text-primary-foreground/60">
-                {lang === "lv" ? "Sest., Sv.: Slēgts" : "Sat, Sun: Closed"}
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* 4 columns */}
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Col 1 — Logo + socials */}
@@ -114,9 +53,6 @@ const Footer = () => {
               <span className="h-6 w-px bg-primary-foreground/25" />
               <img src={stellaLogo} alt="Stanley/Stella Dealer" className="h-4 w-auto opacity-60" />
             </Link>
-            <p className="text-sm leading-relaxed text-primary-foreground/70">
-              {lang === "lv" ? "Jūsu uzticamais apģērbu partneris" : "Your trusted apparel partner"}
-            </p>
             <div className="flex items-center gap-2.5">
               {socials.map((s) => (
                 <a
@@ -149,11 +85,85 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Col 2 — Legal */}
+          {/* Col 2 — Contact info */}
           <div className="space-y-5">
             <h4 className="font-heading text-sm font-bold uppercase tracking-widest text-accent">
-              {lang === "lv" ? "Informācija" : "Information"}
+              {lang === "lv" ? "Kontaktinformācija" : "Contact"}
             </h4>
+            <ul className="flex flex-col gap-4 text-[15px] leading-relaxed">
+              <li className="flex items-start gap-3">
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                <div>
+                  <div className="font-semibold">
+                    {lang === "lv" ? "Braslas Biznesa Centrs" : "Braslas Business Center"}
+                  </div>
+                  <div className="text-primary-foreground/70">
+                    {lang === "lv" ? "Ieeja “D”, 2. stāvs" : "Entrance “D”, 2nd floor"}
+                  </div>
+                  <div className="text-primary-foreground/70">Braslas iela 29, Rīga, LV-1084</div>
+                  <div className="mt-1 text-primary-foreground/60 text-sm">
+                    {lang === "lv" ? "Reģ. Nr." : "Reg. No."} LV40002074377
+                  </div>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <Mail className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                <a href="mailto:birojs@ervitex.lv" className="font-semibold hover:text-accent transition-colors">
+                  birojs@ervitex.lv
+                </a>
+              </li>
+              <li className="flex items-start gap-3">
+                <Phone className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                <div>
+                  <a href="tel:+37167543384" className="block hover:text-accent transition-colors">+371 67543384</a>
+                  <a href="tel:+37167436896" className="block hover:text-accent transition-colors">+371 67436896</a>
+                  <div className="mt-1 text-primary-foreground/70 text-sm">
+                    <Calculator className="mr-1 inline h-3.5 w-3.5" strokeWidth={SW} />
+                    <a href="tel:+37167552540" className="hover:text-accent transition-colors">+371 67552540</a>
+                    <span className="ml-1 text-primary-foreground/50">
+                      ({lang === "lv" ? "grāmatvedība" : "accounting"})
+                    </span>
+                  </div>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <Clock className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                <div>
+                  <div className="text-primary-foreground/75">
+                    {lang === "lv" ? "P. – C." : "Mon – Thu"}: 9:00 – 17:30
+                  </div>
+                  <div className="text-primary-foreground/75">
+                    {lang === "lv" ? "Pk." : "Fri"}: 9:00 – 16:00
+                  </div>
+                  <div className="text-primary-foreground/60">
+                    {lang === "lv" ? "Sest., Sv.: Slēgts" : "Sat, Sun: Closed"}
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 3 — Navigation + Legal */}
+          <div className="space-y-5">
+            <h4 className="font-heading text-sm font-bold uppercase tracking-widest text-accent">
+              {t("footer.navigation")}
+            </h4>
+            <nav className="flex flex-col gap-3 text-[15px]">
+              {[
+                { key: "nav.home" as const, path: "/" },
+                { key: "nav.catalog" as const, path: "/catalog" },
+                { key: "nav.services" as const, path: "/services" },
+                { key: "nav.about" as const, path: "/about" },
+                { key: "nav.contact" as const, path: "/contact" },
+              ].map((item) => (
+                <Link key={item.path} to={item.path} className="text-primary-foreground/80 transition-colors hover:text-accent">
+                  {t(item.key)}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="h-px w-10 bg-primary-foreground/20" />
+
             <ul className="flex flex-col gap-3 text-[15px]">
               <li>
                 <Link to="/terms" className="text-primary-foreground/80 hover:text-accent transition-colors">
@@ -180,26 +190,6 @@ const Footer = () => {
                 </Link>
               </li>
             </ul>
-          </div>
-
-          {/* Col 3 — Navigation */}
-          <div className="space-y-5">
-            <h4 className="font-heading text-sm font-bold uppercase tracking-widest text-accent">
-              {t("footer.navigation")}
-            </h4>
-            <nav className="flex flex-col gap-3 text-[15px]">
-              {[
-                { key: "nav.home" as const, path: "/" },
-                { key: "nav.catalog" as const, path: "/catalog" },
-                { key: "nav.services" as const, path: "/services" },
-                { key: "nav.about" as const, path: "/about" },
-                { key: "nav.contact" as const, path: "/contact" },
-              ].map((item) => (
-                <Link key={item.path} to={item.path} className="text-primary-foreground/80 transition-colors hover:text-accent">
-                  {t(item.key)}
-                </Link>
-              ))}
-            </nav>
           </div>
 
           {/* Col 4 — Services */}
