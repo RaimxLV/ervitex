@@ -232,6 +232,17 @@ const normalizeText = (raw?: string | null): string | null => {
   if (!t || t === "-" || t.toLowerCase() === "none") return null;
   return t;
 };
+const isIncompleteNwgShell = (it: CatalogItem): boolean => {
+  if (it.source !== "nwg") return false;
+  const name = normalizeText(it.name);
+  const hasRealName = !!name && name.toLowerCase() !== it.id.toLowerCase();
+  const hasDescription = !!normalizeText(it.description);
+  const hasCategory = !!normalizeText(it.category);
+  const hasColors = Array.isArray(it.colors) && it.colors.length > 0;
+  // NWG sometimes returns placeholder model rows (only code + brand + image).
+  // Those open a dialog with no supplier content, so keep only real product rows.
+  return !hasRealName && !hasDescription && !hasCategory && !hasColors;
+};
 
 const PAGE_SIZE = 24;
 
@@ -339,6 +350,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       }
       const enriched: EnrichedItem[] = all
         .map((it) => {
+          if (isIncompleteNwgShell(it)) return null;
           const buckets = new Set<ColorBucketKey>();
           const raw = (it.colors || []) as ColorEntry[];
           const colorList: EnrichedColor[] = raw.map((c) => {
