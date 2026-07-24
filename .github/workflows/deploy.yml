@@ -36,6 +36,7 @@ jobs:
 
       - name: SPA fallback
         run: |
+          repo="/${GITHUB_REPOSITORY#*/}"
           cat > dist/404.html <<'EOF'
           <!doctype html>
           <html lang="lv">
@@ -45,7 +46,7 @@ jobs:
               <title>Ervitex</title>
               <script>
                 (function () {
-                  var repo = '/ervitex';
+                  var repo = '__REPO_BASE__';
                   var path = window.location.pathname;
                   var relative = path.indexOf(repo + '/') === 0 ? path.slice(repo.length) : '/';
                   var target = repo + '/?gh-path=' + encodeURIComponent(relative + window.location.search + window.location.hash);
@@ -56,6 +57,7 @@ jobs:
             <body></body>
           </html>
           EOF
+          sed -i "s|__REPO_BASE__|$repo|g" dist/404.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
