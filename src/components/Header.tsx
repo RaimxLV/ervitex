@@ -268,7 +268,7 @@ const Header = () => {
             ? "pointer-events-auto opacity-100 translate-y-0"
             : "pointer-events-none opacity-0 -translate-y-2"
         }`}
-        onMouseEnter={openMega}
+        onMouseEnter={openMegaImmediate}
         onMouseLeave={closeMegaSoon}
       >
         <div className="border-t border-border bg-background text-foreground shadow-2xl shadow-primary/30">
