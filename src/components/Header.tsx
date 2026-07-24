@@ -39,13 +39,20 @@ const Header = () => {
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
+  // Delay opening so incidental mouse traversal across the header does not
+  // trigger the mega menu. Closing has a shorter delay so the panel feels
+  // responsive when leaving.
   const openMega = () => {
+    if (megaTimer.current) window.clearTimeout(megaTimer.current);
+    megaTimer.current = window.setTimeout(() => setMegaOpen(true), 260);
+  };
+  const openMegaImmediate = () => {
     if (megaTimer.current) window.clearTimeout(megaTimer.current);
     setMegaOpen(true);
   };
   const closeMegaSoon = () => {
     if (megaTimer.current) window.clearTimeout(megaTimer.current);
-    megaTimer.current = window.setTimeout(() => setMegaOpen(false), 120);
+    megaTimer.current = window.setTimeout(() => setMegaOpen(false), 140);
   };
 
   useEffect(() => {
@@ -106,7 +113,7 @@ const Header = () => {
                 >
                   <Link
                     to={item.path}
-                    onFocus={openMega}
+                    onFocus={openMegaImmediate}
                     aria-haspopup="menu"
                     aria-expanded={megaOpen}
                     className={`flex items-center gap-1 text-sm font-medium uppercase transition-colors hover:text-accent ${
@@ -261,7 +268,7 @@ const Header = () => {
             ? "pointer-events-auto opacity-100 translate-y-0"
             : "pointer-events-none opacity-0 -translate-y-2"
         }`}
-        onMouseEnter={openMega}
+        onMouseEnter={openMegaImmediate}
         onMouseLeave={closeMegaSoon}
       >
         <div className="border-t border-border bg-background text-foreground shadow-2xl shadow-primary/30">
