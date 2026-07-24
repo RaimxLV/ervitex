@@ -102,6 +102,25 @@ const MANUFACTURER_ORDER: Record<string, number> = Object.fromEntries(
 const MANUFACTURER_LABEL: Record<string, string> = Object.fromEntries(
   MANUFACTURERS.map((m) => [m.key, m.label]),
 );
+const parseManufacturerFilter = (rawValue: string | null): Set<string> => {
+  const parsed = new Set<string>();
+  for (const raw of (rawValue || "").split(",")) {
+    const token = raw.trim().toLowerCase();
+    if (!token) continue;
+    if (token === "nwg" || token === "new-wave-group" || token === "new wave group") {
+      parsed.add("nwg-craft");
+      parsed.add("nwg-clique");
+      parsed.add("nwg-projob");
+      parsed.add("nwg-cutter");
+      continue;
+    }
+    if (token === "stanley-stella" || token === "stanley/stella") parsed.add("ss");
+    else if (token === "pf-concept" || token === "pf concept") parsed.add("pf");
+    else if (token === "beechfield-brands" || token === "beechfield brands") parsed.add("bb");
+    else if (MANUFACTURER_LABEL[token]) parsed.add(token);
+  }
+  return parsed;
+};
 const manufacturerOf = (source: CatalogSource, brand: string | null): string | null => {
   const b = (brand || "").toLowerCase();
   if (source === "ss") return "ss";
@@ -213,6 +232,17 @@ const normalizeText = (raw?: string | null): string | null => {
   if (!t || t === "-" || t.toLowerCase() === "none") return null;
   return t;
 };
+const isIncompleteNwgShell = (it: CatalogItem): boolean => {
+  if (it.source !== "nwg") return false;
+  const name = normalizeText(it.name);
+  const hasRealName = !!name && name.toLowerCase() !== it.id.toLowerCase();
+  const hasDescription = !!normalizeText(it.description);
+  const hasCategory = !!normalizeText(it.category);
+  const hasColors = Array.isArray(it.colors) && it.colors.length > 0;
+  // NWG sometimes returns placeholder model rows (only code + brand + image).
+  // Those open a dialog with no supplier content, so keep only real product rows.
+  return !hasRealName && !hasDescription && !hasCategory && !hasColors;
+};
 
 const PAGE_SIZE = 24;
 
@@ -259,9 +289,14 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(() => {
-    const fromUrl = new Set((searchParams.get("source") || "").split(",").filter(Boolean));
+    // lockedSource already restricts the database query by supplier. Do not
+    // also seed the virtual "Ražotājs" filter with the raw supplier key:
+    // NWG products are mapped to Craft/Clique/ProJob/Cutter & Buck, so
+    // `source=nwg` filters every NWG card out and leaves the page empty.
+    if (lockedSource) return new Set();
+    const fromUrl = parseManufacturerFilter(searchParams.get("source"));
     if (fromUrl.size) return fromUrl;
-    return lockedSource ? new Set([lockedSource]) : new Set();
+    return new Set();
   });
   const [brands, setBrands] = useState<Set<string>>(
     new Set((searchParams.get("brand") || "").split(",").filter(Boolean))
@@ -315,6 +350,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       }
       const enriched: EnrichedItem[] = all
         .map((it) => {
+          if (isIncompleteNwgShell(it)) return null;
           const buckets = new Set<ColorBucketKey>();
           const raw = (it.colors || []) as ColorEntry[];
           const colorList: EnrichedColor[] = raw.map((c) => {
