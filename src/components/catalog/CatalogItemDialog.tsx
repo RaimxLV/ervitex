@@ -719,6 +719,7 @@ const CatalogItemDialog = ({
   open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback,
 }: Props) => {
   const { lang } = useLanguage();
+  const placeholderSrc = `${import.meta.env.BASE_URL}placeholder.svg`;
   const [detail, setDetail] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeColor, setActiveColor] = useState<string | null>(null);
@@ -913,7 +914,7 @@ const CatalogItemDialog = ({
                   src={mainImg}
                   alt={currentColor?.name || displayDetail.title || id}
                   className="h-full w-full object-contain"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/placeholder.svg"; }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholderSrc; }}
                 />
               ) : loading ? (
                 <Skeleton className="h-full w-full" />

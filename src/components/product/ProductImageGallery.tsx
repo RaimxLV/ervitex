@@ -8,6 +8,7 @@ interface ProductImageGalleryProps {
 
 const ProductImageGallery = ({ images, alt, activeColorImage }: ProductImageGalleryProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const placeholderSrc = `${import.meta.env.BASE_URL}placeholder.svg`;
 
   // When a color swatch is clicked, find the matching image or show it as override
   useEffect(() => {
@@ -41,8 +42,8 @@ const ProductImageGallery = ({ images, alt, activeColorImage }: ProductImageGall
           className="h-full w-full object-contain transition-all duration-300"
           onError={(e) => {
             const target = e.currentTarget;
-            if (target.src !== "/placeholder.svg") {
-              target.src = "/placeholder.svg";
+            if (target.src !== placeholderSrc) {
+              target.src = placeholderSrc;
             }
           }}
         />
@@ -70,8 +71,8 @@ const ProductImageGallery = ({ images, alt, activeColorImage }: ProductImageGall
                 loading="lazy"
                 onError={(e) => {
                   const target = e.currentTarget;
-                  if (target.src !== "/placeholder.svg") {
-                    target.src = "/placeholder.svg";
+                  if (target.src !== placeholderSrc) {
+                    target.src = placeholderSrc;
                   }
                 }}
               />
