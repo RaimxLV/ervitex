@@ -93,15 +93,10 @@ const Header = () => {
             const active = location.pathname === item.path;
             if (isCatalog) {
               return (
-                <div
-                  key={item.path}
-                  className="relative"
-                  onMouseEnter={openMega}
-                  onMouseLeave={closeMegaSoon}
-                >
-                  <Link
-                    to={item.path}
-                    onFocus={openMegaImmediate}
+                <div key={item.path} className="relative" ref={megaRef}>
+                  <button
+                    type="button"
+                    onClick={() => setMegaOpen((v) => !v)}
                     aria-haspopup="menu"
                     aria-expanded={megaOpen}
                     className={`flex items-center gap-1 text-sm font-medium uppercase transition-colors hover:text-accent ${
@@ -113,7 +108,7 @@ const Header = () => {
                       className={`h-3.5 w-3.5 transition-transform duration-200 ${megaOpen ? "rotate-180" : ""}`}
                       strokeWidth={2}
                     />
-                  </Link>
+                  </button>
                 </div>
               );
             }
