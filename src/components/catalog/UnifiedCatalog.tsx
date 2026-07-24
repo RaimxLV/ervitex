@@ -278,24 +278,33 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         if (!data || data.length < step) break;
         from += step;
       }
-      const enriched: EnrichedItem[] = all.map((it) => {
-        const buckets = new Set<ColorBucketKey>();
-        const raw = (it.colors || []) as ColorEntry[];
-        const colorList: EnrichedColor[] = raw.map((c) => {
-          const bucket = bucketOf(c.h, c.n);
-          if (bucket) buckets.add(bucket);
-          return { ...c, bucket };
-        });
-        return {
-          ...it,
-          brand: (() => { const b = normalizeText(it.brand); return b && b.toLowerCase() !== "unbranded" ? b : null; })(),
-          category: normalizeCategory(it.category),
-          group_name: normalizeText(it.group_name),
-          gender: normalizeGender(it.gender),
-          colors: colorList,
-          buckets,
-        };
-      });
+      const enriched: EnrichedItem[] = all
+        .map((it) => {
+          const buckets = new Set<ColorBucketKey>();
+          const raw = (it.colors || []) as ColorEntry[];
+          const colorList: EnrichedColor[] = raw.map((c) => {
+            const bucket = bucketOf(c.h, c.n);
+            if (bucket) buckets.add(bucket);
+            return { ...c, bucket };
+          });
+          const brand = (() => {
+            const b = normalizeText(it.brand);
+            return b && b.toLowerCase() !== "unbranded" ? b : null;
+          })();
+          const manufacturer = manufacturerOf(it.source, brand);
+          if (!manufacturer) return null;
+          return {
+            ...it,
+            brand,
+            category: normalizeCategory(it.category),
+            group_name: normalizeText(it.group_name),
+            gender: normalizeGender(it.gender),
+            colors: colorList,
+            buckets,
+            manufacturer,
+          } as EnrichedItem;
+        })
+        .filter((x): x is EnrichedItem => x !== null);
       setItems(enriched);
       setLoaded(true);
 
