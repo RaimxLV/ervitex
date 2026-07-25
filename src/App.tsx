@@ -11,6 +11,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import RequestPage from "./pages/RequestPage.tsx";
 import Index from "./pages/Index.tsx";
 import CatalogPage from "./pages/CatalogPage.tsx";
+import CatalogItemPage from "./pages/CatalogItemPage.tsx";
 import StanleyStellaPage from "./pages/StanleyStellaPage.tsx";
 import NwgPage from "./pages/NwgPage.tsx";
 import PfConceptPage from "./pages/PfConceptPage.tsx";
