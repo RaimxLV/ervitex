@@ -906,7 +906,6 @@ const CatalogItemDialog = ({
     return l !== "brand"; // brand is shown as a pill
   });
 
-  return (
   const body = (
         <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
           <div className="space-y-3">
