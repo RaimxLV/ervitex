@@ -718,10 +718,11 @@ const translateLabel = (label: string, lang: "lv" | "en") => {
 /* ---------- Component ---------- */
 
 const CatalogItemDialog = ({
-  open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback,
+  open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback, inline,
 }: Props) => {
   const { lang } = useLanguage();
   const placeholderSrc = `${import.meta.env.BASE_URL}placeholder.svg`;
+  const isOpen = inline ? true : open;
   const [detail, setDetail] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeColor, setActiveColor] = useState<string | null>(null);
