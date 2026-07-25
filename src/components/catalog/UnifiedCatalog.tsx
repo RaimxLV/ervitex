@@ -894,7 +894,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                           : undefined
                       }
                       fromLabel={lang === "lv" ? "no" : "from"}
-                      onNavigate={() => setSelected(it)}
+                      onNavigate={() => navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}`)}
                     />
                   ))}
                 </div>
