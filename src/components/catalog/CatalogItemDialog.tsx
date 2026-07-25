@@ -942,10 +942,10 @@ const CatalogItemDialog = ({
           </div>
 
           <div className="space-y-6">
-            <DialogHeader className="space-y-4">
-              <DialogDescription className="sr-only">
+            <div className="space-y-4">
+              <span className="sr-only">
                 {displayDetail.title || name || id}
-              </DialogDescription>
+              </span>
               {/* Meta row: code + supplier on left, brand on right */}
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
                 <div className="flex flex-wrap items-center gap-3">
@@ -971,9 +971,9 @@ const CatalogItemDialog = ({
                 )}
               </div>
 
-              <DialogTitle className="font-heading text-3xl font-black uppercase tracking-wide">
+              <h1 className="font-heading text-3xl font-black uppercase tracking-wide">
                 {displayDetail.title || name || id}
-              </DialogTitle>
+              </h1>
 
               {/* Contextual tags */}
               {(displayCategory || displayDetail.gender) && (
@@ -993,7 +993,7 @@ const CatalogItemDialog = ({
 
               {shortDescription && (
                 <p className="text-base text-muted-foreground">{shortDescription}</p>)}
-            </DialogHeader>
+            </div>
 
               {loading && !detail && (
                 <div className="space-y-2">
