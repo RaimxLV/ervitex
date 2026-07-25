@@ -758,7 +758,7 @@ const CatalogItemDialog = ({
   const displayDetail = detail || fallbackDetail;
 
   useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return;
     let cancelled = false;
     setLoading(true);
     setDetail(null);
