@@ -21,6 +21,8 @@ interface Props {
   image: string | null;
   swatches?: { hex: string | null; name: string }[]; // fallback while loading
   descriptionFallback?: string | null;
+  /** When true, render inline (no Dialog wrapper) — used for full-page product route. */
+  inline?: boolean;
 }
 
 interface ColorDetail {
