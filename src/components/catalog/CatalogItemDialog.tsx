@@ -907,8 +907,7 @@ const CatalogItemDialog = ({
   });
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[92vh] overflow-y-auto bg-background p-0">
+  const body = (
         <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
           <div className="space-y-3">
             <div className="aspect-square md:aspect-[4/5] max-h-[70vh] w-full overflow-hidden bg-white flex items-center justify-center">
