@@ -1142,6 +1142,14 @@ const CatalogItemDialog = ({
               )}
             </div>
         </div>
+  );
+
+  if (inline) return body;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-6xl max-h-[92vh] overflow-y-auto bg-background p-0">
+        {body}
       </DialogContent>
     </Dialog>
   );
