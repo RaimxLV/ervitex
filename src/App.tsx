@@ -51,6 +51,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/catalog" element={<CatalogPage />} />
+              <Route path="/catalog/item/:source/:id" element={<CatalogItemPage />} />
               <Route path="/stanley-stella" element={<StanleyStellaPage />} />
               <Route path="/nwg" element={<NwgPage />} />
               <Route path="/pf-concept" element={<PfConceptPage />} />
