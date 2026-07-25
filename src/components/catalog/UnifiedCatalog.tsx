@@ -277,11 +277,11 @@ interface Props {
 
 const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const { lang } = useLanguage();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [items, setItems] = useState<EnrichedItem[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [selected, setSelected] = useState<EnrichedItem | null>(null);
   const [pfPrices, setPfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
   const [ssPrices, setSsPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
   const [bbPrices, setBbPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
