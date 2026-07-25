@@ -124,12 +124,12 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading }: Pro
                     </span>
                   )}
                 </span>
-                <ChevronDown
-                  className={cn(
-                    "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300",
-                    isCollapsed && "-rotate-90"
-                  )}
-                />
+                <span
+                  aria-hidden
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors group-hover:border-accent group-hover:text-accent"
+                >
+                  {isCollapsed ? <Plus className="h-3.5 w-3.5" strokeWidth={2.5} /> : <Minus className="h-3.5 w-3.5" strokeWidth={2.5} />}
+                </span>
               </button>
 
               <div
