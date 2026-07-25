@@ -21,6 +21,8 @@ interface Props {
   image: string | null;
   swatches?: { hex: string | null; name: string }[]; // fallback while loading
   descriptionFallback?: string | null;
+  /** When true, render inline (no Dialog wrapper) — used for full-page product route. */
+  inline?: boolean;
 }
 
 interface ColorDetail {
@@ -716,10 +718,11 @@ const translateLabel = (label: string, lang: "lv" | "en") => {
 /* ---------- Component ---------- */
 
 const CatalogItemDialog = ({
-  open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback,
+  open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback, inline,
 }: Props) => {
   const { lang } = useLanguage();
   const placeholderSrc = `${import.meta.env.BASE_URL}placeholder.svg`;
+  const isOpen = inline ? true : open;
   const [detail, setDetail] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeColor, setActiveColor] = useState<string | null>(null);
@@ -755,7 +758,7 @@ const CatalogItemDialog = ({
   const displayDetail = detail || fallbackDetail;
 
   useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return;
     let cancelled = false;
     setLoading(true);
     setDetail(null);
@@ -790,7 +793,7 @@ const CatalogItemDialog = ({
       }
     })();
     return () => { cancelled = true; };
-  }, [open, source, id]);
+  }, [isOpen, source, id]);
 
   const currentColor = useMemo(
     () => displayDetail.colors.find((c) => c.code === activeColor) || displayDetail.colors[0] || null,
@@ -903,9 +906,7 @@ const CatalogItemDialog = ({
     return l !== "brand"; // brand is shown as a pill
   });
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[92vh] overflow-y-auto bg-background p-0">
+  const body = (
         <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
           <div className="space-y-3">
             <div className="aspect-square md:aspect-[4/5] max-h-[70vh] w-full overflow-hidden bg-white flex items-center justify-center">
@@ -941,10 +942,10 @@ const CatalogItemDialog = ({
           </div>
 
           <div className="space-y-6">
-            <DialogHeader className="space-y-4">
-              <DialogDescription className="sr-only">
+            <div className="space-y-4">
+              <span className="sr-only">
                 {displayDetail.title || name || id}
-              </DialogDescription>
+              </span>
               {/* Meta row: code + supplier on left, brand on right */}
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
                 <div className="flex flex-wrap items-center gap-3">
@@ -970,9 +971,9 @@ const CatalogItemDialog = ({
                 )}
               </div>
 
-              <DialogTitle className="font-heading text-3xl font-black uppercase tracking-wide">
+              <h1 className="font-heading text-3xl font-black uppercase tracking-wide">
                 {displayDetail.title || name || id}
-              </DialogTitle>
+              </h1>
 
               {/* Contextual tags */}
               {(displayCategory || displayDetail.gender) && (
@@ -992,7 +993,7 @@ const CatalogItemDialog = ({
 
               {shortDescription && (
                 <p className="text-base text-muted-foreground">{shortDescription}</p>)}
-            </DialogHeader>
+            </div>
 
               {loading && !detail && (
                 <div className="space-y-2">
@@ -1141,6 +1142,14 @@ const CatalogItemDialog = ({
               )}
             </div>
         </div>
+  );
+
+  if (inline) return body;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-6xl max-h-[92vh] overflow-y-auto bg-background p-0">
+        {body}
       </DialogContent>
     </Dialog>
   );

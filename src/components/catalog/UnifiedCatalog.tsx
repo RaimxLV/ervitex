@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -277,11 +277,11 @@ interface Props {
 
 const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const { lang } = useLanguage();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [items, setItems] = useState<EnrichedItem[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [selected, setSelected] = useState<EnrichedItem | null>(null);
   const [pfPrices, setPfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
   const [ssPrices, setSsPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
   const [bbPrices, setBbPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
@@ -894,7 +894,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                           : undefined
                       }
                       fromLabel={lang === "lv" ? "no" : "from"}
-                      onNavigate={() => setSelected(it)}
+                      onNavigate={() => navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}`)}
                     />
                   ))}
                 </div>
@@ -935,22 +935,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           </div>
         </div>
       </div>
-      {selected && (
-        <CatalogItemDialog
-          open={!!selected}
-          onOpenChange={(o) => !o && setSelected(null)}
-          source={selected.source}
-          id={selected.id}
-          name={selected.name}
-          brand={selected.brand}
-          category={selected.category}
-          image={selected.image_url}
-          descriptionFallback={selected.description}
-          swatches={selected.colors
-            .map((c) => ({ hex: sanitizeHex(c.h, c.bucket, c.n), name: c.n || "" }))
-            .filter((s) => !!s.hex) as { hex: string; name: string }[]}
-        />
-      )}
     </Layout>
   );
 };

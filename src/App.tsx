@@ -11,6 +11,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import RequestPage from "./pages/RequestPage.tsx";
 import Index from "./pages/Index.tsx";
 import CatalogPage from "./pages/CatalogPage.tsx";
+import CatalogItemPage from "./pages/CatalogItemPage.tsx";
 import StanleyStellaPage from "./pages/StanleyStellaPage.tsx";
 import NwgPage from "./pages/NwgPage.tsx";
 import PfConceptPage from "./pages/PfConceptPage.tsx";
@@ -50,6 +51,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/catalog" element={<CatalogPage />} />
+              <Route path="/catalog/item/:source/:id" element={<CatalogItemPage />} />
               <Route path="/stanley-stella" element={<StanleyStellaPage />} />
               <Route path="/nwg" element={<NwgPage />} />
               <Route path="/pf-concept" element={<PfConceptPage />} />

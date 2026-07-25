@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
-import { ChevronDown, Check, Search, SlidersHorizontal, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Plus, Minus, Check, Search, SlidersHorizontal, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 export interface FilterSection {
@@ -30,8 +31,19 @@ interface Props {
 
 const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading }: Props) => {
   const { lang } = useLanguage();
-  // Default: color section OPEN, everything else collapsed on first render can be handled by consumer.
+  const isMobile = useIsMobile();
+  // On mobile, all sections default to collapsed. On desktop, all open.
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [initialized, setInitialized] = useState(false);
+  useEffect(() => {
+    if (initialized) return;
+    if (isMobile) {
+      const initial: Record<string, boolean> = {};
+      sections.forEach((s) => { initial[s.key] = true; });
+      setCollapsed(initial);
+    }
+    setInitialized(true);
+  }, [isMobile, sections, initialized]);
   const [searchByKey, setSearchByKey] = useState<Record<string, string>>({});
 
   const t = useMemo(
@@ -112,12 +124,12 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading }: Pro
                     </span>
                   )}
                 </span>
-                <ChevronDown
-                  className={cn(
-                    "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-300",
-                    isCollapsed && "-rotate-90"
-                  )}
-                />
+                <span
+                  aria-hidden
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors group-hover:border-accent group-hover:text-accent"
+                >
+                  {isCollapsed ? <Plus className="h-3.5 w-3.5" strokeWidth={2.5} /> : <Minus className="h-3.5 w-3.5" strokeWidth={2.5} />}
+                </span>
               </button>
 
               <div
