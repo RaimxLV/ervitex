@@ -793,7 +793,7 @@ const CatalogItemDialog = ({
       }
     })();
     return () => { cancelled = true; };
-  }, [open, source, id]);
+  }, [isOpen, source, id]);
 
   const currentColor = useMemo(
     () => displayDetail.colors.find((c) => c.code === activeColor) || displayDetail.colors[0] || null,
