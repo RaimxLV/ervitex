@@ -114,24 +114,20 @@ const CatalogItemPage = () => {
             </h2>
             <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {related.map((r) => (
-                <Link
+                <CatalogModelCard
                   key={`${r.source}-${r.id}`}
-                  to={`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`}
-                  className="block"
-                >
-                  <CatalogModelCard
-                    image={r.image_url}
-                    hoverImage={r.hover_image_url}
-                    imageAlt={r.name || r.id}
-                    code={r.id}
-                    brandBadge={r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
-                    title={r.name || r.id}
-                    subtitle={r.category}
-                    swatches={[]}
-                    extraSwatches={0}
-                    noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
-                  />
-                </Link>
+                  onClick={() => navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`)}
+                  image={r.image_url}
+                  hoverImage={r.hover_image_url}
+                  imageAlt={r.name || r.id}
+                  code={r.id}
+                  brandBadge={r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
+                  title={r.name || r.id}
+                  subtitle={r.category}
+                  swatches={[]}
+                  extraSwatches={0}
+                  noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
+                />
               ))}
             </div>
           </section>
