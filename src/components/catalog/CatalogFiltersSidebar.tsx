@@ -31,8 +31,19 @@ interface Props {
 
 const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading }: Props) => {
   const { lang } = useLanguage();
-  // Default: color section OPEN, everything else collapsed on first render can be handled by consumer.
+  const isMobile = useIsMobile();
+  // On mobile, all sections default to collapsed. On desktop, all open.
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [initialized, setInitialized] = useState(false);
+  useEffect(() => {
+    if (initialized) return;
+    if (isMobile) {
+      const initial: Record<string, boolean> = {};
+      sections.forEach((s) => { initial[s.key] = true; });
+      setCollapsed(initial);
+    }
+    setInitialized(true);
+  }, [isMobile, sections, initialized]);
   const [searchByKey, setSearchByKey] = useState<Record<string, string>>({});
 
   const t = useMemo(
