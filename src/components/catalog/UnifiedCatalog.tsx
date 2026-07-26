@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { SlidersHorizontal } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
@@ -801,6 +803,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
   );
 
+  const totalSelectedFilters =
+    sources.size + brands.size + categories.size + groups.size + genders.size + colors.size;
+
+
   return (
     <Layout>
       <div className="container px-4 py-8 md:py-14">
@@ -811,7 +817,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           {t.subtitle ? <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p> : null}
         </div>
 
-        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="mb-6 space-y-3">
           <div className="relative w-full md:max-w-xl">
             <Input
               value={q}
@@ -820,14 +826,46 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               className="h-11"
             />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Mobile filter trigger */}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="md:hidden h-9 gap-2 font-heading text-xs font-bold uppercase tracking-wider"
+                >
+                  <SlidersHorizontal className="h-3.5 w-3.5 text-accent" />
+                  {lang === "lv" ? "Filtri" : "Filters"}
+                  {totalSelectedFilters > 0 && (
+                    <span className="rounded-full bg-accent px-1.5 text-[10px] font-bold text-accent-foreground">
+                      {totalSelectedFilters}
+                    </span>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[88vw] max-w-sm overflow-y-auto p-4">
+                <SheetHeader>
+                  <SheetTitle className="font-heading text-sm font-black uppercase tracking-wider">
+                    {lang === "lv" ? "Filtri" : "Filters"}
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="mt-4">
+                  <CatalogFiltersSidebar
+                    sections={filterSections}
+                    onClearAll={clearAll}
+                    heading={lang === "lv" ? "Filtri" : "Filters"}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
             <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
               {lang === "lv" ? "Kārtot" : "Sort"}
             </label>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="h-9 rounded-md border border-border bg-background px-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent"
+              className="h-9 flex-1 min-w-0 rounded-md border border-border bg-background px-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent sm:flex-none"
             >
               <option value="featured">{lang === "lv" ? "Ieteiktie" : "Featured"}</option>
               <option value="newest">{lang === "lv" ? "Pēc jaunākā" : "Newest"}</option>
@@ -836,14 +874,14 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               <option value="price_asc">{lang === "lv" ? "Cena: zemākā vispirms" : "Price: low to high"}</option>
               <option value="price_desc">{lang === "lv" ? "Cena: augstākā vispirms" : "Price: high to low"}</option>
             </select>
-            <div className="text-xs uppercase tracking-wider text-muted-foreground">
+            <div className="ml-auto text-xs uppercase tracking-wider text-muted-foreground">
               {filtered.length.toLocaleString(lang === "lv" ? "lv-LV" : "en-US")} {t.results}
             </div>
           </div>
         </div>
 
         <div className="flex flex-col gap-8 md:flex-row">
-          <div className="md:w-72 md:shrink-0">
+          <div className="hidden md:block md:w-72 md:shrink-0">
             <CatalogFiltersSidebar
               sections={filterSections}
               onClearAll={clearAll}
