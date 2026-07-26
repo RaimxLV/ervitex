@@ -103,14 +103,14 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
         </div>
 
         {(code || brandBadge) && (
-          <div className="flex items-stretch border-t border-border bg-primary text-primary-foreground">
+          <div className="flex flex-col items-stretch border-t border-border bg-primary text-primary-foreground sm:flex-row">
             {code && (
-              <span className="flex-1 truncate px-3 py-1.5 font-mono text-sm font-bold uppercase tracking-wider">
+              <span className="flex-1 truncate px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider sm:text-sm">
                 {code}
               </span>
             )}
             {brandBadge && (
-              <span className="flex items-center border-l border-primary-foreground/20 px-2.5 py-1.5 font-heading text-[10px] font-bold uppercase tracking-wider">
+              <span className="flex items-center border-t border-primary-foreground/20 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-wider sm:border-l sm:border-t-0 sm:px-2.5 sm:py-1.5">
                 {brandBadge}
               </span>
             )}
