@@ -803,6 +803,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
   );
 
+  const totalSelectedFilters =
+    sources.size + brands.size + categories.size + groups.size + genders.size + colors.size;
+
+
   return (
     <Layout>
       <div className="container px-4 py-8 md:py-14">
