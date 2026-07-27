@@ -845,12 +845,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[88vw] max-w-sm overflow-y-auto p-4">
-                <SheetHeader>
-                  <SheetTitle className="font-heading text-sm font-black uppercase tracking-wider">
-                    {lang === "lv" ? "Filtri" : "Filters"}
-                  </SheetTitle>
+                <SheetHeader className="sr-only">
+                  <SheetTitle>{lang === "lv" ? "Filtri" : "Filters"}</SheetTitle>
                 </SheetHeader>
-                <div className="mt-4">
+                <div className="mt-2">
                   <CatalogFiltersSidebar
                     sections={filterSections}
                     onClearAll={clearAll}
