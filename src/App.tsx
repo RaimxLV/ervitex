@@ -30,6 +30,7 @@ import AdminCategories from "./pages/admin/AdminCategories.tsx";
 import AdminQuotes from "./pages/admin/AdminQuotes.tsx";
 import AdminUsers from "./pages/admin/AdminUsers.tsx";
 import AdminTranslate from "./pages/admin/AdminTranslate.tsx";
+import AdminMegaMenu from "./pages/admin/AdminMegaMenu.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import PrivacyPage from "./pages/PrivacyPage.tsx";
 import TermsPage from "./pages/TermsPage.tsx";
@@ -73,6 +74,7 @@ const App = () => (
               <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
               <Route path="/admin/translate" element={<ProtectedRoute><AdminTranslate /></ProtectedRoute>} />
               <Route path="/admin/beechfield-import" element={<ProtectedRoute><AdminBeechfieldImport /></ProtectedRoute>} />
+              <Route path="/admin/mega-menu" element={<ProtectedRoute><AdminMegaMenu /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <QuoteCartButton />
