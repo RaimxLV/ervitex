@@ -92,6 +92,7 @@ const MANUFACTURERS: { key: string; label: string }[] = [
   { key: "nwg-clique", label: "Clique" },
   { key: "nwg-projob", label: "ProJob" },
   { key: "nwg-cutter", label: "Cutter & Buck" },
+  { key: "nwg", label: "New Wave Group" },
   { key: "pf-elevate", label: "Elevate" },
   { key: "pf-roly", label: "Roly" },
   { key: "pf", label: "Prezentmateriāli" },
@@ -109,7 +110,8 @@ const parseManufacturerFilter = (rawValue: string | null): Set<string> => {
   for (const raw of (rawValue || "").split(",")) {
     const token = raw.trim().toLowerCase();
     if (!token) continue;
-    if (token === "nwg" || token === "new-wave-group" || token === "new wave group") {
+    if (token === "new-wave-group" || token === "new wave group") {
+      parsed.add("nwg");
       parsed.add("nwg-craft");
       parsed.add("nwg-clique");
       parsed.add("nwg-projob");
@@ -123,7 +125,7 @@ const parseManufacturerFilter = (rawValue: string | null): Set<string> => {
   }
   return parsed;
 };
-const manufacturerOf = (source: CatalogSource, brand: string | null): string | null => {
+const manufacturerOf = (source: CatalogSource, brand: string | null): string => {
   const b = (brand || "").toLowerCase();
   if (source === "ss") return "ss";
   if (source === "nwg") {
@@ -131,7 +133,7 @@ const manufacturerOf = (source: CatalogSource, brand: string | null): string | n
     if (b.includes("clique")) return "nwg-clique";
     if (b.replace(/\s+/g, "").includes("projob")) return "nwg-projob";
     if (b.includes("cutter")) return "nwg-cutter";
-    return null;
+    return "nwg";
   }
   if (source === "pf") {
     if (b.includes("elevate")) return "pf-elevate";
@@ -140,7 +142,7 @@ const manufacturerOf = (source: CatalogSource, brand: string | null): string | n
   }
   if (source === "bb") return "bb";
   if (source === "mf") return "mf";
-  return null;
+  return source;
 };
 
 const GENDER_MAP: Record<string, string | null> = {
@@ -365,7 +367,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             return b && b.toLowerCase() !== "unbranded" ? b : null;
           })();
           const manufacturer = manufacturerOf(it.source, brand);
-          if (!manufacturer) return null;
           return {
             ...it,
             brand,
