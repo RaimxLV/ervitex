@@ -626,7 +626,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     "Conference Bags": "Konferenču somas", "Wireless Charging": "Bezvadu lādēšana",
     "Smartwatches": "Viedpulksteņi", "Reflective Items": "Atstarojoši priekšmeti",
     "Badge Holders": "Kartes turētāji", "Cycling Accessories": "Riteņbraukšanas aksesuāri",
-    "Beach Items": "Pludmales priekšmeti", "OUTLET": "Izpārdošana",
+    "Beach Items": "Pludmales priekšmeti",
     "Outdoor Items": "Āra priekšmeti", "USB Hubs": "USB centrmezgli",
     "Stress Balls": "Stresa bumbiņas", "Outdoor Games": "Āra spēles",
     "Trolleys & Suitcases": "Koferi & čemodāni", "BBQ Accessories": "Grila aksesuāri",
