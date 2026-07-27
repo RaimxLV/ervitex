@@ -8,7 +8,6 @@ import imgBackpack from "@/assets/menu/backpack.jpg";
 import imgBottle from "@/assets/menu/bottle.jpg";
 import imgBag from "@/assets/menu/bag.jpg";
 import imgCap from "@/assets/menu/cap.jpg";
-import imgPants from "@/assets/menu/pants.jpg";
 import imgPolo from "@/assets/menu/polo.jpg";
 import imgSweater from "@/assets/menu/sweater.jpg";
 import imgTshirt from "@/assets/menu/tshirt.jpg";
@@ -31,13 +30,13 @@ interface TileItem extends Item {
 
 const FEATURED_TILES: TileItem[] = [
   { lv: "Virsjakas", en: "Jackets", categories: ["Jackets", "Non Padded Jacket", "Light Padded Jacket", "Padded Jacket"], image: imgJacket, priority: "hero" },
-  { lv: "Apavi", en: "Shoes", categories: ["Shoes", "Safety Footwear"], image: imgPants, priority: "large" },
   { lv: "Hūdiji", en: "Hoodies", categories: ["Hoodies", "Hoodie sweatshirts"], image: imgHoodie, priority: "large" },
   { lv: "Džemperi", en: "Sweatshirts", categories: ["Sweaters", "Sweatshirts", "Crew neck sweatshirts", "Fleece"], image: imgSweater, priority: "large" },
   { lv: "Vestes", en: "Vests", categories: ["Vests", "Bodywarmers", "Jackets-Vests"], image: imgVest },
-  { lv: "Bikses", en: "Trousers", categories: ["Trousers", "Trousers-shorts", "Bottoms"] , image: imgPants },
   { lv: "Polo krekli", en: "Polos", categories: ["Polos", "Polo shirts"], image: imgPolo },
   { lv: "T-krekli", en: "T-shirts", categories: ["T-shirts", "Tops"], image: imgTshirt },
+  { lv: "Mugursomas", en: "Backpacks", categories: ["Backpacks", "Laptop Backpacks"], image: imgBackpack },
+  { lv: "Somas", en: "Bags", categories: ["Bags", "Travel Bags", "Sports Bags"], image: imgBag },
 ];
 
 const PRIORITY_LINKS: Item[] = [
@@ -193,7 +192,7 @@ function CategoryTile({ item, onNavigate }: { item: TileItem; onNavigate?: () =>
       to={buildCategoryHref(item.categories)}
       onClick={onNavigate}
       role="menuitem"
-      className={`group relative block min-h-[132px] overflow-hidden rounded-sm bg-primary-foreground/5 ${sizeClass}`}
+      className={`group relative block h-full min-h-0 overflow-hidden rounded-sm bg-primary-foreground/5 ${sizeClass}`}
     >
       <img
         src={item.image}
@@ -233,7 +232,7 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
                 {t("no lielākā uz mazāko", "highest value first")}
               </span>
             </div>
-            <div className="grid auto-rows-[116px] grid-cols-2 gap-2.5 sm:grid-cols-4 lg:auto-rows-[88px] xl:auto-rows-[102px] 2xl:auto-rows-[116px]">
+            <div className="grid auto-rows-[104px] grid-cols-2 gap-2.5 sm:grid-cols-4 lg:auto-rows-[96px] xl:auto-rows-[108px]">
               {FEATURED_TILES.map((item) => (
                 <CategoryTile key={item.en} item={item} onNavigate={onNavigate} />
               ))}
