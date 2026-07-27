@@ -197,16 +197,32 @@ export default function AdminMegaMenu() {
     load();
   };
 
-  const move = async (item: Item, direction: -1 | 1) => {
-    const section = bySection[item.section];
-    const idx = section.findIndex((i) => i.id === item.id);
-    const swap = section[idx + direction];
-    if (!swap) return;
-    await Promise.all([
-      supabase.from("mega_menu_items").update({ sort_order: swap.sort_order }).eq("id", item.id),
-      supabase.from("mega_menu_items").update({ sort_order: item.sort_order }).eq("id", swap.id),
-    ]);
-    load();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleDragEnd = async (section: Section, event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const list = bySection[section];
+    const oldIndex = list.findIndex((i) => i.id === active.id);
+    const newIndex = list.findIndex((i) => i.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const reordered = arrayMove(list, oldIndex, newIndex);
+    // Reassign sort_order sequentially (10, 20, 30, ...)
+    const updates = reordered.map((it, idx) => ({ id: it.id, sort_order: (idx + 1) * 10 }));
+    // Optimistic update
+    setItems((prev) => {
+      const map = new Map(updates.map((u) => [u.id, u.sort_order]));
+      return prev.map((it) => (map.has(it.id) ? { ...it, sort_order: map.get(it.id)! } : it));
+    });
+    await Promise.all(
+      updates.map((u) =>
+        supabase.from("mega_menu_items").update({ sort_order: u.sort_order }).eq("id", u.id),
+      ),
+    );
   };
 
   const toggleActive = async (item: Item) => {
