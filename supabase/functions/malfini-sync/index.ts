@@ -78,12 +78,28 @@ Deno.serve(async (req) => {
     const priceRows: any[] = [];
     const stockRows: any[] = [];
 
+    // Remap Malfini's "OUTLET" category to the real product type based on subtitle,
+    // since we don't run sale/outlet campaigns — prices are standard supplier prices.
+    const remapOutletCategory = (categoryName: string | null, subtitle: string | null): string | null => {
+      if (!categoryName || categoryName.toUpperCase() !== "OUTLET") return categoryName;
+      const s = (subtitle || "").toLowerCase();
+      if (s.includes("polo")) return "Polo shirts";
+      if (s.includes("t-shirt") || s.includes("tshirt")) return "T-shirts";
+      if (s.includes("softshell") || s.includes("jacket") || s.includes("vest")) return "Jackets-Vests";
+      if (s.includes("fleece")) return "Fleece";
+      if (s.includes("sweat") || s.includes("hood")) return "Sweatshirts";
+      if (s.includes("shirt")) return "Shirts";
+      if (s.includes("trouser") || s.includes("short") || s.includes("pant")) return "Trousers-shorts";
+      if (s.includes("cap") || s.includes("hat")) return "Caps";
+      if (s.includes("bag")) return "Bags";
+      return "Additional assortment";
+    };
     for (const p of products) {
       styleRows.push({
         style_code: String(p.code),
         name: p.name || null,
         category_code: p.categoryCode || null,
-        category_name: p.categoryName || null,
+        category_name: remapOutletCategory(p.categoryName || null, p.subtitle || null),
         gender: p.gender || null,
         gender_code: p.genderCode || null,
         trademark: p.trademark || null,
