@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
-// Category tile photos — cinematic dark studio shots matching brand tone.
+// Category tile photos.
 import imgTshirt from "@/assets/menu/tshirt.jpg";
 import imgPolo from "@/assets/menu/polo.jpg";
 import imgHoodie from "@/assets/menu/hoodie.jpg";
@@ -33,42 +33,34 @@ interface Tile {
   image: string;
 }
 
-// Apparel tiles — labels 1:1 with CATEGORY_MAP in UnifiedCatalog.tsx.
+// Priority: big/high-value items first, small trinkets last.
 const APPAREL: Tile[] = [
-  { lv: "T-krekli", en: "T-shirts", categories: ["T-shirts"], image: imgTshirt },
-  { lv: "Polo krekli", en: "Polos", categories: ["Polos"], image: imgPolo },
+  { lv: "Jakas", en: "Jackets", categories: ["Jackets"], image: imgJacket },
   { lv: "Hūdiji", en: "Hoodies", categories: ["Hoodies"], image: imgHoodie },
   { lv: "Džemperi", en: "Sweaters", categories: ["Sweaters"], image: imgSweater },
-  { lv: "Jakas", en: "Jackets", categories: ["Jackets"], image: imgJacket },
+  { lv: "T-krekli", en: "T-shirts", categories: ["T-shirts"], image: imgTshirt },
+  { lv: "Polo krekli", en: "Polos", categories: ["Polos"], image: imgPolo },
   { lv: "Vestes", en: "Vests", categories: ["Vests"], image: imgVest },
   { lv: "Bikses", en: "Trousers", categories: ["Trousers"], image: imgPants },
   { lv: "Šorti", en: "Shorts", categories: ["Shorts"], image: imgShorts },
 ];
 
 const ACCESSORIES: Tile[] = [
-  { lv: "Cepures", en: "Caps & Hats", categories: ["Caps & Hats"], image: imgCap },
   { lv: "Mugursomas", en: "Backpacks", categories: ["Backpacks"], image: imgBackpack },
   { lv: "Somas", en: "Bags", categories: ["Bags"], image: imgBag },
+  { lv: "Cepures", en: "Caps & Hats", categories: ["Caps & Hats"], image: imgCap },
   { lv: "Maisiņi", en: "Tote Bags", categories: ["Tote Bags"], image: imgTote },
+  { lv: "Lietussargi", en: "Umbrellas", categories: ["Umbrellas"], image: imgUmbrella },
 ];
-
-const UMBRELLA: Tile = {
-  lv: "Lietussargi",
-  en: "Umbrellas",
-  categories: ["Umbrellas"],
-  image: imgUmbrella,
-};
 
 const GIFTS: Tile[] = [
-  { lv: "Krūzes", en: "Mugs", categories: ["Mugs"], image: imgMug },
   { lv: "Pudeles", en: "Bottles", categories: ["Bottles"], image: imgBottle },
+  { lv: "Krūzes", en: "Mugs", categories: ["Mugs"], image: imgMug },
+  { lv: "Austiņas", en: "Headphones", categories: ["Headphones"], image: imgHeadphones },
   { lv: "Piezīmju grāmatiņas", en: "Notebooks", categories: ["Notebooks"], image: imgNotebook },
   { lv: "Atslēgu piekariņi", en: "Keychains", categories: ["Keychains & Keyrings"], image: imgKeychain },
-  { lv: "Austiņas", en: "Headphones", categories: ["Headphones"], image: imgHeadphones },
 ];
 
-// Manufacturer chips — mirror the "Ražotājs" facet in the sidebar filter.
-// Stanley/Stella pinned first with red accent treatment.
 const MANUFACTURERS: { label: string; token: string; featured?: boolean }[] = [
   { label: "Stanley/Stella", token: "stanley-stella", featured: true },
   { label: "Craft", token: "nwg-craft" },
@@ -87,66 +79,37 @@ const buildCategoryHref = (cats: string[]) =>
 const buildManufacturerHref = (token: string) =>
   `/catalog?source=${encodeURIComponent(token)}`;
 
-// Reusable photo tile — object-cover image + dark gradient + red hover wash.
+// Photo tile: light-fashion look, subtle bottom label plate — no heavy dark overlay.
 function PhotoTile({
   tile,
   onNavigate,
   aspect,
-  size = "md",
 }: {
   tile: Tile;
   onNavigate?: () => void;
   aspect: string;
-  size?: "sm" | "md";
 }) {
   return (
     <Link
       to={buildCategoryHref(tile.categories)}
       onClick={onNavigate}
       role="menuitem"
-      className={`group relative overflow-hidden rounded-sm ${aspect}`}
+      className={`group relative block overflow-hidden rounded-sm bg-neutral-100 ${aspect}`}
     >
       <img
         src={tile.image}
         alt={tile.lv}
         loading="lazy"
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent transition-opacity duration-500 group-hover:opacity-90" />
-      <div className="absolute inset-0 bg-accent/0 transition-colors duration-500 group-hover:bg-accent/40" />
-      <span
-        className={`absolute left-3 bottom-3 font-heading font-bold uppercase tracking-[0.18em] text-white ${
-          size === "sm" ? "text-[10px]" : "text-[11px]"
-        }`}
-      >
-        {tile.lv}
-      </span>
-    </Link>
-  );
-}
-
-// Wide horizontal tile used for the gift-material list.
-function WideTile({ tile, onNavigate }: { tile: Tile; onNavigate?: () => void }) {
-  return (
-    <Link
-      to={buildCategoryHref(tile.categories)}
-      onClick={onNavigate}
-      role="menuitem"
-      className="group relative flex h-16 items-center overflow-hidden rounded-sm border border-white/10"
-    >
-      <img
-        src={tile.image}
-        alt={tile.lv}
-        loading="lazy"
-        className="absolute inset-0 h-full w-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-110 group-hover:opacity-60"
-      />
-      <div className="absolute inset-0 bg-black/60 transition-colors duration-500 group-hover:bg-accent/60" />
-      <div className="relative flex h-full w-full items-center justify-between px-5">
-        <span className="font-heading text-[11px] font-bold uppercase tracking-[0.18em] text-white">
+      {/* Minimal bottom label — no full dark wash */}
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent px-2.5 py-2">
+        <span className="font-heading text-[10px] font-bold uppercase tracking-[0.16em] text-white">
           {tile.lv}
         </span>
-        <ArrowRight className="h-3.5 w-3.5 text-white/40 transition-all group-hover:translate-x-1 group-hover:text-white" />
       </div>
+      {/* Red hover accent frame */}
+      <div className="pointer-events-none absolute inset-0 ring-0 ring-accent transition-all duration-300 group-hover:ring-2" />
     </Link>
   );
 }
@@ -161,110 +124,89 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
       aria-label={t("Kataloga izvēlne", "Catalog menu")}
       className="max-h-[calc(100vh-5rem)] overflow-y-auto bg-[#0A0A0A] text-white"
     >
-      {/* Top banner — Visi produkti */}
-      <Link
-        to="/catalog"
-        onClick={onNavigate}
-        role="menuitem"
-        className="group flex items-center justify-between border-b border-white/5 bg-white px-5 py-3 text-black transition-colors hover:bg-white/95 lg:px-8"
-      >
-        <div className="flex items-center gap-3">
-          <div className="grid h-4 w-4 grid-cols-2 gap-0.5">
-            <div className="bg-accent" />
-            <div className="bg-accent" />
-            <div className="bg-accent" />
-            <div className="bg-accent" />
-          </div>
-          <span className="font-heading text-xs font-bold uppercase tracking-[0.2em] sm:text-sm">
-            {t("Visi produkti", "All products")}
-          </span>
-        </div>
-        <ArrowRight className="h-4 w-4 text-black/30 transition-all group-hover:translate-x-1 group-hover:text-accent" />
-      </Link>
-
-      {/* Category grid */}
-      <div className="grid grid-cols-1 gap-6 p-5 lg:grid-cols-12 lg:gap-8 lg:p-8">
-        {/* Apģērbi — 4 col × 2 rows */}
-        <section className="lg:col-span-6">
-          <div className="mb-4 flex items-center gap-2">
+      <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-12 lg:gap-6 lg:p-6">
+        {/* Apģērbi — priority section, 4×2 */}
+        <section className="lg:col-span-7">
+          <div className="mb-3 flex items-center gap-2">
             <span className="h-1.5 w-1.5 bg-accent" />
             <h3 className="font-heading text-[10px] font-bold uppercase tracking-[0.3em] text-white/90">
               {t("Apģērbi", "Apparel")}
             </h3>
           </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
             {APPAREL.map((tile) => (
               <PhotoTile
                 key={tile.en}
                 tile={tile}
                 onNavigate={onNavigate}
                 aspect="aspect-[3/4]"
-                size="sm"
               />
             ))}
           </div>
         </section>
 
-        {/* Aksesuāri — 2×2 grid + wide umbrella */}
-        <section className="lg:col-span-3">
-          <div className="mb-4 flex items-center gap-2">
+        {/* Aksesuāri — 5 tiles */}
+        <section className="lg:col-span-5">
+          <div className="mb-3 flex items-center gap-2">
             <span className="h-1.5 w-1.5 bg-accent" />
             <h3 className="font-heading text-[10px] font-bold uppercase tracking-[0.3em] text-white/90">
               {t("Aksesuāri", "Accessories")}
             </h3>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {ACCESSORIES.map((tile) => (
+          <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+            {ACCESSORIES.slice(0, 2).map((tile) => (
               <PhotoTile
                 key={tile.en}
                 tile={tile}
                 onNavigate={onNavigate}
-                aspect="aspect-square"
-                size="sm"
+                aspect="aspect-[3/4]"
               />
             ))}
-            <div className="col-span-2">
-              <Link
-                to={buildCategoryHref(UMBRELLA.categories)}
-                onClick={onNavigate}
-                role="menuitem"
-                className="group relative block h-16 overflow-hidden rounded-sm"
-              >
-                <img
-                  src={UMBRELLA.image}
-                  alt={UMBRELLA.lv}
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            <div className="grid grid-cols-1 gap-1.5">
+              {ACCESSORIES.slice(2, 4).map((tile) => (
+                <PhotoTile
+                  key={tile.en}
+                  tile={tile}
+                  onNavigate={onNavigate}
+                  aspect="aspect-[3/2]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent transition-colors group-hover:bg-accent/50" />
-                <span className="absolute left-3 bottom-2 font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-white">
-                  {UMBRELLA.lv}
-                </span>
-              </Link>
+              ))}
+            </div>
+            <div className="col-span-2 sm:col-span-3">
+              <PhotoTile
+                tile={ACCESSORIES[4]}
+                onNavigate={onNavigate}
+                aspect="aspect-[16/5]"
+              />
             </div>
           </div>
-        </section>
 
-        {/* Prezentmateriāli — stacked wide rows */}
-        <section className="lg:col-span-3">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="h-1.5 w-1.5 bg-accent" />
-            <h3 className="font-heading text-[10px] font-bold uppercase tracking-[0.3em] text-white/90">
-              {t("Prezentmateriāli", "Business gifts")}
-            </h3>
-          </div>
-          <div className="flex flex-col gap-2">
-            {GIFTS.map((tile) => (
-              <WideTile key={tile.en} tile={tile} onNavigate={onNavigate} />
-            ))}
+          {/* Prezentmateriāli — lighter, no dark overlay */}
+          <div className="mt-5">
+            <div className="mb-3 flex items-center gap-2">
+              <span className="h-1.5 w-1.5 bg-accent" />
+              <h3 className="font-heading text-[10px] font-bold uppercase tracking-[0.3em] text-white/90">
+                {t("Prezentmateriāli", "Business gifts")}
+              </h3>
+            </div>
+            <div className="grid grid-cols-5 gap-1.5">
+              {GIFTS.map((tile) => (
+                <PhotoTile
+                  key={tile.en}
+                  tile={tile}
+                  onNavigate={onNavigate}
+                  aspect="aspect-square"
+                />
+              ))}
+            </div>
           </div>
         </section>
       </div>
 
       {/* Manufacturers */}
-      <div className="border-t border-white/5 bg-black/40 px-5 py-4 lg:px-8 lg:py-5">
+      <div className="border-t border-white/5 bg-black/40 px-5 py-4 lg:px-6">
         <div className="mb-3 flex items-center gap-2">
-          <Sparkles className="h-3 w-3 text-accent" />
+          <span className="h-1.5 w-1.5 bg-accent" />
           <span className="font-heading text-[10px] font-bold uppercase tracking-[0.28em] text-white/60">
             {t("Ražotāji", "Manufacturers")}
           </span>
@@ -278,8 +220,8 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
               role="menuitem"
               className={
                 m.featured
-                  ? "rounded-sm border-2 border-accent bg-accent/10 px-3.5 py-1.5 font-heading text-[10px] font-bold uppercase tracking-[0.16em] text-white shadow-[0_0_15px_rgba(228,3,46,0.25)] transition-colors hover:bg-accent"
-                  : "rounded-sm border border-white/10 px-3.5 py-1.5 font-heading text-[10px] font-bold uppercase tracking-[0.16em] text-white/60 transition-all hover:border-white/30 hover:text-white"
+                  ? "rounded-sm border-2 border-accent bg-accent/10 px-3 py-1.5 font-heading text-[10px] font-bold uppercase tracking-[0.16em] text-white shadow-[0_0_15px_rgba(228,3,46,0.25)] transition-colors hover:bg-accent"
+                  : "rounded-sm border border-white/10 px-3 py-1.5 font-heading text-[10px] font-bold uppercase tracking-[0.16em] text-white/60 transition-all hover:border-white/30 hover:text-white"
               }
             >
               {m.label}
@@ -287,6 +229,27 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
           ))}
         </div>
       </div>
+
+      {/* Bottom CTA — Visi produkti, prominent */}
+      <Link
+        to="/catalog"
+        onClick={onNavigate}
+        role="menuitem"
+        className="group flex items-center justify-between border-t border-accent bg-accent px-5 py-4 text-white transition-colors hover:bg-accent/90 lg:px-6"
+      >
+        <div className="flex items-center gap-3">
+          <div className="grid h-4 w-4 grid-cols-2 gap-0.5">
+            <div className="bg-white" />
+            <div className="bg-white" />
+            <div className="bg-white" />
+            <div className="bg-white" />
+          </div>
+          <span className="font-heading text-sm font-bold uppercase tracking-[0.24em]">
+            {t("Skatīt visus produktus", "Browse all products")}
+          </span>
+        </div>
+        <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+      </Link>
     </div>
   );
 }
