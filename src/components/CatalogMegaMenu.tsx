@@ -36,9 +36,9 @@ const TILES: TileItem[] = [
   { lv: "Polo krekli", en: "Polos", categories: ["Polos", "Polo shirts"], image: imgPolo },
   { lv: "Hūdiji", en: "Hoodies", categories: ["Hoodies", "Hoodie sweatshirts"], image: imgHoodie },
   { lv: "Džemperi", en: "Sweatshirts", categories: ["Sweaters", "Sweatshirts", "Crew neck sweatshirts", "Fleece"], image: imgSweater },
-  { lv: "Virsjakas", en: "Jackets", categories: ["Jackets", "Non Padded Jacket", "Light Padded Jacket", "Padded Jacket"], image: imgJacket },
-  { lv: "Vestes", en: "Vests", categories: ["Vests", "Bodywarmers", "Jackets-Vests"], image: imgVest },
-  { lv: "Bikses", en: "Trousers", categories: ["Trousers", "Trousers-shorts", "Bottoms", "Pants", "Training pants"], image: imgPants },
+  { lv: "Virsjakas", en: "Jackets", categories: ["Jackets", "Non Padded Jacket", "Light Padded Jacket", "Padded Jacket", "Raincoats"], image: imgJacket },
+  { lv: "Vestes", en: "Vests", categories: ["Vests", "Bodywarmers", "Safety Vests"], image: imgVest },
+  { lv: "Bikses", en: "Trousers", categories: ["Trousers", "Pants", "Training pants", "Trousers-shorts", "Shorts & Trousers"], image: imgPants },
   { lv: "Šorti", en: "Shorts", categories: ["Shorts"], image: imgShorts },
   { lv: "Apavi", en: "Shoes", categories: ["Shoes", "Safety Footwear"], image: imgShoes },
   { lv: "Cepures", en: "Caps & hats", categories: ["Caps & Hats", "Caps", "Headwear"], image: imgCap },
@@ -51,6 +51,7 @@ const APPAREL_LINKS: Item[] = [
   { lv: "Zeķes", en: "Socks", categories: ["Socks"] },
   { lv: "Cimdi", en: "Gloves", categories: ["Gloves"] },
   { lv: "Šalles", en: "Scarves", categories: ["Scarves"] },
+  { lv: "Dvieļi", en: "Towels", categories: ["Towels"] },
 ];
 
 const BAG_LINKS: Item[] = [
