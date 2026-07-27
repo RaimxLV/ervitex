@@ -255,18 +255,18 @@ const Header = () => {
 
       {/* Desktop Mega Menu */}
       <div
+        ref={megaPanelRef}
         className={`hidden xl:block absolute left-0 right-0 top-full origin-top transition-all duration-200 ${
           megaOpen
             ? "pointer-events-auto opacity-100 translate-y-0"
             : "pointer-events-none opacity-0 -translate-y-2"
         }`}
       >
-        <div className="border-t border-border bg-background text-foreground shadow-2xl shadow-primary/30">
-          <div className="container">
-            <CatalogMegaMenu onNavigate={() => setMegaOpen(false)} />
-          </div>
+        <div className="border-t border-white/5 bg-[#0A0A0A] text-white shadow-2xl shadow-black/50">
+          <CatalogMegaMenu onNavigate={() => setMegaOpen(false)} />
         </div>
       </div>
+
 
 
       {/* Mobile nav */}
