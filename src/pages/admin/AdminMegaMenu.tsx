@@ -24,15 +24,32 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Plus,
   Trash2,
-  ArrowUp,
-  ArrowDown,
   Pencil,
   RefreshCw,
   Upload,
   Eye,
   EyeOff,
+  GripVertical,
 } from "lucide-react";
 import { resolveMenuImage } from "@/lib/megaMenuImages";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type Section = "apparel" | "bags" | "promo" | "promo_link";
 
@@ -65,6 +82,107 @@ const emptyDraft = (section: Section): Partial<Item> => ({
   sort_order: 999,
   auto_added: false,
 });
+
+function SortableRow({
+  item,
+  onEdit,
+  onRemove,
+  onToggleActive,
+  onUploadImage,
+}: {
+  item: Item;
+  onEdit: (i: Item) => void;
+  onRemove: (id: string) => void;
+  onToggleActive: (i: Item) => void;
+  onUploadImage: (i: Item, f: File) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : undefined,
+    opacity: isDragging ? 0.85 : 1,
+  };
+  const img = resolveMenuImage(item.image_url, item.label_en);
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-3 p-3 bg-card ${isDragging ? "shadow-lg" : ""}`}
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing touch-none rounded-sm p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+        aria-label="Pārvilkt"
+        type="button"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+
+      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-sm bg-muted">
+        {img ? (
+          <img src={img} alt={item.label_en} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-[9px] text-muted-foreground">
+            nav
+          </div>
+        )}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="font-medium text-sm truncate">
+            {item.label_lv}
+            <span className="ml-2 text-muted-foreground">/ {item.label_en}</span>
+          </p>
+          {item.auto_added && (
+            <span className="rounded-sm bg-accent/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-accent">
+              Auto
+            </span>
+          )}
+        </div>
+        <p className="text-[11px] text-muted-foreground truncate">
+          {item.categories.join(" · ")}
+        </p>
+      </div>
+
+      <label className="cursor-pointer">
+        <input
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) onUploadImage(item, f);
+            e.target.value = "";
+          }}
+        />
+        <span className="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-1 text-xs hover:bg-muted">
+          <Upload className="h-3 w-3" /> Bilde
+        </span>
+      </label>
+
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={() => onToggleActive(item)}
+        title={item.active ? "Paslēpt" : "Rādīt"}
+      >
+        {item.active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 opacity-50" />}
+      </Button>
+
+      <Button size="sm" variant="ghost" onClick={() => onEdit(item)}>
+        <Pencil className="h-4 w-4" />
+      </Button>
+      <Button size="sm" variant="ghost" onClick={() => onRemove(item.id)}>
+        <Trash2 className="h-4 w-4 text-destructive" />
+      </Button>
+    </div>
+  );
+}
 
 export default function AdminMegaMenu() {
   const { toast } = useToast();
@@ -180,16 +298,32 @@ export default function AdminMegaMenu() {
     load();
   };
 
-  const move = async (item: Item, direction: -1 | 1) => {
-    const section = bySection[item.section];
-    const idx = section.findIndex((i) => i.id === item.id);
-    const swap = section[idx + direction];
-    if (!swap) return;
-    await Promise.all([
-      supabase.from("mega_menu_items").update({ sort_order: swap.sort_order }).eq("id", item.id),
-      supabase.from("mega_menu_items").update({ sort_order: item.sort_order }).eq("id", swap.id),
-    ]);
-    load();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const handleDragEnd = async (section: Section, event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const list = bySection[section];
+    const oldIndex = list.findIndex((i) => i.id === active.id);
+    const newIndex = list.findIndex((i) => i.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    const reordered = arrayMove(list, oldIndex, newIndex);
+    // Reassign sort_order sequentially (10, 20, 30, ...)
+    const updates = reordered.map((it, idx) => ({ id: it.id, sort_order: (idx + 1) * 10 }));
+    // Optimistic update
+    setItems((prev) => {
+      const map = new Map(updates.map((u) => [u.id, u.sort_order]));
+      return prev.map((it) => (map.has(it.id) ? { ...it, sort_order: map.get(it.id)! } : it));
+    });
+    await Promise.all(
+      updates.map((u) =>
+        supabase.from("mega_menu_items").update({ sort_order: u.sort_order }).eq("id", u.id),
+      ),
+    );
   };
 
   const toggleActive = async (item: Item) => {
@@ -269,95 +403,32 @@ export default function AdminMegaMenu() {
                 <Plus className="mr-2 h-3 w-3" /> Pievienot
               </Button>
             </div>
-            <div className="divide-y divide-border">
-              {bySection[section].length === 0 && (
-                <p className="p-4 text-sm text-muted-foreground">Nav ierakstu.</p>
-              )}
-              {bySection[section].map((item, idx) => {
-                const img = resolveMenuImage(item.image_url, item.label_en);
-                return (
-                  <div key={item.id} className="flex items-center gap-3 p-3">
-                    <div className="flex flex-col gap-0.5">
-                      <button
-                        onClick={() => move(item, -1)}
-                        disabled={idx === 0}
-                        className="rounded-sm p-1 hover:bg-muted disabled:opacity-30"
-                        aria-label="Uz augšu"
-                      >
-                        <ArrowUp className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        onClick={() => move(item, 1)}
-                        disabled={idx === bySection[section].length - 1}
-                        className="rounded-sm p-1 hover:bg-muted disabled:opacity-30"
-                        aria-label="Uz leju"
-                      >
-                        <ArrowDown className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-
-                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-sm bg-muted">
-                      {img ? (
-                        <img src={img} alt={item.label_en} className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-[9px] text-muted-foreground">
-                          nav
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-sm truncate">
-                          {item.label_lv}
-                          <span className="ml-2 text-muted-foreground">/ {item.label_en}</span>
-                        </p>
-                        {item.auto_added && (
-                          <span className="rounded-sm bg-accent/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-accent">
-                            Auto
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-muted-foreground truncate">
-                        {item.categories.join(" · ")}
-                      </p>
-                    </div>
-
-                    <label className="cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="sr-only"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) uploadImage(item, f);
-                          e.target.value = "";
-                        }}
-                      />
-                      <span className="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-1 text-xs hover:bg-muted">
-                        <Upload className="h-3 w-3" /> Bilde
-                      </span>
-                    </label>
-
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => toggleActive(item)}
-                      title={item.active ? "Paslēpt" : "Rādīt"}
-                    >
-                      {item.active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 opacity-50" />}
-                    </Button>
-
-                    <Button size="sm" variant="ghost" onClick={() => openEdit(item)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => remove(item.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(e) => handleDragEnd(section, e)}
+            >
+              <SortableContext
+                items={bySection[section].map((i) => i.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="divide-y divide-border">
+                  {bySection[section].length === 0 && (
+                    <p className="p-4 text-sm text-muted-foreground">Nav ierakstu.</p>
+                  )}
+                  {bySection[section].map((item) => (
+                    <SortableRow
+                      key={item.id}
+                      item={item}
+                      onEdit={openEdit}
+                      onRemove={remove}
+                      onToggleActive={toggleActive}
+                      onUploadImage={uploadImage}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           </section>
         ))}
       </div>
