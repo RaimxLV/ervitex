@@ -27,9 +27,11 @@ interface Props {
   className?: string;
   /** Optional heading override; defaults to "Filtri / Filters" */
   heading?: string;
+  /** Hide the internal header (title + clear all). Useful when the drawer already renders a title. */
+  hideHeader?: boolean;
 }
 
-const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading }: Props) => {
+const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideHeader }: Props) => {
   const { lang } = useLanguage();
   const isMobile = useIsMobile();
   // On mobile, all sections default to collapsed. On desktop, all open.
@@ -63,27 +65,30 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading }: Pro
   return (
     <aside className={cn("space-y-3", className)}>
       {/* Header */}
-      <div className="flex items-center justify-between px-1">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-3.5 w-3.5 text-accent" />
-          <h2 className="font-heading text-[11px] font-bold uppercase tracking-[0.18em]">
-            {t.filters}
-          </h2>
-          {totalSelected > 0 && (
-            <span className="rounded-full bg-accent px-2 py-[1px] text-[10px] font-bold text-accent-foreground">
-              {totalSelected}
-            </span>
+      {!hideHeader && (
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="h-3.5 w-3.5 text-accent" />
+            <h2 className="font-heading text-[11px] font-bold uppercase tracking-[0.18em]">
+              {t.filters}
+            </h2>
+            {totalSelected > 0 && (
+              <span className="rounded-full bg-accent px-2 py-[1px] text-[10px] font-bold text-accent-foreground">
+                {totalSelected}
+              </span>
+            )}
+          </div>
+          {totalSelected > 0 && onClearAll && (
+            <button
+              onClick={onClearAll}
+              className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition hover:text-accent"
+            >
+              {t.clear}
+            </button>
           )}
         </div>
-        {totalSelected > 0 && onClearAll && (
-          <button
-            onClick={onClearAll}
-            className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition hover:text-accent"
-          >
-            {t.clear}
-          </button>
-        )}
-      </div>
+      )}
+
 
       {/* Sections */}
       <div className="space-y-2">
