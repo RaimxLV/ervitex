@@ -6,11 +6,11 @@ const NwgPage = () => {
   return (
     <UnifiedCatalog
       lockedSource="nwg"
-      title="New Wave Group"
+      title="Craft / Clique / ProJob / Cutter & Buck"
       subtitle={
         lang === "lv"
-          ? "Craft, Clique, Projob un citi profesionāli zīmoli"
-          : "Craft, Clique, Projob and other professional brands"
+          ? "Atlasītie profesionālie ražotāji"
+          : "Selected professional manufacturers"
       }
     />
   );

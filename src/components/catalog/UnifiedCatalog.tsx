@@ -74,14 +74,15 @@ interface EnrichedColor extends ColorEntry { bucket: ColorBucketKey | null }
 interface EnrichedItem extends Omit<CatalogItem, "colors"> {
   colors: EnrichedColor[];
   buckets: Set<ColorBucketKey>;
-  manufacturer: string;
+  manufacturer: string | null;
 }
 
 /**
  * Virtual "Ražotājs" (manufacturer) taxonomy. It unifies:
  *  - Stanley/Stella (its own source)
- *  - Selected NWG brands (Craft / Clique / ProJob / Cutter & Buck) — other NWG
- *    items are dropped from the catalog because we don't sell them.
+ *  - Selected partner brands from the NWG feed (Craft / Clique / ProJob / Cutter & Buck).
+ *    The feed owner name itself is never shown as a manufacturer, and all other
+ *    brands from that feed are hidden from the public catalog.
  *  - PF Concept split: Elevate + Roly become standalone manufacturers, the
  *    remaining PF items live under "Prezentmateriāli".
  *  - Beechfield Brands, Malfini.
@@ -92,7 +93,6 @@ const MANUFACTURERS: { key: string; label: string }[] = [
   { key: "nwg-clique", label: "Clique" },
   { key: "nwg-projob", label: "ProJob" },
   { key: "nwg-cutter", label: "Cutter & Buck" },
-  { key: "nwg", label: "New Wave Group" },
   { key: "pf-elevate", label: "Elevate" },
   { key: "pf-roly", label: "Roly" },
   { key: "pf", label: "Prezentmateriāli" },
@@ -111,7 +111,6 @@ const parseManufacturerFilter = (rawValue: string | null): Set<string> => {
     const token = raw.trim().toLowerCase();
     if (!token) continue;
     if (token === "new-wave-group" || token === "new wave group") {
-      parsed.add("nwg");
       parsed.add("nwg-craft");
       parsed.add("nwg-clique");
       parsed.add("nwg-projob");
@@ -133,7 +132,7 @@ const manufacturerOf = (source: CatalogSource, brand: string | null): string => 
     if (b.includes("clique")) return "nwg-clique";
     if (b.replace(/\s+/g, "").includes("projob")) return "nwg-projob";
     if (b.includes("cutter")) return "nwg-cutter";
-    return "nwg";
+    return null;
   }
   if (source === "pf") {
     if (b.includes("elevate")) return "pf-elevate";
@@ -367,6 +366,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             return b && b.toLowerCase() !== "unbranded" ? b : null;
           })();
           const manufacturer = manufacturerOf(it.source, brand);
+          if (!manufacturer) return null;
           return {
             ...it,
             brand,
