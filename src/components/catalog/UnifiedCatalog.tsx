@@ -216,6 +216,58 @@ const CATEGORY_MAP: Record<string, string> = {
   "bottom": "Bottoms", "bottoms": "Bottoms",
   "top": "Tops", "tops": "Tops",
 };
+
+const CATEGORY_PARAM_ALIASES: Record<string, string[]> = {
+  "t-krekli": ["T-shirts"],
+  "polo-krekli": ["Polos"],
+  "dzemperi": ["Hoodies", "Sweaters"],
+  "adijumi": ["Sweaters"],
+  "virsjakas": ["Jackets"],
+  "vestes": ["Vests"],
+  "flisa-jakas": ["Sweaters"],
+  "cepures": ["Caps & Hats"],
+  "darba-apgerbi": ["Workwear", "Safety", "Coverall"],
+  "darba-apavi": ["Safety Footwear", "Shoes"],
+  "sportam": ["Fitness & Sport", "Sports & Leisure", "Training Set", "Training pants"],
+  "pletkrekli": ["Shirts"],
+  "bikses": ["Trousers", "Pants", "Shorts"],
+  "termovela": ["Bottoms", "Tops"],
+  "audumu-maisini": ["Tote Bags", "Shopping & Tote Bags", "Cotton Bags", "Drawstring Bags", "Foldable Bags"],
+  "somas": ["Bags", "Backpacks", "Laptop Backpacks", "Laptop & Tablet Bags", "Business Bags", "Travel Bags", "Sports Bags", "Sport & Gym Bags", "Conference Bags", "Messenger & Shoulder Bags"],
+  "prieksauti": ["Aprons", "Bib"],
+  "priekšauti": ["Aprons", "Bib"],
+  "dvieli": ["Towels"],
+  "pledi": ["Blankets"],
+  "cimdi": ["Gloves"],
+  "sales": ["Scarves"],
+  "aksesuari": ["Accessories", "Travel Accessories", "Outdoor Items", "Beach Items"],
+  "kruzes": ["Mugs", "Standard Mugs", "Insulated Mugs", "Travel Mugs", "Tumblers", "Cups"],
+  "pudeles": ["Bottles", "Water Bottles", "Sports Bottles", "Insulated Bottles"],
+  "lietussargi": ["Umbrellas"],
+  "bloknoti": ["Notebooks", "Hard Cover Notebooks", "Soft Cover Notebooks", "Notepads", "Sticky Notes", "Planners"],
+  "pildspalvas": ["Pens", "Ballpoint Pens", "Rollerball Pens", "Fountain Pens", "Markers", "Pencils", "Other Pens & Writing Accessories"],
+  "auto": ["Car Accessories", "Tools & Car Accessories"],
+  "birojs": ["Office", "Portfolios", "Desk Pads", "Badge Holders", "Display"],
+  "davanu-komplekti": ["Gift Sets", "Sets"],
+  "atslegu-piekarini": ["Keychains & Keyrings", "Keychains"],
+  "sikumi": ["Giveaways", "Gadgets", "Stress Balls", "Toys & Games", "Games & Play", "Sweets", "Lip Balms", "Reflective Items", "Lanyards"],
+};
+
+const parseCategoryFilter = (rawValue: string | null): Set<string> => {
+  const parsed = new Set<string>();
+  for (const raw of (rawValue || "").split(",")) {
+    const token = raw.trim();
+    if (!token) continue;
+    const key = token.toLowerCase();
+    const aliases = CATEGORY_PARAM_ALIASES[key];
+    if (aliases) {
+      aliases.forEach((alias) => parsed.add(alias));
+    } else {
+      parsed.add(normalizeCategory(token) || token);
+    }
+  }
+  return parsed;
+};
 const normalizeCategory = (raw?: string | null): string | null => {
   if (!raw) return null;
   const trimmed = raw.trim();
@@ -298,7 +350,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     new Set((searchParams.get("brand") || "").split(",").filter(Boolean))
   );
   const [categories, setCategories] = useState<Set<string>>(
-    new Set((searchParams.get("category") || "").split(",").filter(Boolean))
+    parseCategoryFilter(searchParams.get("category"))
   );
   const [groups, setGroups] = useState<Set<string>>(
     new Set((searchParams.get("group") || "").split(",").filter(Boolean))
