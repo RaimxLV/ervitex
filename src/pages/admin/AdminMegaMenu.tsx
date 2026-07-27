@@ -83,6 +83,107 @@ const emptyDraft = (section: Section): Partial<Item> => ({
   auto_added: false,
 });
 
+function SortableRow({
+  item,
+  onEdit,
+  onRemove,
+  onToggleActive,
+  onUploadImage,
+}: {
+  item: Item;
+  onEdit: (i: Item) => void;
+  onRemove: (id: string) => void;
+  onToggleActive: (i: Item) => void;
+  onUploadImage: (i: Item, f: File) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+  });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 10 : undefined,
+    opacity: isDragging ? 0.85 : 1,
+  };
+  const img = resolveMenuImage(item.image_url, item.label_en);
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-3 p-3 bg-card ${isDragging ? "shadow-lg" : ""}`}
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing touch-none rounded-sm p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+        aria-label="Pārvilkt"
+        type="button"
+      >
+        <GripVertical className="h-4 w-4" />
+      </button>
+
+      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-sm bg-muted">
+        {img ? (
+          <img src={img} alt={item.label_en} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-[9px] text-muted-foreground">
+            nav
+          </div>
+        )}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="font-medium text-sm truncate">
+            {item.label_lv}
+            <span className="ml-2 text-muted-foreground">/ {item.label_en}</span>
+          </p>
+          {item.auto_added && (
+            <span className="rounded-sm bg-accent/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-accent">
+              Auto
+            </span>
+          )}
+        </div>
+        <p className="text-[11px] text-muted-foreground truncate">
+          {item.categories.join(" · ")}
+        </p>
+      </div>
+
+      <label className="cursor-pointer">
+        <input
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) onUploadImage(item, f);
+            e.target.value = "";
+          }}
+        />
+        <span className="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-1 text-xs hover:bg-muted">
+          <Upload className="h-3 w-3" /> Bilde
+        </span>
+      </label>
+
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={() => onToggleActive(item)}
+        title={item.active ? "Paslēpt" : "Rādīt"}
+      >
+        {item.active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 opacity-50" />}
+      </Button>
+
+      <Button size="sm" variant="ghost" onClick={() => onEdit(item)}>
+        <Pencil className="h-4 w-4" />
+      </Button>
+      <Button size="sm" variant="ghost" onClick={() => onRemove(item.id)}>
+        <Trash2 className="h-4 w-4 text-destructive" />
+      </Button>
+    </div>
+  );
+}
+
 export default function AdminMegaMenu() {
   const { toast } = useToast();
   const [items, setItems] = useState<Item[]>([]);
