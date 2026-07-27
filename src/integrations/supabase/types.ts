@@ -302,6 +302,48 @@ export type Database = {
         }
         Relationships: []
       }
+      mega_menu_items: {
+        Row: {
+          active: boolean
+          auto_added: boolean
+          categories: string[]
+          created_at: string
+          id: string
+          image_url: string | null
+          label_en: string
+          label_lv: string
+          section: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          auto_added?: boolean
+          categories?: string[]
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          label_en: string
+          label_lv: string
+          section: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          auto_added?: boolean
+          categories?: string[]
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          label_en?: string
+          label_lv?: string
+          section?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mf_images: {
         Row: {
           color_code: string | null

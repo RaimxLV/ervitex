@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, Menu, X, Globe, Languages, Upload } from "lucide-react";
+import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, Menu, X, Globe, Languages, Upload, LayoutGrid } from "lucide-react";
 
 const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
 
@@ -10,6 +10,7 @@ const navItems = [
   { to: "/admin", icon: LayoutDashboard, label: "Galvenais panelis" },
   { to: "/admin/products", icon: Package, label: "Produkti" },
   { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
+  { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
   { to: "/admin/beechfield-import", icon: Upload, label: "Beechfield imports" },
   { to: "/admin/quotes", icon: MessageSquare, label: "Cenu pieprasījumi" },
   { to: "/admin/translate", icon: Languages, label: "Tulkošana", superOnly: true },
