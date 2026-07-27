@@ -110,13 +110,6 @@ const parseManufacturerFilter = (rawValue: string | null): Set<string> => {
   for (const raw of (rawValue || "").split(",")) {
     const token = raw.trim().toLowerCase();
     if (!token) continue;
-    if (token === "new-wave-group" || token === "new wave group") {
-      parsed.add("nwg-craft");
-      parsed.add("nwg-clique");
-      parsed.add("nwg-projob");
-      parsed.add("nwg-cutter");
-      continue;
-    }
     if (token === "stanley-stella" || token === "stanley/stella") parsed.add("ss");
     else if (token === "pf-concept" || token === "pf concept") parsed.add("pf");
     else if (token === "beechfield-brands" || token === "beechfield brands") parsed.add("bb");
