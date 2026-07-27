@@ -80,8 +80,9 @@ interface EnrichedItem extends Omit<CatalogItem, "colors"> {
 /**
  * Virtual "Ražotājs" (manufacturer) taxonomy. It unifies:
  *  - Stanley/Stella (its own source)
- *  - Selected NWG brands (Craft / Clique / ProJob / Cutter & Buck) — other NWG
- *    items are dropped from the catalog because we don't sell them.
+ *  - Selected partner brands from the NWG feed (Craft / Clique / ProJob / Cutter & Buck).
+ *    The feed owner name itself is never shown as a manufacturer, and all other
+ *    brands from that feed are hidden from the public catalog.
  *  - PF Concept split: Elevate + Roly become standalone manufacturers, the
  *    remaining PF items live under "Prezentmateriāli".
  *  - Beechfield Brands, Malfini.
@@ -92,7 +93,6 @@ const MANUFACTURERS: { key: string; label: string }[] = [
   { key: "nwg-clique", label: "Clique" },
   { key: "nwg-projob", label: "ProJob" },
   { key: "nwg-cutter", label: "Cutter & Buck" },
-  { key: "nwg", label: "New Wave Group" },
   { key: "pf-elevate", label: "Elevate" },
   { key: "pf-roly", label: "Roly" },
   { key: "pf", label: "Prezentmateriāli" },
@@ -110,14 +110,6 @@ const parseManufacturerFilter = (rawValue: string | null): Set<string> => {
   for (const raw of (rawValue || "").split(",")) {
     const token = raw.trim().toLowerCase();
     if (!token) continue;
-    if (token === "new-wave-group" || token === "new wave group") {
-      parsed.add("nwg");
-      parsed.add("nwg-craft");
-      parsed.add("nwg-clique");
-      parsed.add("nwg-projob");
-      parsed.add("nwg-cutter");
-      continue;
-    }
     if (token === "stanley-stella" || token === "stanley/stella") parsed.add("ss");
     else if (token === "pf-concept" || token === "pf concept") parsed.add("pf");
     else if (token === "beechfield-brands" || token === "beechfield brands") parsed.add("bb");
@@ -125,7 +117,7 @@ const parseManufacturerFilter = (rawValue: string | null): Set<string> => {
   }
   return parsed;
 };
-const manufacturerOf = (source: CatalogSource, brand: string | null): string => {
+const manufacturerOf = (source: CatalogSource, brand: string | null): string | null => {
   const b = (brand || "").toLowerCase();
   if (source === "ss") return "ss";
   if (source === "nwg") {
@@ -133,7 +125,7 @@ const manufacturerOf = (source: CatalogSource, brand: string | null): string => 
     if (b.includes("clique")) return "nwg-clique";
     if (b.replace(/\s+/g, "").includes("projob")) return "nwg-projob";
     if (b.includes("cutter")) return "nwg-cutter";
-    return "nwg";
+    return null;
   }
   if (source === "pf") {
     if (b.includes("elevate")) return "pf-elevate";
@@ -367,6 +359,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             return b && b.toLowerCase() !== "unbranded" ? b : null;
           })();
           const manufacturer = manufacturerOf(it.source, brand);
+          if (!manufacturer) return null;
           return {
             ...it,
             brand,
