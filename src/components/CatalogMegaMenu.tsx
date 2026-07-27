@@ -157,7 +157,7 @@ function FeatureCard({
       role="menuitem"
       className="group relative block overflow-hidden rounded-sm bg-primary-foreground/5"
     >
-      <div className="aspect-[5/4] lg:aspect-[4/5]">
+      <div className="aspect-[5/4] lg:aspect-[6/5]">
         <img
           src={image}
           alt={title}
@@ -166,7 +166,7 @@ function FeatureCard({
         />
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-primary/85 via-primary/20 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-3">
+      <div className="absolute inset-x-0 bottom-0 p-2.5">
         <div className="mb-1 font-heading text-[9px] font-bold uppercase tracking-[0.28em] text-accent">
           {eyebrow}
         </div>
