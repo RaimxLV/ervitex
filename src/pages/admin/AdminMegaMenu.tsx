@@ -302,95 +302,32 @@ export default function AdminMegaMenu() {
                 <Plus className="mr-2 h-3 w-3" /> Pievienot
               </Button>
             </div>
-            <div className="divide-y divide-border">
-              {bySection[section].length === 0 && (
-                <p className="p-4 text-sm text-muted-foreground">Nav ierakstu.</p>
-              )}
-              {bySection[section].map((item, idx) => {
-                const img = resolveMenuImage(item.image_url, item.label_en);
-                return (
-                  <div key={item.id} className="flex items-center gap-3 p-3">
-                    <div className="flex flex-col gap-0.5">
-                      <button
-                        onClick={() => move(item, -1)}
-                        disabled={idx === 0}
-                        className="rounded-sm p-1 hover:bg-muted disabled:opacity-30"
-                        aria-label="Uz augšu"
-                      >
-                        <ArrowUp className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        onClick={() => move(item, 1)}
-                        disabled={idx === bySection[section].length - 1}
-                        className="rounded-sm p-1 hover:bg-muted disabled:opacity-30"
-                        aria-label="Uz leju"
-                      >
-                        <ArrowDown className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-
-                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-sm bg-muted">
-                      {img ? (
-                        <img src={img} alt={item.label_en} className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-[9px] text-muted-foreground">
-                          nav
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-sm truncate">
-                          {item.label_lv}
-                          <span className="ml-2 text-muted-foreground">/ {item.label_en}</span>
-                        </p>
-                        {item.auto_added && (
-                          <span className="rounded-sm bg-accent/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-accent">
-                            Auto
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-muted-foreground truncate">
-                        {item.categories.join(" · ")}
-                      </p>
-                    </div>
-
-                    <label className="cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="sr-only"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) uploadImage(item, f);
-                          e.target.value = "";
-                        }}
-                      />
-                      <span className="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-1 text-xs hover:bg-muted">
-                        <Upload className="h-3 w-3" /> Bilde
-                      </span>
-                    </label>
-
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => toggleActive(item)}
-                      title={item.active ? "Paslēpt" : "Rādīt"}
-                    >
-                      {item.active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 opacity-50" />}
-                    </Button>
-
-                    <Button size="sm" variant="ghost" onClick={() => openEdit(item)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => remove(item.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(e) => handleDragEnd(section, e)}
+            >
+              <SortableContext
+                items={bySection[section].map((i) => i.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="divide-y divide-border">
+                  {bySection[section].length === 0 && (
+                    <p className="p-4 text-sm text-muted-foreground">Nav ierakstu.</p>
+                  )}
+                  {bySection[section].map((item) => (
+                    <SortableRow
+                      key={item.id}
+                      item={item}
+                      onEdit={openEdit}
+                      onRemove={remove}
+                      onToggleActive={toggleActive}
+                      onUploadImage={uploadImage}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           </section>
         ))}
       </div>
