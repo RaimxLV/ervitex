@@ -1,76 +1,74 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { ArrowRight, LayoutGrid, Sparkles } from "lucide-react";
-import {
-  IconTShirt,
-  IconPolo,
-  IconHoodie,
-  IconJacket,
-  IconVest,
-  IconFleece,
-  IconPants,
-  IconCap,
-  IconBackpack,
-  IconToteBag,
-  IconAccessories,
-  IconMug,
-} from "@/components/catalog/CategoryIcons";
+import { ArrowRight, Sparkles } from "lucide-react";
+
+// Category tile photos — cinematic dark studio shots matching brand tone.
+import imgTshirt from "@/assets/menu/tshirt.jpg";
+import imgPolo from "@/assets/menu/polo.jpg";
+import imgHoodie from "@/assets/menu/hoodie.jpg";
+import imgSweater from "@/assets/menu/sweater.jpg";
+import imgJacket from "@/assets/menu/jacket.jpg";
+import imgVest from "@/assets/menu/vest.jpg";
+import imgPants from "@/assets/menu/pants.jpg";
+import imgShorts from "@/assets/menu/shorts.jpg";
+import imgCap from "@/assets/menu/cap.jpg";
+import imgBackpack from "@/assets/menu/backpack.jpg";
+import imgBag from "@/assets/menu/bag.jpg";
+import imgTote from "@/assets/menu/tote.jpg";
+import imgUmbrella from "@/assets/menu/umbrella.jpg";
+import imgMug from "@/assets/menu/mug.jpg";
+import imgBottle from "@/assets/menu/bottle.jpg";
+import imgNotebook from "@/assets/menu/notebook.jpg";
+import imgKeychain from "@/assets/menu/keychain.jpg";
+import imgHeadphones from "@/assets/menu/headphones.jpg";
 
 interface MegaMenuProps {
   onNavigate?: () => void;
 }
 
-// Each tile links to /catalog with a category filter. Labels come from the
-// canonical CATEGORY_MAP output in UnifiedCatalog.tsx, so filter selection
-// matches 1:1 with what the sidebar shows.
 interface Tile {
   lv: string;
   en: string;
   categories: string[];
-  icon: JSX.Element;
+  image: string;
 }
 
-const COLUMNS: { titleLv: string; titleEn: string; tiles: Tile[] }[] = [
-  {
-    titleLv: "Apģērbi",
-    titleEn: "Apparel",
-    tiles: [
-      { lv: "T-krekli", en: "T-shirts", categories: ["T-shirts"], icon: <IconTShirt /> },
-      { lv: "Polo krekli", en: "Polos", categories: ["Polos"], icon: <IconPolo /> },
-      { lv: "Hūdiji", en: "Hoodies", categories: ["Hoodies"], icon: <IconHoodie /> },
-      { lv: "Džemperi", en: "Sweaters", categories: ["Sweaters"], icon: <IconFleece /> },
-      { lv: "Jakas", en: "Jackets", categories: ["Jackets"], icon: <IconJacket /> },
-      { lv: "Vestes", en: "Vests", categories: ["Vests"], icon: <IconVest /> },
-      { lv: "Bikses", en: "Trousers", categories: ["Trousers"], icon: <IconPants /> },
-      { lv: "Šorti", en: "Shorts", categories: ["Shorts"], icon: <IconPants /> },
-    ],
-  },
-  {
-    titleLv: "Aksesuāri",
-    titleEn: "Accessories",
-    tiles: [
-      { lv: "Cepures", en: "Caps & Hats", categories: ["Caps & Hats"], icon: <IconCap /> },
-      { lv: "Mugursomas", en: "Backpacks", categories: ["Backpacks"], icon: <IconBackpack /> },
-      { lv: "Somas", en: "Bags", categories: ["Bags"], icon: <IconBackpack /> },
-      { lv: "Audumu maisiņi", en: "Tote Bags", categories: ["Tote Bags"], icon: <IconToteBag /> },
-      { lv: "Lietussargi", en: "Umbrellas", categories: ["Umbrellas"], icon: <IconAccessories /> },
-    ],
-  },
-  {
-    titleLv: "Prezentmateriāli",
-    titleEn: "Business gifts",
-    tiles: [
-      { lv: "Krūzes", en: "Mugs", categories: ["Mugs"], icon: <IconMug /> },
-      { lv: "Pudeles", en: "Bottles", categories: ["Bottles"], icon: <IconMug /> },
-      { lv: "Piezīmju grāmatiņas", en: "Notebooks", categories: ["Notebooks"], icon: <IconAccessories /> },
-      { lv: "Atslēgu piekariņi", en: "Keychains", categories: ["Keychains & Keyrings"], icon: <IconAccessories /> },
-      { lv: "Austiņas", en: "Headphones", categories: ["Headphones"], icon: <IconAccessories /> },
-    ],
-  },
+// Apparel tiles — labels 1:1 with CATEGORY_MAP in UnifiedCatalog.tsx.
+const APPAREL: Tile[] = [
+  { lv: "T-krekli", en: "T-shirts", categories: ["T-shirts"], image: imgTshirt },
+  { lv: "Polo krekli", en: "Polos", categories: ["Polos"], image: imgPolo },
+  { lv: "Hūdiji", en: "Hoodies", categories: ["Hoodies"], image: imgHoodie },
+  { lv: "Džemperi", en: "Sweaters", categories: ["Sweaters"], image: imgSweater },
+  { lv: "Jakas", en: "Jackets", categories: ["Jackets"], image: imgJacket },
+  { lv: "Vestes", en: "Vests", categories: ["Vests"], image: imgVest },
+  { lv: "Bikses", en: "Trousers", categories: ["Trousers"], image: imgPants },
+  { lv: "Šorti", en: "Shorts", categories: ["Shorts"], image: imgShorts },
 ];
 
-// Manufacturer chips — mirrors the "Ražotājs" facet in the sidebar filter
-// (MANUFACTURERS in UnifiedCatalog.tsx). Stanley/Stella is pinned first.
+const ACCESSORIES: Tile[] = [
+  { lv: "Cepures", en: "Caps & Hats", categories: ["Caps & Hats"], image: imgCap },
+  { lv: "Mugursomas", en: "Backpacks", categories: ["Backpacks"], image: imgBackpack },
+  { lv: "Somas", en: "Bags", categories: ["Bags"], image: imgBag },
+  { lv: "Maisiņi", en: "Tote Bags", categories: ["Tote Bags"], image: imgTote },
+];
+
+const UMBRELLA: Tile = {
+  lv: "Lietussargi",
+  en: "Umbrellas",
+  categories: ["Umbrellas"],
+  image: imgUmbrella,
+};
+
+const GIFTS: Tile[] = [
+  { lv: "Krūzes", en: "Mugs", categories: ["Mugs"], image: imgMug },
+  { lv: "Pudeles", en: "Bottles", categories: ["Bottles"], image: imgBottle },
+  { lv: "Piezīmju grāmatiņas", en: "Notebooks", categories: ["Notebooks"], image: imgNotebook },
+  { lv: "Atslēgu piekariņi", en: "Keychains", categories: ["Keychains & Keyrings"], image: imgKeychain },
+  { lv: "Austiņas", en: "Headphones", categories: ["Headphones"], image: imgHeadphones },
+];
+
+// Manufacturer chips — mirror the "Ražotājs" facet in the sidebar filter.
+// Stanley/Stella pinned first with red accent treatment.
 const MANUFACTURERS: { label: string; token: string; featured?: boolean }[] = [
   { label: "Stanley/Stella", token: "stanley-stella", featured: true },
   { label: "Craft", token: "nwg-craft" },
@@ -89,68 +87,188 @@ const buildCategoryHref = (cats: string[]) =>
 const buildManufacturerHref = (token: string) =>
   `/catalog?source=${encodeURIComponent(token)}`;
 
+// Reusable photo tile — object-cover image + dark gradient + red hover wash.
+function PhotoTile({
+  tile,
+  onNavigate,
+  aspect,
+  size = "md",
+}: {
+  tile: Tile;
+  onNavigate?: () => void;
+  aspect: string;
+  size?: "sm" | "md";
+}) {
+  return (
+    <Link
+      to={buildCategoryHref(tile.categories)}
+      onClick={onNavigate}
+      role="menuitem"
+      className={`group relative overflow-hidden rounded-sm ${aspect}`}
+    >
+      <img
+        src={tile.image}
+        alt={tile.lv}
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent transition-opacity duration-500 group-hover:opacity-90" />
+      <div className="absolute inset-0 bg-accent/0 transition-colors duration-500 group-hover:bg-accent/40" />
+      <span
+        className={`absolute left-3 bottom-3 font-heading font-bold uppercase tracking-[0.18em] text-white ${
+          size === "sm" ? "text-[10px]" : "text-[11px]"
+        }`}
+      >
+        {tile.lv}
+      </span>
+    </Link>
+  );
+}
+
+// Wide horizontal tile used for the gift-material list.
+function WideTile({ tile, onNavigate }: { tile: Tile; onNavigate?: () => void }) {
+  return (
+    <Link
+      to={buildCategoryHref(tile.categories)}
+      onClick={onNavigate}
+      role="menuitem"
+      className="group relative flex h-16 items-center overflow-hidden rounded-sm border border-white/10"
+    >
+      <img
+        src={tile.image}
+        alt={tile.lv}
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover opacity-40 transition-transform duration-700 group-hover:scale-110 group-hover:opacity-60"
+      />
+      <div className="absolute inset-0 bg-black/60 transition-colors duration-500 group-hover:bg-accent/60" />
+      <div className="relative flex h-full w-full items-center justify-between px-5">
+        <span className="font-heading text-[11px] font-bold uppercase tracking-[0.18em] text-white">
+          {tile.lv}
+        </span>
+        <ArrowRight className="h-3.5 w-3.5 text-white/40 transition-all group-hover:translate-x-1 group-hover:text-white" />
+      </div>
+    </Link>
+  );
+}
+
 export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
   const { lang } = useLanguage();
+  const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
 
   return (
     <div
       role="menu"
-      aria-label={lang === "lv" ? "Kataloga izvēlne" : "Catalog menu"}
-      className="p-6 lg:p-10"
+      aria-label={t("Kataloga izvēlne", "Catalog menu")}
+      className="bg-[#0A0A0A] text-white"
     >
-      {/* All products banner */}
+      {/* Top banner — Visi produkti */}
       <Link
         to="/catalog"
         onClick={onNavigate}
         role="menuitem"
-        className="group mb-8 flex items-center justify-between rounded-sm bg-primary px-5 py-4 text-primary-foreground transition-opacity hover:opacity-90"
+        className="group flex items-center justify-between border-b border-white/5 bg-white px-6 py-4 text-black transition-colors hover:bg-white/95 lg:px-10 lg:py-5"
       >
-        <div className="flex items-center gap-3">
-          <LayoutGrid className="h-4 w-4 text-accent" />
+        <div className="flex items-center gap-4">
+          <div className="grid h-5 w-5 grid-cols-2 gap-1">
+            <div className="bg-accent" />
+            <div className="bg-accent" />
+            <div className="bg-accent" />
+            <div className="bg-accent" />
+          </div>
           <span className="font-heading text-sm font-bold uppercase tracking-[0.2em]">
-            {lang === "lv" ? "Visi produkti" : "All products"}
+            {t("Visi produkti", "All products")}
           </span>
         </div>
-        <ArrowRight className="h-4 w-4 opacity-80 transition-transform group-hover:translate-x-1" />
+        <ArrowRight className="h-5 w-5 text-black/30 transition-all group-hover:translate-x-1 group-hover:text-accent" />
       </Link>
 
       {/* Category grid */}
-      <div className="grid grid-cols-1 gap-x-10 gap-y-8 md:grid-cols-3">
-        {COLUMNS.map((col) => (
-          <div key={col.titleEn}>
-            <h3 className="mb-4 text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground font-heading">
-              {lang === "lv" ? col.titleLv : col.titleEn}
+      <div className="grid grid-cols-1 gap-10 p-6 lg:grid-cols-12 lg:gap-12 lg:p-10">
+        {/* Apģērbi — 4 col × 2 rows */}
+        <section className="lg:col-span-6">
+          <div className="mb-6 flex items-center gap-3">
+            <span className="h-2 w-2 bg-accent" />
+            <h3 className="font-heading text-[11px] font-bold uppercase tracking-[0.3em] text-white">
+              {t("Apģērbi", "Apparel")}
             </h3>
-            <ul className="space-y-1">
-              {col.tiles.map((tile) => (
-                <li key={tile.en}>
-                  <Link
-                    to={buildCategoryHref(tile.categories)}
-                    onClick={onNavigate}
-                    role="menuitem"
-                    className="group flex items-center gap-3 rounded-sm px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted"
-                  >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border bg-card text-foreground/80 transition-colors group-hover:border-accent group-hover:text-accent">
-                      {tile.icon}
-                    </span>
-                    <span className="flex-1 font-medium">
-                      {lang === "lv" ? tile.lv : tile.en}
-                    </span>
-                    <ArrowRight className="h-3.5 w-3.5 shrink-0 text-accent opacity-0 transition-opacity group-hover:opacity-100" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
           </div>
-        ))}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {APPAREL.map((tile) => (
+              <PhotoTile
+                key={tile.en}
+                tile={tile}
+                onNavigate={onNavigate}
+                aspect="aspect-[3/4]"
+                size="sm"
+              />
+            ))}
+          </div>
+        </section>
+
+        {/* Aksesuāri — 2×2 grid + wide umbrella */}
+        <section className="lg:col-span-3">
+          <div className="mb-6 flex items-center gap-3">
+            <span className="h-2 w-2 bg-accent" />
+            <h3 className="font-heading text-[11px] font-bold uppercase tracking-[0.3em] text-white">
+              {t("Aksesuāri", "Accessories")}
+            </h3>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {ACCESSORIES.map((tile) => (
+              <PhotoTile
+                key={tile.en}
+                tile={tile}
+                onNavigate={onNavigate}
+                aspect="aspect-square"
+                size="sm"
+              />
+            ))}
+            <div className="col-span-2">
+              <Link
+                to={buildCategoryHref(UMBRELLA.categories)}
+                onClick={onNavigate}
+                role="menuitem"
+                className="group relative block h-24 overflow-hidden rounded-sm"
+              >
+                <img
+                  src={UMBRELLA.image}
+                  alt={UMBRELLA.lv}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent transition-colors group-hover:bg-accent/50" />
+                <span className="absolute left-4 bottom-3 font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-white">
+                  {UMBRELLA.lv}
+                </span>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Prezentmateriāli — stacked wide rows */}
+        <section className="lg:col-span-3">
+          <div className="mb-6 flex items-center gap-3">
+            <span className="h-2 w-2 bg-accent" />
+            <h3 className="font-heading text-[11px] font-bold uppercase tracking-[0.3em] text-white">
+              {t("Prezentmateriāli", "Business gifts")}
+            </h3>
+          </div>
+          <div className="flex flex-col gap-3">
+            {GIFTS.map((tile) => (
+              <WideTile key={tile.en} tile={tile} onNavigate={onNavigate} />
+            ))}
+          </div>
+        </section>
       </div>
 
       {/* Manufacturers */}
-      <div className="mt-8 border-t border-border pt-6">
-        <h3 className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.28em] text-muted-foreground font-heading">
-          <Sparkles className="h-3 w-3 text-accent" />
-          {lang === "lv" ? "Ražotāji" : "Manufacturers"}
-        </h3>
+      <div className="border-t border-white/5 bg-black/40 p-6 lg:p-10">
+        <div className="mb-5 flex items-center gap-2">
+          <Sparkles className="h-3.5 w-3.5 text-accent" />
+          <span className="font-heading text-[10px] font-bold uppercase tracking-[0.28em] text-white/50">
+            {t("Ražotāji", "Manufacturers")}
+          </span>
+        </div>
         <div className="flex flex-wrap gap-2">
           {MANUFACTURERS.map((m) => (
             <Link
@@ -160,8 +278,8 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
               role="menuitem"
               className={
                 m.featured
-                  ? "rounded-sm border border-accent bg-accent/10 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-accent transition-colors hover:bg-accent hover:text-accent-foreground"
-                  : "rounded-sm border border-border px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-foreground transition-colors hover:border-accent hover:text-accent"
+                  ? "rounded-sm border-2 border-accent bg-accent/10 px-5 py-2.5 font-heading text-[10px] font-bold uppercase tracking-[0.18em] text-white shadow-[0_0_15px_rgba(228,3,46,0.3)] transition-colors hover:bg-accent"
+                  : "rounded-sm border border-white/10 px-5 py-2.5 font-heading text-[10px] font-bold uppercase tracking-[0.18em] text-white/60 transition-all hover:border-white/30 hover:text-white"
               }
             >
               {m.label}
