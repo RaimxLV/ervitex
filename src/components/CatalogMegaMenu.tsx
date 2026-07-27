@@ -159,40 +159,40 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
     <div
       role="menu"
       aria-label={t("Kataloga izvēlne", "Catalog menu")}
-      className="bg-[#0A0A0A] text-white"
+      className="max-h-[calc(100vh-5rem)] overflow-y-auto bg-[#0A0A0A] text-white"
     >
       {/* Top banner — Visi produkti */}
       <Link
         to="/catalog"
         onClick={onNavigate}
         role="menuitem"
-        className="group flex items-center justify-between border-b border-white/5 bg-white px-6 py-4 text-black transition-colors hover:bg-white/95 lg:px-10 lg:py-5"
+        className="group flex items-center justify-between border-b border-white/5 bg-white px-5 py-3 text-black transition-colors hover:bg-white/95 lg:px-8"
       >
-        <div className="flex items-center gap-4">
-          <div className="grid h-5 w-5 grid-cols-2 gap-1">
+        <div className="flex items-center gap-3">
+          <div className="grid h-4 w-4 grid-cols-2 gap-0.5">
             <div className="bg-accent" />
             <div className="bg-accent" />
             <div className="bg-accent" />
             <div className="bg-accent" />
           </div>
-          <span className="font-heading text-sm font-bold uppercase tracking-[0.2em]">
+          <span className="font-heading text-xs font-bold uppercase tracking-[0.2em] sm:text-sm">
             {t("Visi produkti", "All products")}
           </span>
         </div>
-        <ArrowRight className="h-5 w-5 text-black/30 transition-all group-hover:translate-x-1 group-hover:text-accent" />
+        <ArrowRight className="h-4 w-4 text-black/30 transition-all group-hover:translate-x-1 group-hover:text-accent" />
       </Link>
 
       {/* Category grid */}
-      <div className="grid grid-cols-1 gap-10 p-6 lg:grid-cols-12 lg:gap-12 lg:p-10">
+      <div className="grid grid-cols-1 gap-6 p-5 lg:grid-cols-12 lg:gap-8 lg:p-8">
         {/* Apģērbi — 4 col × 2 rows */}
         <section className="lg:col-span-6">
-          <div className="mb-6 flex items-center gap-3">
-            <span className="h-2 w-2 bg-accent" />
-            <h3 className="font-heading text-[11px] font-bold uppercase tracking-[0.3em] text-white">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 bg-accent" />
+            <h3 className="font-heading text-[10px] font-bold uppercase tracking-[0.3em] text-white/90">
               {t("Apģērbi", "Apparel")}
             </h3>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {APPAREL.map((tile) => (
               <PhotoTile
                 key={tile.en}
@@ -207,13 +207,13 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
 
         {/* Aksesuāri — 2×2 grid + wide umbrella */}
         <section className="lg:col-span-3">
-          <div className="mb-6 flex items-center gap-3">
-            <span className="h-2 w-2 bg-accent" />
-            <h3 className="font-heading text-[11px] font-bold uppercase tracking-[0.3em] text-white">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 bg-accent" />
+            <h3 className="font-heading text-[10px] font-bold uppercase tracking-[0.3em] text-white/90">
               {t("Aksesuāri", "Accessories")}
             </h3>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             {ACCESSORIES.map((tile) => (
               <PhotoTile
                 key={tile.en}
@@ -228,7 +228,7 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
                 to={buildCategoryHref(UMBRELLA.categories)}
                 onClick={onNavigate}
                 role="menuitem"
-                className="group relative block h-24 overflow-hidden rounded-sm"
+                className="group relative block h-16 overflow-hidden rounded-sm"
               >
                 <img
                   src={UMBRELLA.image}
@@ -236,8 +236,8 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 to-transparent transition-colors group-hover:bg-accent/50" />
-                <span className="absolute left-4 bottom-3 font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-white">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent transition-colors group-hover:bg-accent/50" />
+                <span className="absolute left-3 bottom-2 font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-white">
                   {UMBRELLA.lv}
                 </span>
               </Link>
@@ -247,13 +247,13 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
 
         {/* Prezentmateriāli — stacked wide rows */}
         <section className="lg:col-span-3">
-          <div className="mb-6 flex items-center gap-3">
-            <span className="h-2 w-2 bg-accent" />
-            <h3 className="font-heading text-[11px] font-bold uppercase tracking-[0.3em] text-white">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 bg-accent" />
+            <h3 className="font-heading text-[10px] font-bold uppercase tracking-[0.3em] text-white/90">
               {t("Prezentmateriāli", "Business gifts")}
             </h3>
           </div>
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2">
             {GIFTS.map((tile) => (
               <WideTile key={tile.en} tile={tile} onNavigate={onNavigate} />
             ))}
@@ -262,14 +262,14 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
       </div>
 
       {/* Manufacturers */}
-      <div className="border-t border-white/5 bg-black/40 p-6 lg:p-10">
-        <div className="mb-5 flex items-center gap-2">
-          <Sparkles className="h-3.5 w-3.5 text-accent" />
-          <span className="font-heading text-[10px] font-bold uppercase tracking-[0.28em] text-white/50">
+      <div className="border-t border-white/5 bg-black/40 px-5 py-4 lg:px-8 lg:py-5">
+        <div className="mb-3 flex items-center gap-2">
+          <Sparkles className="h-3 w-3 text-accent" />
+          <span className="font-heading text-[10px] font-bold uppercase tracking-[0.28em] text-white/60">
             {t("Ražotāji", "Manufacturers")}
           </span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {MANUFACTURERS.map((m) => (
             <Link
               key={m.token}
@@ -278,8 +278,8 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
               role="menuitem"
               className={
                 m.featured
-                  ? "rounded-sm border-2 border-accent bg-accent/10 px-5 py-2.5 font-heading text-[10px] font-bold uppercase tracking-[0.18em] text-white shadow-[0_0_15px_rgba(228,3,46,0.3)] transition-colors hover:bg-accent"
-                  : "rounded-sm border border-white/10 px-5 py-2.5 font-heading text-[10px] font-bold uppercase tracking-[0.18em] text-white/60 transition-all hover:border-white/30 hover:text-white"
+                  ? "rounded-sm border-2 border-accent bg-accent/10 px-3.5 py-1.5 font-heading text-[10px] font-bold uppercase tracking-[0.16em] text-white shadow-[0_0_15px_rgba(228,3,46,0.25)] transition-colors hover:bg-accent"
+                  : "rounded-sm border border-white/10 px-3.5 py-1.5 font-heading text-[10px] font-bold uppercase tracking-[0.16em] text-white/60 transition-all hover:border-white/30 hover:text-white"
               }
             >
               {m.label}
