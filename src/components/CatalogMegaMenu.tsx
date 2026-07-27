@@ -178,7 +178,7 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
       <div className="mx-auto max-w-[1400px] px-5 py-5 lg:px-8 lg:py-6 xl:px-10">
         {/* Apģērbi */}
         <SectionTitle>{t("Apģērbi", "Apparel")}</SectionTitle>
-        <div className="grid grid-cols-4 gap-x-3 gap-y-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-15">
+        <div className="grid grid-cols-4 gap-x-3 gap-y-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12">
           {APPAREL_TILES.map((item) => (
             <CategoryTile key={item.en} item={item} onNavigate={onNavigate} />
           ))}
