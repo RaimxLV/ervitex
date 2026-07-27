@@ -18,11 +18,16 @@ const navItems = [
 ];
 
 const catalogSubItems = [
-  { path: "/stanley-stella", lv: "Stanley/Stella", en: "Stanley/Stella" },
-  { path: "/nwg", lv: "New Wave Group", en: "New Wave Group" },
-  { path: "/pf-concept", lv: "PF Concept", en: "PF Concept" },
-  { path: "/beechfield-brands", lv: "Beechfield Brands", en: "Beechfield Brands" },
-  { path: "/malfini", lv: "Malfini", en: "Malfini" },
+  { path: "/catalog?source=stanley-stella", lv: "Stanley/Stella", en: "Stanley/Stella" },
+  { path: "/catalog?source=nwg-craft", lv: "Craft", en: "Craft" },
+  { path: "/catalog?source=nwg-clique", lv: "Clique", en: "Clique" },
+  { path: "/catalog?source=nwg-projob", lv: "ProJob", en: "ProJob" },
+  { path: "/catalog?source=nwg-cutter", lv: "Cutter & Buck", en: "Cutter & Buck" },
+  { path: "/catalog?source=pf-elevate", lv: "Elevate", en: "Elevate" },
+  { path: "/catalog?source=pf-roly", lv: "Roly", en: "Roly" },
+  { path: "/catalog?source=bb", lv: "Beechfield Brands", en: "Beechfield Brands" },
+  { path: "/catalog?source=mf", lv: "Malfini", en: "Malfini" },
+  { path: "/catalog?source=pf", lv: "Prezentmateriāli", en: "Business gifts" },
 ];
 
 const Header = () => {
