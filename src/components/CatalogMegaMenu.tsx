@@ -222,10 +222,10 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
       aria-label={t("Kataloga izvēlne", "Catalog menu")}
       className="max-h-[calc(100vh-5rem)] overflow-y-auto bg-primary text-primary-foreground"
     >
-      <div className="mx-auto max-w-[1400px] px-5 py-6 lg:px-8 lg:py-7 xl:px-10">
-        <div className="grid grid-cols-12 gap-6 xl:gap-8">
+      <div className="mx-auto max-w-[1400px] px-5 py-4 lg:px-8 lg:py-5 xl:px-10">
+        <div className="grid grid-cols-12 gap-5 xl:gap-6">
           <section className="col-span-12 lg:col-span-7 xl:col-span-8">
-            <div className="mb-4 flex items-baseline justify-between gap-4">
+            <div className="mb-3 flex items-baseline justify-between gap-4">
               <h2 className="font-heading text-xs font-bold uppercase tracking-[0.28em] text-primary-foreground">
                 {t("Prioritārie produkti", "Priority products")}
               </h2>
@@ -233,7 +233,7 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
                 {t("no lielākā uz mazāko", "highest value first")}
               </span>
             </div>
-            <div className="grid auto-rows-[132px] grid-cols-2 gap-3 sm:grid-cols-4 lg:auto-rows-[118px] xl:auto-rows-[132px]">
+            <div className="grid auto-rows-[116px] grid-cols-2 gap-2.5 sm:grid-cols-4 lg:auto-rows-[88px] xl:auto-rows-[102px] 2xl:auto-rows-[116px]">
               {FEATURED_TILES.map((item) => (
                 <CategoryTile key={item.en} item={item} onNavigate={onNavigate} />
               ))}
@@ -257,7 +257,7 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
 
           <section className="col-span-12 border-t border-primary-foreground/10 pt-5">
             <div className="grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-5 xl:gap-8">
-              <LinkList title={t("Dārgākās kategorijas", "Highest value")} items={PRIORITY_LINKS} onNavigate={onNavigate} />
+              <LinkList title={t("Prioritāte", "Priority")} items={PRIORITY_LINKS} onNavigate={onNavigate} />
               <LinkList title={t("Apģērbi", "Apparel")} items={APPAREL_LINKS} onNavigate={onNavigate} />
               <LinkList title={t("Somas", "Bags")} items={BAG_LINKS} onNavigate={onNavigate} />
               <LinkList title={t("Prezentmateriāli", "Promo products")} items={PROMO_LINKS} onNavigate={onNavigate} />
@@ -277,7 +277,7 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
 
       {/* Manufacturers strip */}
       <div className="border-t border-primary-foreground/10 bg-primary-foreground/5">
-        <div className="mx-auto max-w-[1400px] px-6 py-5 lg:px-10">
+        <div className="mx-auto max-w-[1400px] px-6 py-3 lg:px-10">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <span className="font-heading text-[10px] font-bold uppercase tracking-[0.28em] text-primary-foreground/40">
               {t("Ražotāji", "Manufacturers")}
@@ -306,7 +306,7 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
         to="/catalog"
         onClick={onNavigate}
         role="menuitem"
-        className="group flex items-center justify-between bg-accent px-6 py-4 text-accent-foreground transition-colors hover:bg-accent/90 lg:px-10"
+        className="group flex items-center justify-between bg-accent px-6 py-3 text-accent-foreground transition-colors hover:bg-accent/90 lg:px-10"
       >
         <span className="font-heading text-sm font-bold uppercase tracking-[0.24em]">
           {t("Skatīt visus produktus", "Browse all products")}
