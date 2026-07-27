@@ -255,20 +255,11 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
           </section>
 
           <section className="col-span-12 border-t border-primary-foreground/10 pt-5">
-            <div className="grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-5 xl:gap-8">
+            <div className="grid grid-cols-2 gap-6 md:grid-cols-4 xl:gap-8">
               <LinkList title={t("Prioritāte", "Priority")} items={PRIORITY_LINKS} onNavigate={onNavigate} />
               <LinkList title={t("Apģērbi", "Apparel")} items={APPAREL_LINKS} onNavigate={onNavigate} />
               <LinkList title={t("Somas", "Bags")} items={BAG_LINKS} onNavigate={onNavigate} />
               <LinkList title={t("Prezentmateriāli", "Promo products")} items={PROMO_LINKS} onNavigate={onNavigate} />
-              <div className="hidden lg:block">
-                <FeatureCard
-                  image={imgJacket}
-                  eyebrow={t("Katalogs", "Catalog")}
-                  title={t("Visas preces", "All products")}
-                  href="/catalog"
-                  onNavigate={onNavigate}
-                />
-              </div>
             </div>
           </section>
         </div>
