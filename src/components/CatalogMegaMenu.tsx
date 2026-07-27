@@ -1,34 +1,69 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { ArrowRight } from "lucide-react";
-import { useMegaMenuItems, type MegaMenuItem } from "@/hooks/useMegaMenuItems";
-import { resolveMenuImage } from "@/lib/megaMenuImages";
+import imgTshirt from "@/assets/menu/tshirt.jpg";
+import imgHoodie from "@/assets/menu/hoodie.jpg";
+import imgPolo from "@/assets/menu/polo.jpg";
+import imgJacket from "@/assets/menu/jacket.jpg";
+import imgCap from "@/assets/menu/cap.jpg";
+import imgWorkwear from "@/assets/menu/workwear.jpg";
+import imgSport from "@/assets/menu/sweater.jpg";
+import imgShirt from "@/assets/menu/shirt.jpg";
 
 interface MegaMenuProps {
   onNavigate?: () => void;
 }
 
-const MANUFACTURERS: { label: string; token: string; featured?: boolean }[] = [
-  { label: "Stanley/Stella", token: "stanley-stella", featured: true },
-  { label: "Craft", token: "nwg-craft" },
-  { label: "Clique", token: "nwg-clique" },
-  { label: "ProJob", token: "nwg-projob" },
-  { label: "Cutter & Buck", token: "nwg-cutter" },
-  { label: "Elevate", token: "pf-elevate" },
-  { label: "Roly", token: "pf-roly" },
-  { label: "Beechfield Brands", token: "bb" },
-  { label: "Malfini", token: "mf" },
-  { label: "Prezentmateriāli", token: "pf" },
+type Tile = {
+  label_lv: string;
+  label_en: string;
+  categories: string[];
+  image: string;
+};
+
+type TextLink = {
+  label_lv: string;
+  label_en: string;
+  categories: string[];
+};
+
+const COL1: Tile[] = [
+  { label_lv: "T-krekli", label_en: "T-shirts", categories: ["t-krekli"], image: imgTshirt },
+  { label_lv: "Hūdiji un džemperi", label_en: "Hoodies & sweaters", categories: ["dzemperi", "adijumi"], image: imgHoodie },
+  { label_lv: "Polo krekli", label_en: "Polos", categories: ["polo-krekli"], image: imgPolo },
+  { label_lv: "Virsjakas un vestes", label_en: "Jackets & vests", categories: ["virsjakas", "vestes", "flisa-jakas"], image: imgJacket },
 ];
 
-const buildCategoryHref = (cats: string[]) =>
+const COL2: Tile[] = [
+  { label_lv: "Cepures", label_en: "Caps & hats", categories: ["cepures"], image: imgCap },
+  { label_lv: "Darba apģērbs", label_en: "Workwear", categories: ["darba-apgerbi", "darba-apavi"], image: imgWorkwear },
+  { label_lv: "Sporta apģērbs", label_en: "Sportswear", categories: ["sportam"], image: imgSport },
+  { label_lv: "Krekli, bikses un šorti", label_en: "Shirts, trousers & shorts", categories: ["pletkrekli", "bikses", "termovela"], image: imgShirt },
+];
+
+const COL3: TextLink[] = [
+  { label_lv: "Auduma iepirkumu maisiņi", label_en: "Tote bags", categories: ["audumu-maisini"] },
+  { label_lv: "Mugursomas un datoru somas", label_en: "Backpacks & laptop bags", categories: ["somas"] },
+  { label_lv: "Priekšauti", label_en: "Aprons", categories: ["priekšauti", "priekšauti"] },
+  { label_lv: "Dvieļi un pledi", label_en: "Towels & blankets", categories: ["dvieli", "pledi"] },
+  { label_lv: "Cimdi, šalles un citi aksesuāri", label_en: "Gloves, scarves & accessories", categories: ["cimdi", "sales", "aksesuari"] },
+];
+
+const COL4: TextLink[] = [
+  { label_lv: "Krūzes un pudeles", label_en: "Mugs & bottles", categories: ["kruzes", "pudeles"] },
+  { label_lv: "Lietussargi", label_en: "Umbrellas", categories: ["lietussargi"] },
+  { label_lv: "Bloknoti un pildspalvas", label_en: "Notebooks & pens", categories: ["bloknoti", "pildspalvas"] },
+  { label_lv: "Auto un biroja piederumi", label_en: "Car & office", categories: ["auto", "birojs"] },
+  { label_lv: "Dāvanu komplekti", label_en: "Gift sets", categories: ["davanu-komplekti"] },
+  { label_lv: "Atslēgu piekariņi un sīkumi", label_en: "Keychains & small gifts", categories: ["atslegu-piekarini", "sikumi"] },
+];
+
+const buildHref = (cats: string[]) =>
   `/catalog?category=${encodeURIComponent(cats.join(","))}`;
-const buildManufacturerHref = (token: string) =>
-  `/catalog?source=${encodeURIComponent(token)}`;
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-3 flex items-center gap-2">
+    <div className="mb-4 flex items-center gap-2">
       <span className="h-px w-6 bg-accent" />
       <h3 className="font-heading text-[10px] font-bold uppercase tracking-[0.28em] text-primary-foreground/60">
         {children}
@@ -37,41 +72,28 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   );
 }
 
-function CategoryTile({
-  item,
-  onNavigate,
-}: {
-  item: MegaMenuItem;
-  onNavigate?: () => void;
-}) {
+function TileCard({ tile, onNavigate }: { tile: Tile; onNavigate?: () => void }) {
   const { lang } = useLanguage();
-  const title = lang === "lv" ? item.label_lv : item.label_en;
-  const image = resolveMenuImage(item.image_url, item.label_en);
+  const title = lang === "lv" ? tile.label_lv : tile.label_en;
   return (
     <Link
-      to={buildCategoryHref(item.categories)}
+      to={buildHref(tile.categories)}
       onClick={onNavigate}
       role="menuitem"
       className="group block"
     >
       <div className="relative overflow-hidden rounded-sm bg-primary-foreground/5">
-        <div className="aspect-square">
-          {image ? (
-            <img
-              src={image}
-              alt={title}
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-primary-foreground/10 text-primary-foreground/30">
-              <span className="text-[9px] uppercase tracking-widest">—</span>
-            </div>
-          )}
+        <div className="aspect-[4/3]">
+          <img
+            src={tile.image}
+            alt={title}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
         </div>
       </div>
-      <div className="mt-1.5 flex items-center gap-1">
-        <span className="truncate font-heading text-[10.5px] font-semibold uppercase tracking-[0.1em] text-primary-foreground/85 transition-colors group-hover:text-accent">
+      <div className="mt-2 flex items-center gap-1.5">
+        <span className="truncate font-heading text-[11px] font-semibold uppercase tracking-[0.12em] text-primary-foreground/85 transition-colors group-hover:text-accent">
           {title}
         </span>
       </div>
@@ -79,98 +101,73 @@ function CategoryTile({
   );
 }
 
+function TextItem({ item, onNavigate }: { item: TextLink; onNavigate?: () => void }) {
+  const { lang } = useLanguage();
+  return (
+    <li>
+      <Link
+        to={buildHref(item.categories)}
+        onClick={onNavigate}
+        role="menuitem"
+        className="group inline-flex items-center gap-1.5 text-[12.5px] font-medium text-primary-foreground/75 transition-colors hover:text-accent"
+      >
+        <span>{lang === "lv" ? item.label_lv : item.label_en}</span>
+        <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+      </Link>
+    </li>
+  );
+}
+
 export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
   const { lang } = useLanguage();
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
-  const { items } = useMegaMenuItems({ onlyActive: true });
-
-  const apparel = items.filter((i) => i.section === "apparel");
-  const bags = items.filter((i) => i.section === "bags");
-  const promo = items.filter((i) => i.section === "promo");
-  const promoLinks = items.filter((i) => i.section === "promo_link");
 
   return (
     <div
       role="menu"
       aria-label={t("Kataloga izvēlne", "Catalog menu")}
-      className="max-h-[calc(100vh-5rem)] overflow-y-auto bg-primary text-primary-foreground"
+      className="max-h-[70vh] overflow-y-auto bg-primary text-primary-foreground"
     >
-      <div className="mx-auto max-w-[1400px] px-5 py-5 lg:px-8 lg:py-6 xl:px-10">
-        {apparel.length > 0 && (
-          <>
+      <div className="mx-auto max-w-[1400px] px-5 py-6 lg:px-8 xl:px-10">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 lg:grid-cols-4">
+          {/* Column 1 — Apparel top priority */}
+          <div>
             <SectionTitle>{t("Apģērbi", "Apparel")}</SectionTitle>
-            <div className="grid grid-cols-4 gap-x-3 gap-y-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12">
-              {apparel.map((item) => (
-                <CategoryTile key={item.id} item={item} onNavigate={onNavigate} />
-              ))}
-            </div>
-          </>
-        )}
-
-        {bags.length > 0 && (
-          <div className="mt-7 border-t border-primary-foreground/10 pt-5">
-            <SectionTitle>{t("Somas un ceļojumi", "Bags & travel")}</SectionTitle>
-            <div className="grid grid-cols-4 gap-x-3 gap-y-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12">
-              {bags.map((item) => (
-                <CategoryTile key={item.id} item={item} onNavigate={onNavigate} />
+            <div className="grid grid-cols-2 gap-x-3 gap-y-4">
+              {COL1.map((tile) => (
+                <TileCard key={tile.label_en} tile={tile} onNavigate={onNavigate} />
               ))}
             </div>
           </div>
-        )}
 
-        {(promo.length > 0 || promoLinks.length > 0) && (
-          <div className="mt-7 border-t border-primary-foreground/10 pt-5">
-            <SectionTitle>{t("Prezentmateriāli", "Promo products")}</SectionTitle>
-            {promo.length > 0 && (
-              <div className="grid grid-cols-4 gap-x-3 gap-y-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12">
-                {promo.map((item) => (
-                  <CategoryTile key={item.id} item={item} onNavigate={onNavigate} />
-                ))}
-              </div>
-            )}
-            {promoLinks.length > 0 && (
-              <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-1.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7">
-                {promoLinks.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      to={buildCategoryHref(item.categories)}
-                      onClick={onNavigate}
-                      role="menuitem"
-                      className="group inline-flex items-center gap-1.5 text-[12.5px] font-medium text-primary-foreground/80 transition-colors hover:text-accent"
-                    >
-                      <span>{lang === "lv" ? item.label_lv : item.label_en}</span>
-                      <ArrowRight className="h-3 w-3 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
+          {/* Column 2 — Apparel & headwear medium */}
+          <div>
+            <SectionTitle>{t("Apģērbi un cepures", "Apparel & headwear")}</SectionTitle>
+            <div className="grid grid-cols-2 gap-x-3 gap-y-4">
+              {COL2.map((tile) => (
+                <TileCard key={tile.label_en} tile={tile} onNavigate={onNavigate} />
+              ))}
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Manufacturers strip */}
-      <div className="border-t border-primary-foreground/10 bg-primary-foreground/5">
-        <div className="mx-auto max-w-[1400px] px-6 py-3 lg:px-10">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <span className="font-heading text-[10px] font-bold uppercase tracking-[0.28em] text-primary-foreground/40">
-              {t("Ražotāji", "Manufacturers")}
-            </span>
-            {MANUFACTURERS.map((m) => (
-              <Link
-                key={m.token}
-                to={buildManufacturerHref(m.token)}
-                onClick={onNavigate}
-                role="menuitem"
-                className={
-                  m.featured
-                    ? "font-heading text-[11px] font-bold uppercase tracking-[0.16em] text-accent hover:text-primary-foreground"
-                    : "font-heading text-[11px] font-bold uppercase tracking-[0.16em] text-primary-foreground/60 transition-colors hover:text-primary-foreground"
-                }
-              >
-                {m.label}
-              </Link>
-            ))}
+          {/* Column 3 — Bags & textiles */}
+          <div>
+            <SectionTitle>{t("Somas un tekstils", "Bags & textiles")}</SectionTitle>
+            <ul className="space-y-2.5">
+              {COL3.map((item) => (
+                <TextItem key={item.label_en} item={item} onNavigate={onNavigate} />
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4 — Promo & gifts */}
+          <div>
+            <SectionTitle>{t("Prezentmateriāli un dāvanas", "Promo & gifts")}</SectionTitle>
+            <ul className="space-y-2.5">
+              {COL4.map((item) => (
+                <TextItem key={item.label_en} item={item} onNavigate={onNavigate} />
+              ))}
+            </ul>
           </div>
         </div>
       </div>
