@@ -367,7 +367,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             return b && b.toLowerCase() !== "unbranded" ? b : null;
           })();
           const manufacturer = manufacturerOf(it.source, brand);
-          if (!manufacturer) return null;
           return {
             ...it,
             brand,
