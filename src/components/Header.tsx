@@ -262,7 +262,7 @@ const Header = () => {
             : "pointer-events-none opacity-0 -translate-y-2"
         }`}
       >
-        <div className="border-t border-white/5 bg-[#0A0A0A] text-white shadow-2xl shadow-black/50">
+        <div className="border-t border-primary-foreground/10 bg-primary text-primary-foreground shadow-2xl shadow-primary/50">
           <CatalogMegaMenu onNavigate={() => setMegaOpen(false)} />
         </div>
       </div>
