@@ -24,15 +24,32 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Plus,
   Trash2,
-  ArrowUp,
-  ArrowDown,
   Pencil,
   RefreshCw,
   Upload,
   Eye,
   EyeOff,
+  GripVertical,
 } from "lucide-react";
 import { resolveMenuImage } from "@/lib/megaMenuImages";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  KeyboardSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type Section = "apparel" | "bags" | "promo" | "promo_link";
 
