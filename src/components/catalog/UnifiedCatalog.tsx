@@ -74,7 +74,7 @@ interface EnrichedColor extends ColorEntry { bucket: ColorBucketKey | null }
 interface EnrichedItem extends Omit<CatalogItem, "colors"> {
   colors: EnrichedColor[];
   buckets: Set<ColorBucketKey>;
-  manufacturer: string | null;
+  manufacturer: string;
 }
 
 /**
@@ -124,7 +124,7 @@ const parseManufacturerFilter = (rawValue: string | null): Set<string> => {
   }
   return parsed;
 };
-const manufacturerOf = (source: CatalogSource, brand: string | null): string => {
+const manufacturerOf = (source: CatalogSource, brand: string | null): string | null => {
   const b = (brand || "").toLowerCase();
   if (source === "ss") return "ss";
   if (source === "nwg") {
