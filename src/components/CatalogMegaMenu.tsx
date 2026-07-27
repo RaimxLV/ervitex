@@ -11,6 +11,9 @@ import imgCap from "@/assets/menu/cap.jpg";
 import imgPolo from "@/assets/menu/polo.jpg";
 import imgSweater from "@/assets/menu/sweater.jpg";
 import imgTshirt from "@/assets/menu/tshirt.jpg";
+import imgPants from "@/assets/menu/pants.jpg";
+import imgShorts from "@/assets/menu/shorts.jpg";
+import imgVest from "@/assets/menu/vest.jpg";
 
 const imgShoes = "https://images.nwgmedia.com/highres/230335/1906960-999982_V175_Fuseknit_Front.jpg";
 
@@ -28,43 +31,46 @@ interface TileItem extends Item {
   image: string;
 }
 
-// Ordered per user request: t-krekli, polo, hūdiji, džemperi, jakas, apavi, cepures, somas, mugursomas, pudeles
 const TILES: TileItem[] = [
   { lv: "T-krekli", en: "T-shirts", categories: ["T-shirts", "Tops"], image: imgTshirt },
   { lv: "Polo krekli", en: "Polos", categories: ["Polos", "Polo shirts"], image: imgPolo },
   { lv: "Hūdiji", en: "Hoodies", categories: ["Hoodies", "Hoodie sweatshirts"], image: imgHoodie },
   { lv: "Džemperi", en: "Sweatshirts", categories: ["Sweaters", "Sweatshirts", "Crew neck sweatshirts", "Fleece"], image: imgSweater },
-  { lv: "Virsjakas", en: "Jackets", categories: ["Jackets", "Non Padded Jacket", "Light Padded Jacket", "Padded Jacket"], image: imgJacket },
+  { lv: "Virsjakas", en: "Jackets", categories: ["Jackets", "Non Padded Jacket", "Light Padded Jacket", "Padded Jacket", "Raincoats"], image: imgJacket },
+  { lv: "Vestes", en: "Vests", categories: ["Vests", "Bodywarmers", "Safety Vests"], image: imgVest },
+  { lv: "Bikses", en: "Trousers", categories: ["Trousers", "Pants", "Training pants", "Trousers-shorts", "Shorts & Trousers"], image: imgPants },
+  { lv: "Šorti", en: "Shorts", categories: ["Shorts"], image: imgShorts },
   { lv: "Apavi", en: "Shoes", categories: ["Shoes", "Safety Footwear"], image: imgShoes },
   { lv: "Cepures", en: "Caps & hats", categories: ["Caps & Hats", "Caps", "Headwear"], image: imgCap },
-  { lv: "Somas", en: "Bags", categories: ["Bags", "Travel Bags", "Sports Bags"], image: imgBag },
-  { lv: "Mugursomas", en: "Backpacks", categories: ["Backpacks", "Laptop Backpacks"], image: imgBackpack },
-  { lv: "Pudeles", en: "Bottles", categories: ["Bottles", "Water Bottles", "Sports Bottles", "Insulated Bottles"], image: imgBottle },
 ];
 
-// Apparel items without dedicated tiles
 const APPAREL_LINKS: Item[] = [
-  { lv: "Bikses", en: "Trousers", categories: ["Trousers", "Trousers-shorts", "Bottoms"] },
-  { lv: "Šorti", en: "Shorts", categories: ["Shorts"] },
-  { lv: "Vestes", en: "Vests", categories: ["Vests", "Bodywarmers", "Jackets-Vests"] },
   { lv: "Krekli", en: "Shirts", categories: ["Shirts"] },
+  { lv: "Darba apģērbs", en: "Workwear", categories: ["Workwear", "Safety"] },
+  { lv: "Priekšauti", en: "Aprons", categories: ["Aprons"] },
+  { lv: "Zeķes", en: "Socks", categories: ["Socks"] },
   { lv: "Cimdi", en: "Gloves", categories: ["Gloves"] },
   { lv: "Šalles", en: "Scarves", categories: ["Scarves"] },
+  { lv: "Dvieļi", en: "Towels", categories: ["Towels"] },
 ];
 
 const BAG_LINKS: Item[] = [
+  { lv: "Somas", en: "Bags", categories: ["Bags", "Travel Bags", "Sports Bags"] },
+  { lv: "Mugursomas", en: "Backpacks", categories: ["Backpacks", "Laptop Backpacks"] },
   { lv: "Datora somas", en: "Laptop bags", categories: ["Laptop & Tablet Bags"] },
+  { lv: "Biznesa somas", en: "Business bags", categories: ["Business Bags"] },
   { lv: "Ceļojumu aksesuāri", en: "Travel accessories", categories: ["Travel Accessories", "Toiletry Bags"] },
   { lv: "Iepirkumu maisiņi", en: "Tote bags", categories: ["Tote Bags", "Shopping & Tote Bags", "Drawstring Bags"] },
   { lv: "Jostas somas", en: "Waist bags", categories: ["Waist Bags", "Belt Bags"] },
 ];
 
 const PROMO_LINKS: Item[] = [
+  { lv: "Pudeles", en: "Bottles", categories: ["Bottles", "Water Bottles", "Sports Bottles", "Insulated Bottles"] },
   { lv: "Krūzes", en: "Mugs", categories: ["Mugs", "Insulated Mugs", "Travel Mugs", "Standard Mugs"] },
-  { lv: "Austiņas un skaļruņi", en: "Audio", categories: ["Headphones", "Earbuds", "Speakers"] },
-  { lv: "Ārējie akumulatori", en: "Power banks", categories: ["Power Banks", "Wireless Chargers", "Chargers"] },
   { lv: "Lietussargi", en: "Umbrellas", categories: ["Umbrellas", "Golf Umbrellas", "Storm Umbrellas"] },
   { lv: "Bloknoti", en: "Notebooks", categories: ["Notebooks", "Hard Cover Notebooks", "Soft Cover Notebooks", "Notepads"] },
+  { lv: "Austiņas un skaļruņi", en: "Audio", categories: ["Headphones", "Earbuds", "Speakers"] },
+  { lv: "Ārējie akumulatori", en: "Power banks", categories: ["Power Banks", "Wireless Chargers", "Chargers"] },
   { lv: "Pildspalvas", en: "Pens", categories: ["Pens", "Ballpoint Pens"] },
 ];
 
