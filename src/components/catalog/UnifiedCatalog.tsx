@@ -845,17 +845,26 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[88vw] max-w-sm overflow-y-auto p-4">
-                <SheetHeader className="sr-only">
-                  <SheetTitle>{lang === "lv" ? "Filtri" : "Filters"}</SheetTitle>
+                <SheetHeader className="mb-3 text-left">
+                  <SheetTitle className="font-heading text-[11px] font-bold uppercase tracking-[0.18em] flex items-center gap-2">
+                    <SlidersHorizontal className="h-3.5 w-3.5 text-accent" />
+                    {lang === "lv" ? "Filtri" : "Filters"}
+                    {totalSelectedFilters > 0 && (
+                      <span className="rounded-full bg-accent px-2 py-[1px] text-[10px] font-bold text-accent-foreground">
+                        {totalSelectedFilters}
+                      </span>
+                    )}
+                  </SheetTitle>
                 </SheetHeader>
-                <div className="mt-2">
+                <div>
                   <CatalogFiltersSidebar
                     sections={filterSections}
                     onClearAll={clearAll}
-                    heading={lang === "lv" ? "Filtri" : "Filters"}
+                    hideHeader
                   />
                 </div>
               </SheetContent>
+
             </Sheet>
             <label className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
               {lang === "lv" ? "Kārtot" : "Sort"}
