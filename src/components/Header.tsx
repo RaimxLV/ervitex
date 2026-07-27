@@ -44,13 +44,17 @@ const Header = () => {
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
   const megaRef = useRef<HTMLDivElement>(null);
+  const megaPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
         setShareOpen(false);
       }
-      if (megaRef.current && !megaRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const insideTrigger = megaRef.current?.contains(target);
+      const insidePanel = megaPanelRef.current?.contains(target);
+      if (!insideTrigger && !insidePanel) {
         setMegaOpen(false);
       }
     };
