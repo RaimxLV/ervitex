@@ -13,6 +13,8 @@ import imgSweater from "@/assets/menu/sweater.jpg";
 import imgTshirt from "@/assets/menu/tshirt.jpg";
 import imgVest from "@/assets/menu/vest.jpg";
 
+const imgShoes = "https://images.nwgmedia.com/highres/230335/1906960-999982_V175_Fuseknit_Front.jpg";
+
 interface MegaMenuProps {
   onNavigate?: () => void;
 }
@@ -30,6 +32,7 @@ interface TileItem extends Item {
 
 const FEATURED_TILES: TileItem[] = [
   { lv: "Virsjakas", en: "Jackets", categories: ["Jackets", "Non Padded Jacket", "Light Padded Jacket", "Padded Jacket"], image: imgJacket, priority: "hero" },
+  { lv: "Apavi", en: "Shoes", categories: ["Shoes", "Safety Footwear"], image: imgShoes, priority: "large" },
   { lv: "Hūdiji", en: "Hoodies", categories: ["Hoodies", "Hoodie sweatshirts"], image: imgHoodie, priority: "large" },
   { lv: "Džemperi", en: "Sweatshirts", categories: ["Sweaters", "Sweatshirts", "Crew neck sweatshirts", "Fleece"], image: imgSweater, priority: "large" },
   { lv: "Vestes", en: "Vests", categories: ["Vests", "Bodywarmers", "Jackets-Vests"], image: imgVest },
