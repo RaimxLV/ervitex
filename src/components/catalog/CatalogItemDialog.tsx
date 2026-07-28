@@ -1140,6 +1140,11 @@ const CatalogItemDialog = ({
                 <div className="flex flex-col gap-1 border-y border-border py-3">
                   <div className="flex items-baseline gap-2">
                     <span className="font-heading text-xl font-semibold text-muted-foreground">
+                      {priceInfo.max > priceInfo.price && (
+                        <span className="mr-1 text-xs font-medium uppercase tracking-wider">
+                          {lang === "lv" ? "no" : "from"}
+                        </span>
+                      )}
                       €{priceInfo.price.toFixed(2)}
                     </span>
                     <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
@@ -1148,14 +1153,32 @@ const CatalogItemDialog = ({
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="font-heading text-3xl font-black text-foreground">
+                      {priceInfo.max > priceInfo.price && (
+                        <span className="mr-1 text-base font-bold uppercase tracking-wider">
+                          {lang === "lv" ? "no" : "from"}
+                        </span>
+                      )}
                       €{(priceInfo.price * 1.21).toFixed(2)}
                     </span>
                     <span className="text-xs font-bold uppercase tracking-wider text-foreground">
                       {lang === "lv" ? "ar PVN" : "incl. VAT"}
                     </span>
                   </div>
+                  {priceInfo.max > priceInfo.price && (
+                    <p className="text-[11px] text-muted-foreground">
+                      {lang === "lv"
+                        ? `Cena atkarīga no izmēra/krāsas: €${(priceInfo.price * 1.21).toFixed(2)} – €${(priceInfo.max * 1.21).toFixed(2)} ar PVN`
+                        : `Price varies by size/colour: €${(priceInfo.price * 1.21).toFixed(2)} – €${(priceInfo.max * 1.21).toFixed(2)} incl. VAT`}
+                    </p>
+                  )}
+                  {selectedSize && (
+                    <p className="text-[11px] text-muted-foreground">
+                      {lang === "lv" ? `Izmērs ${selectedSize}` : `Size ${selectedSize}`}
+                    </p>
+                  )}
                 </div>
               )}
+
 
               {filteredSpecs.length > 0 && (
                 <div>
