@@ -924,7 +924,15 @@ const CatalogItemDialog = ({
     push(rawCare);
     const nonEmpty = items.some((x) => x && /[a-zA-Z]/.test(x));
     if (!nonEmpty) return;
-    const cacheKey = `xlat:${source}:${id}:lv:v2`;
+    const cacheKey = `xlat:${source}:${id}:lv:v3`;
+    // Purge stale translation caches from earlier versions (they may contain
+    // raw supplier price tables that have since been cleaned out of the data).
+    try {
+      for (let i = sessionStorage.length - 1; i >= 0; i--) {
+        const k = sessionStorage.key(i);
+        if (k && k.startsWith("xlat:") && !k.endsWith(":v3")) sessionStorage.removeItem(k);
+      }
+    } catch { /* ignore */ }
     const cached = typeof sessionStorage !== "undefined" ? sessionStorage.getItem(cacheKey) : null;
     if (cached) {
       try { setTranslated(JSON.parse(cached)); return; } catch { /* ignore */ }
