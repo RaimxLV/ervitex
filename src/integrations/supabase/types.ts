@@ -1658,6 +1658,42 @@ export type Database = {
         }
         Relationships: []
       }
+      ss_price_list_2026: {
+        Row: {
+          color_group: string
+          created_at: string
+          id: string
+          is_large_size: boolean
+          price: number
+          price_vat: number | null
+          size_range: string | null
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          color_group: string
+          created_at?: string
+          id?: string
+          is_large_size?: boolean
+          price: number
+          price_vat?: number | null
+          size_range?: string | null
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          color_group?: string
+          created_at?: string
+          id?: string
+          is_large_size?: boolean
+          price?: number
+          price_vat?: number | null
+          size_range?: string | null
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ss_prices: {
         Row: {
           currency: string | null
@@ -2312,6 +2348,16 @@ export type Database = {
       refresh_mf_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
+      ss_sku_retail_prices: {
+        Args: never
+        Returns: {
+          color_code: string
+          retail_price: number
+          size_code: string
+          sku: string
+          style_code: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin"
