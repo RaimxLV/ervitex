@@ -280,11 +280,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const [items, setItems] = useState<EnrichedItem[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [pfPrices, setPfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
-  const [ssPrices, setSsPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
-  const [bbPrices, setBbPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
-  const [mfPrices, setMfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
-  const [ruPrices, setRuPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
+  const [priceRanges, setPriceRanges] = useState<Map<string, { price: number; max: number; currency: string }>>(new Map());
+
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(() => {
@@ -383,118 +380,36 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       setItems(enriched);
       setLoaded(true);
 
-      // Load PF public retail prices → min per model_code
-      if (!lockedSource || lockedSource === "pf") {
-        const priceMap = new Map<string, { price: number; currency: string }>();
-        let pfrom = 0;
+      // Load unified catalog price ranges (min/max per style, all sources).
+      // Prices are stored excl. VAT and already include our markup.
+      {
+        const ranges = new Map<string, { price: number; max: number; currency: string }>();
+        let from = 0;
         while (true) {
-          const { data, error } = await supabase
-            .from("pf_public_retail_prices" as any)
-            .select("model_code,retail_price,currency")
-            .range(pfrom, pfrom + 999);
+          let query = supabase
+            .from("catalog_price_ranges" as any)
+            .select("source,style_code,min_price,max_price,currency")
+            .range(from, from + 999);
+          if (lockedSource) query = query.eq("source", lockedSource);
+          const { data, error } = await query;
           if (error || !data) break;
           for (const r of data as any[]) {
-            const mc = r.model_code as string;
-            const p = Number(r.retail_price);
-            if (!mc || !Number.isFinite(p) || p <= 0) continue;
-            const cur = priceMap.get(mc);
-            if (!cur || p < cur.price) priceMap.set(mc, { price: p, currency: r.currency || "EUR" });
+            const key = `${r.source}:${r.style_code}`;
+            const min = Number(r.min_price);
+            const max = Number(r.max_price);
+            if (!Number.isFinite(min) || min <= 0) continue;
+            ranges.set(key, {
+              price: min,
+              max: Number.isFinite(max) && max > min ? max : min,
+              currency: r.currency || "EUR",
+            });
           }
           if (data.length < 1000) break;
-          pfrom += 1000;
+          from += 1000;
         }
-        setPfPrices(priceMap);
+        setPriceRanges(ranges);
       }
 
-      // Load SS public retail prices → per style_code
-      if (!lockedSource || lockedSource === "ss") {
-        const ssMap = new Map<string, { price: number; currency: string }>();
-        let sfrom = 0;
-        while (true) {
-          const { data, error } = await supabase
-            .from("ss_public_retail_prices" as any)
-            .select("style_code,retail_price,currency")
-            .range(sfrom, sfrom + 999);
-          if (error || !data) break;
-          for (const r of data as any[]) {
-            const sc = r.style_code as string;
-            const p = Number(r.retail_price);
-            if (!sc || !Number.isFinite(p) || p <= 0) continue;
-            ssMap.set(sc, { price: p, currency: r.currency || "EUR" });
-          }
-          if (data.length < 1000) break;
-          sfrom += 1000;
-        }
-        setSsPrices(ssMap);
-      }
-
-      // Load BB public retail prices → per style_code
-      if (!lockedSource || lockedSource === "bb") {
-        const bbMap = new Map<string, { price: number; currency: string }>();
-        let bfrom = 0;
-        while (true) {
-          const { data, error } = await supabase
-            .from("bb_public_retail_prices" as any)
-            .select("style_code,retail_price,currency")
-            .range(bfrom, bfrom + 999);
-          if (error || !data) break;
-          for (const r of data as any[]) {
-            const sc = r.style_code as string;
-            const p = Number(r.retail_price);
-            if (!sc || !Number.isFinite(p) || p <= 0) continue;
-            bbMap.set(sc, { price: p, currency: r.currency || "EUR" });
-          }
-          if (data.length < 1000) break;
-          bfrom += 1000;
-        }
-        setBbPrices(bbMap);
-      }
-
-      // Load MF public retail prices → per style_code
-      if (!lockedSource || lockedSource === "mf") {
-        const mfMap = new Map<string, { price: number; currency: string }>();
-        let mfrom = 0;
-        while (true) {
-          const { data, error } = await supabase
-            .from("mf_public_retail_prices" as any)
-            .select("style_code,retail_price,currency")
-            .range(mfrom, mfrom + 999);
-          if (error || !data) break;
-          for (const r of data as any[]) {
-            const sc = r.style_code as string;
-            const p = Number(r.retail_price);
-            if (!sc || !Number.isFinite(p) || p <= 0) continue;
-            mfMap.set(sc, { price: p, currency: r.currency || "EUR" });
-          }
-          if (data.length < 1000) break;
-          mfrom += 1000;
-        }
-        setMfPrices(mfMap);
-      }
-
-      // Load Russell public retail prices → per style_code
-      if (!lockedSource || lockedSource === "ru") {
-        const ruMap = new Map<string, { price: number; currency: string }>();
-        let rfrom = 0;
-        while (true) {
-          const { data, error } = await supabase
-            .from("ru_prices" as any)
-            .select("style_code,retail_price,currency")
-            .range(rfrom, rfrom + 999);
-          if (error || !data) break;
-          for (const r of data as any[]) {
-            const sc = r.style_code as string;
-            const p = Number(r.retail_price);
-            if (!sc || !Number.isFinite(p) || p <= 0) continue;
-            // Russell feed stores supplier (wholesale) prices without VAT.
-            // Retail = supplier x markup (1.65) x VAT (1.21)
-            ruMap.set(sc, { price: Math.round(p * 1.65 * 1.21 * 100) / 100, currency: r.currency || "EUR" });
-          }
-          if (data.length < 1000) break;
-          rfrom += 1000;
-        }
-        setRuPrices(ruMap);
-      }
     })();
   }, [lockedSource]);
 
@@ -718,17 +633,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const priceOf = useCallback(
     (it: EnrichedItem): number | null => {
-      const p =
-        it.source === "pf" ? pfPrices.get(it.id) :
-        it.source === "ss" ? ssPrices.get(it.id) :
-        it.source === "bb" ? bbPrices.get(it.id) :
-        it.source === "mf" ? mfPrices.get(it.id) :
-        it.source === "ru" ? ruPrices.get(it.id) :
-        undefined;
+      const p = priceRanges.get(`${it.source}:${it.id}`);
       return p ? p.price : null;
     },
-    [pfPrices, ssPrices, bbPrices, mfPrices, ruPrices]
+    [priceRanges]
   );
+
 
   const filtered = useMemo(() => {
     const base = items.filter((it) => passesExcept(it, "__none__"));
@@ -954,19 +864,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}
                       noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
-                      priceInfo={
-                        it.source === "pf"
-                          ? pfPrices.get(it.id)
-                          : it.source === "ss"
-                          ? ssPrices.get(it.id)
-                          : it.source === "bb"
-                          ? bbPrices.get(it.id)
-                          : it.source === "mf"
-                          ? mfPrices.get(it.id)
-                           : it.source === "ru"
-                           ? ruPrices.get(it.id)
-                          : undefined
-                      }
+                      priceInfo={priceRanges.get(`${it.source}:${it.id}`)}
+
                       fromLabel={lang === "lv" ? "no" : "from"}
                       onNavigate={() => navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}`)}
                     />
@@ -1022,7 +921,7 @@ interface CardProps {
   requestLabel: string;
   noImageLabel: string;
   onNavigate: () => void;
-  priceInfo?: { price: number; currency: string };
+  priceInfo?: { price: number; max: number; currency: string };
   fromLabel?: string;
 }
 
@@ -1078,12 +977,18 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
         priceInfo ? (
           <div className="flex flex-col gap-0.5 leading-tight">
             <p className="font-heading text-sm font-semibold text-muted-foreground">
+              {priceInfo.max > priceInfo.price && (
+                <span className="mr-1 text-[10px] font-medium uppercase tracking-wider">{fromLabel}</span>
+              )}
               €{priceInfo.price.toFixed(2)}
               <span className="ml-1 text-[10px] font-medium uppercase tracking-wider">
                 {lang === "lv" ? "bez PVN" : "excl. VAT"}
               </span>
             </p>
             <p className="font-heading text-base font-black text-foreground">
+              {priceInfo.max > priceInfo.price && (
+                <span className="mr-1 text-[10px] font-bold uppercase tracking-wider">{fromLabel}</span>
+              )}
               €{(priceInfo.price * 1.21).toFixed(2)}
               <span className="ml-1 text-[10px] font-bold uppercase tracking-wider">
                 {lang === "lv" ? "ar PVN" : "incl. VAT"}
@@ -1096,6 +1001,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
           </p>
         )
       }
+
     />
   );
 };

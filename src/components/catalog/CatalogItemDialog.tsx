@@ -808,7 +808,11 @@ const CatalogItemDialog = ({
   const [loading, setLoading] = useState(false);
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [imgIndex, setImgIndex] = useState(0);
-  const [priceInfo, setPriceInfo] = useState<{ price: number; currency: string } | null>(null);
+  const [variantPrices, setVariantPrices] = useState<
+    { color_code: string | null; size: string | null; retail_price: number; currency: string | null }[]
+  >([]);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+
 
   const fallbackDetail = useMemo<ProductDetail>(() => ({
     title: name || id,
@@ -845,7 +849,9 @@ const CatalogItemDialog = ({
     setDetail(null);
     setActiveColor(null);
     setImgIndex(0);
-    setPriceInfo(null);
+    setVariantPrices([]);
+    setSelectedSize(null);
+
     (async () => {
       const loader =
         source === "ss" ? loadSS
@@ -859,39 +865,32 @@ const CatalogItemDialog = ({
       setDetail(d);
       setActiveColor(d?.colors[0]?.code ?? null);
       setLoading(false);
-      if (source === "ru") {
-        const { data } = await supabase
-          .from("ru_prices")
-          .select("retail_price,currency")
+      // Per-variant prices (colour/size aware, excl. VAT, markup already applied)
+      const rows: any[] = [];
+      let from = 0;
+      while (true) {
+        const { data, error } = await supabase
+          .from("catalog_variant_prices" as any)
+          .select("color_code,size,retail_price,currency")
+          .eq("source", source)
           .eq("style_code", id)
-          .maybeSingle();
-        if (!cancelled && data && data.retail_price) {
-          // Russell: supplier price x markup (1.65) x VAT (1.21)
-          setPriceInfo({ price: Math.round(Number(data.retail_price) * 1.65 * 1.21 * 100) / 100, currency: data.currency || "EUR" });
-        }
-      } else if (source === "pf" || source === "ss" || source === "bb" || source === "mf") {
-        const table =
-          source === "pf" ? "pf_public_retail_prices"
-          : source === "ss" ? "ss_public_retail_prices"
-          : source === "bb" ? "bb_public_retail_prices"
-          : "mf_public_retail_prices";
-        const keyCol = source === "pf" ? "model_code" : "style_code";
-        const { data } = await supabase
-          .from(table as any)
-          .select("retail_price,currency")
-          .eq(keyCol, id)
-          .order("retail_price", { ascending: true })
-          .limit(1)
-          .maybeSingle();
-        if (!cancelled && data) {
-          const anyData = data as any;
-          setPriceInfo({ price: Number(anyData.retail_price), currency: anyData.currency || "EUR" });
-        }
+          .range(from, from + 999);
+        if (error || !data) break;
+        rows.push(...(data as any[]));
+        if (data.length < 1000) break;
+        from += 1000;
       }
+      if (!cancelled) setVariantPrices(rows);
+
 
     })();
     return () => { cancelled = true; };
   }, [isOpen, source, id]);
+
+  useEffect(() => {
+    setSelectedSize(null);
+  }, [activeColor]);
+
 
   const currentColor = useMemo(
     () => displayDetail.colors.find((c) => c.code === activeColor) || displayDetail.colors[0] || null,
@@ -907,6 +906,29 @@ const CatalogItemDialog = ({
 
   const mainImg = gallery[imgIndex] || gallery[0] || image;
   const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : displayDetail.sizes || [];
+
+  // Colour/size aware price: prices differ per size and per colour in most catalogs.
+  const priceInfo = useMemo(() => {
+    if (!variantPrices.length) return null;
+    const norm = (s: unknown) => (s ?? "").toString().trim().toLowerCase();
+    let rows = variantPrices;
+    if (currentColor) {
+      const byColor = rows.filter((r) => norm(r.color_code) === norm(currentColor.code));
+      if (byColor.length) rows = byColor;
+    }
+    if (selectedSize) {
+      const bySize = rows.filter((r) => norm(r.size) === norm(selectedSize));
+      if (bySize.length) rows = bySize;
+    }
+    const values = rows.map((r) => Number(r.retail_price)).filter((n) => Number.isFinite(n) && n > 0);
+    if (!values.length) return null;
+    return {
+      price: Math.min(...values),
+      max: Math.max(...values),
+      currency: rows[0]?.currency || "EUR",
+    };
+  }, [variantPrices, currentColor, selectedSize]);
+
   const rawDescriptionLines = displayDetail.features.length ? displayDetail.features : lines(displayDetail.description || descriptionFallback);
   const rawMaterial = displayDetail.material || null;
   const rawCare = displayDetail.care || null;
@@ -1123,6 +1145,11 @@ const CatalogItemDialog = ({
                 <div className="flex flex-col gap-1 border-y border-border py-3">
                   <div className="flex items-baseline gap-2">
                     <span className="font-heading text-xl font-semibold text-muted-foreground">
+                      {priceInfo.max > priceInfo.price && (
+                        <span className="mr-1 text-xs font-medium uppercase tracking-wider">
+                          {lang === "lv" ? "no" : "from"}
+                        </span>
+                      )}
                       €{priceInfo.price.toFixed(2)}
                     </span>
                     <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
@@ -1131,14 +1158,32 @@ const CatalogItemDialog = ({
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="font-heading text-3xl font-black text-foreground">
+                      {priceInfo.max > priceInfo.price && (
+                        <span className="mr-1 text-base font-bold uppercase tracking-wider">
+                          {lang === "lv" ? "no" : "from"}
+                        </span>
+                      )}
                       €{(priceInfo.price * 1.21).toFixed(2)}
                     </span>
                     <span className="text-xs font-bold uppercase tracking-wider text-foreground">
                       {lang === "lv" ? "ar PVN" : "incl. VAT"}
                     </span>
                   </div>
+                  {priceInfo.max > priceInfo.price && (
+                    <p className="text-[11px] text-muted-foreground">
+                      {lang === "lv"
+                        ? `Cena atkarīga no izmēra/krāsas: €${(priceInfo.price * 1.21).toFixed(2)} – €${(priceInfo.max * 1.21).toFixed(2)} ar PVN`
+                        : `Price varies by size/colour: €${(priceInfo.price * 1.21).toFixed(2)} – €${(priceInfo.max * 1.21).toFixed(2)} incl. VAT`}
+                    </p>
+                  )}
+                  {selectedSize && (
+                    <p className="text-[11px] text-muted-foreground">
+                      {lang === "lv" ? `Izmērs ${selectedSize}` : `Size ${selectedSize}`}
+                    </p>
+                  )}
                 </div>
               )}
+
 
               {filteredSpecs.length > 0 && (
                 <div>
@@ -1226,16 +1271,23 @@ const CatalogItemDialog = ({
                   <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.sizes}</h4>
                   <div className="flex flex-wrap gap-1.5">
                     {visibleSizes.map((s) => (
-                      <span
+                      <button
                         key={s}
-                        className="min-w-[2.25rem] rounded-sm border border-border px-2 py-1 text-center text-xs font-medium text-foreground"
+                        type="button"
+                        onClick={() => setSelectedSize(selectedSize === s ? null : s)}
+                        className={`min-w-[2.25rem] rounded-sm border px-2 py-1 text-center text-xs font-medium transition-colors ${
+                          selectedSize === s
+                            ? "border-accent bg-accent text-accent-foreground"
+                            : "border-border text-foreground hover:border-accent"
+                        }`}
                       >
                         {s}
-                      </span>
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
+
 
               {!loading && (
                 <AddToQuoteBlock
