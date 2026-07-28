@@ -15,6 +15,7 @@ const MANUFACTURERS: { label: string; token: string; featured?: boolean }[] = [
   { label: "Cutter & Buck", token: "nwg-cutter" },
   { label: "Elevate", token: "pf-elevate" },
   { label: "Roly", token: "pf-roly" },
+  { label: "Russell", token: "ru" },
   { label: "Beechfield Brands", token: "bb" },
   { label: "Malfini", token: "mf" },
   { label: "Prezentmateriāli", token: "pf" },
