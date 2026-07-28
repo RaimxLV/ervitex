@@ -298,7 +298,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     new Set((searchParams.get("brand") || "").split(",").filter(Boolean))
   );
   const [categories, setCategories] = useState<Set<string>>(
-    new Set((searchParams.get("category") || "").split(",").filter(Boolean))
+    new Set(
+      (searchParams.get("category") || "")
+        .split(",")
+        .map((v) => normalizeCategory(v))
+        .filter((v): v is string => !!v),
+    ),
   );
   const [groups, setGroups] = useState<Set<string>>(
     new Set((searchParams.get("group") || "").split(",").filter(Boolean))
