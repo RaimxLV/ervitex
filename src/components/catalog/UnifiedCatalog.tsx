@@ -95,6 +95,7 @@ const MANUFACTURERS: { key: string; label: string }[] = [
   { key: "nwg-cutter", label: "Cutter & Buck" },
   { key: "pf-elevate", label: "Elevate" },
   { key: "pf-roly", label: "Roly" },
+  { key: "ru", label: "Russell" },
   { key: "pf", label: "Prezentmateriāli" },
   { key: "bb", label: "Beechfield Brands" },
   { key: "mf", label: "Malfini" },
@@ -134,6 +135,7 @@ const manufacturerOf = (source: CatalogSource, brand: string | null): string | n
   }
   if (source === "bb") return "bb";
   if (source === "mf") return "mf";
+  if ((source as string) === "ru") return "ru";
   return source;
 };
 
@@ -298,7 +300,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     new Set((searchParams.get("brand") || "").split(",").filter(Boolean))
   );
   const [categories, setCategories] = useState<Set<string>>(
-    new Set((searchParams.get("category") || "").split(",").filter(Boolean))
+    new Set(
+      (searchParams.get("category") || "")
+        .split(",")
+        .map((v) => normalizeCategory(v))
+        .filter((v): v is string => !!v),
+    ),
   );
   const [groups, setGroups] = useState<Set<string>>(
     new Set((searchParams.get("group") || "").split(",").filter(Boolean))
