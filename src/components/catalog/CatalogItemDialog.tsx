@@ -526,6 +526,7 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
   const colorInfo = new Map<string, { name: string; hex: string | null }>();
   const sizesByColor = new Map<string, Set<string>>();
   const allSizes = new Set<string>();
+  const skuMap: Record<string, string> = {};
   for (const v of variants as any[]) {
     const name = v.color_name || "";
     const key = name.toLowerCase();
@@ -540,6 +541,7 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
         sizesByColor.get(key)!.add(v.size);
       }
     }
+    if (v.sku && name) skuMap[`${name}|${v.size ?? ""}`] = v.sku;
   }
 
   const colors: ColorDetail[] = colorOrder.map((key) => {
