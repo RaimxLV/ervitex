@@ -864,19 +864,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}
                       noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
-                      priceInfo={
-                        it.source === "pf"
-                          ? pfPrices.get(it.id)
-                          : it.source === "ss"
-                          ? ssPrices.get(it.id)
-                          : it.source === "bb"
-                          ? bbPrices.get(it.id)
-                          : it.source === "mf"
-                          ? mfPrices.get(it.id)
-                           : it.source === "ru"
-                           ? ruPrices.get(it.id)
-                          : undefined
-                      }
+                      priceInfo={priceRanges.get(`${it.source}:${it.id}`)}
+
                       fromLabel={lang === "lv" ? "no" : "from"}
                       onNavigate={() => navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}`)}
                     />
