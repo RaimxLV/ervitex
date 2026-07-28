@@ -967,7 +967,17 @@ const CatalogItemDialog = ({
   }, [lang, detail, source, id]);
 
   const shortDescription = translated?.short || rawShort;
-  const descriptionLines = translated?.lines.length ? translated.lines : rawDescriptionLines;
+  const rawLines = translated?.lines.length ? translated.lines : rawDescriptionLines;
+  // Avoid duplicating the intro paragraph inside the "Description" block
+  const norm = (s: string) => s.replace(/\s+/g, " ").replace(/[•·✓\-–—]/g, "").trim().toLowerCase();
+  const shortNorm = shortDescription ? norm(shortDescription) : "";
+  const descriptionLines = shortNorm
+    ? rawLines.filter((l) => {
+        const n = norm(l);
+        return n.length > 0 && n !== shortNorm && !(shortNorm.includes(n) && n.length > 30);
+      })
+    : rawLines;
+
   const materialText = translated?.material || rawMaterial;
   const careText = translated?.care || rawCare;
   const label = {
