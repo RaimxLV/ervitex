@@ -1325,6 +1325,171 @@ export type Database = {
           },
         ]
       }
+      ru_images: {
+        Row: {
+          color_name: string | null
+          created_at: string
+          id: number
+          sort_order: number
+          style_code: string
+          url: string
+        }
+        Insert: {
+          color_name?: string | null
+          created_at?: string
+          id?: number
+          sort_order?: number
+          style_code: string
+          url: string
+        }
+        Update: {
+          color_name?: string | null
+          created_at?: string
+          id?: number
+          sort_order?: number
+          style_code?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ru_images_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "ru_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
+      ru_prices: {
+        Row: {
+          currency: string
+          retail_price: number | null
+          style_code: string
+          updated_at: string
+          wholesale_price: number | null
+        }
+        Insert: {
+          currency?: string
+          retail_price?: number | null
+          style_code: string
+          updated_at?: string
+          wholesale_price?: number | null
+        }
+        Update: {
+          currency?: string
+          retail_price?: number | null
+          style_code?: string
+          updated_at?: string
+          wholesale_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ru_prices_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: true
+            referencedRelation: "ru_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
+      ru_styles: {
+        Row: {
+          brand: string | null
+          category: string | null
+          created_at: string
+          description: string | null
+          fabric: string | null
+          features: string | null
+          gender: string | null
+          hidden_by_admin: boolean
+          href: string | null
+          is_new: boolean
+          last_synced_at: string | null
+          main_image_url: string | null
+          name: string | null
+          published: boolean
+          raw: Json | null
+          sizes: string[] | null
+          style_code: string
+          updated_at: string
+          weight: string | null
+        }
+        Insert: {
+          brand?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          fabric?: string | null
+          features?: string | null
+          gender?: string | null
+          hidden_by_admin?: boolean
+          href?: string | null
+          is_new?: boolean
+          last_synced_at?: string | null
+          main_image_url?: string | null
+          name?: string | null
+          published?: boolean
+          raw?: Json | null
+          sizes?: string[] | null
+          style_code: string
+          updated_at?: string
+          weight?: string | null
+        }
+        Update: {
+          brand?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          fabric?: string | null
+          features?: string | null
+          gender?: string | null
+          hidden_by_admin?: boolean
+          href?: string | null
+          is_new?: boolean
+          last_synced_at?: string | null
+          main_image_url?: string | null
+          name?: string | null
+          published?: boolean
+          raw?: Json | null
+          sizes?: string[] | null
+          style_code?: string
+          updated_at?: string
+          weight?: string | null
+        }
+        Relationships: []
+      }
+      ru_variants: {
+        Row: {
+          color_hex: string | null
+          color_name: string
+          created_at: string
+          style_code: string
+          swatch_url: string | null
+        }
+        Insert: {
+          color_hex?: string | null
+          color_name: string
+          created_at?: string
+          style_code: string
+          swatch_url?: string | null
+        }
+        Update: {
+          color_hex?: string | null
+          color_name?: string
+          created_at?: string
+          style_code?: string
+          swatch_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ru_variants_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "ru_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
       ss_colors: {
         Row: {
           code: string
