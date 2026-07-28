@@ -383,118 +383,36 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       setItems(enriched);
       setLoaded(true);
 
-      // Load PF public retail prices → min per model_code
-      if (!lockedSource || lockedSource === "pf") {
-        const priceMap = new Map<string, { price: number; currency: string }>();
-        let pfrom = 0;
+      // Load unified catalog price ranges (min/max per style, all sources).
+      // Prices are stored excl. VAT and already include our markup.
+      {
+        const ranges = new Map<string, { price: number; max: number; currency: string }>();
+        let from = 0;
         while (true) {
-          const { data, error } = await supabase
-            .from("pf_public_retail_prices" as any)
-            .select("model_code,retail_price,currency")
-            .range(pfrom, pfrom + 999);
+          let query = supabase
+            .from("catalog_price_ranges" as any)
+            .select("source,style_code,min_price,max_price,currency")
+            .range(from, from + 999);
+          if (lockedSource) query = query.eq("source", lockedSource);
+          const { data, error } = await query;
           if (error || !data) break;
           for (const r of data as any[]) {
-            const mc = r.model_code as string;
-            const p = Number(r.retail_price);
-            if (!mc || !Number.isFinite(p) || p <= 0) continue;
-            const cur = priceMap.get(mc);
-            if (!cur || p < cur.price) priceMap.set(mc, { price: p, currency: r.currency || "EUR" });
+            const key = `${r.source}:${r.style_code}`;
+            const min = Number(r.min_price);
+            const max = Number(r.max_price);
+            if (!Number.isFinite(min) || min <= 0) continue;
+            ranges.set(key, {
+              price: min,
+              max: Number.isFinite(max) && max > min ? max : min,
+              currency: r.currency || "EUR",
+            });
           }
           if (data.length < 1000) break;
-          pfrom += 1000;
+          from += 1000;
         }
-        setPfPrices(priceMap);
+        setPriceRanges(ranges);
       }
 
-      // Load SS public retail prices → per style_code
-      if (!lockedSource || lockedSource === "ss") {
-        const ssMap = new Map<string, { price: number; currency: string }>();
-        let sfrom = 0;
-        while (true) {
-          const { data, error } = await supabase
-            .from("ss_public_retail_prices" as any)
-            .select("style_code,retail_price,currency")
-            .range(sfrom, sfrom + 999);
-          if (error || !data) break;
-          for (const r of data as any[]) {
-            const sc = r.style_code as string;
-            const p = Number(r.retail_price);
-            if (!sc || !Number.isFinite(p) || p <= 0) continue;
-            ssMap.set(sc, { price: p, currency: r.currency || "EUR" });
-          }
-          if (data.length < 1000) break;
-          sfrom += 1000;
-        }
-        setSsPrices(ssMap);
-      }
-
-      // Load BB public retail prices → per style_code
-      if (!lockedSource || lockedSource === "bb") {
-        const bbMap = new Map<string, { price: number; currency: string }>();
-        let bfrom = 0;
-        while (true) {
-          const { data, error } = await supabase
-            .from("bb_public_retail_prices" as any)
-            .select("style_code,retail_price,currency")
-            .range(bfrom, bfrom + 999);
-          if (error || !data) break;
-          for (const r of data as any[]) {
-            const sc = r.style_code as string;
-            const p = Number(r.retail_price);
-            if (!sc || !Number.isFinite(p) || p <= 0) continue;
-            bbMap.set(sc, { price: p, currency: r.currency || "EUR" });
-          }
-          if (data.length < 1000) break;
-          bfrom += 1000;
-        }
-        setBbPrices(bbMap);
-      }
-
-      // Load MF public retail prices → per style_code
-      if (!lockedSource || lockedSource === "mf") {
-        const mfMap = new Map<string, { price: number; currency: string }>();
-        let mfrom = 0;
-        while (true) {
-          const { data, error } = await supabase
-            .from("mf_public_retail_prices" as any)
-            .select("style_code,retail_price,currency")
-            .range(mfrom, mfrom + 999);
-          if (error || !data) break;
-          for (const r of data as any[]) {
-            const sc = r.style_code as string;
-            const p = Number(r.retail_price);
-            if (!sc || !Number.isFinite(p) || p <= 0) continue;
-            mfMap.set(sc, { price: p, currency: r.currency || "EUR" });
-          }
-          if (data.length < 1000) break;
-          mfrom += 1000;
-        }
-        setMfPrices(mfMap);
-      }
-
-      // Load Russell public retail prices → per style_code
-      if (!lockedSource || lockedSource === "ru") {
-        const ruMap = new Map<string, { price: number; currency: string }>();
-        let rfrom = 0;
-        while (true) {
-          const { data, error } = await supabase
-            .from("ru_prices" as any)
-            .select("style_code,retail_price,currency")
-            .range(rfrom, rfrom + 999);
-          if (error || !data) break;
-          for (const r of data as any[]) {
-            const sc = r.style_code as string;
-            const p = Number(r.retail_price);
-            if (!sc || !Number.isFinite(p) || p <= 0) continue;
-            // Russell feed stores supplier (wholesale) prices without VAT.
-            // Retail = supplier x markup (1.65) x VAT (1.21)
-            ruMap.set(sc, { price: Math.round(p * 1.65 * 1.21 * 100) / 100, currency: r.currency || "EUR" });
-          }
-          if (data.length < 1000) break;
-          rfrom += 1000;
-        }
-        setRuPrices(ruMap);
-      }
     })();
   }, [lockedSource]);
 
