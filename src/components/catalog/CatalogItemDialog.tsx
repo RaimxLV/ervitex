@@ -849,7 +849,9 @@ const CatalogItemDialog = ({
     setDetail(null);
     setActiveColor(null);
     setImgIndex(0);
-    setPriceInfo(null);
+    setVariantPrices([]);
+    setSelectedSize(null);
+
     (async () => {
       const loader =
         source === "ss" ? loadSS
