@@ -486,7 +486,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             const sc = r.style_code as string;
             const p = Number(r.retail_price);
             if (!sc || !Number.isFinite(p) || p <= 0) continue;
-            ruMap.set(sc, { price: p, currency: r.currency || "EUR" });
+            ruMap.set(sc, { price: Math.round(p * 1.0165 * 100) / 100, currency: r.currency || "EUR" });
           }
           if (data.length < 1000) break;
           rfrom += 1000;
