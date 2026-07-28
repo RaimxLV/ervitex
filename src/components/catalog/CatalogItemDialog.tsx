@@ -839,13 +839,28 @@ const CatalogItemDialog = ({
     setImgIndex(0);
     setPriceInfo(null);
     (async () => {
-      const loader = source === "ss" ? loadSS : source === "nwg" ? loadNWG : source === "bb" ? loadBB : source === "mf" ? loadMF : loadPF;
+      const loader =
+        source === "ss" ? loadSS
+        : source === "nwg" ? loadNWG
+        : source === "bb" ? loadBB
+        : source === "mf" ? loadMF
+        : source === "ru" ? loadRU
+        : loadPF;
       const d = await loader(id).catch(() => null);
       if (cancelled) return;
       setDetail(d);
       setActiveColor(d?.colors[0]?.code ?? null);
       setLoading(false);
-      if (source === "pf" || source === "ss" || source === "bb" || source === "mf") {
+      if (source === "ru") {
+        const { data } = await supabase
+          .from("ru_prices")
+          .select("retail_price,currency")
+          .eq("style_code", id)
+          .maybeSingle();
+        if (!cancelled && data && data.retail_price) {
+          setPriceInfo({ price: Number(data.retail_price) * 1.0165, currency: data.currency || "EUR" });
+        }
+      } else if (source === "pf" || source === "ss" || source === "bb" || source === "mf") {
         const table =
           source === "pf" ? "pf_public_retail_prices"
           : source === "ss" ? "ss_public_retail_prices"
@@ -864,6 +879,7 @@ const CatalogItemDialog = ({
           setPriceInfo({ price: Number(anyData.retail_price), currency: anyData.currency || "EUR" });
         }
       }
+
     })();
     return () => { cancelled = true; };
   }, [isOpen, source, id]);
