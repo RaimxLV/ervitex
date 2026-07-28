@@ -135,6 +135,7 @@ const manufacturerOf = (source: CatalogSource, brand: string | null): string | n
   }
   if (source === "bb") return "bb";
   if (source === "mf") return "mf";
+  if ((source as string) === "ru") return "ru";
   return source;
 };
 
