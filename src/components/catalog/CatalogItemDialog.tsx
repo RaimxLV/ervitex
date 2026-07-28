@@ -673,6 +673,7 @@ async function loadMF(styleCode: string): Promise<ProductDetail | null> {
     notice: null,
     sizes: uniqueSortedSizes(allSizes),
     colors,
+    skus: skuMap,
   };
 }
 
