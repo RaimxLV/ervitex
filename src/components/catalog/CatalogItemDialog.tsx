@@ -583,6 +583,7 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
     notice: null,
     sizes: uniqueSortedSizes(allSizes),
     colors,
+    skus: skuMap,
   };
 }
 
@@ -613,6 +614,7 @@ async function loadMF(styleCode: string): Promise<ProductDetail | null> {
   const sizesByColor = new Map<string, Set<string>>();
   const allSizes = new Set<string>();
   let firstAttrs: any[] | null = null;
+  const skuMap: Record<string, string> = {};
   for (const v of variants) {
     const key = (v.color_code || "").toString();
     if (key && !colorInfo.has(key)) {
@@ -628,6 +630,7 @@ async function loadMF(styleCode: string): Promise<ProductDetail | null> {
         sizesByColor.get(key)!.add(sz);
       }
     }
+    if (v.sku && key) skuMap[`${key}|${sz ?? ""}`] = v.sku;
   }
 
   const colors: ColorDetail[] = colorOrder.map((key) => {
