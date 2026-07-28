@@ -400,6 +400,7 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
   const sizesByColor = new Map<string, Set<string>>();
   const sizeSet = new Set<string>();
   let sampleVariant: any = null;
+  const skuMap: Record<string, string> = {};
   for (const v of variants as any[]) {
     if (!sampleVariant) sampleVariant = v;
     if (v.size) sizeSet.add(v.size);
@@ -417,6 +418,7 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
       });
     }
     colorMap.get(key)!.itemCodes.add(v.item_code);
+    if (v.item_code) skuMap[`${key}|${v.size ?? ""}`] = v.item_code;
   }
 
   const colors: ColorDetail[] = [...colorMap.values()].map((c) => {
