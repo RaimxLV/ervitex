@@ -20,7 +20,8 @@ interface RelatedItem {
 }
 
 const isValidSource = (s: string | undefined): s is CatalogSource =>
-  !!s && ["ss", "nwg", "pf", "bb", "mf"].includes(s);
+  !!s && ["ss", "nwg", "pf", "bb", "mf", "ru"].includes(s);
+
 
 const CatalogItemPage = () => {
   const { source, id } = useParams<{ source: string; id: string }>();
