@@ -859,35 +859,23 @@ const CatalogItemDialog = ({
       setDetail(d);
       setActiveColor(d?.colors[0]?.code ?? null);
       setLoading(false);
-      if (source === "ru") {
-        const { data } = await supabase
-          .from("ru_prices")
-          .select("retail_price,currency")
+      // Per-variant prices (colour/size aware, excl. VAT, markup already applied)
+      const rows: any[] = [];
+      let from = 0;
+      while (true) {
+        const { data, error } = await supabase
+          .from("catalog_variant_prices" as any)
+          .select("color_code,size,retail_price,currency")
+          .eq("source", source)
           .eq("style_code", id)
-          .maybeSingle();
-        if (!cancelled && data && data.retail_price) {
-          // Russell: supplier price x markup (1.65) x VAT (1.21)
-          setPriceInfo({ price: Math.round(Number(data.retail_price) * 1.65 * 1.21 * 100) / 100, currency: data.currency || "EUR" });
-        }
-      } else if (source === "pf" || source === "ss" || source === "bb" || source === "mf") {
-        const table =
-          source === "pf" ? "pf_public_retail_prices"
-          : source === "ss" ? "ss_public_retail_prices"
-          : source === "bb" ? "bb_public_retail_prices"
-          : "mf_public_retail_prices";
-        const keyCol = source === "pf" ? "model_code" : "style_code";
-        const { data } = await supabase
-          .from(table as any)
-          .select("retail_price,currency")
-          .eq(keyCol, id)
-          .order("retail_price", { ascending: true })
-          .limit(1)
-          .maybeSingle();
-        if (!cancelled && data) {
-          const anyData = data as any;
-          setPriceInfo({ price: Number(anyData.retail_price), currency: anyData.currency || "EUR" });
-        }
+          .range(from, from + 999);
+        if (error || !data) break;
+        rows.push(...(data as any[]));
+        if (data.length < 1000) break;
+        from += 1000;
       }
+      if (!cancelled) setVariantPrices(rows);
+
 
     })();
     return () => { cancelled = true; };
