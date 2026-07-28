@@ -88,9 +88,17 @@ const lines = (txt?: string | null) =>
 
 const cleanText = (v?: unknown): string | null => {
   if (v === null || v === undefined) return null;
-  const s = String(v).trim();
+  let s = String(v).trim();
   if (!s || s === "false" || s === "[object Object]") return null;
-  return s;
+  // Defensive scrub for scraped supplier pages: cut off inline basket/price
+  // tables ("ADD TO BASKET ... Colour Size Qty ... EUR 37.44 ...") and drop
+  // leftover section headings.
+  s = s.replace(/\b(ADD TO BASKET|ADD TO BASKET AND CHECKOUT|PIEVIENOT GROZAM)[\s\S]*$/i, "").trim();
+  s = s.replace(/^\s*(FEATURES|CERTIFICATES|FUNKCIJAS|SERTIFIK[ĀA]TI)\b[\s:•-]*/gi, "").trim();
+  // If what remains is mostly numbers/currency noise, discard it.
+  const digits = (s.match(/\d/g) || []).length;
+  if (s.length > 80 && digits / s.length > 0.25) return null;
+  return s || null;
 };
 
 const addSpec = (arr: { label: string; value: string }[], label: string, value?: unknown, suffix = "") => {
