@@ -887,6 +887,11 @@ const CatalogItemDialog = ({
     return () => { cancelled = true; };
   }, [isOpen, source, id]);
 
+  useEffect(() => {
+    setSelectedSize(null);
+  }, [activeColor]);
+
+
   const currentColor = useMemo(
     () => displayDetail.colors.find((c) => c.code === activeColor) || displayDetail.colors[0] || null,
     [displayDetail, activeColor]
