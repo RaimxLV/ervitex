@@ -901,6 +901,29 @@ const CatalogItemDialog = ({
 
   const mainImg = gallery[imgIndex] || gallery[0] || image;
   const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : displayDetail.sizes || [];
+
+  // Colour/size aware price: prices differ per size and per colour in most catalogs.
+  const priceInfo = useMemo(() => {
+    if (!variantPrices.length) return null;
+    const norm = (s: unknown) => (s ?? "").toString().trim().toLowerCase();
+    let rows = variantPrices;
+    if (currentColor) {
+      const byColor = rows.filter((r) => norm(r.color_code) === norm(currentColor.code));
+      if (byColor.length) rows = byColor;
+    }
+    if (selectedSize) {
+      const bySize = rows.filter((r) => norm(r.size) === norm(selectedSize));
+      if (bySize.length) rows = bySize;
+    }
+    const values = rows.map((r) => Number(r.retail_price)).filter((n) => Number.isFinite(n) && n > 0);
+    if (!values.length) return null;
+    return {
+      price: Math.min(...values),
+      max: Math.max(...values),
+      currency: rows[0]?.currency || "EUR",
+    };
+  }, [variantPrices, currentColor, selectedSize]);
+
   const rawDescriptionLines = displayDetail.features.length ? displayDetail.features : lines(displayDetail.description || descriptionFallback);
   const rawMaterial = displayDetail.material || null;
   const rawCare = displayDetail.care || null;
