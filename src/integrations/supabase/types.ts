@@ -176,6 +176,66 @@ export type Database = {
           },
         ]
       }
+      catalog_price_ranges: {
+        Row: {
+          currency: string
+          max_price: number
+          min_price: number
+          source: string
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          currency?: string
+          max_price: number
+          min_price: number
+          source: string
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          currency?: string
+          max_price?: number
+          min_price?: number
+          source?: string
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      catalog_variant_prices: {
+        Row: {
+          color_code: string | null
+          currency: string
+          retail_price: number
+          size: string | null
+          sku: string
+          source: string
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          color_code?: string | null
+          currency?: string
+          retail_price: number
+          size?: string | null
+          sku: string
+          source: string
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          color_code?: string | null
+          currency?: string
+          retail_price?: number
+          size?: string | null
+          sku?: string
+          source?: string
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -2248,6 +2308,7 @@ export type Database = {
         }[]
       }
       refresh_catalog_items_mv: { Args: never; Returns: undefined }
+      refresh_catalog_prices: { Args: never; Returns: undefined }
       refresh_mf_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
