@@ -245,7 +245,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                       <ul
                         className={cn(
                           "space-y-0.5 pr-1",
-                          filtered.length > 10 && "max-h-72 overflow-y-auto"
+                          section.key !== "source" && filtered.length > 10 && "max-h-72 overflow-y-auto"
                         )}
                       >
                         {filtered.length === 0 && (
