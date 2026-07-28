@@ -365,6 +365,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     notice: null,
     sizes,
     colors,
+    skus: skuMap,
   };
 }
 
