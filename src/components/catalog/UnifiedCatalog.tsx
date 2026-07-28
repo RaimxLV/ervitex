@@ -921,7 +921,7 @@ interface CardProps {
   requestLabel: string;
   noImageLabel: string;
   onNavigate: () => void;
-  priceInfo?: { price: number; currency: string };
+  priceInfo?: { price: number; max: number; currency: string };
   fromLabel?: string;
 }
 
