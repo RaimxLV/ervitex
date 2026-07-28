@@ -633,17 +633,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const priceOf = useCallback(
     (it: EnrichedItem): number | null => {
-      const p =
-        it.source === "pf" ? pfPrices.get(it.id) :
-        it.source === "ss" ? ssPrices.get(it.id) :
-        it.source === "bb" ? bbPrices.get(it.id) :
-        it.source === "mf" ? mfPrices.get(it.id) :
-        it.source === "ru" ? ruPrices.get(it.id) :
-        undefined;
+      const p = priceRanges.get(`${it.source}:${it.id}`);
       return p ? p.price : null;
     },
-    [pfPrices, ssPrices, bbPrices, mfPrices, ruPrices]
+    [priceRanges]
   );
+
 
   const filtered = useMemo(() => {
     const base = items.filter((it) => passesExcept(it, "__none__"));
