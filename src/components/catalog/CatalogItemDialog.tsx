@@ -491,6 +491,7 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
     notice: cleanText(style.product_comments),
     sizes,
     colors,
+    skus: skuMap,
   };
 }
 
