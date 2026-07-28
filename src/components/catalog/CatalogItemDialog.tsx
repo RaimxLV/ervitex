@@ -652,6 +652,79 @@ async function loadMF(styleCode: string): Promise<ProductDetail | null> {
   };
 }
 
+async function loadRU(styleCode: string): Promise<ProductDetail | null> {
+  const [styleRes, variantsRes, imagesRes] = await Promise.all([
+    supabase
+      .from("ru_styles")
+      .select("style_code,name,brand,category,gender,fabric,weight,description,features,sizes,main_image_url")
+      .eq("style_code", styleCode)
+      .maybeSingle(),
+    supabase.from("ru_variants").select("color_name,color_hex,swatch_url").eq("style_code", styleCode),
+    supabase.from("ru_images").select("color_name,url,sort_order").eq("style_code", styleCode).order("sort_order", { ascending: true }),
+  ]);
+  const style: any = styleRes.data;
+  if (!style) return null;
+  const variants: any[] = variantsRes.data || [];
+  const images: any[] = imagesRes.data || [];
+
+  const imgByColor = new Map<string, string[]>();
+  const shared: string[] = [];
+  for (const im of images) {
+    if (!im.url) continue;
+    const key = (im.color_name || "").toLowerCase();
+    if (key) {
+      if (!imgByColor.has(key)) imgByColor.set(key, []);
+      imgByColor.get(key)!.push(im.url);
+    } else {
+      shared.push(im.url);
+    }
+  }
+  if (style.main_image_url) shared.unshift(style.main_image_url);
+
+  const sizes: string[] = Array.isArray(style.sizes) ? style.sizes.filter(Boolean) : [];
+  const colors: ColorDetail[] = variants.map((v: any) => {
+    const key = (v.color_name || "").toLowerCase();
+    const imgs = imgByColor.get(key) || [];
+    return {
+      code: v.color_name || key || "default",
+      name: v.color_name || "",
+      hex: cleanHex(v.color_hex),
+      images: imgs.length ? imgs : shared,
+      sizes: uniqueSortedSizes(sizes),
+    };
+  });
+  if (colors.length === 0 && shared.length) {
+    colors.push({ code: "default", name: style.name || style.style_code, hex: null, images: shared, sizes: uniqueSortedSizes(sizes) });
+  }
+
+  const featureArr = lines(style.features);
+
+  const specs: { label: string; value: string }[] = [];
+  addSpec(specs, "Brand", style.brand);
+  addSpec(specs, "Category", style.category);
+  addSpec(specs, "Gender", style.gender);
+  addSpec(specs, "Material", style.fabric);
+  addSpec(specs, "Weight", style.weight);
+
+  return {
+    title: style.name || style.style_code,
+    code: style.style_code,
+    brand: style.brand || "Russell",
+    category: style.category,
+    gender: style.gender,
+    shortDescription: cleanText(style.description),
+    description: cleanText(style.description),
+    features: featureArr,
+    material: style.fabric || null,
+    care: null,
+    specs,
+    notice: null,
+    sizes: uniqueSortedSizes(sizes),
+    colors,
+  };
+}
+
+
 
 /* ---------- i18n for spec labels & values ---------- */
 
