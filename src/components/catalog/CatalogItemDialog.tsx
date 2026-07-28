@@ -48,6 +48,8 @@ interface ProductDetail {
   notice: string | null;
   sizes: string[];
   colors: ColorDetail[];
+  /** Variant article numbers keyed by `${colorCode}|${size}` (and `${colorCode}|` when size-less). */
+  skus?: Record<string, string>;
 }
 
 /* ---------- SS Cloudinary transform ---------- */
@@ -166,7 +168,7 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
       .select("style_code,name,short_description,long_description,category,type,gender,segment,style_main_segment,fit,weight_gsm,neckline,sleeve,wash_instructions,specifications,composition,brand,main_picture_url,over_picture_url,raw")
       .eq("style_code", styleCode)
       .maybeSingle(),
-    supabase.from("ss_variants").select("color_code,color_name,hex_color_code,size_code,color_sequence,size_sequence").eq("style_code", styleCode),
+    supabase.from("ss_variants").select("sku,color_code,color_name,hex_color_code,size_code,color_sequence,size_sequence").eq("style_code", styleCode),
     supabase.from("ss_images").select("color_code,image_type,fname,public_url,source_url,sort_order,is_main").eq("style_code", styleCode).order("sort_order", { ascending: true }),
   ]);
   const style = styleRes.data;
@@ -179,6 +181,7 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
   const colorMap = new Map<string, { code: string; name: string; hex: string | null; seq: number }>();
   const sizeMap = new Map<string, number>();
   const sizesByColor = new Map<string, Set<string>>();
+  const skus: Record<string, string> = {};
   for (const v of variants) {
     if (v.color_code && !colorMap.has(v.color_code)) {
       colorMap.set(v.color_code, {
@@ -193,6 +196,7 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
       if (!sizesByColor.has(v.color_code)) sizesByColor.set(v.color_code, new Set());
       sizesByColor.get(v.color_code)!.add(v.size_code);
     }
+    if ((v as any).sku && v.color_code) skus[`${v.color_code}|${v.size_code ?? ""}`] = (v as any).sku;
   }
   const sortedColors = [...colorMap.values()].sort((a, b) => a.seq - b.seq);
   const sortedSizes = [...sizeMap.entries()].sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0])).map((x) => x[0]);
@@ -249,6 +253,7 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
     notice: cleanText(raw.StyleNotice || raw.Notice),
     sizes: sortedSizes,
     colors,
+    skus,
   };
 }
 
