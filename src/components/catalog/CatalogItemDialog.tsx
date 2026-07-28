@@ -1053,6 +1053,29 @@ const CatalogItemDialog = ({
   const rawBrand = (displayDetail.brand || brand || "").trim();
   const displayBrand = rawBrand && rawBrand.toLowerCase() !== "unbranded" ? rawBrand : null;
   const displayCode = displayDetail.code || id;
+  // Variant article number for the selected colour (+ size, when picked)
+  const variantCode = (() => {
+    const map = displayDetail.skus;
+    if (!map || !currentColor) return null;
+    if (selectedSize) {
+      const exact = map[`${currentColor.code}|${selectedSize}`];
+      if (exact) return exact;
+    }
+    const prefix = `${currentColor.code}|`;
+    const matches = Object.entries(map)
+      .filter(([k]) => k.startsWith(prefix))
+      .map(([, v]) => v);
+    if (!matches.length) return null;
+    if (matches.length === 1) return matches[0];
+    // Multiple sizes: show the shared style+colour part of the article number
+    let common = matches[0];
+    for (const m of matches) {
+      let i = 0;
+      while (i < common.length && i < m.length && common[i] === m[i]) i++;
+      common = common.slice(0, i);
+    }
+    return common.length >= 4 ? common : null;
+  })();
   const displayCategory = displayDetail.category || category;
 
   // Filter out redundant specs (already shown as top pills) and translate them
