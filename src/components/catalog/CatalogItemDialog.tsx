@@ -866,7 +866,8 @@ const CatalogItemDialog = ({
           .eq("style_code", id)
           .maybeSingle();
         if (!cancelled && data && data.retail_price) {
-          setPriceInfo({ price: Number(data.retail_price) * 1.0165, currency: data.currency || "EUR" });
+          // Russell: supplier price x markup (1.65) x VAT (1.21)
+          setPriceInfo({ price: Math.round(Number(data.retail_price) * 1.65 * 1.21 * 100) / 100, currency: data.currency || "EUR" });
         }
       } else if (source === "pf" || source === "ss" || source === "bb" || source === "mf") {
         const table =
