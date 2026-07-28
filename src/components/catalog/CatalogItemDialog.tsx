@@ -1266,16 +1266,23 @@ const CatalogItemDialog = ({
                   <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.sizes}</h4>
                   <div className="flex flex-wrap gap-1.5">
                     {visibleSizes.map((s) => (
-                      <span
+                      <button
                         key={s}
-                        className="min-w-[2.25rem] rounded-sm border border-border px-2 py-1 text-center text-xs font-medium text-foreground"
+                        type="button"
+                        onClick={() => setSelectedSize(selectedSize === s ? null : s)}
+                        className={`min-w-[2.25rem] rounded-sm border px-2 py-1 text-center text-xs font-medium transition-colors ${
+                          selectedSize === s
+                            ? "border-accent bg-accent text-accent-foreground"
+                            : "border-border text-foreground hover:border-accent"
+                        }`}
                       >
                         {s}
-                      </span>
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
+
 
               {!loading && (
                 <AddToQuoteBlock
