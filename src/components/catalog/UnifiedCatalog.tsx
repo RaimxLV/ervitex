@@ -284,6 +284,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [ssPrices, setSsPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
   const [bbPrices, setBbPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
   const [mfPrices, setMfPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
+  const [ruPrices, setRuPrices] = useState<Map<string, { price: number; currency: string }>>(new Map());
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [sources, setSources] = useState<Set<string>>(() => {
@@ -469,6 +470,28 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           mfrom += 1000;
         }
         setMfPrices(mfMap);
+      }
+
+      // Load Russell public retail prices → per style_code
+      if (!lockedSource || lockedSource === "ru") {
+        const ruMap = new Map<string, { price: number; currency: string }>();
+        let rfrom = 0;
+        while (true) {
+          const { data, error } = await supabase
+            .from("ru_prices" as any)
+            .select("style_code,retail_price,currency")
+            .range(rfrom, rfrom + 999);
+          if (error || !data) break;
+          for (const r of data as any[]) {
+            const sc = r.style_code as string;
+            const p = Number(r.retail_price);
+            if (!sc || !Number.isFinite(p) || p <= 0) continue;
+            ruMap.set(sc, { price: p, currency: r.currency || "EUR" });
+          }
+          if (data.length < 1000) break;
+          rfrom += 1000;
+        }
+        setRuPrices(ruMap);
       }
     })();
   }, [lockedSource]);
@@ -698,10 +721,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         it.source === "ss" ? ssPrices.get(it.id) :
         it.source === "bb" ? bbPrices.get(it.id) :
         it.source === "mf" ? mfPrices.get(it.id) :
+        it.source === "ru" ? ruPrices.get(it.id) :
         undefined;
       return p ? p.price : null;
     },
-    [pfPrices, ssPrices, bbPrices, mfPrices]
+    [pfPrices, ssPrices, bbPrices, mfPrices, ruPrices]
   );
 
   const filtered = useMemo(() => {
@@ -937,6 +961,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                           ? bbPrices.get(it.id)
                           : it.source === "mf"
                           ? mfPrices.get(it.id)
+                           : it.source === "ru"
+                           ? ruPrices.get(it.id)
                           : undefined
                       }
                       fromLabel={lang === "lv" ? "no" : "from"}

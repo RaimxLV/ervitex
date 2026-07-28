@@ -1,0 +1,1 @@
+ALTER VIEW public.catalog_items SET (security_invoker = true);
