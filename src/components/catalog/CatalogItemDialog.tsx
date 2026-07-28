@@ -1131,6 +1131,14 @@ const CatalogItemDialog = ({
                     <span className="text-[10px] font-semibold uppercase tracking-widest opacity-70">{label.code}</span>
                     {displayCode}
                   </span>
+                  {variantCode && variantCode !== displayCode && (
+                    <span className="inline-flex items-center gap-2 rounded border border-border px-3 py-1.5 font-mono text-sm font-bold uppercase tracking-wider text-foreground">
+                      <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                        {lang === "lv" ? "Artikuls" : "Article no."}
+                      </span>
+                      {variantCode}
+                    </span>
+                  )}
                   <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
                     {label.supplier}:{" "}
                     <Link
