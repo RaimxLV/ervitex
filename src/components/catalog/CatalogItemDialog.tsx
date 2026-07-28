@@ -808,7 +808,11 @@ const CatalogItemDialog = ({
   const [loading, setLoading] = useState(false);
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [imgIndex, setImgIndex] = useState(0);
-  const [priceInfo, setPriceInfo] = useState<{ price: number; currency: string } | null>(null);
+  const [variantPrices, setVariantPrices] = useState<
+    { color_code: string | null; size: string | null; retail_price: number; currency: string | null }[]
+  >([]);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+
 
   const fallbackDetail = useMemo<ProductDetail>(() => ({
     title: name || id,
