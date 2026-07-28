@@ -95,6 +95,7 @@ const MANUFACTURERS: { key: string; label: string }[] = [
   { key: "nwg-cutter", label: "Cutter & Buck" },
   { key: "pf-elevate", label: "Elevate" },
   { key: "pf-roly", label: "Roly" },
+  { key: "ru", label: "Russell" },
   { key: "pf", label: "Prezentmateriāli" },
   { key: "bb", label: "Beechfield Brands" },
   { key: "mf", label: "Malfini" },
