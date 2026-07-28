@@ -48,6 +48,8 @@ interface ProductDetail {
   notice: string | null;
   sizes: string[];
   colors: ColorDetail[];
+  /** Variant article numbers keyed by `${colorCode}|${size}` (and `${colorCode}|` when size-less). */
+  skus?: Record<string, string>;
 }
 
 /* ---------- SS Cloudinary transform ---------- */
@@ -166,7 +168,7 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
       .select("style_code,name,short_description,long_description,category,type,gender,segment,style_main_segment,fit,weight_gsm,neckline,sleeve,wash_instructions,specifications,composition,brand,main_picture_url,over_picture_url,raw")
       .eq("style_code", styleCode)
       .maybeSingle(),
-    supabase.from("ss_variants").select("color_code,color_name,hex_color_code,size_code,color_sequence,size_sequence").eq("style_code", styleCode),
+    supabase.from("ss_variants").select("sku,color_code,color_name,hex_color_code,size_code,color_sequence,size_sequence").eq("style_code", styleCode),
     supabase.from("ss_images").select("color_code,image_type,fname,public_url,source_url,sort_order,is_main").eq("style_code", styleCode).order("sort_order", { ascending: true }),
   ]);
   const style = styleRes.data;
@@ -179,6 +181,7 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
   const colorMap = new Map<string, { code: string; name: string; hex: string | null; seq: number }>();
   const sizeMap = new Map<string, number>();
   const sizesByColor = new Map<string, Set<string>>();
+  const skus: Record<string, string> = {};
   for (const v of variants) {
     if (v.color_code && !colorMap.has(v.color_code)) {
       colorMap.set(v.color_code, {
@@ -193,6 +196,7 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
       if (!sizesByColor.has(v.color_code)) sizesByColor.set(v.color_code, new Set());
       sizesByColor.get(v.color_code)!.add(v.size_code);
     }
+    if ((v as any).sku && v.color_code) skus[`${v.color_code}|${v.size_code ?? ""}`] = (v as any).sku;
   }
   const sortedColors = [...colorMap.values()].sort((a, b) => a.seq - b.seq);
   const sortedSizes = [...sizeMap.entries()].sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0])).map((x) => x[0]);
@@ -249,6 +253,7 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
     notice: cleanText(raw.StyleNotice || raw.Notice),
     sizes: sortedSizes,
     colors,
+    skus,
   };
 }
 
@@ -257,7 +262,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     supabase.from("nwg_styles").select("product_number,name,brand,category,gender,fit,fabrics,commerce_text,catalog_text,usp,weight,country_of_origin,raw").eq("product_number", productNumber).maybeSingle(),
     supabase.from("nwg_variants").select("item_number,color_name,color_code,filter_color,shade_color,main_picture_url").eq("product_number", productNumber),
     supabase.from("nwg_images").select("item_number,image_url,high_res_url,large_thumbnail_url,standard_url,sort_order").eq("product_number", productNumber).order("sort_order", { ascending: true }),
-    supabase.from("nwg_skus").select("item_number,size,size_sequence").eq("product_number", productNumber),
+    supabase.from("nwg_skus").select("sku,item_number,size,size_sequence").eq("product_number", productNumber),
   ]);
   const style = styleRes.data;
   if (!style) return null;
@@ -290,10 +295,12 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
   }
 
   const sizesByItem = new Map<string, { s: string; seq: string }[]>();
+  const skuMap: Record<string, string> = {};
   for (const sk of skus) {
     const it = (sk as any).item_number || "";
     if (!sizesByItem.has(it)) sizesByItem.set(it, []);
     if ((sk as any).size) sizesByItem.get(it)!.push({ s: (sk as any).size, seq: (sk as any).size_sequence || "" });
+    if ((sk as any).sku && it) skuMap[`${it}|${(sk as any).size ?? ""}`] = (sk as any).sku;
   }
 
   const colors: ColorDetail[] = variants.map((v: any) => ({
@@ -358,6 +365,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     notice: null,
     sizes,
     colors,
+    skus: skuMap,
   };
 }
 
@@ -392,6 +400,7 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
   const sizesByColor = new Map<string, Set<string>>();
   const sizeSet = new Set<string>();
   let sampleVariant: any = null;
+  const skuMap: Record<string, string> = {};
   for (const v of variants as any[]) {
     if (!sampleVariant) sampleVariant = v;
     if (v.size) sizeSet.add(v.size);
@@ -409,6 +418,7 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
       });
     }
     colorMap.get(key)!.itemCodes.add(v.item_code);
+    if (v.item_code) skuMap[`${key}|${v.size ?? ""}`] = v.item_code;
   }
 
   const colors: ColorDetail[] = [...colorMap.values()].map((c) => {
@@ -481,6 +491,7 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
     notice: cleanText(style.product_comments),
     sizes,
     colors,
+    skus: skuMap,
   };
 }
 
@@ -515,6 +526,7 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
   const colorInfo = new Map<string, { name: string; hex: string | null }>();
   const sizesByColor = new Map<string, Set<string>>();
   const allSizes = new Set<string>();
+  const skuMap: Record<string, string> = {};
   for (const v of variants as any[]) {
     const name = v.color_name || "";
     const key = name.toLowerCase();
@@ -529,6 +541,7 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
         sizesByColor.get(key)!.add(v.size);
       }
     }
+    if (v.sku && name) skuMap[`${name}|${v.size ?? ""}`] = v.sku;
   }
 
   const colors: ColorDetail[] = colorOrder.map((key) => {
@@ -570,6 +583,7 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
     notice: null,
     sizes: uniqueSortedSizes(allSizes),
     colors,
+    skus: skuMap,
   };
 }
 
@@ -600,6 +614,7 @@ async function loadMF(styleCode: string): Promise<ProductDetail | null> {
   const sizesByColor = new Map<string, Set<string>>();
   const allSizes = new Set<string>();
   let firstAttrs: any[] | null = null;
+  const skuMap: Record<string, string> = {};
   for (const v of variants) {
     const key = (v.color_code || "").toString();
     if (key && !colorInfo.has(key)) {
@@ -615,6 +630,7 @@ async function loadMF(styleCode: string): Promise<ProductDetail | null> {
         sizesByColor.get(key)!.add(sz);
       }
     }
+    if (v.sku && key) skuMap[`${key}|${sz ?? ""}`] = v.sku;
   }
 
   const colors: ColorDetail[] = colorOrder.map((key) => {
@@ -657,6 +673,7 @@ async function loadMF(styleCode: string): Promise<ProductDetail | null> {
     notice: null,
     sizes: uniqueSortedSizes(allSizes),
     colors,
+    skus: skuMap,
   };
 }
 
@@ -1036,6 +1053,29 @@ const CatalogItemDialog = ({
   const rawBrand = (displayDetail.brand || brand || "").trim();
   const displayBrand = rawBrand && rawBrand.toLowerCase() !== "unbranded" ? rawBrand : null;
   const displayCode = displayDetail.code || id;
+  // Variant article number for the selected colour (+ size, when picked)
+  const variantCode = (() => {
+    const map = displayDetail.skus;
+    if (!map || !currentColor) return null;
+    if (selectedSize) {
+      const exact = map[`${currentColor.code}|${selectedSize}`];
+      if (exact) return exact;
+    }
+    const prefix = `${currentColor.code}|`;
+    const matches = Object.entries(map)
+      .filter(([k]) => k.startsWith(prefix))
+      .map(([, v]) => v);
+    if (!matches.length) return null;
+    if (matches.length === 1) return matches[0];
+    // Multiple sizes: show the shared style+colour part of the article number
+    let common = matches[0];
+    for (const m of matches) {
+      let i = 0;
+      while (i < common.length && i < m.length && common[i] === m[i]) i++;
+      common = common.slice(0, i);
+    }
+    return common.length >= 4 ? common : null;
+  })();
   const displayCategory = displayDetail.category || category;
 
   // Filter out redundant specs (already shown as top pills) and translate them
@@ -1091,6 +1131,14 @@ const CatalogItemDialog = ({
                     <span className="text-[10px] font-semibold uppercase tracking-widest opacity-70">{label.code}</span>
                     {displayCode}
                   </span>
+                  {variantCode && variantCode !== displayCode && (
+                    <span className="inline-flex items-center gap-2 rounded border border-border px-3 py-1.5 font-mono text-sm font-bold uppercase tracking-wider text-foreground">
+                      <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                        {lang === "lv" ? "Artikuls" : "Article no."}
+                      </span>
+                      {variantCode}
+                    </span>
+                  )}
                   <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
                     {label.supplier}:{" "}
                     <Link
