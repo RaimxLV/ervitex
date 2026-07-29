@@ -24,6 +24,9 @@ import imgNotebook from "@/assets/menu/notebook.jpg";
 import imgHeadphones from "@/assets/menu/headphones.jpg";
 import imgUmbrella from "@/assets/menu/umbrella.jpg";
 import imgKeychain from "@/assets/menu/keychain.jpg";
+import imgScarf from "@/assets/menu/scarf.jpg";
+import imgSocks from "@/assets/menu/socks.jpg";
+import imgWaistbag from "@/assets/menu/waistbag.jpg";
 
 const SHOES_URL =
   "https://images.nwgmedia.com/highres/230335/1906960-999982_V175_Fuseknit_Front.jpg";
