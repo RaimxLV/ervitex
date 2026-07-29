@@ -23,89 +23,73 @@ const MANUFACTURERS: { label: string; token: string; featured?: boolean }[] = [
 
 type Tile = { lv: string; en: string; cats: string[]; img?: string };
 type TextLink = { lv: string; en: string; cats: string[] };
-type TextGroup = { lv: string; en: string; links: TextLink[] };
 
 const img = (key: string) => FALLBACK_IMAGES[key];
 
-// COLUMN 1 — Core garments (image tiles)
+// COLUMN 1 — Apparel
 const COL1: Tile[] = [
   { lv: "T-krekli un topi", en: "T-shirts & tops", cats: ["T-shirts", "Tops", "Tees"], img: img("t-shirts") },
   { lv: "Polo krekli", en: "Polos", cats: ["Polos", "Polo shirts"], img: img("polos") },
   { lv: "Krekli", en: "Shirts", cats: ["Shirts"], img: img("shirts") },
-  { lv: "Hūdiji, džemperi un flīsi", en: "Hoodies, sweatshirts & fleece", cats: ["Hoodies", "Hoodie sweatshirts", "Sweaters", "Sweatshirts", "Crew neck sweatshirts", "Fleece"], img: img("hoodies") },
-  { lv: "Virsjakas un vestes", en: "Jackets & vests", cats: ["Jackets", "Non Padded Jacket", "Jackets-Vests", "Bodywarmers"], img: img("jackets") },
-  { lv: "Bikses un šorti", en: "Trousers & shorts", cats: ["Bottoms", "Trousers-shorts", "Shorts & Trousers", "Trousers", "Shorts"], img: img("trousers") },
-  { lv: "Sporta apģērbs", en: "Sportswear", cats: ["Sportswear", "Sports", "Fitness & Sport", "Training Set", "Training pants"], img: img("sweatshirts") },
+  { lv: "Hūdiji", en: "Hoodies", cats: ["Hoodies", "Hoodie sweatshirts"], img: img("hoodies") },
+  { lv: "Džemperi un flīsi", en: "Sweatshirts & fleece", cats: ["Sweaters", "Sweatshirts", "Crew neck sweatshirts", "Fleece"], img: img("sweatshirts") },
+  { lv: "Virsjakas", en: "Jackets", cats: ["Jackets", "Non Padded Jacket", "Jackets-Vests"], img: img("jackets") },
+  { lv: "Vestes", en: "Bodywarmers", cats: ["Bodywarmers", "Vests"], img: img("vests") },
+  { lv: "Bikses", en: "Trousers", cats: ["Bottoms", "Trousers-shorts", "Trousers"], img: img("trousers") },
+  { lv: "Šorti", en: "Shorts", cats: ["Shorts", "Shorts & Trousers"], img: img("shorts") },
 ];
 
-// COLUMN 2 — Workwear, headwear & textiles (image tiles)
+const COL1_LINKS: TextLink[] = [
+  { lv: "Sporta apģērbs", en: "Sportswear", cats: ["Sportswear", "Sports", "Fitness & Sport", "Training Set", "Training pants"] },
+  { lv: "Zeķes", en: "Socks", cats: ["Socks"] },
+];
+
+// COLUMN 2 — Workwear, headwear & textiles
 const COL2: Tile[] = [
-  { lv: "Darba apģērbs un kombinezoni", en: "Workwear & coveralls", cats: ["Workwear", "Coveralls"], img: img("workwear") },
+  { lv: "Darba apģērbs", en: "Workwear", cats: ["Workwear", "Coveralls"], img: img("workwear") },
   { lv: "Atstarojošais apģērbs", en: "Hi-vis clothing", cats: ["Safety", "Safety Vests", "Hi-vis"], img: img("vests") },
   { lv: "Darba apavi", en: "Safety footwear", cats: ["Shoes", "Safety Footwear"], img: img("shoes") },
   { lv: "Cepures", en: "Caps & beanies", cats: ["Caps & Hats", "Caps", "Headwear", "Beanies"], img: img("caps & hats") },
-  { lv: "Cimdi un šalles", en: "Gloves & scarves", cats: ["Gloves", "Scarves"], img: img("gloves") },
-  { lv: "Dvieļi un pledi", en: "Towels & blankets", cats: ["Towels", "Terry", "Blankets", "Fleece Blankets"], img: img("towels") },
+  { lv: "Cimdi", en: "Gloves", cats: ["Gloves"], img: img("gloves") },
+  { lv: "Šalles", en: "Scarves", cats: ["Scarves"], img: img("scarves") },
+  { lv: "Dvieļi", en: "Towels", cats: ["Towels", "Terry"], img: img("towels") },
+  { lv: "Pledi", en: "Blankets", cats: ["Blankets", "Fleece Blankets"], img: img("towels") },
+  { lv: "Priekšauti", en: "Aprons", cats: ["Aprons"], img: img("aprons") },
 ];
 
-// COLUMN 3 — Bags & travel (grouped text)
-const COL3: TextGroup[] = [
-  {
-    lv: "Somas un ceļojumi",
-    en: "Bags & travel",
-    links: [
-      { lv: "Auduma somas un iepirkumu maisiņi", en: "Tote & shopping bags", cats: ["Tote Bags", "Shopping & Tote Bags", "Drawstring Bags"] },
-      { lv: "Mugursomas", en: "Backpacks", cats: ["Backpacks", "Laptop Backpacks"] },
-      { lv: "Datoru un biznesa somas", en: "Laptop & business bags", cats: ["Laptop & Tablet Bags", "Business Bags", "Portfolios", "Conference Bags"] },
-      { lv: "Sporta somas", en: "Sports bags", cats: ["Sports Bags"] },
-      { lv: "Ceļojumu somas un koferi", en: "Travel bags & trolleys", cats: ["Travel Bags", "Trolleys & Suitcases"] },
-      { lv: "Aukstumsomas un ceļojumu piederumi", en: "Cooler bags & travel accessories", cats: ["Cooler Bags", "Travel Accessories", "Toiletry Bags"] },
-    ],
-  },
+// COLUMN 3 — Bags & accessories (renamed: no "travel")
+const COL3: Tile[] = [
+  { lv: "Auduma somas", en: "Tote bags", cats: ["Tote Bags", "Shopping & Tote Bags", "Drawstring Bags"], img: img("tote bags") },
+  { lv: "Mugursomas", en: "Backpacks", cats: ["Backpacks", "Laptop Backpacks"], img: img("backpacks") },
+  { lv: "Datoru somas", en: "Laptop bags", cats: ["Laptop & Tablet Bags"], img: img("laptop bags") },
+  { lv: "Biznesa somas", en: "Business bags", cats: ["Business Bags", "Portfolios", "Conference Bags"], img: img("business bags") },
+  { lv: "Sporta somas", en: "Sports bags", cats: ["Sports Bags", "Travel Bags", "Trolleys & Suitcases"], img: img("bags") },
+  { lv: "Jostas somas", en: "Waist bags", cats: ["Waist Bags", "Belt Bags"], img: img("waist bags") },
 ];
 
-// COLUMN 4 — Promo & gifts (grouped text)
-const COL4: TextGroup[] = [
-  {
-    lv: "Dzērienu trauki",
-    en: "Drinkware",
-    links: [
-      { lv: "Pudeles un termosi", en: "Bottles & thermoses", cats: ["Bottles", "Water Bottles", "Sports Bottles", "Insulated Bottles"] },
-      { lv: "Krūzes un termokrūzes", en: "Mugs & travel mugs", cats: ["Mugs", "Standard Mugs", "Insulated Mugs", "Travel Mugs"] },
-      { lv: "Glāzes, karafes un vīna aksesuāri", en: "Glasses, carafes & wine", cats: ["Glasses", "Bar glass", "Carafes", "Wine Accessories", "Bottle Openers & Accessories"] },
-    ],
-  },
-  {
-    lv: "Virtuve",
-    en: "Kitchen",
-    links: [
-      { lv: "Priekšauti, virtuves tekstils un dēlīši", en: "Aprons, kitchen textiles & boards", cats: ["Aprons", "Kitchen", "Serving Boards", "Lunch Boxes", "BBQ Accessories", "Chef's Knives"] },
-    ],
-  },
-  {
-    lv: "Birojs un rakstāmpiederumi",
-    en: "Office & writing",
-    links: [
-      { lv: "Pildspalvas, zīmuļi un bloknoti", en: "Pens, pencils & notebooks", cats: ["Ballpoint Pens", "Rollerball Pens", "Fountain Pens", "Other Pens & Writing Accessories", "Pencils", "Hard Cover Notebooks", "Soft Cover Notebooks", "Notepads", "Sticky Notes", "Office", "Desk Accessories", "Office Stands & Holders"] },
-    ],
-  },
-  {
-    lv: "Tehnoloģijas",
-    en: "Technology",
-    links: [
-      { lv: "Ārējie akumulatori, USB un austiņas", en: "Power banks, USB & audio", cats: ["Power Banks", "Wireless Charging", "Chargers", "Cables", "USB Flash Drives", "USB Hubs", "Speakers", "Earbuds", "Headphones", "Telephone & Tablet Accessories", "Computer Accessories"] },
-    ],
-  },
-  {
-    lv: "Dāvanas un piederumi",
-    en: "Gifts & accessories",
-    links: [
-      { lv: "Lietussargi", en: "Umbrellas", cats: ["Standard Umbrellas", "Folding Umbrellas", "Golf Umbrellas", "Storm Umbrellas"] },
-      { lv: "Dāvanu komplekti", en: "Gift sets", cats: ["Gift Sets"] },
-      { lv: "Instrumenti", en: "Tools", cats: ["Multitools", "Tool Sets"] },
-      { lv: "Auto piederumi", en: "Car accessories", cats: ["Car Accessories"] },
-    ],
-  },
+const COL3_LINKS: TextLink[] = [
+  { lv: "Aukstumsomas", en: "Cooler bags", cats: ["Cooler Bags"] },
+  { lv: "Kosmētikas somiņas", en: "Toiletry bags", cats: ["Toiletry Bags", "Travel Accessories"] },
+  { lv: "Atslēgu piekariņi", en: "Keyrings", cats: ["Keyrings", "Keychains"] },
+];
+
+// COLUMN 4 — Promo & gifts
+const COL4: Tile[] = [
+  { lv: "Pudeles un termosi", en: "Bottles", cats: ["Bottles", "Water Bottles", "Sports Bottles", "Insulated Bottles"], img: img("bottles") },
+  { lv: "Krūzes", en: "Mugs", cats: ["Mugs", "Standard Mugs", "Insulated Mugs", "Travel Mugs"], img: img("mugs") },
+  { lv: "Bloknoti un pildspalvas", en: "Notebooks & pens", cats: ["Hard Cover Notebooks", "Soft Cover Notebooks", "Notepads", "Ballpoint Pens", "Rollerball Pens", "Pencils"], img: img("notebooks") },
+  { lv: "Austiņas un skaļruņi", en: "Audio", cats: ["Speakers", "Earbuds", "Headphones"], img: img("audio") },
+  { lv: "Lietussargi", en: "Umbrellas", cats: ["Standard Umbrellas", "Folding Umbrellas", "Golf Umbrellas", "Storm Umbrellas"], img: img("umbrellas") },
+  { lv: "Dāvanu komplekti", en: "Gift sets", cats: ["Gift Sets"], img: img("keychains") },
+];
+
+const COL4_LINKS: TextLink[] = [
+  { lv: "Glāzes un vīna aksesuāri", en: "Glasses & wine accessories", cats: ["Glasses", "Bar glass", "Carafes", "Wine Accessories", "Bottle Openers & Accessories"] },
+  { lv: "Virtuve un pusdienu kastes", en: "Kitchen & lunch boxes", cats: ["Kitchen", "Serving Boards", "Lunch Boxes", "BBQ Accessories", "Chef's Knives"] },
+  { lv: "Lādētāji un USB", en: "Chargers & USB", cats: ["Power Banks", "Wireless Charging", "Chargers", "Cables", "USB Flash Drives", "USB Hubs"] },
+  { lv: "Biroja piederumi", en: "Office accessories", cats: ["Office", "Desk Accessories", "Office Stands & Holders", "Sticky Notes"] },
+  { lv: "Instrumenti", en: "Tools", cats: ["Multitools", "Tool Sets"] },
+  { lv: "Auto piederumi", en: "Car accessories", cats: ["Car Accessories"] },
 ];
 
 const buildCategoryHref = (cats: string[]) =>
@@ -115,17 +99,9 @@ const buildManufacturerHref = (token: string) =>
 
 function ColumnHeader({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="mb-3 font-heading text-[10px] font-bold uppercase tracking-[0.28em] text-primary-foreground/50">
+    <h3 className="mb-3 border-b border-primary-foreground/10 pb-2 font-heading text-[10px] font-bold uppercase tracking-[0.28em] text-primary-foreground/50">
       {children}
     </h3>
-  );
-}
-
-function GroupHeader({ children }: { children: React.ReactNode }) {
-  return (
-    <h4 className="mb-1.5 font-heading text-[10px] font-bold uppercase tracking-[0.24em] text-accent/90">
-      {children}
-    </h4>
   );
 }
 
@@ -169,30 +145,24 @@ function TileGrid({ tiles, onNavigate }: { tiles: Tile[]; onNavigate?: () => voi
   );
 }
 
-function TextGroups({ groups, onNavigate }: { groups: TextGroup[]; onNavigate?: () => void }) {
+function LinkList({ links, onNavigate }: { links: TextLink[]; onNavigate?: () => void }) {
   const { lang } = useLanguage();
+  if (!links.length) return null;
   return (
-    <div className="space-y-4">
-      {groups.map((g) => (
-        <div key={g.en}>
-          <GroupHeader>{lang === "lv" ? g.lv : g.en}</GroupHeader>
-          <ul className="space-y-1">
-            {g.links.map((l) => (
-              <li key={l.en}>
-                <Link
-                  to={buildCategoryHref(l.cats)}
-                  onClick={onNavigate}
-                  role="menuitem"
-                  className="group inline-flex items-start gap-1.5 text-[12.5px] leading-snug text-primary-foreground/80 transition-colors hover:text-accent"
-                >
-                  <span>{lang === "lv" ? l.lv : l.en}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
+    <ul className="mt-4 space-y-1.5 border-t border-primary-foreground/10 pt-3">
+      {links.map((l) => (
+        <li key={l.en}>
+          <Link
+            to={buildCategoryHref(l.cats)}
+            onClick={onNavigate}
+            role="menuitem"
+            className="block text-[12.5px] leading-snug text-primary-foreground/75 transition-colors hover:text-accent"
+          >
+            {lang === "lv" ? l.lv : l.en}
+          </Link>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }
 
@@ -206,31 +176,30 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
       aria-label={t("Kataloga izvēlne", "Catalog menu")}
       className="bg-primary text-primary-foreground"
     >
-      <div className="max-h-[60vh] overflow-y-auto">
+      <div className="max-h-[62vh] overflow-y-auto">
         <div className="mx-auto max-w-[1400px] px-5 py-6 lg:px-8 xl:px-10">
           <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 lg:grid-cols-4">
-            {/* Column 1 */}
             <div>
               <ColumnHeader>{t("Apģērbi", "Apparel")}</ColumnHeader>
               <TileGrid tiles={COL1} onNavigate={onNavigate} />
+              <LinkList links={COL1_LINKS} onNavigate={onNavigate} />
             </div>
 
-            {/* Column 2 */}
             <div>
-              <ColumnHeader>{t("Specializētais apģērbs un tekstils", "Workwear, headwear & textiles")}</ColumnHeader>
+              <ColumnHeader>{t("Darba apģērbs un tekstils", "Workwear & textiles")}</ColumnHeader>
               <TileGrid tiles={COL2} onNavigate={onNavigate} />
             </div>
 
-            {/* Column 3 */}
             <div>
-              <ColumnHeader>{t("Somas un ceļojumi", "Bags & travel")}</ColumnHeader>
-              <TextGroups groups={COL3} onNavigate={onNavigate} />
+              <ColumnHeader>{t("Somas un aksesuāri", "Bags & accessories")}</ColumnHeader>
+              <TileGrid tiles={COL3} onNavigate={onNavigate} />
+              <LinkList links={COL3_LINKS} onNavigate={onNavigate} />
             </div>
 
-            {/* Column 4 */}
             <div>
               <ColumnHeader>{t("Prezentmateriāli un dāvanas", "Promo & gifts")}</ColumnHeader>
-              <TextGroups groups={COL4} onNavigate={onNavigate} />
+              <TileGrid tiles={COL4} onNavigate={onNavigate} />
+              <LinkList links={COL4_LINKS} onNavigate={onNavigate} />
             </div>
           </div>
         </div>
