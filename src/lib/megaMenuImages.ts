@@ -60,6 +60,9 @@ export const FALLBACK_IMAGES: Record<string, string> = {
   audio: imgHeadphones,
   umbrellas: imgUmbrella,
   keychains: imgKeychain,
+  scarves: imgScarf,
+  socks: imgSocks,
+  "waist bags": imgWaistbag,
 };
 
 export const resolveMenuImage = (
