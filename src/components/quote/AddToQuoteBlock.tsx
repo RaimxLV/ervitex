@@ -82,6 +82,10 @@ const AddToQuoteBlock = ({
   }, [syncKey]);
 
   const totalHere = Object.values(qtyBySize).reduce((a, b) => a + b, 0);
+  const sumHere = Object.entries(qtyBySize).reduce(
+    (a, [size, qty]) => a + (sizePrices?.[size] || 0) * qty,
+    0,
+  );
   const totalOther = otherColorLines.reduce((a, l) => a + l.qty, 0);
   const totalForProduct = totalHere + totalOther;
 
