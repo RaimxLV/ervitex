@@ -272,15 +272,15 @@ const AddToQuoteBlock = ({
           </div>
         )}
 
-        <div className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-stretch">
+        <div className="mt-1 flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:items-stretch">
           <Button
             type="button"
             size="sm"
             disabled={totalForProduct === 0}
             onClick={() => onClose?.()}
-            className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest px-4"
+            className="h-auto min-h-9 w-full min-w-0 flex-1 whitespace-normal break-words px-3 py-2 text-center leading-tight bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest"
           >
-            <PlusIcon className="mr-2 h-4 w-4" />
+            <PlusIcon className="mr-2 h-4 w-4 shrink-0" />
             {t("Pievienot pieprasījuma sarakstam", "Add to request list")}
           </Button>
           <Button
@@ -288,14 +288,15 @@ const AddToQuoteBlock = ({
             size="sm"
             variant="outline"
             disabled={totalForProduct === 0}
-            className="font-heading text-xs uppercase tracking-widest px-4 sm:shrink-0"
+            className="h-auto min-h-9 w-full min-w-0 whitespace-normal break-words px-3 py-2 text-center leading-tight font-heading text-xs uppercase tracking-widest sm:w-auto"
           >
             <Link to="/request">
-              <ClipboardList className="mr-2 h-4 w-4" />
+              <ClipboardList className="mr-2 h-4 w-4 shrink-0" />
               {t("Uz pieprasījumu", "Go to request")}
             </Link>
           </Button>
         </div>
+
 
       </div>
     </div>
