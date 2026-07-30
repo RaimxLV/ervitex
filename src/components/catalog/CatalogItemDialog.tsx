@@ -1392,6 +1392,8 @@ const CatalogItemDialog = ({
                 <AddToQuoteBlock
                   source={source}
                   productId={id}
+                  sizePrices={sizePriceMap}
+
                   name={displayDetail.title || name || id}
                   code={displayCode}
                   brand={displayBrand}
