@@ -17,11 +17,13 @@ interface Props {
   colorName: string | null;
   colorHex: string | null;
   sizes: string[];
+  /** Price per size, VAT included */
+  sizePrices?: Record<string, number>;
   onClose?: () => void;
 }
 
 const AddToQuoteBlock = ({
-  source, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes, onClose,
+  source, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes, sizePrices, onClose,
 }: Props) => {
   const { items, add, updateQty, remove } = useQuoteCart();
   const { lang } = useLanguage();
