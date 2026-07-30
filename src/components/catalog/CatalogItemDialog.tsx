@@ -946,6 +946,28 @@ const CatalogItemDialog = ({
     };
   }, [variantPrices, currentColor, selectedSize]);
 
+  // Price per size (incl. VAT) for the currently selected colour
+  const sizePriceMap = useMemo(() => {
+    const norm = (s: unknown) => (s ?? "").toString().trim().toLowerCase();
+    if (!variantPrices.length) return {} as Record<string, number>;
+    let rows = variantPrices;
+    if (currentColor) {
+      const byColor = rows.filter((r) => norm(r.color_code) === norm(currentColor.code));
+      if (byColor.length) rows = byColor;
+    }
+    const map: Record<string, number> = {};
+    for (const r of rows) {
+      const size = (r.size ?? "").toString().trim();
+      if (!size) continue;
+      const v = Number(r.retail_price);
+      if (!Number.isFinite(v) || v <= 0) continue;
+      const withVat = v * 1.21;
+      if (map[size] === undefined || withVat < map[size]) map[size] = withVat;
+    }
+    return map;
+  }, [variantPrices, currentColor]);
+
+
   const rawDescriptionLines = displayDetail.features.length ? displayDetail.features : lines(displayDetail.description || descriptionFallback);
   const rawMaterial = displayDetail.material || null;
   const rawCare = displayDetail.care || null;
@@ -1315,29 +1337,63 @@ const CatalogItemDialog = ({
                 <div>
                   <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.sizes}</h4>
                   <div className="flex flex-wrap gap-1.5">
-                    {visibleSizes.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setSelectedSize(selectedSize === s ? null : s)}
-                        className={`min-w-[2.25rem] rounded-sm border px-2 py-1 text-center text-xs font-medium transition-colors ${
-                          selectedSize === s
-                            ? "border-accent bg-accent text-accent-foreground"
-                            : "border-border text-foreground hover:border-accent"
-                        }`}
-                      >
-                        {s}
-                      </button>
-                    ))}
+                    {visibleSizes.map((s) => {
+                      const p = sizePriceMap[s];
+                      return (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setSelectedSize(selectedSize === s ? null : s)}
+                          className={`min-w-[3.25rem] rounded-sm border px-2 py-1 text-center text-xs font-medium transition-colors ${
+                            selectedSize === s
+                              ? "border-accent bg-accent text-accent-foreground"
+                              : "border-border text-foreground hover:border-accent"
+                          }`}
+                        >
+                          <span className="block leading-tight">{s}</span>
+                          {p !== undefined && (
+                            <span className={`block text-[10px] font-semibold leading-tight ${selectedSize === s ? "text-accent-foreground/90" : "text-muted-foreground"}`}>
+                              €{p.toFixed(2)}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
+                  {(() => {
+                    const groups: { sizes: string[]; price: number }[] = [];
+                    for (const s of visibleSizes) {
+                      const p = sizePriceMap[s];
+                      if (p === undefined) continue;
+                      const last = groups[groups.length - 1];
+                      if (last && Math.abs(last.price - p) < 0.005) last.sizes.push(s);
+                      else groups.push({ sizes: [s], price: p });
+                    }
+                    if (groups.length < 2) return null;
+                    return (
+                      <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+                        <span className="font-semibold text-foreground">
+                          {lang === "lv" ? "Cenas pa izmēriem (ar PVN): " : "Prices by size (incl. VAT): "}
+                        </span>
+                        {groups
+                          .map((g) =>
+                            `${g.sizes.length > 2 ? `${g.sizes[0]}–${g.sizes[g.sizes.length - 1]}` : g.sizes.join(", ")} €${g.price.toFixed(2)}`,
+                          )
+                          .join(" · ")}
+                      </p>
+                    );
+                  })()}
                 </div>
               )}
+
 
 
               {!loading && (
                 <AddToQuoteBlock
                   source={source}
                   productId={id}
+                  sizePrices={sizePriceMap}
+
                   name={displayDetail.title || name || id}
                   code={displayCode}
                   brand={displayBrand}

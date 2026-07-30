@@ -17,11 +17,13 @@ interface Props {
   colorName: string | null;
   colorHex: string | null;
   sizes: string[];
+  /** Price per size, VAT included */
+  sizePrices?: Record<string, number>;
   onClose?: () => void;
 }
 
 const AddToQuoteBlock = ({
-  source, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes, onClose,
+  source, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes, sizePrices, onClose,
 }: Props) => {
   const { items, add, updateQty, remove } = useQuoteCart();
   const { lang } = useLanguage();
@@ -80,6 +82,10 @@ const AddToQuoteBlock = ({
   }, [syncKey]);
 
   const totalHere = Object.values(qtyBySize).reduce((a, b) => a + b, 0);
+  const sumHere = Object.entries(qtyBySize).reduce(
+    (a, [size, qty]) => a + (sizePrices?.[size] || 0) * qty,
+    0,
+  );
   const totalOther = otherColorLines.reduce((a, l) => a + l.qty, 0);
   const totalForProduct = totalHere + totalOther;
 
@@ -153,6 +159,7 @@ const AddToQuoteBlock = ({
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
           {sizes.map((s) => {
             const v = qtyBySize[s] || 0;
+            const unit = sizePrices?.[s];
             return (
               <div
                 key={s}
@@ -161,6 +168,9 @@ const AddToQuoteBlock = ({
                 }`}
               >
                 <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{s}</span>
+                {unit !== undefined && (
+                  <span className="text-[10px] font-semibold text-foreground">€{unit.toFixed(2)}</span>
+                )}
                 <div className="mt-1 flex w-full items-center">
                   <button
                     type="button"
@@ -189,9 +199,13 @@ const AddToQuoteBlock = ({
                     <Plus className="h-3 w-3" />
                   </button>
                 </div>
+                {unit !== undefined && v > 0 && (
+                  <span className="mt-0.5 text-[10px] font-bold text-accent">€{(unit * v).toFixed(2)}</span>
+                )}
               </div>
             );
           })}
+
         </div>
       ) : (
         <div className="flex items-center gap-2">
@@ -250,6 +264,14 @@ const AddToQuoteBlock = ({
           <span className="font-heading text-base font-black">{totalForProduct}</span>{" "}
           <span className="text-muted-foreground">{t("gab.", "pcs")}</span>
         </div>
+        {sumHere > 0 && (
+          <div className="text-xs">
+            <span className="text-muted-foreground">{t("Summa šajā krāsā:", "Subtotal this colour:")}</span>{" "}
+            <span className="font-heading text-lg font-black text-accent">€{sumHere.toFixed(2)}</span>{" "}
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">{t("ar PVN", "incl. VAT")}</span>
+          </div>
+        )}
+
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button
             type="button"
