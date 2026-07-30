@@ -2348,6 +2348,7 @@ export type Database = {
       refresh_mf_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
+      ss_fill_missing_variant_prices: { Args: never; Returns: number }
       ss_sku_retail_prices: {
         Args: never
         Returns: {
