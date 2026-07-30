@@ -946,6 +946,28 @@ const CatalogItemDialog = ({
     };
   }, [variantPrices, currentColor, selectedSize]);
 
+  // Price per size (incl. VAT) for the currently selected colour
+  const sizePriceMap = useMemo(() => {
+    const norm = (s: unknown) => (s ?? "").toString().trim().toLowerCase();
+    if (!variantPrices.length) return {} as Record<string, number>;
+    let rows = variantPrices;
+    if (currentColor) {
+      const byColor = rows.filter((r) => norm(r.color_code) === norm(currentColor.code));
+      if (byColor.length) rows = byColor;
+    }
+    const map: Record<string, number> = {};
+    for (const r of rows) {
+      const size = (r.size ?? "").toString().trim();
+      if (!size) continue;
+      const v = Number(r.retail_price);
+      if (!Number.isFinite(v) || v <= 0) continue;
+      const withVat = v * 1.21;
+      if (map[size] === undefined || withVat < map[size]) map[size] = withVat;
+    }
+    return map;
+  }, [variantPrices, currentColor]);
+
+
   const rawDescriptionLines = displayDetail.features.length ? displayDetail.features : lines(displayDetail.description || descriptionFallback);
   const rawMaterial = displayDetail.material || null;
   const rawCare = displayDetail.care || null;
