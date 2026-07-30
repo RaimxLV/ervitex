@@ -272,13 +272,13 @@ const AddToQuoteBlock = ({
           </div>
         )}
 
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-stretch">
           <Button
             type="button"
             size="sm"
             disabled={totalForProduct === 0}
             onClick={() => onClose?.()}
-            className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest"
+            className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest px-4"
           >
             <PlusIcon className="mr-2 h-4 w-4" />
             {t("Pievienot pieprasījuma sarakstam", "Add to request list")}
@@ -288,7 +288,7 @@ const AddToQuoteBlock = ({
             size="sm"
             variant="outline"
             disabled={totalForProduct === 0}
-            className="font-heading text-xs uppercase tracking-widest"
+            className="font-heading text-xs uppercase tracking-widest px-4 sm:shrink-0"
           >
             <Link to="/request">
               <ClipboardList className="mr-2 h-4 w-4" />
@@ -296,6 +296,7 @@ const AddToQuoteBlock = ({
             </Link>
           </Button>
         </div>
+
       </div>
     </div>
   );
