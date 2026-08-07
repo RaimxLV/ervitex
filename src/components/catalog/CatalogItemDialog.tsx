@@ -946,7 +946,7 @@ const CatalogItemDialog = ({
     };
   }, [variantPrices, currentColor, selectedSize]);
 
-  // Price per size (incl. VAT) for the currently selected colour
+  // Price per size (excl. VAT) for the currently selected colour
   const sizePriceMap = useMemo(() => {
     const norm = (s: unknown) => (s ?? "").toString().trim().toLowerCase();
     if (!variantPrices.length) return {} as Record<string, number>;
@@ -961,8 +961,7 @@ const CatalogItemDialog = ({
       if (!size) continue;
       const v = Number(r.retail_price);
       if (!Number.isFinite(v) || v <= 0) continue;
-      const withVat = v * 1.21;
-      if (map[size] === undefined || withVat < map[size]) map[size] = withVat;
+      if (map[size] === undefined || v < map[size]) map[size] = v;
     }
     return map;
   }, [variantPrices, currentColor]);
