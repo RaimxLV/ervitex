@@ -15,6 +15,7 @@ interface Props {
   image: string | null;
   colorCode: string | null;
   colorName: string | null;
+  colorHex: string | null;
   sizes: string[];
   /** Price per size, VAT excluded */
   sizePrices?: Record<string, number>;
