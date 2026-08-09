@@ -93,4 +93,48 @@
   .catalog-card-media {
     background-color: hsl(var(--catalog-card-media));
   }
+
+  .promo-banner {
+    background-color: hsl(var(--promo-bg));
+    color: hsl(var(--promo-fg));
+  }
+
+  .promo-cta {
+    background-image: linear-gradient(100deg, hsl(var(--accent)), hsl(var(--promo-glow-b)));
+    box-shadow: 0 10px 30px -10px hsl(var(--accent) / 0.6);
+  }
+
+  .promo-cta:hover {
+    box-shadow: 0 14px 42px -8px hsl(var(--accent) / 0.75);
+  }
+}
+
+@layer base {
+  :root {
+    --promo-bg: 222 47% 11%;
+    --promo-fg: 0 0% 98%;
+    --promo-glow-a: 0 85% 50%;
+    --promo-glow-b: 258 90% 62%;
+  }
+}
+
+@layer utilities {
+  @keyframes promo-drift {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(6%, -8%, 0) scale(1.15); }
+  }
+
+  @keyframes promo-drift-alt {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.1); }
+    50% { transform: translate3d(-8%, 6%, 0) scale(0.95); }
+  }
+
+  @keyframes promo-pulse {
+    0%, 100% { opacity: 0.55; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.04); }
+  }
+
+  .animate-promo-drift { animation: promo-drift 14s ease-in-out infinite; }
+  .animate-promo-drift-alt { animation: promo-drift-alt 18s ease-in-out infinite; }
+  .animate-promo-pulse { animation: promo-pulse 3s ease-in-out infinite; }
 }
