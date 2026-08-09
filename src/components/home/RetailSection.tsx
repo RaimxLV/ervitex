@@ -1,83 +1,60 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { MousePointerClick, Zap, Shirt, ArrowRight, Sparkles, Palette, Type, ImageIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { MousePointerClick, Zap, Shirt, ArrowRight, Sparkles, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
+import teeMockup from "@/assets/tee-mockup.png";
+import printArt1 from "@/assets/print-art-1.png";
+import printArt2 from "@/assets/print-art-2.png";
 
 const DESIGNER_URL = "https://t-bode.lv/design";
 
 const shirtColors = [
-  { name: "Black", hex: "#111111", ink: "#ffffff" },
-  { name: "White", hex: "#f4f4f4", ink: "#111111" },
+  { name: "Black", hex: "#141414", ink: "#ffffff" },
+  { name: "White", hex: "#f2f2f2", ink: "#111111" },
   { name: "Red", hex: "#d11a1a", ink: "#ffffff" },
   { name: "Navy", hex: "#1f2b48", ink: "#ffffff" },
   { name: "Sand", hex: "#d9c7a7", ink: "#111111" },
 ];
 
-const printOptions = [
-  { icon: Type, lv: "TAVS TEKSTS", en: "YOUR TEXT" },
-  { icon: Sparkles, lv: "LOGO", en: "LOGO" },
-  { icon: ImageIcon, lv: "FOTO", en: "PHOTO" },
-];
+type Design =
+  | { kind: "text"; lv: string; en: string }
+  | { kind: "image"; src: string; lv: string; en: string };
 
-const TShirtMockup = ({ color, ink, label }: { color: string; ink: string; label: string }) => (
-  <svg viewBox="0 0 320 340" className="h-full w-full drop-shadow-2xl" role="img" aria-label={`T-krekls ${color}`}>
-    <path
-      d="M110 26 L80 40 L26 74 L52 128 L82 112 L82 314 Q160 328 238 314 L238 112 L268 128 L294 74 L240 40 L210 26 Q160 62 110 26 Z"
-      fill={color}
-      stroke="rgba(0,0,0,0.2)"
-      strokeWidth="2"
-    />
-    <path d="M110 26 Q160 62 210 26" fill="none" stroke="rgba(0,0,0,0.15)" strokeWidth="3" />
-    <rect x="104" y="150" width="112" height="86" rx="2" fill="none" stroke={ink} strokeOpacity="0.35" strokeDasharray="5 5" />
-    <text
-      x="160"
-      y="200"
-      textAnchor="middle"
-      fill={ink}
-      fontSize="17"
-      fontWeight="700"
-      letterSpacing="1.5"
-      fontFamily="'Space Grotesk', sans-serif"
-    >
-      {label}
-    </text>
-  </svg>
-);
+const designs: Design[] = [
+  { kind: "text", lv: "TAVS TEKSTS", en: "YOUR TEXT" },
+  { kind: "image", src: printArt1, lv: "TAVA BILDE", en: "YOUR PHOTO" },
+  { kind: "text", lv: "TAVS LOGO", en: "YOUR LOGO" },
+  { kind: "image", src: printArt2, lv: "TAVS DIZAINS", en: "YOUR DESIGN" },
+];
 
 const RetailSection = () => {
   const { lang } = useLanguage();
-  const [colorIdx, setColorIdx] = useState(0);
-  const [printIdx, setPrintIdx] = useState(0);
-  const color = shirtColors[colorIdx];
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setStep((s) => s + 1), 2600);
+    return () => clearInterval(id);
+  }, []);
+
+  const color = shirtColors[step % shirtColors.length];
+  const design = designs[step % designs.length];
 
   const benefits = [
-    {
-      icon: MousePointerClick,
-      lv: "Drag & Drop tiešsaistes dizaina konstruktors",
-      en: "Drag & drop online design builder",
-    },
-    {
-      icon: Zap,
-      lv: "Ātra DTF apdruka un piegāde no 1 gabala",
-      en: "Fast DTF printing & delivery from 1 piece",
-    },
-    {
-      icon: Shirt,
-      lv: "Premium kvalitātes T-krekli un hūdiji",
-      en: "Premium quality t-shirts & hoodies",
-    },
+    { icon: MousePointerClick, lv: "Drag & Drop tiešsaistes dizaina konstruktors", en: "Drag & drop online design builder" },
+    { icon: Zap, lv: "Ātra DTF apdruka un piegāde no 1 gabala", en: "Fast DTF printing & delivery from 1 piece" },
+    { icon: Shirt, lv: "Premium kvalitātes T-krekli un hūdiji", en: "Premium quality t-shirts & hoodies" },
   ];
 
   return (
     <section className="py-10 md:py-16">
       <div className="container">
         <motion.div
-          initial={{ opacity: 0, y: 28 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="promo-banner relative isolate overflow-hidden rounded-2xl border border-white/10 shadow-2xl"
+          className="promo-banner relative isolate overflow-hidden rounded-2xl shadow-2xl"
         >
           {/* Ambient animated glows */}
           <div className="pointer-events-none absolute inset-0 -z-10">
@@ -89,20 +66,12 @@ const RetailSection = () => {
               className="absolute -bottom-28 right-0 h-80 w-80 rounded-full blur-3xl opacity-40 animate-promo-drift-alt"
               style={{ background: "radial-gradient(circle, hsl(var(--promo-glow-b)) 0%, transparent 70%)" }}
             />
-            <div
-              className="absolute inset-0 opacity-[0.06]"
-              style={{
-                backgroundImage:
-                  "linear-gradient(hsl(var(--promo-fg)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--promo-fg)) 1px, transparent 1px)",
-                backgroundSize: "32px 32px",
-              }}
-            />
           </div>
 
           <div className="grid items-center gap-8 p-6 sm:p-10 lg:grid-cols-2 lg:gap-12 lg:p-14">
             {/* Copy */}
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-widest text-accent">
+              <span className="inline-flex items-center gap-2 rounded-full bg-accent/15 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-widest text-accent">
                 <Sparkles className="h-3 w-3" strokeWidth={1.8} />
                 {lang === "lv" ? "T-Bode · no 1 gabala" : "T-Bode · from 1 piece"}
               </span>
@@ -128,7 +97,7 @@ const RetailSection = () => {
               <ul className="mt-7 space-y-3">
                 {benefits.map((b) => (
                   <li key={b.en} className="flex items-start gap-3 text-sm sm:text-base">
-                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-accent">
+                    <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-accent">
                       <b.icon className="h-4 w-4" strokeWidth={1.8} />
                     </span>
                     <span className="opacity-90">{lang === "lv" ? b.lv : b.en}</span>
@@ -136,114 +105,109 @@ const RetailSection = () => {
                 ))}
               </ul>
 
-              <div className="mt-8">
-                <a href={DESIGNER_URL} target="_blank" rel="noopener noreferrer" className="block sm:inline-block">
+              <div className="mt-8 flex flex-col items-start gap-3">
+                <a href={DESIGNER_URL} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
                   <Button
                     size="lg"
-                    className="promo-cta group h-auto w-full min-w-0 whitespace-normal rounded-xl border-0 px-6 py-4 font-heading text-xs uppercase tracking-wider text-accent-foreground transition-all duration-300 hover:scale-[1.02] sm:w-auto sm:text-sm"
+                    className="promo-cta group h-12 w-full justify-center gap-2 rounded-xl border-0 px-6 font-heading text-xs uppercase tracking-wider text-accent-foreground transition-transform duration-300 hover:scale-[1.02] sm:w-auto sm:text-sm"
                   >
-                    <Palette className="mr-2 h-4 w-4 shrink-0" strokeWidth={1.8} />
-                    {lang === "lv" ? "Atvērt dizaina konstruktoru" : "Open the design builder"}
-                    <ArrowRight className="ml-2 h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1" strokeWidth={1.8} />
+                    <Palette className="h-4 w-4 shrink-0" strokeWidth={1.8} />
+                    <span className="truncate">
+                      {lang === "lv" ? "Atvērt konstruktoru" : "Open the builder"}
+                    </span>
+                    <ArrowRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1" strokeWidth={1.8} />
                   </Button>
                 </a>
-                <p className="mt-3 text-[11px] uppercase tracking-wider opacity-50">t-bode.lv/design</p>
+                <p className="text-[11px] uppercase tracking-wider opacity-50">t-bode.lv/design</p>
               </div>
             </div>
 
-            {/* Interactive preview */}
+            {/* Animated realistic shirt */}
             <div className="relative">
-              <div className="absolute inset-6 rounded-3xl bg-accent/20 blur-3xl animate-promo-pulse" aria-hidden />
-              <motion.div
-                whileHover={{ y: -6, rotate: -0.6 }}
-                transition={{ type: "spring", stiffness: 220, damping: 18 }}
-                className="relative rounded-2xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-sm sm:p-7"
-              >
-                <div className="mb-4 flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-accent" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-white/25" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-white/25" />
-                  <span className="ml-2 font-heading text-[10px] font-bold uppercase tracking-widest opacity-50">
-                    {lang === "lv" ? "Dizaina priekšskatījums" : "Design preview"}
-                  </span>
-                </div>
+              <div className="absolute inset-8 rounded-full bg-accent/20 blur-3xl animate-promo-pulse" aria-hidden />
 
+              <div className="relative mx-auto aspect-square w-full max-w-[420px]">
+                {/* Colour layer masked to shirt silhouette */}
                 <motion.div
-                  key={`${colorIdx}-${printIdx}`}
-                  initial={{ scale: 0.96, opacity: 0.5 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="mx-auto h-52 w-full max-w-[260px] sm:h-64"
-                >
-                  <TShirtMockup
-                    color={color.hex}
-                    ink={color.ink}
-                    label={lang === "lv" ? printOptions[printIdx].lv : printOptions[printIdx].en}
-                  />
-                </motion.div>
+                  key={`c-${color.name}`}
+                  initial={{ opacity: 0.4 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0"
+                  style={{
+                    backgroundColor: color.hex,
+                    WebkitMaskImage: `url(${teeMockup})`,
+                    maskImage: `url(${teeMockup})`,
+                    WebkitMaskSize: "contain",
+                    maskSize: "contain",
+                    WebkitMaskRepeat: "no-repeat",
+                    maskRepeat: "no-repeat",
+                    WebkitMaskPosition: "center",
+                    maskPosition: "center",
+                  }}
+                />
+                {/* Fabric shading */}
+                <img
+                  src={teeMockup}
+                  alt={lang === "lv" ? "T-krekla priekšskatījums" : "T-shirt preview"}
+                  width={1024}
+                  height={1024}
+                  loading="lazy"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-contain mix-blend-multiply"
+                />
 
-                <div className="mt-5 space-y-4">
-                  <div>
-                    <span className="font-heading text-[10px] font-bold uppercase tracking-widest opacity-50">
-                      {lang === "lv" ? "Krāsa" : "Colour"}
-                    </span>
-                    <div className="mt-2 flex flex-wrap gap-2.5">
-                      {shirtColors.map((c, i) => (
-                        <button
-                          key={c.name}
-                          type="button"
-                          onClick={() => setColorIdx(i)}
-                          aria-label={c.name}
-                          aria-pressed={i === colorIdx}
-                          className={`h-9 w-9 rounded-full border transition-transform hover:scale-110 ${
-                            i === colorIdx ? "border-accent ring-2 ring-accent ring-offset-2 ring-offset-transparent" : "border-white/20"
-                          }`}
-                          style={{ backgroundColor: c.hex }}
+                {/* Rotating design on the chest */}
+                <div className="absolute left-1/2 top-[42%] flex h-[26%] w-[34%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`d-${step}`}
+                      initial={{ opacity: 0, scale: 0.8, y: 8 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: -8 }}
+                      transition={{ duration: 0.45, ease: "easeOut" }}
+                      className="flex h-full w-full items-center justify-center"
+                    >
+                      {design.kind === "image" ? (
+                        <img
+                          src={design.src}
+                          alt=""
+                          width={768}
+                          height={768}
+                          loading="lazy"
+                          className="h-full w-full object-contain"
                         />
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <span className="font-heading text-[10px] font-bold uppercase tracking-widest opacity-50">
-                      {lang === "lv" ? "Apdruka" : "Print"}
-                    </span>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {printOptions.map((p, i) => (
-                        <button
-                          key={p.en}
-                          type="button"
-                          onClick={() => setPrintIdx(i)}
-                          aria-pressed={i === printIdx}
-                          className={`flex min-h-[40px] items-center gap-1.5 rounded-lg border px-3 py-2 font-heading text-[10px] font-bold uppercase tracking-wider transition-colors ${
-                            i === printIdx
-                              ? "border-accent bg-accent text-accent-foreground"
-                              : "border-white/15 opacity-70 hover:border-white/40 hover:opacity-100"
-                          }`}
+                      ) : (
+                        <span
+                          className="text-center font-heading text-[clamp(0.65rem,2.2vw,1rem)] font-bold uppercase leading-tight tracking-widest"
+                          style={{ color: color.ink }}
                         >
-                          <p.icon className="h-3.5 w-3.5" strokeWidth={1.8} />
-                          {lang === "lv" ? p.lv : p.en}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                          {lang === "lv" ? design.lv : design.en}
+                        </span>
+                      )}
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
-              </motion.div>
+              </div>
 
-              {/* Floating stickers */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -right-1 -top-3 rounded-full border border-white/15 bg-accent px-3 py-1.5 font-heading text-[10px] font-bold uppercase tracking-wider text-accent-foreground shadow-lg sm:-right-3"
-              >
-                {lang === "lv" ? "No 1 gab." : "From 1 pc."}
-              </motion.div>
-              <motion.div
-                animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -bottom-3 -left-1 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 font-heading text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm sm:-left-3"
-              >
-                DTF PRINT
-              </motion.div>
+              {/* Colour dots */}
+              <div className="mt-4 flex items-center justify-center gap-2.5">
+                {shirtColors.map((c, i) => (
+                  <button
+                    key={c.name}
+                    type="button"
+                    onClick={() => setStep(i)}
+                    aria-label={c.name}
+                    aria-pressed={c.name === color.name}
+                    className={`h-8 w-8 rounded-full transition-transform hover:scale-110 ${
+                      c.name === color.name ? "ring-2 ring-accent ring-offset-2 ring-offset-transparent" : "opacity-70"
+                    }`}
+                    style={{ backgroundColor: c.hex }}
+                  />
+                ))}
+              </div>
+              <p className="mt-3 text-center font-heading text-[10px] font-bold uppercase tracking-widest opacity-50">
+                {lang === "lv" ? "Teksts · Logo · Foto · DTF apdruka" : "Text · Logo · Photo · DTF print"}
+              </p>
             </div>
           </div>
         </motion.div>
