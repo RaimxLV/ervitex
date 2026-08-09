@@ -127,37 +127,39 @@ const RetailSection = () => {
               <div className="absolute inset-8 rounded-full bg-accent/20 blur-3xl animate-promo-pulse" aria-hidden />
 
               <div className="relative mx-auto aspect-square w-full max-w-[420px]">
-                {/* Colour layer masked to shirt silhouette */}
-                <motion.div
-                  key={`c-${color.name}`}
-                  initial={{ opacity: 0.4 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="absolute inset-0"
-                  style={{
-                    backgroundColor: color.hex,
-                    WebkitMaskImage: `url(${teeMockup})`,
-                    maskImage: `url(${teeMockup})`,
-                    WebkitMaskSize: "contain",
-                    maskSize: "contain",
-                    WebkitMaskRepeat: "no-repeat",
-                    maskRepeat: "no-repeat",
-                    WebkitMaskPosition: "center",
-                    maskPosition: "center",
-                  }}
-                />
-                {/* Fabric shading */}
-                <img
-                  src={teeMockup}
-                  alt={lang === "lv" ? "T-krekla priekšskatījums" : "T-shirt preview"}
-                  width={1024}
-                  height={1024}
-                  loading="lazy"
-                  className="pointer-events-none absolute inset-0 h-full w-full object-contain mix-blend-multiply"
-                />
+                {/* Shirt body: colour + fabric shading in an isolated blend group */}
+                <div className="absolute inset-0 isolate">
+                  <motion.div
+                    key={`c-${color.name}`}
+                    initial={{ opacity: 0.4 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                    className="absolute inset-0"
+                    style={{
+                      backgroundColor: color.hex,
+                      WebkitMaskImage: `url(${teeMockup})`,
+                      maskImage: `url(${teeMockup})`,
+                      WebkitMaskSize: "contain",
+                      maskSize: "contain",
+                      WebkitMaskRepeat: "no-repeat",
+                      maskRepeat: "no-repeat",
+                      WebkitMaskPosition: "center",
+                      maskPosition: "center",
+                    }}
+                  />
+                  <img
+                    src={teeMockup}
+                    alt={lang === "lv" ? "T-krekla priekšskatījums" : "T-shirt preview"}
+                    width={1024}
+                    height={1024}
+                    loading="lazy"
+                    className="pointer-events-none absolute inset-0 h-full w-full object-contain mix-blend-multiply"
+                  />
+                </div>
 
                 {/* Rotating design on the chest */}
-                <div className="absolute left-1/2 top-[42%] flex h-[26%] w-[34%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+                <div className="absolute left-1/2 top-[44%] z-10 flex h-[30%] w-[40%] -translate-x-1/2 -translate-y-1/2 items-center justify-center">
+
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={`d-${step}`}
