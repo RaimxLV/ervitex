@@ -28,9 +28,10 @@ const TBodeWordmark = () => (
     <span className="text-accent transition-transform duration-500 ease-out group-hover/logo:translate-x-0 md:-translate-x-0">
       T
     </span>
-    <span className="inline-flex max-w-[1.2ch] overflow-hidden opacity-60 transition-all duration-500 ease-out group-hover/logo:max-w-[8ch] group-hover/logo:opacity-100">
+    <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-500 ease-out group-hover/logo:max-w-[9ch] group-hover/logo:opacity-100">
       <span className="whitespace-nowrap">-BODE</span>
     </span>
+
     <span className="pointer-events-none absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-accent transition-transform duration-500 ease-out group-hover/logo:scale-x-100" />
   </span>
 );
