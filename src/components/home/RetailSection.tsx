@@ -114,7 +114,7 @@ const RetailSection = () => {
             />
           </div>
 
-          <div className="grid items-center gap-6 p-5 sm:gap-8 sm:p-10 lg:grid-cols-[1.05fr_1fr] lg:gap-12 lg:p-14">
+          <div className="grid items-center gap-5 p-5 sm:gap-8 sm:p-10 lg:grid-cols-[1.05fr_1fr] lg:gap-12 lg:p-14">
             {/* Copy */}
             <div>
               <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-widest text-accent">
@@ -221,7 +221,7 @@ const RetailSection = () => {
                 type="button"
                 onClick={nextDesign}
                 aria-label={lang === "lv" ? "Rādīt nākamo dizainu" : "Show next design"}
-                className="relative mx-auto block aspect-square w-full max-w-[300px] cursor-pointer rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-accent sm:max-w-[360px] lg:max-w-[440px]"
+                className="relative mx-auto block aspect-square w-full max-w-[230px] cursor-pointer rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-accent sm:max-w-[360px] lg:max-w-[440px]"
               >
                 {/* Shirt body: colour + fabric shading in an isolated blend group */}
                 <motion.div
