@@ -134,7 +134,14 @@
     50% { opacity: 0.9; transform: scale(1.04); }
   }
 
+  @keyframes promo-ticker {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-50%, 0, 0); }
+  }
+
   .animate-promo-drift { animation: promo-drift 14s ease-in-out infinite; }
   .animate-promo-drift-alt { animation: promo-drift-alt 18s ease-in-out infinite; }
   .animate-promo-pulse { animation: promo-pulse 3s ease-in-out infinite; }
+  .animate-promo-ticker { animation: promo-ticker 26s linear infinite; }
 }
+
