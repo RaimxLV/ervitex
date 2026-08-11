@@ -18,7 +18,7 @@ const DESIGNER_URL = "https://t-bode.lv/design";
 const designs = [printA, printB, printC, printD, printE, printF, printG];
 
 const HERO_LQIP =
-  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAASACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDG0xhDdh3kKRhSWK+mKsrqcP8AaAlUyjPG9+/GOlV3sT5DMJV+7nGOtUYlWSVEZtgY43elTdMq1jqhLdNeoypm1IG7dH+fNM12OP8AdiJgxCkkA8j0rWyvljByoUc+orl9Tv3ku5dkqlcBAwGcgUoybYSirGcvSq4+8PrRRVslHew/8eaf7g/lXLwqrK2QDyeooorKBpLc/9k=";
+  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAASACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwC7ZvDLnEiHFNuL6BdSitBNEI2BEnXcG7DNc/bTyovy4cE/dUnFU5lJvypLZZwT681nymjkdpK832v7LC43BA+5lwOuMZ9aWMTvlZZEVkPII7VBJMW0tmKMxK4wTz6ZrDe7nAJ/eADqSDUOLZSkirZng/Wmtzfg9/NT+VFFamZI8jjVGAdgN57/AOzVieR9jLvbHpmiiofQtdT/2Q==";
 
 
 /**
@@ -240,7 +240,7 @@ const RetailSection = () => {
       {/* Photo layer with interactive prints */}
       <div ref={stageRef} className="absolute inset-0 -z-10" aria-hidden={false}>
         <div
-          className="absolute top-1/2 h-full w-auto min-w-full -translate-x-1/2 -translate-y-1/2 aspect-[1920/1088] left-[34%] sm:left-1/2 lg:left-[66%] bg-cover bg-center"
+          className="absolute left-0 top-0 w-full aspect-[1920/1088] bg-cover bg-top sm:left-1/2 sm:h-full sm:w-auto sm:min-w-full sm:-translate-x-1/2"
           style={{ backgroundImage: `url(${HERO_LQIP})` }}
         >
           <img
@@ -258,14 +258,14 @@ const RetailSection = () => {
             className="h-full w-full object-cover"
           />
           {/* Man — black tee */}
-          <BackPrint ready={ready} index={indexA} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
+          <BackPrint ready={ready} index={indexA} x="38.2%" y="52%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
           {/* Woman — off-white tee */}
-          <BackPrint ready={ready} index={indexB} x="63.5%" y="60%" w="19.5%" h="27%" rotate={2} opacity={0.94} />
+          <BackPrint ready={ready} index={indexB} x="61.5%" y="57%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
         </div>
 
         {/* Lighter cinematic gradients for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 sm:from-black/50 sm:via-transparent sm:to-black/20" />
 
         {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
@@ -276,7 +276,7 @@ const RetailSection = () => {
         <GlitchSparks />
       </div>
 
-      <div className="container relative flex min-h-[520px] flex-col justify-center py-20 sm:min-h-[600px] sm:py-28 lg:min-h-[680px]">
+      <div className="container relative flex flex-col justify-center pb-16 pt-[calc(56.7vw+1.5rem)] sm:min-h-[600px] sm:py-28 sm:pt-28 lg:min-h-[680px]">
         <div className="max-w-2xl">
           <h2
             id="tbode-promo-title"
