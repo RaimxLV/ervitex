@@ -285,7 +285,7 @@ const RetailSection = () => {
 
         {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden sm:justify-end" aria-hidden>
-          <GlitchLogo className="h-[37%] w-[168%] max-w-none rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)] sm:h-[26%] sm:w-[95%] sm:translate-x-[6%] lg:h-[24%] lg:w-[82%] lg:translate-x-[8%]" />
+          <GlitchLogo className="h-[30%] w-[150%] max-w-none translate-y-[42%] rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)] sm:h-[22%] sm:w-[86%] sm:translate-x-[8%] sm:translate-y-[46%] lg:h-[20%] lg:w-[74%] lg:translate-x-[10%] lg:translate-y-[48%]" />
         </div>
 
         {/* Random glitch sparks */}
