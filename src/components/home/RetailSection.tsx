@@ -48,22 +48,22 @@ const GlitchWordmark = ({ className, strokeWidth = 1.6 }: { className?: string; 
   return (
     <svg viewBox="0 0 600 110" role="img" aria-label="T-Bode" className={className}>
       {/* RGB split layers */}
-      <g className="motion-safe:glitch-layer-a" stroke="#00E5FF" opacity={0.8}>
+      <g className="glitch-layer-a" stroke="#00E5FF" opacity={0.8}>
         <text {...textProps}>T-BODE</text>
         <text {...subProps}>T-SHIRT STORE</text>
       </g>
-      <g className="motion-safe:glitch-layer-b" stroke="#FF1E4D" opacity={0.8}>
+      <g className="glitch-layer-b" stroke="#FF1E4D" opacity={0.8}>
         <text {...textProps}>T-BODE</text>
         <text {...subProps}>T-SHIRT STORE</text>
       </g>
       {/* Main white outline */}
-      <g className="motion-safe:glitch-layer-main" stroke="#FFFFFF">
+      <g className="glitch-layer-main" stroke="#FFFFFF">
         <text {...textProps}>T-BODE</text>
         <text {...subProps}>T-SHIRT STORE</text>
         <line x1={120} y1={74} x2={480} y2={74} strokeWidth={strokeWidth * 0.7} />
       </g>
       {/* Sliced flicker copy */}
-      <g className="motion-safe:glitch-layer-slice" stroke="#FFFFFF" opacity={0.5}>
+      <g className="glitch-layer-slice" stroke="#FFFFFF" opacity={0.5}>
         <text {...textProps}>T-BODE</text>
       </g>
     </svg>
@@ -213,7 +213,7 @@ const RetailSection = () => {
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
           <GlitchWordmark
             strokeWidth={0.8}
-            className="w-[150%] max-w-none opacity-[0.22] mix-blend-screen drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]"
+            className="w-[160%] max-w-none rotate-[-35deg] opacity-[0.25] mix-blend-screen drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]"
           />
         </div>
 
