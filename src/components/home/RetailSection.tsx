@@ -222,6 +222,7 @@ const RetailSection = () => {
     }, 1000);
     return () => {
       clearInterval(idA);
+      window.clearTimeout(offset);
       clearInterval(idB);
     };
   }, [running, indexA, indexB, ready]);
