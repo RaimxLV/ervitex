@@ -4,6 +4,7 @@ import { ArrowRight, MousePointerClick, Timer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import heroDuo from "@/assets/tbode-hero-duo.jpg";
+import tbodeLogo from "@/assets/tbode-logo.webp";
 import printA from "@/assets/print-x1.webp";
 import printB from "@/assets/print-x2.webp";
 import printC from "@/assets/print-x3.webp";
@@ -18,61 +19,93 @@ const DESIGNER_URL =
 const designs = [printA, printB, printC, printD, printE, printF, printG];
 
 /**
- * Outline-only T-Bode wordmark with a neon glitch effect.
- * Nothing is filled — pure stroked contours, with RGB-split layers that jitter.
+ * The original T-Bode logo (unaltered artwork) with an RGB-split neon glitch treatment.
+ * Layers are copies of the same file — no re-drawn / interpreted wordmark.
  */
-const GlitchWordmark = ({ className, strokeWidth = 1.6 }: { className?: string; strokeWidth?: number }) => {
-  const textProps = {
-    x: 300,
-    y: 62,
-    textAnchor: "middle" as const,
-    fontFamily: "var(--font-heading, 'Space Grotesk', sans-serif)",
-    fontSize: 58,
-    fontWeight: 700,
-    letterSpacing: 4,
-    fill: "none",
-    strokeWidth,
-    strokeLinejoin: "round" as const,
-  };
-  const subProps = {
-    x: 300,
-    y: 88,
-    textAnchor: "middle" as const,
-    fontFamily: "var(--font-heading, 'Space Grotesk', sans-serif)",
-    fontSize: 15,
-    letterSpacing: 9,
-    fill: "none",
-    strokeWidth: strokeWidth * 0.55,
-  };
+const GlitchLogo = ({ className }: { className?: string }) => (
+  <div className={`relative ${className ?? ""}`} aria-hidden>
+    <img
+      src={tbodeLogo}
+      alt=""
+      className="glitch-layer-a absolute inset-0 h-full w-full object-contain mix-blend-screen"
+      style={{ filter: "drop-shadow(0 0 6px #00E5FF)", opacity: 0.7 }}
+      loading="lazy"
+      decoding="async"
+    />
+    <img
+      src={tbodeLogo}
+      alt=""
+      className="glitch-layer-b absolute inset-0 h-full w-full object-contain mix-blend-screen"
+      style={{ filter: "drop-shadow(0 0 6px #FF1E4D)", opacity: 0.7 }}
+      loading="lazy"
+      decoding="async"
+    />
+    <img
+      src={tbodeLogo}
+      alt="T-Bode"
+      className="glitch-layer-main relative h-full w-full object-contain"
+      loading="lazy"
+      decoding="async"
+    />
+    <img
+      src={tbodeLogo}
+      alt=""
+      className="glitch-layer-slice absolute inset-0 h-full w-full object-contain"
+      style={{ opacity: 0.45 }}
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+);
+
+/** Random glitch sparks — small crosses and circles flickering at random spots. */
+const GlitchSparks = () => {
+  const sparks = useMemo(
+    () =>
+      Array.from({ length: 14 }).map((_, i) => ({
+        id: i,
+        left: `${5 + Math.random() * 90}%`,
+        top: `${8 + Math.random() * 84}%`,
+        size: 8 + Math.random() * 18,
+        delay: Math.random() * 6,
+        duration: 2.4 + Math.random() * 3,
+        cross: i % 2 === 0,
+        color: i % 3 === 0 ? "#FF1E4D" : i % 3 === 1 ? "#00E5FF" : "#FFFFFF",
+      })),
+    [],
+  );
 
   return (
-    <svg viewBox="0 0 600 110" role="img" aria-label="T-Bode" className={className}>
-      {/* RGB split layers */}
-      <g className="glitch-layer-a" stroke="#00E5FF" opacity={0.8}>
-        <text {...textProps}>T-BODE</text>
-        <text {...subProps}>T-SHIRT STORE</text>
-      </g>
-      <g className="glitch-layer-b" stroke="#FF1E4D" opacity={0.8}>
-        <text {...textProps}>T-BODE</text>
-        <text {...subProps}>T-SHIRT STORE</text>
-      </g>
-      {/* Main white outline */}
-      <g className="glitch-layer-main" stroke="#FFFFFF">
-        <text {...textProps}>T-BODE</text>
-        <text {...subProps}>T-SHIRT STORE</text>
-        <line x1={120} y1={74} x2={480} y2={74} strokeWidth={strokeWidth * 0.7} />
-      </g>
-      {/* Sliced flicker copy */}
-      <g className="glitch-layer-slice" stroke="#FFFFFF" opacity={0.5}>
-        <text {...textProps}>T-BODE</text>
-      </g>
-    </svg>
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      {sparks.map((s) => (
+        <span
+          key={s.id}
+          className="absolute motion-safe:animate-glitch-spark"
+          style={{
+            left: s.left,
+            top: s.top,
+            width: s.size,
+            height: s.size,
+            animationDelay: `${s.delay}s`,
+            animationDuration: `${s.duration}s`,
+          }}
+        >
+          <svg viewBox="0 0 20 20" className="h-full w-full" style={{ filter: `drop-shadow(0 0 6px ${s.color})` }}>
+            {s.cross ? (
+              <g stroke={s.color} strokeWidth={1.6}>
+                <line x1={2} y1={10} x2={18} y2={10} />
+                <line x1={10} y1={2} x2={10} y2={18} />
+              </g>
+            ) : (
+              <circle cx={10} cy={10} r={7} fill="none" stroke={s.color} strokeWidth={1.6} />
+            )}
+          </svg>
+        </span>
+      ))}
+    </div>
   );
 };
 
-const TBodeWordmark = () => (
-  <GlitchWordmark className="h-12 w-auto max-w-[260px] drop-shadow-[0_0_18px_rgba(255,30,77,0.45)] sm:h-14 sm:max-w-[320px]" />
-);
 
 
 /**
