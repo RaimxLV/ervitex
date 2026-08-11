@@ -196,10 +196,10 @@ const RetailSection = () => {
   const running = inView && tabVisible && !reduceMotion && !paused;
 
   // Stream the artwork in during idle time so the banner paints immediately.
-  const [ready, setReady] = useState(2);
+  const [ready, setReady] = useState(3);
   useEffect(() => {
     if (ready >= designs.length) return;
-    const id = window.setTimeout(() => setReady((r) => Math.min(r + 1, designs.length)), 250);
+    const id = window.setTimeout(() => setReady((r) => Math.min(r + 1, designs.length)), 120);
     return () => window.clearTimeout(id);
   }, [ready]);
 
