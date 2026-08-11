@@ -97,7 +97,7 @@ const RetailSection = () => {
 
   useEffect(() => {
     if (!running) return;
-    const id = setInterval(() => setIndex((i) => (i + 1) % designs.length), 2800);
+    const id = setInterval(() => setIndex((i) => (i + 1) % designs.length), 4500);
     return () => clearInterval(id);
   }, [running]);
 
