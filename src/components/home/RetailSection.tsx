@@ -110,8 +110,8 @@ const GlitchSparks = () => {
 
 /**
  * Print rendered on a model's back, positioned in % of the photo.
- * All designs are mounted at once (hard switch, no fade) so swapping is instant
- * and no image has to be fetched mid-animation.
+ * Designs are mounted progressively (`ready` = how many may load) so the banner
+ * paints fast and later artwork streams in during idle time.
  */
 const BackPrint = ({
   index,
@@ -121,7 +121,7 @@ const BackPrint = ({
   h,
   rotate,
   opacity,
-  eager,
+  ready,
 }: {
   index: number;
   x: string;
@@ -130,27 +130,32 @@ const BackPrint = ({
   h: string;
   rotate: number;
   opacity: number;
-  eager: boolean;
+  ready: number;
 }) => (
   <div
     className="pointer-events-none absolute"
     style={{ left: x, top: y, width: w, height: h, transform: `translate(-50%,-50%) rotate(${rotate}deg)` }}
     aria-hidden
   >
-    {designs.map((src, i) => (
-      <img
-        key={src}
-        src={eager || i === index ? src : undefined}
-        data-src={src}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        style={{ opacity: i === index ? opacity : 0 }}
-        className="absolute inset-0 h-full w-full object-contain"
-      />
-    ))}
+    {designs.map((src, i) => {
+      const load = i < ready || i === index;
+      return load ? (
+        <img
+          key={src}
+          src={src}
+          alt=""
+          width={480}
+          height={480}
+          decoding="async"
+          fetchPriority={i === 0 ? "high" : "low"}
+          style={{ opacity: i === index ? opacity : 0 }}
+          className="absolute inset-0 h-full w-full object-contain"
+        />
+      ) : null;
+    })}
   </div>
 );
+
 
 
 
