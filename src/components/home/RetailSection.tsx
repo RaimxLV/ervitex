@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
-import { ArrowRight, MousePointerClick, Timer, Sparkles, Upload, Shirt, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import heroDuo from "@/assets/tbode-hero-duo.webp";
@@ -13,8 +13,7 @@ import printE from "@/assets/print-x5.webp";
 import printF from "@/assets/print-x6.webp";
 import printG from "@/assets/print-x7.webp";
 
-const DESIGNER_URL =
-  "https://t-bode.lv/design?utm_source=ervitex.lv&utm_medium=promo_banner&utm_campaign=tbode_designer";
+const DESIGNER_URL = "https://t-bode.lv/design";
 
 const designs = [printA, printB, printC, printD, printE, printF, printG];
 
@@ -224,21 +223,6 @@ const RetailSection = () => {
   }, [running, indexA, indexB, ready]);
 
 
-  const next = useCallback(() => {
-    setIndexA((a) => (a + 1) % designs.length);
-    setIndexB((b) => (b + 2) % designs.length);
-  }, []);
-
-
-  const highlights = useMemo(
-    () => [
-      { icon: MousePointerClick, lv: "Dizains tiešsaistē", en: "Design online" },
-      { icon: Timer, lv: "2 minūtēs", en: "In 2 minutes" },
-      { icon: Sparkles, lv: "No 1 gabala", en: "From 1 piece" },
-    ],
-    [],
-  );
-
   const ticker = lang === "lv" ? "OVERSIZE  •  DTF APDRUKA  •  NO 1 GABALA  •  T-BODE" : "OVERSIZE  •  DTF PRINT  •  FROM 1 PIECE  •  T-BODE";
 
   return (
@@ -270,19 +254,8 @@ const RetailSection = () => {
           />
           {/* Man — black tee */}
           <BackPrint ready={ready} index={indexA} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
-          {/* Woman — off-white tee (bigger print on the flat upper back) */}
-          <BackPrint
-            ready={ready}
-            index={indexB}
-            x="63.5%"
-            y="60%"
-            w="19.5%"
-            h="27%"
-            rotate={2}
-            opacity={0.94}
-          />
-
-
+          {/* Woman — off-white tee */}
+          <BackPrint ready={ready} index={indexB} x="63.5%" y="60%" w="19.5%" h="27%" rotate={2} opacity={0.94} />
         </div>
 
         {/* Lighter cinematic gradients for text legibility */}
@@ -294,97 +267,41 @@ const RetailSection = () => {
           <GlitchLogo className="h-[37%] w-[168%] max-w-none rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]" />
         </div>
 
-
         {/* Random glitch sparks */}
         <GlitchSparks />
       </div>
 
-      <div className="container relative flex min-h-[660px] flex-col justify-start py-14 sm:min-h-[640px] sm:justify-center sm:py-24 lg:min-h-[720px]">
+      <div className="container relative flex min-h-[520px] flex-col justify-center py-20 sm:min-h-[600px] sm:py-28 lg:min-h-[680px]">
         <div className="max-w-2xl">
-
-
           <h2
             id="tbode-promo-title"
-            className="mt-6 font-heading text-[clamp(2.4rem,7vw,5rem)] font-bold uppercase leading-[0.9] tracking-tight"
+            className="font-heading text-[clamp(2.2rem,5.4vw,4.2rem)] font-bold uppercase leading-[0.95] tracking-tight"
           >
+            {lang === "lv"
+              ? "Nepieciešams T-krekls vai hūdijs dāvanai?"
+              : "Need a T-shirt or hoodie as a gift?"}
+          </h2>
+
+          <p className="mt-8 max-w-xl text-lg font-medium leading-relaxed opacity-90 sm:text-xl">
             {lang === "lv" ? (
               <>
-                Oversize.
-                <br />
-                <span className="text-accent">Tavs dizains.</span>
-                <br />
-                Bez minimuma.
+                Izveido savu dizainu <span className="text-accent">ONLINE</span> un saņem 1–2 dienās jebkurā pakomātā visā LATVIJĀ.
               </>
             ) : (
               <>
-                Oversize.
-                <br />
-                <span className="text-accent">Your design.</span>
-                <br />
-                No minimums.
+                Create your design <span className="text-accent">ONLINE</span> and get it in 1–2 days to any parcel locker in Latvia.
               </>
             )}
-          </h2>
-
-          <p className="mt-6 max-w-md text-base leading-relaxed opacity-85 sm:text-lg">
-            {lang === "lv"
-              ? "Profesionāla DTF apdruka uz oversize krekliem un hūdijiem. Uzliec savu grafiku tiešsaistes konstruktorā un pasūti jau no viena gabala."
-              : "Professional DTF printing on oversize tees and hoodies. Drop your graphic into the online builder and order from a single piece."}
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
-            {highlights.map((h) => (
-              <span key={h.en} className="inline-flex items-center gap-2 text-sm font-medium">
-                <h.icon className="h-4 w-4 text-accent" strokeWidth={1.8} aria-hidden />
-                {lang === "lv" ? h.lv : h.en}
-              </span>
-            ))}
-          </div>
-
-          {/* Mini visual of the online designer: upload → place on tee → order */}
-          <div className="mt-8 inline-flex max-w-md items-center gap-4 border border-white/15 bg-black/45 p-3 backdrop-blur-md">
-            <div className="relative h-24 w-20 shrink-0 border border-white/10 bg-white/5">
-              <span className="absolute inset-x-2 top-2 block text-[0.55rem] uppercase tracking-[0.2em] opacity-60">
-                {lang === "lv" ? "priekšskatījums" : "preview"}
-              </span>
-              <Shirt className="absolute inset-0 m-auto h-16 w-16 opacity-25" strokeWidth={1} aria-hidden />
-              <img
-                src={designs[indexA]}
-                alt=""
-                className="absolute left-1/2 top-[54%] h-9 w-9 -translate-x-1/2 -translate-y-1/2 object-contain"
-                loading="lazy"
-                decoding="async"
-                aria-hidden
-              />
-              <span className="absolute inset-x-1 bottom-1 flex items-center justify-center gap-1 text-[0.5rem] uppercase tracking-widest text-accent">
-                <MousePointerClick className="h-3 w-3" strokeWidth={2} aria-hidden />
-                {lang === "lv" ? "velc & liec" : "drag & drop"}
-              </span>
-            </div>
-
-            <ol className="space-y-1.5 text-xs">
-              {[
-                { icon: Upload, lv: "Augšupielādē savu grafiku", en: "Upload your graphic" },
-                { icon: MousePointerClick, lv: "Novieto uz krekla konstruktorā", en: "Place it on the tee in the builder" },
-                { icon: Check, lv: "Redzi rezultātu un pasūti", en: "See the result and order" },
-              ].map((s) => (
-                <li key={s.en} className="flex items-center gap-2">
-                  <s.icon className="h-3.5 w-3.5 shrink-0 text-accent" strokeWidth={2} aria-hidden />
-                  <span className="opacity-90">{lang === "lv" ? s.lv : s.en}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
-
-
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <a href={DESIGNER_URL} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+          <div className="mt-12">
+            <a href={DESIGNER_URL} target="_blank" rel="noopener noreferrer" className="inline-block w-full sm:w-auto">
               <Button
                 size="lg"
-                className="promo-cta group h-14 w-full justify-center gap-3 rounded-none border-0 px-8 font-heading text-sm uppercase tracking-[0.15em] text-accent-foreground sm:w-auto"
+                className="promo-cta group h-14 w-full justify-center gap-3 rounded-none border-0 px-10 font-heading text-sm uppercase tracking-[0.15em] text-accent-foreground sm:w-auto"
               >
                 <span className="whitespace-nowrap">
-                  {lang === "lv" ? "Veidot savu dizainu" : "Create your design"}
+                  {lang === "lv" ? "Izveidot dizainu" : "Create your design"}
                 </span>
                 <ArrowRight
                   className="h-4 w-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1.5"
@@ -393,26 +310,7 @@ const RetailSection = () => {
                 />
               </Button>
             </a>
-
-            <Button
-              type="button"
-              size="lg"
-              variant="outline"
-              onClick={next}
-              className="h-14 w-full justify-center rounded-none border-white/30 bg-white/5 px-8 font-heading text-sm uppercase tracking-[0.15em] text-current backdrop-blur-sm transition-colors hover:bg-white/15 sm:w-auto"
-            >
-              {lang === "lv" ? "Mainīt apdruku" : "Switch the print"}
-            </Button>
           </div>
-
-          <a
-            href="https://t-bode.lv"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="story-link mt-6 inline-block text-sm uppercase tracking-[0.2em] opacity-80 hover:opacity-100"
-          >
-            {lang === "lv" ? "T-Bode veikals" : "T-Bode store"}
-          </a>
         </div>
       </div>
 
