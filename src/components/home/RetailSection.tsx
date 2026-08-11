@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
-import { ArrowRight, MousePointerClick, Timer, Sparkles } from "lucide-react";
+import { ArrowRight, MousePointerClick, Timer, Sparkles, Upload, Shirt, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import heroDuo from "@/assets/tbode-hero-duo.jpg";
+import heroDuo from "@/assets/tbode-hero-duo.webp";
 import tbodeLogo from "@/assets/tbode-logo.webp";
 import printA from "@/assets/print-x1.webp";
 import printB from "@/assets/print-x2.webp";
@@ -18,27 +18,43 @@ const DESIGNER_URL =
 
 const designs = [printA, printB, printC, printD, printE, printF, printG];
 
+const HERO_LQIP =
+  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAASACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDG0xhDdh3kKRhSWK+mKsrqcP8AaAlUyjPG9+/GOlV3sT5DMJV+7nGOtUYlWSVEZtgY43elTdMq1jqhLdNeoypm1IG7dH+fNM12OP8AdiJgxCkkA8j0rWyvljByoUc+orl9Tv3ku5dkqlcBAwGcgUoybYSirGcvSq4+8PrRRVslHew/8eaf7g/lXLwqrK2QDyeooorKBpLc/9k=";
+
+
 /**
- * The original T-Bode logo (unaltered artwork) with an RGB-split neon glitch treatment.
- * Layers are copies of the same file — no re-drawn / interpreted wordmark.
+ * The original T-Bode logo (unaltered artwork) with a true RGB-split neon glitch treatment.
+ * The R / G / B layers are masked copies of the very same file — no re-drawn wordmark.
  */
+const rgbLayer = (color: string): React.CSSProperties => ({
+  backgroundColor: color,
+  WebkitMaskImage: `url(${tbodeLogo})`,
+  maskImage: `url(${tbodeLogo})`,
+  WebkitMaskRepeat: "no-repeat",
+  maskRepeat: "no-repeat",
+  WebkitMaskPosition: "center",
+  maskPosition: "center",
+  WebkitMaskSize: "contain",
+  maskSize: "contain",
+  mixBlendMode: "screen",
+});
+
 const GlitchLogo = ({ className }: { className?: string }) => (
   <div className={`relative ${className ?? ""}`} aria-hidden>
-    <img
-      src={tbodeLogo}
-      alt=""
-      className="glitch-layer-a absolute inset-0 h-full w-full object-contain mix-blend-screen"
-      style={{ filter: "drop-shadow(0 0 6px #00E5FF)", opacity: 0.7 }}
-      loading="lazy"
-      decoding="async"
+    {/* R */}
+    <span
+      className="glitch-layer-b absolute inset-0 block"
+      style={{ ...rgbLayer("#FF1E4D"), opacity: 0.85 }}
     />
-    <img
-      src={tbodeLogo}
-      alt=""
-      className="glitch-layer-b absolute inset-0 h-full w-full object-contain mix-blend-screen"
-      style={{ filter: "drop-shadow(0 0 6px #FF1E4D)", opacity: 0.7 }}
-      loading="lazy"
-      decoding="async"
+    {/* G */}
+    <span
+      className="glitch-layer-slice absolute inset-0 block"
+      style={{ ...rgbLayer("#39FF6A"), opacity: 0.5 }}
+    />
+    {/* B */}
+    <span
+      className="glitch-layer-a absolute inset-0 block"
+      style={{ ...rgbLayer("#00E5FF"), opacity: 0.85 }}
     />
     <img
       src={tbodeLogo}
@@ -47,16 +63,9 @@ const GlitchLogo = ({ className }: { className?: string }) => (
       loading="lazy"
       decoding="async"
     />
-    <img
-      src={tbodeLogo}
-      alt=""
-      className="glitch-layer-slice absolute inset-0 h-full w-full object-contain"
-      style={{ opacity: 0.45 }}
-      loading="lazy"
-      decoding="async"
-    />
   </div>
 );
+
 
 /** Random glitch sparks — small crosses and circles flickering at random spots. */
 const GlitchSparks = () => {
@@ -188,12 +197,13 @@ const RetailSection = () => {
   const running = inView && tabVisible && !reduceMotion && !paused;
 
   // Stream the artwork in during idle time so the banner paints immediately.
-  const [ready, setReady] = useState(1);
+  const [ready, setReady] = useState(2);
   useEffect(() => {
-    if (!inView || ready >= designs.length) return;
-    const id = window.setTimeout(() => setReady((r) => Math.min(r + 1, designs.length)), 600);
+    if (ready >= designs.length) return;
+    const id = window.setTimeout(() => setReady((r) => Math.min(r + 1, designs.length)), 250);
     return () => window.clearTimeout(id);
-  }, [inView, ready]);
+  }, [ready]);
+
 
   // Random, independent switching for each model (never the same design at once).
   useEffect(() => {
@@ -240,7 +250,10 @@ const RetailSection = () => {
     >
       {/* Photo layer with interactive prints */}
       <div ref={stageRef} className="absolute inset-0 -z-10" aria-hidden={false}>
-        <div className="absolute top-1/2 h-full w-auto min-w-full -translate-x-1/2 -translate-y-1/2 aspect-[1920/1088] left-[34%] sm:left-1/2 lg:left-[66%]">
+        <div
+          className="absolute top-1/2 h-full w-auto min-w-full -translate-x-1/2 -translate-y-1/2 aspect-[1920/1088] left-[34%] sm:left-1/2 lg:left-[66%] bg-cover bg-center"
+          style={{ backgroundImage: `url(${HERO_LQIP})` }}
+        >
           <img
             src={heroDuo}
             alt={
@@ -250,7 +263,8 @@ const RetailSection = () => {
             }
             width={1920}
             height={1088}
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
             decoding="async"
             className="h-full w-full object-cover"
           />
@@ -277,8 +291,9 @@ const RetailSection = () => {
 
         {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
-          <GlitchLogo className="h-[46%] w-[210%] max-w-none rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]" />
+          <GlitchLogo className="h-[37%] w-[168%] max-w-none rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]" />
         </div>
+
 
         {/* Random glitch sparks */}
         <GlitchSparks />
@@ -325,6 +340,42 @@ const RetailSection = () => {
               </span>
             ))}
           </div>
+
+          {/* Mini visual of the online designer: upload → place on tee → order */}
+          <div className="mt-8 inline-flex max-w-md items-center gap-4 border border-white/15 bg-black/45 p-3 backdrop-blur-md">
+            <div className="relative h-24 w-20 shrink-0 border border-white/10 bg-white/5">
+              <span className="absolute inset-x-2 top-2 block text-[0.55rem] uppercase tracking-[0.2em] opacity-60">
+                {lang === "lv" ? "priekšskatījums" : "preview"}
+              </span>
+              <Shirt className="absolute inset-0 m-auto h-16 w-16 opacity-25" strokeWidth={1} aria-hidden />
+              <img
+                src={designs[indexA]}
+                alt=""
+                className="absolute left-1/2 top-[54%] h-9 w-9 -translate-x-1/2 -translate-y-1/2 object-contain"
+                loading="lazy"
+                decoding="async"
+                aria-hidden
+              />
+              <span className="absolute inset-x-1 bottom-1 flex items-center justify-center gap-1 text-[0.5rem] uppercase tracking-widest text-accent">
+                <MousePointerClick className="h-3 w-3" strokeWidth={2} aria-hidden />
+                {lang === "lv" ? "velc & liec" : "drag & drop"}
+              </span>
+            </div>
+
+            <ol className="space-y-1.5 text-xs">
+              {[
+                { icon: Upload, lv: "Augšupielādē savu grafiku", en: "Upload your graphic" },
+                { icon: MousePointerClick, lv: "Novieto uz krekla konstruktorā", en: "Place it on the tee in the builder" },
+                { icon: Check, lv: "Redzi rezultātu un pasūti", en: "See the result and order" },
+              ].map((s) => (
+                <li key={s.en} className="flex items-center gap-2">
+                  <s.icon className="h-3.5 w-3.5 shrink-0 text-accent" strokeWidth={2} aria-hidden />
+                  <span className="opacity-90">{lang === "lv" ? s.lv : s.en}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
             <a href={DESIGNER_URL} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
