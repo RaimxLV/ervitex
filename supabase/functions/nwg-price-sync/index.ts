@@ -122,6 +122,7 @@ Deno.serve(async (req) => {
         // Collect target SKUs for our partner brands.
         const skus: string[] = [];
         const pnBySku = new Map<string, string>();
+        const itemBySku = new Map<string, string>();
         const pageSize = 1000;
 
         const productNumbers: string[] = [];
@@ -146,7 +147,7 @@ Deno.serve(async (req) => {
           for (let from = 0; ; from += pageSize) {
             let q = sb
               .from("nwg_skus")
-              .select("sku, product_number")
+              .select("sku, product_number, item_number")
               .in("product_number", pnChunk)
               .eq("active", true)
               .eq("discontinued", false)
@@ -160,6 +161,7 @@ Deno.serve(async (req) => {
               if (!r.sku) continue;
               skus.push(r.sku);
               if (r.product_number) pnBySku.set(r.sku, r.product_number);
+              if (r.item_number) itemBySku.set(r.sku, r.item_number);
             }
             if (skus.length >= limit) break outer;
             if (data.length < pageSize) break;
@@ -191,6 +193,7 @@ Deno.serve(async (req) => {
             .map((r) => ({
               sku: r.sku,
               product_number: pnBySku.get(r.sku),
+              item_number: itemBySku.get(r.sku) ?? null,
               purchase_price: r.num,
               purchase_currency: "EUR",
               purchase_updated_at: now,
