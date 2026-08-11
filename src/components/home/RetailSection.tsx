@@ -246,10 +246,10 @@ const RetailSection = () => {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Photo layer with interactive prints */}
+      {/* Photo layer with interactive prints — full width on mobile, right column on desktop */}
       <div ref={stageRef} className="absolute inset-0 -z-10" aria-hidden={false}>
         <div
-          className="absolute left-0 top-0 w-full aspect-[1920/1088] bg-cover bg-top sm:h-full sm:w-auto sm:min-w-full sm:translate-x-0"
+          className="absolute left-0 top-0 w-full aspect-[1920/1088] bg-cover bg-top sm:left-auto sm:right-0 sm:h-full sm:w-[62%] sm:aspect-auto lg:w-[58%]"
           style={{ backgroundImage: `url(${HERO_LQIP})` }}
         >
           <img
@@ -264,17 +264,23 @@ const RetailSection = () => {
             loading="eager"
             fetchPriority="high"
             decoding="async"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover object-top"
           />
-          {/* Man — black tee */}
-          <BackPrint ready={ready} index={indexA} x="38.2%" y="52%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
-          {/* Woman — off-white tee */}
-          <BackPrint ready={ready} index={indexB} x="61.5%" y="57%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
+          {/* Prints are positioned against the visible photo box */}
+          <div className="absolute inset-0 sm:-left-[35%] sm:-right-[35%]">
+            {/* Man — black tee */}
+            <BackPrint ready={ready} index={indexA} x="38.2%" y="52%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
+            {/* Woman — off-white tee */}
+            <BackPrint ready={ready} index={indexB} x="61.5%" y="57%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
+          </div>
+
+          {/* Soft blend into the text side */}
+          <div className="pointer-events-none absolute inset-y-0 -left-1 hidden w-1/3 bg-gradient-to-r from-background via-background/70 to-transparent sm:block" />
         </div>
 
-        {/* Lighter cinematic gradients for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent sm:bg-gradient-to-l sm:from-black/75 sm:via-black/35 sm:to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 sm:from-black/50 sm:via-transparent sm:to-black/20" />
+        {/* Cinematic gradients for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 sm:from-black/45 sm:via-transparent sm:to-black/15" />
 
         {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
@@ -286,7 +292,7 @@ const RetailSection = () => {
       </div>
 
       <div className="container relative flex flex-col justify-center pb-16 pt-[calc(56.7vw+1.5rem)] sm:min-h-[600px] sm:py-28 sm:pt-28 lg:min-h-[680px]">
-        <div className="max-w-2xl sm:ml-auto sm:max-w-xl lg:max-w-[34rem]">
+        <div className="max-w-2xl sm:max-w-[54%] lg:max-w-[46%]">
           <h2
             id="tbode-promo-title"
             className="font-heading text-[clamp(2.2rem,5.4vw,4.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight"
