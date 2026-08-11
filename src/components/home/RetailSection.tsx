@@ -205,27 +205,36 @@ const RetailSection = () => {
 
 
   // Random, independent switching for each model (never the same design at once).
+  // Indices live in refs so the interval effect never restarts on every swap
+  // (that previously killed the woman's timer before it could fire).
+  const aRef = useRef(indexA);
+  const bRef = useRef(indexB);
+  aRef.current = indexA;
+  bRef.current = indexB;
+
   useEffect(() => {
     if (!running) return;
-    const pool = Math.max(2, ready);
     const pick = (current: number, other: number) => {
+      const pool = Math.max(2, ready);
       let n = current;
       let guard = 0;
-      while ((n === current || n === other) && guard++ < 20) n = Math.floor(Math.random() * pool);
+      while ((n === current || n === other) && guard++ < 25) n = Math.floor(Math.random() * pool);
       return n;
     };
-    const idA = setInterval(() => setIndexA((a) => pick(a, indexB)), 2000);
-    // Same 2s cadence for the woman, but offset by 1s so they never switch together.
+    const idA = window.setInterval(() => setIndexA(pick(aRef.current, bRef.current)), 2000);
+    // Same 2s cadence for the woman, offset by 1s so they never switch together.
     let idB = 0;
     const offset = window.setTimeout(() => {
-      idB = window.setInterval(() => setIndexB((b) => pick(b, indexA)), 2000);
+      setIndexB(pick(bRef.current, aRef.current));
+      idB = window.setInterval(() => setIndexB(pick(bRef.current, aRef.current)), 2000);
     }, 1000);
     return () => {
-      clearInterval(idA);
+      window.clearInterval(idA);
       window.clearTimeout(offset);
-      clearInterval(idB);
+      window.clearInterval(idB);
     };
-  }, [running, indexA, indexB, ready]);
+  }, [running, ready]);
+
 
 
   const ticker = lang === "lv" ? "OVERSIZE  •  DTF APDRUKA  •  NO 1 GABALA  •  T-BODE" : "OVERSIZE  •  DTF PRINT  •  FROM 1 PIECE  •  T-BODE";
