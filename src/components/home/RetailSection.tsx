@@ -205,27 +205,36 @@ const RetailSection = () => {
 
 
   // Random, independent switching for each model (never the same design at once).
+  // Indices live in refs so the interval effect never restarts on every swap
+  // (that previously killed the woman's timer before it could fire).
+  const aRef = useRef(indexA);
+  const bRef = useRef(indexB);
+  aRef.current = indexA;
+  bRef.current = indexB;
+
   useEffect(() => {
     if (!running) return;
-    const pool = Math.max(2, ready);
     const pick = (current: number, other: number) => {
+      const pool = Math.max(2, ready);
       let n = current;
       let guard = 0;
-      while ((n === current || n === other) && guard++ < 20) n = Math.floor(Math.random() * pool);
+      while ((n === current || n === other) && guard++ < 25) n = Math.floor(Math.random() * pool);
       return n;
     };
-    const idA = setInterval(() => setIndexA((a) => pick(a, indexB)), 2000);
-    // Same 2s cadence for the woman, but offset by 1s so they never switch together.
+    const idA = window.setInterval(() => setIndexA(pick(aRef.current, bRef.current)), 2000);
+    // Same 2s cadence for the woman, offset by 1s so they never switch together.
     let idB = 0;
     const offset = window.setTimeout(() => {
-      idB = window.setInterval(() => setIndexB((b) => pick(b, indexA)), 2000);
+      setIndexB(pick(bRef.current, aRef.current));
+      idB = window.setInterval(() => setIndexB(pick(bRef.current, aRef.current)), 2000);
     }, 1000);
     return () => {
-      clearInterval(idA);
+      window.clearInterval(idA);
       window.clearTimeout(offset);
-      clearInterval(idB);
+      window.clearInterval(idB);
     };
-  }, [running, indexA, indexB, ready]);
+  }, [running, ready]);
+
 
 
   const ticker = lang === "lv" ? "OVERSIZE  •  DTF APDRUKA  •  NO 1 GABALA  •  T-BODE" : "OVERSIZE  •  DTF PRINT  •  FROM 1 PIECE  •  T-BODE";
@@ -237,10 +246,10 @@ const RetailSection = () => {
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Photo layer with interactive prints */}
+      {/* Photo layer with interactive prints — full width on mobile, right column on desktop */}
       <div ref={stageRef} className="absolute inset-0 -z-10" aria-hidden={false}>
         <div
-          className="absolute left-0 top-0 w-full aspect-[1920/1088] bg-cover bg-top sm:h-full sm:w-auto sm:min-w-full sm:translate-x-0"
+          className="absolute left-0 top-0 w-full aspect-[1920/1088] bg-cover bg-top sm:left-auto sm:right-0 sm:h-full sm:w-[70%] sm:aspect-auto sm:[mask-image:linear-gradient(to_right,transparent_0%,black_38%)] lg:w-[66%]"
           style={{ backgroundImage: `url(${HERO_LQIP})` }}
         >
           <img
@@ -255,17 +264,23 @@ const RetailSection = () => {
             loading="eager"
             fetchPriority="high"
             decoding="async"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover object-top"
           />
-          {/* Man — black tee */}
-          <BackPrint ready={ready} index={indexA} x="38.2%" y="52%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
-          {/* Woman — off-white tee */}
-          <BackPrint ready={ready} index={indexB} x="61.5%" y="57%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
+          {/* Prints are positioned against the visible photo box */}
+          {/* Wrapper matches the rendered (object-cover) photo box exactly, so print % stay accurate */}
+          <div className="pointer-events-none absolute left-1/2 top-0 h-full aspect-[1920/1088] -translate-x-1/2">
+
+            {/* Man — black tee */}
+            <BackPrint ready={ready} index={indexA} x="39.4%" y="52%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
+            {/* Woman — off-white tee */}
+            <BackPrint ready={ready} index={indexB} x="61.5%" y="57%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
+          </div>
+
         </div>
 
-        {/* Lighter cinematic gradients for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent sm:bg-gradient-to-l sm:from-black/75 sm:via-black/35 sm:to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 sm:from-black/50 sm:via-transparent sm:to-black/20" />
+        {/* Cinematic gradients for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 sm:from-black/45 sm:via-transparent sm:to-black/15" />
 
         {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
@@ -277,7 +292,7 @@ const RetailSection = () => {
       </div>
 
       <div className="container relative flex flex-col justify-center pb-16 pt-[calc(56.7vw+1.5rem)] sm:min-h-[600px] sm:py-28 sm:pt-28 lg:min-h-[680px]">
-        <div className="max-w-2xl sm:ml-auto sm:max-w-xl lg:max-w-[34rem]">
+        <div className="max-w-2xl sm:max-w-[54%] lg:max-w-[46%]">
           <h2
             id="tbode-promo-title"
             className="font-heading text-[clamp(2.2rem,5.4vw,4.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight"
