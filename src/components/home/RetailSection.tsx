@@ -187,13 +187,22 @@ const RetailSection = () => {
 
   const running = inView && tabVisible && !reduceMotion && !paused;
 
+  // Stream the artwork in during idle time so the banner paints immediately.
+  const [ready, setReady] = useState(1);
+  useEffect(() => {
+    if (!inView || ready >= designs.length) return;
+    const id = window.setTimeout(() => setReady((r) => Math.min(r + 1, designs.length)), 600);
+    return () => window.clearTimeout(id);
+  }, [inView, ready]);
+
   // Random, independent switching for each model (never the same design at once).
   useEffect(() => {
     if (!running) return;
+    const pool = Math.max(2, ready);
     const pick = (current: number, other: number) => {
       let n = current;
       let guard = 0;
-      while ((n === current || n === other) && guard++ < 20) n = Math.floor(Math.random() * designs.length);
+      while ((n === current || n === other) && guard++ < 20) n = Math.floor(Math.random() * pool);
       return n;
     };
     const idA = setInterval(() => setIndexA((a) => pick(a, indexB)), 2000 + Math.random() * 900);
@@ -202,7 +211,8 @@ const RetailSection = () => {
       clearInterval(idA);
       clearInterval(idB);
     };
-  }, [running, indexA, indexB]);
+  }, [running, indexA, indexB, ready]);
+
 
   const next = useCallback(() => {
     setIndexA((a) => (a + 1) % designs.length);
