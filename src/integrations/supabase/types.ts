@@ -670,6 +670,24 @@ export type Database = {
         }
         Relationships: []
       }
+      nwg_auth: {
+        Row: {
+          id: number
+          refresh_token: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          refresh_token: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          refresh_token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nwg_images: {
         Row: {
           created_at: string | null
@@ -731,6 +749,9 @@ export type Database = {
           ean: string | null
           item_number: string | null
           product_number: string
+          purchase_currency: string | null
+          purchase_price: number | null
+          purchase_updated_at: string | null
           retail_price: number | null
           sales_price: number | null
           size: string | null
@@ -746,6 +767,9 @@ export type Database = {
           ean?: string | null
           item_number?: string | null
           product_number: string
+          purchase_currency?: string | null
+          purchase_price?: number | null
+          purchase_updated_at?: string | null
           retail_price?: number | null
           sales_price?: number | null
           size?: string | null
@@ -761,6 +785,9 @@ export type Database = {
           ean?: string | null
           item_number?: string | null
           product_number?: string
+          purchase_currency?: string | null
+          purchase_price?: number | null
+          purchase_updated_at?: string | null
           retail_price?: number | null
           sales_price?: number | null
           size?: string | null
