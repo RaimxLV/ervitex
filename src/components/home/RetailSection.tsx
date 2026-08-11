@@ -221,14 +221,16 @@ const RetailSection = () => {
       while ((n === current || n === other) && guard++ < 25) n = Math.floor(Math.random() * pool);
       return n;
     };
+    // Kick off immediately so prints start switching the moment the banner is in view.
+    const kickA = window.setTimeout(() => setIndexA(pick(aRef.current, bRef.current)), 150);
     const idA = window.setInterval(() => setIndexA(pick(aRef.current, bRef.current)), 2000);
-    // Same 2s cadence for the woman, offset by 1s so they never switch together.
     let idB = 0;
     const offset = window.setTimeout(() => {
       setIndexB(pick(bRef.current, aRef.current));
       idB = window.setInterval(() => setIndexB(pick(bRef.current, aRef.current)), 2000);
     }, 1000);
     return () => {
+      window.clearTimeout(kickA);
       window.clearInterval(idA);
       window.clearTimeout(offset);
       window.clearInterval(idB);
