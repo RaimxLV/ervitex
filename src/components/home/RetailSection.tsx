@@ -276,7 +276,7 @@ const RetailSection = () => {
         <GlitchSparks />
       </div>
 
-      <div className="container relative flex min-h-[520px] flex-col justify-center py-20 sm:min-h-[600px] sm:py-28 lg:min-h-[680px]">
+      <div className="container relative flex flex-col justify-center pb-16 pt-[calc(56.7vw+1.5rem)] sm:min-h-[600px] sm:py-28 sm:pt-28 lg:min-h-[680px]">
         <div className="max-w-2xl">
           <h2
             id="tbode-promo-title"
