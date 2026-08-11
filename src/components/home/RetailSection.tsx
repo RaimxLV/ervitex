@@ -137,7 +137,7 @@ const RetailSection = () => {
             className="h-full w-full object-cover"
           />
           {/* Man — black tee */}
-          <BackPrint index={index} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} blend="normal" opacity={1} />
+          <BackPrint index={index} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} blend="screen" opacity={1} />
           {/* Woman — off-white tee */}
           <BackPrint index={(index + 1) % designs.length} x="63.5%" y="64%" w="19%" h="28%" rotate={2} blend="multiply" opacity={1} />
         </div>
