@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const limit = Math.min(Number(url.searchParams.get("limit") || 1500), 40000);
+    const limit = Math.min(Number(url.searchParams.get("limit") || 4000), 40000);
     const batchSize = Math.min(Number(url.searchParams.get("batch") || 400), 500);
     const onlyMissing = url.searchParams.get("onlyMissing") !== "0";
     const chain = url.searchParams.get("chain") !== "0";
