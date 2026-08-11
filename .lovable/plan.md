@@ -1,46 +1,42 @@
+# NWG kataloga pilns audits un sakārtošana
 
-# Vienota Stanley/Stella + Katalogs plūsma
+Stanley/Stella netiks aiztikts. Darbs attiecas tikai uz NWG (Craft, Clique, ProJob, Cutter & Buck).
 
-Tu saprati pareizi. Šobrīd `products` tabulā ir 126 manuāli pievienoti Stanley/Stella modeļi (piem. `STTU200`, `STSU011`) ar mūsu cenām, bet tie neizmanto reālos S/S attēlus/krāsas/nosaukumus no `ss_styles` — tāpēc rāda tukšas/dīvainas kartītes. Vienlaikus `ss_style_code` kolonna produktiem nav aizpildīta, kaut arī `name_lv` jau satur stila kodu.
+## Audita secinājumi
 
-## Ko izdaru
+- `641001` un `641006` datubāzē nav sajaukti: NWG API atgriež `641001 — 1001 MATERIALS INBAG`, savukārt otrajā ekrānattēlā atvērta cita prece `641006 — 1006 TOOL POCKET`.
+- NWG pamatdati pēdējo reizi pilnībā sinhronizēti 20. jūlijā, tāpēc publiskais katalogs nav droši salīdzināms ar šodienas partnera lapu.
+- Pašreizējais sinhronizators pretēji tā aprakstam meklē visā globālajā NWG katalogā pēc burtiem/cipariem, nevis lasa mūsu aktuālo sortimentu. Tas ir galvenais “svešu” un vecu modeļu avots.
+- Publiskajā katalogā ir 2616 NWG modeļi, tostarp zīmoli, kuriem tur nevajadzētu būt; frontendā tie tiek paslēpti, bet datu slānis joprojām ir nekorekts.
+- Atrasti 3 attēli, kuru `product_number` nepieder attēla variantam.
+- 167 publiski atlasīti partneru modeļi ir nepilnīgas čaulas bez kategorijas un apraksta; 273 nav kategorijas.
+- NWG līgumcena ir saņemta tikai daļai SKU. Formula līgumcenai ir pareiza: `iepirkuma cena × 1.67 × 1.21`. Ja līgumcenas nav, pašreiz tiek rādīta NWG publiskā mazumtirdzniecības cena ar PVN, nevis izdomāta cena.
 
-### 1. Sasaistu esošos katalogā ievietotos modeļus ar S/S datiem (vienreizējs)
-- Ievadu `ss_style_code` visiem `brand='Stanley/Stella'` produktiem no `name_lv` (upper-case, trim).
-- Rezultāts: katalogā rādot šo produktu, varam paņemt attēlus, krāsu apļus un pilno nosaukumu no `ss_style_summary`.
+## Ko labošu
 
-### 2. Katalogs lapa — S/S produktiem izmanto īsto S/S kartīti
-- `CatalogPage.tsx` fetch iemet LEFT JOIN uz `ss_style_summary` pēc `ss_style_code`.
-- `ProductCard.tsx` (tikai S/S produktiem ar aizpildītu `ss_style_code`):
-  - Nosaukums = `ss_styles.name` (piem. "ASHER") + zem tā mūsu kods
-  - Attēli = `ss_style_summary.images` (pilnīgi tāds pats swipe/hover kā S/S lapā)
-  - Krāsu apļi = `ss_style_summary.colors` (HEX no ss_variants)
-  - Cena = `retail_price` no `products` (mūsu manuālā) — negrozām
-  - Zīmola tegs = `STANLEY/STELLA`
-- Ja `ss_style_code` ir bet `ss_style_summary` nav (arhivēts), krītam atpakaļ uz esošo dizainu.
+### 1. Pārbūvēšu NWG sinhronizāciju uz aktuālo sortimentu
+- Iegūšu sortimenta koku un produktus tikai no mūsu pieejamajiem sortimentiem, nevis no globālas teksta meklēšanas.
+- Saglabāšu tikai Craft, Clique, ProJob un Cutter & Buck zīmolus.
+- Pilnas veiksmīgas sinhronizācijas beigās arhivēšu modeļus, kuri vairs nav partnera aktuālajā plūsmā.
+- Sinhronizācijas kļūdas gadījumā neko automātiski neizdzēsīšu/nearhivēšu.
 
-### 3. Stanley/Stella lapa — "Pievienot katalogam ar cenu" (tikai adminam)
-- `StanleyStellaPage.tsx` kartītei apakšā (tikai `is_admin`):
-  - Ja stils **jau ir** katalogā → mazs zaļš tegs "Katalogā €12.34" + poga "Rediģēt cenu".
-  - Ja **nav** → poga "+ Pievienot katalogam".
-- Klikšķis atver mazu Dialog (cenas ievade EUR ar PVN + kategorija dropdown, iepriekš aizpildīts no S/S `Type`).
-- Saglabā:
-  - Ja produkts eksistē → `UPDATE products SET retail_price=…, active=true, hidden_manual=false`.
-  - Ja nav → `INSERT` jauns `products` ieraksts ar `brand='Stanley/Stella'`, `name_lv = style_code`, `ss_style_code = style_code`, `retail_price`, `active=true`.
-- Refresh — modelis uzreiz parādās sadaļā **Katalogs** ar īsto S/S attēlu un mūsu cenu.
+### 2. Salabošu datu sasaistes
+- Validēšu ķēdi `modelis → krāsas variants → SKU/izmērs → attēls → cena`.
+- Izlabošu 3 konstatētās nepareizās attēlu piesaistes.
+- Neļaušu turpmāk saglabāt variantu, SKU vai attēlu zem cita modeļa koda.
+- No publiskā kataloga izslēgšu nepilnīgas čaulas un modeļus bez derīga aktīva varianta.
 
-### 4. Noņemšana (opcionāli tajā pašā dialogā)
-Poga "Noņemt no kataloga" → `active=false, hidden_manual=true`. S/S lapā paliek redzams.
+### 3. Pabeigšu cenu sinhronizāciju
+- Līgumcenas ielasīšu tikai aktuālā NWG sortimenta SKU.
+- Pārbaudīšu, ka katrai līgumcenai gala cena ir tieši `X × 1.67 × 1.21`.
+- Skaidri nodalīšu līgumcenu no NWG publiskās cenas, lai viena netiktu kļūdaini uzskatīta par otru.
 
-## Tehniskās detaļas (izstrādes piezīmes)
+### 4. Pārbaude pirms publiskošanas
+- Salīdzināšu nejaušu paraugu no katra zīmola ar partnera API: kods, nosaukums, attēls, krāsa, izmērs un cena.
+- Atsevišķi atkārtoti pārbaudīšu `641001` un `641006`.
+- Pārbaudīšu kataloga kartīti un produkta lapu desktopā un mobilajā skatā.
+- Sagatavošu skaitlisku atskaiti: cik modeļu palika, cik arhivēti, cik bez cenas/attēla un vai ir palikusi kaut viena neatbilstoša saite.
 
-- Migrācijas nav vajadzīgas — `products.ss_style_code` jau eksistē. Vienreizējs `UPDATE` aizpildīs saiti.
-- RLS: `products` INSERT/UPDATE jau atļauts `admin` lomai (pārbaudīšu, ja nav — pieliksim policy).
-- Query: pievienojam `useQuery` `ss_style_summary` uz katalogu ar `.in('style_code', priceSyleCodes)` — viens papildu request, kešots.
-- Neietekmē citus brandus (BagBase, Beechfield, Quadra, Westford Mill) — tie turpina rādīt savas manuālās bildes.
-- S/S atsevišķā lapa `/stanley-stella` nemainās vizuāli, tikai pievienojas admin-only pogas.
+## Drošības robeža
 
-## Rezultāts
-
-- Katalogs: S/S modeļiem ir profesionāli attēli, krāsas, nosaukumi + mūsu cena.
-- S/S lapa: viena poga = jauns modelis parādās Katalogā ar cenu. Nav vairs jāievada dati divās vietās.
+Neviena Stanley/Stella tabula, funkcija, cena, lapa vai kartīte šajā darbā netiks mainīta.
