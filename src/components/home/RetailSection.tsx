@@ -267,7 +267,9 @@ const RetailSection = () => {
             className="h-full w-full object-cover object-top"
           />
           {/* Prints are positioned against the visible photo box */}
-          <div className="absolute inset-0 sm:-left-[35%] sm:-right-[35%]">
+          {/* Wrapper matches the rendered (object-cover) photo box exactly, so print % stay accurate */}
+          <div className="pointer-events-none absolute left-1/2 top-0 h-full aspect-[1920/1088] -translate-x-1/2">
+
             {/* Man — black tee */}
             <BackPrint ready={ready} index={indexA} x="38.2%" y="52%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
             {/* Woman — off-white tee */}
