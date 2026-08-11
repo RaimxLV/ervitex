@@ -158,7 +158,8 @@ const RetailSection = () => {
   const { lang } = useLanguage();
   const reduceMotion = useReducedMotion();
 
-  const [index, setIndex] = useState(0);
+  const [indexA, setIndexA] = useState(0);
+  const [indexB, setIndexB] = useState(3);
   const [inView, setInView] = useState(false);
   const [tabVisible, setTabVisible] = useState(true);
   const [paused, setPaused] = useState(false);
@@ -181,13 +182,28 @@ const RetailSection = () => {
 
   const running = inView && tabVisible && !reduceMotion && !paused;
 
+  // Random, independent switching for each model (never the same design at once).
   useEffect(() => {
     if (!running) return;
-    const id = setInterval(() => setIndex((i) => (i + 1) % designs.length), 2000);
-    return () => clearInterval(id);
-  }, [running]);
+    const pick = (current: number, other: number) => {
+      let n = current;
+      let guard = 0;
+      while ((n === current || n === other) && guard++ < 20) n = Math.floor(Math.random() * designs.length);
+      return n;
+    };
+    const idA = setInterval(() => setIndexA((a) => pick(a, indexB)), 2000 + Math.random() * 900);
+    const idB = setInterval(() => setIndexB((b) => pick(b, indexA)), 2600 + Math.random() * 900);
+    return () => {
+      clearInterval(idA);
+      clearInterval(idB);
+    };
+  }, [running, indexA, indexB]);
 
-  const next = useCallback(() => setIndex((i) => (i + 1) % designs.length), []);
+  const next = useCallback(() => {
+    setIndexA((a) => (a + 1) % designs.length);
+    setIndexB((b) => (b + 2) % designs.length);
+  }, []);
+
 
   const highlights = useMemo(
     () => [
