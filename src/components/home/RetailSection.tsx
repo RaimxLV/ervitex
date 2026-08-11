@@ -197,12 +197,13 @@ const RetailSection = () => {
   const running = inView && tabVisible && !reduceMotion && !paused;
 
   // Stream the artwork in during idle time so the banner paints immediately.
-  const [ready, setReady] = useState(1);
+  const [ready, setReady] = useState(2);
   useEffect(() => {
-    if (!inView || ready >= designs.length) return;
-    const id = window.setTimeout(() => setReady((r) => Math.min(r + 1, designs.length)), 600);
+    if (ready >= designs.length) return;
+    const id = window.setTimeout(() => setReady((r) => Math.min(r + 1, designs.length)), 250);
     return () => window.clearTimeout(id);
-  }, [inView, ready]);
+  }, [ready]);
+
 
   // Random, independent switching for each model (never the same design at once).
   useEffect(() => {
