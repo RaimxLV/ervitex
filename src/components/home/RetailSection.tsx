@@ -258,9 +258,9 @@ const RetailSection = () => {
             className="h-full w-full object-cover"
           />
           {/* Man — black tee */}
-          <BackPrint ready={ready} index={indexA} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
+          <BackPrint ready={ready} index={indexA} x="38.2%" y="52%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
           {/* Woman — off-white tee */}
-          <BackPrint ready={ready} index={indexB} x="63.5%" y="60%" w="19.5%" h="27%" rotate={2} opacity={0.94} />
+          <BackPrint ready={ready} index={indexB} x="61.5%" y="57%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
         </div>
 
         {/* Lighter cinematic gradients for text legibility */}
