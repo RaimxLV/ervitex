@@ -138,14 +138,15 @@ const RetailSection = () => {
             className="h-full w-full object-cover"
           />
           {/* Man — black tee */}
-          <BackPrint index={index} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} blend="screen" opacity={1} />
-          {/* Woman — off-white tee */}
-          <BackPrint index={(index + 1) % designs.length} x="63.5%" y="64%" w="19%" h="28%" rotate={2} blend="multiply" opacity={1} />
+          <BackPrint index={index} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
+          {/* Woman — off-white tee (always a different design) */}
+          <BackPrint index={(index + 2) % designs.length} x="63.5%" y="64%" w="19%" h="28%" rotate={2} opacity={0.95} />
         </div>
 
-        {/* Cinematic gradients for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/40" />
+        {/* Lighter cinematic gradients for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+
       </div>
 
       <div className="container relative flex min-h-[660px] flex-col justify-start py-14 sm:min-h-[640px] sm:justify-center sm:py-24 lg:min-h-[720px]">
