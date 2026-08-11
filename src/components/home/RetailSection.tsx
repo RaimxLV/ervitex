@@ -240,7 +240,7 @@ const RetailSection = () => {
       {/* Photo layer with interactive prints */}
       <div ref={stageRef} className="absolute inset-0 -z-10" aria-hidden={false}>
         <div
-          className="absolute left-0 top-0 w-full aspect-[1920/1088] bg-cover bg-top sm:left-1/2 sm:h-full sm:w-auto sm:min-w-full sm:-translate-x-1/2"
+          className="absolute left-0 top-0 w-full aspect-[1920/1088] bg-cover bg-top sm:h-full sm:w-auto sm:min-w-full sm:translate-x-0"
           style={{ backgroundImage: `url(${HERO_LQIP})` }}
         >
           <img
@@ -264,7 +264,7 @@ const RetailSection = () => {
         </div>
 
         {/* Lighter cinematic gradients for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent sm:bg-gradient-to-l sm:from-black/75 sm:via-black/35 sm:to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 sm:from-black/50 sm:via-transparent sm:to-black/20" />
 
         {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
@@ -277,7 +277,7 @@ const RetailSection = () => {
       </div>
 
       <div className="container relative flex flex-col justify-center pb-16 pt-[calc(56.7vw+1.5rem)] sm:min-h-[600px] sm:py-28 sm:pt-28 lg:min-h-[680px]">
-        <div className="max-w-2xl">
+        <div className="max-w-2xl sm:ml-auto sm:max-w-xl lg:max-w-[34rem]">
           <h2
             id="tbode-promo-title"
             className="font-heading text-[clamp(2.2rem,5.4vw,4.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight"
