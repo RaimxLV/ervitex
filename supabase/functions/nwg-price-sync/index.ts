@@ -202,6 +202,7 @@ Deno.serve(async (req) => {
           await Promise.all(group);
         }
 
+        const more = onlyMissing && skus.length >= limit;
         // Always refresh so already-synced contract prices get the markup applied
         // (x1.65 x1.21) even while the rest of the assortment is still syncing.
         const { error: refreshErr } = await sb.rpc("refresh_catalog_prices");
