@@ -271,7 +271,7 @@ const RetailSection = () => {
           <div className="pointer-events-none absolute left-1/2 top-0 h-full aspect-[1920/1088] -translate-x-1/2">
 
             {/* Man — black tee */}
-            <BackPrint ready={ready} index={indexA} x="39.6%" y="54.5%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
+            <BackPrint ready={ready} index={indexA} x="38.6%" y="53%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
             {/* Woman — off-white tee */}
             <BackPrint ready={ready} index={indexB} x="62.2%" y="61.5%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
 
