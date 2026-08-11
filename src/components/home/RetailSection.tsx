@@ -277,7 +277,7 @@ const RetailSection = () => {
       </div>
 
       <div className="container relative flex flex-col justify-center pb-16 pt-[calc(56.7vw+1.5rem)] sm:min-h-[600px] sm:py-28 sm:pt-28 lg:min-h-[680px]">
-        <div className="max-w-2xl">
+        <div className="max-w-2xl sm:ml-auto sm:text-left lg:pl-8">
           <h2
             id="tbode-promo-title"
             className="font-heading text-[clamp(2.2rem,5.4vw,4.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight"
