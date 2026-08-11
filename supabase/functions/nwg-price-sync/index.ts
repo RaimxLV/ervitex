@@ -95,6 +95,14 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (mode === "refresh") {
+      const { error } = await sb.rpc("refresh_catalog_prices");
+      if (error) throw new Error(error.message);
+      return new Response(JSON.stringify({ ok: true, refreshed: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const limit = Math.min(Number(url.searchParams.get("limit") || 4000), 40000);
     const batchSize = Math.min(Number(url.searchParams.get("batch") || 400), 500);
     const onlyMissing = url.searchParams.get("onlyMissing") !== "0";
