@@ -146,14 +146,37 @@ const RetailSection = () => {
             className="h-full w-full object-cover"
           />
           {/* Man — black tee */}
-          <BackPrint index={index} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
-          {/* Woman — off-white tee (always a different design) */}
-          <BackPrint index={(index + 2) % designs.length} x="63.5%" y="64%" w="19%" h="28%" rotate={2} opacity={0.95} />
+          <BackPrint eager={inView} index={index} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
+          {/* Woman — off-white tee (smaller, placed on the flat upper back to avoid fabric folds) */}
+          <BackPrint
+            eager={inView}
+            index={(index + 3) % designs.length}
+            x="63.5%"
+            y="59%"
+            w="15%"
+            h="21%"
+            rotate={2}
+            opacity={0.92}
+          />
         </div>
 
         {/* Lighter cinematic gradients for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+
+        {/* Subtle 35° T-Bode watermark across the whole banner */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
+          <img
+            src={tbodeLogo}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="w-[150%] max-w-none opacity-[0.07] mix-blend-overlay"
+            style={{ transform: "rotate(-35deg)" }}
+          />
+        </div>
+
+
 
       </div>
 
