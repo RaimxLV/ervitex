@@ -237,7 +237,6 @@ const RetailSection = () => {
 
 
 
-  const ticker = lang === "lv" ? "OVERSIZE  •  DTF APDRUKA  •  NO 1 GABALA  •  T-BODE" : "OVERSIZE  •  DTF PRINT  •  FROM 1 PIECE  •  T-BODE";
 
   return (
     <section
