@@ -3,7 +3,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ArrowRight, MousePointerClick, Timer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import teeMockup from "@/assets/tee-oversize.webp";
+import heroDuo from "@/assets/tbode-hero-duo.jpg";
 import printArt1 from "@/assets/print-art-1.webp";
 import printArt3 from "@/assets/print-art-3.webp";
 import printArt4 from "@/assets/print-art-4.webp";
@@ -12,47 +12,76 @@ import printArt5 from "@/assets/print-art-5.webp";
 const DESIGNER_URL =
   "https://t-bode.lv/design?utm_source=ervitex.lv&utm_medium=promo_banner&utm_campaign=tbode_designer";
 
-const shirtColors = [
-  { name: "Black", lv: "Melns", en: "Black", hex: "#121212", ink: "#ffffff" },
-  { name: "Bone", lv: "Balts", en: "White", hex: "#f4f2ed", ink: "#111111" },
-  { name: "Red", lv: "Sarkans", en: "Red", hex: "#c8161d", ink: "#ffffff" },
-  { name: "Navy", lv: "Tumši zils", en: "Navy", hex: "#1e2a44", ink: "#ffffff" },
-  { name: "Sage", lv: "Zaļš", en: "Sage", hex: "#7d8b6a", ink: "#ffffff" },
-  { name: "Sand", lv: "Smilšu", en: "Sand", hex: "#d6c3a5", ink: "#111111" },
-];
-
 const designs = [printArt3, printArt4, printArt1, printArt5];
 
 const TBodeWordmark = () => (
   <span className="group/logo relative inline-flex select-none items-center gap-[0.15em] overflow-hidden font-heading text-lg font-bold uppercase tracking-[0.28em]">
-    <span className="text-accent transition-transform duration-500 ease-out group-hover/logo:translate-x-0 md:-translate-x-0">
-      T
-    </span>
+    <span className="text-accent">T</span>
     <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-500 ease-out group-hover/logo:max-w-[9ch] group-hover/logo:opacity-100">
       <span className="whitespace-nowrap">-BODE</span>
     </span>
-
     <span className="pointer-events-none absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-accent transition-transform duration-500 ease-out group-hover/logo:scale-x-100" />
   </span>
+);
+
+/** Print rendered on a model's back, positioned in % of the photo. */
+const BackPrint = ({
+  index,
+  x,
+  y,
+  w,
+  h,
+  rotate,
+  blend,
+  opacity,
+}: {
+  index: number;
+  x: string;
+  y: string;
+  w: string;
+  h: string;
+  rotate: number;
+  blend: string;
+  opacity: number;
+}) => (
+  <div
+    className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
+    style={{ left: x, top: y, width: w, height: h, transform: `translate(-50%,-50%) rotate(${rotate}deg)` }}
+    aria-hidden
+  >
+    <AnimatePresence mode="wait">
+      <motion.img
+        key={`p-${index}`}
+        src={designs[index]}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        initial={{ opacity: 0, scale: 0.82, filter: "blur(8px)" }}
+        animate={{ opacity, scale: 1, filter: "blur(0px)" }}
+        exit={{ opacity: 0, scale: 1.06, filter: "blur(8px)" }}
+        transition={{ type: "spring", stiffness: 200, damping: 22 }}
+        className="h-full w-full object-contain"
+        style={{ mixBlendMode: blend as React.CSSProperties["mixBlendMode"] }}
+      />
+    </AnimatePresence>
+  </div>
 );
 
 const RetailSection = () => {
   const { lang } = useLanguage();
   const reduceMotion = useReducedMotion();
 
-  const [colorIndex, setColorIndex] = useState(0);
-  const [designIndex, setDesignIndex] = useState(0);
+  const [index, setIndex] = useState(0);
   const [inView, setInView] = useState(false);
   const [tabVisible, setTabVisible] = useState(true);
+  const [paused, setPaused] = useState(false);
 
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const el = stageRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
-      threshold: 0.2,
-    });
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.15 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -63,21 +92,15 @@ const RetailSection = () => {
     return () => document.removeEventListener("visibilitychange", onVis);
   }, []);
 
-  const running = inView && tabVisible && !reduceMotion;
+  const running = inView && tabVisible && !reduceMotion && !paused;
 
   useEffect(() => {
     if (!running) return;
-    const id = setInterval(() => {
-      setColorIndex((c) => (c + 1) % shirtColors.length);
-      setDesignIndex((d) => (d + 1) % designs.length);
-    }, 2600);
+    const id = setInterval(() => setIndex((i) => (i + 1) % designs.length), 2800);
     return () => clearInterval(id);
   }, [running]);
 
-  const color = shirtColors[colorIndex];
-  const design = designs[designIndex];
-
-  const nextDesign = useCallback(() => setDesignIndex((d) => (d + 1) % designs.length), []);
+  const next = useCallback(() => setIndex((i) => (i + 1) % designs.length), []);
 
   const highlights = useMemo(
     () => [
@@ -88,62 +111,73 @@ const RetailSection = () => {
     [],
   );
 
-  const maskStyle = {
-    WebkitMaskImage: `url(${teeMockup})`,
-    maskImage: `url(${teeMockup})`,
-    WebkitMaskSize: "contain",
-    maskSize: "contain",
-    WebkitMaskRepeat: "no-repeat",
-    maskRepeat: "no-repeat",
-    WebkitMaskPosition: "center",
-    maskPosition: "center",
-  } as const;
+  const ticker = lang === "lv" ? "OVERSIZE  •  DTF APDRUKA  •  NO 1 GABALA  •  T-BODE" : "OVERSIZE  •  DTF PRINT  •  FROM 1 PIECE  •  T-BODE";
 
   return (
     <section
       className="promo-banner relative isolate w-full overflow-hidden"
       aria-labelledby="tbode-promo-title"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
     >
-      {/* Ambient animated glows */}
-      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
-        <div
-          className="absolute -left-32 -top-40 h-[26rem] w-[26rem] rounded-full opacity-50 blur-3xl motion-safe:animate-promo-drift"
-          style={{ background: "radial-gradient(circle, hsl(var(--promo-glow-a)) 0%, transparent 70%)" }}
-        />
-        <div
-          className="absolute -bottom-40 right-[-10%] h-[30rem] w-[30rem] rounded-full opacity-45 blur-3xl motion-safe:animate-promo-drift-alt"
-          style={{ background: "radial-gradient(circle, hsl(var(--promo-glow-b)) 0%, transparent 70%)" }}
-        />
+      {/* Photo layer with interactive prints */}
+      <div ref={stageRef} className="absolute inset-0 -z-10" aria-hidden={false}>
+        <div className="absolute left-1/2 top-1/2 h-full w-auto min-w-full -translate-x-1/2 -translate-y-1/2 aspect-[1920/1088]">
+          <img
+            src={heroDuo}
+            alt={
+              lang === "lv"
+                ? "Jaunieši oversize T-kreklos ar mainīgu apdrukas dizainu"
+                : "Young people in oversize tees with changing print designs"
+            }
+            width={1920}
+            height={1088}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover"
+          />
+          {/* Man — black tee */}
+          <BackPrint index={index} x="33.5%" y="54%" w="20%" h="30%" rotate={-1.5} blend="screen" opacity={0.92} />
+          {/* Woman — off-white tee */}
+          <BackPrint index={(index + 1) % designs.length} x="63.5%" y="64%" w="16%" h="24%" rotate={2} blend="multiply" opacity={0.95} />
+        </div>
+
+        {/* Cinematic gradients for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/40" />
       </div>
 
-      <div className="container grid items-center gap-8 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:py-24">
-        {/* Copy */}
-        <div>
+      <div className="container relative flex min-h-[560px] flex-col justify-center py-16 sm:min-h-[640px] sm:py-24 lg:min-h-[720px]">
+        <div className="max-w-2xl">
           <TBodeWordmark />
 
           <h2
             id="tbode-promo-title"
-            className="mt-5 max-w-2xl font-heading text-[clamp(1.9rem,5vw,3.5rem)] font-bold uppercase leading-[0.95] tracking-tight"
+            className="mt-6 font-heading text-[clamp(2.4rem,7vw,5rem)] font-bold uppercase leading-[0.9] tracking-tight"
           >
             {lang === "lv" ? (
               <>
-                Tavs dizains.
+                Oversize.
                 <br />
-                <span className="text-accent">Tavs krekls.</span> Bez minimuma.
+                <span className="text-accent">Tavs dizains.</span>
+                <br />
+                Bez minimuma.
               </>
             ) : (
               <>
-                Your design.
+                Oversize.
                 <br />
-                <span className="text-accent">Your tee.</span> No minimums.
+                <span className="text-accent">Your design.</span>
+                <br />
+                No minimums.
               </>
             )}
           </h2>
 
-          <p className="mt-5 max-w-lg text-base leading-relaxed opacity-80 sm:text-lg">
+          <p className="mt-6 max-w-md text-base leading-relaxed opacity-85 sm:text-lg">
             {lang === "lv"
-              ? "Oversize krekli un hūdiji ar profesionālu DTF apdruku. Uzliec savu grafiku, tekstu vai foto tiešsaistes konstruktorā un pasūti jau no viena gabala."
-              : "Oversize tees and hoodies with professional DTF printing. Drop in your graphic, text or photo in the online builder and order from a single piece."}
+              ? "Profesionāla DTF apdruka uz oversize krekliem un hūdijiem. Uzliec savu grafiku tiešsaistes konstruktorā un pasūti jau no viena gabala."
+              : "Professional DTF printing on oversize tees and hoodies. Drop your graphic into the online builder and order from a single piece."}
           </p>
 
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
@@ -155,7 +189,7 @@ const RetailSection = () => {
             ))}
           </div>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
             <a href={DESIGNER_URL} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
               <Button
                 size="lg"
@@ -172,107 +206,48 @@ const RetailSection = () => {
               </Button>
             </a>
 
-            <a href="https://t-bode.lv" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-14 w-full justify-center rounded-none border-white/25 bg-transparent px-8 font-heading text-sm uppercase tracking-[0.15em] text-current transition-colors hover:bg-white/10 sm:w-auto"
-              >
-                {lang === "lv" ? "T-Bode veikals" : "T-Bode store"}
-              </Button>
-            </a>
-          </div>
-        </div>
-
-        {/* Animated oversize tee */}
-        <div ref={stageRef} className="relative">
-          <div
-            className="absolute inset-x-6 inset-y-10 rounded-[50%] bg-accent/15 blur-3xl motion-safe:animate-promo-pulse"
-            aria-hidden
-          />
-
-          <button
-            type="button"
-            onClick={nextDesign}
-            aria-label={lang === "lv" ? "Rādīt nākamo dizainu" : "Show next design"}
-            className="relative mx-auto block aspect-square w-full max-w-[300px] outline-none focus-visible:ring-2 focus-visible:ring-accent sm:max-w-[420px] lg:max-w-[520px]"
-          >
-            <motion.div
-              className="absolute inset-0 isolate"
-              animate={reduceMotion ? undefined : { rotate: [-1.4, 1.4, -1.4], y: [0, -10, 0] }}
-              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              onClick={next}
+              className="h-14 w-full justify-center rounded-none border-white/30 bg-white/5 px-8 font-heading text-sm uppercase tracking-[0.15em] text-current backdrop-blur-sm transition-colors hover:bg-white/15 sm:w-auto"
             >
-              <AnimatePresence initial={false}>
-                <motion.div
-                  key={`c-${color.name}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.7, ease: "easeInOut" }}
-                  className="absolute inset-0"
-                  style={{ backgroundColor: color.hex, ...maskStyle }}
-                />
-              </AnimatePresence>
-
-              <img
-                src={teeMockup}
-                alt={
-                  lang === "lv"
-                    ? "Oversize T-krekla priekšskatījums ar apdruku"
-                    : "Oversize t-shirt preview with print"
-                }
-                width={900}
-                height={900}
-                loading="lazy"
-                decoding="async"
-                className="pointer-events-none absolute inset-0 h-full w-full object-contain mix-blend-multiply"
-              />
-
-              {/* Rotating print on the chest */}
-              <div
-                className="absolute left-1/2 top-[46%] z-10 flex h-[32%] w-[38%] -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-                aria-hidden
-              >
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={`d-${designIndex}`}
-                    src={design}
-                    alt=""
-                    width={900}
-                    height={900}
-                    loading="lazy"
-                    decoding="async"
-                    initial={{ opacity: 0, scale: 0.8, rotate: -4, filter: "blur(6px)" }}
-                    animate={{ opacity: 1, scale: 1, rotate: 0, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, scale: 1.08, rotate: 3, filter: "blur(6px)" }}
-                    transition={{ type: "spring", stiffness: 220, damping: 20 }}
-                    className="h-full w-full object-contain drop-shadow-sm"
-                  />
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          </button>
-
-          {/* Colour selection */}
-          <div
-            className="mt-6 flex items-center justify-center gap-3"
-            role="group"
-            aria-label={lang === "lv" ? "Krekla krāsas izvēle" : "Shirt colour selection"}
-          >
-            {shirtColors.map((c, i) => (
-              <button
-                key={c.name}
-                type="button"
-                onClick={() => setColorIndex(i)}
-                aria-label={lang === "lv" ? c.lv : c.en}
-                aria-pressed={i === colorIndex}
-                className={`h-7 w-7 rounded-full border border-white/30 transition-all duration-300 hover:scale-110 ${
-                  i === colorIndex ? "scale-110 ring-2 ring-accent ring-offset-2 ring-offset-transparent" : "opacity-70"
-                }`}
-                style={{ backgroundColor: c.hex }}
-              />
-            ))}
+              {lang === "lv" ? "Mainīt apdruku" : "Switch the print"}
+            </Button>
           </div>
+
+          <a
+            href="https://t-bode.lv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="story-link mt-6 inline-block text-sm uppercase tracking-[0.2em] opacity-80 hover:opacity-100"
+          >
+            {lang === "lv" ? "T-Bode veikals" : "T-Bode store"}
+          </a>
+        </div>
+      </div>
+
+      {/* Vertical side label */}
+      <span
+        className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rotate-180 font-heading text-[0.7rem] uppercase tracking-[0.45em] opacity-60 lg:block"
+        style={{ writingMode: "vertical-rl" }}
+        aria-hidden
+      >
+        {lang === "lv" ? "Drukāts Latvijā" : "Printed in Latvia"}
+      </span>
+
+      {/* Ticker */}
+      <div className="relative overflow-hidden border-y border-white/10 bg-accent py-2.5" aria-hidden>
+        <div className="flex w-max motion-safe:animate-promo-ticker">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <span
+              key={i}
+              className="whitespace-nowrap px-6 font-heading text-xs uppercase tracking-[0.3em] text-accent-foreground sm:text-sm"
+            >
+              {ticker}
+            </span>
+          ))}
         </div>
       </div>
     </section>
