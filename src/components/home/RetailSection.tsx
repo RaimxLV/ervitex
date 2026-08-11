@@ -215,27 +215,26 @@ const RetailSection = () => {
   useEffect(() => {
     if (!running) return;
     const pick = (current: number, other: number) => {
-      const pool = Math.max(2, ready);
       let n = current;
       let guard = 0;
-      while ((n === current || n === other) && guard++ < 25) n = Math.floor(Math.random() * pool);
+      while ((n === current || n === other) && guard++ < 25) n = Math.floor(Math.random() * designs.length);
       return n;
     };
-    // Kick off immediately so prints start switching the moment the banner is in view.
-    const kickA = window.setTimeout(() => setIndexA(pick(aRef.current, bRef.current)), 150);
+    // Swap both prints in the same frame that the banner becomes visible.
+    const nextA = pick(aRef.current, bRef.current);
+    const nextB = pick(bRef.current, nextA);
+    aRef.current = nextA;
+    bRef.current = nextB;
+    setIndexA(nextA);
+    setIndexB(nextB);
+
     const idA = window.setInterval(() => setIndexA(pick(aRef.current, bRef.current)), 2000);
-    let idB = 0;
-    const offset = window.setTimeout(() => {
-      setIndexB(pick(bRef.current, aRef.current));
-      idB = window.setInterval(() => setIndexB(pick(bRef.current, aRef.current)), 2000);
-    }, 1000);
+    const idB = window.setInterval(() => setIndexB(pick(bRef.current, aRef.current)), 2300);
     return () => {
-      window.clearTimeout(kickA);
       window.clearInterval(idA);
-      window.clearTimeout(offset);
       window.clearInterval(idB);
     };
-  }, [running, ready]);
+  }, [running]);
 
 
 
@@ -272,9 +271,9 @@ const RetailSection = () => {
           <div className="pointer-events-none absolute left-1/2 top-0 h-full aspect-[1920/1088] -translate-x-1/2">
 
             {/* Man — black tee */}
-            <BackPrint ready={ready} index={indexA} x="40.2%" y="54.5%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
+            <BackPrint ready={ready} index={indexA} x="39.6%" y="54.5%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
             {/* Woman — off-white tee */}
-            <BackPrint ready={ready} index={indexB} x="61.6%" y="61.5%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
+            <BackPrint ready={ready} index={indexB} x="62.2%" y="61.5%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
 
           </div>
 
