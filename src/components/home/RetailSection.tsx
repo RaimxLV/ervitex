@@ -209,17 +209,14 @@ const RetailSection = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
-        {/* Subtle 35° T-Bode watermark across the whole banner */}
+        {/* 35° glitchy neon outline T-Bode watermark across the whole banner */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
-          <img
-            src={tbodeLogo}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="w-[150%] max-w-none opacity-[0.07] mix-blend-overlay"
-            style={{ transform: "rotate(-35deg)" }}
+          <GlitchWordmark
+            strokeWidth={0.8}
+            className="w-[150%] max-w-none opacity-[0.22] mix-blend-screen drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]"
           />
         </div>
+
 
 
 
