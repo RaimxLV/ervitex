@@ -249,7 +249,7 @@ const RetailSection = () => {
       {/* Photo layer with interactive prints — full width on mobile, right column on desktop */}
       <div ref={stageRef} className="absolute inset-0 -z-10" aria-hidden={false}>
         <div
-          className="absolute left-0 top-0 w-full aspect-[1920/1088] bg-cover bg-top sm:left-auto sm:right-0 sm:h-full sm:w-[62%] sm:aspect-auto lg:w-[58%]"
+          className="absolute left-0 top-0 w-full aspect-[1920/1088] bg-cover bg-top sm:left-auto sm:right-0 sm:h-full sm:w-[70%] sm:aspect-auto sm:[mask-image:linear-gradient(to_right,transparent_0%,black_38%)] lg:w-[66%]"
           style={{ backgroundImage: `url(${HERO_LQIP})` }}
         >
           <img
@@ -276,8 +276,6 @@ const RetailSection = () => {
             <BackPrint ready={ready} index={indexB} x="61.5%" y="57%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
           </div>
 
-          {/* Soft blend into the text side */}
-          <div className="pointer-events-none absolute inset-y-0 -left-1 hidden w-[45%] bg-gradient-to-r from-black via-black/75 to-transparent sm:block" />
         </div>
 
         {/* Cinematic gradients for text legibility */}
