@@ -242,22 +242,18 @@ const RetailSection = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
-        {/* 35° glitchy neon outline T-Bode watermark across the whole banner */}
+        {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
-          <GlitchWordmark
-            strokeWidth={0.8}
-            className="w-[160%] max-w-none rotate-[-35deg] opacity-[0.25] mix-blend-screen drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]"
-          />
+          <GlitchLogo className="h-[46%] w-[210%] max-w-none rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]" />
         </div>
 
-
-
-
+        {/* Random glitch sparks */}
+        <GlitchSparks />
       </div>
 
       <div className="container relative flex min-h-[660px] flex-col justify-start py-14 sm:min-h-[640px] sm:justify-center sm:py-24 lg:min-h-[720px]">
         <div className="max-w-2xl">
-          <TBodeWordmark />
+
 
           <h2
             id="tbode-promo-title"
