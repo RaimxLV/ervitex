@@ -110,8 +110,8 @@ const GlitchSparks = () => {
 
 /**
  * Print rendered on a model's back, positioned in % of the photo.
- * All designs are mounted at once (hard switch, no fade) so swapping is instant
- * and no image has to be fetched mid-animation.
+ * Designs are mounted progressively (`ready` = how many may load) so the banner
+ * paints fast and later artwork streams in during idle time.
  */
 const BackPrint = ({
   index,
@@ -121,7 +121,7 @@ const BackPrint = ({
   h,
   rotate,
   opacity,
-  eager,
+  ready,
 }: {
   index: number;
   x: string;
@@ -130,27 +130,32 @@ const BackPrint = ({
   h: string;
   rotate: number;
   opacity: number;
-  eager: boolean;
+  ready: number;
 }) => (
   <div
     className="pointer-events-none absolute"
     style={{ left: x, top: y, width: w, height: h, transform: `translate(-50%,-50%) rotate(${rotate}deg)` }}
     aria-hidden
   >
-    {designs.map((src, i) => (
-      <img
-        key={src}
-        src={eager || i === index ? src : undefined}
-        data-src={src}
-        alt=""
-        loading="lazy"
-        decoding="async"
-        style={{ opacity: i === index ? opacity : 0 }}
-        className="absolute inset-0 h-full w-full object-contain"
-      />
-    ))}
+    {designs.map((src, i) => {
+      const load = i < ready || i === index;
+      return load ? (
+        <img
+          key={src}
+          src={src}
+          alt=""
+          width={480}
+          height={480}
+          decoding="async"
+          fetchPriority={i === 0 ? "high" : "low"}
+          style={{ opacity: i === index ? opacity : 0 }}
+          className="absolute inset-0 h-full w-full object-contain"
+        />
+      ) : null;
+    })}
   </div>
 );
+
 
 
 
@@ -182,13 +187,22 @@ const RetailSection = () => {
 
   const running = inView && tabVisible && !reduceMotion && !paused;
 
+  // Stream the artwork in during idle time so the banner paints immediately.
+  const [ready, setReady] = useState(1);
+  useEffect(() => {
+    if (!inView || ready >= designs.length) return;
+    const id = window.setTimeout(() => setReady((r) => Math.min(r + 1, designs.length)), 600);
+    return () => window.clearTimeout(id);
+  }, [inView, ready]);
+
   // Random, independent switching for each model (never the same design at once).
   useEffect(() => {
     if (!running) return;
+    const pool = Math.max(2, ready);
     const pick = (current: number, other: number) => {
       let n = current;
       let guard = 0;
-      while ((n === current || n === other) && guard++ < 20) n = Math.floor(Math.random() * designs.length);
+      while ((n === current || n === other) && guard++ < 20) n = Math.floor(Math.random() * pool);
       return n;
     };
     const idA = setInterval(() => setIndexA((a) => pick(a, indexB)), 2000 + Math.random() * 900);
@@ -197,7 +211,8 @@ const RetailSection = () => {
       clearInterval(idA);
       clearInterval(idB);
     };
-  }, [running, indexA, indexB]);
+  }, [running, indexA, indexB, ready]);
+
 
   const next = useCallback(() => {
     setIndexA((a) => (a + 1) % designs.length);
@@ -240,10 +255,10 @@ const RetailSection = () => {
             className="h-full w-full object-cover"
           />
           {/* Man — black tee */}
-          <BackPrint eager={inView} index={indexA} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
+          <BackPrint ready={ready} index={indexA} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
           {/* Woman — off-white tee (bigger print on the flat upper back) */}
           <BackPrint
-            eager={inView}
+            ready={ready}
             index={indexB}
             x="63.5%"
             y="60%"
@@ -252,6 +267,7 @@ const RetailSection = () => {
             rotate={2}
             opacity={0.94}
           />
+
 
         </div>
 
