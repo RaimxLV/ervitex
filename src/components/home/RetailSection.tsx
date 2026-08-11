@@ -240,7 +240,7 @@ const RetailSection = () => {
       {/* Photo layer with interactive prints */}
       <div ref={stageRef} className="absolute inset-0 -z-10" aria-hidden={false}>
         <div
-          className="absolute left-1/2 top-0 h-full w-auto min-w-full -translate-x-1/2 aspect-[1920/1088] bg-cover bg-top"
+          className="absolute left-0 top-0 w-full aspect-[1920/1088] bg-cover bg-top sm:left-1/2 sm:h-full sm:w-auto sm:min-w-full sm:-translate-x-1/2"
           style={{ backgroundImage: `url(${HERO_LQIP})` }}
         >
           <img
