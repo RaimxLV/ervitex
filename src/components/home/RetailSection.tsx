@@ -4,24 +4,27 @@ import { ArrowRight, MousePointerClick, Timer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import heroDuo from "@/assets/tbode-hero-duo.jpg";
-import printArt1 from "@/assets/print-art-1.webp";
-import printArt3 from "@/assets/print-art-3.webp";
-import printArt4 from "@/assets/print-art-4.webp";
-import printArt5 from "@/assets/print-art-5.webp";
+import tbodeLogo from "@/assets/tbode-logo-white.png.asset.json";
+import printA from "@/assets/print-new-1.png";
+import printB from "@/assets/print-new-2.png";
+import printC from "@/assets/print-new-3.png";
+import printD from "@/assets/print-new-4.png";
 
 const DESIGNER_URL =
   "https://t-bode.lv/design?utm_source=ervitex.lv&utm_medium=promo_banner&utm_campaign=tbode_designer";
 
-const designs = [printArt3, printArt4, printArt1, printArt5];
+const designs = [printA, printB, printC, printD];
 
 const TBodeWordmark = () => (
-  <span className="group/logo relative inline-flex select-none items-center gap-[0.15em] overflow-hidden font-heading text-lg font-bold uppercase tracking-[0.28em]">
-    <span className="text-accent">T</span>
-    <span className="inline-flex max-w-0 overflow-hidden opacity-0 transition-all duration-500 ease-out group-hover/logo:max-w-[9ch] group-hover/logo:opacity-100">
-      <span className="whitespace-nowrap">-BODE</span>
-    </span>
-    <span className="pointer-events-none absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-accent transition-transform duration-500 ease-out group-hover/logo:scale-x-100" />
-  </span>
+  <img
+    src={tbodeLogo.url}
+    alt="T-Bode"
+    width={220}
+    height={60}
+    loading="lazy"
+    decoding="async"
+    className="h-8 w-auto opacity-95 transition-opacity duration-300 hover:opacity-100 sm:h-10"
+  />
 );
 
 /** Print rendered on a model's back, positioned in % of the photo. */
@@ -32,7 +35,6 @@ const BackPrint = ({
   w,
   h,
   rotate,
-  blend,
   opacity,
 }: {
   index: number;
@@ -41,31 +43,30 @@ const BackPrint = ({
   w: string;
   h: string;
   rotate: number;
-  blend: string;
   opacity: number;
 }) => (
   <div
-    className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
+    className="pointer-events-none absolute"
     style={{ left: x, top: y, width: w, height: h, transform: `translate(-50%,-50%) rotate(${rotate}deg)` }}
     aria-hidden
   >
-    <AnimatePresence mode="wait">
+    <AnimatePresence initial={false} mode="sync">
       <motion.img
         key={`p-${index}`}
         src={designs[index]}
         alt=""
         loading="lazy"
         decoding="async"
-        initial={{ opacity: 0, scale: 0.82, filter: "blur(8px)" }}
-        animate={{ opacity, scale: 1, filter: "blur(0px)" }}
-        exit={{ opacity: 0, scale: 1.06, filter: "blur(8px)" }}
-        transition={{ type: "spring", stiffness: 200, damping: 22 }}
-        className="h-full w-full object-contain"
-        style={{ mixBlendMode: blend as React.CSSProperties["mixBlendMode"] }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.6, ease: "easeInOut" }}
+        className="absolute inset-0 h-full w-full object-contain"
       />
     </AnimatePresence>
   </div>
 );
+
 
 const RetailSection = () => {
   const { lang } = useLanguage();
