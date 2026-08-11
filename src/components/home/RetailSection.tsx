@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import { ArrowRight, MousePointerClick, Timer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -105,7 +105,7 @@ const RetailSection = () => {
 
   useEffect(() => {
     if (!running) return;
-    const id = setInterval(() => setIndex((i) => (i + 1) % designs.length), 4500);
+    const id = setInterval(() => setIndex((i) => (i + 1) % designs.length), 2000);
     return () => clearInterval(id);
   }, [running]);
 
