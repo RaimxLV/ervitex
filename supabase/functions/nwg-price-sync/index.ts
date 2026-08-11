@@ -95,6 +95,14 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (mode === "refresh") {
+      const { error } = await sb.rpc("refresh_catalog_prices");
+      if (error) throw new Error(error.message);
+      return new Response(JSON.stringify({ ok: true, refreshed: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const limit = Math.min(Number(url.searchParams.get("limit") || 4000), 40000);
     const batchSize = Math.min(Number(url.searchParams.get("batch") || 400), 500);
     const onlyMissing = url.searchParams.get("onlyMissing") !== "0";
@@ -195,10 +203,10 @@ Deno.serve(async (req) => {
         }
 
         const more = onlyMissing && skus.length >= limit;
-        if (!more) {
-          const { error: refreshErr } = await sb.rpc("refresh_catalog_prices");
-          if (refreshErr) console.error(`refresh_catalog_prices: ${refreshErr.message}`);
-        }
+        // Always refresh so already-synced contract prices get the markup applied
+        // (x1.65 x1.21) even while the rest of the assortment is still syncing.
+        const { error: refreshErr } = await sb.rpc("refresh_catalog_prices");
+        if (refreshErr) console.error(`refresh_catalog_prices: ${refreshErr.message}`);
 
         const result = { skus_requested: skus.length, updated, failed, more };
         await finishLog(sb, logId, {
