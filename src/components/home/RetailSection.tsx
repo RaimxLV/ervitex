@@ -214,8 +214,12 @@ const RetailSection = () => {
       while ((n === current || n === other) && guard++ < 20) n = Math.floor(Math.random() * pool);
       return n;
     };
-    const idA = setInterval(() => setIndexA((a) => pick(a, indexB)), 2000 + Math.random() * 900);
-    const idB = setInterval(() => setIndexB((b) => pick(b, indexA)), 2600 + Math.random() * 900);
+    const idA = setInterval(() => setIndexA((a) => pick(a, indexB)), 2000);
+    // Same 2s cadence for the woman, but offset by 1s so they never switch together.
+    let idB = 0;
+    const offset = window.setTimeout(() => {
+      idB = window.setInterval(() => setIndexB((b) => pick(b, indexA)), 2000);
+    }, 1000);
     return () => {
       clearInterval(idA);
       clearInterval(idB);
