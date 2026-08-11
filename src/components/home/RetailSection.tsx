@@ -240,18 +240,19 @@ const RetailSection = () => {
             className="h-full w-full object-cover"
           />
           {/* Man — black tee */}
-          <BackPrint eager={inView} index={index} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
-          {/* Woman — off-white tee (smaller, placed on the flat upper back to avoid fabric folds) */}
+          <BackPrint eager={inView} index={indexA} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
+          {/* Woman — off-white tee (bigger print on the flat upper back) */}
           <BackPrint
             eager={inView}
-            index={(index + 3) % designs.length}
+            index={indexB}
             x="63.5%"
-            y="59%"
-            w="15%"
-            h="21%"
+            y="60%"
+            w="19.5%"
+            h="27%"
             rotate={2}
-            opacity={0.92}
+            opacity={0.94}
           />
+
         </div>
 
         {/* Lighter cinematic gradients for text legibility */}
