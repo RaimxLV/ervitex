@@ -4,31 +4,76 @@ import { ArrowRight, MousePointerClick, Timer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import heroDuo from "@/assets/tbode-hero-duo.jpg";
-import tbodeLogo from "@/assets/tbode-logo.webp";
-import printA from "@/assets/print-new-1.webp";
-import printB from "@/assets/print-new-2.webp";
-import printC from "@/assets/print-new-3.webp";
-import printD from "@/assets/print-new-4.webp";
-import printE from "@/assets/print-new-5.webp";
-import printF from "@/assets/print-new-6.webp";
-import printG from "@/assets/print-new-7.webp";
+import printA from "@/assets/print-x1.webp";
+import printB from "@/assets/print-x2.webp";
+import printC from "@/assets/print-x3.webp";
+import printD from "@/assets/print-x4.webp";
+import printE from "@/assets/print-x5.webp";
+import printF from "@/assets/print-x6.webp";
+import printG from "@/assets/print-x7.webp";
 
 const DESIGNER_URL =
   "https://t-bode.lv/design?utm_source=ervitex.lv&utm_medium=promo_banner&utm_campaign=tbode_designer";
 
 const designs = [printA, printB, printC, printD, printE, printF, printG];
 
+/**
+ * Outline-only T-Bode wordmark with a neon glitch effect.
+ * Nothing is filled — pure stroked contours, with RGB-split layers that jitter.
+ */
+const GlitchWordmark = ({ className, strokeWidth = 1.6 }: { className?: string; strokeWidth?: number }) => {
+  const textProps = {
+    x: 300,
+    y: 62,
+    textAnchor: "middle" as const,
+    fontFamily: "var(--font-heading, 'Space Grotesk', sans-serif)",
+    fontSize: 58,
+    fontWeight: 700,
+    letterSpacing: 4,
+    fill: "none",
+    strokeWidth,
+    strokeLinejoin: "round" as const,
+  };
+  const subProps = {
+    x: 300,
+    y: 88,
+    textAnchor: "middle" as const,
+    fontFamily: "var(--font-heading, 'Space Grotesk', sans-serif)",
+    fontSize: 15,
+    letterSpacing: 9,
+    fill: "none",
+    strokeWidth: strokeWidth * 0.55,
+  };
+
+  return (
+    <svg viewBox="0 0 600 110" role="img" aria-label="T-Bode" className={className}>
+      {/* RGB split layers */}
+      <g className="glitch-layer-a" stroke="#00E5FF" opacity={0.8}>
+        <text {...textProps}>T-BODE</text>
+        <text {...subProps}>T-SHIRT STORE</text>
+      </g>
+      <g className="glitch-layer-b" stroke="#FF1E4D" opacity={0.8}>
+        <text {...textProps}>T-BODE</text>
+        <text {...subProps}>T-SHIRT STORE</text>
+      </g>
+      {/* Main white outline */}
+      <g className="glitch-layer-main" stroke="#FFFFFF">
+        <text {...textProps}>T-BODE</text>
+        <text {...subProps}>T-SHIRT STORE</text>
+        <line x1={120} y1={74} x2={480} y2={74} strokeWidth={strokeWidth * 0.7} />
+      </g>
+      {/* Sliced flicker copy */}
+      <g className="glitch-layer-slice" stroke="#FFFFFF" opacity={0.5}>
+        <text {...textProps}>T-BODE</text>
+      </g>
+    </svg>
+  );
+};
+
 const TBodeWordmark = () => (
-  <img
-    src={tbodeLogo}
-    alt="T-Bode"
-    width={220}
-    height={60}
-    loading="lazy"
-    decoding="async"
-    className="h-8 w-auto opacity-95 transition-opacity duration-300 hover:opacity-100 sm:h-10"
-  />
+  <GlitchWordmark className="h-12 w-auto max-w-[260px] drop-shadow-[0_0_18px_rgba(255,30,77,0.45)] sm:h-14 sm:max-w-[320px]" />
 );
+
 
 /**
  * Print rendered on a model's back, positioned in % of the photo.
@@ -164,17 +209,14 @@ const RetailSection = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
-        {/* Subtle 35° T-Bode watermark across the whole banner */}
+        {/* 35° glitchy neon outline T-Bode watermark across the whole banner */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
-          <img
-            src={tbodeLogo}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="w-[150%] max-w-none opacity-[0.07] mix-blend-overlay"
-            style={{ transform: "rotate(-35deg)" }}
+          <GlitchWordmark
+            strokeWidth={0.8}
+            className="w-[160%] max-w-none rotate-[-35deg] opacity-[0.25] mix-blend-screen drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]"
           />
         </div>
+
 
 
 
