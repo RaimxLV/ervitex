@@ -271,13 +271,13 @@ const RetailSection = () => {
           <div className="pointer-events-none absolute left-1/2 top-0 h-full aspect-[1920/1088] -translate-x-1/2">
 
             {/* Man — black tee */}
-            <BackPrint ready={ready} index={indexA} x="38.2%" y="52%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
+            <BackPrint ready={ready} index={indexA} x="39.4%" y="52%" w="14.5%" h="21%" rotate={-1} opacity={0.97} />
             {/* Woman — off-white tee */}
             <BackPrint ready={ready} index={indexB} x="61.5%" y="57%" w="13.5%" h="19.5%" rotate={1.5} opacity={0.94} />
           </div>
 
           {/* Soft blend into the text side */}
-          <div className="pointer-events-none absolute inset-y-0 -left-1 hidden w-1/3 bg-gradient-to-r from-background via-background/70 to-transparent sm:block" />
+          <div className="pointer-events-none absolute inset-y-0 -left-1 hidden w-[45%] bg-gradient-to-r from-black via-black/75 to-transparent sm:block" />
         </div>
 
         {/* Cinematic gradients for text legibility */}
