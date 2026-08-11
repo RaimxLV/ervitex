@@ -23,26 +23,38 @@ const HERO_LQIP =
 
 
 /**
- * The original T-Bode logo (unaltered artwork) with an RGB-split neon glitch treatment.
- * Layers are copies of the same file — no re-drawn / interpreted wordmark.
+ * The original T-Bode logo (unaltered artwork) with a true RGB-split neon glitch treatment.
+ * The R / G / B layers are masked copies of the very same file — no re-drawn wordmark.
  */
+const rgbLayer = (color: string): React.CSSProperties => ({
+  backgroundColor: color,
+  WebkitMaskImage: `url(${tbodeLogo})`,
+  maskImage: `url(${tbodeLogo})`,
+  WebkitMaskRepeat: "no-repeat",
+  maskRepeat: "no-repeat",
+  WebkitMaskPosition: "center",
+  maskPosition: "center",
+  WebkitMaskSize: "contain",
+  maskSize: "contain",
+  mixBlendMode: "screen",
+});
+
 const GlitchLogo = ({ className }: { className?: string }) => (
   <div className={`relative ${className ?? ""}`} aria-hidden>
-    <img
-      src={tbodeLogo}
-      alt=""
-      className="glitch-layer-a absolute inset-0 h-full w-full object-contain mix-blend-screen"
-      style={{ filter: "drop-shadow(0 0 6px #00E5FF)", opacity: 0.7 }}
-      loading="lazy"
-      decoding="async"
+    {/* R */}
+    <span
+      className="glitch-layer-b absolute inset-0 block"
+      style={{ ...rgbLayer("#FF1E4D"), opacity: 0.85 }}
     />
-    <img
-      src={tbodeLogo}
-      alt=""
-      className="glitch-layer-b absolute inset-0 h-full w-full object-contain mix-blend-screen"
-      style={{ filter: "drop-shadow(0 0 6px #FF1E4D)", opacity: 0.7 }}
-      loading="lazy"
-      decoding="async"
+    {/* G */}
+    <span
+      className="glitch-layer-slice absolute inset-0 block"
+      style={{ ...rgbLayer("#39FF6A"), opacity: 0.5 }}
+    />
+    {/* B */}
+    <span
+      className="glitch-layer-a absolute inset-0 block"
+      style={{ ...rgbLayer("#00E5FF"), opacity: 0.85 }}
     />
     <img
       src={tbodeLogo}
@@ -51,16 +63,9 @@ const GlitchLogo = ({ className }: { className?: string }) => (
       loading="lazy"
       decoding="async"
     />
-    <img
-      src={tbodeLogo}
-      alt=""
-      className="glitch-layer-slice absolute inset-0 h-full w-full object-contain"
-      style={{ opacity: 0.45 }}
-      loading="lazy"
-      decoding="async"
-    />
   </div>
 );
+
 
 /** Random glitch sparks — small crosses and circles flickering at random spots. */
 const GlitchSparks = () => {
