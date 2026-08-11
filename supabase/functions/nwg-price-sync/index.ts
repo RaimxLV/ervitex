@@ -198,12 +198,22 @@ Deno.serve(async (req) => {
               purchase_currency: "EUR",
               purchase_updated_at: now,
             }));
-          for (let j = 0; j < updates.length; j += 500) {
-            const chunk = updates.slice(j, j + 500);
+          const writeChunk = async (chunk: any[]): Promise<void> => {
             const { error } = await sb.from("nwg_skus").upsert(chunk, { onConflict: "sku" });
-            if (error) { console.error(`upsert: ${error.message}`); failed += chunk.length; }
-            else updated += chunk.length;
+            if (!error) { updated += chunk.length; return; }
+            if (chunk.length === 1) {
+              console.error(`upsert ${chunk[0].sku}: ${error.message}`);
+              failed += 1;
+              return;
+            }
+            const mid = Math.ceil(chunk.length / 2);
+            await writeChunk(chunk.slice(0, mid));
+            await writeChunk(chunk.slice(mid));
+          };
+          for (let j = 0; j < updates.length; j += 500) {
+            await writeChunk(updates.slice(j, j + 500));
           }
+
         };
 
         const CONCURRENCY = 4;
