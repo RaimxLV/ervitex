@@ -264,7 +264,7 @@ const RetailSection = () => {
         </div>
 
         {/* Lighter cinematic gradients for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent sm:bg-gradient-to-l sm:from-black/75 sm:via-black/35 sm:to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 sm:from-black/50 sm:via-transparent sm:to-black/20" />
 
         {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
