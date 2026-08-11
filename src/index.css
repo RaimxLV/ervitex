@@ -186,10 +186,24 @@
     70% { clip-path: inset(0 0 0 0); }
   }
 
+  @keyframes glitch-spark {
+    0%, 100% { opacity: 0; transform: scale(0.6); }
+    4% { opacity: 0.9; transform: scale(1); }
+    7% { opacity: 0; transform: scale(0.9); }
+    11% { opacity: 0.75; transform: scale(1.15); }
+    14% { opacity: 0; transform: scale(1); }
+    40% { opacity: 0; }
+    43% { opacity: 0.6; transform: scale(1.05); }
+    46% { opacity: 0; }
+  }
+
+  .animate-glitch-spark { animation: glitch-spark 3s steps(1, end) infinite; }
+
   .glitch-layer-a { animation: glitch-shift-a 2.6s steps(1, end) infinite; }
   .glitch-layer-b { animation: glitch-shift-b 3.1s steps(1, end) infinite; }
   .glitch-layer-main { animation: glitch-flicker 4s steps(1, end) infinite; }
   .glitch-layer-slice { animation: glitch-slice 3.4s steps(1, end) infinite; }
+
 }
 
 
