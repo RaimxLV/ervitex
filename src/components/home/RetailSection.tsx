@@ -196,10 +196,10 @@ const RetailSection = () => {
   const running = inView && tabVisible && !reduceMotion && !paused;
 
   // Stream the artwork in during idle time so the banner paints immediately.
-  const [ready, setReady] = useState(2);
+  const [ready, setReady] = useState(3);
   useEffect(() => {
     if (ready >= designs.length) return;
-    const id = window.setTimeout(() => setReady((r) => Math.min(r + 1, designs.length)), 250);
+    const id = window.setTimeout(() => setReady((r) => Math.min(r + 1, designs.length)), 120);
     return () => window.clearTimeout(id);
   }, [ready]);
 
@@ -221,14 +221,16 @@ const RetailSection = () => {
       while ((n === current || n === other) && guard++ < 25) n = Math.floor(Math.random() * pool);
       return n;
     };
+    // Kick off immediately so prints start switching the moment the banner is in view.
+    const kickA = window.setTimeout(() => setIndexA(pick(aRef.current, bRef.current)), 150);
     const idA = window.setInterval(() => setIndexA(pick(aRef.current, bRef.current)), 2000);
-    // Same 2s cadence for the woman, offset by 1s so they never switch together.
     let idB = 0;
     const offset = window.setTimeout(() => {
       setIndexB(pick(bRef.current, aRef.current));
       idB = window.setInterval(() => setIndexB(pick(bRef.current, aRef.current)), 2000);
     }, 1000);
     return () => {
+      window.clearTimeout(kickA);
       window.clearInterval(idA);
       window.clearTimeout(offset);
       window.clearInterval(idB);
@@ -237,7 +239,6 @@ const RetailSection = () => {
 
 
 
-  const ticker = lang === "lv" ? "OVERSIZE  •  DTF APDRUKA  •  NO 1 GABALA  •  T-BODE" : "OVERSIZE  •  DTF PRINT  •  FROM 1 PIECE  •  T-BODE";
 
   return (
     <section
@@ -283,8 +284,8 @@ const RetailSection = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 sm:from-black/45 sm:via-transparent sm:to-black/15" />
 
         {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
-          <GlitchLogo className="h-[37%] w-[168%] max-w-none rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden sm:justify-end" aria-hidden>
+          <GlitchLogo className="h-[37%] w-[168%] max-w-none rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)] sm:h-[26%] sm:w-[95%] sm:translate-x-[6%] lg:h-[24%] lg:w-[82%] lg:translate-x-[8%]" />
         </div>
 
         {/* Random glitch sparks */}
@@ -359,20 +360,6 @@ const RetailSection = () => {
       >
         {lang === "lv" ? "Drukāts Latvijā" : "Printed in Latvia"}
       </span>
-
-      {/* Ticker */}
-      <div className="relative overflow-hidden border-y border-white/10 bg-accent py-2.5" aria-hidden>
-        <div className="flex w-max motion-safe:animate-promo-ticker">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <span
-              key={i}
-              className="whitespace-nowrap px-6 font-heading text-xs uppercase tracking-[0.3em] text-accent-foreground sm:text-sm"
-            >
-              {ticker}
-            </span>
-          ))}
-        </div>
-      </div>
     </section>
   );
 };
