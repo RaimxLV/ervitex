@@ -249,7 +249,10 @@ const RetailSection = () => {
     >
       {/* Photo layer with interactive prints */}
       <div ref={stageRef} className="absolute inset-0 -z-10" aria-hidden={false}>
-        <div className="absolute top-1/2 h-full w-auto min-w-full -translate-x-1/2 -translate-y-1/2 aspect-[1920/1088] left-[34%] sm:left-1/2 lg:left-[66%]">
+        <div
+          className="absolute top-1/2 h-full w-auto min-w-full -translate-x-1/2 -translate-y-1/2 aspect-[1920/1088] left-[34%] sm:left-1/2 lg:left-[66%] bg-cover bg-center"
+          style={{ backgroundImage: `url(${HERO_LQIP})` }}
+        >
           <img
             src={heroDuo}
             alt={
@@ -259,7 +262,8 @@ const RetailSection = () => {
             }
             width={1920}
             height={1088}
-            loading="lazy"
+            loading="eager"
+            fetchPriority="high"
             decoding="async"
             className="h-full w-full object-cover"
           />
@@ -286,8 +290,9 @@ const RetailSection = () => {
 
         {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
-          <GlitchLogo className="h-[46%] w-[210%] max-w-none rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]" />
+          <GlitchLogo className="h-[37%] w-[168%] max-w-none rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)]" />
         </div>
+
 
         {/* Random glitch sparks */}
         <GlitchSparks />
