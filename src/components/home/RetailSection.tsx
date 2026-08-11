@@ -122,7 +122,7 @@ const RetailSection = () => {
     >
       {/* Photo layer with interactive prints */}
       <div ref={stageRef} className="absolute inset-0 -z-10" aria-hidden={false}>
-        <div className="absolute left-1/2 top-1/2 h-full w-auto min-w-full -translate-x-1/2 -translate-y-1/2 aspect-[1920/1088]">
+        <div className="absolute left-1/2 top-1/2 h-full w-auto min-w-full -translate-x-1/2 -translate-y-1/2 aspect-[1920/1088] lg:left-[66%]">
           <img
             src={heroDuo}
             alt={
@@ -137,9 +137,9 @@ const RetailSection = () => {
             className="h-full w-full object-cover"
           />
           {/* Man — black tee */}
-          <BackPrint index={index} x="33.5%" y="54%" w="20%" h="30%" rotate={-1.5} blend="screen" opacity={0.92} />
+          <BackPrint index={index} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} blend="normal" opacity={1} />
           {/* Woman — off-white tee */}
-          <BackPrint index={(index + 1) % designs.length} x="63.5%" y="64%" w="16%" h="24%" rotate={2} blend="multiply" opacity={0.95} />
+          <BackPrint index={(index + 1) % designs.length} x="63.5%" y="64%" w="19%" h="28%" rotate={2} blend="multiply" opacity={1} />
         </div>
 
         {/* Cinematic gradients for text legibility */}
