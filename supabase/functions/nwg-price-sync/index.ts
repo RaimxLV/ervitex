@@ -20,7 +20,7 @@ const TOKEN_URL = "https://id.gateway.nwg.se/connect/token";
 const CLIENT_ID = "ReactJs";
 const PRICE_URL = "https://commerce.gateway.nwg.se/assortment/fi/customerprice";
 const CONTEXT_ID = "C58B7BDF-CCA1-4655-8BD2-438E91964DB0";
-const BRANDS = ["Craft", "Craft AP", "Clique", "Clique Retail", "ProJob", "Cutter & Buck"];
+const BRANDS = ["Craft", "Clique", "ProJob", "Cutter & Buck"];
 
 async function getAccessToken(sb: SupabaseClient): Promise<string> {
   const { data, error } = await sb.from("nwg_auth").select("refresh_token").eq("id", 1).maybeSingle();
@@ -73,7 +73,14 @@ async function finishLog(sb: SupabaseClient, id: string | undefined, patch: Reco
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceRoleKey) {
+    return new Response(JSON.stringify({ ok: false, error: "Backend configuration missing" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const sb = createClient(supabaseUrl, serviceRoleKey);
   const url = new URL(req.url);
   const mode = (url.searchParams.get("mode") || "sync").toLowerCase();
 
@@ -123,6 +130,8 @@ Deno.serve(async (req) => {
             .from("nwg_styles")
             .select("product_number")
             .in("brand", BRANDS)
+            .eq("published", true)
+            .eq("archived", false)
             .order("product_number")
             .range(from, from + pageSize - 1);
           if (error) throw new Error(`style fetch: ${error.message}`);
@@ -139,6 +148,8 @@ Deno.serve(async (req) => {
               .from("nwg_skus")
               .select("sku, product_number")
               .in("product_number", pnChunk)
+              .eq("active", true)
+              .eq("discontinued", false)
               .order("sku")
               .range(from, from + pageSize - 1);
             if (onlyMissing) q = q.is("purchase_price", null);
@@ -179,7 +190,7 @@ Deno.serve(async (req) => {
             .filter((r) => r.valid && typeof r.num === "number" && (r.num as number) > 0 && pnBySku.has(r.sku))
             .map((r) => ({
               sku: r.sku,
-              product_number: pnBySku.get(r.sku)!,
+              product_number: pnBySku.get(r.sku),
               purchase_price: r.num,
               purchase_currency: "EUR",
               purchase_updated_at: now,
@@ -203,8 +214,8 @@ Deno.serve(async (req) => {
         }
 
         const more = onlyMissing && skus.length >= limit;
-        // Always refresh so already-synced contract prices get the markup applied
-        // (x1.65 x1.21) even while the rest of the assortment is still syncing.
+        // Always refresh so already-synced contract prices get the exact
+        // x1.67 markup and x1.21 VAT applied while the rest is still syncing.
         const { error: refreshErr } = await sb.rpc("refresh_catalog_prices");
         if (refreshErr) console.error(`refresh_catalog_prices: ${refreshErr.message}`);
 
@@ -219,12 +230,12 @@ Deno.serve(async (req) => {
 
         // Self-chain so the whole assortment is covered across invocations.
         if (more && chain) {
-          const next = `${Deno.env.get("SUPABASE_URL")}/functions/v1/nwg-price-sync?limit=${limit}&batch=${batchSize}`;
+          const next = `${supabaseUrl}/functions/v1/nwg-price-sync?limit=${limit}&batch=${batchSize}`;
           fetch(next, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+              "Authorization": `Bearer ${serviceRoleKey}`,
             },
           }).catch((e) => console.error(`chain: ${(e as Error).message}`));
         }

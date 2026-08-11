@@ -17,6 +17,14 @@ const corsHeaders: Record<string, string> = {
 const NWG_ENDPOINT = "https://api.gateway.nwg.se/graphql";
 const LANG = "en";
 const PAGE_SIZE = 100;
+const BRAND_NAMES = new Map([
+  ["craft", "Craft"],
+  ["craft ap", "Craft"],
+  ["clique", "Clique"],
+  ["clique retail", "Clique"],
+  ["projob", "ProJob"],
+  ["cutter & buck", "Cutter & Buck"],
+]);
 
 // ------------------------------------------------------------------- helpers
 
@@ -97,9 +105,9 @@ async function finishLog(sb: SupabaseClient, id: string | undefined, patch: Reco
 
 // ------------------------------------------------------------------- GraphQL
 
-const Q_ASSORTMENT_ROOTS = `
-  query($lang: String!, $page: Int!, $size: PageSize!) {
-    assortment(assortmentId: "", language: $lang, page: $page, pageSize: $size) {
+const Q_ASSORTMENT_PAGE = `
+  query($assortmentId: String!, $lang: String!, $page: Int!, $size: PageSize!) {
+    assortment(assortmentId: $assortmentId, language: $lang, page: $page, pageSize: $size) {
       count
       result { id name assortmentId parentId childNodeIds }
     }
@@ -114,10 +122,21 @@ const Q_ASSORTMENT_NODE = `
   }
 `;
 
+const Q_DISCOVER_ASSORTMENTS = `
+  query($q: String!) {
+    productSearch(q: $q, language: "en", assortmentId: "", page: 1, pageSize: 5) {
+      result {
+        assortmentNodes { id name assortmentId parentId childNodeIds }
+      }
+    }
+  }
+`;
+
 const PRODUCT_FIELDS = `
   productNumber productName productBrand productFabrics productWeight
   productCountryOfOrigin productCatalogText productCommerceText productUsp
   productAssortment
+  assortmentNodes { id name assortmentId parentId childNodeIds }
   productCategory { key value }
   productGender   { key value }
   productFit      { key value }
@@ -144,9 +163,9 @@ const PRODUCT_FIELDS = `
   }
 `;
 
-const Q_PRODUCT_SEARCH = `
-  query($lang: String!, $q: String!, $page: Int!, $size: PageSize!) {
-    productSearch(language: $lang, q: $q, assortmentId: "", page: $page, pageSize: $size) {
+const Q_PRODUCTS_BY_ASSORTMENT = `
+  query($lang: String!, $assortmentId: String!, $page: Int!, $size: PageSize!) {
+    productsByAssortmentId(language: $lang, assortmentId: $assortmentId, page: $page, pageSize: $size) {
       count
       result { ${PRODUCT_FIELDS} }
     }
@@ -156,18 +175,20 @@ const Q_PRODUCT_SEARCH = `
 
 // -------------------------------------------------------------- mapping ----
 
-function mapProduct(row: any, seenProductNumbers: Set<string>): {
+function mapProduct(row: any, assortmentId: string, seenProductNumbers: Set<string>): {
   style?: any; variants: any[]; skus: any[]; images: any[];
 } {
   const pn = toStr(row.productNumber);
   if (!pn) return { variants: [], skus: [], images: [] };
+  const brand = BRAND_NAMES.get((toStr(row.productBrand) ?? "").toLocaleLowerCase());
+  if (!brand) return { variants: [], skus: [], images: [] };
   if (seenProductNumbers.has(pn)) return { variants: [], skus: [], images: [] };
   seenProductNumbers.add(pn);
 
   const style = {
     product_number: pn,
     name: toStr(row.productName) ?? pn,
-    brand: toStr(row.productBrand),
+    brand,
     category: kvpFirst(row.productCategory),
     gender: kvpFirst(row.productGender),
     fit: kvpFirst(row.productFit),
@@ -180,7 +201,10 @@ function mapProduct(row: any, seenProductNumbers: Set<string>): {
     retail_price: toNum(row.retailPrice?.price),
     currency: toStr(row.retailPrice?.currency) ?? "EUR",
     main_picture_url: toStr(row.pictures?.[0]?.highResUrl ?? row.pictures?.[0]?.standardUrl ?? row.pictures?.[0]?.imageUrl),
-    assortment_ids: Array.isArray(row.productAssortment) ? row.productAssortment : null,
+    assortment_ids: Array.from(new Set([
+      assortmentId,
+      ...(Array.isArray(row.productAssortment) ? row.productAssortment.map(toStr).filter(Boolean) : []),
+    ])),
     published: true,
     archived: false,
     raw: (() => { const { variations, pictures, ...rest } = row; return rest; })(),
@@ -209,9 +233,14 @@ function mapProduct(row: any, seenProductNumbers: Set<string>): {
     });
   });
 
-  (row.variations ?? []).forEach((v: any) => {
+  (Array.isArray(row.variations) ? row.variations : []).forEach((v: any) => {
     const itemNumber = toStr(v.itemNumber);
     if (!itemNumber) return;
+    const validSkus = (Array.isArray(v.skus) ? v.skus : []).filter((s: any) => {
+      const skuProductNumber = toStr(s.productNumber);
+      return !skuProductNumber || skuProductNumber === pn;
+    });
+    if (!validSkus.length) return;
     variants.push({
       item_number: itemNumber,
       product_number: pn,
@@ -242,7 +271,7 @@ function mapProduct(row: any, seenProductNumbers: Set<string>): {
       });
     });
 
-    (v.skus ?? []).forEach((s: any) => {
+    validSkus.forEach((s: any) => {
       const sku = toStr(s.sku);
       if (!sku) return;
       const price = Array.isArray(s.prices) && s.prices.length ? s.prices[0] : null;
@@ -269,36 +298,86 @@ function mapProduct(row: any, seenProductNumbers: Set<string>): {
 // ------------------------------------------------------------------ syncers
 
 async function syncAssortments(sb: SupabaseClient) {
-  const collected: any[] = [];
-  let page = 1;
-  while (true) {
-    const data = await gql<any>(Q_ASSORTMENT_ROOTS, { lang: LANG, page, size: 100 });
-    const res = data.assortment?.result ?? [];
-    if (!res.length) break;
-    for (const a of res) {
-      collected.push({
-        id: toStr(a.id) ?? toStr(a.assortmentId),
+  const collected = new Map<string, any>();
+  const queuedNodeIds: string[] = [];
+  const visitedNodeIds = new Set<string>();
+  const discoveryProducts = ["010177", "1900095", "351033", "641006"];
+  for (const productNumber of discoveryProducts) {
+    const data = await gql<any>(Q_DISCOVER_ASSORTMENTS, { q: productNumber });
+    for (const product of data.productSearch?.result ?? []) {
+      for (const a of product.assortmentNodes ?? []) {
+        const id = toStr(a.id);
+        if (!id) continue;
+        collected.set(id, {
+          id,
+          name: toStr(a.name),
+          parent_id: toStr(a.parentId),
+          raw: a,
+        });
+        queuedNodeIds.push(id);
+        for (const childId of Array.isArray(a.childNodeIds) ? a.childNodeIds : []) {
+          const child = toStr(childId);
+          if (child) queuedNodeIds.push(child);
+        }
+      }
+    }
+  }
+  for (const seed of [...collected.values()]) {
+    const assortmentId = toStr(seed.raw?.assortmentId);
+    if (!assortmentId) continue;
+    let page = 1;
+    while (true) {
+      const data = await gql<any>(Q_ASSORTMENT_PAGE, { assortmentId, lang: LANG, page, size: 100 });
+      const res = data.assortment?.result ?? [];
+      if (!res.length) break;
+      for (const a of res) {
+      const id = toStr(a.id) ?? toStr(a.assortmentId);
+      if (!id) continue;
+      collected.set(id, {
+        id,
         name: toStr(a.name),
         parent_id: toStr(a.parentId),
         raw: a,
       });
+      for (const childId of Array.isArray(a.childNodeIds) ? a.childNodeIds : []) {
+        const child = toStr(childId);
+        if (child) queuedNodeIds.push(child);
+      }
+      }
+      if (res.length < 100) break;
+      page++;
+      if (page > 100) break;
     }
-    if (res.length < 100) break;
-    page++;
-    if (page > 100) break;
   }
-  if (collected.length) await chunkUpsert(sb, "nwg_assortments", collected, "id");
-  return collected.length;
-}
+  while (queuedNodeIds.length) {
+    const nodeId = queuedNodeIds.shift();
+    if (!nodeId || visitedNodeIds.has(nodeId)) continue;
+    visitedNodeIds.add(nodeId);
+    const data = await gql<any>(Q_ASSORTMENT_NODE, { id: nodeId, lang: LANG });
+    const a = data.assortmentNodeById;
+    if (!a) continue;
+    const id = toStr(a.id) ?? toStr(a.assortmentId) ?? nodeId;
+    collected.set(id, {
+      id,
+      name: toStr(a.name),
+      parent_id: toStr(a.parentId),
+      raw: a,
+    });
+    for (const childId of Array.isArray(a.childNodeIds) ? a.childNodeIds : []) {
+      const child = toStr(childId);
+      if (child && !visitedNodeIds.has(child)) queuedNodeIds.push(child);
+    }
+  }
 
-// NWG productSearch caps pagination around ~10 000 results per query.
-// To crawl the full catalog we shard the search across many narrow queries
-// (single letters/digits) and dedupe by product_number.
-const DEFAULT_SHARDS = "abcdefghijklmnopqrstuvwxyz0123456789".split("");
+  const rows = [...collected.values()];
+  if (!rows.length) throw new Error("NWG returned no assortment nodes; catalog was left unchanged");
+  await chunkUpsert(sb, "nwg_assortments", rows, "id");
+  return rows;
+}
 
 async function syncStyles(
   sb: SupabaseClient,
-  opts: { maxPages?: number; startPage?: number; query?: string; shards?: string[] } = {},
+  assortmentNodes: any[],
 ) {
   const seen = new Set<string>();
   let styles: any[] = [];
@@ -314,65 +393,108 @@ async function syncStyles(
     styles = []; variants = []; skus = []; images = [];
   };
 
-  const shards = opts.query ? [opts.query] : (opts.shards ?? DEFAULT_SHARDS);
-  const startPage = Math.max(1, opts.startPage ?? 1);
-  const maxPages = opts.maxPages ?? 100; // per-shard cap (NWG hard-limit ~100)
   let pagesFetched = 0;
-  const perShard: Record<string, { pages: number; count: number }> = {};
+  const perAssortment: Record<string, { pages: number; count: number }> = {};
+  const assortmentIds = Array.from(new Set(assortmentNodes
+    .map((node) => toStr(node.raw?.assortmentId) ?? toStr(node.id))
+    .filter((id): id is string => Boolean(id))));
+  if (!assortmentIds.length) throw new Error("No usable NWG assortment IDs; catalog was left unchanged");
 
-  for (const shard of shards) {
-    let page = startPage;
-    const endPage = startPage + maxPages - 1;
-    let shardCount = 0;
-    let shardPages = 0;
-    while (page <= endPage) {
-      let data: any;
-      try {
-        data = await gql<any>(Q_PRODUCT_SEARCH, { lang: LANG, q: shard, page, size: PAGE_SIZE });
-      } catch (e) {
-        console.error(`shard "${shard}" page ${page} failed: ${(e as Error).message}`);
-        break;
-      }
-      const rows = data.productSearch?.result ?? [];
-      shardCount = data.productSearch?.count ?? shardCount;
+  for (const assortmentId of assortmentIds) {
+    let page = 1;
+    let assortmentCount = 0;
+    let assortmentPages = 0;
+    while (true) {
+      const data = await gql<any>(Q_PRODUCTS_BY_ASSORTMENT, {
+        lang: LANG, assortmentId, page, size: PAGE_SIZE,
+      });
+      const rows = data.productsByAssortmentId?.result ?? [];
+      assortmentCount = data.productsByAssortmentId?.count ?? assortmentCount;
       if (!rows.length) break;
       for (const r of rows) {
-        const m = mapProduct(r, seen);
+        const m = mapProduct(r, assortmentId, seen);
         if (m.style) styles.push(m.style);
         variants.push(...m.variants);
         skus.push(...m.skus);
         images.push(...m.images);
       }
       pagesFetched++;
-      shardPages++;
+      assortmentPages++;
 
       if (styles.length >= 300 || variants.length >= 1500 || images.length >= 4000) {
         await flush();
       }
       if (rows.length < PAGE_SIZE) break;
       page++;
+      if (page > 1000) throw new Error(`Pagination safety limit reached for assortment ${assortmentId}`);
     }
-    perShard[shard] = { pages: shardPages, count: shardCount };
+    perAssortment[assortmentId] = { pages: assortmentPages, count: assortmentCount };
     await flush();
   }
 
-  return { pages_fetched: pagesFetched, unique_styles: seen.size, shards: perShard };
+  if (!seen.size) throw new Error("NWG assortments returned no supported products; catalog was left unchanged");
+
+  const { data: existing, error: existingError } = await sb
+    .from("nwg_styles")
+    .select("product_number")
+    .in("brand", ["Craft", "Craft AP", "Clique", "Clique Retail", "ProJob", "Cutter & Buck"])
+    .eq("archived", false);
+  if (existingError) throw new Error(`archive candidate fetch: ${existingError.message}`);
+  const stale = (existing ?? []).map((row: any) => toStr(row.product_number)).filter((pn): pn is string => Boolean(pn) && !seen.has(pn));
+  for (let i = 0; i < stale.length; i += 200) {
+    const { error } = await sb.from("nwg_styles").update({
+      archived: true,
+      archived_at: new Date().toISOString(),
+    }).in("product_number", stale.slice(i, i + 200));
+    if (error) throw new Error(`archive stale styles: ${error.message}`);
+  }
+
+  return {
+    pages_fetched: pagesFetched,
+    unique_styles: seen.size,
+    archived_styles: stale.length,
+    assortments: perAssortment,
+  };
 }
 
 
 async function inspectApi(q?: string) {
-  const schema = await gql<any>(`{ __schema { queryType { name } } }`);
+  const schema = await gql<any>(`{
+    __schema {
+      queryType {
+        name
+        fields {
+          name
+          args { name type { kind name ofType { kind name } } }
+          type { kind name ofType { kind name } }
+        }
+      }
+    }
+  }`);
   const query = q || "*";
   let sample: any = null;
   try {
     sample = await gql<any>(
-      `query($q:String!){ productSearch(q:$q, language:"en", assortmentId:"", page:1, pageSize:2){ count result{ productNumber productName productBrand retailPrice{ price currency } variations{ itemNumber skus{ sku prices{ currency salesPrice retailPrice priceList } retailPrice{ price currency } } } } } }`,
+      `query($q:String!){ productSearch(q:$q, language:"en", assortmentId:"", page:1, pageSize:2){ count result{ productNumber productName productBrand assortmentNodes { id name assortmentId parentId childNodeIds } retailPrice{ price currency } variations{ itemNumber skus{ sku productNumber prices{ currency salesPrice retailPrice priceList } retailPrice{ price currency } } } } } }`,
       { q: query },
     );
   } catch (e) {
     sample = { error: (e as Error).message };
   }
-  return { schemaOk: !!schema?.__schema, sample };
+  let assortmentSample: any = null;
+  if (q) {
+    try {
+      assortmentSample = await gql<any>(Q_PRODUCTS_BY_ASSORTMENT, {
+        lang: LANG, assortmentId: q, page: 1, size: 2,
+      });
+    } catch (e) {
+      assortmentSample = { error: (e as Error).message };
+    }
+  }
+  const relevantFields = (schema?.__schema?.queryType?.fields ?? []).filter((field: any) =>
+    /assort|product/i.test(field.name)
+  );
+  return { schemaOk: !!schema?.__schema, relevantFields, sample, assortmentSample };
 }
 
 // ------------------------------------------------------------------ handler
@@ -380,28 +502,33 @@ async function inspectApi(q?: string) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceRoleKey) {
+    return new Response(JSON.stringify({ ok: false, error: "Backend configuration missing" }), {
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const sb = createClient(supabaseUrl, serviceRoleKey);
   const url = new URL(req.url);
   const mode = (url.searchParams.get("mode") || "all").toLowerCase();
-  const maxPages = url.searchParams.get("maxPages");
-  const startPage = url.searchParams.get("startPage");
   const q = url.searchParams.get("q") || undefined;
-
-  const shardsParam = url.searchParams.get("shards");
 
   const logId = await startLog(sb, `nwg:${mode}`);
   const result: Record<string, unknown> = {};
 
   try {
     if (mode === "inspect") result.inspect = await inspectApi(q);
-    if (mode === "assortments" || mode === "all") result.assortments = await syncAssortments(sb);
+    let assortmentNodes: any[] | null = null;
+    if (mode === "assortments" || mode === "styles" || mode === "all") {
+      assortmentNodes = await syncAssortments(sb);
+      result.assortments = assortmentNodes.length;
+    }
     if (mode === "styles" || mode === "all") {
-      result.catalog = await syncStyles(sb, {
-        maxPages: maxPages ? Number(maxPages) : undefined,
-        startPage: startPage ? Number(startPage) : undefined,
-        query: q,
-        shards: shardsParam ? shardsParam.split(",").map((s) => s.trim()).filter(Boolean) : undefined,
-      });
+      if (!assortmentNodes) throw new Error("NWG assortment discovery failed");
+      result.catalog = await syncStyles(sb, assortmentNodes);
+      const { error: itemsError } = await sb.rpc("refresh_catalog_items_mv");
+      if (itemsError) throw new Error(`catalog refresh: ${itemsError.message}`);
     }
 
     await finishLog(sb, logId, { status: "success", message: `NWG sync (${mode}) ok`, details: result });

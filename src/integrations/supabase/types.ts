@@ -737,7 +737,29 @@ export type Database = {
           standard_url?: string | null
           thumbnail_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "nwg_images_style_fk"
+            columns: ["product_number"]
+            isOneToOne: false
+            referencedRelation: "nwg_style_summary"
+            referencedColumns: ["product_number"]
+          },
+          {
+            foreignKeyName: "nwg_images_style_fk"
+            columns: ["product_number"]
+            isOneToOne: false
+            referencedRelation: "nwg_styles"
+            referencedColumns: ["product_number"]
+          },
+          {
+            foreignKeyName: "nwg_images_variant_fk"
+            columns: ["product_number", "item_number"]
+            isOneToOne: false
+            referencedRelation: "nwg_variants"
+            referencedColumns: ["product_number", "item_number"]
+          },
+        ]
       }
       nwg_skus: {
         Row: {
@@ -794,7 +816,29 @@ export type Database = {
           size_sequence?: string | null
           sku?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "nwg_skus_style_fk"
+            columns: ["product_number"]
+            isOneToOne: false
+            referencedRelation: "nwg_style_summary"
+            referencedColumns: ["product_number"]
+          },
+          {
+            foreignKeyName: "nwg_skus_style_fk"
+            columns: ["product_number"]
+            isOneToOne: false
+            referencedRelation: "nwg_styles"
+            referencedColumns: ["product_number"]
+          },
+          {
+            foreignKeyName: "nwg_skus_variant_fk"
+            columns: ["product_number", "item_number"]
+            isOneToOne: false
+            referencedRelation: "nwg_variants"
+            referencedColumns: ["product_number", "item_number"]
+          },
+        ]
       }
       nwg_styles: {
         Row: {
@@ -2149,7 +2193,29 @@ export type Database = {
           size_sequence?: string | null
           sku?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "nwg_skus_style_fk"
+            columns: ["product_number"]
+            isOneToOne: false
+            referencedRelation: "nwg_style_summary"
+            referencedColumns: ["product_number"]
+          },
+          {
+            foreignKeyName: "nwg_skus_style_fk"
+            columns: ["product_number"]
+            isOneToOne: false
+            referencedRelation: "nwg_styles"
+            referencedColumns: ["product_number"]
+          },
+          {
+            foreignKeyName: "nwg_skus_variant_fk"
+            columns: ["product_number", "item_number"]
+            isOneToOne: false
+            referencedRelation: "nwg_variants"
+            referencedColumns: ["product_number", "item_number"]
+          },
+        ]
       }
       nwg_style_summary: {
         Row: {
