@@ -4,7 +4,7 @@ import { ArrowRight, MousePointerClick, Timer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import heroDuo from "@/assets/tbode-hero-duo.jpg";
-import tbodeLogo from "@/assets/tbode-logo-white.png.asset.json";
+import tbodeLogo from "@/assets/tbode-logo.webp";
 import printA from "@/assets/print-new-1.png";
 import printB from "@/assets/print-new-2.png";
 import printC from "@/assets/print-new-3.png";
@@ -17,7 +17,7 @@ const designs = [printA, printB, printC, printD];
 
 const TBodeWordmark = () => (
   <img
-    src={tbodeLogo.url}
+    src={tbodeLogo}
     alt="T-Bode"
     width={220}
     height={60}
