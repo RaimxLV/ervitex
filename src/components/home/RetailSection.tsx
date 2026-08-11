@@ -359,20 +359,6 @@ const RetailSection = () => {
       >
         {lang === "lv" ? "Drukāts Latvijā" : "Printed in Latvia"}
       </span>
-
-      {/* Ticker */}
-      <div className="relative overflow-hidden border-y border-white/10 bg-accent py-2.5" aria-hidden>
-        <div className="flex w-max motion-safe:animate-promo-ticker">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <span
-              key={i}
-              className="whitespace-nowrap px-6 font-heading text-xs uppercase tracking-[0.3em] text-accent-foreground sm:text-sm"
-            >
-              {ticker}
-            </span>
-          ))}
-        </div>
-      </div>
     </section>
   );
 };
