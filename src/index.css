@@ -199,6 +199,14 @@
 
   .animate-glitch-spark { animation: glitch-spark 3s steps(1, end) infinite; }
 
+  @keyframes promo-pulse-cta {
+    0%, 100% { transform: scale(1); box-shadow: 0 10px 30px -10px hsl(var(--accent) / 0.6); }
+    50% { transform: scale(1.03); box-shadow: 0 18px 48px -8px hsl(var(--accent) / 0.85); }
+  }
+
+  .animate-promo-pulse-cta { animation: promo-pulse-cta 2.4s ease-in-out infinite; }
+
+
   .glitch-layer-a { animation: glitch-shift-a 2.6s steps(1, end) infinite; }
   .glitch-layer-b { animation: glitch-shift-b 3.1s steps(1, end) infinite; }
   .glitch-layer-main { animation: glitch-flicker 4s steps(1, end) infinite; }

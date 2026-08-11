@@ -214,10 +214,15 @@ const RetailSection = () => {
       while ((n === current || n === other) && guard++ < 20) n = Math.floor(Math.random() * pool);
       return n;
     };
-    const idA = setInterval(() => setIndexA((a) => pick(a, indexB)), 2000 + Math.random() * 900);
-    const idB = setInterval(() => setIndexB((b) => pick(b, indexA)), 2600 + Math.random() * 900);
+    const idA = setInterval(() => setIndexA((a) => pick(a, indexB)), 2000);
+    // Same 2s cadence for the woman, but offset by 1s so they never switch together.
+    let idB = 0;
+    const offset = window.setTimeout(() => {
+      idB = window.setInterval(() => setIndexB((b) => pick(b, indexA)), 2000);
+    }, 1000);
     return () => {
       clearInterval(idA);
+      window.clearTimeout(offset);
       clearInterval(idB);
     };
   }, [running, indexA, indexB, ready]);
@@ -275,21 +280,37 @@ const RetailSection = () => {
         <div className="max-w-2xl">
           <h2
             id="tbode-promo-title"
-            className="font-heading text-[clamp(2.2rem,5.4vw,4.2rem)] font-bold uppercase leading-[0.95] tracking-tight"
+            className="font-heading text-[clamp(2.2rem,5.4vw,4.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight"
           >
-            {lang === "lv"
-              ? "Nepieciešams T-krekls vai hūdijs dāvanai?"
-              : "Need a T-shirt or hoodie as a gift?"}
-          </h2>
-
-          <p className="mt-8 max-w-xl text-lg font-medium leading-relaxed opacity-90 sm:text-xl">
             {lang === "lv" ? (
               <>
-                Izveido savu dizainu <span className="text-accent">ONLINE</span> un saņem 1–2 dienās jebkurā pakomātā visā LATVIJĀ.
+                Nepieciešams <span className="whitespace-nowrap text-accent">T-krekls</span> vai{" "}
+                <span className="whitespace-nowrap">hūdijs</span> dāvanai?
               </>
             ) : (
               <>
-                Create your design <span className="text-accent">ONLINE</span> and get it in 1–2 days to any parcel locker in Latvia.
+                Need a <span className="whitespace-nowrap text-accent">T-shirt</span> or{" "}
+                <span className="whitespace-nowrap">hoodie</span> as a gift?
+              </>
+            )}
+          </h2>
+
+          <p className="mt-8 max-w-2xl text-xl font-bold leading-snug tracking-tight sm:text-2xl lg:text-[1.75rem]">
+            {lang === "lv" ? (
+              <>
+                Izveido savu dizainu{" "}
+                <span className="font-extrabold uppercase text-accent drop-shadow-[0_0_18px_hsl(var(--accent)/0.6)]">
+                  ONLINE
+                </span>{" "}
+                un saņem 1–2 dienās jebkurā pakomātā visā LATVIJĀ.
+              </>
+            ) : (
+              <>
+                Create your design{" "}
+                <span className="font-extrabold uppercase text-accent drop-shadow-[0_0_18px_hsl(var(--accent)/0.6)]">
+                  ONLINE
+                </span>{" "}
+                and get it in 1–2 days to any parcel locker in Latvia.
               </>
             )}
           </p>
@@ -298,19 +319,20 @@ const RetailSection = () => {
             <a href={DESIGNER_URL} target="_blank" rel="noopener noreferrer" className="inline-block w-full sm:w-auto">
               <Button
                 size="lg"
-                className="promo-cta group h-14 w-full justify-center gap-3 rounded-none border-0 px-10 font-heading text-sm uppercase tracking-[0.15em] text-accent-foreground sm:w-auto"
+                className="promo-cta group h-16 w-full justify-center gap-4 rounded-none border-0 px-12 font-heading text-base font-bold uppercase tracking-[0.15em] text-accent-foreground transition-transform duration-300 motion-safe:animate-promo-pulse-cta hover:scale-[1.04] sm:h-[4.25rem] sm:w-auto sm:text-lg"
               >
                 <span className="whitespace-nowrap">
                   {lang === "lv" ? "Izveidot dizainu" : "Create your design"}
                 </span>
                 <ArrowRight
-                  className="h-4 w-4 shrink-0 transition-transform duration-300 group-hover:translate-x-1.5"
-                  strokeWidth={2}
+                  className="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:translate-x-2"
+                  strokeWidth={2.5}
                   aria-hidden
                 />
               </Button>
             </a>
           </div>
+
         </div>
       </div>
 
