@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
-import { ArrowRight, MousePointerClick, Timer, Sparkles } from "lucide-react";
+import { ArrowRight, MousePointerClick, Timer, Sparkles, Upload, Shirt, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import heroDuo from "@/assets/tbode-hero-duo.jpg";
+import heroDuo from "@/assets/tbode-hero-duo.webp";
 import tbodeLogo from "@/assets/tbode-logo.webp";
 import printA from "@/assets/print-x1.webp";
 import printB from "@/assets/print-x2.webp";
@@ -17,6 +17,10 @@ const DESIGNER_URL =
   "https://t-bode.lv/design?utm_source=ervitex.lv&utm_medium=promo_banner&utm_campaign=tbode_designer";
 
 const designs = [printA, printB, printC, printD, printE, printF, printG];
+
+const HERO_LQIP =
+  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAASACADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDG0xhDdh3kKRhSWK+mKsrqcP8AaAlUyjPG9+/GOlV3sT5DMJV+7nGOtUYlWSVEZtgY43elTdMq1jqhLdNeoypm1IG7dH+fNM12OP8AdiJgxCkkA8j0rWyvljByoUc+orl9Tv3ku5dkqlcBAwGcgUoybYSirGcvSq4+8PrRRVslHew/8eaf7g/lXLwqrK2QDyeooorKBpLc/9k=";
+
 
 /**
  * The original T-Bode logo (unaltered artwork) with an RGB-split neon glitch treatment.
