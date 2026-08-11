@@ -152,8 +152,7 @@ Deno.serve(async (req) => {
         const now = new Date().toISOString();
         let token = await getAccessToken(sb);
 
-        for (let i = 0; i < skus.length; i += batchSize) {
-          const slice = skus.slice(i, i + batchSize);
+        const processSlice = async (slice: string[]) => {
           let rows: Array<{ sku: string; num: number | null; valid: boolean }>;
           try {
             rows = await fetchPrices(token, slice);
@@ -165,7 +164,7 @@ Deno.serve(async (req) => {
             } else {
               console.error(msg);
               failed += slice.length;
-              continue;
+              return;
             }
           }
           const updates = rows
@@ -183,6 +182,16 @@ Deno.serve(async (req) => {
             if (error) { console.error(`upsert: ${error.message}`); failed += chunk.length; }
             else updated += chunk.length;
           }
+        };
+
+        const CONCURRENCY = 4;
+        for (let i = 0; i < skus.length; i += batchSize * CONCURRENCY) {
+          const group: Promise<void>[] = [];
+          for (let k = 0; k < CONCURRENCY; k++) {
+            const slice = skus.slice(i + k * batchSize, i + (k + 1) * batchSize);
+            if (slice.length) group.push(processSlice(slice));
+          }
+          await Promise.all(group);
         }
 
         const more = onlyMissing && skus.length >= limit;
