@@ -283,10 +283,15 @@ const RetailSection = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/10 sm:from-black/45 sm:via-transparent sm:to-black/15" />
 
-        {/* 25° glitchy neon T-Bode watermark across the whole banner (original logo artwork) */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden sm:justify-end" aria-hidden>
-          <GlitchLogo className="h-[30%] w-[150%] max-w-none translate-y-[42%] rotate-[-25deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)] sm:h-[22%] sm:w-[86%] sm:translate-x-[8%] sm:translate-y-[46%] lg:h-[20%] lg:w-[74%] lg:translate-x-[10%] lg:translate-y-[48%]" />
+        {/* Glitchy neon T-Bode watermark split in two halves:
+            part 1 peeks in from the top edge, part 2 from the bottom edge. */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+          {/* Top half — only the lower portion of the wordmark is visible */}
+          <GlitchLogo className="absolute left-[-6%] top-0 h-[26%] w-[150%] max-w-none origin-top-left -translate-y-[52%] rotate-[-25deg] opacity-[0.28] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)] sm:left-auto sm:right-[-4%] sm:h-[24%] sm:w-[86%] sm:-translate-y-[50%] lg:h-[22%] lg:w-[72%]" />
+          {/* Bottom half — only the upper portion of the wordmark is visible */}
+          <GlitchLogo className="absolute bottom-0 left-[-14%] h-[26%] w-[150%] max-w-none translate-y-[50%] rotate-[-25deg] opacity-[0.28] drop-shadow-[0_0_30px_rgba(255,30,77,0.3)] sm:left-[-6%] sm:h-[24%] sm:w-[86%] lg:h-[22%] lg:w-[72%]" />
         </div>
+
 
         {/* Random glitch sparks */}
         <GlitchSparks />
