@@ -286,12 +286,13 @@ const RetailSection = () => {
 
         {/* Two separate oversized wordmarks, deliberately cropped by opposite edges. */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-          <div className="absolute inset-x-0 top-0 h-[22%] overflow-hidden">
-            <GlitchLogo className="absolute right-[-18%] top-0 h-[190%] w-[105%] -translate-y-[63%] rotate-[-14deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)] sm:right-[-5%] sm:w-[62%] lg:right-[1%] lg:w-[52%]" />
+          <div className="absolute inset-x-0 top-0 h-[26%] overflow-hidden">
+            <GlitchLogo className="absolute right-[-18%] top-0 h-[170%] w-[105%] -translate-y-[52%] rotate-[-11deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(0,229,255,0.35)] sm:right-[-5%] sm:w-[62%] lg:right-[1%] lg:w-[52%]" />
           </div>
-          <div className="absolute inset-x-0 bottom-0 h-[22%] overflow-hidden">
-            <GlitchLogo className="absolute bottom-0 left-[-18%] h-[190%] w-[105%] translate-y-[36%] rotate-[-14deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(255,30,77,0.3)] sm:left-[18%] sm:w-[62%] lg:left-[27%] lg:w-[52%]" />
+          <div className="absolute inset-x-0 bottom-0 h-[26%] overflow-hidden">
+            <GlitchLogo className="absolute bottom-0 left-[-18%] h-[170%] w-[105%] translate-y-[46%] rotate-[-11deg] opacity-[0.3] drop-shadow-[0_0_30px_rgba(255,30,77,0.3)] sm:left-[18%] sm:w-[62%] lg:left-[27%] lg:w-[52%]" />
           </div>
+
         </div>
 
 
