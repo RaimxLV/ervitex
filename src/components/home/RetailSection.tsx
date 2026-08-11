@@ -5,15 +5,18 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import heroDuo from "@/assets/tbode-hero-duo.jpg";
 import tbodeLogo from "@/assets/tbode-logo.webp";
-import printA from "@/assets/print-new-1.png";
-import printB from "@/assets/print-new-2.png";
-import printC from "@/assets/print-new-3.png";
-import printD from "@/assets/print-new-4.png";
+import printA from "@/assets/print-new-1.webp";
+import printB from "@/assets/print-new-2.webp";
+import printC from "@/assets/print-new-3.webp";
+import printD from "@/assets/print-new-4.webp";
+import printE from "@/assets/print-new-5.webp";
+import printF from "@/assets/print-new-6.webp";
+import printG from "@/assets/print-new-7.webp";
 
 const DESIGNER_URL =
   "https://t-bode.lv/design?utm_source=ervitex.lv&utm_medium=promo_banner&utm_campaign=tbode_designer";
 
-const designs = [printA, printB, printC, printD];
+const designs = [printA, printB, printC, printD, printE, printF, printG];
 
 const TBodeWordmark = () => (
   <img
@@ -27,7 +30,11 @@ const TBodeWordmark = () => (
   />
 );
 
-/** Print rendered on a model's back, positioned in % of the photo. */
+/**
+ * Print rendered on a model's back, positioned in % of the photo.
+ * All designs are mounted at once (hard switch, no fade) so swapping is instant
+ * and no image has to be fetched mid-animation.
+ */
 const BackPrint = ({
   index,
   x,
@@ -36,6 +43,7 @@ const BackPrint = ({
   h,
   rotate,
   opacity,
+  eager,
 }: {
   index: number;
   x: string;
@@ -44,28 +52,28 @@ const BackPrint = ({
   h: string;
   rotate: number;
   opacity: number;
+  eager: boolean;
 }) => (
   <div
     className="pointer-events-none absolute"
     style={{ left: x, top: y, width: w, height: h, transform: `translate(-50%,-50%) rotate(${rotate}deg)` }}
     aria-hidden
   >
-    <AnimatePresence initial={false} mode="sync">
-      <motion.img
-        key={`p-${index}`}
-        src={designs[index]}
+    {designs.map((src, i) => (
+      <img
+        key={src}
+        src={eager || i === index ? src : undefined}
+        data-src={src}
         alt=""
         loading="lazy"
         decoding="async"
-        initial={{ opacity: 0 }}
-        animate={{ opacity }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
+        style={{ opacity: i === index ? opacity : 0 }}
         className="absolute inset-0 h-full w-full object-contain"
       />
-    </AnimatePresence>
+    ))}
   </div>
 );
+
 
 
 const RetailSection = () => {
