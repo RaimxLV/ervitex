@@ -1,19 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import { ArrowRight, MousePointerClick, Timer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import heroDuo from "@/assets/tbode-hero-duo.jpg";
 import tbodeLogo from "@/assets/tbode-logo.webp";
-import printA from "@/assets/print-new-1.png";
-import printB from "@/assets/print-new-2.png";
-import printC from "@/assets/print-new-3.png";
-import printD from "@/assets/print-new-4.png";
+import printA from "@/assets/print-new-1.webp";
+import printB from "@/assets/print-new-2.webp";
+import printC from "@/assets/print-new-3.webp";
+import printD from "@/assets/print-new-4.webp";
+import printE from "@/assets/print-new-5.webp";
+import printF from "@/assets/print-new-6.webp";
+import printG from "@/assets/print-new-7.webp";
 
 const DESIGNER_URL =
   "https://t-bode.lv/design?utm_source=ervitex.lv&utm_medium=promo_banner&utm_campaign=tbode_designer";
 
-const designs = [printA, printB, printC, printD];
+const designs = [printA, printB, printC, printD, printE, printF, printG];
 
 const TBodeWordmark = () => (
   <img
@@ -27,7 +30,11 @@ const TBodeWordmark = () => (
   />
 );
 
-/** Print rendered on a model's back, positioned in % of the photo. */
+/**
+ * Print rendered on a model's back, positioned in % of the photo.
+ * All designs are mounted at once (hard switch, no fade) so swapping is instant
+ * and no image has to be fetched mid-animation.
+ */
 const BackPrint = ({
   index,
   x,
@@ -36,6 +43,7 @@ const BackPrint = ({
   h,
   rotate,
   opacity,
+  eager,
 }: {
   index: number;
   x: string;
@@ -44,28 +52,28 @@ const BackPrint = ({
   h: string;
   rotate: number;
   opacity: number;
+  eager: boolean;
 }) => (
   <div
     className="pointer-events-none absolute"
     style={{ left: x, top: y, width: w, height: h, transform: `translate(-50%,-50%) rotate(${rotate}deg)` }}
     aria-hidden
   >
-    <AnimatePresence initial={false} mode="sync">
-      <motion.img
-        key={`p-${index}`}
-        src={designs[index]}
+    {designs.map((src, i) => (
+      <img
+        key={src}
+        src={eager || i === index ? src : undefined}
+        data-src={src}
         alt=""
         loading="lazy"
         decoding="async"
-        initial={{ opacity: 0 }}
-        animate={{ opacity }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.6, ease: "easeInOut" }}
+        style={{ opacity: i === index ? opacity : 0 }}
         className="absolute inset-0 h-full w-full object-contain"
       />
-    </AnimatePresence>
+    ))}
   </div>
 );
+
 
 
 const RetailSection = () => {
@@ -97,7 +105,7 @@ const RetailSection = () => {
 
   useEffect(() => {
     if (!running) return;
-    const id = setInterval(() => setIndex((i) => (i + 1) % designs.length), 4500);
+    const id = setInterval(() => setIndex((i) => (i + 1) % designs.length), 2000);
     return () => clearInterval(id);
   }, [running]);
 
@@ -138,14 +146,37 @@ const RetailSection = () => {
             className="h-full w-full object-cover"
           />
           {/* Man — black tee */}
-          <BackPrint index={index} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
-          {/* Woman — off-white tee (always a different design) */}
-          <BackPrint index={(index + 2) % designs.length} x="63.5%" y="64%" w="19%" h="28%" rotate={2} opacity={0.95} />
+          <BackPrint eager={inView} index={index} x="33.5%" y="55%" w="23%" h="33%" rotate={-1.5} opacity={0.97} />
+          {/* Woman — off-white tee (smaller, placed on the flat upper back to avoid fabric folds) */}
+          <BackPrint
+            eager={inView}
+            index={(index + 3) % designs.length}
+            x="63.5%"
+            y="59%"
+            w="15%"
+            h="21%"
+            rotate={2}
+            opacity={0.92}
+          />
         </div>
 
         {/* Lighter cinematic gradients for text legibility */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+
+        {/* Subtle 35° T-Bode watermark across the whole banner */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden" aria-hidden>
+          <img
+            src={tbodeLogo}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="w-[150%] max-w-none opacity-[0.07] mix-blend-overlay"
+            style={{ transform: "rotate(-35deg)" }}
+          />
+        </div>
+
+
 
       </div>
 
