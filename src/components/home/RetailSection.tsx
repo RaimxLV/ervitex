@@ -341,6 +341,42 @@ const RetailSection = () => {
             ))}
           </div>
 
+          {/* Mini visual of the online designer: upload → place on tee → order */}
+          <div className="mt-8 inline-flex max-w-md items-center gap-4 border border-white/15 bg-black/45 p-3 backdrop-blur-md">
+            <div className="relative h-24 w-20 shrink-0 border border-white/10 bg-white/5">
+              <span className="absolute inset-x-2 top-2 block text-[0.55rem] uppercase tracking-[0.2em] opacity-60">
+                {lang === "lv" ? "priekšskatījums" : "preview"}
+              </span>
+              <Shirt className="absolute inset-0 m-auto h-16 w-16 opacity-25" strokeWidth={1} aria-hidden />
+              <img
+                src={designs[indexA]}
+                alt=""
+                className="absolute left-1/2 top-[54%] h-9 w-9 -translate-x-1/2 -translate-y-1/2 object-contain"
+                loading="lazy"
+                decoding="async"
+                aria-hidden
+              />
+              <span className="absolute inset-x-1 bottom-1 flex items-center justify-center gap-1 text-[0.5rem] uppercase tracking-widest text-accent">
+                <MousePointerClick className="h-3 w-3" strokeWidth={2} aria-hidden />
+                {lang === "lv" ? "velc & liec" : "drag & drop"}
+              </span>
+            </div>
+
+            <ol className="space-y-1.5 text-xs">
+              {[
+                { icon: Upload, lv: "Augšupielādē savu grafiku", en: "Upload your graphic" },
+                { icon: MousePointerClick, lv: "Novieto uz krekla konstruktorā", en: "Place it on the tee in the builder" },
+                { icon: Check, lv: "Redzi rezultātu un pasūti", en: "See the result and order" },
+              ].map((s) => (
+                <li key={s.en} className="flex items-center gap-2">
+                  <s.icon className="h-3.5 w-3.5 shrink-0 text-accent" strokeWidth={2} aria-hidden />
+                  <span className="opacity-90">{lang === "lv" ? s.lv : s.en}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
             <a href={DESIGNER_URL} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
               <Button
