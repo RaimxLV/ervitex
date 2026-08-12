@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, Menu, X, Globe, Languages, Upload, LayoutGrid } from "lucide-react";
+import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, Menu, X, Globe, Languages, Upload, LayoutGrid, BadgeEuro } from "lucide-react";
 
 const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
 
 const navItems = [
   { to: "/admin", icon: LayoutDashboard, label: "Galvenais panelis" },
+  { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits" },
   { to: "/admin/products", icon: Package, label: "Produkti" },
   { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
   { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
@@ -16,6 +17,7 @@ const navItems = [
   { to: "/admin/translate", icon: Languages, label: "Tulkošana", superOnly: true },
   { to: "/admin/users", icon: Users, label: "Lietotāji", superOnly: true },
 ];
+
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const { signOut, user } = useAuth();
