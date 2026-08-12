@@ -1,0 +1,1 @@
+select cron.schedule('nwg-prices-watchdog', '*/5 * * * *', $$select public.invoke_sync_function('nwg-price-sync','?limit=8000&batch=400')$$);
