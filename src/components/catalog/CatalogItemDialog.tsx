@@ -957,17 +957,30 @@ const CatalogItemDialog = ({
   const mainImg = gallery[imgIndex] || gallery[0] || image;
   const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : displayDetail.sizes || [];
 
+  // Map raw supplier size code -> display label (e.g. NWG "4" -> "S")
+  const rawToLabel = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const [label, raw] of Object.entries(displayDetail.sizeAliases || {})) {
+      out[raw.toString().trim().toLowerCase()] = label;
+    }
+    return out;
+  }, [displayDetail.sizeAliases]);
+
   // Colour/size aware price: prices differ per size and per colour in most catalogs.
   const priceInfo = useMemo(() => {
     if (!variantPrices.length) return null;
     const norm = (s: unknown) => (s ?? "").toString().trim().toLowerCase();
+    const sizeKey = (s: unknown) => {
+      const n = norm(s);
+      return rawToLabel[n] ? norm(rawToLabel[n]) : n;
+    };
     let rows = variantPrices;
     if (currentColor) {
       const byColor = rows.filter((r) => norm(r.color_code) === norm(currentColor.code));
       if (byColor.length) rows = byColor;
     }
     if (selectedSize) {
-      const bySize = rows.filter((r) => norm(r.size) === norm(selectedSize));
+      const bySize = rows.filter((r) => sizeKey(r.size) === norm(selectedSize));
       if (bySize.length) rows = bySize;
     }
     const values = rows.map((r) => Number(r.retail_price)).filter((n) => Number.isFinite(n) && n > 0);
@@ -977,7 +990,7 @@ const CatalogItemDialog = ({
       max: Math.max(...values),
       currency: rows[0]?.currency || "EUR",
     };
-  }, [variantPrices, currentColor, selectedSize]);
+  }, [variantPrices, currentColor, selectedSize, rawToLabel]);
 
   // Price per size (excl. VAT) for the currently selected colour
   const sizePriceMap = useMemo(() => {
@@ -990,14 +1003,16 @@ const CatalogItemDialog = ({
     }
     const map: Record<string, number> = {};
     for (const r of rows) {
-      const size = (r.size ?? "").toString().trim();
-      if (!size) continue;
+      const raw = (r.size ?? "").toString().trim();
+      if (!raw) continue;
+      const size = rawToLabel[raw.toLowerCase()] || raw;
       const v = Number(r.retail_price);
       if (!Number.isFinite(v) || v <= 0) continue;
       if (map[size] === undefined || v < map[size]) map[size] = v;
     }
     return map;
-  }, [variantPrices, currentColor]);
+  }, [variantPrices, currentColor, rawToLabel]);
+
 
 
   const rawDescriptionLines = displayDetail.features.length ? displayDetail.features : lines(displayDetail.description || descriptionFallback);
