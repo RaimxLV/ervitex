@@ -987,9 +987,10 @@ interface CardProps {
   onNavigate: () => void;
   priceInfo?: { price: number; max: number; currency: string };
   fromLabel?: string;
+  priority?: boolean;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel }: CardProps) => {
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel, priority }: CardProps) => {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   // Filter-driven initial match
@@ -1001,8 +1002,9 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const active = effectiveIdx !== null ? item.colors[effectiveIdx] : null;
 
   const matchedImg = active?.u || null;
-  const img = resolveImgUrl(item.source, matchedImg ?? item.image_url);
-  const hover = matchedImg ? null : resolveImgUrl(item.source, item.hover_image_url);
+  const rawImg = resolveImgUrl(item.source, matchedImg ?? item.image_url);
+  const img = thumbUrl(rawImg);
+  const hover = matchedImg ? null : thumbUrl(resolveImgUrl(item.source, item.hover_image_url));
 
   const withHex = item.colors
     .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c.h, c.bucket, c.n) }))
