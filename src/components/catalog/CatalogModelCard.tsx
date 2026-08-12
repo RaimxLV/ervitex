@@ -46,8 +46,12 @@ export interface CatalogModelCardProps {
   href?: string;
   as?: "button" | "a";
   image: string | null;
+  /** Original (unproxied) URL used if the thumbnail fails to load. */
+  fallbackImage?: string | null;
   hoverImage?: string | null;
   imageAlt: string;
+  /** Above-the-fold cards load immediately instead of lazily. */
+  priority?: boolean;
   code?: string | null;
   brandBadge?: string | null;
   topRight?: ReactNode;
@@ -67,32 +71,50 @@ export interface CatalogModelCardProps {
  */
 const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
   (
-    { onClick, image, hoverImage, imageAlt, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, footer, noImageLabel },
+    { onClick, image, fallbackImage, hoverImage, imageAlt, priority, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, footer, noImageLabel },
     ref
   ) => {
     const [copied, setCopied] = useState(false);
+    const [ready, setReady] = useState(false);
+    const [hovered, setHovered] = useState(false);
+    const triedFallback = useRef(false);
     return (
       <button
         ref={ref}
         type="button"
         onClick={onClick}
+        onMouseEnter={() => setHovered(true)}
         className="group flex h-full flex-col overflow-hidden border border-border bg-white text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
       >
         <div className="relative aspect-[3/4] overflow-hidden bg-white">
           {image ? (
             <>
+              {!ready && <div className="absolute inset-0 animate-pulse bg-neutral-100" />}
               <img
                 src={image}
                 alt={imageAlt}
-                loading="lazy"
-                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                className={`absolute inset-0 h-full w-full object-contain p-2 transition-opacity duration-500 ${hoverImage ? "group-hover:opacity-0" : ""}`}
+                loading={priority ? "eager" : "lazy"}
+                fetchPriority={priority ? "high" : "auto"}
+                decoding="async"
+                onLoad={() => setReady(true)}
+                onError={(e) => {
+                  const el = e.currentTarget as HTMLImageElement;
+                  if (fallbackImage && !triedFallback.current && fallbackImage !== image) {
+                    triedFallback.current = true;
+                    el.src = fallbackImage;
+                    return;
+                  }
+                  setReady(true);
+                  el.style.display = "none";
+                }}
+                className={`absolute inset-0 h-full w-full object-contain p-2 transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"} ${hoverImage ? "group-hover:opacity-0" : ""}`}
               />
-              {hoverImage && (
+              {hoverImage && hovered && (
                 <img
                   src={hoverImage}
                   alt=""
                   loading="lazy"
+                  decoding="async"
                   className="absolute inset-0 h-full w-full object-contain p-2 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 />
               )}
@@ -104,6 +126,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
           )}
           {topRight}
         </div>
+
 
         {(code || brandBadge) && (
           <div className="flex flex-col items-stretch border-t border-border bg-primary text-primary-foreground sm:flex-row">
