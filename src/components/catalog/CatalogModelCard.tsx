@@ -1,6 +1,8 @@
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import type { ReactNode } from "react";
+import { Check, Copy } from "lucide-react";
 import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
+
 
 /**
  * Given a color name like "Black/Lime Green" and an optional stored hex,
