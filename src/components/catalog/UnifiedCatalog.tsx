@@ -259,7 +259,7 @@ const CATALOG_CACHE = new Map<
 
 
 const SS_CDN_BASE = "https://res.cloudinary.com/www-stanleystella-com/image/upload/";
-const SS_THUMB = "f_auto,q_auto,w_600,c_fill,g_auto";
+const SS_THUMB = "f_auto,q_auto,w_500,c_fill,g_auto";
 const resolveSsUrl = (u?: string | null): string | null => {
   if (!u || u === "[object Object]") return null;
   if (/^https?:\/\//i.test(u)) {
@@ -274,6 +274,26 @@ const resolveSsUrl = (u?: string | null): string | null => {
 const resolveImgUrl = (source: CatalogSource, u: string | null): string | null => {
   if (!u || u === "[object Object]") return null;
   return source === "ss" ? resolveSsUrl(u) : u;
+};
+
+/**
+ * Grid thumbnails: several partner CDNs serve print-resolution originals
+ * (NWG "highres" files are 4–7 MB each), which makes the catalog grid appear
+ * as empty white cards for seconds. Route those through an image resizing CDN
+ * so cards receive ~30 KB WebP thumbs. Cloudinary (Stanley/Stella) and hosts
+ * that already serve small files are left untouched.
+ */
+const HEAVY_IMAGE_HOSTS = [
+  "images.nwgmedia.com",
+  "d2csxpduxe849s.cloudfront.net",
+  "mediahub.beechfieldbrands.com",
+  "cdn.fruitoftheloom.eu",
+];
+
+const thumbUrl = (u: string | null, width = 500): string | null => {
+  if (!u) return null;
+  if (!HEAVY_IMAGE_HOSTS.some((h) => u.includes(h))) return u;
+  return `https://wsrv.nl/?url=${encodeURIComponent(u.replace(/^https?:\/\//, ""))}&w=${width}&output=webp&q=82&we`;
 };
 
 /* -------------------- component -------------------- */
@@ -900,10 +920,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
-                  {paginated.map((it) => (
+                  {paginated.map((it, idx) => (
                     <CatalogCard
                       key={`${it.source}-${it.id}`}
                       item={it}
+                      priority={idx < 8}
                       lang={lang}
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}
@@ -967,9 +988,10 @@ interface CardProps {
   onNavigate: () => void;
   priceInfo?: { price: number; max: number; currency: string };
   fromLabel?: string;
+  priority?: boolean;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel }: CardProps) => {
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel, priority }: CardProps) => {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   // Filter-driven initial match
@@ -981,8 +1003,9 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const active = effectiveIdx !== null ? item.colors[effectiveIdx] : null;
 
   const matchedImg = active?.u || null;
-  const img = resolveImgUrl(item.source, matchedImg ?? item.image_url);
-  const hover = matchedImg ? null : resolveImgUrl(item.source, item.hover_image_url);
+  const rawImg = resolveImgUrl(item.source, matchedImg ?? item.image_url);
+  const img = thumbUrl(rawImg);
+  const hover = matchedImg ? null : thumbUrl(resolveImgUrl(item.source, item.hover_image_url));
 
   const withHex = item.colors
     .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c.h, c.bucket, c.n) }))
@@ -1008,6 +1031,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
     <CatalogModelCard
       onClick={onNavigate}
       image={img}
+      fallbackImage={rawImg}
+      priority={priority}
       hoverImage={hover}
       imageAlt={item.name || item.id}
       code={displayCode}
