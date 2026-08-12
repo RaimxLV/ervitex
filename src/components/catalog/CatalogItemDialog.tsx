@@ -51,6 +51,9 @@ interface ProductDetail {
   colors: ColorDetail[];
   /** Variant article numbers keyed by `${colorCode}|${size}` (and `${colorCode}|` when size-less). */
   skus?: Record<string, string>;
+  /** Display size label -> raw supplier size code (used to match price rows). */
+  sizeAliases?: Record<string, string>;
+
 }
 
 /* ---------- SS Cloudinary transform ---------- */
