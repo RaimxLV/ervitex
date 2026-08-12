@@ -1030,6 +1030,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
     <CatalogModelCard
       onClick={onNavigate}
       image={img}
+      fallbackImage={rawImg}
+      priority={priority}
       hoverImage={hover}
       imageAlt={item.name || item.id}
       code={displayCode}
