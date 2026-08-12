@@ -70,6 +70,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
     { onClick, image, hoverImage, imageAlt, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, footer, noImageLabel },
     ref
   ) => {
+    const [copied, setCopied] = useState(false);
     return (
       <button
         ref={ref}
