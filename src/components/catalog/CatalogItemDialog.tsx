@@ -51,6 +51,9 @@ interface ProductDetail {
   colors: ColorDetail[];
   /** Variant article numbers keyed by `${colorCode}|${size}` (and `${colorCode}|` when size-less). */
   skus?: Record<string, string>;
+  /** Display size label -> raw supplier size code (used to match price rows). */
+  sizeAliases?: Record<string, string>;
+
 }
 
 /* ---------- SS Cloudinary transform ---------- */
@@ -295,26 +298,51 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     imgByItem.get(key)!.push(url as string);
   }
 
-  const sizesByItem = new Map<string, { s: string; seq: string }[]>();
+  const rawSkuSizes = skus
+    .map((sk: any) => ({ s: sk.size as string | null, seq: Number(sk.size_sequence) }))
+    .filter((x) => x.s);
+
+  // NWG (Craft/Clique/ProJob/C&B) apparel uses numeric size codes where
+  // size_sequence === size * 10 (3=XS ... 12=6XL). Shoes/kids sizes do not
+  // follow that pattern, so only translate when every size matches it.
+  const NWG_SIZE_CODES: Record<string, string> = {
+    "1": "3XS", "2": "XXS", "3": "XS", "4": "S", "5": "M", "6": "L",
+    "7": "XL", "8": "XXL", "9": "3XL", "10": "4XL", "11": "5XL", "12": "6XL",
+  };
+  const codeSized =
+    rawSkuSizes.length > 0 &&
+    rawSkuSizes.every((x) => /^\d{1,2}$/.test(x.s!) && Number.isFinite(x.seq) && x.seq === Number(x.s) * 10);
+  const sizeLabel = (s: string) => (codeSized ? NWG_SIZE_CODES[s] || s : s);
+
+  const sizesByItem = new Map<string, { s: string; seq: number }[]>();
   const skuMap: Record<string, string> = {};
   for (const sk of skus) {
     const it = (sk as any).item_number || "";
     if (!sizesByItem.has(it)) sizesByItem.set(it, []);
-    if ((sk as any).size) sizesByItem.get(it)!.push({ s: (sk as any).size, seq: (sk as any).size_sequence || "" });
-    if ((sk as any).sku && it) skuMap[`${it}|${(sk as any).size ?? ""}`] = (sk as any).sku;
+    const sz = (sk as any).size;
+    if (sz) sizesByItem.get(it)!.push({ s: sizeLabel(sz), seq: Number((sk as any).size_sequence) || 0 });
+    if ((sk as any).sku && it) skuMap[`${it}|${sz ? sizeLabel(sz) : ""}`] = (sk as any).sku;
   }
+
+  const seqBySize = new Map<string, number>();
+  for (const arr of sizesByItem.values()) for (const s of arr) {
+    if (!seqBySize.has(s.s)) seqBySize.set(s.s, s.seq);
+  }
+  const orderSizes = (list: Iterable<string>) =>
+    Array.from(new Set(Array.from(list).filter(Boolean))).sort(
+      (a, b) => (seqBySize.get(a) ?? 9999) - (seqBySize.get(b) ?? 9999) || sizeIndex(a) - sizeIndex(b) || a.localeCompare(b)
+    );
 
   const colors: ColorDetail[] = variants.map((v: any) => ({
     code: v.item_number,
     name: v.color_name || v.color_code || v.item_number,
     hex: hexFromNwg(v),
     images: imgByItem.get(v.item_number) || (v.main_picture_url ? [v.main_picture_url] : []),
-    sizes: uniqueSortedSizes((sizesByItem.get(v.item_number) || []).map((s) => s.s)),
+    sizes: orderSizes((sizesByItem.get(v.item_number) || []).map((s) => s.s)),
   }));
 
-  const sizeSet = new Map<string, string>();
-  for (const arr of sizesByItem.values()) for (const s of arr) sizeSet.set(s.s, s.seq);
-  const sizes = [...sizeSet.entries()].sort((a, b) => a[1].localeCompare(b[1])).map((x) => x[0]);
+  const sizes = orderSizes(seqBySize.keys());
+
 
   // Full description: commerce + catalog + USP (preserve bullets & newlines).
   // NWG API leaves these null for a large portion of the catalog, so compose
@@ -367,6 +395,10 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     sizes,
     colors,
     skus: skuMap,
+    sizeAliases: codeSized
+      ? Object.fromEntries(rawSkuSizes.map((x) => [sizeLabel(x.s!), x.s!]))
+      : undefined,
+
   };
 }
 
@@ -925,17 +957,30 @@ const CatalogItemDialog = ({
   const mainImg = gallery[imgIndex] || gallery[0] || image;
   const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : displayDetail.sizes || [];
 
+  // Map raw supplier size code -> display label (e.g. NWG "4" -> "S")
+  const rawToLabel = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const [label, raw] of Object.entries(displayDetail.sizeAliases || {})) {
+      out[raw.toString().trim().toLowerCase()] = label;
+    }
+    return out;
+  }, [displayDetail.sizeAliases]);
+
   // Colour/size aware price: prices differ per size and per colour in most catalogs.
   const priceInfo = useMemo(() => {
     if (!variantPrices.length) return null;
     const norm = (s: unknown) => (s ?? "").toString().trim().toLowerCase();
+    const sizeKey = (s: unknown) => {
+      const n = norm(s);
+      return rawToLabel[n] ? norm(rawToLabel[n]) : n;
+    };
     let rows = variantPrices;
     if (currentColor) {
       const byColor = rows.filter((r) => norm(r.color_code) === norm(currentColor.code));
       if (byColor.length) rows = byColor;
     }
     if (selectedSize) {
-      const bySize = rows.filter((r) => norm(r.size) === norm(selectedSize));
+      const bySize = rows.filter((r) => sizeKey(r.size) === norm(selectedSize));
       if (bySize.length) rows = bySize;
     }
     const values = rows.map((r) => Number(r.retail_price)).filter((n) => Number.isFinite(n) && n > 0);
@@ -945,7 +990,7 @@ const CatalogItemDialog = ({
       max: Math.max(...values),
       currency: rows[0]?.currency || "EUR",
     };
-  }, [variantPrices, currentColor, selectedSize]);
+  }, [variantPrices, currentColor, selectedSize, rawToLabel]);
 
   // Price per size (excl. VAT) for the currently selected colour
   const sizePriceMap = useMemo(() => {
@@ -958,14 +1003,16 @@ const CatalogItemDialog = ({
     }
     const map: Record<string, number> = {};
     for (const r of rows) {
-      const size = (r.size ?? "").toString().trim();
-      if (!size) continue;
+      const raw = (r.size ?? "").toString().trim();
+      if (!raw) continue;
+      const size = rawToLabel[raw.toLowerCase()] || raw;
       const v = Number(r.retail_price);
       if (!Number.isFinite(v) || v <= 0) continue;
       if (map[size] === undefined || v < map[size]) map[size] = v;
     }
     return map;
-  }, [variantPrices, currentColor]);
+  }, [variantPrices, currentColor, rawToLabel]);
+
 
 
   const rawDescriptionLines = displayDetail.features.length ? displayDetail.features : lines(displayDetail.description || descriptionFallback);
