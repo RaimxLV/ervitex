@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
+import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
   type FilterSection,
@@ -283,18 +284,7 @@ const resolveImgUrl = (source: CatalogSource, u: string | null): string | null =
  * so cards receive ~30 KB WebP thumbs. Cloudinary (Stanley/Stella) and hosts
  * that already serve small files are left untouched.
  */
-const HEAVY_IMAGE_HOSTS = [
-  "images.nwgmedia.com",
-  "d2csxpduxe849s.cloudfront.net",
-  "mediahub.beechfieldbrands.com",
-  "cdn.fruitoftheloom.eu",
-];
 
-const thumbUrl = (u: string | null, width = 500): string | null => {
-  if (!u) return null;
-  if (!HEAVY_IMAGE_HOSTS.some((h) => u.includes(h))) return u;
-  return `https://wsrv.nl/?url=${encodeURIComponent(u.replace(/^https?:\/\//, ""))}&w=${width}&output=webp&q=82&we`;
-};
 
 /* -------------------- component -------------------- */
 
