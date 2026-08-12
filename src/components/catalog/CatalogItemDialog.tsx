@@ -1117,7 +1117,8 @@ const CatalogItemDialog = ({
                     src={thumbUrl(mainImg, 96) || mainImg}
                     alt=""
                     aria-hidden
-                    className="absolute inset-0 h-full w-full object-contain blur-[6px] scale-105"
+                    data-preview={mainImg}
+                    className="absolute inset-0 h-full w-full object-contain blur-[8px] scale-105 transition-opacity duration-300"
                   />
                   <img
                     key={mainImg}
@@ -1126,7 +1127,12 @@ const CatalogItemDialog = ({
                     loading="eager"
                     fetchPriority="high"
                     decoding="async"
-                    onLoad={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "1"; }}
+                    onLoad={(e) => {
+                      const el = e.currentTarget as HTMLImageElement;
+                      el.style.opacity = "1";
+                      const prev = el.parentElement?.querySelector<HTMLImageElement>("img[data-preview]");
+                      if (prev) prev.style.opacity = "0";
+                    }}
                     style={{ opacity: 0 }}
                     className="relative h-full w-full object-contain transition-opacity duration-300"
                     onError={(e) => {
@@ -1154,7 +1160,17 @@ const CatalogItemDialog = ({
                     onClick={() => setImgIndex(i)}
                     className={`aspect-square overflow-hidden border-2 ${i === imgIndex ? "border-accent" : "border-transparent hover:border-border"} bg-white flex items-center justify-center`}
                   >
-                    <img src={thumbUrl(u, 160) || u} alt="" className="h-full w-full object-contain" loading="lazy" decoding="async" />
+                    <img
+                      src={thumbUrl(u, 160) || u}
+                      alt=""
+                      className="h-full w-full object-contain"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const el = e.currentTarget as HTMLImageElement;
+                        if (el.src !== u) el.src = u;
+                      }}
+                    />
                   </button>
                 ))}
               </div>
