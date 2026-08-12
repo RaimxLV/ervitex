@@ -244,6 +244,20 @@ const isIncompleteNwgShell = (it: CatalogItem): boolean => {
 
 const PAGE_SIZE = 24;
 
+/**
+ * In-memory cache of the fetched catalog per supplier scope. Keeps navigating
+ * back from a product page (or between catalog pages) instant instead of
+ * re-downloading thousands of rows.
+ */
+const CATALOG_CACHE = new Map<
+  string,
+  {
+    items: EnrichedItem[];
+    ranges: Map<string, { price: number; max: number; currency: string }>;
+  }
+>();
+
+
 const SS_CDN_BASE = "https://res.cloudinary.com/www-stanleystella-com/image/upload/";
 const SS_THUMB = "f_auto,q_auto,w_600,c_fill,g_auto";
 const resolveSsUrl = (u?: string | null): string | null => {
