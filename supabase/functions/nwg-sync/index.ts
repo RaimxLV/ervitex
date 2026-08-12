@@ -565,6 +565,9 @@ Deno.serve(async (req) => {
   const url = new URL(req.url);
   const mode = (url.searchParams.get("mode") || "all").toLowerCase();
   const q = url.searchParams.get("q") || undefined;
+  const only = (url.searchParams.get("ids") || "").split(",").map((s) => s.trim()).filter(Boolean);
+  const full = url.searchParams.get("full") === "1";
+
 
   const logId = await startLog(sb, `nwg:${mode}`);
   const result: Record<string, unknown> = {};
