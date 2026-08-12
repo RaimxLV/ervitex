@@ -1,0 +1,1 @@
+SELECT public.refresh_catalog_prices();
