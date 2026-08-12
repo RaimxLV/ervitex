@@ -259,7 +259,7 @@ const CATALOG_CACHE = new Map<
 
 
 const SS_CDN_BASE = "https://res.cloudinary.com/www-stanleystella-com/image/upload/";
-const SS_THUMB = "f_auto,q_auto,w_600,c_fill,g_auto";
+const SS_THUMB = "f_auto,q_auto,w_500,c_fill,g_auto";
 const resolveSsUrl = (u?: string | null): string | null => {
   if (!u || u === "[object Object]") return null;
   if (/^https?:\/\//i.test(u)) {
@@ -274,6 +274,26 @@ const resolveSsUrl = (u?: string | null): string | null => {
 const resolveImgUrl = (source: CatalogSource, u: string | null): string | null => {
   if (!u || u === "[object Object]") return null;
   return source === "ss" ? resolveSsUrl(u) : u;
+};
+
+/**
+ * Grid thumbnails: several partner CDNs serve print-resolution originals
+ * (NWG "highres" files are 4–7 MB each), which makes the catalog grid appear
+ * as empty white cards for seconds. Route those through an image resizing CDN
+ * so cards receive ~30 KB WebP thumbs. Cloudinary (Stanley/Stella) and hosts
+ * that already serve small files are left untouched.
+ */
+const HEAVY_IMAGE_HOSTS = [
+  "images.nwgmedia.com",
+  "d2csxpduxe849s.cloudfront.net",
+  "mediahub.beechfieldbrands.com",
+  "cdn.fruitoftheloom.eu",
+];
+
+const thumbUrl = (u: string | null, width = 500): string | null => {
+  if (!u) return null;
+  if (!HEAVY_IMAGE_HOSTS.some((h) => u.includes(h))) return u;
+  return `https://wsrv.nl/?url=${encodeURIComponent(u.replace(/^https?:\/\//, ""))}&w=${width}&output=webp&q=82&we`;
 };
 
 /* -------------------- component -------------------- */
