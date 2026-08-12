@@ -2419,6 +2419,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      invoke_sync_function: {
+        Args: { fn: string; qs?: string }
+        Returns: undefined
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
