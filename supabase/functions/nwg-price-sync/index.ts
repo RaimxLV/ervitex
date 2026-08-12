@@ -125,21 +125,40 @@ Deno.serve(async (req) => {
         const itemBySku = new Map<string, string>();
         const pageSize = 1000;
 
+        // Only price products that are actually visible in our catalog
+        // (catalog_items already applies the partner-brand + assortment filters),
+        // so we never spend API calls on NWG products we don't sell.
         const productNumbers: string[] = [];
         for (let from = 0; ; from += pageSize) {
           const { data, error } = await sb
-            .from("nwg_styles")
-            .select("product_number")
-            .in("brand", BRANDS)
-            .eq("published", true)
-            .eq("archived", false)
-            .order("product_number")
+            .from("catalog_items")
+            .select("id")
+            .eq("source", "nwg")
+            .order("id")
             .range(from, from + pageSize - 1);
-          if (error) throw new Error(`style fetch: ${error.message}`);
+          if (error) throw new Error(`catalog fetch: ${error.message}`);
           if (!data?.length) break;
-          for (const r of data as any[]) if (r.product_number) productNumbers.push(r.product_number);
+          for (const r of data as any[]) if (r.id) productNumbers.push(r.id);
           if (data.length < pageSize) break;
         }
+        if (!productNumbers.length) {
+          // Fallback: brand-filtered styles (e.g. before the catalog index is built).
+          for (let from = 0; ; from += pageSize) {
+            const { data, error } = await sb
+              .from("nwg_styles")
+              .select("product_number")
+              .in("brand", BRANDS)
+              .eq("published", true)
+              .eq("archived", false)
+              .order("product_number")
+              .range(from, from + pageSize - 1);
+            if (error) throw new Error(`style fetch: ${error.message}`);
+            if (!data?.length) break;
+            for (const r of data as any[]) if (r.product_number) productNumbers.push(r.product_number);
+            if (data.length < pageSize) break;
+          }
+        }
+
 
         outer:
         for (let pi = 0; pi < productNumbers.length; pi += 200) {
