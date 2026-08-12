@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
+import NwgSyncProgress from "@/components/admin/NwgSyncProgress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -164,6 +165,10 @@ const AdminDashboard = () => {
           </div>
         ))}
       </div>
+
+      <NwgSyncProgress />
+
+
 
       <div className="mt-10 rounded-sm border border-border bg-card p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
