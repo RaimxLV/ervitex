@@ -194,7 +194,7 @@ Deno.serve(async (req) => {
 
         };
 
-        const CONCURRENCY = 6;
+        const CONCURRENCY = 12;
         for (let i = 0; i < skus.length; i += batchSize * CONCURRENCY) {
           const group: Promise<void>[] = [];
           for (let k = 0; k < CONCURRENCY; k++) {
