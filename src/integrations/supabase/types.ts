@@ -2441,6 +2441,41 @@ export type Database = {
         }[]
       }
       nwg_propagate_purchase_prices: { Args: never; Returns: number }
+      price_audit_lookup: {
+        Args: { _limit?: number; _q: string }
+        Returns: {
+          actual: number
+          base_price: number
+          diff: number
+          expected: number
+          sku: string
+          source: string
+          style_code: string
+        }[]
+      }
+      price_audit_mismatches: {
+        Args: { _limit?: number; _source?: string }
+        Returns: {
+          actual: number
+          base_price: number
+          diff: number
+          expected: number
+          sku: string
+          source: string
+          style_code: string
+        }[]
+      }
+      price_audit_summary: {
+        Args: never
+        Returns: {
+          checked: number
+          max_diff: number
+          mismatches: number
+          missing_base: number
+          source: string
+          variants: number
+        }[]
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
