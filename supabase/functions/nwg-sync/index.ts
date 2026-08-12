@@ -378,6 +378,7 @@ async function syncAssortments(sb: SupabaseClient) {
 async function syncStyles(
   sb: SupabaseClient,
   assortmentNodes: any[],
+  opts: { only?: string[]; full?: boolean } = {},
 ) {
   const seen = new Set<string>();
   let styles: any[] = [];
@@ -394,16 +395,39 @@ async function syncStyles(
   };
 
   let pagesFetched = 0;
-  const perAssortment: Record<string, { pages: number; count: number }> = {};
-  const assortmentIds = Array.from(new Set(assortmentNodes
+  const perAssortment: Record<string, { pages: number; count: number; partner_hits: number }> = {};
+  let assortmentIds = Array.from(new Set(assortmentNodes
     .map((node) => toStr(node.raw?.assortmentId) ?? toStr(node.id))
     .filter((id): id is string => Boolean(id))));
   if (!assortmentIds.length) throw new Error("No usable NWG assortment IDs; catalog was left unchanged");
+
+  // Only crawl assortments that actually contain our partner brands. The list is
+  // learned on the first (full) run and cached in nwg_assortments.raw.partner_hits,
+  // so later runs skip the rest of the NWG tree entirely.
+  let narrowed = false;
+  if (opts.only?.length) {
+    const wanted = new Set(opts.only);
+    assortmentIds = assortmentIds.filter((id) => wanted.has(id));
+    if (!assortmentIds.length) assortmentIds = opts.only.slice();
+    narrowed = true;
+  } else if (!opts.full) {
+    const { data } = await sb.from("nwg_assortments").select("id, raw");
+    const productive = (data ?? [])
+      .filter((r: any) => toInt(r.raw?.partner_hits, 0) > 0)
+      .map((r: any) => toStr(r.raw?.assortmentId) ?? toStr(r.id))
+      .filter((id): id is string => Boolean(id));
+    if (productive.length) {
+      const set = new Set(productive);
+      const filtered = assortmentIds.filter((id) => set.has(id));
+      if (filtered.length) { assortmentIds = filtered; narrowed = true; }
+    }
+  }
 
   for (const assortmentId of assortmentIds) {
     let page = 1;
     let assortmentCount = 0;
     let assortmentPages = 0;
+    let hits = 0;
     while (true) {
       const data = await gql<any>(Q_PRODUCTS_BY_ASSORTMENT, {
         lang: LANG, assortmentId, page, size: PAGE_SIZE,
@@ -413,7 +437,7 @@ async function syncStyles(
       if (!rows.length) break;
       for (const r of rows) {
         const m = mapProduct(r, assortmentId, seen);
-        if (m.style) styles.push(m.style);
+        if (m.style) { styles.push(m.style); hits++; }
         variants.push(...m.variants);
         skus.push(...m.skus);
         images.push(...m.images);
@@ -428,11 +452,33 @@ async function syncStyles(
       page++;
       if (page > 1000) throw new Error(`Pagination safety limit reached for assortment ${assortmentId}`);
     }
-    perAssortment[assortmentId] = { pages: assortmentPages, count: assortmentCount };
+    perAssortment[assortmentId] = { pages: assortmentPages, count: assortmentCount, partner_hits: hits };
     await flush();
   }
 
+  // Remember which assortments carried partner products.
+  const memo = Object.entries(perAssortment).map(([id, s]) => ({
+    id,
+    raw: { assortmentId: id, partner_hits: s.partner_hits },
+  }));
+  if (memo.length) {
+    const { data: existing } = await sb.from("nwg_assortments").select("id, name, parent_id, raw").in("id", memo.map((m) => m.id));
+    const byId = new Map((existing ?? []).map((r: any) => [r.id, r]));
+    const rows = memo.map((m) => {
+      const prev = byId.get(m.id);
+      return {
+        id: m.id,
+        name: prev?.name ?? null,
+        parent_id: prev?.parent_id ?? null,
+        raw: { ...(prev?.raw ?? {}), ...m.raw },
+      };
+    });
+    await chunkUpsert(sb, "nwg_assortments", rows, "id");
+  }
+
   if (!seen.size) throw new Error("NWG assortments returned no supported products; catalog was left unchanged");
+
+
 
   const { data: existing, error: existingError } = await sb
     .from("nwg_styles")
