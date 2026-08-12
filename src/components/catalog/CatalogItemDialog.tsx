@@ -395,6 +395,10 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     sizes,
     colors,
     skus: skuMap,
+    sizeAliases: codeSized
+      ? Object.fromEntries(rawSkuSizes.map((x) => [sizeLabel(x.s!), x.s!]))
+      : undefined,
+
   };
 }
 
