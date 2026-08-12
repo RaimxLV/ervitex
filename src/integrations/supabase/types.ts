@@ -2428,6 +2428,15 @@ export type Database = {
         }
         Returns: number
       }
+      nwg_price_targets: {
+        Args: { lim?: number; off?: number; only_missing?: boolean }
+        Returns: {
+          item_number: string
+          product_number: string
+          sku: string
+        }[]
+      }
+      nwg_propagate_purchase_prices: { Args: never; Returns: number }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
