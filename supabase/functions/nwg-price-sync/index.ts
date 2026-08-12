@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const limit = Math.min(Number(url.searchParams.get("limit") || 4000), 40000);
+    const limit = Math.min(Number(url.searchParams.get("limit") || 4000), 100000);
     const batchSize = Math.min(Number(url.searchParams.get("batch") || 400), 500);
     const onlyMissing = url.searchParams.get("onlyMissing") !== "0";
     const chain = url.searchParams.get("chain") !== "0";
@@ -197,9 +197,12 @@ Deno.serve(async (req) => {
           // that this account cannot currently buy the SKU. Never leave an old
           // contract price behind, because that would keep a withdrawn model in
           // the public catalog even though it only exists in NWG's global feed.
-          const rejectedSkus = rows
-            .filter((r) => r.valid === false && pnBySku.has(r.sku))
-            .map((r) => r.sku);
+          const offeredSkus = new Set(
+            rows
+              .filter((r) => r.valid && typeof r.num === "number" && r.num > 0)
+              .map((r) => r.sku),
+          );
+          const rejectedSkus = slice.filter((sku) => pnBySku.has(sku) && !offeredSkus.has(sku));
           for (let j = 0; j < rejectedSkus.length; j += 500) {
             const chunk = rejectedSkus.slice(j, j + 500);
             const { error } = await sb
