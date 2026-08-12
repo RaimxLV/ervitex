@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const limit = Math.min(Number(url.searchParams.get("limit") || 4000), 40000);
+    const limit = Math.min(Number(url.searchParams.get("limit") || 4000), 100000);
     const batchSize = Math.min(Number(url.searchParams.get("batch") || 400), 500);
     const onlyMissing = url.searchParams.get("onlyMissing") !== "0";
     const chain = url.searchParams.get("chain") !== "0";
@@ -148,6 +148,7 @@ Deno.serve(async (req) => {
 
         let updated = 0;
         let failed = 0;
+        let rejected = 0;
         const now = new Date().toISOString();
         let token = await getAccessToken(sb);
 
@@ -192,6 +193,34 @@ Deno.serve(async (req) => {
             await writeChunk(updates.slice(j, j + 500));
           }
 
+          // `valid: false` is the customer commerce API's authoritative answer
+          // that this account cannot currently buy the SKU. Never leave an old
+          // contract price behind, because that would keep a withdrawn model in
+          // the public catalog even though it only exists in NWG's global feed.
+          const offeredSkus = new Set(
+            rows
+              .filter((r) => r.valid && typeof r.num === "number" && r.num > 0)
+              .map((r) => r.sku),
+          );
+          const rejectedSkus = slice.filter((sku) => pnBySku.has(sku) && !offeredSkus.has(sku));
+          for (let j = 0; j < rejectedSkus.length; j += 500) {
+            const chunk = rejectedSkus.slice(j, j + 500);
+            const { error } = await sb
+              .from("nwg_skus")
+              .update({
+                purchase_price: null,
+                purchase_currency: null,
+                purchase_updated_at: now,
+              })
+              .in("sku", chunk);
+            if (error) {
+              console.error(`clear rejected SKUs: ${error.message}`);
+              failed += chunk.length;
+            } else {
+              rejected += chunk.length;
+            }
+          }
+
         };
 
         const CONCURRENCY = 12;
@@ -221,7 +250,7 @@ Deno.serve(async (req) => {
           if (refreshErr) console.error(`refresh_catalog_prices: ${refreshErr.message}`);
         }
 
-        const result = { skus_requested: skus.length, updated, propagated, failed, more };
+        const result = { skus_requested: skus.length, updated, rejected, propagated, failed, more };
 
         await finishLog(sb, logId, {
           status: "success",
