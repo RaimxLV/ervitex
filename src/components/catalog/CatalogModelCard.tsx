@@ -1,6 +1,8 @@
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import type { ReactNode } from "react";
+import { Check, Copy } from "lucide-react";
 import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
+
 
 /**
  * Given a color name like "Black/Lime Green" and an optional stored hex,
@@ -68,6 +70,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
     { onClick, image, hoverImage, imageAlt, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, footer, noImageLabel },
     ref
   ) => {
+    const [copied, setCopied] = useState(false);
     return (
       <button
         ref={ref}
@@ -105,8 +108,31 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
         {(code || brandBadge) && (
           <div className="flex flex-col items-stretch border-t border-border bg-primary text-primary-foreground sm:flex-row">
             {code && (
-              <span className="flex-1 truncate px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider sm:text-sm">
-                {code}
+              <span className="flex flex-1 items-center gap-1.5 overflow-hidden px-3 py-1.5">
+                <span
+                  onClick={(e) => e.stopPropagation()}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  className="truncate font-mono text-xs font-bold uppercase tracking-wider select-all cursor-text sm:text-sm"
+                >
+                  {code}
+                </span>
+                <span
+                  role="button"
+                  tabIndex={0}
+                  aria-label={copied ? "Nokopēts" : "Kopēt kodu"}
+                  title={copied ? "Nokopēts" : "Kopēt kodu"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    navigator.clipboard?.writeText(code).then(() => {
+                      setCopied(true);
+                      window.setTimeout(() => setCopied(false), 1500);
+                    });
+                  }}
+                  className="shrink-0 rounded p-0.5 opacity-70 transition hover:bg-primary-foreground/15 hover:opacity-100"
+                >
+                  {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                </span>
               </span>
             )}
             {brandBadge && (
@@ -116,6 +142,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
             )}
           </div>
         )}
+
 
         <div className="flex flex-1 flex-col gap-1.5 p-3">
           <h3 className="line-clamp-1 font-heading text-sm font-bold uppercase tracking-wide transition-colors group-hover:text-accent">
