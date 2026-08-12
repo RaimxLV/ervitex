@@ -8,6 +8,8 @@ import {
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import ModernGallery, { type GallerySlide } from "@/components/ModernGallery";
+import TechShowcase from "@/components/services/TechShowcase";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 
 import screenPrint1 from "@/assets/services/screen-printing-1.jpg";
