@@ -119,10 +119,9 @@ Deno.serve(async (req) => {
     const work = async () => {
       const logId = await startLog(sb, "nwg:prices");
       try {
-        // Only price what we actually sell, and only ONE representative SKU per
-        // (model + size). Colors share the contract price, so after fetching the
-        // representatives we propagate them to all sibling SKUs in SQL.
-        // This turns ~52 000 API lookups into ~15 000 (and ~0 on later runs).
+        // Price every active SKU belonging to the four public NWG brands.
+        // Contract prices may differ by color/item number, so a price must never
+        // be copied from a representative color to its siblings.
         const skus: string[] = [];
         const pnBySku = new Map<string, string>();
         const itemBySku = new Map<string, string>();
@@ -207,8 +206,8 @@ Deno.serve(async (req) => {
 
         const more = onlyMissing && skus.length >= limit;
 
-        // Spread the representative contract prices to every sibling SKU
-        // (same model + size, other colors).
+        // Kept as a compatibility hook. The database function intentionally
+        // performs no propagation because every SKU is priced independently.
         let propagated = 0;
         const { data: propData, error: propErr } = await sb.rpc("nwg_propagate_purchase_prices");
         if (propErr) console.error(`propagate: ${propErr.message}`);
@@ -231,7 +230,7 @@ Deno.serve(async (req) => {
 
         // Self-chain so the whole assortment is covered across invocations.
         if (more && chain) {
-          const next = `${supabaseUrl}/functions/v1/nwg-price-sync?limit=${limit}&batch=${batchSize}`;
+          const next = `${supabaseUrl}/functions/v1/nwg-price-sync?limit=${limit}&batch=${batchSize}&onlyMissing=${onlyMissing ? "1" : "0"}`;
           fetch(next, {
             method: "POST",
             headers: {
