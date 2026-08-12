@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { supabase } from "@/integrations/supabase/client";
+import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 
@@ -118,8 +119,9 @@ const CatalogItemPage = () => {
                 <CatalogModelCard
                   key={`${r.source}-${r.id}`}
                   onClick={() => navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`)}
-                  image={r.image_url}
-                  hoverImage={r.hover_image_url}
+                  image={thumbUrl(r.image_url)}
+                  fallbackImage={r.image_url}
+                  hoverImage={thumbUrl(r.hover_image_url)}
                   imageAlt={r.name || r.id}
                   code={r.id}
                   brandBadge={r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
