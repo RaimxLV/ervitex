@@ -1108,14 +1108,34 @@ const CatalogItemDialog = ({
   const body = (
         <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
           <div className="space-y-3">
-            <div className="aspect-square md:aspect-[4/5] max-h-[70vh] w-full overflow-hidden bg-white flex items-center justify-center">
+            <div className="relative aspect-square md:aspect-[4/5] max-h-[70vh] w-full overflow-hidden bg-white flex items-center justify-center">
               {mainImg ? (
-                <img
-                  src={mainImg}
-                  alt={currentColor?.name || displayDetail.title || id}
-                  className="h-full w-full object-contain"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = placeholderSrc; }}
-                />
+                <>
+                  {/* Instant low-res preview so the frame is never blank */}
+                  <img
+                    src={thumbUrl(mainImg, 96) || mainImg}
+                    alt=""
+                    aria-hidden
+                    className="absolute inset-0 h-full w-full object-contain blur-[6px] scale-105"
+                  />
+                  <img
+                    key={mainImg}
+                    src={thumbUrl(mainImg, 900) || mainImg}
+                    alt={currentColor?.name || displayDetail.title || id}
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
+                    onLoad={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = "1"; }}
+                    style={{ opacity: 0 }}
+                    className="relative h-full w-full object-contain transition-opacity duration-300"
+                    onError={(e) => {
+                      const el = e.currentTarget as HTMLImageElement;
+                      if (el.src !== mainImg) { el.src = mainImg; return; }
+                      el.src = placeholderSrc;
+                      el.style.opacity = "1";
+                    }}
+                  />
+                </>
               ) : loading ? (
                 <Skeleton className="h-full w-full" />
               ) : (
@@ -1133,7 +1153,7 @@ const CatalogItemDialog = ({
                     onClick={() => setImgIndex(i)}
                     className={`aspect-square overflow-hidden border-2 ${i === imgIndex ? "border-accent" : "border-transparent hover:border-border"} bg-white flex items-center justify-center`}
                   >
-                    <img src={u} alt="" className="h-full w-full object-contain" loading="lazy" />
+                    <img src={thumbUrl(u, 160) || u} alt="" className="h-full w-full object-contain" loading="lazy" decoding="async" />
                   </button>
                 ))}
               </div>
