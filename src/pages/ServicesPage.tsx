@@ -216,6 +216,9 @@ const ServicesPage = () => {
         <div className="mt-0 h-1 bg-accent" />
       </section>
 
+      {/* Technologies & Processes — interactive showcase */}
+      <TechShowcase />
+
       {/* Service Sections */}
       <section className="container py-16 md:py-24">
         <div className="grid gap-10">
@@ -224,6 +227,7 @@ const ServicesPage = () => {
           ))}
         </div>
       </section>
+
 
       {/* Technical Requirements */}
       <section className="bg-muted py-16 md:py-24">
