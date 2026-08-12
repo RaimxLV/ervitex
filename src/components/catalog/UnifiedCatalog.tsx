@@ -332,23 +332,62 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   }, [q, sources, brands, categories, groups, genders, colors, sort, page, setSearchParams]);
 
   useEffect(() => {
+    const cacheKey = lockedSource || "all";
+    const cached = CATALOG_CACHE.get(cacheKey);
+    if (cached) {
+      setItems(cached.items);
+      setPriceRanges(cached.ranges);
+      setLoaded(true);
+      return;
+    }
+
+    let cancelled = false;
+    const STEP = 1000;
+
+    const fetchAllPages = async <T,>(
+      table: string,
+      columns: string,
+      order: string,
+    ): Promise<T[]> => {
+      const build = (from: number, withCount: boolean) => {
+        let q = supabase
+          .from(table as any)
+          .select(columns, withCount ? { count: "exact" } : undefined)
+          .order(order, { ascending: true })
+          .range(from, from + STEP - 1);
+        if (lockedSource) q = q.eq("source", lockedSource);
+        return q;
+      };
+      const first = await build(0, true);
+      if (first.error) return [];
+      const rows = ((first.data || []) as unknown) as T[];
+      const total = first.count ?? rows.length;
+      if (total <= STEP) return rows;
+      // Fetch every remaining page in parallel instead of one-by-one.
+      const offsets: number[] = [];
+      for (let from = STEP; from < total; from += STEP) offsets.push(from);
+      const pages = await Promise.all(offsets.map((from) => build(from, false)));
+      const out = [...rows];
+      for (const p of pages) if (!p.error && p.data) out.push(...((p.data as unknown) as T[]));
+      return out;
+    };
+
     (async () => {
-      const all: CatalogItem[] = [];
-      const step = 1000;
-      let from = 0;
-      while (true) {
-        let query = supabase
-          .from("catalog_items" as any)
-          .select(
-            "source,id,name,brand,category,group_name,gender,image_url,hover_image_url,colors"
-          );
-        if (lockedSource) query = query.eq("source", lockedSource);
-        const { data, error } = await query.range(from, from + step - 1);
-        if (error) break;
-        all.push(...((data || []) as unknown as CatalogItem[]));
-        if (!data || data.length < step) break;
-        from += step;
-      }
+      // Items and prices load simultaneously — prices no longer wait for items.
+      const [all, priceRows] = await Promise.all([
+        fetchAllPages<CatalogItem>(
+          "catalog_items",
+          "source,id,name,brand,category,group_name,gender,image_url,hover_image_url,colors",
+          "id",
+        ),
+        fetchAllPages<any>(
+          "catalog_price_ranges",
+          "source,style_code,min_price,max_price,currency",
+          "style_code",
+        ),
+      ]);
+      if (cancelled) return;
+
       const enriched: EnrichedItem[] = all
         .map((it) => {
           if (isIncompleteNwgShell(it)) return null;
@@ -377,41 +416,32 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           } as EnrichedItem;
         })
         .filter((x): x is EnrichedItem => x !== null);
-      setItems(enriched);
-      setLoaded(true);
 
-      // Load unified catalog price ranges (min/max per style, all sources).
+      // Unified catalog price ranges (min/max per style, all sources).
       // Prices are stored excl. VAT and already include our markup.
-      {
-        const ranges = new Map<string, { price: number; max: number; currency: string }>();
-        let from = 0;
-        while (true) {
-          let query = supabase
-            .from("catalog_price_ranges" as any)
-            .select("source,style_code,min_price,max_price,currency")
-            .range(from, from + 999);
-          if (lockedSource) query = query.eq("source", lockedSource);
-          const { data, error } = await query;
-          if (error || !data) break;
-          for (const r of data as any[]) {
-            const key = `${r.source}:${r.style_code}`;
-            const min = Number(r.min_price);
-            const max = Number(r.max_price);
-            if (!Number.isFinite(min) || min <= 0) continue;
-            ranges.set(key, {
-              price: min,
-              max: Number.isFinite(max) && max > min ? max : min,
-              currency: r.currency || "EUR",
-            });
-          }
-          if (data.length < 1000) break;
-          from += 1000;
-        }
-        setPriceRanges(ranges);
+      const ranges = new Map<string, { price: number; max: number; currency: string }>();
+      for (const r of priceRows) {
+        const min = Number(r.min_price);
+        const max = Number(r.max_price);
+        if (!Number.isFinite(min) || min <= 0) continue;
+        ranges.set(`${r.source}:${r.style_code}`, {
+          price: min,
+          max: Number.isFinite(max) && max > min ? max : min,
+          currency: r.currency || "EUR",
+        });
       }
 
+      CATALOG_CACHE.set(cacheKey, { items: enriched, ranges });
+      setItems(enriched);
+      setPriceRanges(ranges);
+      setLoaded(true);
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [lockedSource]);
+
 
   useEffect(() => {
     setPage(1);
