@@ -480,27 +480,33 @@ async function syncStyles(
 
 
 
-  const { data: existing, error: existingError } = await sb
-    .from("nwg_styles")
-    .select("product_number")
-    .in("brand", ["Craft", "Craft AP", "Clique", "Clique Retail", "ProJob", "Cutter & Buck"])
-    .eq("archived", false);
-  if (existingError) throw new Error(`archive candidate fetch: ${existingError.message}`);
-  const stale = (existing ?? []).map((row: any) => toStr(row.product_number)).filter((pn): pn is string => Boolean(pn) && !seen.has(pn));
-  for (let i = 0; i < stale.length; i += 200) {
-    const { error } = await sb.from("nwg_styles").update({
-      archived: true,
-      archived_at: new Date().toISOString(),
-    }).in("product_number", stale.slice(i, i + 200));
-    if (error) throw new Error(`archive stale styles: ${error.message}`);
+  let stale: string[] = [];
+  if (!opts.only?.length) {
+    const { data: existing, error: existingError } = await sb
+      .from("nwg_styles")
+      .select("product_number")
+      .in("brand", ["Craft", "Craft AP", "Clique", "Clique Retail", "ProJob", "Cutter & Buck"])
+      .eq("archived", false);
+    if (existingError) throw new Error(`archive candidate fetch: ${existingError.message}`);
+    stale = (existing ?? []).map((row: any) => toStr(row.product_number)).filter((pn): pn is string => Boolean(pn) && !seen.has(pn));
+    for (let i = 0; i < stale.length; i += 200) {
+      const { error } = await sb.from("nwg_styles").update({
+        archived: true,
+        archived_at: new Date().toISOString(),
+      }).in("product_number", stale.slice(i, i + 200));
+      if (error) throw new Error(`archive stale styles: ${error.message}`);
+    }
   }
 
   return {
     pages_fetched: pagesFetched,
+    narrowed,
+    assortments_crawled: assortmentIds.length,
     unique_styles: seen.size,
     archived_styles: stale.length,
     assortments: perAssortment,
   };
+
 }
 
 
