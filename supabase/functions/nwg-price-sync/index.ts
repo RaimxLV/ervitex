@@ -119,73 +119,33 @@ Deno.serve(async (req) => {
     const work = async () => {
       const logId = await startLog(sb, "nwg:prices");
       try {
-        // Collect target SKUs for our partner brands.
+        // Only price what we actually sell, and only ONE representative SKU per
+        // (model + size). Colors share the contract price, so after fetching the
+        // representatives we propagate them to all sibling SKUs in SQL.
+        // This turns ~52 000 API lookups into ~15 000 (and ~0 on later runs).
         const skus: string[] = [];
         const pnBySku = new Map<string, string>();
         const itemBySku = new Map<string, string>();
-        const pageSize = 1000;
 
-        // Only price products that are actually visible in our catalog
-        // (catalog_items already applies the partner-brand + assortment filters),
-        // so we never spend API calls on NWG products we don't sell.
-        const productNumbers: string[] = [];
-        for (let from = 0; ; from += pageSize) {
-          const { data, error } = await sb
-            .from("catalog_items")
-            .select("id")
-            .eq("source", "nwg")
-            .order("id")
-            .range(from, from + pageSize - 1);
-          if (error) throw new Error(`catalog fetch: ${error.message}`);
-          if (!data?.length) break;
-          for (const r of data as any[]) if (r.id) productNumbers.push(r.id);
-          if (data.length < pageSize) break;
-        }
-        if (!productNumbers.length) {
-          // Fallback: brand-filtered styles (e.g. before the catalog index is built).
-          for (let from = 0; ; from += pageSize) {
-            const { data, error } = await sb
-              .from("nwg_styles")
-              .select("product_number")
-              .in("brand", BRANDS)
-              .eq("published", true)
-              .eq("archived", false)
-              .order("product_number")
-              .range(from, from + pageSize - 1);
-            if (error) throw new Error(`style fetch: ${error.message}`);
-            if (!data?.length) break;
-            for (const r of data as any[]) if (r.product_number) productNumbers.push(r.product_number);
-            if (data.length < pageSize) break;
+        const page = 1000; // PostgREST caps RPC rows, so page through targets.
+        for (let off = 0; skus.length < limit; off += page) {
+          const { data: targets, error: targetErr } = await sb.rpc("nwg_price_targets", {
+            only_missing: onlyMissing,
+            lim: Math.min(page, limit - skus.length),
+            off,
+          });
+          if (targetErr) throw new Error(`target fetch: ${targetErr.message}`);
+          const rows = (targets ?? []) as any[];
+          for (const r of rows) {
+            if (!r?.sku) continue;
+            skus.push(r.sku);
+            if (r.product_number) pnBySku.set(r.sku, r.product_number);
+            if (r.item_number) itemBySku.set(r.sku, r.item_number);
           }
+          if (rows.length < page) break;
         }
 
 
-        outer:
-        for (let pi = 0; pi < productNumbers.length; pi += 200) {
-          const pnChunk = productNumbers.slice(pi, pi + 200);
-          for (let from = 0; ; from += pageSize) {
-            let q = sb
-              .from("nwg_skus")
-              .select("sku, product_number, item_number")
-              .in("product_number", pnChunk)
-              .eq("active", true)
-              .eq("discontinued", false)
-              .order("sku")
-              .range(from, from + pageSize - 1);
-            if (onlyMissing) q = q.is("purchase_price", null);
-            const { data, error } = await q;
-            if (error) throw new Error(`sku fetch: ${error.message}`);
-            if (!data?.length) break;
-            for (const r of data as any[]) {
-              if (!r.sku) continue;
-              skus.push(r.sku);
-              if (r.product_number) pnBySku.set(r.sku, r.product_number);
-              if (r.item_number) itemBySku.set(r.sku, r.item_number);
-            }
-            if (skus.length >= limit) break outer;
-            if (data.length < pageSize) break;
-          }
-        }
 
         let updated = 0;
         let failed = 0;
@@ -235,7 +195,7 @@ Deno.serve(async (req) => {
 
         };
 
-        const CONCURRENCY = 4;
+        const CONCURRENCY = 6;
         for (let i = 0; i < skus.length; i += batchSize * CONCURRENCY) {
           const group: Promise<void>[] = [];
           for (let k = 0; k < CONCURRENCY; k++) {
@@ -246,12 +206,21 @@ Deno.serve(async (req) => {
         }
 
         const more = onlyMissing && skus.length >= limit;
+
+        // Spread the representative contract prices to every sibling SKU
+        // (same model + size, other colors).
+        let propagated = 0;
+        const { data: propData, error: propErr } = await sb.rpc("nwg_propagate_purchase_prices");
+        if (propErr) console.error(`propagate: ${propErr.message}`);
+        else propagated = Number(propData ?? 0);
+
         // Always refresh so already-synced contract prices get the exact
         // x1.67 markup and x1.21 VAT applied while the rest is still syncing.
         const { error: refreshErr } = await sb.rpc("refresh_catalog_prices");
         if (refreshErr) console.error(`refresh_catalog_prices: ${refreshErr.message}`);
 
-        const result = { skus_requested: skus.length, updated, failed, more };
+        const result = { skus_requested: skus.length, updated, propagated, failed, more };
+
         await finishLog(sb, logId, {
           status: "success",
           message: `NWG contract prices synced${more ? " (continuing)" : ""}`,
