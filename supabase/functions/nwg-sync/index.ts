@@ -581,7 +581,7 @@ Deno.serve(async (req) => {
     }
     if (mode === "styles" || mode === "all") {
       if (!assortmentNodes) throw new Error("NWG assortment discovery failed");
-      result.catalog = await syncStyles(sb, assortmentNodes);
+      result.catalog = await syncStyles(sb, assortmentNodes, { only, full });
       const { error: itemsError } = await sb.rpc("refresh_catalog_items_mv");
       if (itemsError) throw new Error(`catalog refresh: ${itemsError.message}`);
     }
