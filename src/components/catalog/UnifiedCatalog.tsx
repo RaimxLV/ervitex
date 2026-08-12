@@ -920,10 +920,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
-                  {paginated.map((it) => (
+                  {paginated.map((it, idx) => (
                     <CatalogCard
                       key={`${it.source}-${it.id}`}
                       item={it}
+                      priority={idx < 8}
                       lang={lang}
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}
