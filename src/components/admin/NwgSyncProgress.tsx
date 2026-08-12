@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Progress {
   total: number;
   priced: number;
   lastUpdate: string | null;
 }
+
+const NWG_BRANDS = ["Craft", "Clique", "ProJob", "Cutter & Buck"];
 
 const NwgSyncProgress = () => {
   const [p, setP] = useState<Progress>({ total: 0, priced: 0, lastUpdate: null });
@@ -15,11 +18,19 @@ const NwgSyncProgress = () => {
   const load = useCallback(async () => {
     setLoading(true);
     const [total, priced, last] = await Promise.all([
-      supabase.from("nwg_skus").select("*", { count: "exact", head: true }),
-      supabase.from("nwg_skus").select("*", { count: "exact", head: true }).gt("purchase_price", 0),
       supabase
         .from("nwg_skus")
-        .select("purchase_updated_at")
+        .select("nwg_styles!inner(brand)", { count: "exact", head: true })
+        .in("nwg_styles.brand", NWG_BRANDS),
+      supabase
+        .from("nwg_skus")
+        .select("nwg_styles!inner(brand)", { count: "exact", head: true })
+        .in("nwg_styles.brand", NWG_BRANDS)
+        .gt("purchase_price", 0),
+      supabase
+        .from("nwg_skus")
+        .select("purchase_updated_at,nwg_styles!inner(brand)")
+        .in("nwg_styles.brand", NWG_BRANDS)
         .not("purchase_updated_at", "is", null)
         .order("purchase_updated_at", { ascending: false })
         .limit(1)
@@ -39,7 +50,9 @@ const NwgSyncProgress = () => {
     return () => clearInterval(t);
   }, [load]);
 
-  const pct = p.total ? Math.round((p.priced / p.total) * 100) : 0;
+  const pct = p.total ? (p.priced / p.total) * 100 : 0;
+  const remaining = Math.max(0, p.total - p.priced);
+  const complete = p.total > 0 && remaining <= 12;
   const stale = p.lastUpdate ? Date.now() - new Date(p.lastUpdate).getTime() > 5 * 60 * 1000 : true;
 
   return (
@@ -53,30 +66,39 @@ const NwgSyncProgress = () => {
             Craft, Clique, ProJob, Cutter &amp; Buck — līgumcena × 1,67 (bez PVN)
           </p>
         </div>
-        <button
+        <Button
+          variant="outline"
+          size="sm"
           onClick={load}
-          className="inline-flex items-center gap-2 rounded-sm border border-border px-3 py-2 text-xs font-bold uppercase tracking-wider text-foreground hover:bg-muted"
+          disabled={loading}
+          className="gap-2 rounded-sm text-xs font-bold uppercase tracking-wider"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
           Atjaunot
-        </button>
+        </Button>
       </div>
 
       <div className="mt-5">
         <div className="flex items-end justify-between text-sm">
-          <span className="font-heading text-2xl font-black text-foreground">{pct}%</span>
+          <span className="font-heading text-2xl font-black text-foreground">
+            {complete ? "100" : pct.toFixed(1)}%
+          </span>
           <span className="text-muted-foreground">
             {p.priced.toLocaleString("lv-LV")} / {p.total.toLocaleString("lv-LV")} SKU
           </span>
         </div>
         <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
-          <div className="h-full bg-accent transition-all" style={{ width: `${pct}%` }} />
+          <div className="h-full bg-accent transition-all" style={{ width: `${complete ? 100 : pct}%` }} />
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
           Pēdējā cena saņemta:{" "}
           {p.lastUpdate ? new Date(p.lastUpdate).toLocaleString("lv-LV") : "—"}
           {" · "}
-          {stale ? "process šobrīd neaktīvs" : "process darbojas"}
+          {complete
+            ? `sinhronizācija pabeigta${remaining ? `; ${remaining} SKU piegādātājs cenu neatgrieza` : ""}`
+            : stale
+              ? "process šobrīd neaktīvs"
+              : "process darbojas"}
         </p>
       </div>
     </div>

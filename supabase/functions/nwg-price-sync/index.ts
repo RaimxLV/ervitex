@@ -213,10 +213,13 @@ Deno.serve(async (req) => {
         if (propErr) console.error(`propagate: ${propErr.message}`);
         else propagated = Number(propData ?? 0);
 
-        // Always refresh so already-synced contract prices get the exact
-        // x1.67 markup and x1.21 VAT applied while the rest is still syncing.
-        const { error: refreshErr } = await sb.rpc("refresh_catalog_prices");
-        if (refreshErr) console.error(`refresh_catalog_prices: ${refreshErr.message}`);
+        // Refresh public prices only when this invocation actually changed data.
+        // The watchdog may continue to run after completion and must not launch
+        // the expensive catalog refresh repeatedly with zero updates.
+        if (updated > 0) {
+          const { error: refreshErr } = await sb.rpc("refresh_catalog_prices");
+          if (refreshErr) console.error(`refresh_catalog_prices: ${refreshErr.message}`);
+        }
 
         const result = { skus_requested: skus.length, updated, propagated, failed, more };
 
