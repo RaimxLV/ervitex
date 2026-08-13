@@ -554,7 +554,29 @@ async function syncStyles(
   let images: any[] = [];
 
   const flush = async () => {
-    if (styles.length)   await chunkUpsert(sb, "nwg_styles", styles, "product_number", 200);
+    if (styles.length) {
+      // A metadata sync must not undo the website/contract audit. Preserve an
+      // existing archived state; the price sync alone may restore a model after
+      // the authoritative NWG website confirms it again.
+      const productNumbers = styles.map((style) => style.product_number);
+      const { data: existing, error } = await sb
+        .from("nwg_styles")
+        .select("product_number, published, archived, archived_at")
+        .in("product_number", productNumbers);
+      if (error) throw new Error(`nwg_styles visibility read: ${error.message}`);
+      const visibility = new Map((existing ?? []).map((row: any) => [row.product_number, row]));
+      styles = styles.map((style) => {
+        const current = visibility.get(style.product_number);
+        if (!current?.archived) return style;
+        return {
+          ...style,
+          published: false,
+          archived: true,
+          archived_at: current.archived_at ?? new Date().toISOString(),
+        };
+      });
+      await chunkUpsert(sb, "nwg_styles", styles, "product_number", 200);
+    }
     if (variants.length) await chunkUpsert(sb, "nwg_variants", variants, "item_number");
     if (skus.length)     await chunkUpsert(sb, "nwg_skus", skus, "sku");
     if (images.length)   await chunkUpsert(sb, "nwg_images", images, "product_number,item_number,resource_file_id,picture_angle");
