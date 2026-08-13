@@ -172,6 +172,168 @@ const Q_PRODUCTS_BY_ASSORTMENT = `
   }
 `;
 
+const EXACT_AUDIT_BATCH_SIZE = 25;
+
+type ExactAuditProduct = {
+  productNumber?: string | null;
+  productName?: string | null;
+  productBrand?: string | null;
+  pictures?: Array<{
+    imageUrl?: string | null;
+    highResUrl?: string | null;
+    standardUrl?: string | null;
+  }> | null;
+  variations?: Array<{
+    itemNumber?: string | null;
+    pictures?: Array<{
+      imageUrl?: string | null;
+      highResUrl?: string | null;
+      standardUrl?: string | null;
+    }> | null;
+    skus?: Array<{
+      sku?: string | null;
+      productNumber?: string | null;
+    }> | null;
+  }> | null;
+};
+
+function normalizedUrl(value: string): string {
+  try {
+    const url = new URL(value);
+    return `${url.origin}${decodeURIComponent(url.pathname)}${url.search}`;
+  } catch {
+    return value;
+  }
+}
+
+function exactAuditQuery(productNumbers: string[]): string {
+  const fields = productNumbers.map((productNumber, index) => {
+    if (!/^[A-Za-z0-9._-]+$/.test(productNumber)) {
+      throw new Error(`Unsafe NWG product number in audit: ${productNumber}`);
+    }
+    return `p${index}: productById(productNumber: ${JSON.stringify(productNumber)}, language: "en", disableCache: true) {
+      productNumber productName productBrand
+      pictures { imageUrl highResUrl standardUrl }
+      variations {
+        itemNumber
+        pictures { imageUrl highResUrl standardUrl }
+        skus { sku productNumber }
+      }
+    }`;
+  });
+  return `query ExactProductAudit { ${fields.join("\n")} }`;
+}
+
+function productImageUrls(product: ExactAuditProduct): Set<string> {
+  const urls = new Set<string>();
+  const addPictures = (pictures: ExactAuditProduct["pictures"]) => {
+    for (const picture of pictures ?? []) {
+      for (const value of [picture.highResUrl, picture.standardUrl, picture.imageUrl]) {
+        const url = toStr(value);
+        if (url) urls.add(normalizedUrl(url));
+      }
+    }
+  };
+  addPictures(product.pictures);
+  for (const variation of product.variations ?? []) addPictures(variation.pictures);
+  return urls;
+}
+
+function imageFilenameMatchesProduct(value: string, productNumber: string): boolean {
+  try {
+    const filename = decodeURIComponent(new URL(value).pathname.split("/").pop() ?? "");
+    return filename.startsWith(`${productNumber}-`) || filename.startsWith(`${productNumber}_`);
+  } catch {
+    return false;
+  }
+}
+
+async function auditPublicCards(sb: SupabaseClient, offset: number, limit: number) {
+  const safeOffset = Math.max(0, offset);
+  const safeLimit = Math.max(1, Math.min(limit, 1000));
+  const { data, error, count } = await sb
+    .from("catalog_items")
+    .select("id,name,brand,image_url", { count: "exact" })
+    .eq("source", "nwg")
+    .order("id")
+    .range(safeOffset, safeOffset + safeLimit - 1);
+  if (error) throw new Error(`NWG public-card audit read: ${error.message}`);
+
+  const cards = (data ?? []) as Array<{ id: string; name: string | null; brand: string | null; image_url: string | null }>;
+  const mismatches: Array<{ id: string; reasons: string[]; local: unknown; api: unknown }> = [];
+
+  for (let start = 0; start < cards.length; start += EXACT_AUDIT_BATCH_SIZE) {
+    const batch = cards.slice(start, start + EXACT_AUDIT_BATCH_SIZE);
+    const productNumbers = batch.map((card) => card.id);
+    const [exact, localVariants, localSkus] = await Promise.all([
+      gql<Record<string, ExactAuditProduct | null>>(exactAuditQuery(productNumbers)),
+      sb.from("nwg_variants").select("product_number,item_number").in("product_number", productNumbers),
+      sb.from("nwg_skus").select("product_number,item_number,sku").in("product_number", productNumbers),
+    ]);
+    if (localVariants.error) throw new Error(`NWG variant audit read: ${localVariants.error.message}`);
+    if (localSkus.error) throw new Error(`NWG SKU audit read: ${localSkus.error.message}`);
+    batch.forEach((card, index) => {
+      const product = exact[`p${index}`];
+      const reasons: string[] = [];
+      if (!product) {
+        reasons.push("exact_product_not_found");
+      } else {
+        const exactNumber = toStr(product.productNumber);
+        const exactName = toStr(product.productName);
+        const exactBrand = BRAND_NAMES.get((toStr(product.productBrand) ?? "").toLocaleLowerCase()) ?? toStr(product.productBrand);
+        const exactItems = new Set((product.variations ?? []).map((variation) => toStr(variation.itemNumber)).filter(Boolean));
+        const exactSkus = new Map<string, string | null>();
+        for (const variation of product.variations ?? []) {
+          for (const sku of variation.skus ?? []) {
+            const skuCode = toStr(sku.sku);
+            if (skuCode) exactSkus.set(skuCode, toStr(sku.productNumber));
+          }
+        }
+        if (exactNumber !== card.id) reasons.push(`product_number:${exactNumber ?? "null"}`);
+        if (exactName !== card.name) reasons.push(`name:${exactName ?? "null"}`);
+        if (exactBrand !== card.brand) reasons.push(`brand:${exactBrand ?? "null"}`);
+        if (
+          card.image_url &&
+          !productImageUrls(product).has(normalizedUrl(card.image_url)) &&
+          !imageFilenameMatchesProduct(card.image_url, card.id)
+        ) reasons.push("image_not_owned_by_product");
+        for (const variant of localVariants.data ?? []) {
+          if (variant.product_number === card.id && !exactItems.has(variant.item_number)) {
+            reasons.push(`variant_not_owned:${variant.item_number}`);
+          }
+        }
+        for (const sku of localSkus.data ?? []) {
+          if (sku.product_number !== card.id) continue;
+          if (!exactSkus.has(sku.sku)) reasons.push(`sku_not_owned:${sku.sku}`);
+          else if (exactSkus.get(sku.sku) !== card.id) reasons.push(`sku_product_number:${sku.sku}`);
+          if (sku.item_number && !exactItems.has(sku.item_number)) reasons.push(`sku_variant_not_owned:${sku.sku}`);
+        }
+      }
+      if (reasons.length) {
+        mismatches.push({
+          id: card.id,
+          reasons,
+          local: { name: card.name, brand: card.brand, image_url: card.image_url },
+          api: product ? {
+            product_number: toStr(product.productNumber),
+            name: toStr(product.productName),
+            brand: toStr(product.productBrand),
+          } : null,
+        });
+      }
+    });
+  }
+
+  return {
+    total_public_cards: count ?? cards.length,
+    offset: safeOffset,
+    checked: cards.length,
+    next_offset: safeOffset + cards.length < (count ?? 0) ? safeOffset + cards.length : null,
+    mismatch_count: mismatches.length,
+    mismatches,
+  };
+}
+
 
 // -------------------------------------------------------------- mapping ----
 
@@ -567,6 +729,8 @@ Deno.serve(async (req) => {
   const q = url.searchParams.get("q") || undefined;
   const only = (url.searchParams.get("ids") || "").split(",").map((s) => s.trim()).filter(Boolean);
   const full = url.searchParams.get("full") === "1";
+  const auditOffset = toInt(url.searchParams.get("offset"), 0);
+  const auditLimit = toInt(url.searchParams.get("limit"), 500);
 
 
   const logId = await startLog(sb, `nwg:${mode}`);
@@ -574,6 +738,7 @@ Deno.serve(async (req) => {
 
   try {
     if (mode === "inspect") result.inspect = await inspectApi(q);
+    if (mode === "audit") result.audit = await auditPublicCards(sb, auditOffset, auditLimit);
     let assortmentNodes: any[] | null = null;
     if (mode === "assortments" || mode === "styles" || mode === "all") {
       assortmentNodes = await syncAssortments(sb);
