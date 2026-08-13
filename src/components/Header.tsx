@@ -256,13 +256,13 @@ const Header = () => {
       {/* Desktop Mega Menu */}
       <div
         ref={megaPanelRef}
-        className={`hidden xl:block absolute left-0 right-0 top-full origin-top transition-all duration-200 ${
+        className={`hidden xl:block absolute left-0 right-0 top-full origin-top px-4 lg:px-8 transition-all duration-200 ${
           megaOpen
             ? "pointer-events-auto opacity-100 translate-y-0"
             : "pointer-events-none opacity-0 -translate-y-2"
         }`}
       >
-        <div className="border-t border-primary-foreground/10 bg-primary text-primary-foreground shadow-2xl shadow-primary/50">
+        <div className="mx-auto w-full max-w-[1120px] overflow-hidden rounded-b-sm border border-primary-foreground/10 border-t-0 bg-primary text-primary-foreground shadow-2xl shadow-black/60">
           <CatalogMegaMenu onNavigate={() => setMegaOpen(false)} />
         </div>
       </div>
