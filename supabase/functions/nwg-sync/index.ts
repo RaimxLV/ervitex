@@ -26,6 +26,10 @@ const BRAND_NAMES = new Map([
   ["cutter & buck", "Cutter & Buck"],
 ]);
 
+// Products confirmed unavailable through NWG's ordering channel must never be
+// restored by a later catalog sync, even if productById still returns metadata.
+const BLOCKED_PRODUCT_NUMBERS = new Set(["1903482"]);
+
 // ------------------------------------------------------------------- helpers
 
 async function gql<T = any>(query: string, variables: Record<string, unknown> = {}): Promise<T> {
@@ -342,6 +346,7 @@ function mapProduct(row: any, assortmentId: string, seenProductNumbers: Set<stri
 } {
   const pn = toStr(row.productNumber);
   if (!pn) return { variants: [], skus: [], images: [] };
+  if (BLOCKED_PRODUCT_NUMBERS.has(pn)) return { variants: [], skus: [], images: [] };
   const brand = BRAND_NAMES.get((toStr(row.productBrand) ?? "").toLocaleLowerCase());
   if (!brand) return { variants: [], skus: [], images: [] };
   if (seenProductNumbers.has(pn)) return { variants: [], skus: [], images: [] };
