@@ -17,6 +17,7 @@ const PRICE_URL = "https://commerce.gateway.nwg.se/assortment/fi/customerprice";
 const WEBSITE_CATALOG_URL = "https://commerce.gateway.nwg.se/assortment/en/products";
 const CONTEXT_ID = "C58B7BDF-CCA1-4655-8BD2-438E91964DB0";
 const BRANDS = ["Craft", "Clique", "ProJob", "Cutter & Buck"];
+const BLOCKED_PRODUCT_NUMBERS = new Set(["1903482", "1904160"]);
 
 type WebsiteProduct = {
   productNumber?: string | null;
@@ -73,7 +74,7 @@ async function validateWebsiteCatalog(sb: SupabaseClient) {
     for (const products of results) {
       for (const product of products) {
         const productNumber = typeof product.productNumber === "string" ? product.productNumber.trim() : "";
-        if (productNumber) found.add(productNumber);
+        if (productNumber && !BLOCKED_PRODUCT_NUMBERS.has(productNumber)) found.add(productNumber);
       }
     }
   }
