@@ -190,8 +190,21 @@ type ExactAuditProduct = {
       highResUrl?: string | null;
       standardUrl?: string | null;
     }> | null;
+    skus?: Array<{
+      sku?: string | null;
+      productNumber?: string | null;
+    }> | null;
   }> | null;
 };
+
+function normalizedUrl(value: string): string {
+  try {
+    const url = new URL(value);
+    return `${url.origin}${decodeURIComponent(url.pathname)}${url.search}`;
+  } catch {
+    return value;
+  }
+}
 
 function exactAuditQuery(productNumbers: string[]): string {
   const fields = productNumbers.map((productNumber, index) => {
@@ -201,7 +214,11 @@ function exactAuditQuery(productNumbers: string[]): string {
     return `p${index}: productById(productNumber: ${JSON.stringify(productNumber)}, language: "en", disableCache: true) {
       productNumber productName productBrand
       pictures { imageUrl highResUrl standardUrl }
-      variations { itemNumber pictures { imageUrl highResUrl standardUrl } }
+      variations {
+        itemNumber
+        pictures { imageUrl highResUrl standardUrl }
+        skus { sku productNumber }
+      }
     }`;
   });
   return `query ExactProductAudit { ${fields.join("\n")} }`;
@@ -213,7 +230,7 @@ function productImageUrls(product: ExactAuditProduct): Set<string> {
     for (const picture of pictures ?? []) {
       for (const value of [picture.highResUrl, picture.standardUrl, picture.imageUrl]) {
         const url = toStr(value);
-        if (url) urls.add(url);
+        if (url) urls.add(normalizedUrl(url));
       }
     }
   };
@@ -238,7 +255,14 @@ async function auditPublicCards(sb: SupabaseClient, offset: number, limit: numbe
 
   for (let start = 0; start < cards.length; start += EXACT_AUDIT_BATCH_SIZE) {
     const batch = cards.slice(start, start + EXACT_AUDIT_BATCH_SIZE);
-    const exact = await gql<Record<string, ExactAuditProduct | null>>(exactAuditQuery(batch.map((card) => card.id)));
+    const productNumbers = batch.map((card) => card.id);
+    const [exact, localVariants, localSkus] = await Promise.all([
+      gql<Record<string, ExactAuditProduct | null>>(exactAuditQuery(productNumbers)),
+      sb.from("nwg_variants").select("product_number,item_number").in("product_number", productNumbers),
+      sb.from("nwg_skus").select("product_number,item_number,sku").in("product_number", productNumbers),
+    ]);
+    if (localVariants.error) throw new Error(`NWG variant audit read: ${localVariants.error.message}`);
+    if (localSkus.error) throw new Error(`NWG SKU audit read: ${localSkus.error.message}`);
     batch.forEach((card, index) => {
       const product = exact[`p${index}`];
       const reasons: string[] = [];
@@ -248,10 +272,29 @@ async function auditPublicCards(sb: SupabaseClient, offset: number, limit: numbe
         const exactNumber = toStr(product.productNumber);
         const exactName = toStr(product.productName);
         const exactBrand = BRAND_NAMES.get((toStr(product.productBrand) ?? "").toLocaleLowerCase()) ?? toStr(product.productBrand);
+        const exactItems = new Set((product.variations ?? []).map((variation) => toStr(variation.itemNumber)).filter(Boolean));
+        const exactSkus = new Map<string, string | null>();
+        for (const variation of product.variations ?? []) {
+          for (const sku of variation.skus ?? []) {
+            const skuCode = toStr(sku.sku);
+            if (skuCode) exactSkus.set(skuCode, toStr(sku.productNumber));
+          }
+        }
         if (exactNumber !== card.id) reasons.push(`product_number:${exactNumber ?? "null"}`);
         if (exactName !== card.name) reasons.push(`name:${exactName ?? "null"}`);
         if (exactBrand !== card.brand) reasons.push(`brand:${exactBrand ?? "null"}`);
-        if (card.image_url && !productImageUrls(product).has(card.image_url)) reasons.push("image_not_owned_by_product");
+        if (card.image_url && !productImageUrls(product).has(normalizedUrl(card.image_url))) reasons.push("image_not_owned_by_product");
+        for (const variant of localVariants.data ?? []) {
+          if (variant.product_number === card.id && !exactItems.has(variant.item_number)) {
+            reasons.push(`variant_not_owned:${variant.item_number}`);
+          }
+        }
+        for (const sku of localSkus.data ?? []) {
+          if (sku.product_number !== card.id) continue;
+          if (!exactSkus.has(sku.sku)) reasons.push(`sku_not_owned:${sku.sku}`);
+          else if (exactSkus.get(sku.sku) !== card.id) reasons.push(`sku_product_number:${sku.sku}`);
+          if (sku.item_number && !exactItems.has(sku.item_number)) reasons.push(`sku_variant_not_owned:${sku.sku}`);
+        }
       }
       if (reasons.length) {
         mismatches.push({
