@@ -343,6 +343,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [sort, setSort] = useState<string>(searchParams.get("sort") || "featured");
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
+  // Tracks the query string this component itself wrote, so that navigations
+  // coming from outside (mega menu links while already on /catalog) can be
+  // detected and applied instead of being overwritten by the local state.
+  const lastWrittenSearch = useRef<string | null>(null);
+
   useEffect(() => {
     const p = new URLSearchParams();
     if (q) p.set("q", q);
@@ -354,8 +359,33 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (colors.size) p.set("color", [...colors].join(","));
     if (sort && sort !== "featured") p.set("sort", sort);
     if (page > 1) p.set("page", String(page));
+    lastWrittenSearch.current = p.toString();
     setSearchParams(p, { replace: true });
   }, [q, sources, brands, categories, groups, genders, colors, sort, page, setSearchParams]);
+
+  // External URL changes (e.g. clicking another mega menu category while the
+  // catalog is already mounted) must reset the filters to the incoming params.
+  useEffect(() => {
+    const incoming = searchParams.toString();
+    if (lastWrittenSearch.current === incoming) return;
+    lastWrittenSearch.current = incoming;
+    setQ(searchParams.get("q") || "");
+    setSources(lockedSource ? new Set() : parseManufacturerFilter(searchParams.get("source")));
+    setBrands(new Set((searchParams.get("brand") || "").split(",").filter(Boolean)));
+    setCategories(
+      new Set(
+        (searchParams.get("category") || "")
+          .split(",")
+          .map((v) => normalizeCategory(v))
+          .filter((v): v is string => !!v),
+      ),
+    );
+    setGroups(new Set((searchParams.get("group") || "").split(",").filter(Boolean)));
+    setGenders(new Set((searchParams.get("gender") || "").split(",").filter(Boolean)));
+    setColors(new Set((searchParams.get("color") || "").split(",").filter(Boolean)));
+    setSort(searchParams.get("sort") || "featured");
+    setPage(parseInt(searchParams.get("page") || "1", 10));
+  }, [searchParams, lockedSource]);
 
   useEffect(() => {
     const cacheKey = lockedSource || "all";
