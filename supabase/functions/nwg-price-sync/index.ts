@@ -9,18 +9,107 @@
 //         onlyMissing=1 (default) to skip SKUs already priced.
 
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-
-const corsHeaders: Record<string, string> = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
-};
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 const TOKEN_URL = "https://id.gateway.nwg.se/connect/token";
 const CLIENT_ID = "ReactJs";
 const PRICE_URL = "https://commerce.gateway.nwg.se/assortment/fi/customerprice";
+const WEBSITE_CATALOG_URL = "https://commerce.gateway.nwg.se/assortment/en/products";
 const CONTEXT_ID = "C58B7BDF-CCA1-4655-8BD2-438E91964DB0";
 const BRANDS = ["Craft", "Clique", "ProJob", "Cutter & Buck"];
+const BLOCKED_PRODUCT_NUMBERS = new Set(["1903482", "1904160"]);
+
+type WebsiteProduct = {
+  productNumber?: string | null;
+  productBrandName?: string | null;
+};
+
+async function getPartnerProductNumbers(sb: SupabaseClient): Promise<string[]> {
+  const productNumbers: string[] = [];
+  const pageSize = 1000;
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await sb
+      .from("nwg_styles")
+      .select("product_number")
+      .in("brand", BRANDS)
+      .range(offset, offset + pageSize - 1);
+    if (error) throw new Error(`NWG style validation read: ${error.message}`);
+    for (const row of data ?? []) {
+      if (typeof row.product_number === "string" && row.product_number.trim()) {
+        productNumbers.push(row.product_number.trim());
+      }
+    }
+    if ((data ?? []).length < pageSize) break;
+  }
+  return [...new Set(productNumbers)];
+}
+
+async function fetchWebsiteProducts(productNumbers: string[]): Promise<WebsiteProduct[]> {
+  const url = new URL(WEBSITE_CATALOG_URL);
+  for (const productNumber of productNumbers) url.searchParams.append("products", productNumber);
+  const res = await fetch(url, {
+    headers: {
+      "contextid": CONTEXT_ID,
+      "Origin": "https://www.newwaveprofile.com",
+      "Referer": "https://www.newwaveprofile.com/",
+      "Accept": "application/json",
+    },
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`NWG website catalog failed [${res.status}]: ${text.slice(0, 300)}`);
+  const parsed = JSON.parse(text);
+  if (!Array.isArray(parsed)) throw new Error("NWG website catalog returned an invalid response");
+  return parsed as WebsiteProduct[];
+}
+
+async function validateWebsiteCatalog(sb: SupabaseClient) {
+  const productNumbers = await getPartnerProductNumbers(sb);
+  const batches: string[][] = [];
+  for (let i = 0; i < productNumbers.length; i += 80) batches.push(productNumbers.slice(i, i + 80));
+
+  const found = new Set<string>();
+  const concurrency = 8;
+  for (let i = 0; i < batches.length; i += concurrency) {
+    const results = await Promise.all(batches.slice(i, i + concurrency).map(fetchWebsiteProducts));
+    for (const products of results) {
+      for (const product of products) {
+        const productNumber = typeof product.productNumber === "string" ? product.productNumber.trim() : "";
+        if (productNumber && !BLOCKED_PRODUCT_NUMBERS.has(productNumber)) found.add(productNumber);
+      }
+    }
+  }
+
+  const missing = productNumbers.filter((productNumber) => !found.has(productNumber));
+  const now = new Date().toISOString();
+
+  // The website catalog is authoritative in both directions. Restore products
+  // confirmed there in case an earlier broad catalog cleanup archived them.
+  const confirmed = [...found];
+  for (let i = 0; i < confirmed.length; i += 200) {
+    const { error } = await sb
+      .from("nwg_styles")
+      .update({ published: true, archived: false, archived_at: null })
+      .in("product_number", confirmed.slice(i, i + 200));
+    if (error) throw new Error(`Restore website-confirmed NWG products: ${error.message}`);
+  }
+
+  for (let i = 0; i < missing.length; i += 200) {
+    const chunk = missing.slice(i, i + 200);
+    const { error: skuError } = await sb
+      .from("nwg_skus")
+      .update({ purchase_price: null, purchase_currency: null, purchase_updated_at: now })
+      .in("product_number", chunk);
+    if (skuError) throw new Error(`Clear website-missing NWG products: ${skuError.message}`);
+
+    const { error: styleError } = await sb
+      .from("nwg_styles")
+      .update({ published: false, archived: true, archived_at: now })
+      .in("product_number", chunk);
+    if (styleError) throw new Error(`Archive website-missing NWG products: ${styleError.message}`);
+  }
+
+  return { checked: productNumbers.length, found: found.size, missing, allowed: found };
+}
 
 async function getAccessToken(sb: SupabaseClient): Promise<string> {
   const { data, error } = await sb.from("nwg_auth").select("refresh_token").eq("id", 1).maybeSingle();
@@ -119,6 +208,12 @@ Deno.serve(async (req) => {
     const work = async () => {
       const logId = await startLog(sb, "nwg:prices");
       try {
+        // The customer-facing NWG website is the source of truth for whether a
+        // model belongs to our contract catalog. The global GraphQL feed and a
+        // stale customer price can both contain products that cannot be found or
+        // ordered on the actual NWG site, so validate exact product numbers first.
+        const websiteCatalog = await validateWebsiteCatalog(sb);
+
         // Price every active SKU belonging to the four public NWG brands.
         // Contract prices may differ by color/item number, so a price must never
         // be copied from a representative color to its siblings.
@@ -137,6 +232,7 @@ Deno.serve(async (req) => {
           const rows = (targets ?? []) as any[];
           for (const r of rows) {
             if (!r?.sku) continue;
+            if (!websiteCatalog.allowed.has(r.product_number)) continue;
             skus.push(r.sku);
             if (r.product_number) pnBySku.set(r.sku, r.product_number);
             if (r.item_number) itemBySku.set(r.sku, r.item_number);
@@ -242,15 +338,31 @@ Deno.serve(async (req) => {
         if (propErr) console.error(`propagate: ${propErr.message}`);
         else propagated = Number(propData ?? 0);
 
-        // Refresh public prices only when this invocation actually changed data.
+        // Refresh public prices when prices changed or website-only products were
+        // removed. The materialized catalog is refreshed separately below.
         // The watchdog may continue to run after completion and must not launch
         // the expensive catalog refresh repeatedly with zero updates.
-        if (updated > 0) {
+        if (updated > 0 || rejected > 0 || websiteCatalog.missing.length > 0) {
           const { error: refreshErr } = await sb.rpc("refresh_catalog_prices");
           if (refreshErr) console.error(`refresh_catalog_prices: ${refreshErr.message}`);
         }
 
-        const result = { skus_requested: skus.length, updated, rejected, propagated, failed, more };
+        if (websiteCatalog.missing.length > 0) {
+          const { error: itemsError } = await sb.rpc("refresh_catalog_items_mv");
+          if (itemsError) console.error(`refresh_catalog_items_mv: ${itemsError.message}`);
+        }
+
+        const result = {
+          website_checked: websiteCatalog.checked,
+          website_found: websiteCatalog.found,
+          website_removed: websiteCatalog.missing.length,
+          skus_requested: skus.length,
+          updated,
+          rejected,
+          propagated,
+          failed,
+          more,
+        };
 
         await finishLog(sb, logId, {
           status: "success",
