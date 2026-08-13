@@ -239,6 +239,15 @@ function productImageUrls(product: ExactAuditProduct): Set<string> {
   return urls;
 }
 
+function imageFilenameMatchesProduct(value: string, productNumber: string): boolean {
+  try {
+    const filename = decodeURIComponent(new URL(value).pathname.split("/").pop() ?? "");
+    return filename.startsWith(`${productNumber}-`) || filename.startsWith(`${productNumber}_`);
+  } catch {
+    return false;
+  }
+}
+
 async function auditPublicCards(sb: SupabaseClient, offset: number, limit: number) {
   const safeOffset = Math.max(0, offset);
   const safeLimit = Math.max(1, Math.min(limit, 1000));
@@ -283,7 +292,11 @@ async function auditPublicCards(sb: SupabaseClient, offset: number, limit: numbe
         if (exactNumber !== card.id) reasons.push(`product_number:${exactNumber ?? "null"}`);
         if (exactName !== card.name) reasons.push(`name:${exactName ?? "null"}`);
         if (exactBrand !== card.brand) reasons.push(`brand:${exactBrand ?? "null"}`);
-        if (card.image_url && !productImageUrls(product).has(normalizedUrl(card.image_url))) reasons.push("image_not_owned_by_product");
+        if (
+          card.image_url &&
+          !productImageUrls(product).has(normalizedUrl(card.image_url)) &&
+          !imageFilenameMatchesProduct(card.image_url, card.id)
+        ) reasons.push("image_not_owned_by_product");
         for (const variant of localVariants.data ?? []) {
           if (variant.product_number === card.id && !exactItems.has(variant.item_number)) {
             reasons.push(`variant_not_owned:${variant.item_number}`);
