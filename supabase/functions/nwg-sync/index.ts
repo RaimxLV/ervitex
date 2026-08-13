@@ -28,7 +28,7 @@ const BRAND_NAMES = new Map([
 
 // Products confirmed unavailable through NWG's ordering channel must never be
 // restored by a later catalog sync, even if productById still returns metadata.
-const BLOCKED_PRODUCT_NUMBERS = new Set(["1903482"]);
+const BLOCKED_PRODUCT_NUMBERS = new Set(["1903482", "1904160"]);
 
 // ------------------------------------------------------------------- helpers
 
