@@ -179,7 +179,9 @@ const CATEGORY_MAP: Record<string, string> = {
   "sweater": "Sweaters", "sweaters": "Sweaters",
   "sweatshirt": "Sweaters", "sweatshirts": "Sweaters",
   "crew neck sweatshirts": "Sweaters", "zip-thru sweatshirts": "Sweaters",
-  "fleece": "Sweaters", "terry": "Sweaters",
+  "fleece": "Sweaters",
+  // Towels (terry cloth is towelling, not a sweatshirt)
+  "towel": "Towels", "towels": "Towels", "terry": "Towels",
   // Jackets
   "jacket": "Jackets", "jackets": "Jackets", "jackets-vests": "Jackets",
   "non padded jacket": "Jackets", "light padded jacket": "Jackets", "padded jacket": "Jackets",
