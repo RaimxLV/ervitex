@@ -1419,7 +1419,8 @@ const CatalogItemDialog = ({
                           title={`${c.name} – ${c.code}`}
                           aria-label={c.name}
                           className={`h-7 w-7 rounded-full border-2 transition-transform ${isActive ? "border-foreground ring-2 ring-foreground/30 scale-110" : isLightHex(hex) ? "border-neutral-500 hover:scale-105" : "border-border hover:scale-105"}`}
-                          style={{ backgroundColor: hex }}
+                          style={swatchBackground(c.hex, c.name)}
+
                         />
                       );
                     })}
