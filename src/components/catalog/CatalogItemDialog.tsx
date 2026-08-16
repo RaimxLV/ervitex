@@ -579,15 +579,21 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
 
   const colors: ColorDetail[] = colorOrder.map((key) => {
     const info = colorInfo.get(key)!;
-    const imgs = imgByColor.get(key) || [];
+    const colourImgs = imgByColor.get(key) || [];
+    // Gallery = colour swatch shots + all style shots that mention this colour,
+    // falling back to every shared shot when the colour isn't in the filename.
+    const slug = key.replace(/[^a-z0-9]/g, "");
+    const matching = shared.filter((u) => u.toLowerCase().replace(/[^a-z0-9]/g, "").includes(slug));
+    const merged = [...new Set([...colourImgs, ...(matching.length ? matching : shared)])];
     return {
       code: info.name,
       name: info.name,
       hex: info.hex,
-      images: imgs.length ? imgs : shared,
+      images: merged.length ? merged : shared,
       sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes),
     };
   });
+
 
   // If no colors at all, still expose one "default" color with shared imgs
   if (colors.length === 0 && shared.length) {
