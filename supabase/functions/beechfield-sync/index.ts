@@ -100,10 +100,25 @@ function parseProduct(url: string, html: string): Parsed | null {
     }
   }
 
-  // Gallery images: all cloudfront/mediahub urls
-  const imgs = [...html.matchAll(/https:\/\/(?:d2csxpduxe849s\.cloudfront\.net|mediahub\.beechfieldbrands\.com)\/[^\s"'<>]+\.(?:png|jpg|jpeg|webp)/g)]
-    .map((m) => m[0]);
-  const images = [...new Set(imgs)].slice(0, 40);
+  // Gallery images: mediahub/cloudfront urls, WITH or WITHOUT file extension
+  // (Beechfield group serves most gallery shots as /asset/<uuid>/thumbnail/<name>).
+  const rawUrls = [...html.matchAll(/https:\/\/(?:d2csxpduxe849s\.cloudfront\.net|mediahub\.beechfieldbrands\.com)\/[^\s"'<>)\\]+/g)]
+    .map((m) => m[0].replace(/[.,;]+$/, ""));
+  const images: string[] = [];
+  for (const u of rawUrls) {
+    if (/\/mp4\/|\.mp4$|\/original\//i.test(u)) continue;
+    const fname = u.split("/").pop() || "";
+    // Only keep media that belongs to THIS style (pages also link related products)
+    if (!fname.toLowerCase().includes(code.toLowerCase())) continue;
+    if (!images.includes(u)) images.push(u);
+  }
+  // Prefer the "Product-Shot-01" / primary shot first
+  images.sort((a, b) => {
+    const rank = (u: string) => (/product-shot-0?1/i.test(u) ? 0 : /front|ecommerce/i.test(u) ? 1 : 2);
+    return rank(a) - rank(b);
+  });
+  images.splice(40);
+
 
   // Category heuristic from slug words
   const s = slug.toLowerCase();
