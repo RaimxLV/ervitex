@@ -199,21 +199,25 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
                     role={clickable ? "button" : undefined}
                     tabIndex={clickable ? 0 : -1}
                     title={s.name}
+                    aria-label={s.name}
+                    onPointerDown={clickable ? (e) => e.stopPropagation() : undefined}
+                    onTouchStart={clickable ? (e) => e.stopPropagation() : undefined}
                     onClick={
                       clickable
-                        ? (e) => { e.stopPropagation(); s.onSelect!(); }
+                        ? (e) => { e.stopPropagation(); e.preventDefault(); s.onSelect!(); }
                         : undefined
                     }
-                    className={`inline-block h-4 w-4 rounded-full transition-transform ${
+                    className={`inline-block h-6 w-6 rounded-full transition-transform sm:h-4 sm:w-4 ${
                       s.active
                         ? "ring-2 ring-foreground ring-offset-1 ring-offset-background scale-110"
                         : isLight
                           ? "border border-neutral-500"
                           : "border border-black/20"
-                    } ${clickable ? "cursor-pointer hover:scale-110" : ""}`}
+                    } ${clickable ? "cursor-pointer touch-manipulation hover:scale-110" : ""}`}
                     style={bgStyle}
                   />
                 );
+
               })}
               {extraSwatches && extraSwatches > 0 ? (
                 <span className="text-[10px] leading-none text-muted-foreground">+{extraSwatches}</span>
