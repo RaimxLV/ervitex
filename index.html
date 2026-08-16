@@ -130,7 +130,35 @@
             .catch(function () {});
         } catch (e) {}
       })();
+      // Stale-bundle recovery: installed PWAs / mobile browsers can hold an old
+      // index.html whose hashed chunks no longer exist, leaving a blank screen.
+      // On a chunk load failure, bust caches once and reload.
+      (function () {
+        var KEY = 'ex-chunk-recovered';
+        function recover() {
+          if (sessionStorage.getItem(KEY)) return;
+          sessionStorage.setItem(KEY, '1');
+          try {
+            if (window.caches && caches.keys) {
+              caches.keys().then(function (keys) {
+                return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+              }).finally(function () { location.reload(); });
+              return;
+            }
+          } catch (e) {}
+          location.reload();
+        }
+        window.addEventListener('error', function (e) {
+          var t = e && e.target;
+          if (t && (t.tagName === 'SCRIPT' || t.tagName === 'LINK')) recover();
+        }, true);
+        window.addEventListener('unhandledrejection', function (e) {
+          var msg = (e && e.reason && (e.reason.message || String(e.reason))) || '';
+          if (/dynamically imported module|Importing a module script failed|Loading chunk|ChunkLoadError/i.test(msg)) recover();
+        });
+      })();
     </script>
+
 
 
     

@@ -165,6 +165,42 @@ const resolveHex = (hex?: string | null, name?: string | null): string => {
   return "#e5e5e5";
 };
 
+/**
+ * Multi-tone colours ("Black/Yellow", "Navy/White") must show both tones,
+ * otherwise every combination renders as a single flat (often black) circle.
+ * Returns 1 or 2 hexes.
+ */
+const resolveHexParts = (hex?: string | null, name?: string | null): string[] => {
+  const parts = (name || "")
+    .split(/[\/|&+]|\s-\s/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (parts.length >= 2) {
+    const hexes = parts
+      .slice(0, 3)
+      .map((p) => {
+        const key = canonName(p);
+        if (key && NAME_HEX_MAP[key]) return NAME_HEX_MAP[key];
+        const found = Object.keys(NAME_HEX_MAP)
+          .filter((k) => key.includes(k))
+          .sort((a, b) => b.length - a.length)[0];
+        return found ? NAME_HEX_MAP[found] : null;
+      })
+      .filter((h): h is string => !!h);
+    const uniq = Array.from(new Set(hexes.map((h) => h.toLowerCase())));
+    if (uniq.length >= 2) return uniq.slice(0, 2);
+  }
+  return [resolveHex(hex, name)];
+};
+
+const swatchBackground = (hex?: string | null, name?: string | null): React.CSSProperties => {
+  const [a, b] = resolveHexParts(hex, name);
+  return b
+    ? { background: `linear-gradient(135deg, ${a} 0 50%, ${b} 50% 100%)` }
+    : { backgroundColor: a };
+};
+
+
 async function loadSS(styleCode: string): Promise<ProductDetail | null> {
   const [styleRes, variantsRes, imagesRes] = await Promise.all([
     supabase
@@ -1383,7 +1419,8 @@ const CatalogItemDialog = ({
                           title={`${c.name} – ${c.code}`}
                           aria-label={c.name}
                           className={`h-7 w-7 rounded-full border-2 transition-transform ${isActive ? "border-foreground ring-2 ring-foreground/30 scale-110" : isLightHex(hex) ? "border-neutral-500 hover:scale-105" : "border-border hover:scale-105"}`}
-                          style={{ backgroundColor: hex }}
+                          style={swatchBackground(c.hex, c.name)}
+
                         />
                       );
                     })}
