@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
-  ArrowRight, Printer, Grid3X3, PenLine, Wind, Users, Building2, ShoppingBag,
-  Gift, CircleCheck, MessageCircle, ShieldCheck, Sparkles,
+  ArrowRight, Users, Building2, ShoppingBag, Gift, CircleCheck, MessageCircle,
+  ShieldCheck, Shirt, HardHat, Package, Clock, Wallet, Ruler,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
@@ -22,272 +22,296 @@ import promoImg from "@/assets/services/rt-promo.jpg";
 type L = { lv: string; en: string };
 const SW = 1.4;
 
-interface TechBlock {
+/* ---------------- Ko var pasūtīt ---------------- */
+
+interface OfferBlock {
   id: string;
   icon: React.ReactNode;
   eyebrow: L;
   title: L;
   lead: L;
-  body: L;
-  bullets: L[];
-  stats: { label: L; value: L }[];
+  items: L[];
+  facts: { icon: React.ReactNode; label: L; value: L }[];
   image: string;
   ctaLabel: L;
   ctaHref: string;
 }
 
-const TECH_BLOCKS: TechBlock[] = [
+const OFFERS: OfferBlock[] = [
   {
-    id: "dtf",
-    icon: <Printer className="h-5 w-5" strokeWidth={SW} />,
-    eyebrow: { lv: "No 1 gabala", en: "From 1 piece" },
-    title: { lv: "DTF digitālā apdruka", en: "DTF digital printing" },
+    id: "teamwear",
+    icon: <Users className="h-5 w-5" strokeWidth={SW} />,
+    eyebrow: { lv: "Sports un komandas", en: "Sport & teams" },
+    title: { lv: "Komandu formas ar vārdiem un numuriem", en: "Team kits with names and numbers" },
     lead: {
-      lv: "Pilnkrāsu druka bez sietu sagatavošanas — vienlīdz izdevīga gan vienam kreklam, gan visai komandai.",
-      en: "Full-colour printing with no screen setup — equally viable for one shirt or a whole team.",
+      lv: "Basketbola, futbola, florbola un skriešanas komandām — spēlētāju uzvārdi, numuri, klubu un sponsoru logo. Katrs krekls citāds, cena tā dēļ nemainās.",
+      en: "For basketball, football, floorball and running teams — player names, numbers, club and sponsor logos. Every shirt different, at the same price.",
     },
-    body: {
-      lv: "DTF ir mūsu elastīgākā tehnoloģija. Ar to apdrukājam gan individuālus pasūtījumus, gan vairumtirdzniecības tirāžas komandām un uzņēmumiem. Īpaši bieži to izmantojam sporta formām — spēlētāju vārdiem, numuriem, sponsoru logotipiem uz basketbola un futbola kreklu mugurām. Apģērbu ņemam no sava kataloga, taču strādājam arī ar klienta materiālu.",
-      en: "DTF is our most flexible technology. We use it for one-off orders as well as wholesale runs for teams and companies. It is our default for sportswear — player names, numbers and sponsor logos on basketball and football jerseys. Garments come from our own catalogue, but we also print on customer-supplied stock.",
-    },
-    bullets: [
-      { lv: "Vārdi, numuri un sponsori sporta formām", en: "Names, numbers and sponsors on sportswear" },
-      { lv: "Individuāli pasūtījumi no 1 gab.", en: "Individual orders from 1 pc" },
-      { lv: "Komandu un uzņēmumu vairumtirāžas", en: "Team and corporate wholesale runs" },
-      { lv: "Kokvilna, poliesters, neilons, somas, cepures", en: "Cotton, polyester, nylon, bags, caps" },
+    items: [
+      { lv: "Spēļu un treniņu formas, sporta t-krekli", en: "Match and training kits, sports tees" },
+      { lv: "Uzvārdi un numuri katram spēlētājam", en: "Names and numbers for each player" },
+      { lv: "Sponsoru logo uz krūtīm, piedurknēm, mugurām", en: "Sponsor logos on chest, sleeves, back" },
+      { lv: "Bufi, cepures, somas komandas krāsās", en: "Buffs, caps and bags in team colours" },
     ],
-    stats: [
-      { label: { lv: "Tirāža", en: "Run size" }, value: { lv: "1–250 gab.", en: "1–250 pcs" } },
-      { label: { lv: "Krāsas", en: "Colours" }, value: { lv: "CMYK+W", en: "CMYK+W" } },
-      { label: { lv: "Mazgāšana", en: "Wash" }, value: { lv: "līdz 40 °C", en: "up to 40 °C" } },
+    facts: [
+      { icon: <Package className="h-4 w-4" strokeWidth={SW} />, label: { lv: "No cik gab.", en: "From" }, value: { lv: "1 gab.", en: "1 pc" } },
+      { icon: <Clock className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Termiņš", en: "Lead time" }, value: { lv: "3–7 darba dienas", en: "3–7 working days" } },
+      { icon: <Wallet className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Cenu nosaka", en: "Price driven by" }, value: { lv: "Apdrukas izmērs un skaits", en: "Print size and quantity" } },
     ],
-    image: dtfImg,
-    ctaHref: "/catalog?category=T-shirts",
-    ctaLabel: { lv: "Izvēlēties apģērbu DTF drukai", en: "Pick garments for DTF" },
+    image: teamwearImg,
+    ctaHref: "/catalog?category=Sportswear",
+    ctaLabel: { lv: "Skatīt sporta apģērbu", en: "Browse sportswear" },
   },
   {
-    id: "screen",
-    icon: <Grid3X3 className="h-5 w-5" strokeWidth={SW} />,
-    eyebrow: { lv: "Lielām tirāžām", en: "For volume" },
-    title: { lv: "Sietspiede", en: "Screen printing" },
+    id: "corporate",
+    icon: <Building2 className="h-5 w-5" strokeWidth={SW} />,
+    eyebrow: { lv: "Uzņēmumiem", en: "For companies" },
+    title: { lv: "Uzņēmuma apģērbs ar jūsu logo", en: "Company apparel with your logo" },
     lead: {
-      lv: "Industriāla M&R automatizācija — koša, sedzoša un noturīga druka par zemāko cenu vienā vienībā.",
-      en: "Industrial M&R automation — vivid, opaque, durable prints at the lowest cost per piece.",
+      lv: "Polo krekli, hūdiji, flīsa un virsjakas, vestes, kreklu apkakles — ar izšūtu vai apdrukātu logo. Apģērbu izvēlaties mūsu katalogā, pārējo darām mēs.",
+      en: "Polos, hoodies, fleece and outer jackets, vests and shirts — with an embroidered or printed logo. Pick the garment from our catalogue, we do the rest.",
     },
-    body: {
-      lv: "Sietspiede ir izdevīgākais risinājums no aptuveni 50 vienībām: jo lielāka tirāža, jo zemāka cena par gabalu. Drukājam t-kreklus, polo, hūdijus un auduma maisiņus — gan no sava kataloga, gan uz klienta piegādātā apģērba. Katrai krāsai gatavojam atsevišķu sietu un saskaņojam toņus pēc Pantone® Solid Coated.",
-      en: "Screen printing is the most economical route from roughly 50 pieces up: the larger the run, the lower the unit price. We print tees, polos, hoodies and tote bags — from our catalogue or on customer-supplied garments. Every colour gets its own screen, matched to Pantone® Solid Coated.",
-    },
-    bullets: [
-      { lv: "T-krekli, polo, hūdiji, auduma maisiņi", en: "Tees, polos, hoodies, tote bags" },
-      { lv: "Pantone® toņu saskaņošana", en: "Pantone® colour matching" },
-      { lv: "Līdz 12 krāsām vienā dizainā", en: "Up to 12 colours per design" },
-      { lv: "Zemākā cena par vienību lielās tirāžās", en: "Lowest unit price at scale" },
+    items: [
+      { lv: "Izšūts logo uz polo, flīša, jakām, cepurēm", en: "Embroidered logo on polos, fleece, jackets, caps" },
+      { lv: "Apdruka uz t-krekliem un hūdijiem", en: "Printing on tees and hoodies" },
+      { lv: "Vienāds komplekts visai komandai", en: "One consistent kit for the whole team" },
+      { lv: "Papildinājumi vēlāk — tā pati kvalitāte", en: "Repeat orders later — identical result" },
     ],
-    stats: [
-      { label: { lv: "Tirāža", en: "Run size" }, value: { lv: "50–10 000 gab.", en: "50–10,000 pcs" } },
-      { label: { lv: "Krāsas", en: "Colours" }, value: { lv: "Pantone®", en: "Pantone®" } },
-      { label: { lv: "Mazgāšana", en: "Wash" }, value: { lv: "līdz 60 °C", en: "up to 60 °C" } },
+    facts: [
+      { icon: <Package className="h-4 w-4" strokeWidth={SW} />, label: { lv: "No cik gab.", en: "From" }, value: { lv: "10 gab. (izšuvumam)", en: "10 pcs (embroidery)" } },
+      { icon: <Clock className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Termiņš", en: "Lead time" }, value: { lv: "5–10 darba dienas", en: "5–10 working days" } },
+      { icon: <Wallet className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Cenu nosaka", en: "Price driven by" }, value: { lv: "Izšuvuma lielums un sarežģītība", en: "Embroidery size and complexity" } },
+    ],
+    image: embroideryImg,
+    ctaHref: "/catalog?category=Polo",
+    ctaLabel: { lv: "Skatīt polo un jakas", en: "Browse polos & jackets" },
+  },
+  {
+    id: "volume",
+    icon: <Shirt className="h-5 w-5" strokeWidth={SW} />,
+    eyebrow: { lv: "Lielām tirāžām", en: "Volume runs" },
+    title: { lv: "T-krekli un hūdiji pasākumiem, akcijām, veikaliem", en: "Tees and hoodies for events, campaigns and retail" },
+    lead: {
+      lv: "Jo lielāks skaits, jo zemāka cena par gabalu. Festivāliem, skolām, konferencēm, zīmolu kolekcijām — līdz pat vairākiem tūkstošiem vienību.",
+      en: "The bigger the run, the lower the unit price. Festivals, schools, conferences, brand collections — up to several thousand pieces.",
+    },
+    items: [
+      { lv: "T-krekli, polo, hūdiji, auduma maisiņi", en: "Tees, polos, hoodies, tote bags" },
+      { lv: "Precīza logo krāsa pēc Pantone®", en: "Exact logo colour to Pantone®" },
+      { lv: "Efekti: zelts, sudrabs, fluo, 3D, silikons", en: "Effects: gold, silver, fluo, 3D, silicone" },
+      { lv: "Apdruka arī uz jūsu piegādātā apģērba", en: "We also print on your own garments" },
+    ],
+    facts: [
+      { icon: <Package className="h-4 w-4" strokeWidth={SW} />, label: { lv: "No cik gab.", en: "From" }, value: { lv: "25 gab.", en: "25 pcs" } },
+      { icon: <Clock className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Termiņš", en: "Lead time" }, value: { lv: "7–14 darba dienas", en: "7–14 working days" } },
+      { icon: <Wallet className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Cenu nosaka", en: "Price driven by" }, value: { lv: "Krāsu skaits un tirāža", en: "Number of colours and run size" } },
     ],
     image: screenImg,
     ctaHref: "/catalog?category=T-shirts",
-    ctaLabel: { lv: "Izvēlēties apģērbu sietspiedei", en: "Pick garments for screen printing" },
+    ctaLabel: { lv: "Skatīt t-kreklus", en: "Browse t-shirts" },
   },
   {
-    id: "embroidery",
-    icon: <PenLine className="h-5 w-5" strokeWidth={SW} />,
-    eyebrow: { lv: "Premium segments", en: "Premium segment" },
-    title: { lv: "Izšūšana", en: "Embroidery" },
+    id: "single",
+    icon: <Gift className="h-5 w-5" strokeWidth={SW} />,
+    eyebrow: { lv: "No 1 gabala", en: "From 1 piece" },
+    title: { lv: "Viens krekls, dāvana vai paraugs", en: "One shirt, a gift or a sample" },
     lead: {
-      lv: "Taustāma tekstūra un praktiski neierobežots kalpošanas laiks — augstākā pievienotā vērtība zīmolam.",
-      en: "Tangible texture and a practically unlimited lifespan — the highest perceived brand value.",
+      lv: "Nav minimālā pasūtījuma. Pilnkrāsu attēls, foto, teksts vai vārds uz viena krekla, hūdija, somas vai cepures — arī kā paraugs pirms lielās tirāžas.",
+      en: "No minimum order. Full-colour artwork, photos, text or a name on a single shirt, hoodie, bag or cap — including a sample before a big run.",
     },
-    body: {
-      lv: "Izšujam cepures, uzšuves (patch), polo un kreklus, flīsu, jakas un darba apģērbu. Logotipu digitalizējam izšuvuma programmā, saskaņojam paraugu un tikai tad laižam tirāžā. Uzšuves varam izgatavot atsevišķi un piestiprināt uz jebkura izstrādājuma — arī tur, kur tiešā izšūšana nav iespējama.",
-      en: "We embroider caps, patches, polos and shirts, fleece, jackets and workwear. Your logo is digitised into a stitch file, approved as a sample, and only then run in production. Patches can be produced separately and applied to items where direct embroidery is not possible.",
-    },
-    bullets: [
-      { lv: "Cepures un beanie", en: "Caps and beanies" },
-      { lv: "Uzšuves (patch) ar apmali", en: "Patches with merrowed border" },
-      { lv: "Polo, krekli, flīss, jakas", en: "Polos, shirts, fleece, jackets" },
-      { lv: "Madeira / Isacord palete + metāliskie", en: "Madeira / Isacord palette + metallics" },
+    items: [
+      { lv: "Dāvanas, jubilejas, vecmeitu/vecpuišu ballītes", en: "Gifts, anniversaries, parties" },
+      { lv: "Paraugs pirms lielās tirāžas", en: "Sample before the main run" },
+      { lv: "Personalizēti vārdi un teksti", en: "Personalised names and text" },
+      { lv: "Foto kvalitātes pilnkrāsu attēli", en: "Photo-quality full-colour artwork" },
     ],
-    stats: [
-      { label: { lv: "Tirāža", en: "Run size" }, value: { lv: "10–5 000 gab.", en: "10–5,000 pcs" } },
-      { label: { lv: "Digitalizācija", en: "Digitising" }, value: { lv: "Vienreizēja", en: "One-off" } },
-      { label: { lv: "Mazgāšana", en: "Wash" }, value: { lv: "līdz 90 °C", en: "up to 90 °C" } },
+    facts: [
+      { icon: <Package className="h-4 w-4" strokeWidth={SW} />, label: { lv: "No cik gab.", en: "From" }, value: { lv: "1 gab.", en: "1 pc" } },
+      { icon: <Clock className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Termiņš", en: "Lead time" }, value: { lv: "1–3 darba dienas", en: "1–3 working days" } },
+      { icon: <Wallet className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Cenu nosaka", en: "Price driven by" }, value: { lv: "Apdrukas izmērs (A5/A4/A3)", en: "Print size (A5/A4/A3)" } },
     ],
-    image: embroideryImg,
-    ctaHref: "/catalog?category=Caps%20%26%20Hats,Caps,Headwear,Beanies",
-    ctaLabel: { lv: "Izvēlēties cepures izšūšanai", en: "Pick headwear for embroidery" },
+    image: dtfImg,
+    ctaHref: "/catalog?category=T-shirts",
+    ctaLabel: { lv: "Izvēlēties apģērbu", en: "Pick a garment" },
   },
   {
-    id: "sublimation",
-    icon: <Wind className="h-5 w-5" strokeWidth={SW} />,
-    eyebrow: { lv: "Šūts pēc mēra", en: "Cut & sewn" },
-    title: { lv: "Sublimācija un šūšana", en: "Sublimation & sewing" },
+    id: "promo",
+    icon: <ShoppingBag className="h-5 w-5" strokeWidth={SW} />,
+    eyebrow: { lv: "Reklāmas preces", en: "Promotional items" },
+    title: { lv: "Somas, lietussargi, krūzes, cepures", en: "Bags, umbrellas, mugs, caps" },
     lead: {
-      lv: "Vispirms apdrukājam audumu, tad pēc piegrieztnēm sašujam gatavu izstrādājumu — bez šuvju pārtraukumiem dizainā.",
-      en: "We print the fabric first, then cut and sew the finished garment — with no breaks in the design at the seams.",
+      lv: "Ne tikai apģērbs. Apdrukājam auduma maisiņus, lietussargus, krūzes, peles paliktņus, dvieļus un aksesuārus — viss vienā pasūtījumā ar vienu logo.",
+      en: "Not only apparel. We brand tote bags, umbrellas, mugs, mousepads, towels and accessories — all in one order with one logo.",
     },
-    body: {
-      lv: "Sublimācijā krāsa kļūst par auduma daļu: nav taustāmas kārtas, nezūd elpojamība un druka nenolobās. Šādi ražojam sporta formas, bufus, kaklautus, karogus un citus poliestera izstrādājumus. Dizains var klāt visu virsmu, un cena nav atkarīga no krāsu skaita.",
-      en: "In sublimation the ink becomes part of the fabric: no hand feel, no loss of breathability, nothing to peel. This is how we make sports kits, buffs, neck gaiters, flags and other polyester products. The design can cover the full surface and pricing is independent of colour count.",
-    },
-    bullets: [
-      { lv: "Sporta formas pēc individuāla dizaina", en: "Fully custom sports kits" },
-      { lv: "Bufi, kaklauti, karogi", en: "Buffs, neck gaiters, flags" },
-      { lv: "Druka pa visu virsmu, bez šuvju robiem", en: "Full-surface print, seamless across panels" },
-      { lv: "Tikai poliesters un tā maisījumi", en: "Polyester and blends only" },
+    items: [
+      { lv: "Auduma maisiņi un mugursomas", en: "Tote bags and backpacks" },
+      { lv: "Lietussargi", en: "Umbrellas" },
+      { lv: "Krūzes un keramika (sublimācija)", en: "Mugs and ceramics (sublimation)" },
+      { lv: "Dvieļi, bufi, cepures, uzšuves", en: "Towels, buffs, caps, patches" },
     ],
-    stats: [
-      { label: { lv: "Tirāža", en: "Run size" }, value: { lv: "10–2 000 gab.", en: "10–2,000 pcs" } },
-      { label: { lv: "Krāsas", en: "Colours" }, value: { lv: "Neierobežotas", en: "Unlimited" } },
-      { label: { lv: "Noturība", en: "Durability" }, value: { lv: "Nenolobās", en: "Will not peel" } },
+    facts: [
+      { icon: <Package className="h-4 w-4" strokeWidth={SW} />, label: { lv: "No cik gab.", en: "From" }, value: { lv: "1–25 gab. atkarībā no preces", en: "1–25 pcs depending on item" } },
+      { icon: <Clock className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Termiņš", en: "Lead time" }, value: { lv: "3–10 darba dienas", en: "3–10 working days" } },
+      { icon: <Wallet className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Cenu nosaka", en: "Price driven by" }, value: { lv: "Preces veids un skaits", en: "Item type and quantity" } },
+    ],
+    image: promoImg,
+    ctaHref: "/catalog?category=Bags",
+    ctaLabel: { lv: "Skatīt reklāmas preces", en: "Browse promo items" },
+  },
+  {
+    id: "custom-sewn",
+    icon: <Ruler className="h-5 w-5" strokeWidth={SW} />,
+    eyebrow: { lv: "Šūts pēc pasūtījuma", en: "Made to order" },
+    title: { lv: "Formas, kas šūtas tieši jums", en: "Kits sewn specifically for you" },
+    lead: {
+      lv: "Ja katalogā nav vajadzīgā, apdrukājam audumu pa visu virsmu un pēc piegrieznēm sašujam gatavu izstrādājumu — sporta formas, bufus, speciālus komplektus.",
+      en: "If the catalogue doesn't have it, we print the fabric edge to edge and sew the finished garment to pattern — sports kits, buffs, special sets.",
+    },
+    items: [
+      { lv: "Sporta formas ar dizainu pa visu virsmu", en: "Sports kits with all-over design" },
+      { lv: "Bufi un galvas aksesuāri", en: "Buffs and headwear" },
+      { lv: "Karogi un tekstila reklāma", en: "Flags and textile signage" },
+      { lv: "Druka neizbalē un nav jūtama ar roku", en: "Print won't fade and has no hand feel" },
+    ],
+    facts: [
+      { icon: <Package className="h-4 w-4" strokeWidth={SW} />, label: { lv: "No cik gab.", en: "From" }, value: { lv: "10 gab.", en: "10 pcs" } },
+      { icon: <Clock className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Termiņš", en: "Lead time" }, value: { lv: "10–20 darba dienas", en: "10–20 working days" } },
+      { icon: <Wallet className="h-4 w-4" strokeWidth={SW} />, label: { lv: "Cenu nosaka", en: "Price driven by" }, value: { lv: "Modelis un daudzums", en: "Model and quantity" } },
     ],
     image: sublimationImg,
-    ctaHref: "/catalog?category=Sportswear,Sports,Fitness%20%26%20Sport",
-    ctaLabel: { lv: "Apskatīt sporta apģērbu", en: "Browse sportswear" },
+    ctaHref: "/request",
+    ctaLabel: { lv: "Pieprasīt piedāvājumu", en: "Request a quote" },
   },
 ];
 
-const USE_CASES: { icon: React.ReactNode; title: L; text: L; image?: string; href: string }[] = [
+/* ---------------- Ātrā izvēles tabula ---------------- */
+
+const CHOICE_ROWS: { method: L; best: L; from: L; wash: L }[] = [
   {
-    icon: <Users className="h-5 w-5" strokeWidth={SW} />,
-    title: { lv: "Komandu formas", en: "Team kits" },
-    text: {
-      lv: "Basketbola un futbola formas ar vārdiem, numuriem un sponsoriem. DTF uz gataviem krekliem vai pilnībā sublimēts komplekts.",
-      en: "Basketball and football kits with names, numbers and sponsors. DTF on stock garments or a fully sublimated set.",
-    },
-    image: teamwearImg,
-    href: "/catalog?category=Sportswear,Sports,Fitness%20%26%20Sport",
+    method: { lv: "DTF digitālā apdruka", en: "DTF digital printing" },
+    best: { lv: "Vārdi, numuri, foto, mazi apjomi", en: "Names, numbers, photos, small runs" },
+    from: { lv: "1 gab.", en: "1 pc" },
+    wash: { lv: "40 °C", en: "40 °C" },
   },
   {
-    icon: <Building2 className="h-5 w-5" strokeWidth={SW} />,
-    title: { lv: "Uzņēmumu apģērbs", en: "Corporate apparel" },
-    text: {
-      lv: "Polo, krekli, jakas un darba apģērbs ar izšūtu logotipu — vienots izskats visai komandai un atkārtojami pasūtījumi.",
-      en: "Polos, shirts, jackets and workwear with an embroidered logo — one consistent look and repeatable reorders.",
-    },
-    href: "/catalog?category=Polos,Workwear",
+    method: { lv: "Sietspiede", en: "Screen printing" },
+    best: { lv: "Lielas tirāžas ar vienu dizainu", en: "Large runs of one design" },
+    from: { lv: "25 gab.", en: "25 pcs" },
+    wash: { lv: "40–60 °C", en: "40–60 °C" },
   },
   {
-    icon: <ShoppingBag className="h-5 w-5" strokeWidth={SW} />,
-    title: { lv: "Somas un lietussargi", en: "Bags & umbrellas" },
-    text: {
-      lv: "Auduma maisiņi, mugursomas un lietussargi ar sietspiedes vai DTF apdruku — pasākumiem, veikaliem un dāvanām.",
-      en: "Tote bags, backpacks and umbrellas with screen or DTF printing — for events, retail and gifting.",
-    },
-    image: promoImg,
-    href: "/catalog?category=Tote%20Bags,Shopping%20%26%20Tote%20Bags,Standard%20Umbrellas,Folding%20Umbrellas",
+    method: { lv: "Izšūšana", en: "Embroidery" },
+    best: { lv: "Logo uz polo, jakām, cepurēm", en: "Logos on polos, jackets, caps" },
+    from: { lv: "10 gab.", en: "10 pcs" },
+    wash: { lv: "60–90 °C", en: "60–90 °C" },
   },
   {
-    icon: <Gift className="h-5 w-5" strokeWidth={SW} />,
-    title: { lv: "Individuāli pasūtījumi", en: "One-off orders" },
-    text: {
-      lv: "Viens krekls dāvanai, personalizēts vārds vai neliela ģimenes tirāža — DTF ļauj to izdarīt bez sagatavošanas izmaksām.",
-      en: "A single gift shirt, a personalised name or a small family run — DTF makes it possible with no setup cost.",
-    },
-    href: "/catalog",
+    method: { lv: "Sublimācija", en: "Sublimation" },
+    best: { lv: "Poliestera formas, krūzes, karogi", en: "Polyester kits, mugs, flags" },
+    from: { lv: "1 gab.", en: "1 pc" },
+    wash: { lv: "60 °C", en: "60 °C" },
+  },
+  {
+    method: { lv: "Termodruka (plēve, floks)", en: "Heat transfer (vinyl, flock)" },
+    best: { lv: "Atstarojoši, metāliski, 3D efekti", en: "Reflective, metallic, 3D effects" },
+    from: { lv: "1 gab.", en: "1 pc" },
+    wash: { lv: "40 °C", en: "40 °C" },
   },
 ];
 
-const PROCESS: { step: string; title: L; text: L }[] = [
+/* ---------------- Process ---------------- */
+
+const STEPS: { title: L; text: L }[] = [
   {
-    step: "01",
-    title: { lv: "Pieprasījums", en: "Request" },
+    title: { lv: "Atsūti pieprasījumu", en: "Send your request" },
     text: {
-      lv: "Izvēlies preces katalogā un nosūti pieprasījumu vai uzraksti mums — pietiek ar aptuvenu apjomu un ideju.",
-      en: "Pick items from the catalogue and send a request, or just write to us — a rough quantity and idea is enough.",
+      lv: "Pievieno logo vai ideju, norādi apģērbu, skaitu, izmērus un vēlamo termiņu. Ja nezini, ko izvēlēties — pasaki mērķi, pārējo ieteiksim mēs.",
+      en: "Attach your logo or idea and tell us the garment, quantity, sizes and deadline. Not sure what to pick? Tell us the goal and we'll advise.",
     },
   },
   {
-    step: "02",
-    title: { lv: "Tehnoloģijas izvēle", en: "Technology choice" },
+    title: { lv: "Saņem piedāvājumu", en: "Get a quote" },
     text: {
-      lv: "Iesakām apdrukas veidu, kas atbilst apjomam, audumam un dizainam, un sagatavojam tāmi.",
-      en: "We recommend the decoration method that fits your volume, fabric and artwork, and prepare a quote.",
+      lv: "Atbildam vienas darba dienas laikā ar cenu par gabalu, apdrukas metodi un izpildes termiņu.",
+      en: "We reply within one working day with a unit price, the decoration method and a delivery date.",
     },
   },
   {
-    step: "03",
-    title: { lv: "Makets un saskaņošana", en: "Mockup & approval" },
+    title: { lv: "Apstiprini vizualizāciju", en: "Approve the mockup" },
     text: {
-      lv: "Sagatavojam vizualizāciju ar precīzu novietojumu un izmēru. Ražošanu sākam tikai pēc tavas apstiprināšanas.",
-      en: "We produce a visual with exact placement and size. Production starts only after your approval.",
+      lv: "Nosūtām maketu ar apdrukas izvietojumu un izmēru. Ražošanu sākam tikai pēc jūsu apstiprinājuma.",
+      en: "We send a mockup with placement and print size. Production only starts after your approval.",
     },
   },
   {
-    step: "04",
-    title: { lv: "Ražošana", en: "Production" },
+    title: { lv: "Ražojam Rīgā", en: "We produce in Riga" },
     text: {
-      lv: "Apdrukājam vai izšujam savā ražotnē Rīgā, veicot kvalitātes pārbaudi katrā partijā.",
-      en: "We print or embroider in our own facility in Riga, with quality control on every batch.",
+      lv: "Viss notiek mūsu ražotnē — nav starpnieku, tāpēc termiņus un kvalitāti kontrolējam paši.",
+      en: "Everything happens in our own facility — no middlemen, so we control timing and quality ourselves.",
     },
   },
   {
-    step: "05",
-    title: { lv: "Piegāde", en: "Delivery" },
+    title: { lv: "Saņem pasūtījumu", en: "Receive your order" },
     text: {
-      lv: "Salokām, iepakojam un piegādājam visā Latvijā un Baltijā vai sagatavojam saņemšanai uz vietas.",
-      en: "Folded, packed and delivered across Latvia and the Baltics, or ready for pickup.",
+      lv: "Salokām, iepakojam un piegādājam visā Latvijā vai sagatavojam saņemšanai uz vietas Rīgā.",
+      en: "Folded, packed and delivered anywhere in Latvia, or ready for pickup in Riga.",
     },
   },
 ];
 
-const FILE_SPECS: { title: L; desc: L }[] = [
-  { title: { lv: "Vektora faili", en: "Vector files" }, desc: { lv: "AI, PDF vai EPS. Rastra attēli — vismaz 300 DPI reālajā izmērā.", en: "AI, PDF or EPS. Raster images — at least 300 DPI at final size." } },
-  { title: { lv: "Krāsu telpa", en: "Colour space" }, desc: { lv: "CMYK vai Pantone® Solid Coated. RGB toņi drukā mainās.", en: "CMYK or Pantone® Solid Coated. RGB tones shift in print." } },
-  { title: { lv: "Fonti", en: "Fonts" }, desc: { lv: "Visi teksti pārveidoti līknēs (outlines/curves).", en: "All text converted to outlines/curves." } },
-  { title: { lv: "Novietojums", en: "Placement" }, desc: { lv: "Norādi izmēru centimetros un vietu uz apģērba.", en: "Specify size in centimetres and position on the garment." } },
-  { title: { lv: "Izšūšanai", en: "For embroidery" }, desc: { lv: "Vienkāršotas formas bez gradientiem, minimālais teksta augstums 5 mm.", en: "Simplified shapes without gradients, minimum text height 5 mm." } },
-  { title: { lv: "Sublimācijai", en: "For sublimation" }, desc: { lv: "Dizains ar 2 cm izlaidumu ārpus piegriezuma kontūras.", en: "Artwork with a 2 cm bleed beyond the pattern outline." } },
-];
+/* ---------------- FAQ ---------------- */
 
 const FAQ: { q: L; a: L }[] = [
   {
-    q: { lv: "Kāds ir minimālais pasūtījuma apjoms?", en: "What is the minimum order quantity?" },
+    q: { lv: "Cik maksā apdruka?", en: "How much does decoration cost?" },
     a: {
-      lv: "DTF apdrukai un izšūšanai minimuma faktiski nav — strādājam no viena gabala. Sietspiedei ieteicamais minimums ir 50 vienības, sublimācijai ar šūšanu — 10 komplekti.",
-      en: "For DTF and embroidery there is effectively no minimum — we work from a single piece. For screen printing the recommended minimum is 50 units, and for cut-and-sew sublimation 10 sets.",
+      lv: "Cenu nosaka apģērba veids, apdrukas izmērs, krāsu skaits dizainā un daudzums. Piemēram, 100 t-kreklu ar viena krāsas logo maksā ievērojami mazāk par gabalu nekā 10 gab. Precīzu cenu nosūtām vienas darba dienas laikā pēc pieprasījuma.",
+      en: "Price depends on the garment, print size, number of colours in the design and quantity. 100 tees with a one-colour logo cost far less per piece than 10. We send an exact price within one working day.",
     },
   },
   {
-    q: { lv: "Vai apģērbs jāpērk pie jums?", en: "Do garments have to be bought from you?" },
+    q: { lv: "Vai varu pasūtīt tikai vienu gabalu?", en: "Can I order just one piece?" },
     a: {
-      lv: "Ērtāk ir izvēlēties no mūsu kataloga — tur ir Stanley/Stella, Craft, Clique, ProJob, Cutter & Buck, Malfini, Russell, Beechfield un prezentmateriālu klāsts ar zināmiem izmēriem un krāsām. Taču apdrukājam arī klienta piegādātu apģērbu pēc iepriekšējas saskaņošanas.",
-      en: "It is simpler to choose from our catalogue — Stanley/Stella, Craft, Clique, ProJob, Cutter & Buck, Malfini, Russell, Beechfield and promotional items with known sizes and colours. We also decorate customer-supplied garments after prior agreement.",
+      lv: "Jā. DTF, sublimācijas un termodrukas apdruku veicam arī no 1 gabala. Sietspiedei minimums ir 25 gab., izšūšanai — 10 gab.",
+      en: "Yes. DTF, sublimation and heat transfer work from a single piece. Screen printing starts at 25 pcs and embroidery at 10 pcs.",
     },
   },
   {
-    q: { lv: "Cik ilgs ir izpildes termiņš?", en: "What is the lead time?" },
+    q: { lv: "Vai varu atnest savu apģērbu?", en: "Can I bring my own garments?" },
     a: {
-      lv: "Standarta termiņš ir 5–10 darba dienas pēc maketa apstiprināšanas un preces saņemšanas noliktavā. Steidzamiem pasūtījumiem meklējam ātrāku risinājumu individuāli.",
-      en: "The standard lead time is 5–10 working days after mockup approval and stock arrival. For urgent orders we look for a faster solution case by case.",
+      lv: "Jā, apdrukājam arī klienta piegādāto apģērbu. Iepriekš pārrunājam materiālu un apdrukas metodi, lai rezultāts būtu garantēts.",
+      en: "Yes, we decorate customer-supplied garments too. We agree on the fabric and method beforehand so the result is guaranteed.",
     },
   },
   {
-    q: { lv: "Kuru tehnoloģiju izvēlēties sporta formām?", en: "Which technology suits sports kits?" },
+    q: { lv: "Cik ilgi jāgaida?", en: "How long does it take?" },
     a: {
-      lv: "Ja forma tiek pirkta gatava un vajag vārdus ar numuriem — DTF. Ja vēlies unikālu dizainu pa visu virsmu, ražojam formu no nulles: apdrukājam audumu sublimācijā un sašujam pēc piegrieztnēm.",
-      en: "If you buy ready-made kit and need names and numbers — DTF. If you want a unique full-surface design, we build the kit from scratch: sublimated fabric, cut and sewn to pattern.",
+      lv: "Standarta pasūtījums ir gatavs 5–10 darba dienās pēc makets apstiprināšanas. Atsevišķi krekli un mazi apjomi bieži 1–3 dienās. Steidzamiem projektiem pasakiet termiņu — meklēsim risinājumu.",
+      en: "A standard order is ready in 5–10 working days after mockup approval. Single shirts and small runs are often done in 1–3 days. For rush jobs, tell us the deadline and we'll find a way.",
     },
   },
   {
-    q: { lv: "Vai varat izgatavot uzšuves?", en: "Can you make patches?" },
+    q: { lv: "Kāds fails jāatsūta?", en: "What file should I send?" },
     a: {
-      lv: "Jā. Izšujam uzšuves ar apmali un piestiprinām tās uz cepurēm, jakām vai darba apģērba — arī uz izstrādājumiem, kur tiešā izšūšana nav iespējama.",
-      en: "Yes. We embroider bordered patches and apply them to caps, jackets or workwear — including items where direct embroidery is not possible.",
+      lv: "Vislabāk vektorgrafika (AI, EPS, PDF, SVG). Der arī PNG ar caurspīdīgu fonu vismaz 300 dpi apdrukas izmērā. Ja ir tikai foto vai zīmējums — pārzīmēsim.",
+      en: "Vector art is best (AI, EPS, PDF, SVG). A transparent PNG at 300 dpi at final print size also works. If you only have a photo or sketch, we can redraw it.",
+    },
+  },
+  {
+    q: { lv: "Vai varu pasūtīt papildus vēlāk?", en: "Can I reorder later?" },
+    a: {
+      lv: "Jā. Saglabājam jūsu maketus, sietus un izšūšanas programmas, tāpēc atkārtots pasūtījums izskatās tieši tāpat kā pirmais.",
+      en: "Yes. We keep your artwork, screens and embroidery programs, so a repeat order looks exactly like the first one.",
+    },
+  },
+  {
+    q: { lv: "Vai apdruka iztur mazgāšanu?", en: "Does it survive washing?" },
+    a: {
+      lv: "Iztur. Izšuvums neizbalē un nenolobās, sietspiede un sublimācija iztur regulāru mazgāšanu. Iesakām mazgāt no kreisās puses līdz 40 °C.",
+      en: "Yes. Embroidery won't fade or peel; screen prints and sublimation handle regular washing. We recommend washing inside out at up to 40 °C.",
     },
   },
 ];
-
-const fadeUp = {
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-80px" },
-  transition: { duration: 0.5 },
-};
 
 const ServicesPage = () => {
   const { lang } = useLanguage();
@@ -295,203 +319,138 @@ const ServicesPage = () => {
 
   return (
     <Layout>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-primary text-primary-foreground">
+      {/* HERO */}
+      <section className="relative overflow-hidden bg-background">
         <img
           src={heroImg}
-          alt={lang === "lv" ? "Ervitex apdrukas ražotne" : "Ervitex decoration facility"}
-          width={1920}
-          height={1088}
-          className="absolute inset-0 h-full w-full object-cover opacity-40"
+          alt={lang === "lv" ? "Ervitex apdrukas ražotne Rīgā" : "Ervitex decoration facility in Riga"}
+          className="absolute inset-0 h-full w-full object-cover opacity-30"
+          loading="eager"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/85 to-primary/30" />
-        <div className="container relative py-20 md:py-32">
-          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-3xl">
-            <div className="flex items-center gap-3">
-              <span className="block h-px w-8 bg-accent" />
-              <span className="font-body text-[10px] font-semibold uppercase tracking-[0.4em] text-accent">
-                {lang === "lv" ? "Pakalpojumi" : "Services"}
-              </span>
-            </div>
-            <h1 className="mt-5 font-heading text-4xl font-bold uppercase leading-[0.95] md:text-6xl">
-              {lang === "lv" ? "Apdruka, kas iztur" : "Decoration that lasts"}
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/40" />
+        <div className="container relative mx-auto px-4 py-20 md:py-32">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-2xl"
+          >
+            <span className="inline-block rounded-full border border-primary/40 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-primary">
+              {lang === "lv" ? "Pakalpojumi" : "Services"}
+            </span>
+            <h1 className="mt-5 font-display text-4xl font-bold leading-[1.05] md:text-6xl">
+              {lang === "lv" ? "Ko vari pasūtīt ar savu logo" : "What you can order with your logo"}
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-relaxed text-primary-foreground/70 md:text-lg">
+            <p className="mt-5 max-w-xl text-lg text-muted-foreground">
               {lang === "lv"
-                ? "Sietspiede, DTF, izšūšana un sublimācija zem viena jumta Rīgā. Vienam kreklam vai desmit tūkstošiem — apģērbs no mūsu kataloga, apdruka no mūsu ražotnes."
-                : "Screen printing, DTF, embroidery and sublimation under one roof in Riga. From a single shirt to ten thousand — garments from our catalogue, decoration from our own facility."}
+                ? "Krekli, hūdiji, jakas, cepures, somas, lietussargi un komandu formas — apģērbu izvēlies mūsu katalogā, apdruku un izšūšanu izdarām paši savā ražotnē Rīgā. No viena gabala līdz vairākiem tūkstošiem."
+                : "Shirts, hoodies, jackets, caps, bags, umbrellas and team kits — pick the garment from our catalogue and we handle printing and embroidery in our own facility in Riga. From one piece to several thousand."}
             </p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Button size="lg" className="bg-accent font-heading text-xs uppercase text-accent-foreground hover:bg-accent/90" asChild>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg">
                 <Link to="/request">
                   {lang === "lv" ? "Pieprasīt piedāvājumu" : "Request a quote"} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-primary-foreground/30 bg-transparent font-heading text-xs uppercase text-primary-foreground hover:bg-primary-foreground/10"
-                asChild
-              >
+              <Button asChild size="lg" variant="outline">
                 <Link to="/catalog">{lang === "lv" ? "Apskatīt katalogu" : "Browse the catalogue"}</Link>
               </Button>
             </div>
-            <ul className="mt-10 grid gap-x-8 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
               {[
                 { lv: "No 1 gabala", en: "From 1 piece" },
                 { lv: "Sava ražotne Rīgā", en: "Own facility in Riga" },
-                { lv: "Makets pirms ražošanas", en: "Mockup before production" },
-                { lv: "Piegāde visā Baltijā", en: "Delivery across the Baltics" },
-              ].map((item) => (
-                <li key={item.en} className="flex items-center gap-2 text-xs uppercase tracking-wide text-primary-foreground/70">
-                  <CircleCheck className="h-4 w-4 shrink-0 text-accent" strokeWidth={SW} />
-                  {tx(item)}
-                </li>
+                { lv: "Piegāde visā Latvijā", en: "Delivery across Latvia" },
+                { lv: "Atbilde 1 darba dienā", en: "Reply in 1 working day" },
+              ].map((f, i) => (
+                <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={SW} />
+                  <span>{tx(f)}</span>
+                </div>
               ))}
-            </ul>
+            </div>
           </motion.div>
         </div>
-        <div className="h-1 bg-accent" />
       </section>
 
-
-
-      {/* Deep dive per technology */}
+      {/* OFFER BLOCKS */}
       <section className="bg-background py-16 md:py-24">
-        <div className="container">
-          <motion.div {...fadeUp} className="max-w-2xl">
-            <div className="flex items-center gap-3">
-              <span className="block h-px w-8 bg-accent" />
-              <span className="font-body text-[10px] font-semibold uppercase tracking-[0.4em] text-accent">
-                {lang === "lv" ? "Mūsu tehnoloģijas" : "Our technologies"}
-              </span>
-            </div>
-            <h2 className="mt-4 font-heading text-2xl font-bold uppercase text-foreground md:text-4xl">
-              {lang === "lv" ? "Četras metodes. Viena kvalitātes latiņa." : "Four methods. One quality bar."}
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl">
+            <span className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+              {lang === "lv" ? "Ko var pasūtīt" : "What you can order"}
+            </span>
+            <h2 className="mt-3 font-display text-3xl font-bold md:text-4xl">
+              {lang === "lv" ? "Sāc ar to, kas tev vajadzīgs" : "Start with what you actually need"}
             </h2>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">
+            <p className="mt-3 text-muted-foreground">
               {lang === "lv"
-                ? "Katrai idejai ir sava pareizā tehnoloģija. Zemāk — kad kuru izvēlēties un ko ar to reāli apdrukājam."
-                : "Every idea has a right technology. Below — when to choose which, and what we actually decorate with it."}
+                ? "Nav jāzina, kā sauc tehnoloģiju. Pasaki, ko un cik daudz vajag — piemērotāko apdrukas veidu piedāvāsim mēs."
+                : "You don't need to know the technology names. Tell us what you need and how many — we'll pick the right method."}
             </p>
-          </motion.div>
+          </div>
 
-          <div className="mt-14 space-y-16 md:space-y-24">
-            {TECH_BLOCKS.map((block, i) => (
-              <motion.article
-                key={block.id}
-                id={block.id}
-                {...fadeUp}
-                className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14"
+          <div className="mt-14 space-y-20 md:space-y-28">
+            {OFFERS.map((o, idx) => (
+              <motion.div
+                key={o.id}
+                id={o.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.5 }}
+                className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16"
               >
-                <div className={i % 2 === 1 ? "lg:order-2" : ""}>
-                  <img
-                    src={block.image}
-                    alt={tx(block.title)}
-                    loading="lazy"
-                    width={1600}
-                    height={1200}
-                    className="aspect-[4/3] w-full object-cover"
-                  />
+                <div className={idx % 2 === 1 ? "lg:order-2" : ""}>
+                  <div className="overflow-hidden rounded-2xl border border-border/60">
+                    <img
+                      src={o.image}
+                      alt={tx(o.title)}
+                      className="aspect-[4/3] w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
 
-                <div className={i % 2 === 1 ? "lg:order-1" : ""}>
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center border border-accent/30 bg-accent/10 text-accent">
-                      {block.icon}
-                    </span>
-                    <span className="font-body text-[10px] font-semibold uppercase tracking-[0.35em] text-accent">
-                      {tx(block.eyebrow)}
-                    </span>
+                <div className={idx % 2 === 1 ? "lg:order-1" : ""}>
+                  <div className="flex items-center gap-2 text-primary">
+                    {o.icon}
+                    <span className="text-xs font-medium uppercase tracking-[0.18em]">{tx(o.eyebrow)}</span>
                   </div>
-                  <h3 className="mt-4 font-heading text-xl font-bold uppercase text-foreground md:text-3xl">
-                    {tx(block.title)}
-                  </h3>
-                  <p className="mt-3 text-sm font-medium leading-relaxed text-foreground/80 md:text-base">
-                    {tx(block.lead)}
-                  </p>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{tx(block.body)}</p>
+                  <h3 className="mt-3 font-display text-2xl font-bold md:text-3xl">{tx(o.title)}</h3>
+                  <p className="mt-4 text-muted-foreground">{tx(o.lead)}</p>
 
-                  <ul className="mt-6 space-y-2">
-                    {block.bullets.map((b) => (
-                      <li key={b.en} className="flex gap-3 text-sm leading-relaxed text-muted-foreground">
-                        <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-accent" strokeWidth={SW} />
-                        {tx(b)}
+                  <ul className="mt-6 space-y-2.5">
+                    {o.items.map((b, i) => (
+                      <li key={i} className="flex items-start gap-2.5 text-sm">
+                        <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={SW} />
+                        <span>{tx(b)}</span>
                       </li>
                     ))}
                   </ul>
 
-                  <dl className="mt-7 grid grid-cols-3 gap-px border border-border bg-border">
-                    {block.stats.map((s) => (
-                      <div key={s.label.en} className="bg-card p-4">
-                        <dt className="font-body text-[9px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                          {tx(s.label)}
-                        </dt>
-                        <dd className="mt-1.5 font-heading text-xs font-bold uppercase text-card-foreground">
-                          {tx(s.value)}
-                        </dd>
+                  <div className="mt-7 grid gap-3 sm:grid-cols-3">
+                    {o.facts.map((s, i) => (
+                      <div key={i} className="rounded-xl border border-border/60 bg-card/40 p-3">
+                        <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground">
+                          {s.icon}
+                          <span>{tx(s.label)}</span>
+                        </div>
+                        <div className="mt-1.5 text-sm font-semibold">{tx(s.value)}</div>
                       </div>
                     ))}
-                  </dl>
+                  </div>
 
                   <div className="mt-7 flex flex-wrap gap-3">
-                    <Button className="bg-accent font-heading text-xs uppercase text-accent-foreground hover:bg-accent/90" asChild>
-                      <Link to={block.ctaHref}>
-                        {tx(block.ctaLabel)} <ArrowRight className="ml-2 h-4 w-4" />
+                    <Button asChild>
+                      <Link to={o.ctaHref}>
+                        {tx(o.ctaLabel)} <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
-                    <Button variant="outline" className="font-heading text-xs uppercase" asChild>
+                    <Button asChild variant="outline">
                       <Link to="/request">{lang === "lv" ? "Pieprasīt cenu" : "Get a price"}</Link>
                     </Button>
                   </div>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Use cases */}
-      <section className="bg-muted py-16 md:py-24">
-        <div className="container">
-          <motion.div {...fadeUp} className="max-w-2xl">
-            <div className="flex items-center gap-3">
-              <span className="block h-px w-8 bg-accent" />
-              <span className="font-body text-[10px] font-semibold uppercase tracking-[0.4em] text-accent">
-                {lang === "lv" ? "Ko mēs apdrukājam" : "What we decorate"}
-              </span>
-            </div>
-            <h2 className="mt-4 font-heading text-2xl font-bold uppercase text-foreground md:text-4xl">
-              {lang === "lv" ? "No vienas dāvanas līdz visai līgai" : "From one gift to a whole league"}
-            </h2>
-          </motion.div>
-
-          <div className="mt-10 grid gap-5 sm:grid-cols-2">
-            {USE_CASES.map((uc) => (
-              <motion.div key={uc.title.en} {...fadeUp} className="flex h-full flex-col border border-border bg-card">
-                {uc.image && (
-                  <img
-                    src={uc.image}
-                    alt={tx(uc.title)}
-                    loading="lazy"
-                    width={1600}
-                    height={1200}
-                    className="aspect-[16/10] w-full object-cover"
-                  />
-                )}
-                <div className="flex flex-1 flex-col p-6">
-                  <div className="flex items-center gap-3 text-accent">
-                    {uc.icon}
-                    <h3 className="font-heading text-sm font-bold uppercase text-card-foreground">{tx(uc.title)}</h3>
-                  </div>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">{tx(uc.text)}</p>
-                  <Link
-                    to={uc.href}
-                    className="mt-5 inline-flex items-center gap-1.5 font-heading text-[11px] font-bold uppercase tracking-wide text-accent hover:underline"
-                  >
-                    {lang === "lv" ? "Skatīt preces" : "View products"}
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
                 </div>
               </motion.div>
             ))}
@@ -499,145 +458,169 @@ const ServicesPage = () => {
         </div>
       </section>
 
-      {/* Process */}
-      <section className="bg-primary py-16 text-primary-foreground md:py-24">
-        <div className="container">
-          <motion.div {...fadeUp} className="max-w-2xl">
-            <div className="flex items-center gap-3">
-              <span className="block h-px w-8 bg-accent" />
-              <span className="font-body text-[10px] font-semibold uppercase tracking-[0.4em] text-accent">
-                {lang === "lv" ? "Process" : "Process"}
-              </span>
-            </div>
-            <h2 className="mt-4 font-heading text-2xl font-bold uppercase md:text-4xl">
+      {/* CHOICE TABLE */}
+      <section className="border-y border-border/60 bg-card/30 py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl">
+            <span className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+              {lang === "lv" ? "Īsumā" : "At a glance" }
+            </span>
+            <h2 className="mt-3 font-display text-3xl font-bold md:text-4xl">
+              {lang === "lv" ? "Kura metode kam der" : "Which method suits what"}
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              {lang === "lv"
+                ? "Ja gribi zināt tehnisko pusi — te ir viss svarīgākais vienā tabulā. Ja negribi, izlaid to: metodi izvēlēsimies mēs."
+                : "If you want the technical side, here it is in one table. If not, skip it — we'll choose the method for you."}
+            </p>
+          </div>
+
+          <div className="mt-10 overflow-x-auto rounded-2xl border border-border/60">
+            <table className="w-full min-w-[640px] text-left text-sm">
+              <thead className="bg-background/60 text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3 font-medium">{lang === "lv" ? "Metode" : "Method"}</th>
+                  <th className="px-4 py-3 font-medium">{lang === "lv" ? "Kam vislabāk" : "Best for"}</th>
+                  <th className="px-4 py-3 font-medium">{lang === "lv" ? "No cik gab." : "From"}</th>
+                  <th className="px-4 py-3 font-medium">{lang === "lv" ? "Mazgāšana" : "Wash"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {CHOICE_ROWS.map((r, i) => (
+                  <tr key={i} className="border-t border-border/50">
+                    <td className="px-4 py-3 font-semibold">{tx(r.method)}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{tx(r.best)}</td>
+                    <td className="px-4 py-3">{tx(r.from)}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{tx(r.wash)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* PROCESS */}
+      <section className="bg-background py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl">
+            <span className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+              {lang === "lv" ? "Process" : "Process"}
+            </span>
+            <h2 className="mt-3 font-display text-3xl font-bold md:text-4xl">
               {lang === "lv" ? "Kā notiek pasūtījums" : "How an order works"}
             </h2>
-          </motion.div>
+          </div>
 
-          <div className="mt-12 grid gap-px bg-primary-foreground/10 sm:grid-cols-2 lg:grid-cols-5">
-            {PROCESS.map((p) => (
-              <div key={p.step} className="bg-primary p-6">
-                <span className="font-heading text-3xl font-bold text-accent">{p.step}</span>
-                <h3 className="mt-4 font-heading text-xs font-bold uppercase">{tx(p.title)}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-primary-foreground/60">{tx(p.text)}</p>
-              </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-3 lg:grid-cols-5">
+            {STEPS.map((s, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                className="rounded-2xl border border-border/60 bg-card/40 p-5"
+              >
+                <div className="font-display text-3xl font-bold text-primary/70">{`0${i + 1}`}</div>
+                <h3 className="mt-3 font-semibold">{tx(s.title)}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{tx(s.text)}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* File preparation */}
-      <section className="bg-background py-16 md:py-24">
-        <div className="container">
-          <motion.div {...fadeUp}>
-            <div className="flex items-center gap-3">
-              <span className="block h-px w-8 bg-accent" />
-              <span className="font-body text-[10px] font-semibold uppercase tracking-[0.4em] text-accent">
-                {lang === "lv" ? "Tehniskās prasības" : "Technical requirements"}
-              </span>
-            </div>
-            <h2 className="mt-4 font-heading text-2xl font-bold uppercase text-foreground md:text-3xl">
-              {lang === "lv" ? "Failu sagatavošana" : "File preparation"}
-            </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              {lang === "lv"
-                ? "Ja kaut kas no šī sagādā grūtības — atsūti, kas ir, un mūsu dizaineri sagatavos failu drukai."
-                : "If any of this is a hurdle — send what you have and our designers will prepare the file for print."}
-            </p>
-
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {FILE_SPECS.map((item) => (
-                <div key={item.title.en} className="border border-border bg-card p-5">
-                  <div className="flex items-start gap-3">
-                    <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-accent" strokeWidth={SW} />
-                    <div>
-                      <h3 className="font-heading text-xs font-bold uppercase text-card-foreground">{tx(item.title)}</h3>
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{tx(item.desc)}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="bg-muted py-16 md:py-24">
-        <div className="container max-w-3xl">
-          <motion.div {...fadeUp}>
-            <div className="flex items-center gap-3">
-              <span className="block h-px w-8 bg-accent" />
-              <span className="font-body text-[10px] font-semibold uppercase tracking-[0.4em] text-accent">
-                {lang === "lv" ? "Biežākie jautājumi" : "FAQ"}
-              </span>
-            </div>
-            <h2 className="mt-4 font-heading text-2xl font-bold uppercase text-foreground md:text-3xl">
-              {lang === "lv" ? "Pirms pasūti" : "Before you order"}
-            </h2>
-
-            <Accordion type="single" collapsible className="mt-8">
-              {FAQ.map((item, i) => (
-                <AccordionItem key={i} value={`faq-${i}`} className="border-border">
-                  <AccordionTrigger className="text-left font-heading text-sm font-bold uppercase text-foreground">
-                    {tx(item.q)}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
-                    {tx(item.a)}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* OEKO-TEX */}
-      <section className="border-t border-border bg-card py-10">
-        <div className="container flex flex-col items-center gap-4 text-center">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="h-8 w-8 text-accent" strokeWidth={SW} />
-            <span className="font-heading text-sm font-bold uppercase tracking-wide text-card-foreground">
-              OEKO-TEX® Standard 100
+      {/* FILES + FAQ */}
+      <section className="border-t border-border/60 bg-card/30 py-16 md:py-24">
+        <div className="container mx-auto grid gap-12 px-4 lg:grid-cols-2 lg:gap-20">
+          <div>
+            <span className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+              {lang === "lv" ? "Ko atsūtīt" : "What to send"}
             </span>
-          </div>
-          <p className="max-w-md text-xs leading-relaxed text-muted-foreground">
-            {lang === "lv"
-              ? "Mūsu izmantotie materiāli un drukas tehnoloģijas atbilst OEKO-TEX® standartiem — droši cilvēkiem un videi."
-              : "Our materials and printing technologies comply with OEKO-TEX® standards — safe for people and the environment."}
-          </p>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="bg-primary py-16 text-primary-foreground md:py-24">
-        <div className="container text-center">
-          <motion.div {...fadeUp}>
-            <MessageCircle className="mx-auto mb-4 h-10 w-10 text-accent" strokeWidth={SW} />
-            <h2 className="font-heading text-2xl font-bold uppercase md:text-4xl">
-              {lang === "lv" ? "Pastāsti par savu projektu" : "Tell us about your project"}
+            <h2 className="mt-3 font-display text-3xl font-bold">
+              {lang === "lv" ? "Pieprasījumam pievieno" : "Include in your request"}
             </h2>
-            <p className="mx-auto mt-4 max-w-md leading-relaxed text-primary-foreground/60">
-              {lang === "lv"
-                ? "Atsūti ideju, apjomu un termiņu — atbildēsim ar tehnoloģijas ieteikumu un cenu."
-                : "Send us the idea, volume and deadline — we will reply with a technology recommendation and a price."}
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Button size="lg" className="bg-accent font-heading text-xs uppercase text-accent-foreground hover:bg-accent/90" asChild>
+            <ul className="mt-6 space-y-3 text-sm">
+              {[
+                { lv: "Logo vai dizainu (AI, EPS, PDF, SVG vai PNG 300 dpi)", en: "Logo or artwork (AI, EPS, PDF, SVG or 300 dpi PNG)" },
+                { lv: "Apģērbu no kataloga vai aprakstu, ko meklē", en: "A garment from the catalogue, or a description of what you need" },
+                { lv: "Daudzumu un izmēru sadalījumu", en: "Quantity and size breakdown" },
+                { lv: "Vēlamo apdrukas vietu un aptuveno izmēru", en: "Desired placement and approximate print size" },
+                { lv: "Termiņu, līdz kuram pasūtījums vajadzīgs", en: "The date you need the order by" },
+              ].map((b, i) => (
+                <li key={i} className="flex items-start gap-2.5">
+                  <CircleCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={SW} />
+                  <span>{tx(b)}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex items-start gap-3 rounded-2xl border border-border/60 bg-background/60 p-4">
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" strokeWidth={SW} />
+              <p className="text-sm text-muted-foreground">
+                {lang === "lv"
+                  ? "Nav gatava faila? Nav problēmu — pārzīmēsim logo drukai piemērotā formātā un pirms ražošanas atsūtīsim maketu apstiprināšanai."
+                  : "No print-ready file? No problem — we redraw your logo for production and send a mockup for approval before printing."}
+              </p>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild>
                 <Link to="/request">
                   {lang === "lv" ? "Pieprasīt piedāvājumu" : "Request a quote"} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-primary-foreground/30 bg-transparent font-heading text-xs uppercase text-primary-foreground hover:bg-primary-foreground/10"
-                asChild
-              >
-                <Link to="/contact">{lang === "lv" ? "Sazināties" : "Contact us"}</Link>
+              <Button asChild variant="outline">
+                <Link to="/contact">
+                  <MessageCircle className="mr-2 h-4 w-4" strokeWidth={SW} />
+                  {lang === "lv" ? "Sazināties" : "Contact us"}
+                </Link>
               </Button>
             </div>
-          </motion.div>
+          </div>
+
+          <div>
+            <span className="text-xs font-medium uppercase tracking-[0.18em] text-primary">
+              {lang === "lv" ? "Biežākie jautājumi" : "FAQ"}
+            </span>
+            <h2 className="mt-3 font-display text-3xl font-bold">
+              {lang === "lv" ? "Pirms pasūti" : "Before you order"}
+            </h2>
+            <Accordion type="single" collapsible className="mt-6">
+              {FAQ.map((f, i) => (
+                <AccordionItem key={i} value={`faq-${i}`}>
+                  <AccordionTrigger className="text-left text-sm font-semibold">{tx(f.q)}</AccordionTrigger>
+                  <AccordionContent className="text-sm text-muted-foreground">{tx(f.a)}</AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-background py-16 md:py-24">
+        <div className="container mx-auto px-4">
+          <div className="rounded-3xl border border-border/60 bg-card/50 p-8 text-center md:p-14">
+            <HardHat className="mx-auto h-8 w-8 text-primary" strokeWidth={SW} />
+            <h2 className="mt-5 font-display text-3xl font-bold md:text-4xl">
+              {lang === "lv" ? "Pastāsti, ko vajag" : "Tell us what you need"}
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+              {lang === "lv"
+                ? "Atsūti logo un aptuvenu daudzumu — atbildēsim vienas darba dienas laikā ar cenu, termiņu un ieteikumiem."
+                : "Send your logo and rough quantity — we'll reply within one working day with a price, a deadline and recommendations."}
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Button asChild size="lg">
+                <Link to="/request">
+                  {lang === "lv" ? "Pieprasīt piedāvājumu" : "Request a quote"} <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/catalog">{lang === "lv" ? "Apskatīt katalogu" : "Browse the catalogue"}</Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
     </Layout>

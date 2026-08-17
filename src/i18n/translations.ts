@@ -71,8 +71,9 @@ export const translations = {
   // About page
   "about.title": { lv: "Par Ervitex", en: "About Ervitex" },
   "about.heroText": {
-    lv: "Vairāk nekā 20 gadus SIA Ervitex ir uzticams partneris uzņēmumiem, kas meklē kvalitatīvu vairumtirdzniecības apģērbu un profesionālus apdrukas pakalpojumus Baltijā un Eiropā.",
-    en: "For over 20 years, Ervitex has been the trusted partner for businesses seeking premium wholesale apparel and professional textile printing across the Baltics and Europe.",
+    lv: "Vairāk nekā 20 gadus SIA Ervitex ir uzticams partneris Latvijas uzņēmumiem, kas meklē kvalitatīvu vairumtirdzniecības apģērbu un profesionālus apdrukas pakalpojumus.",
+    en: "For over 20 years, Ervitex has been the trusted partner for Latvian businesses seeking premium wholesale apparel and professional textile printing.",
+
   },
   "about.storyTitle": { lv: "Mūsu stāsts", en: "Our Story" },
   "about.story1": {
@@ -84,8 +85,9 @@ export const translations = {
     en: "Over the years, we expanded into professional screen printing, embroidery, and sublimation — becoming a one-stop solution for branded corporate and promotional apparel.",
   },
   "about.story3": {
-    lv: "Šodien apkalpojam simtiem klientu Baltijas valstīs un ārpus tām — no maziem uzņēmumiem līdz lielām korporācijām.",
-    en: "Today, we serve hundreds of clients across the Baltics and beyond — from startups to major corporations.",
+    lv: "Šodien apkalpojam simtiem klientu visā Latvijā — no maziem uzņēmumiem līdz lielām korporācijām.",
+    en: "Today, we serve hundreds of clients across Latvia — from startups to major corporations.",
+
   },
   "about.valuesTitle": { lv: "Kas mūs virza", en: "What Drives Us" },
   "about.precision": { lv: "Precizitāte", en: "Precision" },
