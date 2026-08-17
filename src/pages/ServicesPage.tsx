@@ -355,8 +355,7 @@ const ServicesPage = () => {
         <div className="h-1 bg-accent" />
       </section>
 
-      {/* Interactive technology showcase */}
-      <TechShowcase />
+
 
       {/* Deep dive per technology */}
       <section className="bg-background py-16 md:py-24">
