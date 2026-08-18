@@ -904,9 +904,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               <option value="price_asc">{lang === "lv" ? "Cena: zemākā vispirms" : "Price: low to high"}</option>
               <option value="price_desc">{lang === "lv" ? "Cena: augstākā vispirms" : "Price: high to low"}</option>
             </select>
-            <div className="ml-auto text-xs uppercase tracking-wider text-muted-foreground">
+            <div className="w-full text-[11px] uppercase tracking-wider text-muted-foreground sm:ml-auto sm:w-auto sm:text-xs">
               {filtered.length.toLocaleString(lang === "lv" ? "lv-LV" : "en-US")} {t.results}
             </div>
+
           </div>
         </div>
 
