@@ -176,6 +176,54 @@ export type Database = {
           },
         ]
       }
+      catalog_overrides: {
+        Row: {
+          description_en: string | null
+          description_lv: string | null
+          extra_images: string[]
+          hidden: boolean
+          hidden_images: string[]
+          hide_price: boolean
+          item_id: string
+          name_en: string | null
+          name_lv: string | null
+          price_override: number | null
+          source: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          description_en?: string | null
+          description_lv?: string | null
+          extra_images?: string[]
+          hidden?: boolean
+          hidden_images?: string[]
+          hide_price?: boolean
+          item_id: string
+          name_en?: string | null
+          name_lv?: string | null
+          price_override?: number | null
+          source: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          description_en?: string | null
+          description_lv?: string | null
+          extra_images?: string[]
+          hidden?: boolean
+          hidden_images?: string[]
+          hide_price?: boolean
+          item_id?: string
+          name_en?: string | null
+          name_lv?: string | null
+          price_override?: number | null
+          source?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       catalog_price_ranges: {
         Row: {
           currency: string
