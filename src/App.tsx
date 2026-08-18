@@ -71,7 +71,9 @@ const App = () => (
               <Route path="/login" element={<LoginPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
+              <Route path="/piedavajums/:token" element={<OfferPage />} />
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+
               <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
               <Route path="/admin/products/:id" element={<ProtectedRoute><AdminProductForm /></ProtectedRoute>} />
               <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
