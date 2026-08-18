@@ -55,14 +55,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          // Fire and forget — no await to prevent deadlock
-          checkAdmin(session.user.id);
+          // Keep loading until the role check resolves, otherwise protected
+          // routes briefly see "logged in but not admin" and redirect to /login.
+          setLoading(true);
+          checkAdmin(session.user.id).finally(() => {
+            if (mounted) setLoading(false);
+          });
         } else {
           setIsAdmin(false);
+          setLoading(false);
         }
-        setLoading(false);
       }
     );
+
 
     return () => {
       mounted = false;
