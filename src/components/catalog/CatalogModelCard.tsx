@@ -169,9 +169,10 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
 
 
         <div className="flex flex-1 flex-col gap-1 p-2 sm:gap-1.5 sm:p-3">
-          <h3 className="line-clamp-2 font-heading text-[12px] font-bold uppercase leading-tight tracking-wide transition-colors group-hover:text-accent sm:line-clamp-1 sm:text-sm">
+          <h3 className="line-clamp-2 min-h-[2.1em] font-heading text-[12px] font-bold uppercase leading-tight tracking-wide transition-colors group-hover:text-accent sm:text-sm">
             {title}
           </h3>
+
           {subtitle && (
             <p className="line-clamp-1 text-[11px] text-muted-foreground sm:line-clamp-2 sm:text-xs">{subtitle}</p>
           )}
