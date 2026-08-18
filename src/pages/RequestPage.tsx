@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
+import { useAuth } from "@/hooks/useAuth";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { OFFICE_EMAIL } from "@/data/projectManagers";
