@@ -146,12 +146,27 @@ const RequestPage = () => {
               {t("Pārbaudi preces un nosūti pieprasījumu — mēs sazināsimies tuvākajā laikā.", "Review items and send the request — we'll get back to you shortly.")}
             </p>
           </div>
-          <Button asChild variant="outline" size="sm" className="font-heading text-xs uppercase tracking-widest">
-            <Link to="/catalog">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("Atgriezties katalogā", "Back to catalog")}
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            {isAdmin && items.length > 0 && (
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                className="font-heading text-xs uppercase tracking-widest"
+                onClick={createOffer}
+                disabled={creatingOffer}
+              >
+                {t("Izveidot piedāvājumu klientam", "Create client offer")}
+              </Button>
+            )}
+            <Button asChild variant="outline" size="sm" className="font-heading text-xs uppercase tracking-widest">
+              <Link to="/catalog">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                {t("Atgriezties katalogā", "Back to catalog")}
+              </Link>
+            </Button>
+          </div>
+
         </div>
 
         {items.length === 0 ? (
