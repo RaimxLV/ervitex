@@ -13,7 +13,10 @@ export interface QuoteCartItem {
   colorHex: string | null;
   size: string | null;
   qty: number;
+  /** Unit price, VAT excluded (from catalog at time of adding) */
+  unitPrice?: number | null;
 }
+
 
 interface Ctx {
   items: QuoteCartItem[];

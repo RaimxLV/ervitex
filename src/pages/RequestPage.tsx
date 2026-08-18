@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
+import { useAuth } from "@/hooks/useAuth";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { OFFICE_EMAIL } from "@/data/projectManagers";
@@ -25,8 +27,31 @@ const RequestPage = () => {
   const [print, setPrint] = useState({ method: "", placement: "", colors: "", deadline: "", notes: "" });
   const [files, setFiles] = useState<File[]>([]);
   const [sending, setSending] = useState(false);
+  const [creatingOffer, setCreatingOffer] = useState(false);
+  const { isAdmin } = useAuth();
 
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
+
+  const createOffer = async () => {
+    setCreatingOffer(true);
+    const payload = items.map((i) => ({
+      id: i.id, source: i.source, productId: i.productId, name: i.name, code: i.code,
+      brand: i.brand, image: i.image, colorName: i.colorName, colorHex: i.colorHex,
+      size: i.size, qty: i.qty, unitPrice: i.unitPrice ?? null,
+    }));
+    const { data, error } = await supabase
+      .from("pm_offers")
+      .insert({ title: "Piedāvājums", items: payload as any })
+      .select("id")
+      .single();
+    setCreatingOffer(false);
+    if (error || !data) {
+      toast({ title: t("Kļūda", "Error"), description: error?.message, variant: "destructive" });
+      return;
+    }
+    navigate(`/admin/offers/${data.id}`);
+  };
+
 
   const handleFiles = (list: FileList | null) => {
     if (!list) return;
@@ -146,12 +171,27 @@ const RequestPage = () => {
               {t("Pārbaudi preces un nosūti pieprasījumu — mēs sazināsimies tuvākajā laikā.", "Review items and send the request — we'll get back to you shortly.")}
             </p>
           </div>
-          <Button asChild variant="outline" size="sm" className="font-heading text-xs uppercase tracking-widest">
-            <Link to="/catalog">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("Atgriezties katalogā", "Back to catalog")}
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            {isAdmin && items.length > 0 && (
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                className="font-heading text-xs uppercase tracking-widest"
+                onClick={createOffer}
+                disabled={creatingOffer}
+              >
+                {t("Izveidot piedāvājumu klientam", "Create client offer")}
+              </Button>
+            )}
+            <Button asChild variant="outline" size="sm" className="font-heading text-xs uppercase tracking-widest">
+              <Link to="/catalog">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                {t("Atgriezties katalogā", "Back to catalog")}
+              </Link>
+            </Button>
+          </div>
+
         </div>
 
         {items.length === 0 ? (

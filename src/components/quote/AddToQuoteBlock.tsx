@@ -104,7 +104,9 @@ const AddToQuoteBlock = ({
         source, productId, name, code, brand, image,
         colorCode, colorName, colorHex,
         size: cartSize, qty,
+        unitPrice: sizePrices?.[size] ?? null,
       });
+
     }
     setFlash(true);
     window.clearTimeout((setSize as any)._t);

@@ -32,6 +32,10 @@ import AdminUsers from "./pages/admin/AdminUsers.tsx";
 import AdminTranslate from "./pages/admin/AdminTranslate.tsx";
 import AdminMegaMenu from "./pages/admin/AdminMegaMenu.tsx";
 import AdminPriceAudit from "./pages/admin/AdminPriceAudit.tsx";
+import AdminOffers from "./pages/admin/AdminOffers.tsx";
+import AdminOfferEdit from "./pages/admin/AdminOfferEdit.tsx";
+import OfferPage from "./pages/OfferPage.tsx";
+
 import NotFound from "./pages/NotFound.tsx";
 import PrivacyPage from "./pages/PrivacyPage.tsx";
 import TermsPage from "./pages/TermsPage.tsx";
@@ -67,7 +71,12 @@ const App = () => (
               <Route path="/login" element={<LoginPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
+              <Route path="/piedavajums/:token" element={<OfferPage />} />
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/offers" element={<ProtectedRoute><AdminOffers /></ProtectedRoute>} />
+              <Route path="/admin/offers/:id" element={<ProtectedRoute><AdminOfferEdit /></ProtectedRoute>} />
+
+
               <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
               <Route path="/admin/products/:id" element={<ProtectedRoute><AdminProductForm /></ProtectedRoute>} />
               <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />

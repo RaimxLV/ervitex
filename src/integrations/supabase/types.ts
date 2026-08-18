@@ -1179,6 +1179,57 @@ export type Database = {
           },
         ]
       }
+      pm_offers: {
+        Row: {
+          client_company: string | null
+          client_email: string | null
+          client_name: string
+          client_phone: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          items: Json
+          note: string | null
+          status: string
+          title: string
+          token: string
+          updated_at: string
+          vat_rate: number
+        }
+        Insert: {
+          client_company?: string | null
+          client_email?: string | null
+          client_name?: string
+          client_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          items?: Json
+          note?: string | null
+          status?: string
+          title?: string
+          token?: string
+          updated_at?: string
+          vat_rate?: number
+        }
+        Update: {
+          client_company?: string | null
+          client_email?: string | null
+          client_name?: string
+          client_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          items?: Json
+          note?: string | null
+          status?: string
+          title?: string
+          token?: string
+          updated_at?: string
+          vat_rate?: number
+        }
+        Relationships: []
+      }
       product_colors: {
         Row: {
           created_at: string
@@ -2403,6 +2454,21 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      get_pm_offer: {
+        Args: { _token: string }
+        Returns: {
+          client_company: string
+          client_name: string
+          created_at: string
+          id: string
+          items: Json
+          note: string
+          status: string
+          title: string
+          updated_at: string
+          vat_rate: number
+        }[]
       }
       get_product_wholesale: {
         Args: { _product_id: string }
