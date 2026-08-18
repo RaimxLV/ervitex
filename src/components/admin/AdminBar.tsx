@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Pencil, FileText, Settings, ChevronUp, ChevronDown, ShieldCheck } from "lucide-react";
+import { FileText, Settings, ChevronUp, ChevronDown, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useSiteEditor } from "@/hooks/useSiteEditor";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -18,7 +16,6 @@ import type { OfferItem } from "@/lib/offer";
  */
 const AdminBar = () => {
   const { isAdmin } = useAuth();
-  const { editMode, toggleEditMode } = useSiteEditor();
   const { items } = useQuoteCart();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -67,19 +64,11 @@ const AdminBar = () => {
         >
           <ShieldCheck className="h-3.5 w-3.5 text-accent" />
           Admin režīms
-          {editMode && <span className="rounded-sm bg-accent px-1.5 py-0.5 text-[9px] text-accent-foreground">Rediģē</span>}
           {open ? <ChevronDown className="ml-auto h-3.5 w-3.5" /> : <ChevronUp className="ml-auto h-3.5 w-3.5" />}
         </button>
 
         {open && (
           <div className="flex flex-col gap-3 border-t border-background/15 px-4 py-3 sm:min-w-[260px]">
-            <label className="flex items-center justify-between gap-4 text-xs">
-              <span className="flex items-center gap-2">
-                <Pencil className="h-3.5 w-3.5" /> Rediģēšana uz vietas
-              </span>
-              <Switch checked={editMode} onCheckedChange={toggleEditMode} />
-            </label>
-
             <Button
               size="sm"
               onClick={createOffer}
