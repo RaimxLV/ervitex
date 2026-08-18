@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/co
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSiteEditor, type CatalogOverride } from "@/hooks/useSiteEditor";
 import CatalogFiltersSidebar, {
   type FilterSection,
 } from "@/components/catalog/CatalogFiltersSidebar";
@@ -302,6 +303,7 @@ interface Props {
 const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const { lang } = useLanguage();
   const navigate = useNavigate();
+  const { editMode, get: getOverride, openEditor, overrides } = useSiteEditor();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [items, setItems] = useState<EnrichedItem[]>([]);
@@ -727,7 +729,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
 
   const filtered = useMemo(() => {
-    const base = items.filter((it) => passesExcept(it, "__none__"));
+    const base = items.filter((it) => {
+      if (!passesExcept(it, "__none__")) return false;
+      const ov = getOverride(it.source, it.id);
+      // Admin-hidden products stay visible while editing so they can be restored.
+      return editMode || !ov?.hidden;
+    });
     const cmpName = (a: EnrichedItem, b: EnrichedItem) =>
       (a.name || a.id).localeCompare(b.name || b.id, lang === "lv" ? "lv" : "en", { sensitivity: "base" });
     if (sort === "az") return [...base].sort(cmpName);
@@ -751,7 +758,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     return base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, q, sources, brands, categories, groups, genders, colors, sort, priceOf, lang]);
+  }, [items, q, sources, brands, categories, groups, genders, colors, sort, priceOf, lang, overrides, editMode, getOverride]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -954,6 +961,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       priceInfo={priceRanges.get(`${it.source}:${it.id}`)}
 
                       fromLabel={lang === "lv" ? "no" : "from"}
+                      override={getOverride(it.source, it.id)}
+                      editMode={editMode}
+                      onEdit={() => openEditor(it.source, it.id, { name: it.name, image: it.image_url })}
                       onNavigate={() => navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}`)}
                     />
                   ))}
@@ -1011,9 +1021,12 @@ interface CardProps {
   priceInfo?: { price: number; max: number; currency: string };
   fromLabel?: string;
   priority?: boolean;
+  override?: CatalogOverride;
+  editMode?: boolean;
+  onEdit?: () => void;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel, priority }: CardProps) => {
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel, priority, override, editMode, onEdit }: CardProps) => {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   // Filter-driven initial match
