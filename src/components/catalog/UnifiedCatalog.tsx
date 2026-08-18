@@ -904,9 +904,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               <option value="price_asc">{lang === "lv" ? "Cena: zemākā vispirms" : "Price: low to high"}</option>
               <option value="price_desc">{lang === "lv" ? "Cena: augstākā vispirms" : "Price: high to low"}</option>
             </select>
-            <div className="ml-auto text-xs uppercase tracking-wider text-muted-foreground">
+            <div className="w-full text-[11px] uppercase tracking-wider text-muted-foreground sm:ml-auto sm:w-auto sm:text-xs">
               {filtered.length.toLocaleString(lang === "lv" ? "lv-LV" : "en-US")} {t.results}
             </div>
+
           </div>
         </div>
 
@@ -1069,24 +1070,18 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       noImageLabel={noImageLabel}
       price={
         effectivePrice ? (
-          <div className="flex flex-col gap-0.5 leading-tight">
-            <p className="font-heading text-sm font-semibold text-muted-foreground">
-              {effectivePrice.max > effectivePrice.price && (
-                <span className="mr-1 text-[10px] font-medium uppercase tracking-wider">{fromLabel}</span>
-              )}
-              €{effectivePrice.price.toFixed(2)}
-              <span className="ml-1 text-[10px] font-medium uppercase tracking-wider">
-                {lang === "lv" ? "bez PVN" : "excl. VAT"}
-              </span>
-            </p>
-            <p className="font-heading text-base font-black text-foreground">
+          <div className="flex flex-col leading-tight">
+            <p className="font-heading text-base font-black text-foreground sm:text-lg">
               {effectivePrice.max > effectivePrice.price && (
                 <span className="mr-1 text-[10px] font-bold uppercase tracking-wider">{fromLabel}</span>
               )}
               €{(effectivePrice.price * 1.21).toFixed(2)}
-              <span className="ml-1 text-[10px] font-bold uppercase tracking-wider">
-                {lang === "lv" ? "ar PVN" : "incl. VAT"}
+              <span className="ml-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                {lang === "lv" ? "ar PVN" : "incl."}
               </span>
+            </p>
+            <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              €{effectivePrice.price.toFixed(2)} {lang === "lv" ? "bez PVN" : "excl. VAT"}
             </p>
           </div>
         ) : (
@@ -1095,6 +1090,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
           </p>
         )
       }
+
 
     />
   );

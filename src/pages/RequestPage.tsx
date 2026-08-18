@@ -22,6 +22,8 @@ const RequestPage = () => {
   const { lang } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const cartNet = items.reduce((s, i) => s + (i.unitPrice || 0) * i.qty, 0);
+
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "" });
   const [print, setPrint] = useState({ method: "", placement: "", colors: "", deadline: "", notes: "" });
@@ -202,66 +204,112 @@ const RequestPage = () => {
           <form onSubmit={submit} className="grid gap-8 lg:grid-cols-[1fr,380px]">
             <div className="space-y-8">
               {/* Items */}
-              <section className="rounded-md border border-border bg-card p-4 sm:p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="font-heading text-lg font-black uppercase tracking-wide">
+              <section className="rounded-md border border-border bg-card p-3 sm:p-6">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
                     {t("Preces", "Items")} <span className="text-muted-foreground text-sm">({totalQty})</span>
                   </h2>
-                  <Button type="button" variant="ghost" size="sm" onClick={clear} className="text-xs text-muted-foreground">
+                  <Button type="button" variant="ghost" size="sm" onClick={clear} className="h-8 px-2 text-[11px] text-muted-foreground">
                     {t("Notīrīt visu", "Clear all")}
                   </Button>
                 </div>
-                <div className="space-y-4">
+                <div className="divide-y divide-border border-y border-border">
                   {grouped.map((group) => {
                     const head = group[0];
+                    const groupNet = group.reduce((s, it) => s + (it.unitPrice || 0) * it.qty, 0);
+                    const groupQty = group.reduce((s, it) => s + it.qty, 0);
                     return (
-                      <div key={head.productId + head.colorCode} className="flex gap-3 rounded border border-border p-3">
-                        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded bg-white">
+                      <div key={head.productId + head.colorCode} className="flex gap-2.5 py-2.5 sm:gap-3">
+                        <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded bg-white sm:h-16 sm:w-16">
                           {head.image ? (
                             <img src={head.image} alt={head.name} className="h-full w-full object-contain" />
                           ) : (
                             <div className="h-full w-full bg-muted" />
                           )}
                         </div>
-                        <div className="min-w-0 flex-1 space-y-2">
-                          <div className="flex flex-wrap items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className="truncate font-medium text-sm">{head.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {head.code}
-                                {head.colorName && <> · <span className="inline-flex items-center gap-1">
-                                  {head.colorHex && <span className="inline-block h-3 w-3 rounded-full border border-black/20" style={{ backgroundColor: head.colorHex }} />}
-                                  {head.colorName}
-                                </span></>}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="space-y-1.5">
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[13px] font-semibold leading-tight">{head.name}</p>
+                          <p className="mt-0.5 flex items-center gap-1 truncate text-[11px] text-muted-foreground">
+                            <span className="font-mono">{head.code}</span>
+                            {head.colorName && (
+                              <>
+                                <span>·</span>
+                                {head.colorHex && (
+                                  <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full border border-black/20" style={{ backgroundColor: head.colorHex }} />
+                                )}
+                                <span className="truncate">{head.colorName}</span>
+                              </>
+                            )}
+                          </p>
+                          <div className="mt-1.5 space-y-1">
                             {group.map((it) => (
-                              <div key={it.id} className="flex items-center gap-2 text-sm">
-                                <span className="min-w-[3rem] rounded border border-border px-2 py-0.5 text-center text-xs font-bold">
+                              <div key={it.id} className="flex items-center gap-1.5 text-[13px]">
+                                <span className="w-11 shrink-0 rounded border border-border px-1 py-0.5 text-center text-[11px] font-bold">
                                   {it.size || "—"}
                                 </span>
                                 <Input
                                   type="number"
                                   min={1}
+                                  inputMode="numeric"
                                   value={it.qty}
                                   onChange={(e) => updateQty(it.id, parseInt(e.target.value) || 1)}
-                                  className="h-8 w-20"
+                                  className="h-7 w-14 px-1 text-center text-[13px]"
                                 />
-                                <span className="text-xs text-muted-foreground">{t("gab.", "pcs")}</span>
-                                <Button type="button" size="icon" variant="ghost" className="ml-auto h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => remove(it.id)}>
+                                {it.unitPrice ? (
+                                  <span className="ml-1 truncate text-[11px] text-muted-foreground">
+                                    €{it.unitPrice.toFixed(2)} → <span className="font-semibold text-foreground">€{(it.unitPrice * it.qty).toFixed(2)}</span>
+                                  </span>
+                                ) : null}
+                                <button
+                                  type="button"
+                                  aria-label={t("Dzēst", "Remove")}
+                                  className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-destructive"
+                                  onClick={() => remove(it.id)}
+                                >
                                   <X className="h-3.5 w-3.5" />
-                                </Button>
+                                </button>
                               </div>
                             ))}
                           </div>
+                          <p className="mt-1 text-[11px] text-muted-foreground">
+                            {groupQty} {t("gab.", "pcs")}
+                            {groupNet > 0 && (
+                              <>
+                                {" · "}
+                                <span className="font-semibold text-foreground">€{groupNet.toFixed(2)}</span> {t("bez PVN", "excl. VAT")}
+                                {" · "}€{(groupNet * 1.21).toFixed(2)} {t("ar PVN", "incl. VAT")}
+                              </>
+                            )}
+                          </p>
                         </div>
                       </div>
                     );
                   })}
                 </div>
+                {cartNet > 0 && (
+                  <dl className="mt-3 space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <dt className="text-muted-foreground">{t("Kopā bez PVN", "Total excl. VAT")}</dt>
+                      <dd className="font-medium">€{cartNet.toFixed(2)}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-muted-foreground">{t("PVN 21%", "VAT 21%")}</dt>
+                      <dd>€{(cartNet * 0.21).toFixed(2)}</dd>
+                    </div>
+                    <div className="flex justify-between border-t border-border pt-1 text-base">
+                      <dt className="font-semibold">{t("Kopā ar PVN", "Total incl. VAT")}</dt>
+                      <dd className="font-black text-accent">€{(cartNet * 1.21).toFixed(2)}</dd>
+                    </div>
+                    <p className="pt-1 text-[11px] leading-snug text-muted-foreground">
+                      {t(
+                        "Cenas ir informatīvas, par preci bez apdrukas. Apdrukas un izšuvumu izmaksas aprēķinām atsevišķi.",
+                        "Prices are indicative, for the product without decoration. Printing and embroidery are quoted separately.",
+                      )}
+                    </p>
+                  </dl>
+                )}
               </section>
+
 
               {/* Print details */}
               <section className="rounded-md border border-border bg-card p-4 sm:p-6 space-y-4">

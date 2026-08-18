@@ -47,18 +47,42 @@ const AdminProducts = () => {
 
   const fetchProducts = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    // The Data API caps a single response at 1000 rows, so page through
+    // everything instead of silently stopping at "1000 no 1000".
+    const STEP = 1000;
+    const select = "*, product_images(url), categories(name_en, name_lv)";
+    const page1 = await supabase
       .from("products")
-      .select("*, product_images(url), categories(name_en, name_lv)")
+      .select(select, { count: "exact" })
       .order("created_at", { ascending: false })
-      .limit(2000);
-    if (error) {
-      toast({ title: "Kļūda", description: error.message, variant: "destructive" });
-    } else {
-      setProducts((data as unknown as ProductRow[]) || []);
+      .range(0, STEP - 1);
+    if (page1.error) {
+      toast({ title: "Kļūda", description: page1.error.message, variant: "destructive" });
+      setLoading(false);
+      return;
     }
+    const rows = ((page1.data as unknown) as ProductRow[]) || [];
+    const total = page1.count ?? rows.length;
+    if (total > STEP) {
+      const offsets: number[] = [];
+      for (let from = STEP; from < total; from += STEP) offsets.push(from);
+      const pages = await Promise.all(
+        offsets.map((from) =>
+          supabase
+            .from("products")
+            .select(select)
+            .order("created_at", { ascending: false })
+            .range(from, from + STEP - 1),
+        ),
+      );
+      for (const p of pages) {
+        if (!p.error && p.data) rows.push(...((p.data as unknown) as ProductRow[]));
+      }
+    }
+    setProducts(rows);
     setLoading(false);
   };
+
 
   useEffect(() => {
     supabase.from("categories").select("id, name_lv").order("sort_order").then(({ data }) => {
