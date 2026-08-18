@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { Pencil } from "lucide-react";
+
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
