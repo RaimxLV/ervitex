@@ -267,11 +267,17 @@ const AddToQuoteBlock = ({
           <span className="text-muted-foreground">{t("gab.", "pcs")}</span>
         </div>
         {sumHere > 0 && (
-          <div className="text-xs">
-            <span className="text-muted-foreground">{t("Summa (bez PVN):", "Total (excl. VAT):")}</span>{" "}
-            <span className="font-heading text-lg font-black text-accent">€{sumHere.toFixed(2)}</span>
+          <div className="flex flex-wrap items-baseline gap-x-2 text-xs">
+            <span className="font-heading text-lg font-black text-accent">€{(sumHere * 1.21).toFixed(2)}</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              {t("ar PVN", "incl. VAT")}
+            </span>
+            <span className="text-muted-foreground">
+              €{sumHere.toFixed(2)} {t("bez PVN", "excl. VAT")}
+            </span>
           </div>
         )}
+
 
 
         <div className="mt-1 flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:items-stretch">
