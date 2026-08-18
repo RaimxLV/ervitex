@@ -22,6 +22,8 @@ const RequestPage = () => {
   const { lang } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const cartNet = items.reduce((s, i) => s + (i.unitPrice || 0) * i.qty, 0);
+
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "" });
   const [print, setPrint] = useState({ method: "", placement: "", colors: "", deadline: "", notes: "" });
