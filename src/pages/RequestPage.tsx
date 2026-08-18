@@ -25,8 +25,31 @@ const RequestPage = () => {
   const [print, setPrint] = useState({ method: "", placement: "", colors: "", deadline: "", notes: "" });
   const [files, setFiles] = useState<File[]>([]);
   const [sending, setSending] = useState(false);
+  const [creatingOffer, setCreatingOffer] = useState(false);
+  const { isAdmin } = useAuth();
 
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
+
+  const createOffer = async () => {
+    setCreatingOffer(true);
+    const payload = items.map((i) => ({
+      id: i.id, source: i.source, productId: i.productId, name: i.name, code: i.code,
+      brand: i.brand, image: i.image, colorName: i.colorName, colorHex: i.colorHex,
+      size: i.size, qty: i.qty, unitPrice: i.unitPrice ?? null,
+    }));
+    const { data, error } = await supabase
+      .from("pm_offers")
+      .insert({ title: "Piedāvājums", items: payload as any })
+      .select("id")
+      .single();
+    setCreatingOffer(false);
+    if (error || !data) {
+      toast({ title: t("Kļūda", "Error"), description: error?.message, variant: "destructive" });
+      return;
+    }
+    navigate(`/admin/offers/${data.id}`);
+  };
+
 
   const handleFiles = (list: FileList | null) => {
     if (!list) return;
