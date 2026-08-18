@@ -86,7 +86,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
         type="button"
         onClick={onClick}
         onMouseEnter={() => setHovered(true)}
-        className="group flex h-full flex-col overflow-hidden border border-border bg-white text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
+        className="group flex h-full w-full flex-col overflow-hidden border border-border bg-white text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
       >
         <div className="relative aspect-[3/4] w-full shrink-0 overflow-hidden bg-white">
           {image ? (
