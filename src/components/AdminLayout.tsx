@@ -6,18 +6,35 @@ import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, Men
 
 const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
 
-const navItems = [
-  { to: "/admin", icon: LayoutDashboard, label: "Galvenais panelis" },
-  { to: "/admin/offers", icon: FileText, label: "Piedāvājumi klientiem" },
-  { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits" },
-
-  { to: "/admin/products", icon: Package, label: "Produkti" },
-  { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
-  { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
-  { to: "/admin/beechfield-import", icon: Upload, label: "Beechfield imports" },
-  { to: "/admin/quotes", icon: MessageSquare, label: "Cenu pieprasījumi" },
-  { to: "/admin/translate", icon: Languages, label: "Tulkošana", superOnly: true },
-  { to: "/admin/users", icon: Users, label: "Lietotāji", superOnly: true },
+const navGroups: {
+  title: string;
+  items: { to: string; icon: typeof Package; label: string; superOnly?: boolean }[];
+}[] = [
+  {
+    title: "Ikdienas darbs",
+    items: [
+      { to: "/admin", icon: LayoutDashboard, label: "Galvenais panelis" },
+      { to: "/admin/offers", icon: FileText, label: "Piedāvājumi klientiem" },
+      { to: "/admin/quotes", icon: MessageSquare, label: "Cenu pieprasījumi" },
+    ],
+  },
+  {
+    title: "Katalogs un dati",
+    items: [
+      { to: "/admin/products", icon: Package, label: "Produkti" },
+      { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
+      { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
+      { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits" },
+      { to: "/admin/beechfield-import", icon: Upload, label: "Beechfield imports" },
+    ],
+  },
+  {
+    title: "Sistēma",
+    items: [
+      { to: "/admin/translate", icon: Languages, label: "Tulkošana", superOnly: true },
+      { to: "/admin/users", icon: Users, label: "Lietotāji", superOnly: true },
+    ],
+  },
 ];
 
 
@@ -46,25 +63,34 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         </button>
       </div>
 
-      <nav className="space-y-1 p-4">
-        {navItems
-          .filter((item) => !item.superOnly || user?.email === SUPER_ADMIN_EMAIL)
-          .map((item) => {
-            const active = location.pathname === item.to;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setMobileOpen(false)}
-                className={`flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm transition-colors ${
-                  active ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            );
-          })}
+      <nav className="space-y-5 p-4">
+        {navGroups.map((group) => {
+          const items = group.items.filter((item) => !item.superOnly || user?.email === SUPER_ADMIN_EMAIL);
+          if (!items.length) return null;
+          return (
+            <div key={group.title} className="space-y-1">
+              <p className="px-3 pb-1 font-heading text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                {group.title}
+              </p>
+              {items.map((item) => {
+                const active = location.pathname === item.to;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm transition-colors ${
+                      active ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          );
+        })}
       </nav>
 
       <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4 space-y-2">
