@@ -10,9 +10,8 @@ import type { OfferItem } from "@/lib/offer";
 
 /**
  * Always-on admin toolbar shown while an admin browses the public site.
- * It replaces the need to go "into" the admin panel for everyday work:
- * flip on edit mode to get a pencil on every product card, and turn the
- * regular customer cart into a client offer with one click.
+ * Its only job: turn the regular customer cart into a client offer with
+ * one click, plus a shortcut into the technical panel.
  */
 const AdminBar = () => {
   const { isAdmin } = useAuth();
