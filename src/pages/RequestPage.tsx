@@ -201,8 +201,9 @@ const RequestPage = () => {
             {t("Pieprasījums ir tukšs. Pārlūko katalogu un pievieno preces.", "Your request is empty. Browse the catalog and add items.")}
           </div>
         ) : (
-          <form onSubmit={submit} className="grid gap-8 lg:grid-cols-[1fr,380px]">
-            <div className="space-y-8">
+          <form onSubmit={submit} className="grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr),380px]">
+            <div className="min-w-0 space-y-8">
+
               {/* Items */}
               <section className="rounded-md border border-border bg-card p-3 sm:p-6">
                 <div className="mb-3 flex items-center justify-between gap-2">
