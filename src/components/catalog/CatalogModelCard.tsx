@@ -130,13 +130,13 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
 
 
         {(code || brandBadge) && (
-          <div className="flex flex-col items-stretch border-t border-border bg-primary text-primary-foreground sm:flex-row">
+          <div className="flex flex-row items-stretch border-t border-border bg-primary text-primary-foreground">
             {code && (
-              <span className="flex flex-1 items-center gap-1.5 overflow-hidden px-3 py-1.5">
+              <span className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden px-2 py-1 sm:px-3 sm:py-1.5">
                 <span
                   onClick={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
-                  className="truncate font-mono text-xs font-bold uppercase tracking-wider select-all cursor-text sm:text-sm"
+                  className="truncate font-mono text-[11px] font-bold uppercase tracking-wider select-all cursor-text sm:text-sm"
                 >
                   {code}
                 </span>
@@ -160,7 +160,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
               </span>
             )}
             {brandBadge && (
-              <span className="flex items-center border-t border-primary-foreground/20 px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-wider sm:border-l sm:border-t-0 sm:px-2.5 sm:py-1.5">
+              <span className="flex max-w-[45%] items-center truncate border-l border-primary-foreground/20 px-2 py-1 font-heading text-[9px] font-bold uppercase tracking-wider sm:px-2.5 sm:py-1.5 sm:text-[10px]">
                 {brandBadge}
               </span>
             )}
@@ -168,13 +168,14 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
         )}
 
 
-        <div className="flex flex-1 flex-col gap-1.5 p-3">
-          <h3 className="line-clamp-1 font-heading text-sm font-bold uppercase tracking-wide transition-colors group-hover:text-accent">
+        <div className="flex flex-1 flex-col gap-1 p-2 sm:gap-1.5 sm:p-3">
+          <h3 className="line-clamp-2 font-heading text-[12px] font-bold uppercase leading-tight tracking-wide transition-colors group-hover:text-accent sm:line-clamp-1 sm:text-sm">
             {title}
           </h3>
           {subtitle && (
-            <p className="line-clamp-2 text-xs text-muted-foreground">{subtitle}</p>
+            <p className="line-clamp-1 text-[11px] text-muted-foreground sm:line-clamp-2 sm:text-xs">{subtitle}</p>
           )}
+
           {swatches && swatches.length > 0 && (
             <div className="flex flex-wrap items-center gap-1 pt-1">
               {swatches.slice(0, 8).map((s, i) => {
