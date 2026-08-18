@@ -350,31 +350,52 @@ const AdminOfferEdit = () => {
             {offer.items.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">Vēl nav pievienota neviena prece.</p>
             ) : (
-              <div className="mt-3 space-y-2">
+              <div className="mt-3 divide-y divide-border border-y border-border">
                 {offer.items.map((i) => (
-                  <div key={i.id} className="grid gap-2 rounded-sm border border-border p-2 sm:grid-cols-[1fr,80px,110px,90px,40px] sm:items-center">
+                  <div key={i.id} className="grid gap-1.5 py-2 sm:grid-cols-[1fr,70px,100px,110px,32px] sm:items-center sm:gap-2">
                     <div className="flex min-w-0 items-center gap-2">
-                      {i.image && <img src={i.image} alt="" loading="lazy" className="h-10 w-10 rounded-sm object-cover" />}
-                      <div className="min-w-0">
-                        <p className="truncate text-sm text-foreground">{i.name}</p>
-                        <p className="truncate text-xs text-muted-foreground">
+                      {i.image && <img src={i.image} alt="" loading="lazy" className="h-9 w-9 shrink-0 rounded-sm object-cover" />}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[13px] leading-tight text-foreground">{i.name}</p>
+                        <p className="truncate text-[11px] text-muted-foreground">
                           {i.code}{i.colorName && ` · ${i.colorName}`}{i.size && ` · ${i.size}`}
                         </p>
                       </div>
+                      <button
+                        type="button"
+                        aria-label="Dzēst pozīciju"
+                        onClick={() => removeItem(i.id)}
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-destructive sm:hidden"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </div>
-                    <Input type="number" min={1} value={i.qty} onChange={(e) => patchItem(i.id, { qty: Math.max(1, Number(e.target.value) || 1) })} className="h-9" />
+                    <Input type="number" min={1} value={i.qty} onChange={(e) => patchItem(i.id, { qty: Math.max(1, Number(e.target.value) || 1) })} className="h-8 px-2 text-center text-[13px]" />
                     <Input
                       type="number" step="0.01" min={0}
                       value={i.unitPrice ?? ""}
                       placeholder="cena"
                       onChange={(e) => patchItem(i.id, { unitPrice: e.target.value === "" ? null : Number(e.target.value) })}
-                      className="h-9"
+                      className="h-8 px-2 text-[13px]"
                     />
-                    <p className="text-right text-sm font-medium text-foreground">{money((i.unitPrice || 0) * i.qty)}</p>
-                    <Button variant="ghost" size="sm" onClick={() => removeItem(i.id)} className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                    <div className="text-right leading-tight">
+                      <p className="text-[13px] font-medium text-foreground">{money((i.unitPrice || 0) * i.qty)}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {money((i.unitPrice || 0) * i.qty * (1 + offer.vat_rate / 100))} ar PVN
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label="Dzēst pozīciju"
+                      onClick={() => removeItem(i.id)}
+                      className="hidden h-7 w-7 items-center justify-center rounded text-muted-foreground hover:text-destructive sm:flex"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 ))}
               </div>
+
             )}
           </section>
         </div>
