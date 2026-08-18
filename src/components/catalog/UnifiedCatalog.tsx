@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { SlidersHorizontal } from "lucide-react";
+import { Pencil, SlidersHorizontal } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/co
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSiteEditor, type CatalogOverride } from "@/hooks/useSiteEditor";
 import CatalogFiltersSidebar, {
   type FilterSection,
 } from "@/components/catalog/CatalogFiltersSidebar";
@@ -302,6 +303,7 @@ interface Props {
 const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const { lang } = useLanguage();
   const navigate = useNavigate();
+  const { editMode, get: getOverride, openEditor, overrides } = useSiteEditor();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [items, setItems] = useState<EnrichedItem[]>([]);
@@ -727,7 +729,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
 
   const filtered = useMemo(() => {
-    const base = items.filter((it) => passesExcept(it, "__none__"));
+    const base = items.filter((it) => {
+      if (!passesExcept(it, "__none__")) return false;
+      const ov = getOverride(it.source, it.id);
+      // Admin-hidden products stay visible while editing so they can be restored.
+      return editMode || !ov?.hidden;
+    });
     const cmpName = (a: EnrichedItem, b: EnrichedItem) =>
       (a.name || a.id).localeCompare(b.name || b.id, lang === "lv" ? "lv" : "en", { sensitivity: "base" });
     if (sort === "az") return [...base].sort(cmpName);
@@ -751,7 +758,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     return base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, q, sources, brands, categories, groups, genders, colors, sort, priceOf, lang]);
+  }, [items, q, sources, brands, categories, groups, genders, colors, sort, priceOf, lang, overrides, editMode, getOverride]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -954,6 +961,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       priceInfo={priceRanges.get(`${it.source}:${it.id}`)}
 
                       fromLabel={lang === "lv" ? "no" : "from"}
+                      override={getOverride(it.source, it.id)}
+                      editMode={editMode}
+                      onEdit={() => openEditor(it.source, it.id, { name: it.name, image: it.image_url })}
                       onNavigate={() => navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}`)}
                     />
                   ))}
@@ -1011,9 +1021,12 @@ interface CardProps {
   priceInfo?: { price: number; max: number; currency: string };
   fromLabel?: string;
   priority?: boolean;
+  override?: CatalogOverride;
+  editMode?: boolean;
+  onEdit?: () => void;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel, priority }: CardProps) => {
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel, priority, override, editMode, onEdit }: CardProps) => {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   // Filter-driven initial match
@@ -1024,8 +1037,11 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const effectiveIdx = activeIdx ?? (filterMatchIdx >= 0 ? filterMatchIdx : null);
   const active = effectiveIdx !== null ? item.colors[effectiveIdx] : null;
 
+  const ovName = (lang === "lv" ? override?.name_lv : override?.name_en) || override?.name_lv || override?.name_en || null;
+  const displayTitle = ovName || item.name || item.id;
+  const ovImage = override?.extra_images?.[0] || null;
   const matchedImg = active?.u || null;
-  const rawImg = resolveImgUrl(item.source, matchedImg ?? item.image_url);
+  const rawImg = resolveImgUrl(item.source, matchedImg ?? ovImage ?? item.image_url);
   const img = thumbUrl(rawImg);
   const hover = matchedImg ? null : thumbUrl(resolveImgUrl(item.source, item.hover_image_url));
 
@@ -1049,6 +1065,11 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   };
   const displayCode = formatCode(active?.c || item.id);
 
+  // A manual price override wins over the synced supplier price.
+  const effectivePrice = override?.price_override
+    ? { price: override.price_override, max: override.price_override, currency: "EUR" }
+    : priceInfo;
+
   return (
     <CatalogModelCard
       onClick={onNavigate}
@@ -1056,31 +1077,46 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       fallbackImage={rawImg}
       priority={priority}
       hoverImage={hover}
-      imageAlt={item.name || item.id}
+      imageAlt={displayTitle}
       code={displayCode}
       brandBadge={item.brand && item.brand.toLowerCase() !== "unbranded" ? item.brand : SOURCE_META[item.source].label}
-      title={item.name || item.id}
+      title={displayTitle}
       subtitle={active?.n || item.description}
+      topRight={
+        editMode ? (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onEdit?.(); }}
+            className="flex items-center gap-1 rounded-sm bg-foreground px-2 py-1 font-heading text-[10px] font-black uppercase tracking-wider text-background shadow-lg"
+          >
+            <Pencil className="h-3 w-3" /> {override ? "Labots" : "Labot"}
+          </button>
+        ) : undefined
+      }
       swatches={swatches}
       extraSwatches={extra}
       noImageLabel={noImageLabel}
       price={
-        priceInfo ? (
+        override?.hide_price ? (
+          <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {requestLabel}
+          </p>
+        ) : effectivePrice ? (
           <div className="flex flex-col gap-0.5 leading-tight">
             <p className="font-heading text-sm font-semibold text-muted-foreground">
-              {priceInfo.max > priceInfo.price && (
+              {effectivePrice.max > effectivePrice.price && (
                 <span className="mr-1 text-[10px] font-medium uppercase tracking-wider">{fromLabel}</span>
               )}
-              €{priceInfo.price.toFixed(2)}
+              €{effectivePrice.price.toFixed(2)}
               <span className="ml-1 text-[10px] font-medium uppercase tracking-wider">
                 {lang === "lv" ? "bez PVN" : "excl. VAT"}
               </span>
             </p>
             <p className="font-heading text-base font-black text-foreground">
-              {priceInfo.max > priceInfo.price && (
+              {effectivePrice.max > effectivePrice.price && (
                 <span className="mr-1 text-[10px] font-bold uppercase tracking-wider">{fromLabel}</span>
               )}
-              €{(priceInfo.price * 1.21).toFixed(2)}
+              €{(effectivePrice.price * 1.21).toFixed(2)}
               <span className="ml-1 text-[10px] font-bold uppercase tracking-wider">
                 {lang === "lv" ? "ar PVN" : "incl. VAT"}
               </span>

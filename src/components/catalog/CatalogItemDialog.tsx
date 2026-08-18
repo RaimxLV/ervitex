@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { Pencil } from "lucide-react";
+
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useSiteEditor } from "@/hooks/useSiteEditor";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
@@ -932,7 +935,21 @@ const CatalogItemDialog = ({
     })),
   }), [name, id, brand, category, descriptionFallback, swatches, image, lang]);
 
-  const displayDetail = detail || fallbackDetail;
+  const { editMode, get: getOverride, openEditor } = useSiteEditor();
+  const override = getOverride(source, id);
+
+  const displayDetail = useMemo<ProductDetail>(() => {
+    const base = detail || fallbackDetail;
+    if (!override) return base;
+    const ovName = (lang === "lv" ? override.name_lv : override.name_en) || override.name_lv || override.name_en;
+    const ovDesc = (lang === "lv" ? override.description_lv : override.description_en) || override.description_lv || override.description_en;
+    return {
+      ...base,
+      title: ovName || base.title,
+      description: ovDesc || base.description,
+      shortDescription: ovDesc || base.shortDescription,
+    };
+  }, [detail, fallbackDetail, override, lang]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -990,11 +1007,15 @@ const CatalogItemDialog = ({
   );
 
   const gallery = useMemo(() => {
+    const extra = override?.extra_images || [];
+    const hiddenSet = new Set((override?.hidden_images || []).map((u) => u.trim()));
+    const withAdmin = (list: string[]) => [...extra, ...list.filter((u) => !hiddenSet.has((u || "").trim()))];
+    if (extra.length && !currentColor) return extra;
     if (!currentColor) return image ? [image] : [];
-    if (currentColor.images.length) return currentColor.images;
-    for (const c of displayDetail.colors || []) if (c.images.length) return c.images.slice(0, 1);
-    return image ? [image] : [];
-  }, [currentColor, displayDetail, image]);
+    if (currentColor.images.length) return withAdmin(currentColor.images);
+    for (const c of displayDetail.colors || []) if (c.images.length) return withAdmin(c.images.slice(0, 1));
+    return withAdmin(image ? [image] : []);
+  }, [currentColor, displayDetail, image, override]);
 
   const mainImg = gallery[imgIndex] || gallery[0] || image;
   const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : displayDetail.sizes || [];
@@ -1010,6 +1031,10 @@ const CatalogItemDialog = ({
 
   // Colour/size aware price: prices differ per size and per colour in most catalogs.
   const priceInfo = useMemo(() => {
+    if (override?.hide_price) return null;
+    if (override?.price_override) {
+      return { price: override.price_override, max: override.price_override, currency: "EUR" };
+    }
     if (!variantPrices.length) return null;
     const norm = (s: unknown) => (s ?? "").toString().trim().toLowerCase();
     const sizeKey = (s: unknown) => {
@@ -1032,7 +1057,7 @@ const CatalogItemDialog = ({
       max: Math.max(...values),
       currency: rows[0]?.currency || "EUR",
     };
-  }, [variantPrices, currentColor, selectedSize, rawToLabel]);
+  }, [variantPrices, currentColor, selectedSize, rawToLabel, override]);
 
   // Price per size (excl. VAT) for the currently selected colour
   const sizePriceMap = useMemo(() => {
@@ -1301,9 +1326,20 @@ const CatalogItemDialog = ({
                 )}
               </div>
 
-              <h1 className="font-heading text-3xl font-black uppercase tracking-wide">
-                {displayDetail.title || name || id}
-              </h1>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <h1 className="font-heading text-3xl font-black uppercase tracking-wide">
+                  {displayDetail.title || name || id}
+                </h1>
+                {editMode && (
+                  <button
+                    type="button"
+                    onClick={() => openEditor(source, id, { name: displayDetail.title || name, image: mainImg })}
+                    className="flex shrink-0 items-center gap-1.5 rounded-sm bg-foreground px-3 py-1.5 font-heading text-[10px] font-black uppercase tracking-widest text-background"
+                  >
+                    <Pencil className="h-3 w-3" /> {override ? "Labots" : "Labot"}
+                  </button>
+                )}
+              </div>
 
               {/* Contextual tags */}
               {(displayCategory || displayDetail.gender) && (

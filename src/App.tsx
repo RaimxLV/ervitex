@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { AuthProvider } from "@/hooks/useAuth";
 import { QuoteCartProvider } from "@/hooks/useQuoteCart";
+import { SiteEditorProvider } from "@/hooks/useSiteEditor";
+import AdminBar from "@/components/admin/AdminBar";
 import QuoteCartButton from "@/components/quote/QuoteCartButton";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import RequestPage from "./pages/RequestPage.tsx";
@@ -50,7 +52,9 @@ const App = () => (
       <LanguageProvider>
         <AuthProvider>
           <QuoteCartProvider>
+          <SiteEditorProvider>
           <Toaster />
+
           <Sonner />
           <BrowserRouter basename={routerBase}>
             <ScrollToTop />
@@ -89,7 +93,9 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <QuoteCartButton />
+            <AdminBar />
           </BrowserRouter>
+          </SiteEditorProvider>
           </QuoteCartProvider>
         </AuthProvider>
 
