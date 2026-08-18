@@ -55,9 +55,9 @@ const CatalogOverrideDialog = ({ source, itemId, fallbackName, fallbackImage, ex
       for (const file of Array.from(files)) {
         const ext = file.name.split(".").pop() || "jpg";
         const path = `${source}/${itemId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-        const { error } = await supabase.storage.from("quote-files").upload(path, file, { upsert: true });
+        const { error } = await supabase.storage.from("product-images").upload(path, file, { upsert: true });
         if (error) throw error;
-        const { data } = supabase.storage.from("quote-files").getPublicUrl(path);
+        const { data } = supabase.storage.from("product-images").getPublicUrl(path);
         uploaded.push(data.publicUrl);
       }
       setImages((prev) => [...prev, ...uploaded]);
