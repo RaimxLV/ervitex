@@ -79,6 +79,8 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
     const [hovered, setHovered] = useState(false);
     const triedFallback = useRef(false);
     return (
+      <div className="relative h-full">
+      {topRight && <div className="absolute right-2 top-2 z-10">{topRight}</div>}
       <button
         ref={ref}
         type="button"
@@ -124,7 +126,6 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
               {noImageLabel}
             </div>
           )}
-          {topRight}
         </div>
 
 
@@ -229,6 +230,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
           {footer}
         </div>
       </button>
+      </div>
     );
   }
 );
