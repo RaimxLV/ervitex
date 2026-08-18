@@ -6,18 +6,35 @@ import { Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, Men
 
 const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
 
-const navItems = [
-  { to: "/admin", icon: LayoutDashboard, label: "Galvenais panelis" },
-  { to: "/admin/offers", icon: FileText, label: "Piedāvājumi klientiem" },
-  { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits" },
-
-  { to: "/admin/products", icon: Package, label: "Produkti" },
-  { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
-  { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
-  { to: "/admin/beechfield-import", icon: Upload, label: "Beechfield imports" },
-  { to: "/admin/quotes", icon: MessageSquare, label: "Cenu pieprasījumi" },
-  { to: "/admin/translate", icon: Languages, label: "Tulkošana", superOnly: true },
-  { to: "/admin/users", icon: Users, label: "Lietotāji", superOnly: true },
+const navGroups: {
+  title: string;
+  items: { to: string; icon: typeof Package; label: string; superOnly?: boolean }[];
+}[] = [
+  {
+    title: "Ikdienas darbs",
+    items: [
+      { to: "/admin", icon: LayoutDashboard, label: "Galvenais panelis" },
+      { to: "/admin/offers", icon: FileText, label: "Piedāvājumi klientiem" },
+      { to: "/admin/quotes", icon: MessageSquare, label: "Cenu pieprasījumi" },
+    ],
+  },
+  {
+    title: "Katalogs un dati",
+    items: [
+      { to: "/admin/products", icon: Package, label: "Produkti" },
+      { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
+      { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
+      { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits" },
+      { to: "/admin/beechfield-import", icon: Upload, label: "Beechfield imports" },
+    ],
+  },
+  {
+    title: "Sistēma",
+    items: [
+      { to: "/admin/translate", icon: Languages, label: "Tulkošana", superOnly: true },
+      { to: "/admin/users", icon: Users, label: "Lietotāji", superOnly: true },
+    ],
+  },
 ];
 
 
