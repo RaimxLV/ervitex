@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FileText, Settings, ChevronUp, ChevronDown, ShieldCheck } from "lucide-react";
+import { FileText, Settings, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { Button } from "@/components/ui/button";
