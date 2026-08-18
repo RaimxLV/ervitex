@@ -50,7 +50,9 @@ const App = () => (
       <LanguageProvider>
         <AuthProvider>
           <QuoteCartProvider>
+          <SiteEditorProvider>
           <Toaster />
+
           <Sonner />
           <BrowserRouter basename={routerBase}>
             <ScrollToTop />
