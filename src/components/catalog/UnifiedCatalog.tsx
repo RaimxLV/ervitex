@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { SlidersHorizontal } from "lucide-react";
+import { Pencil, SlidersHorizontal } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1037,8 +1037,11 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const effectiveIdx = activeIdx ?? (filterMatchIdx >= 0 ? filterMatchIdx : null);
   const active = effectiveIdx !== null ? item.colors[effectiveIdx] : null;
 
+  const ovName = (lang === "lv" ? override?.name_lv : override?.name_en) || override?.name_lv || override?.name_en || null;
+  const displayTitle = ovName || item.name || item.id;
+  const ovImage = override?.extra_images?.[0] || null;
   const matchedImg = active?.u || null;
-  const rawImg = resolveImgUrl(item.source, matchedImg ?? item.image_url);
+  const rawImg = resolveImgUrl(item.source, matchedImg ?? ovImage ?? item.image_url);
   const img = thumbUrl(rawImg);
   const hover = matchedImg ? null : thumbUrl(resolveImgUrl(item.source, item.hover_image_url));
 
@@ -1062,6 +1065,11 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   };
   const displayCode = formatCode(active?.c || item.id);
 
+  // A manual price override wins over the synced supplier price.
+  const effectivePrice = override?.price_override
+    ? { price: override.price_override, max: override.price_override, currency: "EUR" }
+    : priceInfo;
+
   return (
     <CatalogModelCard
       onClick={onNavigate}
@@ -1069,16 +1077,31 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       fallbackImage={rawImg}
       priority={priority}
       hoverImage={hover}
-      imageAlt={item.name || item.id}
+      imageAlt={displayTitle}
       code={displayCode}
       brandBadge={item.brand && item.brand.toLowerCase() !== "unbranded" ? item.brand : SOURCE_META[item.source].label}
-      title={item.name || item.id}
+      title={displayTitle}
       subtitle={active?.n || item.description}
+      topRight={
+        editMode ? (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onEdit?.(); }}
+            className="flex items-center gap-1 rounded-sm bg-foreground px-2 py-1 font-heading text-[10px] font-black uppercase tracking-wider text-background shadow-lg"
+          >
+            <Pencil className="h-3 w-3" /> {override ? "Labots" : "Labot"}
+          </button>
+        ) : undefined
+      }
       swatches={swatches}
       extraSwatches={extra}
       noImageLabel={noImageLabel}
       price={
-        priceInfo ? (
+        override?.hide_price ? (
+          <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {requestLabel}
+          </p>
+        ) : effectivePrice ? (
           <div className="flex flex-col gap-0.5 leading-tight">
             <p className="font-heading text-sm font-semibold text-muted-foreground">
               {priceInfo.max > priceInfo.price && (
