@@ -32,6 +32,10 @@ import AdminUsers from "./pages/admin/AdminUsers.tsx";
 import AdminTranslate from "./pages/admin/AdminTranslate.tsx";
 import AdminMegaMenu from "./pages/admin/AdminMegaMenu.tsx";
 import AdminPriceAudit from "./pages/admin/AdminPriceAudit.tsx";
+import AdminOffers from "./pages/admin/AdminOffers.tsx";
+import AdminOfferEdit from "./pages/admin/AdminOfferEdit.tsx";
+import OfferPage from "./pages/OfferPage.tsx";
+
 import NotFound from "./pages/NotFound.tsx";
 import PrivacyPage from "./pages/PrivacyPage.tsx";
 import TermsPage from "./pages/TermsPage.tsx";
