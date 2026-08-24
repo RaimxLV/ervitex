@@ -25,11 +25,11 @@ const TechnologiesShowcase = () => {
             {isLv ? "Mūsu pakalpojumi" : "Our services"}
           </span>
           <h2 className="mt-4 font-heading text-3xl font-bold uppercase tracking-tight text-foreground md:text-5xl">
-            {isLv ? "Apdrukas tehnoloģijas" : "Decoration technologies"}
+            {isLv ? "APDRUKAS RISINĀJUMI" : "Decoration technologies"}
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
             {isLv
-              ? "Sietspiede, DTF druka, izšūšana un sublimācija — visu izpildām pašu ražotnē Latvijā. Palīdzēsim izvēlēties tehnoloģiju, kas Jūsu dizainam un tirāžai ir izdevīgākā."
+              ? "No smalkām detaļām līdz lielām tirāžām — palīdzēsim izvēlēties pareizo metodi, lai jūsu zīmols uz apģērba izskatītos nevainojami."
               : "Screen printing, DTF, embroidery and sublimation — all produced in our own facility in Latvia. We help you pick the technology that fits your design and quantity best."}
           </p>
         </motion.div>
