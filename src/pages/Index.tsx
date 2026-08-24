@@ -2,7 +2,7 @@ import Layout from "@/components/Layout";
 import HeroSection from "@/components/home/HeroSection";
 import BentoCategories from "@/components/home/BentoCategories";
 import TrustedBrands from "@/components/home/TrustedBrands";
-import ValueCards from "@/components/home/ValueCards";
+import TechnologiesShowcase from "@/components/home/TechnologiesShowcase";
 import CtaSection from "@/components/home/CtaSection";
 import RetailSection from "@/components/home/RetailSection";
 
@@ -12,7 +12,7 @@ const Index = () => {
       <HeroSection />
       <BentoCategories />
       <TrustedBrands />
-      <ValueCards />
+      <TechnologiesShowcase />
       <CtaSection />
       <RetailSection />
     </Layout>
