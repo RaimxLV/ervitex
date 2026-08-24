@@ -10,6 +10,8 @@ import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 
+interface ColorEntry { h: string | null; n: string | null; u: string | null }
+
 interface RelatedItem {
   source: CatalogSource;
   id: string;
@@ -18,10 +20,14 @@ interface RelatedItem {
   category: string | null;
   image_url: string | null;
   hover_image_url: string | null;
+  colors?: ColorEntry[] | null;
 }
+
+interface PriceInfo { price: number; max: number }
 
 const isValidSource = (s: string | undefined): s is CatalogSource =>
   !!s && ["ss", "nwg", "pf", "bb", "mf", "ru"].includes(s);
+
 
 
 const CatalogItemPage = () => {
