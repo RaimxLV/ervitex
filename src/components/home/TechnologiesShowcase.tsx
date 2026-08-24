@@ -4,7 +4,7 @@ import { Check, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { techs } from "@/data/technologies";
 
-import guaranteeImg from "@/assets/services/rt-hero.jpg";
+import guaranteeImg from "@/assets/partner-section.jpg.asset.json";
 
 const TechnologiesShowcase = () => {
   const { lang } = useLanguage();
@@ -69,8 +69,8 @@ const TechnologiesShowcase = () => {
         {/* Guarantee block */}
         <div className="mt-20 grid gap-10 border-t border-border pt-16 lg:grid-cols-2 lg:items-center lg:gap-16 md:mt-28">
           <img
-            src={guaranteeImg}
-            alt={isLv ? "Ervitex apdrukas ražotne Latvijā" : "Ervitex print facility in Latvia"}
+            src={guaranteeImg.url}
+            alt={isLv ? "Apdrukāts krekls ar individualizētu dizainu" : "Printed t-shirt with a custom design"}
             loading="lazy"
             className="aspect-[4/3] w-full rounded-sm object-cover"
           />
