@@ -141,8 +141,10 @@ const techs: Tech[] = [
 const TechnologiesShowcase = () => {
   const { lang } = useLanguage();
   const isLv = lang === "lv";
-  const [active, setActive] = useState(techs[0].id);
-  const current = techs.find((t) => t.id === active) ?? techs[0];
+
+  const scrollTo = (id: string) => {
+    document.getElementById(`tech-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <section id="tehnologijas" className="bg-background py-20 md:py-28">
@@ -159,7 +161,7 @@ const TechnologiesShowcase = () => {
             {isLv ? "Mūsu pakalpojumi" : "Our services"}
           </span>
           <h2 className="mt-4 font-heading text-3xl font-bold uppercase tracking-tight text-foreground md:text-5xl">
-            {isLv ? "Četras apdrukas tehnoloģijas" : "Four decoration technologies"}
+            {isLv ? "Apdrukas tehnoloģijas" : "Decoration technologies"}
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
             {isLv
@@ -168,81 +170,106 @@ const TechnologiesShowcase = () => {
           </p>
         </motion.div>
 
-        {/* Tabs */}
-        <div className="mt-10 flex flex-wrap justify-center gap-2 md:mt-12 md:gap-3">
-          {techs.map((t) => (
-            <button
+        {/* Overview cards */}
+        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 md:mt-16">
+          {techs.map((t, i) => (
+            <motion.div
               key={t.id}
-              onClick={() => setActive(t.id)}
-              className={`rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-wide transition-colors md:px-6 md:py-2.5 md:text-sm ${
-                active === t.id
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-card text-muted-foreground hover:border-foreground hover:text-foreground"
-              }`}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.08 }}
             >
-              {t.name[lang]}
-            </button>
+              <button onClick={() => scrollTo(t.id)} className="group block w-full text-left">
+                <div className="overflow-hidden rounded-sm">
+                  <img
+                    src={t.images[0]}
+                    alt={t.name[lang]}
+                    loading="lazy"
+                    className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                  />
+                </div>
+                <h3 className="mt-5 font-heading text-lg font-bold uppercase text-foreground">
+                  {t.name[lang]}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.short[lang]}</p>
+                <span className="mt-4 inline-flex items-center gap-2 font-heading text-xs font-bold uppercase tracking-wider text-foreground group-hover:text-accent">
+                  {isLv ? "Vairāk informācijas" : "Learn more"}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </span>
+              </button>
+            </motion.div>
           ))}
         </div>
 
-        {/* Active technology */}
-        <motion.div
-          key={current.id}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mt-10 grid gap-10 md:mt-14 lg:grid-cols-2 lg:items-center lg:gap-16"
-        >
-          <div className="[&>div]:mt-0">
-            <ServiceImageCarousel images={current.images} alt={current.name[lang]} />
-          </div>
+        {/* Detailed sections */}
+        {techs.map((current, idx) => (
+          <div
+            key={current.id}
+            id={`tech-${current.id}`}
+            className="mt-20 scroll-mt-28 border-t border-border pt-16 md:mt-24"
+          >
+            <div
+              className={`grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16 ${
+                idx % 2 === 1 ? "lg:[&>*:first-child]:order-2" : ""
+              }`}
+            >
+              <div className="[&>div]:mt-0">
+                <ServiceImageCarousel images={current.images} alt={current.name[lang]} />
+              </div>
 
-          <div>
-            <span className="font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
-              {current.tagline[lang]}
-            </span>
-            <h3 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:text-4xl">
-              {current.name[lang]}
-            </h3>
-            <p className="mt-5 leading-relaxed text-muted-foreground">{current.desc[lang]}</p>
+              <div>
+                <span className="font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
+                  {current.tagline[lang]}
+                </span>
+                <h3 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:text-4xl">
+                  {current.name[lang]}
+                </h3>
+                <p className="mt-5 leading-relaxed text-muted-foreground">{current.desc[lang]}</p>
 
-            <ul className="mt-6 space-y-2.5">
-              {current.features.map((f) => (
-                <li key={f.en} className="flex items-start gap-3 text-sm text-foreground md:text-base">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" strokeWidth={2.4} />
-                  <span>{f[lang]}</span>
-                </li>
-              ))}
-            </ul>
+                <p className="mt-8 font-heading text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+                  {isLv ? "Iespējas" : "Capabilities"}
+                </p>
+                <ul className="mt-4 space-y-2.5">
+                  {current.features.map((f) => (
+                    <li key={f.en} className="flex items-start gap-3 text-sm text-foreground md:text-base">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" strokeWidth={2.4} />
+                      <span>{f[lang]}</span>
+                    </li>
+                  ))}
+                </ul>
 
-            <dl className="mt-8 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-3">
-              {current.specs.map((s) => (
-                <div key={s.label.en} className="bg-card p-4">
-                  <dt className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    {s.label[lang]}
-                  </dt>
-                  <dd className="mt-1 text-sm font-semibold text-foreground">{s.value[lang]}</dd>
+                <dl className="mt-8 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-3">
+                  {current.specs.map((s) => (
+                    <div key={s.label.en} className="bg-card p-4">
+                      <dt className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                        {s.label[lang]}
+                      </dt>
+                      <dd className="mt-1 text-sm font-semibold text-foreground">{s.value[lang]}</dd>
+                    </div>
+                  ))}
+                </dl>
+
+                <div className="mt-8 flex flex-wrap items-center gap-3">
+                  <Link
+                    to="/catalog"
+                    className="inline-flex items-center gap-2 bg-foreground px-6 py-3 font-heading text-xs font-bold uppercase tracking-wider text-background transition-colors hover:bg-accent"
+                  >
+                    {isLv ? "Veikt pasūtījumu" : "Begin your order"}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    to="/contact"
+                    className="inline-flex items-center gap-2 border border-border px-6 py-3 font-heading text-xs font-bold uppercase tracking-wider text-foreground transition-colors hover:border-foreground"
+                  >
+                    {isLv ? "Konsultēties ar speciālistu" : "Talk to a specialist"}
+                  </Link>
                 </div>
-              ))}
-            </dl>
-
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                to="/catalog"
-                className="inline-flex items-center gap-2 bg-foreground px-6 py-3 font-heading text-xs font-bold uppercase tracking-wider text-background transition-colors hover:bg-accent"
-              >
-                {isLv ? "Veikt pasūtījumu" : "Begin your order"}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                to="/contact"
-                className="inline-flex items-center gap-2 border border-border px-6 py-3 font-heading text-xs font-bold uppercase tracking-wider text-foreground transition-colors hover:border-foreground"
-              >
-                {isLv ? "Konsultēties ar speciālistu" : "Talk to a specialist"}
-              </Link>
+              </div>
             </div>
           </div>
-        </motion.div>
+        ))}
+
 
         {/* Guarantee block */}
         <div className="mt-20 grid gap-10 border-t border-border pt-16 lg:grid-cols-2 lg:items-center lg:gap-16 md:mt-28">
