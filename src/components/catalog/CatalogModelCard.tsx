@@ -12,33 +12,39 @@ import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
  */
 function displayHexes(name: string, hex?: string | null): string[] {
   const parts = (name || "")
-    .split(/[\/&+]|\s-\s/)
+    .split(/[\/&+,]|\s-\s|-|\swith\s/i)
     .map((p) => p.trim())
-    .filter(Boolean);
-  const hexFromName = (n: string): string | null => {
-    const b = bucketFromName(n);
-    return b ? getBucket(b).hex : null;
-  };
+    .filter((p) => p.length > 1);
+
+  // Resolve every name part to a palette bucket and keep the distinct ones in
+  // order, so "Black/Lime Green" or "Navy-White" render as a split circle.
   if (parts.length >= 2) {
-    const a = hexFromName(parts[0]) || hex || null;
-    const b = hexFromName(parts[1]) || hex || null;
-    if (a && b && a.toLowerCase() !== b.toLowerCase()) return [a, b];
+    const hexes: string[] = [];
+    for (const p of parts) {
+      const b = bucketFromName(p);
+      if (!b || b === "multi") continue;
+      const h = getBucket(b).hex;
+      if (!hexes.includes(h)) hexes.push(h);
+      if (hexes.length === 2) break;
+    }
+    if (hexes.length === 2) return hexes;
   }
+
   const provided = (hex || "").trim();
   if (provided && provided.length >= 4) {
     // Sanity check: if provided hex doesn't match the name bucket at all,
     // prefer the name-based hex (e.g. "Lime Green" stored as #000000).
     const nameBucket = bucketFromName(name);
     const hexBucket = bucketFromHex(provided);
-    if (nameBucket && hexBucket && nameBucket !== hexBucket) {
-      const fromName = hexFromName(name);
-      if (fromName) return [fromName];
+    if (nameBucket && nameBucket !== "multi" && hexBucket && nameBucket !== hexBucket) {
+      return [getBucket(nameBucket).hex];
     }
     return [provided];
   }
-  const fromName = hexFromName(name);
-  return fromName ? [fromName] : ["#ccc"];
+  const nb = bucketFromName(name);
+  return nb && nb !== "multi" ? [getBucket(nb).hex] : ["#ccc"];
 }
+
 
 
 export interface CatalogModelCardProps {

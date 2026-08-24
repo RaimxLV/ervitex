@@ -10,6 +10,8 @@ import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 
+interface ColorEntry { h: string | null; n: string | null; u: string | null }
+
 interface RelatedItem {
   source: CatalogSource;
   id: string;
@@ -18,10 +20,14 @@ interface RelatedItem {
   category: string | null;
   image_url: string | null;
   hover_image_url: string | null;
+  colors?: ColorEntry[] | null;
 }
+
+interface PriceInfo { price: number; max: number }
 
 const isValidSource = (s: string | undefined): s is CatalogSource =>
   !!s && ["ss", "nwg", "pf", "bb", "mf", "ru"].includes(s);
+
 
 
 const CatalogItemPage = () => {
@@ -30,6 +36,7 @@ const CatalogItemPage = () => {
   const { lang } = useLanguage();
   const [meta, setMeta] = useState<RelatedItem | null>(null);
   const [related, setRelated] = useState<RelatedItem[]>([]);
+  const [prices, setPrices] = useState<Map<string, PriceInfo>>(new Map());
 
   const validSource = isValidSource(source) ? source : null;
 
@@ -51,17 +58,36 @@ const CatalogItemPage = () => {
       if (cur?.category) {
         const { data: rel } = await supabase
           .from("catalog_items" as any)
-          .select("source,id,name,brand,category,image_url,hover_image_url")
+          .select("source,id,name,brand,category,image_url,hover_image_url,colors")
           .eq("source", validSource)
           .eq("category", cur.category)
           .neq("id", id)
           .limit(12);
         if (cancelled) return;
-        setRelated(((rel || []) as unknown as RelatedItem[]).slice(0, 8));
+        const list = ((rel || []) as unknown as RelatedItem[]).slice(0, 8);
+        setRelated(list);
+
+        if (list.length) {
+          const { data: pr } = await supabase
+            .from("catalog_price_ranges" as any)
+            .select("source,style_code,min_price,max_price")
+            .eq("source", validSource)
+            .in("style_code", list.map((r) => r.id));
+          if (cancelled) return;
+          const map = new Map<string, PriceInfo>();
+          for (const row of (pr || []) as any[]) {
+            const min = Number(row.min_price);
+            const max = Number(row.max_price);
+            if (!Number.isFinite(min) || min <= 0) continue;
+            map.set(`${row.source}:${row.style_code}`, { price: min, max: Number.isFinite(max) ? max : min });
+          }
+          setPrices(map);
+        }
       }
     })();
     return () => { cancelled = true; };
   }, [validSource, id]);
+
 
   const t = useMemo(
     () => ({
@@ -115,23 +141,56 @@ const CatalogItemPage = () => {
               {t.related}
             </h2>
             <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {related.map((r) => (
-                <CatalogModelCard
-                  key={`${r.source}-${r.id}`}
-                  onClick={() => navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`)}
-                  image={thumbUrl(r.image_url)}
-                  fallbackImage={r.image_url}
-                  hoverImage={thumbUrl(r.hover_image_url)}
-                  imageAlt={r.name || r.id}
-                  code={r.id}
-                  brandBadge={r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
-                  title={r.name || r.id}
-                  subtitle={r.category}
-                  swatches={[]}
-                  extraSwatches={0}
-                  noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
-                />
-              ))}
+              {related.map((r) => {
+                const cols = (r.colors || []).filter((c) => c && (c.h || c.n));
+                const swatches = cols.slice(0, 8).map((c) => ({
+                  hex: c.h ?? null,
+                  name: c.n || "",
+                }));
+                const p = prices.get(`${r.source}:${r.id}`);
+                return (
+                  <CatalogModelCard
+                    key={`${r.source}-${r.id}`}
+                    onClick={() => navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`)}
+                    image={thumbUrl(r.image_url)}
+                    fallbackImage={r.image_url}
+                    hoverImage={thumbUrl(r.hover_image_url)}
+                    imageAlt={r.name || r.id}
+                    code={r.id}
+                    brandBadge={r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
+                    title={r.name || r.id}
+                    subtitle={r.category}
+                    swatches={swatches}
+                    extraSwatches={Math.max(0, cols.length - 8)}
+                    noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
+                    price={
+                      p ? (
+                        <div className="flex flex-col leading-tight">
+                          <p className="font-heading text-base font-black text-foreground sm:text-lg">
+                            {p.max > p.price && (
+                              <span className="mr-1 text-[10px] font-bold uppercase tracking-wider">
+                                {lang === "lv" ? "no" : "from"}
+                              </span>
+                            )}
+                            €{(p.price * 1.21).toFixed(2)}
+                            <span className="ml-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                              {lang === "lv" ? "ar PVN" : "incl."}
+                            </span>
+                          </p>
+                          <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            €{p.price.toFixed(2)} {lang === "lv" ? "bez PVN" : "excl. VAT"}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          {lang === "lv" ? "Cena pēc pieprasījuma" : "Price on request"}
+                        </p>
+                      )
+                    }
+                  />
+                );
+              })}
+
             </div>
           </section>
         )}
