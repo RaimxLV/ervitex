@@ -3,7 +3,6 @@ import HeroSection from "@/components/home/HeroSection";
 import BentoCategories from "@/components/home/BentoCategories";
 import TrustedBrands from "@/components/home/TrustedBrands";
 import TechnologiesShowcase from "@/components/home/TechnologiesShowcase";
-import CtaSection from "@/components/home/CtaSection";
 import RetailSection from "@/components/home/RetailSection";
 
 const Index = () => {
@@ -11,9 +10,8 @@ const Index = () => {
     <Layout>
       <HeroSection />
       <BentoCategories />
-      <TrustedBrands />
       <TechnologiesShowcase />
-      <CtaSection />
+      <TrustedBrands />
       <RetailSection />
     </Layout>
   );

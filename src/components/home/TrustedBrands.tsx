@@ -3,7 +3,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 
 const brands = [
   "Stanley/Stella", "Craft", "Clique", "ProJob", "Cutter & Buck",
-  "Elevate", "Roly", "Beechfield Brands", "Malfini", "Prezentmateriāli",
+  "Elevate", "Roly", "Russell", "Beechfield Brands", "Malfini",
+  "Prezentmateriāli",
 ];
 
 const TrustedBrands = () => {
