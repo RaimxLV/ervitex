@@ -39,7 +39,7 @@ const HeroSection = () => {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           poster={heroPoster}
           className="absolute inset-0 h-full w-full object-cover object-center opacity-80"
         />
