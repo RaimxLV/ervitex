@@ -40,6 +40,10 @@ const techs: Tech[] = [
     id: "sietspiede",
     name: { lv: "Sietspiede", en: "Screen printing" },
     tagline: { lv: "Lielām tirāžām", en: "For large runs" },
+    short: {
+      lv: "Ekonomiskākā izvēle lielām tirāžām — spilgta, mīksta un ļoti izturīga apdruka.",
+      en: "The most economical choice for large runs — vivid, soft and highly durable prints.",
+    },
     desc: {
       lv: "Klasiskā un ekonomiskākā tehnoloģija lielām tirāžām. Katrai krāsai tiek sagatavots atsevišķs siets, tāpēc rezultāts ir spilgts, mīksts uz taustes un ļoti izturīgs pret mazgāšanu. Ideāla izvēle T-krekliem, hūdijiem un pasākumu apģērbam.",
       en: "The classic and most cost-effective technology for large runs. A separate screen is prepared for every colour, so the result is vivid, soft to the touch and extremely wash-resistant. Ideal for tees, hoodies and event apparel.",
@@ -61,6 +65,10 @@ const techs: Tech[] = [
     id: "dtf",
     name: { lv: "DTF druka", en: "DTF printing" },
     tagline: { lv: "Fotogrāfiskai detaļai", en: "For photographic detail" },
+    short: {
+      lv: "Digitāla druka bez krāsu ierobežojuma — arī no viena gabala un uz tumša auduma.",
+      en: "Digital printing with no colour limit — even one-offs and on dark fabric.",
+    },
     desc: {
       lv: "Digitālā druka uz plēves, kas tiek pārnesta ar presi. Bez krāsu skaita ierobežojuma — gradienti, fotogrāfijas un smalkas detaļas izskatās perfekti pat uz tumša auduma. Piemērota mazām tirāžām un personalizācijai pa vienam gabalam.",
       en: "Digital film printing transferred with a heat press. No colour limit — gradients, photos and fine detail look perfect even on dark fabric. Perfect for small runs and one-off personalisation.",
@@ -82,6 +90,10 @@ const techs: Tech[] = [
     id: "izsusana",
     name: { lv: "Izšūšana", en: "Embroidery" },
     tagline: { lv: "Premium izskatam", en: "For a premium look" },
+    short: {
+      lv: "Reljefs diegu dizains, kas korporatīvajam apģērbam piešķir premium izskatu.",
+      en: "Textured thread design that gives corporate apparel a premium look.",
+    },
     desc: {
       lv: "Vissolīdākais risinājums korporatīvajam apģērbam. Dizains tiek digitalizēts un izšūts ar diegu — reljefs, taustāms un praktiski nenodilstošs. Lieliski strādā uz cepurēm, polo krekliem, jakām un darba apģērba.",
       en: "The most solid solution for corporate apparel. The design is digitised and stitched with thread — textured, tangible and virtually indestructible. Works great on caps, polos, jackets and workwear.",
@@ -103,6 +115,10 @@ const techs: Tech[] = [
     id: "sublimacija",
     name: { lv: "Sublimācija", en: "Sublimation" },
     tagline: { lv: "Sporta un pilnkrāsu risinājums", en: "Sport & all-over solution" },
+    short: {
+      lv: "Krāsa iekļūst šķiedrā — pilnkrāsu risinājums sporta formām un suvenīriem.",
+      en: "Ink bonds inside the fibre — full-colour solution for sports kits and gifts.",
+    },
     desc: {
       lv: "Krāsa iekļūst pašā šķiedrā, tāpēc apdruka nav ne saredzama, ne sajūtama — tā nekad neplaisā un neatlīmējas. Piemērota gaišam poliestera audumam: sporta formām, pilnkrāsu dizainiem, krūzēm un suvenīriem.",
       en: "The ink bonds inside the fibre, so the print cannot be seen or felt — it never cracks or peels. Suited to light polyester fabrics: sports kits, all-over designs, mugs and gifts.",
