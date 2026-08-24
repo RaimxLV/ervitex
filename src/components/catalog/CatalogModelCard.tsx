@@ -2,6 +2,7 @@ import { forwardRef, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
+import { unproxyUrl } from "@/lib/imageProxy";
 
 
 /**
@@ -83,7 +84,10 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
     const [copied, setCopied] = useState(false);
     const [ready, setReady] = useState(false);
     const [hovered, setHovered] = useState(false);
+    const [hoverFailed, setHoverFailed] = useState(false);
     const triedFallback = useRef(false);
+    const triedHoverFallback = useRef(false);
+    const showHover = !!hoverImage && !hoverFailed;
     return (
       <div className="relative h-full">
       {topRight && <div className="absolute right-2 top-2 z-10">{topRight}</div>}
@@ -115,18 +119,29 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
                   setReady(true);
                   el.style.display = "none";
                 }}
-                className={`absolute inset-0 h-full w-full object-contain p-2 transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"} ${hoverImage ? "group-hover:opacity-0" : ""}`}
+                className={`absolute inset-0 h-full w-full object-contain p-2 transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"} ${showHover ? "group-hover:opacity-0" : ""}`}
               />
-              {hoverImage && hovered && (
+              {hoverImage && hovered && !hoverFailed && (
                 <img
                   src={hoverImage}
                   alt=""
                   loading="lazy"
                   decoding="async"
+                  onError={(e) => {
+                    const el = e.currentTarget as HTMLImageElement;
+                    const raw = unproxyUrl(hoverImage);
+                    if (raw && raw !== el.src && !triedHoverFallback.current) {
+                      triedHoverFallback.current = true;
+                      el.src = raw;
+                      return;
+                    }
+                    setHoverFailed(true);
+                  }}
                   className="absolute inset-0 h-full w-full object-contain p-2 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                 />
               )}
             </>
+
           ) : (
             <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
               {noImageLabel}

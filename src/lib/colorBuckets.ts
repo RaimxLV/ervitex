@@ -121,7 +121,17 @@ const NAME_PATTERNS: [RegExp, ColorBucketKey][] = [
   [/yellow|jaun|jaune|gelb|giallo|dzelten|mustard|gold|lemon|ochre|ocher|canary|corn/i, "yellow"],
   [/green|vert|gr[üu]n|verde|zaļ|olive|khaki green|mint|sage|forest|emerald|jade|lime|hunter|moss|pistach|army/i, "green"],
   [/purple|violet|viole?ts?|lilac|lavender|mauve|plum|aubergin|orchid|grape/i, "purple"],
-  [/pink|rose|rosa|roz[āa]|fuchsia|magenta|blush|candy/i, "pink"],
+  [/pink|rose|rosa|roz[āa]|fuchsia|magenta|blush|candy|rhododendron|raspberry|watermelon|blossom/i, "pink"],
+  // Long-tail partner colour names that previously resolved to nothing.
+  [/military|army|olive|khaki|kiwi|alpine|glacier|forest/i, "green"],
+  [/almond|oyster|mushroom|nougat|pebble|granite|sahara|sea ?salt|cameo|frost|wood|english/i, "beige"],
+  [/garnet|cranberry|port|oxblood|winter berries/i, "red"],
+  [/ink|midnight|snorkel/i, "navy"],
+  [/light oxford|sport heather|reflective|clear|transparent|haze/i, "gray"],
+  [/mandarine|mango|sunset|pumpkin|campfire/i, "orange"],
+  [/sunflower|saffron/i, "yellow"],
+  [/lavendar/i, "purple"],
+
 
 ];
 
