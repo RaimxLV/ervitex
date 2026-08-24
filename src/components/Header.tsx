@@ -12,7 +12,7 @@ import CatalogMegaMenu from "@/components/CatalogMegaMenu";
 const navItems = [
   { key: "nav.home" as const, path: "/" },
   { key: "nav.catalog" as const, path: "/catalog" },
-  { key: "nav.services" as const, path: "/#tehnologijas" },
+  
   { key: "nav.about" as const, path: "/about" },
   { key: "nav.contact" as const, path: "/contact" },
 ];
