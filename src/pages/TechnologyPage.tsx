@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import Layout from "@/components/Layout";
 import ServiceImageCarousel from "@/components/services/ServiceImageCarousel";
+import TechRelatedProducts from "@/components/services/TechRelatedProducts";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 import { getTech, techs } from "@/data/technologies";
 
@@ -90,10 +92,7 @@ const TechnologyPage = () => {
 
           {/* Gallery */}
           <div className="mt-16 border-t border-border pt-12 md:mt-24">
-            <h2 className="font-heading text-xl font-bold uppercase text-foreground md:text-2xl">
-              {isLv ? "Bilžu galerija" : "Photo gallery"}
-            </h2>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {tech.images.map((src, i) => (
                 <img
                   key={src}
@@ -105,6 +104,9 @@ const TechnologyPage = () => {
               ))}
             </div>
           </div>
+
+          <TechRelatedProducts techId={tech.id} />
+
 
           {/* Other technologies */}
           <div className="mt-16 border-t border-border pt-12 md:mt-24">
