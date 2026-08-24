@@ -21,6 +21,7 @@ import MalfiniPage from "./pages/MalfiniPage.tsx";
 import AdminBeechfieldImport from "./pages/admin/AdminBeechfieldImport.tsx";
 import ProductDetailPage from "./pages/ProductDetailPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
+import TechnologyPage from "./pages/TechnologyPage.tsx";
 import ContactPage from "./pages/ContactPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
@@ -67,6 +68,7 @@ const App = () => (
               <Route path="/product/:id" element={<ProductDetailPage />} />
               <Route path="/request" element={<RequestPage />} />
               <Route path="/services" element={<Navigate to="/#tehnologijas" replace />} />
+              <Route path="/tehnologijas/:slug" element={<TechnologyPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/login" element={<LoginPage />} />
