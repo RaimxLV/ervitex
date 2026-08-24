@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +6,7 @@ import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
+import { bucketOf, getBucket, type ColorBucketKey } from "@/lib/colorBuckets";
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null }
 
@@ -21,6 +22,27 @@ type Row = {
 };
 
 interface PriceInfo { price: number; max: number }
+
+const VALID_HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
+const PLACEHOLDER_HEX = new Set(["#000000", "#000", "#ffffff", "#fff", "#cccccc"]);
+
+/** Same swatch-hex resolution the main catalog uses, so cards look identical. */
+const sanitizeHex = (
+  hex: string | null | undefined,
+  bucket: ColorBucketKey | null,
+  name?: string | null,
+): string | null => {
+  const raw = (hex ?? "").trim().toLowerCase();
+  const valid = raw && VALID_HEX.test(raw) ? raw : null;
+  if (bucket && bucket !== "multi") {
+    if (!valid) return getBucket(bucket).hex;
+    if (PLACEHOLDER_HEX.has(valid)) {
+      const isCombo = /[\/&+]| - /.test(name || "");
+      if (!isCombo) return getBucket(bucket).hex;
+    }
+  }
+  return valid;
+};
 
 /** Raw catalog categories that make sense for each print technology. */
 const TECH_CATEGORIES: Record<string, { cats: string[]; link: string }> = {
@@ -58,6 +80,83 @@ const pickRandom = <T,>(arr: T[], n: number): T[] => {
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy.slice(0, n);
+};
+
+const RelatedCard = ({
+  row,
+  price,
+  isLv,
+  onNavigate,
+}: {
+  row: Row;
+  price?: PriceInfo;
+  isLv: boolean;
+  onNavigate: () => void;
+}) => {
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+
+  const colors = useMemo(
+    () =>
+      (row.colors || [])
+        .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c?.h, bucketOf(c?.h, c?.n), c?.n) }))
+        .filter((c) => !!c.hex),
+    [row.colors]
+  );
+
+  const active = activeIdx !== null ? colors.find((c) => c.idx === activeIdx) ?? null : null;
+  const rawImg = active?.u || row.image_url;
+
+  const swatches = colors.slice(0, 8).map((c) => ({
+    hex: c.hex!,
+    name: c.n || "",
+    active: activeIdx === c.idx,
+    onSelect: () => setActiveIdx(activeIdx === c.idx ? null : c.idx),
+  }));
+
+  return (
+    <CatalogModelCard
+      onClick={onNavigate}
+      image={thumbUrl(rawImg)}
+      fallbackImage={rawImg}
+      hoverImage={active ? null : thumbUrl(row.hover_image_url)}
+      imageAlt={row.name || row.id}
+      code={row.id}
+      brandBadge={
+        row.brand && row.brand.toLowerCase() !== "unbranded"
+          ? row.brand
+          : SOURCE_META[row.source]?.label ?? null
+      }
+      title={row.name || row.id}
+      subtitle={active?.n || row.category}
+      swatches={swatches}
+      extraSwatches={Math.max(0, colors.length - 8)}
+      noImageLabel={isLv ? "Bez attēla" : "No image"}
+      price={
+        price ? (
+          <div className="flex flex-col leading-tight">
+            <p className="font-heading text-base font-black text-foreground sm:text-lg">
+              {price.max > price.price && (
+                <span className="mr-1 text-[10px] font-bold uppercase tracking-wider">
+                  {isLv ? "no" : "from"}
+                </span>
+              )}
+              €{(price.price * 1.21).toFixed(2)}
+              <span className="ml-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                {isLv ? "ar PVN" : "incl."}
+              </span>
+            </p>
+            <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              €{price.price.toFixed(2)} {isLv ? "bez PVN" : "excl. VAT"}
+            </p>
+          </div>
+        ) : (
+          <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {isLv ? "Cena pēc pieprasījuma" : "Price on request"}
+          </p>
+        )
+      }
+    />
+  );
 };
 
 const TechRelatedProducts = ({ techId }: { techId: string }) => {
@@ -122,56 +221,15 @@ const TechRelatedProducts = ({ techId }: { techId: string }) => {
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {items.map((r) => {
-          const cols = (r.colors || []).filter((c) => c && (c.h || c.n));
-          const swatches = cols.slice(0, 8).map((c) => ({ hex: c.h ?? null, name: c.n || "" }));
-          const p = prices.get(`${r.source}:${r.id}`);
-          return (
-            <CatalogModelCard
-              key={`${r.source}-${r.id}`}
-              onClick={() => navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`)}
-              image={thumbUrl(r.image_url)}
-              fallbackImage={r.image_url}
-              hoverImage={thumbUrl(r.hover_image_url)}
-              imageAlt={r.name || r.id}
-              code={r.id}
-              brandBadge={
-                r.brand && r.brand.toLowerCase() !== "unbranded"
-                  ? r.brand
-                  : SOURCE_META[r.source]?.label ?? null
-              }
-              title={r.name || r.id}
-              subtitle={r.category}
-              swatches={swatches}
-              extraSwatches={Math.max(0, cols.length - 8)}
-              noImageLabel={isLv ? "Bez attēla" : "No image"}
-              price={
-                p ? (
-                  <div className="flex flex-col leading-tight">
-                    <p className="font-heading text-base font-black text-foreground sm:text-lg">
-                      {p.max > p.price && (
-                        <span className="mr-1 text-[10px] font-bold uppercase tracking-wider">
-                          {isLv ? "no" : "from"}
-                        </span>
-                      )}
-                      €{(p.price * 1.21).toFixed(2)}
-                      <span className="ml-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
-                        {isLv ? "ar PVN" : "incl."}
-                      </span>
-                    </p>
-                    <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      €{p.price.toFixed(2)} {isLv ? "bez PVN" : "excl. VAT"}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    {isLv ? "Cena pēc pieprasījuma" : "Price on request"}
-                  </p>
-                )
-              }
-            />
-          );
-        })}
+        {items.map((r) => (
+          <RelatedCard
+            key={`${r.source}-${r.id}`}
+            row={r}
+            price={prices.get(`${r.source}:${r.id}`)}
+            isLv={isLv}
+            onNavigate={() => navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`)}
+          />
+        ))}
       </div>
     </div>
   );
