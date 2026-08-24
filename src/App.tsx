@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,7 +20,6 @@ import BeechfieldBrandsPage from "./pages/BeechfieldBrandsPage.tsx";
 import MalfiniPage from "./pages/MalfiniPage.tsx";
 import AdminBeechfieldImport from "./pages/admin/AdminBeechfieldImport.tsx";
 import ProductDetailPage from "./pages/ProductDetailPage.tsx";
-import ServicesPage from "./pages/ServicesPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
 import ContactPage from "./pages/ContactPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
@@ -67,7 +66,7 @@ const App = () => (
               <Route path="/malfini" element={<MalfiniPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
               <Route path="/request" element={<RequestPage />} />
-              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/services" element={<Navigate to="/#tehnologijas" replace />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/login" element={<LoginPage />} />
