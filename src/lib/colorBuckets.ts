@@ -110,18 +110,19 @@ export function bucketFromHex(hex?: string | null): ColorBucketKey | null {
 const NAME_PATTERNS: [RegExp, ColorBucketKey][] = [
   [/multi|mix|assort|print|melang|melir|marm|floral|camo|stripe|check|plaid|jacquard/i, "multi"],
   [/navy|marine|indig|dark ?blue|nakts/i, "navy"],
-  [/turquois|teal|petrol|aqua|sky|light ?blue|cyan|zils|blue|bleu|blau|azzur|kobalt|denim|jean/i, "blue"],
-  [/black|noir|schwarz|nero|melns|anthrac|onyx|coal|carbon/i, "black"],
-  [/white|blanc|weiss|bianco|balts|ivory|natural|ecru|cream|off ?white|off-white|snow/i, "white"],
-  [/gr[ae]y|gris|grigio|pelēk|silver|charcoal|graphit|slate/i, "gray"],
-  [/beige|sand|tan|khaki|camel|stone|linen|nude|cappucc|latte|oat|straw/i, "beige"],
-  [/brown|marron|bruin|braun|brūn|mocha|chocolate|espresso|cocoa|coffee|hazel|walnut|toffee|caramel|tabak/i, "brown"],
-  [/red|rouge|rot|rosso|sarkan|crimson|scarlet|burgund|wine|cherry|maroon|carmine|ruby/i, "red"],
-  [/orang|oran[žz]|coral|salmon|apricot|peach|rust|amber/i, "orange"],
-  [/yellow|jaun|jaune|gelb|giallo|dzelten|mustard|gold|lemon|ochre|ocher|canary/i, "yellow"],
-  [/green|vert|gr[üu]n|verde|zaļ|olive|khaki green|mint|sage|forest|emerald|jade|lime|hunter/i, "green"],
-  [/purple|violet|viole?ts?|lilac|lavender|mauve|plum|aubergin/i, "purple"],
-  [/pink|rose|rosa|roz[āa]|fuchsia|magenta/i, "pink"],
+  [/turquois|teal|petrol|aqua|sky|light ?blue|cyan|zils|blue|bleu|blau|azzur|kobalt|cobalt|royal|denim|jean/i, "blue"],
+  [/black|noir|schwarz|nero|melns|anthrac|onyx|coal|carbon|jet/i, "black"],
+  [/white|blanc|weiss|bianco|balts|ivory|natural|ecru|cream|off ?white|off-white|snow|vanilla|bone|chalk|milk/i, "white"],
+  [/gr[ae]y|gris|grigio|pelēk|silver|charcoal|graphit|slate|shadow|steel|ash/i, "gray"],
+  [/beige|sand|tan|khaki|camel|stone|linen|nude|cappucc|latte|oat|straw|putty|wheat|biscuit|taupe|clay|dune|desert/i, "beige"],
+  [/brown|marron|bruin|braun|brūn|mocha|chocolate|espresso|cocoa|coffee|hazel|walnut|toffee|caramel|tabak|chestnut/i, "brown"],
+  [/red|rouge|rot|rosso|sarkan|crimson|scarlet|burgund|wine|cherry|maroon|carmine|ruby|brick/i, "red"],
+  [/orang|oran[žz]|coral|salmon|apricot|peach|rust|amber|tangerine|terracot/i, "orange"],
+  [/yellow|jaun|jaune|gelb|giallo|dzelten|mustard|gold|lemon|ochre|ocher|canary|corn/i, "yellow"],
+  [/green|vert|gr[üu]n|verde|zaļ|olive|khaki green|mint|sage|forest|emerald|jade|lime|hunter|moss|pistach|army/i, "green"],
+  [/purple|violet|viole?ts?|lilac|lavender|mauve|plum|aubergin|orchid|grape/i, "purple"],
+  [/pink|rose|rosa|roz[āa]|fuchsia|magenta|blush|candy/i, "pink"],
+
 ];
 
 export function bucketFromName(name?: string | null): ColorBucketKey | null {
