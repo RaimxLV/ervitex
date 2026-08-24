@@ -346,10 +346,19 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     "1": "3XS", "2": "XXS", "3": "XS", "4": "S", "5": "M", "6": "L",
     "7": "XL", "8": "XXL", "9": "3XL", "10": "4XL", "11": "5XL", "12": "6XL",
   };
+  // Treat as coded sizes when every value is a small integer within 1..12 —
+  // real numeric sizings (shoes 36-48, kids 110-164) fall outside that range.
+  // size_sequence is often missing/inconsistent, so it must not be required.
   const codeSized =
     rawSkuSizes.length > 0 &&
-    rawSkuSizes.every((x) => /^\d{1,2}$/.test(x.s!) && Number.isFinite(x.seq) && x.seq === Number(x.s) * 10);
+    rawSkuSizes.every((x) => {
+      if (!/^\d{1,2}$/.test(x.s!)) return false;
+      const n = Number(x.s);
+      if (n < 1 || n > 12) return false;
+      return !Number.isFinite(x.seq) || x.seq === n * 10 || x.seq === n;
+    });
   const sizeLabel = (s: string) => (codeSized ? NWG_SIZE_CODES[s] || s : s);
+
 
   const sizesByItem = new Map<string, { s: string; seq: number }[]>();
   const skuMap: Record<string, string> = {};
