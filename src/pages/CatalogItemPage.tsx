@@ -141,23 +141,56 @@ const CatalogItemPage = () => {
               {t.related}
             </h2>
             <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {related.map((r) => (
-                <CatalogModelCard
-                  key={`${r.source}-${r.id}`}
-                  onClick={() => navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`)}
-                  image={thumbUrl(r.image_url)}
-                  fallbackImage={r.image_url}
-                  hoverImage={thumbUrl(r.hover_image_url)}
-                  imageAlt={r.name || r.id}
-                  code={r.id}
-                  brandBadge={r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
-                  title={r.name || r.id}
-                  subtitle={r.category}
-                  swatches={[]}
-                  extraSwatches={0}
-                  noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
-                />
-              ))}
+              {related.map((r) => {
+                const cols = (r.colors || []).filter((c) => c && (c.h || c.n));
+                const swatches = cols.slice(0, 8).map((c) => ({
+                  hex: c.h ?? null,
+                  name: c.n || "",
+                }));
+                const p = prices.get(`${r.source}:${r.id}`);
+                return (
+                  <CatalogModelCard
+                    key={`${r.source}-${r.id}`}
+                    onClick={() => navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`)}
+                    image={thumbUrl(r.image_url)}
+                    fallbackImage={r.image_url}
+                    hoverImage={thumbUrl(r.hover_image_url)}
+                    imageAlt={r.name || r.id}
+                    code={r.id}
+                    brandBadge={r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
+                    title={r.name || r.id}
+                    subtitle={r.category}
+                    swatches={swatches}
+                    extraSwatches={Math.max(0, cols.length - 8)}
+                    noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
+                    price={
+                      p ? (
+                        <div className="flex flex-col leading-tight">
+                          <p className="font-heading text-base font-black text-foreground sm:text-lg">
+                            {p.max > p.price && (
+                              <span className="mr-1 text-[10px] font-bold uppercase tracking-wider">
+                                {lang === "lv" ? "no" : "from"}
+                              </span>
+                            )}
+                            €{(p.price * 1.21).toFixed(2)}
+                            <span className="ml-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">
+                              {lang === "lv" ? "ar PVN" : "incl."}
+                            </span>
+                          </p>
+                          <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            €{p.price.toFixed(2)} {lang === "lv" ? "bez PVN" : "excl. VAT"}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          {lang === "lv" ? "Cena pēc pieprasījuma" : "Price on request"}
+                        </p>
+                      )
+                    }
+                  />
+                );
+              })}
+
             </div>
           </section>
         )}
