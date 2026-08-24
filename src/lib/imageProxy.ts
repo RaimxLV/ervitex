@@ -23,3 +23,15 @@ export const blurUrl = (u: string | null): string | null => {
   if (!u) return null;
   return `https://wsrv.nl/?url=${encodeURIComponent(u.replace(/^https?:\/\//, ""))}&w=32&output=webp&q=40&blur=5&we`;
 };
+
+/** Original URL behind a wsrv.nl proxy link (no-op for direct URLs). */
+export const unproxyUrl = (u: string | null): string | null => {
+  if (!u) return null;
+  if (!u.startsWith("https://wsrv.nl/?url=")) return u;
+  try {
+    const raw = decodeURIComponent(new URL(u).searchParams.get("url") || "");
+    return raw ? (raw.startsWith("http") ? raw : `https://${raw}`) : null;
+  } catch {
+    return null;
+  }
+};
