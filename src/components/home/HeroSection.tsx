@@ -49,22 +49,31 @@ const HeroSection = () => {
         style={{ y: bgY }}
         className="absolute inset-0 will-change-transform"
       >
-        {/* Video loop — full bleed */}
-        <video
-          src={heroLoop}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          poster={heroPoster}
+        {/* Poster paints immediately; video swaps in when idle */}
+        <img
+          src={heroPoster}
+          alt=""
+          aria-hidden="true"
+          width={1920}
+          height={1080}
+          fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover object-center opacity-80"
         />
+        {videoSrc && (
+          <video
+            src={videoSrc}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="none"
+            poster={heroPoster}
+            className="absolute inset-0 h-full w-full object-cover object-center opacity-80"
+          />
+        )}
 
-        {/* Legacy image fallback (hidden, kept for reference) */}
-        <div className="hidden">
-          <img src={heroModels} alt="" width={1920} height={1080} />
-        </div>
+
 
       </motion.div>
 
