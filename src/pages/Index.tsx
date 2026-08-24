@@ -1,18 +1,24 @@
+import { Suspense, lazy } from "react";
 import Layout from "@/components/Layout";
 import HeroSection from "@/components/home/HeroSection";
-import BentoCategories from "@/components/home/BentoCategories";
-import TrustedBrands from "@/components/home/TrustedBrands";
-import TechnologiesShowcase from "@/components/home/TechnologiesShowcase";
-import RetailSection from "@/components/home/RetailSection";
+
+// Only the hero is part of the initial bundle — everything below the fold is
+// code-split so the first paint is as fast as possible.
+const BentoCategories = lazy(() => import("@/components/home/BentoCategories"));
+const TechnologiesShowcase = lazy(() => import("@/components/home/TechnologiesShowcase"));
+const TrustedBrands = lazy(() => import("@/components/home/TrustedBrands"));
+const RetailSection = lazy(() => import("@/components/home/RetailSection"));
 
 const Index = () => {
   return (
     <Layout>
       <HeroSection />
-      <BentoCategories />
-      <TechnologiesShowcase />
-      <TrustedBrands />
-      <RetailSection />
+      <Suspense fallback={<div className="min-h-[40svh]" />}>
+        <BentoCategories />
+        <TechnologiesShowcase />
+        <TrustedBrands />
+        <RetailSection />
+      </Suspense>
     </Layout>
   );
 };

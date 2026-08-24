@@ -400,51 +400,22 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     let cancelled = false;
     const STEP = 1000;
 
-    const fetchAllPages = async <T,>(
-      table: string,
-      columns: string,
-      order: string,
-    ): Promise<T[]> => {
-      const build = (from: number, withCount: boolean) => {
-        let q = supabase
-          .from(table as any)
-          .select(columns, withCount ? { count: "exact" } : undefined)
-          .order(order, { ascending: true })
-          .range(from, from + STEP - 1);
-        if (lockedSource) q = q.eq("source", lockedSource);
-        return q;
-      };
-      const first = await build(0, true);
-      if (first.error) return [];
-      const rows = ((first.data || []) as unknown) as T[];
-      const total = first.count ?? rows.length;
-      if (total <= STEP) return rows;
-      // Fetch every remaining page in parallel instead of one-by-one.
-      const offsets: number[] = [];
-      for (let from = STEP; from < total; from += STEP) offsets.push(from);
-      const pages = await Promise.all(offsets.map((from) => build(from, false)));
-      const out = [...rows];
-      for (const p of pages) if (!p.error && p.data) out.push(...((p.data as unknown) as T[]));
-      return out;
+    const query = (table: string, columns: string, order: string, from: number, withCount: boolean) => {
+      let q = supabase
+        .from(table as any)
+        .select(columns, withCount ? { count: "exact" } : undefined)
+        .order(order, { ascending: true })
+        .range(from, from + STEP - 1);
+      if (lockedSource) q = q.eq("source", lockedSource);
+      return q;
     };
 
-    (async () => {
-      // Items and prices load simultaneously — prices no longer wait for items.
-      const [all, priceRows] = await Promise.all([
-        fetchAllPages<CatalogItem>(
-          "catalog_items",
-          "source,id,name,brand,category,group_name,gender,image_url,hover_image_url,colors",
-          "id",
-        ),
-        fetchAllPages<any>(
-          "catalog_price_ranges",
-          "source,style_code,min_price,max_price,currency",
-          "style_code",
-        ),
-      ]);
-      if (cancelled) return;
+    const ITEM_COLUMNS =
+      "source,id,name,brand,category,group_name,gender,image_url,hover_image_url,colors";
+    const PRICE_COLUMNS = "source,style_code,min_price,max_price,currency";
 
-      const enriched: EnrichedItem[] = all
+    const enrich = (all: CatalogItem[]): EnrichedItem[] =>
+      all
         .map((it) => {
           if (isIncompleteNwgShell(it)) return null;
           const buckets = new Set<ColorBucketKey>();
@@ -473,8 +444,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         })
         .filter((x): x is EnrichedItem => x !== null);
 
-      // Unified catalog price ranges (min/max per style, all sources).
-      // Prices are stored excl. VAT and already include our markup.
+    // Prices are stored excl. VAT and already include our markup.
+    const toRanges = (priceRows: any[]) => {
       const ranges = new Map<string, { price: number; max: number; currency: string }>();
       for (const r of priceRows) {
         const min = Number(r.min_price);
@@ -486,17 +457,63 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           currency: r.currency || "EUR",
         });
       }
+      return ranges;
+    };
 
-      CATALOG_CACHE.set(cacheKey, { items: enriched, ranges });
-      setItems(enriched);
-      setPriceRanges(ranges);
+    (async () => {
+      // 1) First batch of items + all prices: render as soon as these land so
+      //    the grid appears in ~1 request instead of waiting for the whole
+      //    catalog (~6 batches) to download.
+      const [firstItems, firstPrices] = await Promise.all([
+        query("catalog_items", ITEM_COLUMNS, "id", 0, true),
+        query("catalog_price_ranges", PRICE_COLUMNS, "style_code", 0, true),
+      ]);
+      if (cancelled) return;
+
+      const itemRows = ((firstItems.data || []) as unknown) as CatalogItem[];
+      const itemTotal = firstItems.count ?? itemRows.length;
+      let allItems = enrich(itemRows);
+      let priceRows = ((firstPrices.data || []) as unknown) as any[];
+      const priceTotal = firstPrices.count ?? priceRows.length;
+
+      setItems(allItems);
+      setPriceRanges(toRanges(priceRows));
       setLoaded(true);
+
+      // 2) Remaining batches in parallel, then merge in one update.
+      const itemOffsets: number[] = [];
+      for (let from = STEP; from < itemTotal; from += STEP) itemOffsets.push(from);
+      const priceOffsets: number[] = [];
+      for (let from = STEP; from < priceTotal; from += STEP) priceOffsets.push(from);
+      if (!itemOffsets.length && !priceOffsets.length) {
+        CATALOG_CACHE.set(cacheKey, { items: allItems, ranges: toRanges(priceRows) });
+        return;
+      }
+
+      const [restItems, restPrices] = await Promise.all([
+        Promise.all(itemOffsets.map((from) => query("catalog_items", ITEM_COLUMNS, "id", from, false))),
+        Promise.all(
+          priceOffsets.map((from) => query("catalog_price_ranges", PRICE_COLUMNS, "style_code", from, false)),
+        ),
+      ]);
+      if (cancelled) return;
+
+      const extra: CatalogItem[] = [];
+      for (const p of restItems) if (!p.error && p.data) extra.push(...((p.data as unknown) as CatalogItem[]));
+      for (const p of restPrices) if (!p.error && p.data) priceRows = priceRows.concat(p.data as any[]);
+
+      allItems = allItems.concat(enrich(extra));
+      const ranges = toRanges(priceRows);
+      CATALOG_CACHE.set(cacheKey, { items: allItems, ranges });
+      setItems(allItems);
+      setPriceRanges(ranges);
     })();
 
     return () => {
       cancelled = true;
     };
   }, [lockedSource]);
+
 
 
   useEffect(() => {

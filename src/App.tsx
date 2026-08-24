@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,41 +10,46 @@ import { QuoteCartProvider } from "@/hooks/useQuoteCart";
 
 import QuoteCartButton from "@/components/quote/QuoteCartButton";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import RequestPage from "./pages/RequestPage.tsx";
 import Index from "./pages/Index.tsx";
-import CatalogPage from "./pages/CatalogPage.tsx";
-import CatalogItemPage from "./pages/CatalogItemPage.tsx";
-import StanleyStellaPage from "./pages/StanleyStellaPage.tsx";
-import NwgPage from "./pages/NwgPage.tsx";
-import PfConceptPage from "./pages/PfConceptPage.tsx";
-import BeechfieldBrandsPage from "./pages/BeechfieldBrandsPage.tsx";
-import MalfiniPage from "./pages/MalfiniPage.tsx";
-import AdminBeechfieldImport from "./pages/admin/AdminBeechfieldImport.tsx";
-import ProductDetailPage from "./pages/ProductDetailPage.tsx";
-import AboutPage from "./pages/AboutPage.tsx";
-import TechnologyPage from "./pages/TechnologyPage.tsx";
-import ContactPage from "./pages/ContactPage.tsx";
-import LoginPage from "./pages/LoginPage.tsx";
-import AdminDashboard from "./pages/admin/AdminDashboard.tsx";
-import AdminProducts from "./pages/admin/AdminProducts.tsx";
-import AdminProductForm from "./pages/admin/AdminProductForm.tsx";
-import AdminCategories from "./pages/admin/AdminCategories.tsx";
-import AdminQuotes from "./pages/admin/AdminQuotes.tsx";
-import AdminUsers from "./pages/admin/AdminUsers.tsx";
-import AdminTranslate from "./pages/admin/AdminTranslate.tsx";
-import AdminMegaMenu from "./pages/admin/AdminMegaMenu.tsx";
-import AdminPriceAudit from "./pages/admin/AdminPriceAudit.tsx";
-import AdminOffers from "./pages/admin/AdminOffers.tsx";
-import AdminOfferEdit from "./pages/admin/AdminOfferEdit.tsx";
-import OfferPage from "./pages/OfferPage.tsx";
-
-import NotFound from "./pages/NotFound.tsx";
-import PrivacyPage from "./pages/PrivacyPage.tsx";
-import TermsPage from "./pages/TermsPage.tsx";
 import ScrollToTop from "./components/ScrollToTop.tsx";
+
+// Everything except the landing page is code-split so the first visit only
+// downloads the home-page bundle instead of the whole app.
+const RequestPage = lazy(() => import("./pages/RequestPage.tsx"));
+const CatalogPage = lazy(() => import("./pages/CatalogPage.tsx"));
+const CatalogItemPage = lazy(() => import("./pages/CatalogItemPage.tsx"));
+const StanleyStellaPage = lazy(() => import("./pages/StanleyStellaPage.tsx"));
+const NwgPage = lazy(() => import("./pages/NwgPage.tsx"));
+const PfConceptPage = lazy(() => import("./pages/PfConceptPage.tsx"));
+const BeechfieldBrandsPage = lazy(() => import("./pages/BeechfieldBrandsPage.tsx"));
+const MalfiniPage = lazy(() => import("./pages/MalfiniPage.tsx"));
+const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage.tsx"));
+const AboutPage = lazy(() => import("./pages/AboutPage.tsx"));
+const TechnologyPage = lazy(() => import("./pages/TechnologyPage.tsx"));
+const ContactPage = lazy(() => import("./pages/ContactPage.tsx"));
+const LoginPage = lazy(() => import("./pages/LoginPage.tsx"));
+const OfferPage = lazy(() => import("./pages/OfferPage.tsx"));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage.tsx"));
+const TermsPage = lazy(() => import("./pages/TermsPage.tsx"));
+const NotFound = lazy(() => import("./pages/NotFound.tsx"));
+
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard.tsx"));
+const AdminProducts = lazy(() => import("./pages/admin/AdminProducts.tsx"));
+const AdminProductForm = lazy(() => import("./pages/admin/AdminProductForm.tsx"));
+const AdminCategories = lazy(() => import("./pages/admin/AdminCategories.tsx"));
+const AdminQuotes = lazy(() => import("./pages/admin/AdminQuotes.tsx"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers.tsx"));
+const AdminTranslate = lazy(() => import("./pages/admin/AdminTranslate.tsx"));
+const AdminMegaMenu = lazy(() => import("./pages/admin/AdminMegaMenu.tsx"));
+const AdminPriceAudit = lazy(() => import("./pages/admin/AdminPriceAudit.tsx"));
+const AdminOffers = lazy(() => import("./pages/admin/AdminOffers.tsx"));
+const AdminOfferEdit = lazy(() => import("./pages/admin/AdminOfferEdit.tsx"));
+const AdminBeechfieldImport = lazy(() => import("./pages/admin/AdminBeechfieldImport.tsx"));
 
 const queryClient = new QueryClient();
 const routerBase = import.meta.env.BASE_URL;
+
+const RouteFallback = () => <div className="min-h-[60svh]" />;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -56,6 +62,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter basename={routerBase}>
             <ScrollToTop />
+            <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/catalog" element={<CatalogPage />} />
@@ -91,6 +98,7 @@ const App = () => (
               <Route path="/admin/mega-menu" element={<ProtectedRoute><AdminMegaMenu /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            </Suspense>
             <QuoteCartButton />
             
           </BrowserRouter>

@@ -3,19 +3,36 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useRef } from "react";
-import heroModels from "@/assets/hero-models.jpg";
+import { useEffect, useRef, useState } from "react";
 const heroLoop = `${import.meta.env.BASE_URL}hero-loop.mp4`;
 const heroPoster = `${import.meta.env.BASE_URL}hero-poster.jpg`;
 
 const HeroSection = () => {
   const { lang } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
+  // The looping video is ~2.4 MB — never let it compete with first paint.
+  // The poster renders instantly and the video is attached once the browser
+  // is idle (or shortly after mount as a fallback).
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    const start = () => setVideoSrc(heroLoop);
+    const w = window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+    };
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(start, { timeout: 2500 });
+      return () => (window as any).cancelIdleCallback?.(id);
+    }
+    const t = window.setTimeout(start, 1200);
+    return () => window.clearTimeout(t);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
+
 
   // Parallax — background moves slower (0.2 factor)
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 160]);
@@ -32,22 +49,31 @@ const HeroSection = () => {
         style={{ y: bgY }}
         className="absolute inset-0 will-change-transform"
       >
-        {/* Video loop — full bleed */}
-        <video
-          src={heroLoop}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          poster={heroPoster}
+        {/* Poster paints immediately; video swaps in when idle */}
+        <img
+          src={heroPoster}
+          alt=""
+          aria-hidden="true"
+          width={1920}
+          height={1080}
+          fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover object-center opacity-80"
         />
+        {videoSrc && (
+          <video
+            src={videoSrc}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="none"
+            poster={heroPoster}
+            className="absolute inset-0 h-full w-full object-cover object-center opacity-80"
+          />
+        )}
 
-        {/* Legacy image fallback (hidden, kept for reference) */}
-        <div className="hidden">
-          <img src={heroModels} alt="" width={1920} height={1080} />
-        </div>
+
 
       </motion.div>
 
