@@ -27,11 +27,13 @@ type Tech = {
   id: string;
   name: { lv: string; en: string };
   tagline: { lv: string; en: string };
+  short: { lv: string; en: string };
   desc: { lv: string; en: string };
   features: { lv: string; en: string }[];
   specs: { label: { lv: string; en: string }; value: { lv: string; en: string } }[];
   images: string[];
 };
+
 
 const techs: Tech[] = [
   {
