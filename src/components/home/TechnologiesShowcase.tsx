@@ -77,21 +77,21 @@ const TechnologiesShowcase = () => {
           <div>
             <h3 className="font-heading text-2xl font-bold uppercase leading-tight text-foreground md:text-4xl">
               {isLv
-                ? "Garantējam precizitāti, kvalitāti un termiņus katrā pasūtījumā."
+                ? "UZTICAMS PARTNERIS\nJŪSU UZŅĒMUMA\nAPĢĒRBU PROJEKTIEM"
                 : "We guarantee accuracy, quality and delivery on every order."}
             </h3>
             <p className="mt-5 leading-relaxed text-muted-foreground">
               {isLv
-                ? "Ilggadēja pieredze, plašs realizēto projektu klāsts un liels produktu katalogs. Vienam kreklam vai lielai tirāžai — process ir tikpat rūpīgs."
+                ? "Pārbaudīti zīmoli, industriālas iekārtas un personīga projektu vadība — lai jūsu komandas vai pasākuma apģērbs tiktu izgatavots precīzi laikā."
                 : "Long-standing experience, a wide range of completed projects and a large product catalogue. One shirt or a large run — the process is just as careful."}
             </p>
             <ul className="mt-6 space-y-2.5">
               {(isLv
                 ? [
-                    "Bezmaksas dizaina pārbaude pirms ražošanas",
-                    "Digitāls apstiprinājums pirms drukas",
-                    "Pārbaudīta kvalitāte — Stanley/Stella, Malfini, Clique",
-                    "Precīzi termiņi, arī steidzamiem projektiem",
+                    "Uzticami partneri un tekstils — strādājam tikai ar pārbaudītiem apģērbu piegādātājiem",
+                    "Precīzi jūsu termiņi — vienmēr pielāgojamies jūsu grafikam un pasākuma datumam",
+                    "Individuāla pieeja prasībām — iedziļināmies detaļās un pirms ražošanas saskaņojam katru niansi",
+                    "Kvalitatīvas un drošas krāsas — noturīgi materiāli, kas saglabā toni un neplaisā pēc mazgāšanas",
                   ]
                 : [
                     "Free design review before production",
