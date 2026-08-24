@@ -2,6 +2,7 @@ import { forwardRef, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
+import { unproxyUrl } from "@/lib/imageProxy";
 
 
 /**
