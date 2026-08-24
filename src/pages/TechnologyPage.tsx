@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import Layout from "@/components/Layout";
 import ServiceImageCarousel from "@/components/services/ServiceImageCarousel";
+import TechRelatedProducts from "@/components/services/TechRelatedProducts";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 import { getTech, techs } from "@/data/technologies";
 
