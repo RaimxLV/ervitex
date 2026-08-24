@@ -4,7 +4,7 @@ import { Check, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { techs } from "@/data/technologies";
 
-import guaranteeImg from "@/assets/services/rt-hero.jpg";
+import guaranteeImg from "@/assets/partner-section.jpg.asset.json";
 
 const TechnologiesShowcase = () => {
   const { lang } = useLanguage();
