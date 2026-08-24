@@ -36,6 +36,7 @@ const CatalogItemPage = () => {
   const { lang } = useLanguage();
   const [meta, setMeta] = useState<RelatedItem | null>(null);
   const [related, setRelated] = useState<RelatedItem[]>([]);
+  const [prices, setPrices] = useState<Map<string, PriceInfo>>(new Map());
 
   const validSource = isValidSource(source) ? source : null;
 
@@ -57,17 +58,36 @@ const CatalogItemPage = () => {
       if (cur?.category) {
         const { data: rel } = await supabase
           .from("catalog_items" as any)
-          .select("source,id,name,brand,category,image_url,hover_image_url")
+          .select("source,id,name,brand,category,image_url,hover_image_url,colors")
           .eq("source", validSource)
           .eq("category", cur.category)
           .neq("id", id)
           .limit(12);
         if (cancelled) return;
-        setRelated(((rel || []) as unknown as RelatedItem[]).slice(0, 8));
+        const list = ((rel || []) as unknown as RelatedItem[]).slice(0, 8);
+        setRelated(list);
+
+        if (list.length) {
+          const { data: pr } = await supabase
+            .from("catalog_price_ranges" as any)
+            .select("source,style_code,min_price,max_price")
+            .eq("source", validSource)
+            .in("style_code", list.map((r) => r.id));
+          if (cancelled) return;
+          const map = new Map<string, PriceInfo>();
+          for (const row of (pr || []) as any[]) {
+            const min = Number(row.min_price);
+            const max = Number(row.max_price);
+            if (!Number.isFinite(min) || min <= 0) continue;
+            map.set(`${row.source}:${row.style_code}`, { price: min, max: Number.isFinite(max) ? max : min });
+          }
+          setPrices(map);
+        }
       }
     })();
     return () => { cancelled = true; };
   }, [validSource, id]);
+
 
   const t = useMemo(
     () => ({
