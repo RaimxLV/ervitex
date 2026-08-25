@@ -20,7 +20,7 @@ const HausmanaKvartalsMap = () => {
             ? "Braslas Biznesa Centra ēku plāns ar iezīmētu Ervitex ieeju"
             : "Braslas Business Center building plan with the Ervitex entrance marked"
         }
-        className="h-[400px] w-full object-contain p-3"
+        className="h-[300px] w-full object-contain p-3 sm:h-[400px]"
         loading="lazy"
       />
     </motion.div>
