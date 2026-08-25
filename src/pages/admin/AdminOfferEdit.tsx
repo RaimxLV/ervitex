@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { money, offerTotals, offerPlainText, offerUrl, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
+import { money, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
 import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Save, Search, Send, Trash2, Plus } from "lucide-react";
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
@@ -508,10 +508,10 @@ const AdminOfferEdit = () => {
               <Button size="sm" variant="outline" onClick={whatsapp}><MessageCircle className="mr-2 h-3 w-3" /> WhatsApp</Button>
               <Button size="sm" variant="outline" onClick={mail}><Mail className="mr-2 h-3 w-3" /> E-pasts</Button>
               <Button size="sm" variant="outline" asChild>
-                <a href={offer.token ? `/piedavajums/${offer.token}` : "#"} target="_blank" rel="noreferrer"><ExternalLink className="mr-2 h-3 w-3" /> Skatīt</a>
+                <a href={offer.token ? offerPath(offer.token) : "#"} target="_blank" rel="noreferrer"><ExternalLink className="mr-2 h-3 w-3" /> Skatīt</a>
               </Button>
               <Button size="sm" variant="outline" asChild>
-                <a href={offer.token ? `/piedavajums/${offer.token}?print=1` : "#"} target="_blank" rel="noreferrer"><Printer className="mr-2 h-3 w-3" /> Drukāt</a>
+                <a href={offer.token ? offerPath(offer.token, "?print=1") : "#"} target="_blank" rel="noreferrer"><Printer className="mr-2 h-3 w-3" /> Drukāt</a>
               </Button>
             </div>
           </div>
