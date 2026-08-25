@@ -185,11 +185,9 @@ const ContactPage = () => {
               <GoogleMapEmbed />
             </div>
             <div>
-              <p className="mb-3 font-heading text-xs font-bold uppercase text-muted-foreground">
-                {lang === "lv" ? "Ēku plāns — Hausmaņa Kvartāls" : "Building plan — Hausmaņa Kvartāls"}
-              </p>
               <HausmanaKvartalsMap />
             </div>
+
           </div>
         </div>
       </section>
