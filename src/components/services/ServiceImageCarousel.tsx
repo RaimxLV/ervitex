@@ -27,8 +27,12 @@ const ServiceImageCarousel = ({ images, alt }: ServiceImageCarouselProps) => {
           <img
             src={images[current]}
             alt={`${alt} ${current + 1}`}
+            loading={current === 0 ? "eager" : "lazy"}
+            decoding="async"
+            fetchPriority={current === 0 ? "high" : "low"}
             className="aspect-[16/10] w-full object-cover"
           />
+
         </div>
 
         {images.length > 1 && (
