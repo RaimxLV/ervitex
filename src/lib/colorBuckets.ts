@@ -135,11 +135,23 @@ const NAME_PATTERNS: [RegExp, ColorBucketKey][] = [
 
 ];
 
+/** Words that only describe the yarn texture, never the colour family. */
+const TEXTURE_WORDS = /\b(melange|melang[eé]?|melir\w*|marl|marmor\w*|heather\w*|mel\.)\b/gi;
+
 export function bucketFromName(name?: string | null): ColorBucketKey | null {
   if (!name) return null;
   for (const [re, k] of NAME_PATTERNS) if (re.test(name)) return k;
+  // "dark gray melange", "sunset melange" etc: drop the texture word and retry,
+  // so these still get a proper colour circle instead of being dropped.
+  const stripped = name.replace(TEXTURE_WORDS, " ").replace(/\s+/g, " ").trim();
+  if (stripped && stripped.toLowerCase() !== name.toLowerCase()) {
+    for (const [re, k] of NAME_PATTERNS) if (re.test(stripped)) return k;
+    if (stripped.length < 2) return "gray"; // bare "melange"
+  }
+  if (TEXTURE_WORDS.test(name)) return "gray";
   return null;
 }
+
 
 /** Combined: prefer HEX, fall back to name hint. */
 export function bucketOf(hex?: string | null, name?: string | null): ColorBucketKey | null {
