@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { money, offerTotals, offerPlainText, offerUrl, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
-import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Save, Search, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Save, Search, Send, Trash2, Plus } from "lucide-react";
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
 const sizeIdx = (s: string) => {
@@ -38,9 +39,11 @@ const emptyOffer: Offer = {
 const AdminOfferEdit = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [offer, setOffer] = useState<Offer>(emptyOffer);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState<"client" | "test" | null>(null);
 
   // --- product picker state
   const [q, setQ] = useState("");
@@ -199,6 +202,64 @@ const AdminOfferEdit = () => {
     const body = `${offer.client_name ? `Sveiki, ${offer.client_name}!\n\n` : ""}${offerPlainText(offer, "lv")}`;
     window.location.href = `mailto:${offer.client_email || ""}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
+
+  // Real send through the platform email system
+  const sendEmail = async (mode: "client" | "test") => {
+    const to = mode === "client" ? (offer.client_email || "").trim() : (user?.email || "").trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+      toast({
+        title: mode === "client" ? "Nav klienta e-pasta" : "Nav tava e-pasta",
+        description: mode === "client" ? "Ievadi klienta e-pastu un saglabā." : "Pieslēdzies ar e-pasta kontu.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (offer.items.length === 0) {
+      toast({ title: "Piedāvājums ir tukšs", variant: "destructive" });
+      return;
+    }
+
+    setSendingEmail(mode);
+    // Publish the link first so the client can open it
+    if (mode === "client") await save("sent");
+    else await save();
+
+    const t = offerTotals(offer.items, offer.vat_rate);
+    const { error } = await supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "pm-offer",
+        recipientEmail: to,
+        replyTo: "birojs@ervitex.lv",
+        idempotencyKey: `pm-offer-${offer.id}-${mode}-${Date.now()}`,
+        templateData: {
+          title: offer.title || "Ervitex piedāvājums",
+          clientName: offer.client_name || "",
+          note: offer.note || "",
+          items: offer.items.map((i) => ({
+            name: i.name,
+            code: i.code,
+            colorName: i.colorName,
+            size: i.size,
+            qty: i.qty,
+            unitPrice: i.unitPrice ? money(i.unitPrice) : null,
+            lineTotal: i.unitPrice ? money(i.unitPrice * i.qty) : "",
+          })),
+          totalQty: t.qty,
+          net: money(t.net),
+          vat: money(t.vat),
+          gross: money(t.gross),
+          vatRate: offer.vat_rate,
+          url: offer.token ? offerUrl(offer.token) : "",
+          disclaimer: PRINT_DISCLAIMER_LV,
+          isTest: mode === "test",
+        },
+      },
+    });
+    setSendingEmail(null);
+    if (error) toast({ title: "Neizdevās nosūtīt", description: error.message, variant: "destructive" });
+    else toast({ title: mode === "test" ? `Tests nosūtīts uz ${to}` : `Piedāvājums nosūtīts: ${to}` });
+  };
+
 
   if (loading) {
     return <AdminLayout><p className="py-10 text-center text-muted-foreground">Ielādē...</p></AdminLayout>;
@@ -418,7 +479,30 @@ const AdminOfferEdit = () => {
               <p className="text-xs text-amber-600">Saite darbosies tikai pēc “Publicēt saiti”.</p>
             )}
             <Input readOnly value={link} className="text-xs" onFocus={(e) => e.currentTarget.select()} />
+
+            <Button
+              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+              onClick={() => sendEmail("client")}
+              disabled={sendingEmail !== null || saving}
+            >
+              <Send className="mr-2 h-4 w-4" />
+              {sendingEmail === "client" ? "Sūta…" : "Nosūtīt piedāvājumu klientam"}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() => sendEmail("test")}
+              disabled={sendingEmail !== null || saving}
+            >
+              {sendingEmail === "test" ? "Sūta testu…" : `Nosūtīt testu${user?.email ? ` (${user.email})` : ""}`}
+            </Button>
+            <p className="text-[11px] text-muted-foreground">
+              Sūtot klientam, piedāvājums tiek saglabāts un saite automātiski publicēta.
+            </p>
+
             <div className="grid grid-cols-2 gap-2">
+
               <Button size="sm" variant="outline" onClick={() => copy(link, "Links")}><Copy className="mr-2 h-3 w-3" /> Saite</Button>
               <Button size="sm" variant="outline" onClick={() => copy(offerPlainText(offer, "lv"), "Teksts")}><Copy className="mr-2 h-3 w-3" /> Teksts</Button>
               <Button size="sm" variant="outline" onClick={whatsapp}><MessageCircle className="mr-2 h-3 w-3" /> WhatsApp</Button>
