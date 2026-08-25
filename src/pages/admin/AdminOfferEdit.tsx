@@ -38,9 +38,11 @@ const emptyOffer: Offer = {
 const AdminOfferEdit = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [offer, setOffer] = useState<Offer>(emptyOffer);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState<"client" | "test" | null>(null);
 
   // --- product picker state
   const [q, setQ] = useState("");
