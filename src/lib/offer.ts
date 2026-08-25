@@ -47,12 +47,18 @@ export const offerTotals = (items: OfferItem[], vatRate = VAT_DEFAULT) => {
 /** Publiskā, strādājošā lapas bāze (GitHub Pages), ko izmanto, ja nav pieejams window. */
 const PUBLIC_APP_BASE = "https://raimxlv.github.io/ervitex";
 
-/** Absolūta saite uz piedāvājumu — vienmēr uz to vietni, kur šī aplikācija tiešām ir publicēta. */
+/**
+ * Absolūta saite uz piedāvājumu klientam.
+ * Ja admins strādā uz publiskās vietnes (GitHub Pages / ervitex domēna), lieto to pašu hostu;
+ * citādi (Lovable preview u.c.) vienmēr lieto publisko GitHub Pages adresi, lai klientam saite strādā.
+ */
 export const offerUrl = (token: string) => {
-  const base =
-    typeof window !== "undefined"
-      ? `${window.location.origin}${import.meta.env.BASE_URL || "/"}`.replace(/\/+$/, "")
-      : PUBLIC_APP_BASE;
+  let base = PUBLIC_APP_BASE;
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    const isPublic = host.endsWith("github.io") || host.endsWith("ervitex.lv");
+    if (isPublic) base = `${window.location.origin}${import.meta.env.BASE_URL || "/"}`.replace(/\/+$/, "");
+  }
   return `${base}/piedavajums/${token}`;
 };
 
