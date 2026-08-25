@@ -310,6 +310,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const [items, setItems] = useState<EnrichedItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
   const [priceRanges, setPriceRanges] = useState<Map<string, { price: number; max: number; currency: string }>>(new Map());
 
 
@@ -397,12 +399,15 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (cached) {
       setItems(cached.items);
       setPriceRanges(cached.ranges);
+      setLoadError(false);
       setLoaded(true);
       return;
     }
 
     let cancelled = false;
     const STEP = 1000;
+    setLoaded(false);
+    setLoadError(false);
 
     const query = (table: string, columns: string, order: string, from: number, withCount: boolean) => {
       let q = supabase
@@ -412,6 +417,22 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         .range(from, from + STEP - 1);
       if (lockedSource) q = q.eq("source", lockedSource);
       return q;
+    };
+
+    const queryWithRetry = async (
+      table: string,
+      columns: string,
+      order: string,
+      from: number,
+      withCount: boolean,
+    ) => {
+      let result = await query(table, columns, order, from, withCount);
+      for (let attempt = 1; result.error && attempt < 3; attempt += 1) {
+        await new Promise((resolve) => window.setTimeout(resolve, attempt * 500));
+        if (cancelled) return result;
+        result = await query(table, columns, order, from, withCount);
+      }
+      return result;
     };
 
     const ITEM_COLUMNS =
@@ -469,13 +490,18 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       //    the grid appears in ~1 request instead of waiting for the whole
       //    catalog (~6 batches) to download.
       const [firstItems, firstPrices] = await Promise.all([
-        query("catalog_items", ITEM_COLUMNS, "id", 0, true),
-        query("catalog_price_ranges", PRICE_COLUMNS, "style_code", 0, true),
+        queryWithRetry("catalog_items", ITEM_COLUMNS, "id", 0, true),
+        queryWithRetry("catalog_price_ranges", PRICE_COLUMNS, "style_code", 0, true),
       ]);
       if (cancelled) return;
 
       const itemRows = ((firstItems.data || []) as unknown) as CatalogItem[];
       const itemTotal = firstItems.count ?? itemRows.length;
+      if (firstItems.error || (!lockedSource && itemTotal === 0)) {
+        setLoadError(true);
+        setLoaded(true);
+        return;
+      }
       let allItems = enrich(itemRows);
       let priceRows = ((firstPrices.data || []) as unknown) as any[];
       const priceTotal = firstPrices.count ?? priceRows.length;
@@ -495,9 +521,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       }
 
       const [restItems, restPrices] = await Promise.all([
-        Promise.all(itemOffsets.map((from) => query("catalog_items", ITEM_COLUMNS, "id", from, false))),
+        Promise.all(itemOffsets.map((from) => queryWithRetry("catalog_items", ITEM_COLUMNS, "id", from, false))),
         Promise.all(
-          priceOffsets.map((from) => query("catalog_price_ranges", PRICE_COLUMNS, "style_code", from, false)),
+          priceOffsets.map((from) => queryWithRetry("catalog_price_ranges", PRICE_COLUMNS, "style_code", from, false)),
         ),
       ]);
       if (cancelled) return;
@@ -511,12 +537,17 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       CATALOG_CACHE.set(cacheKey, { items: allItems, ranges });
       setItems(allItems);
       setPriceRanges(ranges);
-    })();
+    })().catch(() => {
+      if (!cancelled) {
+        setLoadError(true);
+        setLoaded(true);
+      }
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [lockedSource]);
+  }, [lockedSource, loadAttempt]);
 
 
 
@@ -547,6 +578,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       prev: lang === "lv" ? "Iepriekšējā" : "Previous",
       next: lang === "lv" ? "Nākamā" : "Next",
       request: lang === "lv" ? "Cena pēc pieprasījuma" : "Request quote",
+      loadFailed: lang === "lv" ? "Katalogu neizdevās ielādēt" : "Catalog could not be loaded",
+      retry: lang === "lv" ? "Mēģināt vēlreiz" : "Try again",
     }),
     [lang, title, subtitle]
   );
@@ -925,9 +958,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               <option value="price_asc">{lang === "lv" ? "Cena: zemākā vispirms" : "Price: low to high"}</option>
               <option value="price_desc">{lang === "lv" ? "Cena: augstākā vispirms" : "Price: high to low"}</option>
             </select>
-            <div className="w-full text-[11px] uppercase tracking-wider text-muted-foreground sm:ml-auto sm:w-auto sm:text-xs">
-              {filtered.length.toLocaleString(lang === "lv" ? "lv-LV" : "en-US")} {t.results}
-            </div>
+            {!loadError && (
+              <div className="w-full text-[11px] uppercase tracking-wider text-muted-foreground sm:ml-auto sm:w-auto sm:text-xs">
+                {filtered.length.toLocaleString(lang === "lv" ? "lv-LV" : "en-US")} {t.results}
+              </div>
+            )}
 
           </div>
         </div>
@@ -953,6 +988,17 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                     </div>
                   </div>
                 ))}
+              </div>
+            ) : loadError ? (
+              <div className="py-20 text-center">
+                <p className="text-lg text-muted-foreground">{t.loadFailed}</p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => setLoadAttempt((attempt) => attempt + 1)}
+                >
+                  {t.retry}
+                </Button>
               </div>
             ) : filtered.length === 0 ? (
               <div className="py-20 text-center">
