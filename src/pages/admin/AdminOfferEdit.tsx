@@ -200,6 +200,64 @@ const AdminOfferEdit = () => {
     window.location.href = `mailto:${offer.client_email || ""}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
+  // Real send through the platform email system
+  const sendEmail = async (mode: "client" | "test") => {
+    const to = mode === "client" ? (offer.client_email || "").trim() : (user?.email || "").trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+      toast({
+        title: mode === "client" ? "Nav klienta e-pasta" : "Nav tava e-pasta",
+        description: mode === "client" ? "Ievadi klienta e-pastu un saglabā." : "Pieslēdzies ar e-pasta kontu.",
+        variant: "destructive",
+      });
+      return;
+    }
+    if (offer.items.length === 0) {
+      toast({ title: "Piedāvājums ir tukšs", variant: "destructive" });
+      return;
+    }
+
+    setSendingEmail(mode);
+    // Publish the link first so the client can open it
+    if (mode === "client") await save("sent");
+    else await save();
+
+    const t = offerTotals(offer.items, offer.vat_rate);
+    const { error } = await supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "pm-offer",
+        recipientEmail: to,
+        replyTo: "birojs@ervitex.lv",
+        idempotencyKey: `pm-offer-${offer.id}-${mode}-${Date.now()}`,
+        templateData: {
+          title: offer.title || "Ervitex piedāvājums",
+          clientName: offer.client_name || "",
+          note: offer.note || "",
+          items: offer.items.map((i) => ({
+            name: i.name,
+            code: i.code,
+            colorName: i.colorName,
+            size: i.size,
+            qty: i.qty,
+            unitPrice: i.unitPrice ? money(i.unitPrice) : null,
+            lineTotal: i.unitPrice ? money(i.unitPrice * i.qty) : "",
+          })),
+          totalQty: t.qty,
+          net: money(t.net),
+          vat: money(t.vat),
+          gross: money(t.gross),
+          vatRate: offer.vat_rate,
+          url: offer.token ? offerUrl(offer.token) : "",
+          disclaimer: PRINT_DISCLAIMER_LV,
+          isTest: mode === "test",
+        },
+      },
+    });
+    setSendingEmail(null);
+    if (error) toast({ title: "Neizdevās nosūtīt", description: error.message, variant: "destructive" });
+    else toast({ title: mode === "test" ? `Tests nosūtīts uz ${to}` : `Piedāvājums nosūtīts: ${to}` });
+  };
+
+
   if (loading) {
     return <AdminLayout><p className="py-10 text-center text-muted-foreground">Ielādē...</p></AdminLayout>;
   }
