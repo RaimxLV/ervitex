@@ -39,6 +39,9 @@ const sanitizeHex = (
 ): string | null => {
   const raw = (hex ?? "").trim().toLowerCase();
   const valid = raw && VALID_HEX.test(raw) ? raw : null;
+  // Multicolour/melange names have no single hex — hand the palette gradient to
+  // the card so the swatch still renders instead of being dropped.
+  if (bucket === "multi" && !valid) return getBucket("multi").hex;
   // If the stored hex is a known placeholder OR its color family disagrees
   // with the name-derived bucket, fall back to the palette hex.
   if (bucket && bucket !== "multi") {
@@ -51,6 +54,7 @@ const sanitizeHex = (
     }
   }
   return valid;
+
 };
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
