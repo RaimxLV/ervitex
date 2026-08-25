@@ -20,16 +20,9 @@ const HausmanaKvartalsMap = () => {
             ? "Braslas Biznesa Centra ēku plāns ar iezīmētu Ervitex ieeju"
             : "Braslas Business Center building plan with the Ervitex entrance marked"
         }
-        className="w-full h-auto"
+        className="h-[300px] w-full object-contain p-3 sm:h-[400px]"
         loading="lazy"
       />
-      {/* Marker over the highlighted entrance */}
-      <div className="pointer-events-none absolute left-[17%] top-[44%] -translate-x-1/2 -translate-y-1/2">
-        <span className="relative flex h-3 w-3">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-          <span className="relative inline-flex h-3 w-3 rounded-full bg-primary" />
-        </span>
-      </div>
     </motion.div>
   );
 };

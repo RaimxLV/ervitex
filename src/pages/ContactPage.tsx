@@ -177,7 +177,7 @@ const ContactPage = () => {
             </p>
           </motion.div>
 
-          <div className="grid gap-8 lg:grid-cols-2">
+          <div className="grid items-start gap-8 lg:grid-cols-2">
             <div>
               <p className="mb-3 font-heading text-xs font-bold uppercase text-muted-foreground">
                 {lang === "lv" ? "Atrašanās vieta kartē" : "Location on map"}
@@ -185,9 +185,11 @@ const ContactPage = () => {
               <GoogleMapEmbed />
             </div>
             <div>
+              <p className="mb-3 font-heading text-xs font-bold uppercase text-muted-foreground">
+                {lang === "lv" ? "Ieeja D · 2. stāvs" : "Entrance D · 2nd floor"}
+              </p>
               <HausmanaKvartalsMap />
             </div>
-
           </div>
         </div>
       </section>
