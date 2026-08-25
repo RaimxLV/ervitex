@@ -479,7 +479,30 @@ const AdminOfferEdit = () => {
               <p className="text-xs text-amber-600">Saite darbosies tikai pēc “Publicēt saiti”.</p>
             )}
             <Input readOnly value={link} className="text-xs" onFocus={(e) => e.currentTarget.select()} />
+
+            <Button
+              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+              onClick={() => sendEmail("client")}
+              disabled={sendingEmail !== null || saving}
+            >
+              <Send className="mr-2 h-4 w-4" />
+              {sendingEmail === "client" ? "Sūta…" : "Nosūtīt piedāvājumu klientam"}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() => sendEmail("test")}
+              disabled={sendingEmail !== null || saving}
+            >
+              {sendingEmail === "test" ? "Sūta testu…" : `Nosūtīt testu${user?.email ? ` (${user.email})` : ""}`}
+            </Button>
+            <p className="text-[11px] text-muted-foreground">
+              Sūtot klientam, piedāvājums tiek saglabāts un saite automātiski publicēta.
+            </p>
+
             <div className="grid grid-cols-2 gap-2">
+
               <Button size="sm" variant="outline" onClick={() => copy(link, "Links")}><Copy className="mr-2 h-3 w-3" /> Saite</Button>
               <Button size="sm" variant="outline" onClick={() => copy(offerPlainText(offer, "lv"), "Teksts")}><Copy className="mr-2 h-3 w-3" /> Teksts</Button>
               <Button size="sm" variant="outline" onClick={whatsapp}><MessageCircle className="mr-2 h-3 w-3" /> WhatsApp</Button>
