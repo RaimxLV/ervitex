@@ -145,7 +145,7 @@ export function bucketFromName(name?: string | null): ColorBucketKey | null {
   for (const [re, k] of NAME_PATTERNS) if (re.test(name)) return k;
   // "dark gray melange", "sunset melange" etc: drop the texture word and retry,
   // so these still get a proper colour circle instead of being dropped.
-  const stripped = name.replace(TEXTURE_WORDS, " ").replace(/\s+/g, " ").trim();
+  const stripped = name.replace(TEXTURE_WORDS_G, " ").replace(/\s+/g, " ").trim();
   if (stripped && stripped.toLowerCase() !== name.toLowerCase()) {
     for (const [re, k] of NAME_PATTERNS) if (re.test(stripped)) return k;
     if (stripped.length < 2) return "gray"; // bare "melange"
