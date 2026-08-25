@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { money, offerTotals, offerPlainText, offerUrl, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
-import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Save, Search, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Save, Search, Send, Trash2, Plus } from "lucide-react";
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
 const sizeIdx = (s: string) => {
