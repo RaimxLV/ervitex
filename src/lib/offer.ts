@@ -44,7 +44,27 @@ export const offerTotals = (items: OfferItem[], vatRate = VAT_DEFAULT) => {
   return { net, vat, gross: round2(net + vat), qty: items.reduce((s, i) => s + i.qty, 0) };
 };
 
-export const offerUrl = (token: string) => `https://www.ervitex.lv/piedavajums/${token}`;
+/** Publiskā, strādājošā lapas bāze (GitHub Pages), ko izmanto, ja nav pieejams window. */
+const PUBLIC_APP_BASE = "https://raimxlv.github.io/ervitex";
+
+/**
+ * Absolūta saite uz piedāvājumu klientam.
+ * Ja admins strādā uz publiskās vietnes (GitHub Pages / ervitex domēna), lieto to pašu hostu;
+ * citādi (Lovable preview u.c.) vienmēr lieto publisko GitHub Pages adresi, lai klientam saite strādā.
+ */
+export const offerUrl = (token: string) => {
+  let base = PUBLIC_APP_BASE;
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname;
+    const isPublic = host.endsWith("github.io") || host.endsWith("ervitex.lv");
+    if (isPublic) base = `${window.location.origin}${import.meta.env.BASE_URL || "/"}`.replace(/\/+$/, "");
+  }
+  return `${base}/piedavajums/${token}`;
+};
+
+/** Relatīva saite (ņem vērā GitHub Pages apakšceļu) — priekš iekšējiem `<a href>`. */
+export const offerPath = (token: string, search = "") =>
+  `${(import.meta.env.BASE_URL || "/").replace(/\/+$/, "")}/piedavajums/${token}${search}`;
 
 export const PRINT_DISCLAIMER_LV =
   "Norādītās cenas ir par apģērbu/preci bez apdrukas. Apdrukas (DTF, sietspiede, sublimācija) un izšuvumu izmaksas tiek aprēķinātas atsevišķi — atkarībā no izvēlētās tehnoloģijas, izmēra, krāsu skaita un tirāžas. Cenas ir informatīvas un spēkā 14 dienas, ja nav norādīts citādi.";
