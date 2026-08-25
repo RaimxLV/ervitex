@@ -165,18 +165,41 @@ const TechRelatedProducts = ({ techId }: { techId: string }) => {
   const isLv = lang === "lv";
   const [items, setItems] = useState<Row[]>([]);
   const [prices, setPrices] = useState<Map<string, PriceInfo>>(new Map());
+  const [visible, setVisible] = useState(false);
+  const [sentinel, setSentinel] = useState<HTMLDivElement | null>(null);
   const conf = TECH_CATEGORIES[techId];
 
+  // Only fetch once the section is close to the viewport, so the technology page
+  // itself paints immediately instead of waiting on the catalog query.
   useEffect(() => {
-    if (!conf) return;
+    if (!sentinel || visible) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) setVisible(true);
+      },
+      { rootMargin: "600px 0px" },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [sentinel, visible]);
+
+  useEffect(() => {
+    if (!conf || !visible) return;
     let cancelled = false;
     (async () => {
+      // Keep the payload small: a random slice of matching models is plenty for 4 cards.
+      const offset = Math.floor(Math.random() * 6) * 24;
       const { data } = await supabase
         .from("catalog_items" as any)
         .select("source,id,name,brand,category,image_url,hover_image_url,colors")
         .in("category", conf.cats)
         .not("image_url", "is", null)
-        .limit(200);
+        .order("id")
+        .range(offset, offset + 23);
       if (cancelled) return;
       const rows = ((data || []) as unknown as Row[]).filter((r) => r.name && r.image_url);
       const picked = pickRandom(rows, 4);
@@ -201,9 +224,11 @@ const TechRelatedProducts = ({ techId }: { techId: string }) => {
     return () => {
       cancelled = true;
     };
-  }, [techId, conf]);
+  }, [techId, conf, visible]);
 
-  if (!conf || items.length === 0) return null;
+  if (!conf) return null;
+  if (items.length === 0) return <div ref={setSentinel} className="h-1" aria-hidden />;
+
 
   return (
     <div className="mt-16 border-t border-border pt-12 md:mt-24">
