@@ -108,7 +108,7 @@ export function bucketFromHex(hex?: string | null): ColorBucketKey | null {
 
 // Name-based hints for colors that arrive without hex (or with a wrong hex).
 const NAME_PATTERNS: [RegExp, ColorBucketKey][] = [
-  [/multi|mix|assort|print|melang|melir|marm|floral|camo|stripe|check|plaid|jacquard/i, "multi"],
+  [/multi|mix|assort|floral|camo|camouflage|leopard|zebra|stripe|check|plaid|jacquard|print/i, "multi"],
   [/navy|marine|indig|dark ?blue|nakts/i, "navy"],
   [/turquois|teal|petrol|aqua|sky|light ?blue|cyan|zils|blue|bleu|blau|azzur|kobalt|cobalt|royal|denim|jean/i, "blue"],
   [/black|noir|schwarz|nero|melns|anthrac|onyx|coal|carbon|jet/i, "black"],
