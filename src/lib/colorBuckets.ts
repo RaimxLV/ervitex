@@ -136,7 +136,9 @@ const NAME_PATTERNS: [RegExp, ColorBucketKey][] = [
 ];
 
 /** Words that only describe the yarn texture, never the colour family. */
-const TEXTURE_WORDS = /\b(melange|melang[eé]?|melir\w*|marl|marmor\w*|heather\w*|mel\.)\b/gi;
+const TEXTURE_WORDS = /\b(melange|melang[eé]?|melir\w*|marl|marmor\w*|heather\w*|mel\.)\b/i;
+const TEXTURE_WORDS_G = new RegExp(TEXTURE_WORDS.source, "gi");
+
 
 export function bucketFromName(name?: string | null): ColorBucketKey | null {
   if (!name) return null;
