@@ -75,7 +75,7 @@ const GoogleMapEmbed = () => {
     >
       {/* Map */}
       <div className="relative overflow-hidden rounded-sm border border-border z-0">
-        <div ref={mapRef} className="w-full" style={{ height: 400, zIndex: 0 }} />
+        <div ref={mapRef} className="h-[300px] w-full sm:h-[400px]" style={{ zIndex: 0 }} />
         <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-sm bg-primary/95 px-4 py-2.5 shadow-lg backdrop-blur-sm z-[1000]">
           <div className="h-3 w-3 rounded-full bg-accent animate-pulse" />
           <div>
