@@ -131,6 +131,10 @@ const NAME_PATTERNS: [RegExp, ColorBucketKey][] = [
   [/mandarine|mango|sunset|pumpkin|campfire/i, "orange"],
   [/sunflower|saffron/i, "yellow"],
   [/lavendar/i, "purple"],
+  // Fantasy/pattern names and brand labels used by some partners.
+  [/rocky peaks|arctic dawn|milkshake|dawn|peaks/i, "multi"],
+  [/malfini|rimeck|logo|brand label/i, "gray"],
+
 
 
 ];
