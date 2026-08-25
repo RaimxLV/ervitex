@@ -5,11 +5,13 @@ import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
 import { unproxyUrl } from "@/lib/imageProxy";
 
 
+const VALID_HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
+
 /**
  * Given a color name like "Black/Lime Green" and an optional stored hex,
  * return 1 or 2 display hexes so multi-tone products don't show as a single
  * flat swatch. Falls back to name-based bucket lookup when the stored hex is
- * missing or clearly generic.
+ * missing, invalid (some partners store "#Black") or clearly generic.
  */
 function displayHexes(name: string, hex?: string | null): string[] {
   const parts = (name || "")
@@ -32,7 +34,9 @@ function displayHexes(name: string, hex?: string | null): string[] {
   }
 
   const provided = (hex || "").trim();
-  if (provided && provided.length >= 4) {
+  // Only trust real hex values — partner feeds sometimes contain "#Black",
+  // which CSS ignores and renders as an empty (white) circle.
+  if (VALID_HEX.test(provided)) {
     // Sanity check: if provided hex doesn't match the name bucket at all,
     // prefer the name-based hex (e.g. "Lime Green" stored as #000000).
     const nameBucket = bucketFromName(name);
@@ -43,8 +47,20 @@ function displayHexes(name: string, hex?: string | null): string[] {
     return [provided];
   }
   const nb = bucketFromName(name);
-  return nb && nb !== "multi" ? [getBucket(nb).hex] : ["#ccc"];
+  if (nb === "multi") return ["MULTI"];
+  return nb ? [getBucket(nb).hex] : ["#ccc"];
 }
+
+/** Background style for one swatch circle (single, two-tone or multicolour). */
+function swatchBackground(name: string, hex?: string | null): React.CSSProperties {
+  if ((hex || "").startsWith("linear-gradient")) return { background: hex as string };
+  const hexes = displayHexes(name, hex);
+  if (hexes[0] === "MULTI") return { background: getBucket("multi").hex };
+  return hexes[1]
+    ? { background: `linear-gradient(90deg, ${hexes[0]} 0 50%, ${hexes[1]} 50% 100%)` }
+    : { backgroundColor: hexes[0] };
+}
+
 
 
 
@@ -214,9 +230,8 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
                 };
                 const isLight = isLightHex(primary) && (!secondary || isLightHex(secondary));
                 const clickable = !!s.onSelect;
-                const bgStyle: React.CSSProperties = secondary
-                  ? { background: `linear-gradient(90deg, ${primary} 0 50%, ${secondary} 50% 100%)` }
-                  : { backgroundColor: primary };
+                const bgStyle: React.CSSProperties = swatchBackground(s.name, s.hex);
+
                 return (
                   <span
                     key={`${s.name}-${i}`}

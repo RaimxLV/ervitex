@@ -34,6 +34,7 @@ const sanitizeHex = (
 ): string | null => {
   const raw = (hex ?? "").trim().toLowerCase();
   const valid = raw && VALID_HEX.test(raw) ? raw : null;
+  if (bucket === "multi" && !valid) return getBucket("multi").hex;
   if (bucket && bucket !== "multi") {
     if (!valid) return getBucket(bucket).hex;
     if (PLACEHOLDER_HEX.has(valid)) {
@@ -42,6 +43,7 @@ const sanitizeHex = (
     }
   }
   return valid;
+
 };
 
 /** Raw catalog categories that make sense for each print technology. */
