@@ -230,9 +230,8 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
                 };
                 const isLight = isLightHex(primary) && (!secondary || isLightHex(secondary));
                 const clickable = !!s.onSelect;
-                const bgStyle: React.CSSProperties = secondary
-                  ? { background: `linear-gradient(90deg, ${primary} 0 50%, ${secondary} 50% 100%)` }
-                  : { backgroundColor: primary };
+                const bgStyle: React.CSSProperties = swatchBackground(s.name, s.hex);
+
                 return (
                   <span
                     key={`${s.name}-${i}`}
