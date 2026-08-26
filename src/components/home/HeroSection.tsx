@@ -6,12 +6,18 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCallback, useRef } from "react";
 
 import bgLayer from "@/assets/hero/layer-bg.jpg";
-import rockLayer from "@/assets/hero/layer-rock.png";
-import jacketImg from "@/assets/hero/jacket.png";
-import hoodieImg from "@/assets/hero/hoodie.png";
-import pantsImg from "@/assets/hero/pants.png";
-import sneakerImg from "@/assets/hero/sneaker.png";
-import teesImg from "@/assets/hero/tee-oversized.png";
+import rockLayer from "@/assets/hero/layer-rock-hero.webp";
+import rockLayerSm from "@/assets/hero/layer-rock-hero-sm.webp";
+import jacketImg from "@/assets/hero/jacket-hero.webp";
+import jacketImgSm from "@/assets/hero/jacket-hero-sm.webp";
+import hoodieImg from "@/assets/hero/hoodie-hero.webp";
+import hoodieImgSm from "@/assets/hero/hoodie-hero-sm.webp";
+import pantsImg from "@/assets/hero/pants-hero.webp";
+import pantsImgSm from "@/assets/hero/pants-hero-sm.webp";
+import sneakerImg from "@/assets/hero/sneaker-hero.webp";
+import sneakerImgSm from "@/assets/hero/sneaker-hero-sm.webp";
+import teesImg from "@/assets/hero/tee-oversized-hero.webp";
+import teesImgSm from "@/assets/hero/tee-oversized-hero-sm.webp";
 
 /**
  * Multi-layer parallax hero.
@@ -21,6 +27,7 @@ import teesImg from "@/assets/hero/tee-oversized.png";
 
 type Item = {
   src: string;
+  mobileSrc: string;
   alt: string;
   /** tailwind position + size classes */
   className: string;
@@ -35,8 +42,9 @@ type Item = {
 const items: Item[] = [
   {
     src: jacketImg,
+    mobileSrc: jacketImgSm,
     alt: "",
-    className: "right-[6%] top-[8%] w-[42vw] max-w-[620px] md:w-[34vw]",
+    className: "right-[-38%] top-[8%] w-[72vw] max-w-[620px] sm:right-[-10%] sm:w-[62vw] md:right-[6%] md:top-[8%] md:w-[34vw]",
     push: [-46, -26],
     float: 9,
     rotate: -3,
@@ -44,8 +52,9 @@ const items: Item[] = [
   },
   {
     src: pantsImg,
+    mobileSrc: pantsImgSm,
     alt: "",
-    className: "right-[2%] bottom-[2%] w-[45vw] max-w-[645px] md:w-[36vw]",
+    className: "right-[-36%] bottom-[-2%] w-[72vw] max-w-[645px] sm:right-[-12%] sm:w-[64vw] md:right-[2%] md:bottom-[2%] md:w-[36vw]",
     push: [34, 22],
     float: 11,
     rotate: 4,
@@ -53,8 +62,9 @@ const items: Item[] = [
   },
   {
     src: hoodieImg,
+    mobileSrc: hoodieImgSm,
     alt: "",
-    className: "right-[27%] top-[30%] w-[39vw] max-w-[540px] md:w-[30vw] brightness-125",
+    className: "right-[-8%] top-[40%] w-[52vw] max-w-[540px] brightness-125 sm:right-[18%] sm:top-[28%] sm:w-[54vw] md:right-[27%] md:top-[30%] md:w-[30vw]",
     push: [-28, 34],
     float: 8,
     rotate: -6,
@@ -62,8 +72,9 @@ const items: Item[] = [
   },
   {
     src: teesImg,
+    mobileSrc: teesImgSm,
     alt: "",
-    className: "right-[24%] bottom-[4%] w-[42vw] max-w-[600px] md:w-[32vw]",
+    className: "right-[-18%] bottom-[12%] w-[52vw] max-w-[600px] sm:right-[2%] sm:bottom-[20%] sm:w-[52vw] md:right-[24%] md:bottom-[4%] md:w-[32vw]",
     push: [26, -18],
     float: 10,
     rotate: 3,
@@ -71,6 +82,7 @@ const items: Item[] = [
   },
   {
     src: sneakerImg,
+    mobileSrc: sneakerImgSm,
     alt: "",
     className: "right-[43%] bottom-[18%] w-[24vw] max-w-[300px] md:w-[17vw] hidden lg:block",
     push: [-20, -30],
@@ -174,18 +186,23 @@ const HeroSection = () => {
         style={{ y: rockY, x: rockX, translateY: rockYm }}
         className="absolute inset-0 pointer-events-none will-change-transform"
       >
-        <motion.img
-          src={rockLayer}
-          alt=""
-          aria-hidden="true"
-          width={1536}
-          height={1024}
-          decoding="async"
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 0.95, y: 0 }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute right-[-6%] bottom-[-6%] w-[72vw] max-w-[1100px] select-none"
-        />
+        <picture>
+          <source srcSet={rockLayerSm} media="(max-width: 767px)" />
+          <motion.img
+            src={rockLayer}
+            alt=""
+            aria-hidden="true"
+            width={1200}
+            height={800}
+            decoding="async"
+            loading="eager"
+            fetchPriority="high"
+            initial={false}
+            animate={{ opacity: 0.95, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute right-[-34%] bottom-[-4%] w-[100vw] max-w-[1100px] select-none sm:right-[-14%] sm:w-[86vw] md:right-[-6%] md:bottom-[-6%] md:w-[72vw]"
+          />
+        </picture>
       </motion.div>
 
       {/* ── Layer 4: garments that flee the cursor ── */}
@@ -224,7 +241,14 @@ const HeroSection = () => {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to right, hsl(var(--primary) / 0.92) 0%, hsl(var(--primary) / 0.75) 26%, hsl(var(--primary) / 0.3) 52%, transparent 72%)",
+            "linear-gradient(to right, hsl(var(--primary) / 0.94) 0%, hsl(var(--primary) / 0.82) 38%, hsl(var(--primary) / 0.42) 66%, transparent 86%)",
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none md:hidden"
+        style={{
+          background:
+            "linear-gradient(to bottom, hsl(var(--primary) / 0.2) 0%, hsl(var(--primary) / 0.58) 36%, hsl(var(--primary) / 0.9) 86%, hsl(var(--primary) / 0.98) 100%)",
         }}
       />
 
@@ -235,8 +259,8 @@ const HeroSection = () => {
       />
 
       {/* ── Content ── */}
-      <div className="container relative z-10 py-20">
-        <div className="max-w-3xl">
+       <div className="container relative z-10 py-20 sm:py-24">
+        <div className="max-w-[min(37rem,86vw)] md:max-w-3xl">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -255,8 +279,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="font-heading text-4xl font-bold leading-[0.95] text-primary-foreground sm:text-5xl md:text-7xl lg:text-[5.5rem]"
-            style={{ letterSpacing: "-0.04em" }}
+            className="font-heading text-[2.55rem] font-bold leading-[0.98] text-primary-foreground sm:text-5xl md:text-7xl lg:text-[5.5rem]"
           >
             {lang === "lv" ? "Tekstila" : "Textile"}
             <br />
@@ -272,7 +295,7 @@ const HeroSection = () => {
           </motion.h1>
 
           {/* Subtitle */}
-          <p className="mt-6 max-w-md text-sm leading-relaxed text-primary-foreground/50 md:text-base">
+          <p className="mt-6 max-w-[22rem] text-sm leading-relaxed text-primary-foreground/55 md:max-w-md md:text-base">
             {lang === "lv" ? (
               <>
                 <span className="block font-heading font-bold uppercase tracking-wide text-primary-foreground">
@@ -299,11 +322,11 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
-            className="mt-10 flex flex-wrap gap-4"
+            className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4"
           >
             <Button
               size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase rounded-none px-14 py-4 h-14 min-w-[220px] justify-center shadow-[0_0_30px_hsl(var(--accent)/0.3)]"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase rounded-none px-8 py-4 h-14 w-full justify-center shadow-[0_0_30px_hsl(var(--accent)/0.3)] sm:w-auto sm:min-w-[220px] sm:px-14"
               asChild
             >
               <Link to="/catalog">
@@ -314,7 +337,7 @@ const HeroSection = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent hover:text-accent font-heading text-xs uppercase rounded-none px-14 py-4 h-14 min-w-[220px] justify-center"
+              className="border border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent hover:text-accent font-heading text-xs uppercase rounded-none px-8 py-4 h-14 w-full justify-center sm:w-auto sm:min-w-[220px] sm:px-14"
               asChild
             >
               <Link to="/services">
@@ -324,7 +347,7 @@ const HeroSection = () => {
           </motion.div>
 
           {/* Stats */}
-          <div className="mt-14 flex gap-10 border-t border-primary-foreground/10 pt-7">
+          <div className="mt-10 grid max-w-[23rem] grid-cols-3 gap-4 border-t border-primary-foreground/10 pt-6 sm:mt-14 sm:flex sm:max-w-none sm:gap-10 sm:pt-7">
             {[
               { value: "20+", label: lang === "lv" ? "Gadi pieredzē" : "Years Experience" },
               { value: "3000+", label: lang === "lv" ? "Produkti" : "Products" },
@@ -377,18 +400,23 @@ const ParallaxItem = ({ item, mx, my }: { item: Item; mx: MV; my: MV }) => {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 1, delay: item.delay ?? 0, ease: [0.22, 1, 0.36, 1] }}
       >
-        <motion.img
-          src={item.src}
-          alt={item.alt}
-          aria-hidden="true"
-          width={1024}
-          height={1024}
-          decoding="async"
-          className="h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)]"
-          style={{ rotate: item.rotate ?? 0 }}
-          animate={{ y: [0, -14, 0] }}
-          transition={{ duration: item.float, repeat: Infinity, ease: "easeInOut" }}
-        />
+        <picture>
+          <source srcSet={item.mobileSrc} media="(max-width: 767px)" />
+          <motion.img
+            src={item.src}
+            alt={item.alt}
+            aria-hidden="true"
+            width={900}
+            height={900}
+            decoding="async"
+            loading="eager"
+            fetchPriority="high"
+            className="h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)]"
+            style={{ rotate: item.rotate ?? 0 }}
+            animate={{ y: [0, -14, 0] }}
+            transition={{ duration: item.float, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </picture>
       </motion.div>
     </motion.div>
   );
