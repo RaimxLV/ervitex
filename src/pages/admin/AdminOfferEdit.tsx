@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { money, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
+import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
 import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Save, Search, Send, Trash2, Plus } from "lucide-react";
+
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
 const sizeIdx = (s: string) => {
@@ -59,10 +61,20 @@ const AdminOfferEdit = () => {
     (async () => {
       const { data, error } = await supabase.from("pm_offers").select("*").eq("id", id!).maybeSingle();
       if (error) toast({ title: "Kļūda", description: error.message, variant: "destructive" });
-      else if (data) setOffer({ ...(data as any), items: ((data as any).items || []) as OfferItem[] });
+      else if (data) {
+        const row = data as any;
+        const me = PROJECT_MANAGERS.find((p) => p.email.toLowerCase() === (user?.email || "").toLowerCase());
+        setOffer({
+          ...row,
+          items: (row.items || []) as OfferItem[],
+          pm_email: row.pm_email || me?.email || user?.email || OFFICE_EMAIL,
+          pm_name: row.pm_name || me?.name || "",
+        });
+      }
       setLoading(false);
     })();
-  }, [id]);
+  }, [id, user?.email]);
+
 
   // debounce search
   useEffect(() => {
@@ -171,14 +183,17 @@ const AdminOfferEdit = () => {
         note: next.note,
         status: next.status,
         vat_rate: next.vat_rate,
+        pm_name: next.pm_name || null,
+        pm_email: next.pm_email || null,
         items: next.items as any,
-      })
+      } as any)
       .eq("id", offer.id);
     setSaving(false);
     if (error) return toast({ title: "Kļūda", description: error.message, variant: "destructive" });
     setOffer(next);
     toast({ title: status === "sent" ? "Saglabāts un gatavs sūtīšanai" : "Saglabāts" });
   };
+
 
   const link = offer.token ? offerUrl(offer.token) : "";
 
@@ -225,16 +240,21 @@ const AdminOfferEdit = () => {
     else await save();
 
     const t = offerTotals(offer.items, offer.vat_rate);
+    const pmEmail = (offer.pm_email || user?.email || OFFICE_EMAIL).trim();
+    const pmName = offer.pm_name || "";
     const { error } = await supabase.functions.invoke("send-transactional-email", {
       body: {
         templateName: "pm-offer",
         recipientEmail: to,
-        replyTo: "birojs@ervitex.lv",
+        replyTo: pmEmail,
         idempotencyKey: `pm-offer-${offer.id}-${mode}-${Date.now()}`,
         templateData: {
           title: offer.title || "Ervitex piedāvājums",
           clientName: offer.client_name || "",
           note: offer.note || "",
+          pmName,
+          pmEmail,
+
           items: offer.items.map((i) => ({
             name: i.name,
             code: i.code,
@@ -323,10 +343,36 @@ const AdminOfferEdit = () => {
                 <Label className="text-xs">PVN %</Label>
                 <Input type="number" value={offer.vat_rate} onChange={(e) => setOffer({ ...offer, vat_rate: Number(e.target.value) || 0 })} />
               </div>
+              <div>
+                <Label className="text-xs">Projektu vadītājs (atbildes saņēmējs)</Label>
+                <Select
+                  value={offer.pm_email || OFFICE_EMAIL}
+                  onValueChange={(v) =>
+                    setOffer({
+                      ...offer,
+                      pm_email: v,
+                      pm_name: PROJECT_MANAGERS.find((p) => p.email === v)?.name || (v === OFFICE_EMAIL ? "Ervitex birojs" : offer.pm_name || ""),
+                    })
+                  }
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {PROJECT_MANAGERS.map((p) => (
+                      <SelectItem key={p.email} value={p.email}>{p.name} · {p.email}</SelectItem>
+                    ))}
+                    <SelectItem value={OFFICE_EMAIL}>Ervitex birojs · {OFFICE_EMAIL}</SelectItem>
+                    {offer.pm_email && !PROJECT_MANAGERS.some((p) => p.email === offer.pm_email) && offer.pm_email !== OFFICE_EMAIL && (
+                      <SelectItem value={offer.pm_email}>{offer.pm_email}</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="mt-1 text-[11px] text-muted-foreground">Klienta atbilde e-pastā nonāks šeit.</p>
+              </div>
               <div className="sm:col-span-2">
                 <Label className="text-xs">Piezīme klientam</Label>
                 <Textarea rows={3} value={offer.note || ""} onChange={(e) => setOffer({ ...offer, note: e.target.value })} placeholder="Apdrukas veids, izmērs, termiņi…" />
               </div>
+
             </div>
           </section>
 

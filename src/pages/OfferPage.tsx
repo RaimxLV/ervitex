@@ -7,7 +7,7 @@ import {
   money, offerTotals, offerPlainText, type Offer, type OfferItem,
   PRINT_DISCLAIMER_LV, PRINT_DISCLAIMER_EN,
 } from "@/lib/offer";
-import { Printer, MessageCircle, Mail, ClipboardList } from "lucide-react";
+import { Printer, MessageCircle, Mail, ClipboardList, ArrowUpRight, Store } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
 
 const OfferPage = () => {
@@ -51,6 +51,8 @@ const OfferPage = () => {
 
   const totals = offerTotals(offer.items, offer.vat_rate);
   const text = offerPlainText(offer, lang === "lv" ? "lv" : "en");
+  const pmEmail = offer.pm_email || "birojs@ervitex.lv";
+  const itemLink = (i: OfferItem) => `/catalog/item/${i.source}/${encodeURIComponent(i.productId)}`;
 
   return (
     <div className="min-h-screen bg-muted/30 py-6 print:bg-white print:py-0">
@@ -73,12 +75,13 @@ const OfferPage = () => {
               </a>
             </Button>
             <Button size="sm" asChild>
-              <a href={`mailto:birojs@ervitex.lv?subject=${encodeURIComponent(offer.title || "Piedāvājums")}&body=${encodeURIComponent(text)}`}>
-                <Mail className="mr-2 h-3 w-3" /> {t("Atbildēt", "Reply")}
+              <a href={`mailto:${pmEmail}?subject=${encodeURIComponent(offer.title || "Piedāvājums")}&body=${encodeURIComponent(text)}`}>
+                <Mail className="mr-2 h-3 w-3" /> {t("Atbildēt e-pastā", "Reply by email")}
               </a>
             </Button>
           </div>
         </div>
+
 
         <article className="rounded-md border border-border bg-card p-5 sm:p-8 print:border-0 print:p-0">
           <header className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-5">
@@ -118,15 +121,18 @@ const OfferPage = () => {
               </thead>
               <tbody>
                 {offer.items.map((i) => (
-                  <tr key={i.id} className="border-b border-border/60 align-middle">
+                  <tr key={i.id} className="border-b border-border/60 align-middle hover:bg-muted/40 print:hover:bg-transparent">
                     <td className="py-2">
-                      <div className="flex items-center gap-2">
+                      <Link to={itemLink(i)} className="flex items-center gap-2 group">
                         {i.image && <img src={i.image} alt={i.name} loading="lazy" className="h-12 w-12 rounded-sm object-cover print:hidden" />}
                         <span>
-                          <span className="block font-medium text-foreground">{i.name}</span>
+                          <span className="block font-medium text-foreground group-hover:text-accent">{i.name}</span>
                           <span className="block text-xs text-muted-foreground">{i.code}{i.brand ? ` · ${i.brand}` : ""}</span>
+                          <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-accent print:hidden">
+                            {t("Skatīt preci", "View product")} <ArrowUpRight className="h-3 w-3" />
+                          </span>
                         </span>
-                      </div>
+                      </Link>
                     </td>
                     <td className="py-2">
                       <span className="inline-flex items-center gap-1.5">
@@ -140,6 +146,7 @@ const OfferPage = () => {
                     <td className="py-2 text-right font-medium">{i.unitPrice ? money(i.unitPrice * i.qty) : "—"}</td>
                   </tr>
                 ))}
+
               </tbody>
             </table>
           </div>
@@ -164,9 +171,41 @@ const OfferPage = () => {
           <p className="mt-6 rounded-sm border border-dashed border-border p-4 text-xs leading-relaxed text-muted-foreground">
             {lang === "lv" ? PRINT_DISCLAIMER_LV : PRINT_DISCLAIMER_EN}
           </p>
+
+          <div className="mt-8 flex flex-col gap-3 rounded-md border border-border bg-muted/40 p-5 sm:flex-row sm:items-center sm:justify-between print:hidden">
+            <div>
+              <p className="font-heading text-sm font-black uppercase tracking-wide text-foreground">
+                {t("Vēlies redzēt vairāk?", "Want to see more?")}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t(
+                  "Ienāc mūsu veikala katalogā — visi zīmoli, krāsas un izmēri.",
+                  "Browse our shop catalog — all brands, colours and sizes.",
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild>
+                <Link to="/catalog">
+                  <Store className="mr-2 h-4 w-4" /> {t("Doties uz katalogu", "Go to catalog")}
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <a href={`mailto:${pmEmail}?subject=${encodeURIComponent(offer.title || "Piedāvājums")}`}>
+                  <Mail className="mr-2 h-4 w-4" /> {t("Rakstīt projektu vadītājam", "Email project manager")}
+                </a>
+              </Button>
+            </div>
+          </div>
+
+          <p className="mt-4 text-xs text-muted-foreground">
+            {t("Tavs kontakts", "Your contact")}: {offer.pm_name ? `${offer.pm_name} · ` : ""}
+            <a className="underline" href={`mailto:${pmEmail}`}>{pmEmail}</a>
+          </p>
         </article>
       </div>
     </div>
+
   );
 };
 

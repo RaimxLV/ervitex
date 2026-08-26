@@ -37,7 +37,10 @@ interface Props {
   url?: string
   disclaimer?: string
   isTest?: boolean
+  pmName?: string
+  pmEmail?: string
 }
+
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
 const container = { maxWidth: '680px', margin: '0 auto', padding: '20px' }
@@ -70,6 +73,8 @@ const PmOfferEmail = ({
   url = '',
   disclaimer = '',
   isTest = false,
+  pmName = '',
+  pmEmail = 'birojs@ervitex.lv',
 }: Props) => (
   <Html lang="lv">
     <Head />
@@ -83,9 +88,11 @@ const PmOfferEmail = ({
 
         <Text style={{ fontSize: '14px' }}>Sveiki{clientName ? `, ${clientName}` : ''}!</Text>
         <Text style={{ fontSize: '14px' }}>
-          Zemāk atradīsi mūsu sagatavoto piedāvājumu. Ja rodas jautājumi vai vēlies izmaiņas, vienkārši
-          atbildi uz šo e-pastu.
+          Zemāk atradīsi mūsu sagatavoto piedāvājumu. Visu turpmāko saziņu — jautājumus, izmaiņas un
+          apstiprinājumu — kārtojam e-pastā: vienkārši atbildi uz šo vēstuli
+          {pmName ? `, un tā nonāks pie ${pmName}` : ''} ({pmEmail}).
         </Text>
+
 
         {items.length > 0 && (
           <table width="100%" cellPadding={0} cellSpacing={0} style={{ borderCollapse: 'collapse', marginTop: '16px' }}>
@@ -132,7 +139,10 @@ const PmOfferEmail = ({
 
         {url && (
           <Section style={{ margin: '22px 0' }}>
-            <Button href={url} style={btn}>SKATĪT PIEDĀVĀJUMU TIEŠSAISTĒ</Button>
+            <Button href={url} style={btn}>SKATĪT PIEDĀVĀJUMU UN PRECES TIEŠSAISTĒ</Button>
+            <Text style={{ ...subtle, marginTop: '8px' }}>
+              Tiešsaistes skatā vari atvērt katru preci, apskatīt aprakstu, visas krāsas un izmērus.
+            </Text>
           </Section>
         )}
 
@@ -141,7 +151,11 @@ const PmOfferEmail = ({
         )}
 
         <Hr style={{ borderColor: '#eee', margin: '18px 0' }} />
-        <Text style={subtle}>Ervitex · birojs@ervitex.lv · www.ervitex.lv</Text>
+        <Text style={{ fontSize: '13px', margin: '0 0 4px' }}>
+          {pmName ? `${pmName} · ` : ''}{pmEmail}
+        </Text>
+        <Text style={subtle}>Ervitex · www.ervitex.lv · Atbildi uz šo e-pastu, lai turpinātu saziņu.</Text>
+
       </Container>
     </Body>
   </Html>
