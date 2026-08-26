@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,9 @@ const isValidSource = (s: string | undefined): s is CatalogSource =>
 const CatalogItemPage = () => {
   const { source, id } = useParams<{ source: string; id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const preColor = searchParams.get("color");
+  const preSize = searchParams.get("size");
   const { lang } = useLanguage();
   const [meta, setMeta] = useState<RelatedItem | null>(null);
   const [related, setRelated] = useState<RelatedItem[]>([]);
@@ -133,6 +136,8 @@ const CatalogItemPage = () => {
           brand={meta?.brand ?? null}
           category={meta?.category ?? null}
           image={meta?.image_url ?? null}
+          initialColor={preColor}
+          initialSize={preSize}
         />
 
         {related.length > 0 && (

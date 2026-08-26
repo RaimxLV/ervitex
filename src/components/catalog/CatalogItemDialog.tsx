@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,10 @@ interface Props {
   descriptionFallback?: string | null;
   /** When true, render inline (no Dialog wrapper) — used for full-page product route. */
   inline?: boolean;
+  /** Preselect a colour by supplier code or colour name (used by PM offer links). */
+  initialColor?: string | null;
+  /** Preselect a size label (used by PM offer links). */
+  initialSize?: string | null;
 }
 
 interface ColorDetail {
@@ -902,6 +906,7 @@ const translateLabel = (label: string, lang: "lv" | "en") => {
 
 const CatalogItemDialog = ({
   open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback, inline,
+  initialColor, initialSize,
 }: Props) => {
   const { lang } = useLanguage();
   const placeholderSrc = `${import.meta.env.BASE_URL}placeholder.svg`;
@@ -914,6 +919,9 @@ const CatalogItemDialog = ({
     { color_code: string | null; size: string | null; retail_price: number; currency: string | null }[]
   >([]);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  /** Size that must be applied right after the initial colour preselection. */
+  const pendingSizeRef = useRef<string | null>(null);
+
 
 
   const fallbackDetail = useMemo<ProductDetail>(() => ({
@@ -965,8 +973,23 @@ const CatalogItemDialog = ({
       const d = await loader(id).catch(() => null);
       if (cancelled) return;
       setDetail(d);
-      setActiveColor(d?.colors[0]?.code ?? null);
+      // Preselect the colour the client was quoted (match by supplier code, then by name)
+      const wanted = (initialColor || "").trim();
+      let picked = d?.colors[0]?.code ?? null;
+      if (wanted && d?.colors?.length) {
+        const wc = wanted.toLowerCase();
+        const wn = canonName(wanted);
+        const hit =
+          d.colors.find((c) => (c.code || "").toLowerCase() === wc) ||
+          d.colors.find((c) => (c.name || "").toLowerCase() === wc) ||
+          d.colors.find((c) => canonName(c.name) === wn) ||
+          (wn ? d.colors.find((c) => canonName(c.name).includes(wn) || wn.includes(canonName(c.name))) : undefined);
+        if (hit) picked = hit.code;
+      }
+      pendingSizeRef.current = initialSize?.trim() || null;
+      setActiveColor(picked);
       setLoading(false);
+
       // Per-variant prices (colour/size aware, excl. VAT, markup already applied)
       const rows: any[] = [];
       let from = 0;
@@ -987,9 +1010,14 @@ const CatalogItemDialog = ({
 
     })();
     return () => { cancelled = true; };
-  }, [isOpen, source, id]);
+  }, [isOpen, source, id, initialColor, initialSize]);
 
   useEffect(() => {
+    if (pendingSizeRef.current) {
+      setSelectedSize(pendingSizeRef.current);
+      pendingSizeRef.current = null;
+      return;
+    }
     setSelectedSize(null);
   }, [activeColor]);
 
