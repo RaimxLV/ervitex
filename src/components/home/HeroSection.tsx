@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import HeroLayoutEditor from "./HeroLayoutEditor";
+import { HeroLayout, HeroPos, heroPosStyle, loadHeroLayout } from "./heroLayout";
+
 
 import bgLayer from "@/assets/hero/layer-bg.jpg";
 import rockLayer from "@/assets/hero/layer-rock-hero.webp";
