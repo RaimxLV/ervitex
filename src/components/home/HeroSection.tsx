@@ -11,7 +11,7 @@ import jacketImg from "@/assets/hero/jacket.png";
 import hoodieImg from "@/assets/hero/hoodie.png";
 import pantsImg from "@/assets/hero/pants.png";
 import sneakerImg from "@/assets/hero/sneaker.png";
-import teesImg from "@/assets/hero/cap.png";
+import teesImg from "@/assets/hero/tee-oversized.png";
 
 /**
  * Multi-layer parallax hero.
@@ -63,7 +63,7 @@ const items: Item[] = [
   {
     src: teesImg,
     alt: "",
-    className: "right-[26%] bottom-[6%] w-[20vw] max-w-[260px] md:w-[14vw]",
+    className: "right-[24%] bottom-[4%] w-[28vw] max-w-[400px] md:w-[21vw]",
     push: [26, -18],
     float: 10,
     rotate: 3,
@@ -119,8 +119,8 @@ const HeroSection = () => {
   const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
 
   // Layer drifts driven by pointer (background moves with, objects move away)
-  const bgX = useTransform(mx, (v) => v * 26);
-  const bgYm = useTransform(my, (v) => v * 18);
+  const bgX = useTransform(mx, (v) => v * 70);
+  const bgYm = useTransform(my, (v) => v * 48);
   const hazeX = useTransform(mx, (v) => v * -60);
   const hazeY = useTransform(my, (v) => v * -40);
   const rockX = useTransform(mx, (v) => v * -34);
@@ -134,8 +134,8 @@ const HeroSection = () => {
       className="relative min-h-[100svh] flex items-center overflow-hidden bg-primary"
     >
       {/* ── Layer 1: industrial backdrop ── */}
-      <motion.div style={{ y: bgY, x: bgX, translateY: bgYm }} className="absolute -inset-8 will-change-transform">
-        <img
+      <motion.div style={{ y: bgY, x: bgX, translateY: bgYm }} className="absolute -inset-16 will-change-transform">
+        <motion.img
           src={bgLayer}
           alt=""
           aria-hidden="true"
@@ -143,9 +143,11 @@ const HeroSection = () => {
           height={1080}
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 h-full w-full object-cover object-center opacity-90"
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-100 brightness-[1.55] contrast-[0.95] saturate-[0.9]"
+          animate={{ scale: [1.04, 1.1, 1.04], x: [0, -22, 0] }}
+          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
         />
-        <div className="absolute inset-0 bg-primary/40" />
+        <div className="absolute inset-0 bg-primary/15" />
       </motion.div>
 
       {/* ── Layer 2: atmosphere / light leaks ── */}
