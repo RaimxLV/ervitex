@@ -214,20 +214,23 @@ const OfferPage = () => {
             ))}
           </ul>
 
-
-          <div className="mt-6 flex justify-end">
-            <dl className="w-full max-w-xs space-y-1 text-sm">
-              <div className="flex justify-between">
+          <div className="mt-6 flex justify-end border-t border-border pt-5">
+            <dl className="w-full space-y-1.5 text-sm sm:max-w-xs">
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">{t("Vienības kopā", "Total units")}</dt>
+                <dd className="tabular-nums">{totals.qty}</dd>
+              </div>
+              <div className="flex justify-between gap-4">
                 <dt className="text-muted-foreground">{t("Kopā bez PVN", "Total excl. VAT")}</dt>
-                <dd className="font-medium">{money(totals.net)}</dd>
+                <dd className="font-medium tabular-nums">{money(totals.net)}</dd>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-4">
                 <dt className="text-muted-foreground">PVN {offer.vat_rate}%</dt>
-                <dd>{money(totals.vat)}</dd>
+                <dd className="tabular-nums">{money(totals.vat)}</dd>
               </div>
-              <div className="flex justify-between border-t border-border pt-2 text-base">
-                <dt className="font-heading font-black uppercase">{t("Kopā ar PVN", "Total incl. VAT")}</dt>
-                <dd className="font-black text-accent">{money(totals.gross)}</dd>
+              <div className="flex items-baseline justify-between gap-4 border-t border-border pt-2.5 text-base">
+                <dt className="font-heading text-sm font-black uppercase tracking-wide">{t("Kopā ar PVN", "Total incl. VAT")}</dt>
+                <dd className="font-heading font-black tabular-nums text-accent">{money(totals.gross)}</dd>
               </div>
             </dl>
           </div>
@@ -236,19 +239,19 @@ const OfferPage = () => {
             {lang === "lv" ? PRINT_DISCLAIMER_LV : PRINT_DISCLAIMER_EN}
           </p>
 
-          <div className="mt-8 flex flex-col gap-3 rounded-md border border-border bg-muted/40 p-5 sm:flex-row sm:items-center sm:justify-between print:hidden">
+          <div className="mt-8 flex flex-col gap-4 rounded-md border border-border bg-muted/40 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5 print:hidden">
             <div>
               <p className="font-heading text-sm font-black uppercase tracking-wide text-foreground">
                 {t("Vēlies redzēt vairāk?", "Want to see more?")}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                 {t(
                   "Ienāc mūsu veikala katalogā — visi zīmoli, krāsas un izmēri.",
                   "Browse our shop catalog — all brands, colours and sizes.",
                 )}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:shrink-0">
               <Button asChild>
                 <Link to="/catalog">
                   <Store className="mr-2 h-4 w-4" /> {t("Doties uz katalogu", "Go to catalog")}
@@ -261,6 +264,7 @@ const OfferPage = () => {
               </Button>
             </div>
           </div>
+
 
           <p className="mt-4 text-xs text-muted-foreground">
             {t("Tavs kontakts", "Your contact")}: {offer.pm_name ? `${offer.pm_name} · ` : ""}
