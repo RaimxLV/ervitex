@@ -906,6 +906,7 @@ const translateLabel = (label: string, lang: "lv" | "en") => {
 
 const CatalogItemDialog = ({
   open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback, inline,
+  initialColor, initialSize,
 }: Props) => {
   const { lang } = useLanguage();
   const placeholderSrc = `${import.meta.env.BASE_URL}placeholder.svg`;
@@ -918,6 +919,9 @@ const CatalogItemDialog = ({
     { color_code: string | null; size: string | null; retail_price: number; currency: string | null }[]
   >([]);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  /** Size that must be applied right after the initial colour preselection. */
+  const pendingSizeRef = useRef<string | null>(null);
+
 
 
   const fallbackDetail = useMemo<ProductDetail>(() => ({
