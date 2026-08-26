@@ -171,9 +171,41 @@ const OfferPage = () => {
           <p className="mt-6 rounded-sm border border-dashed border-border p-4 text-xs leading-relaxed text-muted-foreground">
             {lang === "lv" ? PRINT_DISCLAIMER_LV : PRINT_DISCLAIMER_EN}
           </p>
+
+          <div className="mt-8 flex flex-col gap-3 rounded-md border border-border bg-muted/40 p-5 sm:flex-row sm:items-center sm:justify-between print:hidden">
+            <div>
+              <p className="font-heading text-sm font-black uppercase tracking-wide text-foreground">
+                {t("Vēlies redzēt vairāk?", "Want to see more?")}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t(
+                  "Ienāc mūsu veikala katalogā — visi zīmoli, krāsas un izmēri.",
+                  "Browse our shop catalog — all brands, colours and sizes.",
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button asChild>
+                <Link to="/catalog">
+                  <Store className="mr-2 h-4 w-4" /> {t("Doties uz katalogu", "Go to catalog")}
+                </Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <a href={`mailto:${pmEmail}?subject=${encodeURIComponent(offer.title || "Piedāvājums")}`}>
+                  <Mail className="mr-2 h-4 w-4" /> {t("Rakstīt projektu vadītājam", "Email project manager")}
+                </a>
+              </Button>
+            </div>
+          </div>
+
+          <p className="mt-4 text-xs text-muted-foreground">
+            {t("Tavs kontakts", "Your contact")}: {offer.pm_name ? `${offer.pm_name} · ` : ""}
+            <a className="underline" href={`mailto:${pmEmail}`}>{pmEmail}</a>
+          </p>
         </article>
       </div>
     </div>
+
   );
 };
 
