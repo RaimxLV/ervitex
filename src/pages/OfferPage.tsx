@@ -7,7 +7,7 @@ import {
   money, offerTotals, offerPlainText, type Offer, type OfferItem,
   PRINT_DISCLAIMER_LV, PRINT_DISCLAIMER_EN,
 } from "@/lib/offer";
-import { Printer, MessageCircle, Mail, ClipboardList } from "lucide-react";
+import { Printer, MessageCircle, Mail, ClipboardList, ArrowUpRight, Store } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
 
 const OfferPage = () => {
