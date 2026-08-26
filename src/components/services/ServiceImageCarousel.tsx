@@ -19,9 +19,9 @@ const ServiceImageCarousel = ({ images, alt }: ServiceImageCarouselProps) => {
   return (
     <>
       {/* Inline carousel */}
-      <div className="relative mt-6 overflow-hidden rounded-sm">
+      <div className="relative mt-6 aspect-[16/10] overflow-hidden rounded-sm bg-muted">
         <div
-          className="cursor-pointer"
+          className="h-full cursor-pointer"
           onClick={() => setLightbox(true)}
         >
           <img
@@ -30,7 +30,7 @@ const ServiceImageCarousel = ({ images, alt }: ServiceImageCarouselProps) => {
             loading={current === 0 ? "eager" : "lazy"}
             decoding="async"
             fetchPriority={current === 0 ? "high" : "low"}
-            className="aspect-[16/10] w-full object-cover"
+            className="h-full w-full bg-muted object-cover"
           />
 
         </div>

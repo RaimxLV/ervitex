@@ -42,19 +42,19 @@ const TechnologiesShowcase = () => {
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
+              transition={{ duration: 0.25 }}
             >
               <Link to={`/tehnologijas/${t.id}`} className="group block w-full text-left">
-                <div className="overflow-hidden rounded-sm">
+                <div className="aspect-[4/3] overflow-hidden rounded-sm bg-muted">
                   <img
                     src={t.images[0]}
                     alt={t.name[lang]}
                     width={640}
                     height={480}
-                    loading={i < 2 ? "eager" : "lazy"}
-                    fetchPriority={i < 2 ? "high" : "low"}
+                    loading="eager"
+                    fetchPriority="high"
                     decoding="async"
-                    className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    className="h-full w-full bg-muted object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                 </div>
                 <h3 className="mt-5 font-heading text-lg font-bold uppercase text-foreground">
@@ -77,9 +77,10 @@ const TechnologiesShowcase = () => {
             width={1400}
             height={1050}
             alt={isLv ? "Apdrukāts krekls ar individualizētu dizainu" : "Printed t-shirt with a custom design"}
-            loading="lazy"
+            loading="eager"
+            fetchPriority="auto"
             decoding="async"
-            className="aspect-[4/3] w-full rounded-sm object-cover"
+            className="aspect-[4/3] w-full rounded-sm bg-muted object-cover"
           />
           <div>
             <h3 className="font-heading text-2xl font-bold uppercase leading-tight text-foreground md:text-4xl">
