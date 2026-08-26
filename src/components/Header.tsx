@@ -88,11 +88,11 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-primary/95 backdrop-blur-md text-primary-foreground">
-      <div className="relative flex h-16 items-center justify-between px-4 sm:px-6 md:h-20">
-        <Link to="/" className="flex items-center gap-2 sm:gap-3">
-          <img src={ervitexLogo} alt="Ervitex" className="h-8 w-auto md:h-10" />
-          <span className="h-5 w-px bg-primary-foreground/20 sm:h-6" />
-          <img src={stellaLogo} alt="Stanley/Stella Dealer" className="h-4 w-auto opacity-70 sm:h-5 md:h-6" />
+      <div className="relative flex h-16 items-center justify-between gap-2 px-4 sm:px-6 md:h-20">
+        <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <img src={ervitexLogo} alt="Ervitex" className="h-7 w-auto shrink-0 sm:h-8 md:h-10" />
+          <span className="hidden h-5 w-px shrink-0 bg-primary-foreground/20 min-[370px]:block sm:h-6" />
+          <img src={stellaLogo} alt="Stanley/Stella Dealer" className="hidden h-4 w-auto shrink opacity-70 min-[370px]:block sm:h-5 md:h-6" />
         </Link>
 
         {/* Desktop nav */}
@@ -229,7 +229,7 @@ const Header = () => {
         </div>
 
         {/* Mobile controls */}
-        <div className="flex items-center gap-2 xl:hidden">
+        <div className="flex shrink-0 items-center gap-1.5 xl:hidden">
           <div className="flex items-center border border-primary-foreground/20 text-xs font-medium">
             <button
               onClick={() => setLang("lv")}
