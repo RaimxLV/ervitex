@@ -44,7 +44,7 @@ const items: Item[] = [
     src: jacketImg,
     mobileSrc: jacketImgSm,
     alt: "",
-    className: "right-[-28%] top-[5%] w-[86vw] max-w-[620px] sm:right-[-10%] sm:w-[62vw] md:right-[6%] md:top-[8%] md:w-[34vw]",
+    className: "right-[-38%] top-[8%] w-[72vw] max-w-[620px] sm:right-[-10%] sm:w-[62vw] md:right-[6%] md:top-[8%] md:w-[34vw]",
     push: [-46, -26],
     float: 9,
     rotate: -3,
@@ -54,7 +54,7 @@ const items: Item[] = [
     src: pantsImg,
     mobileSrc: pantsImgSm,
     alt: "",
-    className: "right-[-30%] bottom-[1%] w-[86vw] max-w-[645px] sm:right-[-12%] sm:w-[64vw] md:right-[2%] md:bottom-[2%] md:w-[36vw]",
+    className: "right-[-36%] bottom-[-2%] w-[72vw] max-w-[645px] sm:right-[-12%] sm:w-[64vw] md:right-[2%] md:bottom-[2%] md:w-[36vw]",
     push: [34, 22],
     float: 11,
     rotate: 4,
@@ -64,7 +64,7 @@ const items: Item[] = [
     src: hoodieImg,
     mobileSrc: hoodieImgSm,
     alt: "",
-    className: "right-[10%] top-[28%] w-[70vw] max-w-[540px] brightness-125 sm:right-[18%] sm:w-[54vw] md:right-[27%] md:top-[30%] md:w-[30vw]",
+    className: "right-[-8%] top-[40%] w-[52vw] max-w-[540px] brightness-125 sm:right-[18%] sm:top-[28%] sm:w-[54vw] md:right-[27%] md:top-[30%] md:w-[30vw]",
     push: [-28, 34],
     float: 8,
     rotate: -6,
@@ -74,7 +74,7 @@ const items: Item[] = [
     src: teesImg,
     mobileSrc: teesImgSm,
     alt: "",
-    className: "right-[-12%] bottom-[20%] w-[70vw] max-w-[600px] sm:right-[2%] sm:w-[52vw] md:right-[24%] md:bottom-[4%] md:w-[32vw]",
+    className: "right-[-18%] bottom-[12%] w-[52vw] max-w-[600px] sm:right-[2%] sm:bottom-[20%] sm:w-[52vw] md:right-[24%] md:bottom-[4%] md:w-[32vw]",
     push: [26, -18],
     float: 10,
     rotate: 3,
@@ -200,7 +200,7 @@ const HeroSection = () => {
             initial={false}
             animate={{ opacity: 0.95, y: 0 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute right-[-38%] bottom-[-5%] w-[120vw] max-w-[1100px] select-none sm:right-[-14%] sm:w-[86vw] md:right-[-6%] md:bottom-[-6%] md:w-[72vw]"
+            className="absolute right-[-34%] bottom-[-4%] w-[100vw] max-w-[1100px] select-none sm:right-[-14%] sm:w-[86vw] md:right-[-6%] md:bottom-[-6%] md:w-[72vw]"
           />
         </picture>
       </motion.div>
@@ -241,7 +241,14 @@ const HeroSection = () => {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to right, hsl(var(--primary) / 0.92) 0%, hsl(var(--primary) / 0.75) 26%, hsl(var(--primary) / 0.3) 52%, transparent 72%)",
+            "linear-gradient(to right, hsl(var(--primary) / 0.94) 0%, hsl(var(--primary) / 0.82) 38%, hsl(var(--primary) / 0.42) 66%, transparent 86%)",
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none md:hidden"
+        style={{
+          background:
+            "linear-gradient(to bottom, hsl(var(--primary) / 0.2) 0%, hsl(var(--primary) / 0.58) 36%, hsl(var(--primary) / 0.9) 86%, hsl(var(--primary) / 0.98) 100%)",
         }}
       />
 
@@ -253,7 +260,7 @@ const HeroSection = () => {
 
       {/* ── Content ── */}
        <div className="container relative z-10 py-20 sm:py-24">
-        <div className="max-w-[min(42rem,86vw)] md:max-w-3xl">
+        <div className="max-w-[min(37rem,86vw)] md:max-w-3xl">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -272,8 +279,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="font-heading text-[2.75rem] font-bold leading-[0.95] text-primary-foreground sm:text-5xl md:text-7xl lg:text-[5.5rem]"
-            style={{ letterSpacing: "-0.04em" }}
+            className="font-heading text-[2.55rem] font-bold leading-[0.98] text-primary-foreground sm:text-5xl md:text-7xl lg:text-[5.5rem]"
           >
             {lang === "lv" ? "Tekstila" : "Textile"}
             <br />
