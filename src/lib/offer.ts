@@ -27,6 +27,10 @@ export interface Offer {
   status: string;
   vat_rate: number;
   items: OfferItem[];
+  /** Projektu vadītājs, kuram klients atbild */
+  pm_name?: string | null;
+  pm_email?: string | null;
+
   created_at: string;
   updated_at: string;
 }
