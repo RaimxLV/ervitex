@@ -1,113 +1,231 @@
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useEffect, useRef, useState } from "react";
-const heroLoop = `${import.meta.env.BASE_URL}hero-loop.mp4`;
-const heroPoster = `${import.meta.env.BASE_URL}hero-poster.jpg`;
+import { useCallback, useRef } from "react";
+
+import bgLayer from "@/assets/hero/layer-bg.jpg";
+import rockLayer from "@/assets/hero/layer-rock.png";
+import jacketImg from "@/assets/hero/jacket.png";
+import hoodieImg from "@/assets/hero/hoodie.png";
+import pantsImg from "@/assets/hero/pants.png";
+import sneakerImg from "@/assets/hero/sneaker.png";
+import teesImg from "@/assets/hero/cap.png";
+
+/**
+ * Multi-layer parallax hero.
+ * Depth is built from 5 stacked layers (backdrop -> haze -> rock -> garments -> dust).
+ * Garments drift away from the cursor, each with its own direction and strength.
+ */
+
+type Item = {
+  src: string;
+  alt: string;
+  /** tailwind position + size classes */
+  className: string;
+  /** repel strength & direction multiplier (x, y) */
+  push: [number, number];
+  /** idle float duration */
+  float: number;
+  rotate?: number;
+  delay?: number;
+};
+
+const items: Item[] = [
+  {
+    src: jacketImg,
+    alt: "",
+    className: "right-[6%] top-[8%] w-[42vw] max-w-[620px] md:w-[34vw]",
+    push: [-46, -26],
+    float: 9,
+    rotate: -3,
+    delay: 0.15,
+  },
+  {
+    src: pantsImg,
+    alt: "",
+    className: "right-[2%] bottom-[2%] w-[30vw] max-w-[430px] md:w-[24vw]",
+    push: [34, 22],
+    float: 11,
+    rotate: 4,
+    delay: 0.3,
+  },
+  {
+    src: hoodieImg,
+    alt: "",
+    className: "right-[34%] top-[34%] w-[26vw] max-w-[360px] md:w-[19vw]",
+    push: [-28, 34],
+    float: 8,
+    rotate: -6,
+    delay: 0.45,
+  },
+  {
+    src: teesImg,
+    alt: "",
+    className: "right-[30%] bottom-[6%] w-[20vw] max-w-[260px] md:w-[14vw]",
+    push: [26, -18],
+    float: 10,
+    rotate: 3,
+    delay: 0.6,
+  },
+  {
+    src: sneakerImg,
+    alt: "",
+    className: "right-[52%] bottom-[16%] w-[16vw] max-w-[210px] md:w-[11vw] hidden lg:block",
+    push: [-20, -30],
+    float: 7,
+    rotate: 8,
+    delay: 0.75,
+  },
+];
+
+const springCfg = { stiffness: 60, damping: 18, mass: 0.6 };
 
 const HeroSection = () => {
   const { lang } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
-  // The looping video is ~2.4 MB — never let it compete with first paint.
-  // The poster renders instantly and the video is attached once the browser
-  // is idle (or shortly after mount as a fallback).
-  const [videoSrc, setVideoSrc] = useState<string | null>(null);
-  const [videoReady, setVideoReady] = useState(false);
 
-  useEffect(() => {
-    const start = () => setVideoSrc(heroLoop);
-    const w = window as unknown as {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
-    };
-    if (w.requestIdleCallback) {
-      const id = w.requestIdleCallback(start, { timeout: 2500 });
-      return () => (window as any).cancelIdleCallback?.(id);
-    }
-    const t = window.setTimeout(start, 1200);
-    return () => window.clearTimeout(t);
-  }, []);
+  // Normalized pointer position (-0.5 .. 0.5)
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const mx = useSpring(px, springCfg);
+  const my = useSpring(py, springCfg);
+
+  const handleMove = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      const r = e.currentTarget.getBoundingClientRect();
+      px.set((e.clientX - r.left) / r.width - 0.5);
+      py.set((e.clientY - r.top) / r.height - 0.5);
+    },
+    [px, py],
+  );
+
+  const handleLeave = useCallback(() => {
+    px.set(0);
+    py.set(0);
+  }, [px, py]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
+  // Scroll parallax per depth
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 90]);
+  const rockY = useTransform(scrollYProgress, [0, 1], [0, 170]);
+  const itemsY = useTransform(scrollYProgress, [0, 1], [0, 250]);
+  const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
 
-  // Parallax — background moves slower (0.2 factor)
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, 160]);
-  // Aggressive fade-to-black on scroll
-  const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.25], [0, 1]);
+  // Layer drifts driven by pointer (background moves with, objects move away)
+  const bgX = useTransform(mx, (v) => v * 26);
+  const bgYm = useTransform(my, (v) => v * 18);
+  const hazeX = useTransform(mx, (v) => v * -60);
+  const hazeY = useTransform(my, (v) => v * -40);
+  const rockX = useTransform(mx, (v) => v * -34);
+  const rockYm = useTransform(my, (v) => v * -20);
 
   return (
     <section
       ref={sectionRef}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
       className="relative min-h-[100svh] flex items-center overflow-hidden bg-primary"
     >
-      {/* ── Layer 1: Single background image with parallax ── */}
-      <motion.div
-        style={{ y: bgY }}
-        className="absolute inset-0 will-change-transform"
-      >
-        {/* Poster paints immediately; video swaps in when idle */}
+      {/* ── Layer 1: industrial backdrop ── */}
+      <motion.div style={{ y: bgY, x: bgX, translateY: bgYm }} className="absolute -inset-8 will-change-transform">
         <img
-          src={heroPoster}
+          src={bgLayer}
           alt=""
           aria-hidden="true"
           width={1920}
           height={1080}
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 h-full w-full object-cover object-center opacity-80"
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-90"
         />
-        {videoSrc && (
-          <video
-            src={videoSrc}
-            onLoadedData={() => setVideoReady(true)}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="none"
-            poster={heroPoster}
-            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 ${videoReady ? "opacity-80" : "opacity-0"}`}
-          />
-        )}
-
-
-
+        <div className="absolute inset-0 bg-primary/40" />
       </motion.div>
 
-      {/* ── Layer 2: Atmosphere — light leaks ── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {/* Top-right warm accent light leak */}
+      {/* ── Layer 2: atmosphere / light leaks ── */}
+      <motion.div
+        style={{ x: hazeX, y: hazeY }}
+        className="absolute -inset-10 pointer-events-none will-change-transform"
+      >
         <div
-          className="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full opacity-20 blur-[120px]"
-          style={{ background: "radial-gradient(circle, hsl(var(--accent) / 0.6), transparent 70%)" }}
+          className="absolute top-[6%] right-[12%] h-[62%] w-[55%] rounded-full opacity-[0.22] blur-[130px]"
+          style={{ background: "radial-gradient(circle, hsl(84 90% 55% / 0.75), transparent 70%)" }}
         />
-        {/* Bottom-left subtle white light leak */}
         <div
-          className="absolute -bottom-[15%] -left-[10%] w-[50%] h-[50%] rounded-full opacity-10 blur-[100px]"
+          className="absolute bottom-[4%] right-[6%] h-[45%] w-[40%] rounded-full opacity-25 blur-[110px]"
+          style={{ background: "radial-gradient(circle, hsl(84 80% 45% / 0.5), transparent 70%)" }}
+        />
+        <div
+          className="absolute bottom-[10%] left-[-8%] h-[40%] w-[40%] rounded-full opacity-10 blur-[120px]"
           style={{ background: "radial-gradient(circle, hsl(0 0% 100% / 0.4), transparent 70%)" }}
         />
-        {/* Center-right accent glow */}
-        <div
-          className="absolute top-[30%] right-[5%] w-[30%] h-[40%] rounded-full opacity-15 blur-[80px]"
-          style={{ background: "radial-gradient(circle, hsl(var(--accent) / 0.3), transparent 60%)" }}
+      </motion.div>
+
+      {/* ── Layer 3: floating rock platform ── */}
+      <motion.div
+        style={{ y: rockY, x: rockX, translateY: rockYm }}
+        className="absolute inset-0 pointer-events-none will-change-transform"
+      >
+        <motion.img
+          src={rockLayer}
+          alt=""
+          aria-hidden="true"
+          width={1536}
+          height={1024}
+          decoding="async"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 0.95, y: 0 }}
+          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute right-[-6%] bottom-[-6%] w-[72vw] max-w-[1100px] select-none"
         />
+      </motion.div>
+
+      {/* ── Layer 4: garments that flee the cursor ── */}
+      <motion.div style={{ y: itemsY }} className="absolute inset-0 pointer-events-none will-change-transform">
+        {items.map((item, i) => (
+          <ParallaxItem key={i} item={item} mx={mx} my={my} />
+        ))}
+      </motion.div>
+
+      {/* ── Layer 5: drifting dust sparks ── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {Array.from({ length: 18 }).map((_, i) => (
+          <motion.span
+            key={i}
+            className="absolute rounded-full bg-accent"
+            style={{
+              left: `${45 + ((i * 37) % 55)}%`,
+              top: `${8 + ((i * 53) % 84)}%`,
+              width: i % 3 === 0 ? 3 : 2,
+              height: i % 3 === 0 ? 3 : 2,
+              filter: "blur(0.5px)",
+            }}
+            animate={{ y: [0, -28, 0], opacity: [0, 0.7, 0] }}
+            transition={{
+              duration: 6 + (i % 5),
+              repeat: Infinity,
+              delay: i * 0.4,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
       </div>
 
-      {/* ── Gradient mask for text readability (left side) ── */}
+      {/* ── Readability gradient (left) ── */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "linear-gradient(to right, hsl(var(--primary) / 0.7) 5%, hsl(var(--primary) / 0.45) 25%, hsl(var(--primary) / 0.15) 50%, transparent 70%)",
+            "linear-gradient(to right, hsl(var(--primary) / 0.92) 0%, hsl(var(--primary) / 0.75) 26%, hsl(var(--primary) / 0.3) 52%, transparent 72%)",
         }}
       />
 
-      {/* ── Scroll-driven aggressive fade-to-black ── */}
+      {/* ── Scroll-driven fade-to-black ── */}
       <motion.div
         style={{ opacity: darkOverlayOpacity }}
         className="absolute inset-0 bg-primary pointer-events-none"
@@ -240,6 +358,36 @@ const HeroSection = () => {
       {/* Bottom accent line */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-accent" />
     </section>
+  );
+};
+
+type MV = ReturnType<typeof useSpring>;
+
+const ParallaxItem = ({ item, mx, my }: { item: Item; mx: MV; my: MV }) => {
+  const x = useTransform(mx, (v) => v * item.push[0]);
+  const y = useTransform(my, (v) => v * item.push[1]);
+
+  return (
+    <motion.div style={{ x, y }} className={`absolute ${item.className} will-change-transform`}>
+      <motion.div
+        initial={{ opacity: 0, y: 60, scale: 0.94 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 1, delay: item.delay ?? 0, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <motion.img
+          src={item.src}
+          alt={item.alt}
+          aria-hidden="true"
+          width={1024}
+          height={1024}
+          decoding="async"
+          className="h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)]"
+          style={{ rotate: item.rotate ?? 0 }}
+          animate={{ y: [0, -14, 0] }}
+          transition={{ duration: item.float, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </motion.div>
+    </motion.div>
   );
 };
 
