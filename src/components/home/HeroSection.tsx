@@ -14,6 +14,7 @@ const HeroSection = () => {
   // The poster renders instantly and the video is attached once the browser
   // is idle (or shortly after mount as a fallback).
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
     const start = () => setVideoSrc(heroLoop);
@@ -63,13 +64,14 @@ const HeroSection = () => {
         {videoSrc && (
           <video
             src={videoSrc}
+            onLoadedData={() => setVideoReady(true)}
             autoPlay
             muted
             loop
             playsInline
             preload="none"
             poster={heroPoster}
-            className="absolute inset-0 h-full w-full object-cover object-center opacity-80"
+            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 ${videoReady ? "opacity-80" : "opacity-0"}`}
           />
         )}
 

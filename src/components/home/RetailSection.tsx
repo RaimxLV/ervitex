@@ -261,8 +261,8 @@ const RetailSection = () => {
             }
             width={1920}
             height={1088}
-            loading="eager"
-            fetchPriority="high"
+            loading="lazy"
+            fetchPriority="low"
             decoding="async"
             className="h-full w-full object-cover object-top"
           />
