@@ -25,6 +25,10 @@ interface Props {
   descriptionFallback?: string | null;
   /** When true, render inline (no Dialog wrapper) — used for full-page product route. */
   inline?: boolean;
+  /** Preselect a colour by supplier code or colour name (used by PM offer links). */
+  initialColor?: string | null;
+  /** Preselect a size label (used by PM offer links). */
+  initialSize?: string | null;
 }
 
 interface ColorDetail {
