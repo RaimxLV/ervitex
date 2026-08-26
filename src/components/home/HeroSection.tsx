@@ -54,7 +54,7 @@ const items: Item[] = [
   {
     src: hoodieImg,
     alt: "",
-    className: "right-[34%] top-[34%] w-[26vw] max-w-[360px] md:w-[19vw]",
+    className: "right-[27%] top-[30%] w-[26vw] max-w-[360px] md:w-[20vw] brightness-125",
     push: [-28, 34],
     float: 8,
     rotate: -6,
@@ -63,7 +63,7 @@ const items: Item[] = [
   {
     src: teesImg,
     alt: "",
-    className: "right-[30%] bottom-[6%] w-[20vw] max-w-[260px] md:w-[14vw]",
+    className: "right-[26%] bottom-[6%] w-[20vw] max-w-[260px] md:w-[14vw]",
     push: [26, -18],
     float: 10,
     rotate: 3,
@@ -72,12 +72,13 @@ const items: Item[] = [
   {
     src: sneakerImg,
     alt: "",
-    className: "right-[52%] bottom-[16%] w-[16vw] max-w-[210px] md:w-[11vw] hidden lg:block",
+    className: "right-[43%] bottom-[18%] w-[16vw] max-w-[200px] md:w-[11vw] hidden lg:block",
     push: [-20, -30],
     float: 7,
     rotate: 8,
     delay: 0.75,
   },
+
 ];
 
 const springCfg = { stiffness: 60, damping: 18, mass: 0.6 };
