@@ -394,18 +394,23 @@ const ParallaxItem = ({ item, mx, my }: { item: Item; mx: MV; my: MV }) => {
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 1, delay: item.delay ?? 0, ease: [0.22, 1, 0.36, 1] }}
       >
-        <motion.img
-          src={item.src}
-          alt={item.alt}
-          aria-hidden="true"
-          width={1024}
-          height={1024}
-          decoding="async"
-          className="h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)]"
-          style={{ rotate: item.rotate ?? 0 }}
-          animate={{ y: [0, -14, 0] }}
-          transition={{ duration: item.float, repeat: Infinity, ease: "easeInOut" }}
-        />
+        <picture>
+          <source srcSet={item.mobileSrc} media="(max-width: 767px)" />
+          <motion.img
+            src={item.src}
+            alt={item.alt}
+            aria-hidden="true"
+            width={900}
+            height={900}
+            decoding="async"
+            loading="eager"
+            fetchPriority="high"
+            className="h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)]"
+            style={{ rotate: item.rotate ?? 0 }}
+            animate={{ y: [0, -14, 0] }}
+            transition={{ duration: item.float, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </picture>
       </motion.div>
     </motion.div>
   );
