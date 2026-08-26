@@ -343,10 +343,36 @@ const AdminOfferEdit = () => {
                 <Label className="text-xs">PVN %</Label>
                 <Input type="number" value={offer.vat_rate} onChange={(e) => setOffer({ ...offer, vat_rate: Number(e.target.value) || 0 })} />
               </div>
+              <div>
+                <Label className="text-xs">Projektu vadītājs (atbildes saņēmējs)</Label>
+                <Select
+                  value={offer.pm_email || OFFICE_EMAIL}
+                  onValueChange={(v) =>
+                    setOffer({
+                      ...offer,
+                      pm_email: v,
+                      pm_name: PROJECT_MANAGERS.find((p) => p.email === v)?.name || (v === OFFICE_EMAIL ? "Ervitex birojs" : offer.pm_name || ""),
+                    })
+                  }
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {PROJECT_MANAGERS.map((p) => (
+                      <SelectItem key={p.email} value={p.email}>{p.name} · {p.email}</SelectItem>
+                    ))}
+                    <SelectItem value={OFFICE_EMAIL}>Ervitex birojs · {OFFICE_EMAIL}</SelectItem>
+                    {offer.pm_email && !PROJECT_MANAGERS.some((p) => p.email === offer.pm_email) && offer.pm_email !== OFFICE_EMAIL && (
+                      <SelectItem value={offer.pm_email}>{offer.pm_email}</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="mt-1 text-[11px] text-muted-foreground">Klienta atbilde e-pastā nonāks šeit.</p>
+              </div>
               <div className="sm:col-span-2">
                 <Label className="text-xs">Piezīme klientam</Label>
                 <Textarea rows={3} value={offer.note || ""} onChange={(e) => setOffer({ ...offer, note: e.target.value })} placeholder="Apdrukas veids, izmērs, termiņi…" />
               </div>
+
             </div>
           </section>
 
