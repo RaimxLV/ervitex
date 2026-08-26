@@ -138,7 +138,7 @@ const BentoCategories = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: Math.min(i, 6) * 0.04 }}
+              transition={{ duration: 0.25 }}
             >
               <Link
                 to={tile.link}
@@ -152,7 +152,7 @@ const BentoCategories = () => {
                   loading={i < 4 ? "eager" : "lazy"}
                   fetchPriority={i < 4 ? "high" : "low"}
                   decoding="async"
-                  className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="h-full w-full bg-muted object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
                 <div
                   className={`absolute bottom-3 left-3 rounded-lg border px-2.5 py-1.5 shadow-sm md:bottom-4 md:left-4 md:px-3 ${
