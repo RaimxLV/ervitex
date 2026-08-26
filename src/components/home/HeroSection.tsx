@@ -29,72 +29,75 @@ import teesImgSm from "@/assets/hero/tee-oversized-hero-sm.webp";
  */
 
 type Item = {
+  id: string;
   src: string;
   mobileSrc: string;
   alt: string;
-  /** tailwind position + size classes */
+  /** tailwind position + size classes used below md (desktop comes from heroLayout) */
   className: string;
+  /** extra visual classes on the image */
+  imgClassName?: string;
   /** repel strength & direction multiplier (x, y) */
   push: [number, number];
   /** idle float duration */
   float: number;
-  rotate?: number;
   delay?: number;
 };
 
 const items: Item[] = [
   {
+    id: "jacket",
     src: jacketImg,
     mobileSrc: jacketImgSm,
     alt: "",
-    className: "right-[-38%] top-[8%] w-[72vw] max-w-[620px] sm:right-[-10%] sm:w-[62vw] md:right-[6%] md:top-[8%] md:w-[34vw]",
+    className: "right-[-38%] top-[8%] w-[72vw] max-w-[620px] sm:right-[-10%] sm:w-[62vw]",
     push: [-46, -26],
     float: 9,
-    rotate: -3,
     delay: 0.15,
   },
   {
+    id: "pants",
     src: pantsImg,
     mobileSrc: pantsImgSm,
     alt: "",
-    className: "right-[-36%] bottom-[-2%] w-[72vw] max-w-[645px] sm:right-[-12%] sm:w-[64vw] md:right-[2%] md:bottom-[2%] md:w-[36vw]",
+    className: "right-[-36%] bottom-[-2%] w-[72vw] max-w-[645px] sm:right-[-12%] sm:w-[64vw]",
     push: [34, 22],
     float: 11,
-    rotate: 4,
     delay: 0.3,
   },
   {
+    id: "hoodie",
     src: hoodieImg,
     mobileSrc: hoodieImgSm,
     alt: "",
-    className: "right-[-8%] top-[40%] w-[52vw] max-w-[540px] brightness-125 sm:right-[18%] sm:top-[28%] sm:w-[54vw] md:right-[27%] md:top-[30%] md:w-[30vw]",
+    className: "right-[-8%] top-[40%] w-[52vw] max-w-[540px] sm:right-[18%] sm:top-[28%] sm:w-[54vw]",
+    imgClassName: "brightness-125",
     push: [-28, 34],
     float: 8,
-    rotate: -6,
     delay: 0.45,
   },
   {
+    id: "tee",
     src: teesImg,
     mobileSrc: teesImgSm,
     alt: "",
-    className: "right-[-18%] bottom-[12%] w-[52vw] max-w-[600px] sm:right-[2%] sm:bottom-[20%] sm:w-[52vw] md:right-[24%] md:bottom-[4%] md:w-[32vw]",
+    className: "right-[-18%] bottom-[12%] w-[52vw] max-w-[600px] sm:right-[2%] sm:bottom-[20%] sm:w-[52vw]",
     push: [26, -18],
     float: 10,
-    rotate: 3,
     delay: 0.6,
   },
   {
+    id: "sneaker",
     src: sneakerImg,
     mobileSrc: sneakerImgSm,
     alt: "",
-    className: "right-[43%] bottom-[18%] w-[24vw] max-w-[300px] md:w-[17vw] hidden lg:block",
+    className: "right-[43%] bottom-[18%] w-[24vw] max-w-[300px] hidden lg:block",
     push: [-20, -30],
     float: 7,
-    rotate: 8,
     delay: 0.75,
   },
-
 ];
+
 
 const springCfg = { stiffness: 60, damping: 18, mass: 0.6 };
 
