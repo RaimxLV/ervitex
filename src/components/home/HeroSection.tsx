@@ -45,7 +45,7 @@ const items: Item[] = [
   {
     src: pantsImg,
     alt: "",
-    className: "right-[2%] bottom-[2%] w-[30vw] max-w-[430px] md:w-[24vw]",
+    className: "right-[2%] bottom-[2%] w-[45vw] max-w-[645px] md:w-[36vw]",
     push: [34, 22],
     float: 11,
     rotate: 4,
@@ -54,7 +54,7 @@ const items: Item[] = [
   {
     src: hoodieImg,
     alt: "",
-    className: "right-[27%] top-[30%] w-[26vw] max-w-[360px] md:w-[20vw] brightness-125",
+    className: "right-[27%] top-[30%] w-[39vw] max-w-[540px] md:w-[30vw] brightness-125",
     push: [-28, 34],
     float: 8,
     rotate: -6,
@@ -63,7 +63,7 @@ const items: Item[] = [
   {
     src: teesImg,
     alt: "",
-    className: "right-[24%] bottom-[4%] w-[28vw] max-w-[400px] md:w-[21vw]",
+    className: "right-[24%] bottom-[4%] w-[42vw] max-w-[600px] md:w-[32vw]",
     push: [26, -18],
     float: 10,
     rotate: 3,
@@ -72,7 +72,7 @@ const items: Item[] = [
   {
     src: sneakerImg,
     alt: "",
-    className: "right-[43%] bottom-[18%] w-[16vw] max-w-[200px] md:w-[11vw] hidden lg:block",
+    className: "right-[43%] bottom-[18%] w-[24vw] max-w-[300px] md:w-[17vw] hidden lg:block",
     push: [-20, -30],
     float: 7,
     rotate: 8,
