@@ -104,12 +104,28 @@ const springCfg = { stiffness: 60, damping: 18, mass: 0.6 };
 const HeroSection = () => {
   const { lang } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
+  const location = useLocation();
+  const editMode = new URLSearchParams(location.search).has("hero-edit");
+
+  const [layout, setLayout] = useState<HeroLayout>(() => loadHeroLayout());
+  const [selected, setSelected] = useState<string | null>("hoodie");
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = () => setIsDesktop(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   // Normalized pointer position (-0.5 .. 0.5)
   const px = useMotionValue(0);
   const py = useMotionValue(0);
   const mx = useSpring(px, springCfg);
   const my = useSpring(py, springCfg);
+
 
   const handleMove = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
