@@ -17,11 +17,11 @@ export type HeroLayout = Record<string, HeroPos>;
 
 /** Desktop (>= 768px) layout. Mobile keeps its own tuned classes. */
 export const DEFAULT_HERO_LAYOUT: HeroLayout = {
-  jacket: { right: 1, y: 6, anchor: "top", width: 30, rotate: -3, z: 20 },
-  pants: { right: 4, y: -4, anchor: "bottom", width: 30, rotate: 4, z: 25 },
-  hoodie: { right: 30, y: 8, anchor: "top", width: 27, rotate: -6, z: 40 },
-  tee: { right: 23, y: 2, anchor: "bottom", width: 30, rotate: 3, z: 35 },
-  sneaker: { right: 46, y: 14, anchor: "bottom", width: 15, rotate: 8, z: 50 },
+  jacket: { right: 4, y: -3, anchor: "top", width: 30, rotate: -3, z: 20 },
+  pants: { right: 3.3, y: -3.5, anchor: "bottom", width: 30, rotate: -12, z: 25 },
+  hoodie: { right: 32.4, y: 34.4, anchor: "top", width: 35, rotate: -14, z: 40 },
+  tee: { right: 25.1, y: 40.3, anchor: "bottom", width: 34, rotate: 9, z: 35 },
+  sneaker: { right: 17.5, y: -7.3, anchor: "bottom", width: 15, rotate: -18, z: 39 },
 };
 
 const KEY = "ervitex.heroLayout.v1";
