@@ -228,11 +228,28 @@ const HeroSection = () => {
       </motion.div>
 
       {/* ── Layer 4: garments that flee the cursor ── */}
-      <motion.div style={{ y: itemsY }} className="absolute inset-0 pointer-events-none will-change-transform">
-        {items.map((item, i) => (
-          <ParallaxItem key={i} item={item} mx={mx} my={my} />
+      <motion.div
+        style={{ y: editMode ? 0 : itemsY }}
+        className={`absolute inset-0 will-change-transform ${editMode ? "z-[60]" : "pointer-events-none"}`}
+      >
+        {items.map((item) => (
+          <ParallaxItem
+            key={item.id}
+            item={item}
+            mx={mx}
+            my={my}
+            pos={isDesktop ? layout[item.id] : undefined}
+            editMode={editMode}
+            selected={selected === item.id}
+            onSelect={() => setSelected(item.id)}
+            onDrag={(right, y) =>
+              setLayout((prev) => ({ ...prev, [item.id]: { ...prev[item.id], right, y } }))
+            }
+            sectionRef={sectionRef}
+          />
         ))}
       </motion.div>
+
 
       {/* ── Layer 5: drifting dust sparks ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
