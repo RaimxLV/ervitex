@@ -10,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { money, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
+import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
 import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Save, Search, Send, Trash2, Plus } from "lucide-react";
+
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
 const sizeIdx = (s: string) => {
