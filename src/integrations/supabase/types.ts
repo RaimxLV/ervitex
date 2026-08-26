@@ -1238,6 +1238,8 @@ export type Database = {
           id: string
           items: Json
           note: string | null
+          pm_email: string | null
+          pm_name: string | null
           status: string
           title: string
           token: string
@@ -1254,6 +1256,8 @@ export type Database = {
           id?: string
           items?: Json
           note?: string | null
+          pm_email?: string | null
+          pm_name?: string | null
           status?: string
           title?: string
           token?: string
@@ -1270,6 +1274,8 @@ export type Database = {
           id?: string
           items?: Json
           note?: string | null
+          pm_email?: string | null
+          pm_name?: string | null
           status?: string
           title?: string
           token?: string
@@ -2512,6 +2518,8 @@ export type Database = {
           id: string
           items: Json
           note: string
+          pm_email: string
+          pm_name: string
           status: string
           title: string
           updated_at: string
