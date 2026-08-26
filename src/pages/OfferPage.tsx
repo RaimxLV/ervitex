@@ -52,7 +52,13 @@ const OfferPage = () => {
   const totals = offerTotals(offer.items, offer.vat_rate);
   const text = offerPlainText(offer, lang === "lv" ? "lv" : "en");
   const pmEmail = offer.pm_email || "birojs@ervitex.lv";
-  const itemLink = (i: OfferItem) => `/catalog/item/${i.source}/${encodeURIComponent(i.productId)}`;
+  const itemLink = (i: OfferItem) => {
+    const q = new URLSearchParams();
+    if (i.colorName) q.set("color", i.colorName);
+    if (i.size) q.set("size", i.size);
+    const qs = q.toString();
+    return `/catalog/item/${i.source}/${encodeURIComponent(i.productId)}${qs ? `?${qs}` : ""}`;
+  };
 
   return (
     <div className="min-h-screen bg-muted/30 py-6 print:bg-white print:py-0">
