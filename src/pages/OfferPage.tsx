@@ -51,6 +51,8 @@ const OfferPage = () => {
 
   const totals = offerTotals(offer.items, offer.vat_rate);
   const text = offerPlainText(offer, lang === "lv" ? "lv" : "en");
+  const pmEmail = offer.pm_email || "birojs@ervitex.lv";
+  const itemLink = (i: OfferItem) => `/catalog/item/${i.source}/${encodeURIComponent(i.productId)}`;
 
   return (
     <div className="min-h-screen bg-muted/30 py-6 print:bg-white print:py-0">
@@ -73,12 +75,13 @@ const OfferPage = () => {
               </a>
             </Button>
             <Button size="sm" asChild>
-              <a href={`mailto:birojs@ervitex.lv?subject=${encodeURIComponent(offer.title || "Piedāvājums")}&body=${encodeURIComponent(text)}`}>
-                <Mail className="mr-2 h-3 w-3" /> {t("Atbildēt", "Reply")}
+              <a href={`mailto:${pmEmail}?subject=${encodeURIComponent(offer.title || "Piedāvājums")}&body=${encodeURIComponent(text)}`}>
+                <Mail className="mr-2 h-3 w-3" /> {t("Atbildēt e-pastā", "Reply by email")}
               </a>
             </Button>
           </div>
         </div>
+
 
         <article className="rounded-md border border-border bg-card p-5 sm:p-8 print:border-0 print:p-0">
           <header className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-5">
