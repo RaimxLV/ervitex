@@ -59,10 +59,20 @@ const AdminOfferEdit = () => {
     (async () => {
       const { data, error } = await supabase.from("pm_offers").select("*").eq("id", id!).maybeSingle();
       if (error) toast({ title: "Kļūda", description: error.message, variant: "destructive" });
-      else if (data) setOffer({ ...(data as any), items: ((data as any).items || []) as OfferItem[] });
+      else if (data) {
+        const row = data as any;
+        const me = PROJECT_MANAGERS.find((p) => p.email.toLowerCase() === (user?.email || "").toLowerCase());
+        setOffer({
+          ...row,
+          items: (row.items || []) as OfferItem[],
+          pm_email: row.pm_email || me?.email || user?.email || OFFICE_EMAIL,
+          pm_name: row.pm_name || me?.name || "",
+        });
+      }
       setLoading(false);
     })();
-  }, [id]);
+  }, [id, user?.email]);
+
 
   // debounce search
   useEffect(() => {
