@@ -37,7 +37,10 @@ interface Props {
   url?: string
   disclaimer?: string
   isTest?: boolean
+  pmName?: string
+  pmEmail?: string
 }
+
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
 const container = { maxWidth: '680px', margin: '0 auto', padding: '20px' }
