@@ -1010,9 +1010,14 @@ const CatalogItemDialog = ({
 
     })();
     return () => { cancelled = true; };
-  }, [isOpen, source, id]);
+  }, [isOpen, source, id, initialColor, initialSize]);
 
   useEffect(() => {
+    if (pendingSizeRef.current) {
+      setSelectedSize(pendingSizeRef.current);
+      pendingSizeRef.current = null;
+      return;
+    }
     setSelectedSize(null);
   }, [activeColor]);
 
