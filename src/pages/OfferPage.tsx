@@ -121,15 +121,18 @@ const OfferPage = () => {
               </thead>
               <tbody>
                 {offer.items.map((i) => (
-                  <tr key={i.id} className="border-b border-border/60 align-middle">
+                  <tr key={i.id} className="border-b border-border/60 align-middle hover:bg-muted/40 print:hover:bg-transparent">
                     <td className="py-2">
-                      <div className="flex items-center gap-2">
+                      <Link to={itemLink(i)} className="flex items-center gap-2 group">
                         {i.image && <img src={i.image} alt={i.name} loading="lazy" className="h-12 w-12 rounded-sm object-cover print:hidden" />}
                         <span>
-                          <span className="block font-medium text-foreground">{i.name}</span>
+                          <span className="block font-medium text-foreground group-hover:text-accent">{i.name}</span>
                           <span className="block text-xs text-muted-foreground">{i.code}{i.brand ? ` · ${i.brand}` : ""}</span>
+                          <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] uppercase tracking-wider text-accent print:hidden">
+                            {t("Skatīt preci", "View product")} <ArrowUpRight className="h-3 w-3" />
+                          </span>
                         </span>
-                      </div>
+                      </Link>
                     </td>
                     <td className="py-2">
                       <span className="inline-flex items-center gap-1.5">
@@ -143,6 +146,7 @@ const OfferPage = () => {
                     <td className="py-2 text-right font-medium">{i.unitPrice ? money(i.unitPrice * i.qty) : "—"}</td>
                   </tr>
                 ))}
+
               </tbody>
             </table>
           </div>
