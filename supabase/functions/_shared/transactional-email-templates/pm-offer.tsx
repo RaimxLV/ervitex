@@ -139,7 +139,10 @@ const PmOfferEmail = ({
 
         {url && (
           <Section style={{ margin: '22px 0' }}>
-            <Button href={url} style={btn}>SKATĪT PIEDĀVĀJUMU TIEŠSAISTĒ</Button>
+            <Button href={url} style={btn}>SKATĪT PIEDĀVĀJUMU UN PRECES TIEŠSAISTĒ</Button>
+            <Text style={{ ...subtle, marginTop: '8px' }}>
+              Tiešsaistes skatā vari atvērt katru preci, apskatīt aprakstu, visas krāsas un izmērus.
+            </Text>
           </Section>
         )}
 
@@ -148,7 +151,11 @@ const PmOfferEmail = ({
         )}
 
         <Hr style={{ borderColor: '#eee', margin: '18px 0' }} />
-        <Text style={subtle}>Ervitex · birojs@ervitex.lv · www.ervitex.lv</Text>
+        <Text style={{ fontSize: '13px', margin: '0 0 4px' }}>
+          {pmName ? `${pmName} · ` : ''}{pmEmail}
+        </Text>
+        <Text style={subtle}>Ervitex · www.ervitex.lv · Atbildi uz šo e-pastu, lai turpinātu saziņu.</Text>
+
       </Container>
     </Body>
   </Html>
