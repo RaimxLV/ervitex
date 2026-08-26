@@ -422,18 +422,77 @@ const HeroSection = () => {
 
       {/* Bottom accent line */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-accent" />
+
+      {editMode && (
+        <HeroLayoutEditor layout={layout} setLayout={setLayout} selected={selected} setSelected={setSelected} />
+      )}
     </section>
   );
 };
 
 type MV = ReturnType<typeof useSpring>;
 
-const ParallaxItem = ({ item, mx, my }: { item: Item; mx: MV; my: MV }) => {
-  const x = useTransform(mx, (v) => v * item.push[0]);
-  const y = useTransform(my, (v) => v * item.push[1]);
+const ParallaxItem = ({
+  item,
+  mx,
+  my,
+  pos,
+  editMode,
+  selected,
+  onSelect,
+  onDrag,
+  sectionRef,
+}: {
+  item: Item;
+  mx: MV;
+  my: MV;
+  pos?: HeroPos;
+  editMode: boolean;
+  selected: boolean;
+  onSelect: () => void;
+  onDrag: (right: number, y: number) => void;
+  sectionRef: React.RefObject<HTMLElement>;
+}) => {
+  const x = useTransform(mx, (v) => (editMode ? 0 : v * item.push[0]));
+  const y = useTransform(my, (v) => (editMode ? 0 : v * item.push[1]));
+  const rotate = (pos ?? DEFAULT_HERO_LAYOUT[item.id]).rotate;
+
+  const startDrag = (e: React.PointerEvent) => {
+    if (!editMode || !pos) return;
+    e.preventDefault();
+    onSelect();
+    const rect = sectionRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const el = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const offX = e.clientX - el.left;
+    const offY = e.clientY - el.top;
+
+    const move = (ev: PointerEvent) => {
+      const left = ev.clientX - offX - rect.left;
+      const top = ev.clientY - offY - rect.top;
+      const right = ((rect.width - left - el.width) / rect.width) * 100;
+      const yPct =
+        pos.anchor === "top"
+          ? (top / rect.height) * 100
+          : ((rect.height - top - el.height) / rect.height) * 100;
+      onDrag(Math.round(right * 10) / 10, Math.round(yPct * 10) / 10);
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  };
 
   return (
-    <motion.div style={{ x, y }} className={`absolute ${item.className} will-change-transform`}>
+    <motion.div
+      onPointerDown={startDrag}
+      style={{ x, y, ...(pos ? heroPosStyle(pos) : {}) }}
+      className={`absolute ${pos ? "" : item.className} will-change-transform ${
+        editMode ? `cursor-grab ${selected ? "outline outline-2 outline-accent" : "outline-dashed outline-1 outline-white/30"}` : ""
+      }`}
+    >
       <motion.div
         initial={{ opacity: 0, y: 60, scale: 0.94 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -450,15 +509,17 @@ const ParallaxItem = ({ item, mx, my }: { item: Item; mx: MV; my: MV }) => {
             decoding="async"
             loading="eager"
             fetchPriority="high"
-            className="h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)]"
-            style={{ rotate: item.rotate ?? 0 }}
-            animate={{ y: [0, -14, 0] }}
-            transition={{ duration: item.float, repeat: Infinity, ease: "easeInOut" }}
+            draggable={false}
+            className={`h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)] ${item.imgClassName ?? ""}`}
+            style={{ rotate }}
+            animate={editMode ? { y: 0 } : { y: [0, -14, 0] }}
+            transition={editMode ? { duration: 0 } : { duration: item.float, repeat: Infinity, ease: "easeInOut" }}
           />
         </picture>
       </motion.div>
     </motion.div>
   );
 };
+
 
 export default HeroSection;
