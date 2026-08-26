@@ -11,7 +11,7 @@ import jacketImg from "@/assets/hero/jacket.png";
 import hoodieImg from "@/assets/hero/hoodie.png";
 import pantsImg from "@/assets/hero/pants.png";
 import sneakerImg from "@/assets/hero/sneaker.png";
-import teesImg from "@/assets/hero/cap.png";
+import teesImg from "@/assets/hero/tee-oversized.png";
 
 /**
  * Multi-layer parallax hero.
@@ -63,7 +63,7 @@ const items: Item[] = [
   {
     src: teesImg,
     alt: "",
-    className: "right-[26%] bottom-[6%] w-[20vw] max-w-[260px] md:w-[14vw]",
+    className: "right-[24%] bottom-[4%] w-[28vw] max-w-[400px] md:w-[21vw]",
     push: [26, -18],
     float: 10,
     rotate: 3,
@@ -119,8 +119,8 @@ const HeroSection = () => {
   const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
 
   // Layer drifts driven by pointer (background moves with, objects move away)
-  const bgX = useTransform(mx, (v) => v * 26);
-  const bgYm = useTransform(my, (v) => v * 18);
+  const bgX = useTransform(mx, (v) => v * 70);
+  const bgYm = useTransform(my, (v) => v * 48);
   const hazeX = useTransform(mx, (v) => v * -60);
   const hazeY = useTransform(my, (v) => v * -40);
   const rockX = useTransform(mx, (v) => v * -34);
