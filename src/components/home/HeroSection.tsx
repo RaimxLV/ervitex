@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCallback, useEffect, useRef, useState } from "react";
 import HeroLayoutEditor from "./HeroLayoutEditor";
-import { HeroLayout, HeroPos, heroPosStyle, loadHeroLayout } from "./heroLayout";
+import { DEFAULT_HERO_LAYOUT, HeroLayout, HeroPos, heroPosStyle, loadHeroLayout } from "./heroLayout";
 
 
 import bgLayer from "@/assets/hero/layer-bg.jpg";
