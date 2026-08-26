@@ -228,16 +228,21 @@ const AdminOfferEdit = () => {
     else await save();
 
     const t = offerTotals(offer.items, offer.vat_rate);
+    const pmEmail = (offer.pm_email || user?.email || OFFICE_EMAIL).trim();
+    const pmName = offer.pm_name || "";
     const { error } = await supabase.functions.invoke("send-transactional-email", {
       body: {
         templateName: "pm-offer",
         recipientEmail: to,
-        replyTo: "birojs@ervitex.lv",
+        replyTo: pmEmail,
         idempotencyKey: `pm-offer-${offer.id}-${mode}-${Date.now()}`,
         templateData: {
           title: offer.title || "Ervitex piedāvājums",
           clientName: offer.client_name || "",
           note: offer.note || "",
+          pmName,
+          pmEmail,
+
           items: offer.items.map((i) => ({
             name: i.name,
             code: i.code,
