@@ -973,8 +973,23 @@ const CatalogItemDialog = ({
       const d = await loader(id).catch(() => null);
       if (cancelled) return;
       setDetail(d);
-      setActiveColor(d?.colors[0]?.code ?? null);
+      // Preselect the colour the client was quoted (match by supplier code, then by name)
+      const wanted = (initialColor || "").trim();
+      let picked = d?.colors[0]?.code ?? null;
+      if (wanted && d?.colors?.length) {
+        const wc = wanted.toLowerCase();
+        const wn = canonName(wanted);
+        const hit =
+          d.colors.find((c) => (c.code || "").toLowerCase() === wc) ||
+          d.colors.find((c) => (c.name || "").toLowerCase() === wc) ||
+          d.colors.find((c) => canonName(c.name) === wn) ||
+          (wn ? d.colors.find((c) => canonName(c.name).includes(wn) || wn.includes(canonName(c.name))) : undefined);
+        if (hit) picked = hit.code;
+      }
+      pendingSizeRef.current = initialSize?.trim() || null;
+      setActiveColor(picked);
       setLoading(false);
+
       // Per-variant prices (colour/size aware, excl. VAT, markup already applied)
       const rows: any[] = [];
       let from = 0;
