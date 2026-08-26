@@ -171,14 +171,17 @@ const AdminOfferEdit = () => {
         note: next.note,
         status: next.status,
         vat_rate: next.vat_rate,
+        pm_name: next.pm_name || null,
+        pm_email: next.pm_email || null,
         items: next.items as any,
-      })
+      } as any)
       .eq("id", offer.id);
     setSaving(false);
     if (error) return toast({ title: "Kļūda", description: error.message, variant: "destructive" });
     setOffer(next);
     toast({ title: status === "sent" ? "Saglabāts un gatavs sūtīšanai" : "Saglabāts" });
   };
+
 
   const link = offer.token ? offerUrl(offer.token) : "";
 
