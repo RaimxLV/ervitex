@@ -49,7 +49,11 @@ const TechnologiesShowcase = () => {
                   <img
                     src={t.images[0]}
                     alt={t.name[lang]}
-                    loading="lazy"
+                    width={640}
+                    height={480}
+                    loading={i < 2 ? "eager" : "lazy"}
+                    fetchPriority={i < 2 ? "high" : "low"}
+                    decoding="async"
                     className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                 </div>
@@ -74,6 +78,7 @@ const TechnologiesShowcase = () => {
             height={1050}
             alt={isLv ? "Apdrukāts krekls ar individualizētu dizainu" : "Printed t-shirt with a custom design"}
             loading="lazy"
+            decoding="async"
             className="aspect-[4/3] w-full rounded-sm object-cover"
           />
           <div>

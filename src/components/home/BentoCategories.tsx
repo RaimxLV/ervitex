@@ -147,7 +147,11 @@ const BentoCategories = () => {
                 <img
                   src={tile.image}
                   alt={tile[lang]}
-                  loading="lazy"
+                  width={640}
+                  height={640}
+                  loading={i < 4 ? "eager" : "lazy"}
+                  fetchPriority={i < 4 ? "high" : "low"}
+                  decoding="async"
                   className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
                 <div
