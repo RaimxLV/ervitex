@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import HeroLayoutEditor from "./HeroLayoutEditor";
+import { DEFAULT_HERO_LAYOUT, HeroLayout, HeroPos, heroPosStyle, loadHeroLayout } from "./heroLayout";
+
 
 import bgLayer from "@/assets/hero/layer-bg.jpg";
 import rockLayer from "@/assets/hero/layer-rock-hero.webp";
@@ -26,84 +29,103 @@ import teesImgSm from "@/assets/hero/tee-oversized-hero-sm.webp";
  */
 
 type Item = {
+  id: string;
   src: string;
   mobileSrc: string;
   alt: string;
-  /** tailwind position + size classes */
+  /** tailwind position + size classes used below md (desktop comes from heroLayout) */
   className: string;
+  /** extra visual classes on the image */
+  imgClassName?: string;
   /** repel strength & direction multiplier (x, y) */
   push: [number, number];
   /** idle float duration */
   float: number;
-  rotate?: number;
   delay?: number;
 };
 
 const items: Item[] = [
   {
+    id: "jacket",
     src: jacketImg,
     mobileSrc: jacketImgSm,
     alt: "",
-    className: "right-[-38%] top-[8%] w-[72vw] max-w-[620px] sm:right-[-10%] sm:w-[62vw] md:right-[6%] md:top-[8%] md:w-[34vw]",
+    className: "right-[-38%] top-[8%] w-[72vw] max-w-[620px] sm:right-[-10%] sm:w-[62vw]",
     push: [-46, -26],
     float: 9,
-    rotate: -3,
     delay: 0.15,
   },
   {
+    id: "pants",
     src: pantsImg,
     mobileSrc: pantsImgSm,
     alt: "",
-    className: "right-[-36%] bottom-[-2%] w-[72vw] max-w-[645px] sm:right-[-12%] sm:w-[64vw] md:right-[2%] md:bottom-[2%] md:w-[36vw]",
+    className: "right-[-36%] bottom-[-2%] w-[72vw] max-w-[645px] sm:right-[-12%] sm:w-[64vw]",
     push: [34, 22],
     float: 11,
-    rotate: 4,
     delay: 0.3,
   },
   {
+    id: "hoodie",
     src: hoodieImg,
     mobileSrc: hoodieImgSm,
     alt: "",
-    className: "right-[-8%] top-[40%] w-[52vw] max-w-[540px] brightness-125 sm:right-[18%] sm:top-[28%] sm:w-[54vw] md:right-[27%] md:top-[30%] md:w-[30vw]",
+    className: "right-[-8%] top-[40%] w-[52vw] max-w-[540px] sm:right-[18%] sm:top-[28%] sm:w-[54vw]",
+    imgClassName: "brightness-125",
     push: [-28, 34],
     float: 8,
-    rotate: -6,
     delay: 0.45,
   },
   {
+    id: "tee",
     src: teesImg,
     mobileSrc: teesImgSm,
     alt: "",
-    className: "right-[-18%] bottom-[12%] w-[52vw] max-w-[600px] sm:right-[2%] sm:bottom-[20%] sm:w-[52vw] md:right-[24%] md:bottom-[4%] md:w-[32vw]",
+    className: "right-[-18%] bottom-[12%] w-[52vw] max-w-[600px] sm:right-[2%] sm:bottom-[20%] sm:w-[52vw]",
     push: [26, -18],
     float: 10,
-    rotate: 3,
     delay: 0.6,
   },
   {
+    id: "sneaker",
     src: sneakerImg,
     mobileSrc: sneakerImgSm,
     alt: "",
-    className: "right-[43%] bottom-[18%] w-[24vw] max-w-[300px] md:w-[17vw] hidden lg:block",
+    className: "right-[43%] bottom-[18%] w-[24vw] max-w-[300px] hidden lg:block",
     push: [-20, -30],
     float: 7,
-    rotate: 8,
     delay: 0.75,
   },
-
 ];
+
 
 const springCfg = { stiffness: 60, damping: 18, mass: 0.6 };
 
 const HeroSection = () => {
   const { lang } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
+  const location = useLocation();
+  const editMode = new URLSearchParams(location.search).has("hero-edit");
+
+  const [layout, setLayout] = useState<HeroLayout>(() => loadHeroLayout());
+  const [selected, setSelected] = useState<string | null>("hoodie");
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches,
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = () => setIsDesktop(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   // Normalized pointer position (-0.5 .. 0.5)
   const px = useMotionValue(0);
   const py = useMotionValue(0);
   const mx = useSpring(px, springCfg);
   const my = useSpring(py, springCfg);
+
 
   const handleMove = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
@@ -206,11 +228,28 @@ const HeroSection = () => {
       </motion.div>
 
       {/* ── Layer 4: garments that flee the cursor ── */}
-      <motion.div style={{ y: itemsY }} className="absolute inset-0 pointer-events-none will-change-transform">
-        {items.map((item, i) => (
-          <ParallaxItem key={i} item={item} mx={mx} my={my} />
+      <motion.div
+        style={{ y: editMode ? 0 : itemsY }}
+        className={`absolute inset-0 will-change-transform ${editMode ? "z-[60]" : "pointer-events-none"}`}
+      >
+        {items.map((item) => (
+          <ParallaxItem
+            key={item.id}
+            item={item}
+            mx={mx}
+            my={my}
+            pos={isDesktop ? layout[item.id] : undefined}
+            editMode={editMode}
+            selected={selected === item.id}
+            onSelect={() => setSelected(item.id)}
+            onDrag={(right, y) =>
+              setLayout((prev) => ({ ...prev, [item.id]: { ...prev[item.id], right, y } }))
+            }
+            sectionRef={sectionRef}
+          />
         ))}
       </motion.div>
+
 
       {/* ── Layer 5: drifting dust sparks ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -383,18 +422,77 @@ const HeroSection = () => {
 
       {/* Bottom accent line */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-accent" />
+
+      {editMode && (
+        <HeroLayoutEditor layout={layout} setLayout={setLayout} selected={selected} setSelected={setSelected} />
+      )}
     </section>
   );
 };
 
 type MV = ReturnType<typeof useSpring>;
 
-const ParallaxItem = ({ item, mx, my }: { item: Item; mx: MV; my: MV }) => {
-  const x = useTransform(mx, (v) => v * item.push[0]);
-  const y = useTransform(my, (v) => v * item.push[1]);
+const ParallaxItem = ({
+  item,
+  mx,
+  my,
+  pos,
+  editMode,
+  selected,
+  onSelect,
+  onDrag,
+  sectionRef,
+}: {
+  item: Item;
+  mx: MV;
+  my: MV;
+  pos?: HeroPos;
+  editMode: boolean;
+  selected: boolean;
+  onSelect: () => void;
+  onDrag: (right: number, y: number) => void;
+  sectionRef: React.RefObject<HTMLElement>;
+}) => {
+  const x = useTransform(mx, (v) => (editMode ? 0 : v * item.push[0]));
+  const y = useTransform(my, (v) => (editMode ? 0 : v * item.push[1]));
+  const rotate = (pos ?? DEFAULT_HERO_LAYOUT[item.id]).rotate;
+
+  const startDrag = (e: React.PointerEvent) => {
+    if (!editMode || !pos) return;
+    e.preventDefault();
+    onSelect();
+    const rect = sectionRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const el = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const offX = e.clientX - el.left;
+    const offY = e.clientY - el.top;
+
+    const move = (ev: PointerEvent) => {
+      const left = ev.clientX - offX - rect.left;
+      const top = ev.clientY - offY - rect.top;
+      const right = ((rect.width - left - el.width) / rect.width) * 100;
+      const yPct =
+        pos.anchor === "top"
+          ? (top / rect.height) * 100
+          : ((rect.height - top - el.height) / rect.height) * 100;
+      onDrag(Math.round(right * 10) / 10, Math.round(yPct * 10) / 10);
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  };
 
   return (
-    <motion.div style={{ x, y }} className={`absolute ${item.className} will-change-transform`}>
+    <motion.div
+      onPointerDown={startDrag}
+      style={{ x, y, ...(pos ? heroPosStyle(pos) : {}) }}
+      className={`absolute ${pos ? "" : item.className} will-change-transform ${
+        editMode ? `cursor-grab ${selected ? "outline outline-2 outline-accent" : "outline-dashed outline-1 outline-white/30"}` : ""
+      }`}
+    >
       <motion.div
         initial={{ opacity: 0, y: 60, scale: 0.94 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -411,15 +509,17 @@ const ParallaxItem = ({ item, mx, my }: { item: Item; mx: MV; my: MV }) => {
             decoding="async"
             loading="eager"
             fetchPriority="high"
-            className="h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)]"
-            style={{ rotate: item.rotate ?? 0 }}
-            animate={{ y: [0, -14, 0] }}
-            transition={{ duration: item.float, repeat: Infinity, ease: "easeInOut" }}
+            draggable={false}
+            className={`h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)] ${item.imgClassName ?? ""}`}
+            style={{ rotate }}
+            animate={editMode ? { y: 0 } : { y: [0, -14, 0] }}
+            transition={editMode ? { duration: 0 } : { duration: item.float, repeat: Infinity, ease: "easeInOut" }}
           />
         </picture>
       </motion.div>
     </motion.div>
   );
 };
+
 
 export default HeroSection;
