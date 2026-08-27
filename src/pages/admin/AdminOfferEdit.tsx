@@ -619,7 +619,7 @@ const AdminOfferEdit = () => {
 
             <div className="grid grid-cols-2 gap-2">
 
-              <Button size="sm" variant="outline" onClick={() => copy(link, "Links")}><Copy className="mr-2 h-3 w-3" /> Saite</Button>
+              <Button size="sm" variant="outline" onClick={async () => { await publish(); copy(link, "Links"); }}><Copy className="mr-2 h-3 w-3" /> Saite</Button>
               <Button size="sm" variant="outline" onClick={() => copy(offerPlainText(offer, "lv"), "Teksts")}><Copy className="mr-2 h-3 w-3" /> Teksts</Button>
               <Button size="sm" variant="outline" onClick={whatsapp}><MessageCircle className="mr-2 h-3 w-3" /> WhatsApp</Button>
               <Button size="sm" variant="outline" onClick={mail}><Mail className="mr-2 h-3 w-3" /> E-pasts</Button>
