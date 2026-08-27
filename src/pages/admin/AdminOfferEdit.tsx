@@ -328,17 +328,10 @@ const AdminOfferEdit = () => {
                 <Input value={offer.client_phone || ""} onChange={(e) => setOffer({ ...offer, client_phone: e.target.value })} placeholder="+371…" />
               </div>
               <div>
-                <Label className="text-xs">Statuss</Label>
-                <Select value={offer.status} onValueChange={(v) => setOffer({ ...offer, status: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Melnraksts (saite nedarbojas)</SelectItem>
-                    <SelectItem value="sent">Nosūtīts</SelectItem>
-                    <SelectItem value="accepted">Apstiprināts</SelectItem>
-                    <SelectItem value="closed">Slēgts</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label className="text-xs">PVN %</Label>
+                <Input type="number" value={offer.vat_rate} onChange={(e) => setOffer({ ...offer, vat_rate: Number(e.target.value) || 0 })} />
               </div>
+
               <div>
                 <Label className="text-xs">PVN %</Label>
                 <Input type="number" value={offer.vat_rate} onChange={(e) => setOffer({ ...offer, vat_rate: Number(e.target.value) || 0 })} />
