@@ -39,6 +39,10 @@ const AdminMegaMenu = lazy(() => import("./pages/admin/AdminMegaMenu.tsx"));
 const AdminPriceAudit = lazy(() => import("./pages/admin/AdminPriceAudit.tsx"));
 const AdminOffers = lazy(() => import("./pages/admin/AdminOffers.tsx"));
 const AdminOfferEdit = lazy(() => import("./pages/admin/AdminOfferEdit.tsx"));
+const AdminProducts = lazy(() => import("./pages/admin/AdminProducts.tsx"));
+const AdminProductForm = lazy(() => import("./pages/admin/AdminProductForm.tsx"));
+const AdminCategories = lazy(() => import("./pages/admin/AdminCategories.tsx"));
+
 
 const queryClient = new QueryClient();
 const routerBase = import.meta.env.BASE_URL;
