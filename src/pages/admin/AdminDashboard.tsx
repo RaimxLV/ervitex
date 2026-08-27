@@ -2,9 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
-import NwgSyncProgress from "@/components/admin/NwgSyncProgress";
+import SyncHealthPanel from "@/components/admin/SyncHealthPanel";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { MessageSquare, FileText, TrendingUp, RefreshCw, CheckCircle2, AlertTriangle, BadgeEuro } from "lucide-react";
 
 interface SourceSummary {
@@ -32,17 +31,11 @@ const SOURCE_LABELS: Record<string, string> = {
   ru: "Russell Europe",
 };
 
-/** Sinhronizācijas soļi tiek izsaukti ar taimautu, lai panelis nekad neuzkārtos. */
-const SYNC_TIMEOUT_MS = 120_000;
-
 const AdminDashboard = () => {
-  const { toast } = useToast();
   const [stats, setStats] = useState({ quotes: 0, newQuotes: 0, offers: 0, sentOffers: 0 });
   const [sources, setSources] = useState<SourceSummary[]>([]);
   const [syncLogs, setSyncLogs] = useState<SyncRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
-  const [syncStep, setSyncStep] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -89,63 +82,6 @@ const AdminDashboard = () => {
   useEffect(() => {
     load();
   }, [load]);
-
-  const callSync = async (mode: string) => {
-    const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stanley-stella-sync?mode=${mode}`;
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), SYNC_TIMEOUT_MS);
-    try {
-      const session = (await supabase.auth.getSession()).data.session;
-      const res = await fetch(url, {
-        method: "POST",
-        signal: controller.signal,
-        headers: {
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-      });
-      const data = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
-      if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
-      return data;
-    } catch (e) {
-      if ((e as Error).name === "AbortError") throw new Error("Solis pārsniedza 2 minūtes un tika apturēts");
-      throw e;
-    } finally {
-      clearTimeout(timer);
-    }
-  };
-
-  const runSync = async () => {
-    setSyncing(true);
-    const steps: [string, string][] = [
-      ["colors", "Krāsas"],
-      ["sizes", "Izmēri"],
-      ["styles", "Modeļi un varianti"],
-      ["stock", "Pieejamība"],
-      ["prices", "Iepirkuma cenas"],
-    ];
-    const failed: string[] = [];
-    for (const [mode, label] of steps) {
-      setSyncStep(label);
-      try {
-        await callSync(mode);
-      } catch (e) {
-        failed.push(`${label}: ${(e as Error).message}`);
-      }
-    }
-    setSyncStep(null);
-    setSyncing(false);
-    if (failed.length) {
-      toast({
-        title: "Sinhronizācija pabeigta ar kļūdām",
-        description: failed.join(" · "),
-        variant: "destructive",
-      });
-    } else {
-      toast({ title: "Stanley/Stella katalogs sinhronizēts" });
-    }
-    await load();
-  };
 
   const cards = [
     { label: "Pieprasījumi", value: stats.quotes, icon: MessageSquare, to: "/admin/quotes" },
