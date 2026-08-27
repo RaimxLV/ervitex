@@ -197,6 +197,11 @@ const AdminOfferEdit = () => {
 
   const link = offer.token ? offerUrl(offer.token) : "";
 
+  // Any client-facing share must publish the link first (draft links do not work)
+  const publish = async () => {
+    if (offer.status === "draft") await save("sent");
+  };
+
   const copy = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -206,17 +211,20 @@ const AdminOfferEdit = () => {
     }
   };
 
-  const whatsapp = () => {
+  const whatsapp = async () => {
+    await publish();
     const text = `${offer.client_name ? `Sveiki, ${offer.client_name}!\n\n` : ""}${offerPlainText(offer, "lv")}`;
     const phone = (offer.client_phone || "").replace(/[^\d]/g, "");
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
-  const mail = () => {
+  const mail = async () => {
+    await publish();
     const subject = offer.title || "Ervitex piedāvājums";
     const body = `${offer.client_name ? `Sveiki, ${offer.client_name}!\n\n` : ""}${offerPlainText(offer, "lv")}`;
     window.location.href = `mailto:${offer.client_email || ""}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
+
 
   // Real send through the platform email system
   const sendEmail = async (mode: "client" | "test") => {
