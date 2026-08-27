@@ -343,11 +343,8 @@ async function syncPrices(sb: SupabaseClient) {
   if (!token) throw new Error("PF_FEED_TOKEN not set");
   const url = `http://www.pfconcept.com/portal/datafeed/pricefeed_${token}_v3.json`;
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`pricefeed fetch ${res.status}`);
-  const feed: any = await res.json();
+  if (!res.ok || !res.body) throw new Error(`pricefeed fetch ${res.status}`);
 
-  // Structure: PFCPriceFeed.priceInfo[].models[].model[].items[].item[]{itemcode,currency,scales[].scale[]{priceBar,nettPrice},promotion[].scales[].scale[]{priceBar,standardPrice}}
-  const rows: any[] = [];
   const now = new Date().toISOString();
 
   const pickLowestScale = (scales: any): { bar: number; val: number } | null => {
@@ -366,51 +363,90 @@ async function syncPrices(sb: SupabaseClient) {
     return best;
   };
 
-  const priceInfoArr = Array.isArray(feed?.PFCPriceFeed?.priceInfo)
-    ? feed.PFCPriceFeed.priceInfo
-    : (feed?.PFCPriceFeed?.priceInfo ? [feed.PFCPriceFeed.priceInfo] : []);
-  for (const pi of priceInfoArr) {
-    const modelsWrap = Array.isArray(pi?.models) ? pi.models : (pi?.models ? [pi.models] : []);
-    for (const mw of modelsWrap) {
-      const models = Array.isArray(mw?.model) ? mw.model : (mw?.model ? [mw.model] : []);
-      for (const m of models) {
-        const itemsWrap = Array.isArray(m?.items) ? m.items : (m?.items ? [m.items] : []);
-        for (const iw of itemsWrap) {
-          const items = Array.isArray(iw?.item) ? iw.item : (iw?.item ? [iw.item] : []);
-          for (const it of items) {
-            const item_code = toStr(it?.itemcode) || toStr(it?.itemCode);
-            if (!item_code) continue;
-            const currency = toStr(it?.currency) ?? "EUR";
-            const nett = pickLowestScale(it?.scales);
-            const promo = pickLowestScale(it?.promotion?.[0]?.scales ?? it?.promotion?.scales);
-            const price = nett?.val ?? null;
-            const list_price = promo?.val ?? null;
-            if (price === null && list_price === null) continue;
-            rows.push({ item_code, price, list_price, currency, updated_at: now });
-          }
-        }
+  // Stream the feed: the full price feed is far too large to JSON.parse in one go
+  // (that used to kill the function with a memory limit). We emit one `model`
+  // at a time and flush price rows in small batches.
+  const parser = new JSONParser({
+    paths: ["$.PFCPriceFeed.priceInfo.*.models.*.model"],
+    keepStack: false,
+  });
+
+  let parsed = 0;
+  let upserted = 0;
+  let published = 0;
+  let batch: any[] = [];
+  const pending: Promise<void>[] = [];
+
+  const flush = async () => {
+    if (!batch.length) return;
+    const rows = batch;
+    batch = [];
+    upserted += await chunkUpsert(sb, "pf_prices", rows, "item_code", 500);
+    const pub = rows
+      .filter((r) => r.price !== null && r.price > 0)
+      .map((r) => ({
+        item_code: r.item_code,
+        model_code: String(r.item_code).slice(0, 6),
+        retail_price: Number((Number(r.price) * 1.65).toFixed(2)),
+        currency: r.currency || "EUR",
+        updated_at: now,
+      }));
+    if (pub.length) {
+      const { error } = await sb.from("pf_public_retail_prices").upsert(pub, { onConflict: "item_code" });
+      if (error) throw new Error(`pf_public_retail_prices upsert: ${error.message}`);
+      published += pub.length;
+    }
+  };
+
+  const collect = (m: any) => {
+    const itemsWrap = Array.isArray(m?.items) ? m.items : (m?.items ? [m.items] : []);
+    for (const iw of itemsWrap) {
+      const items = Array.isArray(iw?.item) ? iw.item : (iw?.item ? [iw.item] : []);
+      for (const it of items) {
+        const item_code = toStr(it?.itemcode) || toStr(it?.itemCode);
+        if (!item_code) continue;
+        const currency = toStr(it?.currency) ?? "EUR";
+        const nett = pickLowestScale(it?.scales);
+        const promo = pickLowestScale(it?.promotion?.[0]?.scales ?? it?.promotion?.scales);
+        const price = nett?.val ?? null;
+        const list_price = promo?.val ?? null;
+        if (price === null && list_price === null) continue;
+        parsed++;
+        batch.push({ item_code, price, list_price, currency, updated_at: now });
       }
     }
-  }
+  };
 
-  const upserted = await chunkUpsert(sb, "pf_prices", rows, "item_code", 500);
-  const { error: publishError, count: published } = await sb
-    .from("pf_public_retail_prices")
-    .upsert(
-      rows
-        .filter((r) => r.price !== null && r.price > 0)
-        .map((r) => ({
-          item_code: r.item_code,
-          model_code: String(r.item_code).slice(0, 6),
-          retail_price: Number((Number(r.price) * 1.65).toFixed(2)),
-          currency: r.currency || "EUR",
-          updated_at: now,
-        })),
-      { onConflict: "item_code", count: "exact" },
-    );
-  if (publishError) throw new Error(`pf_public_retail_prices upsert: ${publishError.message}`);
-  return { parsed: rows.length, upserted, published };
+  const done = new Promise<void>((resolve, reject) => {
+    parser.onValue = (v: any) => {
+      const val = v.value;
+      if (Array.isArray(val)) for (const m of val) collect(m);
+      else collect(val);
+      if (batch.length >= 1000) pending.push(flush());
+    };
+    parser.onEnd = () => resolve();
+    parser.onError = (e: any) => reject(e);
+  });
+
+  const reader = res.body.getReader();
+  try {
+    while (true) {
+      const { value, done: rd } = await reader.read();
+      if (rd) break;
+      parser.write(value);
+      if (pending.length) await Promise.all(pending.splice(0));
+    }
+  } finally {
+    try { reader.cancel(); } catch { /* ignore */ }
+  }
+  parser.end();
+  await done;
+  if (pending.length) await Promise.all(pending.splice(0));
+  await flush();
+
+  return { parsed, upserted, published };
 }
+
 
 async function probePrices() {
   const token = Deno.env.get("PF_FEED_TOKEN");
