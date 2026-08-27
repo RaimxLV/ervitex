@@ -284,8 +284,15 @@ const AdminOfferEdit = () => {
       },
     });
     setSendingEmail(null);
-    if (error) toast({ title: "Neizdevās nosūtīt", description: error.message, variant: "destructive" });
-    else toast({ title: mode === "test" ? `Tests nosūtīts uz ${to}` : `Piedāvājums nosūtīts: ${to}` });
+    if (error) {
+      toast({ title: "Neizdevās nosūtīt", description: error.message, variant: "destructive" });
+      return;
+    }
+    if (mode === "client" && offer.status === "draft") {
+      // Status changes automatically on a successful send
+      await save("sent");
+    }
+    toast({ title: mode === "test" ? `Tests nosūtīts uz ${to}` : `Piedāvājums nosūtīts: ${to}` });
   };
 
 
@@ -293,21 +300,26 @@ const AdminOfferEdit = () => {
     return <AdminLayout><p className="py-10 text-center text-muted-foreground">Ielādē...</p></AdminLayout>;
   }
 
+  const st = STATUS_META[offer.status] || STATUS_META.draft;
+
   return (
     <AdminLayout>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button asChild variant="outline" size="sm">
-          <Link to="/admin/offers"><ArrowLeft className="mr-2 h-4 w-4" /> Visi piedāvājumi</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/admin/offers"><ArrowLeft className="mr-2 h-4 w-4" /> Visi piedāvājumi</Link>
+          </Button>
+          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${st.cls}`}>
+            <span className="h-1.5 w-1.5 rounded-full bg-current" /> {st.label}
+          </span>
+        </div>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" onClick={() => save()} disabled={saving}>
             <Save className="mr-2 h-4 w-4" /> Saglabāt
           </Button>
-          <Button size="sm" variant="outline" onClick={() => save("sent")} disabled={saving}>
-            Publicēt saiti
-          </Button>
         </div>
       </div>
+
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1fr,360px]">
         <div className="space-y-6">
