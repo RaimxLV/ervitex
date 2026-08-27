@@ -241,22 +241,8 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <NwgSyncProgress />
+      <SyncHealthPanel />
 
-      {/* Stanley/Stella sinhronizācija */}
-      <div className="mt-8 rounded-sm border border-border bg-card p-4 sm:p-6">
-        <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Stanley/Stella sinhronizācija</h2>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Atjauno krāsas, izmērus, modeļus, variantus, pieejamību un iepirkuma cenas. Katram solim ir 2 minūšu limits — ja kāds solis
-          neizdodas, pārējie tomēr izpildās un kļūda tiek parādīta.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button onClick={runSync} disabled={syncing} className="bg-accent text-accent-foreground hover:bg-accent/90">
-            <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-            {syncing ? syncStep ?? "Sinhronizē..." : "Sinhronizēt katalogu"}
-          </Button>
-        </div>
-      </div>
     </AdminLayout>
   );
 };
