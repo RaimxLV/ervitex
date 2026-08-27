@@ -472,7 +472,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const url = new URL(req.url);
-  const mode = (url.searchParams.get("mode") || "manifest").toLowerCase();
+  const mode = (url.searchParams.get("mode") || "prices").toLowerCase();
   const lang = url.searchParams.get("lang") || "en";
 
   const logId = await startLog(sb, `pf:${mode}`);
