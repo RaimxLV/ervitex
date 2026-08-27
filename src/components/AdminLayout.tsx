@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   MessageSquare, LogOut, LayoutDashboard, Users, ArrowLeft,
-  LayoutGrid, BadgeEuro, FileText, MoreHorizontal,
+  LayoutGrid, BadgeEuro, FileText, MoreHorizontal, Package, FolderTree,
 } from "lucide-react";
 
 const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
@@ -16,14 +16,17 @@ const primary: NavItem[] = [
   { to: "/admin", icon: LayoutDashboard, label: "Panelis", short: "Panelis" },
   { to: "/admin/offers", icon: FileText, label: "Piedāvājumi", short: "Piedāv." },
   { to: "/admin/quotes", icon: MessageSquare, label: "Pieprasījumi", short: "Pieprs." },
-  { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits", short: "Cenas" },
+  { to: "/admin/products", icon: Package, label: "Mūsu produkti", short: "Produkti" },
 ];
 
 /** Secondary items — desktop strip + mobile "Vairāk" sheet. */
 const secondary: NavItem[] = [
+  { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits" },
+  { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
   { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
   { to: "/admin/users", icon: Users, label: "Lietotāji", superOnly: true },
 ];
+
 
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {

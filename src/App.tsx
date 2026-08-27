@@ -39,6 +39,10 @@ const AdminMegaMenu = lazy(() => import("./pages/admin/AdminMegaMenu.tsx"));
 const AdminPriceAudit = lazy(() => import("./pages/admin/AdminPriceAudit.tsx"));
 const AdminOffers = lazy(() => import("./pages/admin/AdminOffers.tsx"));
 const AdminOfferEdit = lazy(() => import("./pages/admin/AdminOfferEdit.tsx"));
+const AdminProducts = lazy(() => import("./pages/admin/AdminProducts.tsx"));
+const AdminProductForm = lazy(() => import("./pages/admin/AdminProductForm.tsx"));
+const AdminCategories = lazy(() => import("./pages/admin/AdminCategories.tsx"));
+
 
 const queryClient = new QueryClient();
 const routerBase = import.meta.env.BASE_URL;
@@ -80,7 +84,11 @@ const App = () => (
               <Route path="/admin/offers/:id" element={<ProtectedRoute><AdminOfferEdit /></ProtectedRoute>} />
 
 
+              <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
+              <Route path="/admin/products/:id" element={<ProtectedRoute><AdminProductForm /></ProtectedRoute>} />
+              <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
               <Route path="/admin/quotes" element={<ProtectedRoute><AdminQuotes /></ProtectedRoute>} />
+
               <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
               <Route path="/admin/price-audit" element={<ProtectedRoute><AdminPriceAudit /></ProtectedRoute>} />
               <Route path="/admin/mega-menu" element={<ProtectedRoute><AdminMegaMenu /></ProtectedRoute>} />
