@@ -140,24 +140,37 @@ function parseProduct(url: string, html: string): Parsed | null {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  let logId: string | null = null;
   try {
     const body = await req.json().catch(() => ({}));
-    const brandKey = String(body.brand || "");
-    const offset = Math.max(0, parseInt(String(body.offset ?? 0), 10));
-    const limit = Math.min(30, Math.max(1, parseInt(String(body.limit ?? 15), 10)));
+    const url0 = new URL(req.url);
+    const brandKey = String(body.brand || url0.searchParams.get("brand") || "");
+    const offset = Math.max(0, parseInt(String(body.offset ?? url0.searchParams.get("offset") ?? 0), 10));
+    const limit = Math.min(30, Math.max(1, parseInt(String(body.limit ?? url0.searchParams.get("limit") ?? 15), 10)));
 
-    const bcfg = BRANDS[brandKey];
-    if (!bcfg) {
+    // No brand given (e.g. scheduled run): refresh a small slice of every brand
+    // instead of failing with "Invalid brand".
+    const brandKeys = brandKey ? [brandKey] : Object.keys(BRANDS);
+    if (brandKey && !BRANDS[brandKey]) {
       return new Response(JSON.stringify({ error: "Invalid brand" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    const { data: logRow } = await supabase
+      .from("sync_logs")
+      .insert({ source: `bb:${brandKey || "all"}`, status: "running" })
+      .select("id")
+      .maybeSingle();
+    logId = (logRow as { id: string } | null)?.id ?? null;
 
-    const urls = await fetchSitemap(bcfg.host);
-    const slice = urls.slice(offset, offset + limit);
+    const summary: any[] = [];
+    for (const key of brandKeys) {
+      const bcfg = BRANDS[key];
+
 
     let processed = 0;
     const errors: string[] = [];
