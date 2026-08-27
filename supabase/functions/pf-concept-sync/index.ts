@@ -338,78 +338,86 @@ async function probe(lang = "en") {
 
 // ------------------------------------------------------------------ price feed
 
-async function syncPrices(sb: SupabaseClient) {
+// Resumable price sync.
+// The PF price feed is ~190 MB — a single edge invocation cannot download or
+// parse it within the CPU limit. We therefore read it in byte slices with HTTP
+// Range requests, extract item prices with a cheap text scan, and chain the
+// next slice in the background until the whole feed is processed.
+const PRICE_SLICE = 12_000_000; // ~12 MB per invocation
+
+async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: boolean }) {
   const token = Deno.env.get("PF_FEED_TOKEN");
   if (!token) throw new Error("PF_FEED_TOKEN not set");
-  const url = `http://www.pfconcept.com/portal/datafeed/pricefeed_${token}_v3.json`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`pricefeed fetch ${res.status}`);
-  const feed: any = await res.json();
+  const feedUrl = `http://www.pfconcept.com/portal/datafeed/pricefeed_${token}_v3.json`;
 
-  // Structure: PFCPriceFeed.priceInfo[].models[].model[].items[].item[]{itemcode,currency,scales[].scale[]{priceBar,nettPrice},promotion[].scales[].scale[]{priceBar,standardPrice}}
-  const rows: any[] = [];
+  const start = Math.max(0, opts.start);
+  const res = await fetch(feedUrl, { headers: { Range: `bytes=${start}-${start + PRICE_SLICE - 1}` } });
+  if (!res.ok && res.status !== 206) throw new Error(`pricefeed fetch ${res.status}`);
+  const text = await res.text();
+
+  const cr = res.headers.get("content-range") || "";
+  const total = Number(cr.split("/")[1]) || 0;
+
   const now = new Date().toISOString();
+  const marker = '{"itemcode":"';
+  const parts = text.split(marker);
+  // First fragment is whatever preceded the first item; last one may be cut off.
+  const complete = parts.slice(1, parts.length - 1);
+  const rows: any[] = [];
 
-  const pickLowestScale = (scales: any): { bar: number; val: number } | null => {
-    const arr = Array.isArray(scales) ? scales : (scales ? [scales] : []);
-    let best: { bar: number; val: number } | null = null;
-    for (const s of arr) {
-      const inner = s?.scale;
-      const list = Array.isArray(inner) ? inner : (inner ? [inner] : []);
-      for (const sc of list) {
-        const bar = toInt(sc?.priceBar) ?? 1;
-        const val = toNum(sc?.nettPrice) ?? toNum(sc?.standardPrice);
-        if (val === null) continue;
-        if (!best || bar < best.bar) best = { bar, val };
-      }
+  for (const seg of complete) {
+    const codeEnd = seg.indexOf('"');
+    if (codeEnd <= 0) continue;
+    const item_code = seg.slice(0, codeEnd);
+    if (!/^\d+$/.test(item_code)) continue;
+    const cur = seg.match(/"currency":"([A-Z]{3})"/);
+    let price: number | null = null;
+    let lowestBar = Number.MAX_SAFE_INTEGER;
+    const re = /"priceBar":(\d+),"nettPrice":([\d.]+)/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(seg)) !== null) {
+      const bar = Number(m[1]);
+      const val = Number(m[2]);
+      if (Number.isFinite(val) && bar < lowestBar) { lowestBar = bar; price = val; }
     }
-    return best;
-  };
-
-  const priceInfoArr = Array.isArray(feed?.PFCPriceFeed?.priceInfo)
-    ? feed.PFCPriceFeed.priceInfo
-    : (feed?.PFCPriceFeed?.priceInfo ? [feed.PFCPriceFeed.priceInfo] : []);
-  for (const pi of priceInfoArr) {
-    const modelsWrap = Array.isArray(pi?.models) ? pi.models : (pi?.models ? [pi.models] : []);
-    for (const mw of modelsWrap) {
-      const models = Array.isArray(mw?.model) ? mw.model : (mw?.model ? [mw.model] : []);
-      for (const m of models) {
-        const itemsWrap = Array.isArray(m?.items) ? m.items : (m?.items ? [m.items] : []);
-        for (const iw of itemsWrap) {
-          const items = Array.isArray(iw?.item) ? iw.item : (iw?.item ? [iw.item] : []);
-          for (const it of items) {
-            const item_code = toStr(it?.itemcode) || toStr(it?.itemCode);
-            if (!item_code) continue;
-            const currency = toStr(it?.currency) ?? "EUR";
-            const nett = pickLowestScale(it?.scales);
-            const promo = pickLowestScale(it?.promotion?.[0]?.scales ?? it?.promotion?.scales);
-            const price = nett?.val ?? null;
-            const list_price = promo?.val ?? null;
-            if (price === null && list_price === null) continue;
-            rows.push({ item_code, price, list_price, currency, updated_at: now });
-          }
-        }
-      }
-    }
+    if (price === null) continue;
+    rows.push({ item_code, price, list_price: null, currency: cur?.[1] || "EUR", updated_at: now });
   }
 
   const upserted = await chunkUpsert(sb, "pf_prices", rows, "item_code", 500);
-  const { error: publishError, count: published } = await sb
-    .from("pf_public_retail_prices")
-    .upsert(
-      rows
-        .filter((r) => r.price !== null && r.price > 0)
-        .map((r) => ({
-          item_code: r.item_code,
-          model_code: String(r.item_code).slice(0, 6),
-          retail_price: Number((Number(r.price) * 1.65).toFixed(2)),
-          currency: r.currency || "EUR",
-          updated_at: now,
-        })),
-      { onConflict: "item_code", count: "exact" },
-    );
-  if (publishError) throw new Error(`pf_public_retail_prices upsert: ${publishError.message}`);
-  return { parsed: rows.length, upserted, published };
+  const pub = rows
+    .filter((r) => r.price !== null && r.price > 0)
+    .map((r) => ({
+      item_code: r.item_code,
+      model_code: String(r.item_code).slice(0, 6),
+      retail_price: Number((Number(r.price) * 1.65).toFixed(2)),
+      currency: r.currency || "EUR",
+      updated_at: now,
+    }));
+  if (pub.length) {
+    const { error } = await sb.from("pf_public_retail_prices").upsert(pub, { onConflict: "item_code" });
+    if (error) throw new Error(`pf_public_retail_prices upsert: ${error.message}`);
+  }
+
+  // Where does the incomplete tail begin? Resume exactly there next time.
+  const consumed = parts.slice(0, parts.length - 1).join(marker).length;
+  const consumedBytes = new TextEncoder().encode(text.slice(0, consumed)).length;
+  const bytesRead = new TextEncoder().encode(text).length;
+  const nextStart = start + (consumedBytes > 0 ? consumedBytes : bytesRead);
+  const done = bytesRead === 0 || (total > 0 && nextStart >= total) || bytesRead < PRICE_SLICE - 1024;
+
+  if (!done && opts.chain) {
+    // Continue with the next slice in the background; the caller returns now.
+    const nextUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/pf-concept-sync?mode=prices&start=${nextStart}`;
+    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    fetch(nextUrl, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, apikey: key, "Content-Type": "application/json" },
+      body: "{}",
+    }).catch(() => { /* the nightly job retries */ });
+  }
+
+  return { start, next_start: nextStart, total_bytes: total, items: rows.length, upserted, done };
 }
 
 async function probePrices() {
@@ -436,7 +444,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const url = new URL(req.url);
-  const mode = (url.searchParams.get("mode") || "manifest").toLowerCase();
+  const mode = (url.searchParams.get("mode") || "prices").toLowerCase();
   const lang = url.searchParams.get("lang") || "en";
 
   const logId = await startLog(sb, `pf:${mode}`);
@@ -461,7 +469,11 @@ Deno.serve(async (req) => {
         throw new Error("process mode requires ?chunk=N or ?from=A&to=B");
       }
     } else if (mode === "prices") {
-      result = await syncPrices(sb);
+      result = await syncPrices(sb, {
+        start: Number(url.searchParams.get("start") || "0"),
+        chain: (url.searchParams.get("chain") || "1") !== "0",
+      });
+
     } else if (mode === "probe_prices") {
       result = await probePrices();
     } else if (mode === "ingest") {

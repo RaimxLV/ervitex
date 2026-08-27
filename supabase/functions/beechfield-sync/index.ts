@@ -140,88 +140,122 @@ function parseProduct(url: string, html: string): Parsed | null {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  let logId: string | null = null;
   try {
     const body = await req.json().catch(() => ({}));
-    const brandKey = String(body.brand || "");
-    const offset = Math.max(0, parseInt(String(body.offset ?? 0), 10));
-    const limit = Math.min(30, Math.max(1, parseInt(String(body.limit ?? 15), 10)));
+    const url0 = new URL(req.url);
+    const brandKey = String(body.brand || url0.searchParams.get("brand") || "");
+    const offset = Math.max(0, parseInt(String(body.offset ?? url0.searchParams.get("offset") ?? 0), 10));
+    const limit = Math.min(30, Math.max(1, parseInt(String(body.limit ?? url0.searchParams.get("limit") ?? 15), 10)));
 
-    const bcfg = BRANDS[brandKey];
-    if (!bcfg) {
+    // No brand given (e.g. scheduled run): refresh a small slice of every brand
+    // instead of failing with "Invalid brand".
+    const brandKeys = brandKey ? [brandKey] : Object.keys(BRANDS);
+    if (brandKey && !BRANDS[brandKey]) {
       return new Response(JSON.stringify({ error: "Invalid brand" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
+    const { data: logRow } = await supabase
+      .from("sync_logs")
+      .insert({ source: `bb:${brandKey || "all"}`, status: "running" })
+      .select("id")
+      .maybeSingle();
+    logId = (logRow as { id: string } | null)?.id ?? null;
 
-    const urls = await fetchSitemap(bcfg.host);
-    const slice = urls.slice(offset, offset + limit);
+    const summary: any[] = [];
+    let totalProcessed = 0;
+    const allErrors: string[] = [];
 
-    let processed = 0;
-    const errors: string[] = [];
+    for (const key of brandKeys) {
+      const bcfg = BRANDS[key];
+      const urls = await fetchSitemap(bcfg.host);
+      const slice = urls.slice(offset, offset + limit);
 
-    for (const url of slice) {
-      try {
-        const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-        if (!res.ok) { errors.push(`${url}: HTTP ${res.status}`); continue; }
-        const html = await res.text();
-        const p = parseProduct(url, html);
-        if (!p) { errors.push(`${url}: parse failed`); continue; }
+      let processed = 0;
+      const errors: string[] = [];
 
-        // Upsert style
-        const { error: se } = await supabase.from("bb_styles").upsert({
-          style_code: p.style_code,
-          brand: bcfg.brand,
-          name: p.name,
-          description: p.description,
-          category: p.category,
-          features: p.features,
-          active: true,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: "style_code" });
-        if (se) { errors.push(`${p.style_code} style: ${se.message}`); continue; }
+      for (const url of slice) {
+        try {
+          const res = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+          if (!res.ok) { errors.push(`${url}: HTTP ${res.status}`); continue; }
+          const html = await res.text();
+          const p = parseProduct(url, html);
+          if (!p) { errors.push(`${url}: parse failed`); continue; }
 
-        // Variants (one per color, size null for now)
-        if (p.colors.length) {
-          const rows = p.colors.map((c) => ({
-            sku: `${p.style_code}-${c.name.replace(/\s+/g, "").toUpperCase()}`,
+          const { error: se } = await supabase.from("bb_styles").upsert({
             style_code: p.style_code,
-            color_name: c.name,
-            color_hex: guessHex(c.name),
-            size: null,
+            brand: bcfg.brand,
+            name: p.name,
+            description: p.description,
+            category: p.category,
+            features: p.features,
             active: true,
-          }));
-          await supabase.from("bb_variants").upsert(rows, { onConflict: "sku" });
+            updated_at: new Date().toISOString(),
+          }, { onConflict: "style_code" });
+          if (se) { errors.push(`${p.style_code} style: ${se.message}`); continue; }
+
+          if (p.colors.length) {
+            const rows = p.colors.map((c) => ({
+              sku: `${p.style_code}-${c.name.replace(/\s+/g, "").toUpperCase()}`,
+              style_code: p.style_code,
+              color_name: c.name,
+              color_hex: guessHex(c.name),
+              size: null,
+              active: true,
+            }));
+            await supabase.from("bb_variants").upsert(rows, { onConflict: "sku" });
+          }
+
+          await supabase.from("bb_images").delete().eq("style_code", p.style_code);
+          const imgRows: any[] = [];
+          p.images.forEach((u, i) => imgRows.push({ style_code: p.style_code, color_name: null, url: u, sort_order: i, is_primary: i === 0 }));
+          p.colors.forEach((c, i) => { if (c.image) imgRows.push({ style_code: p.style_code, color_name: c.name, url: c.image, sort_order: 100 + i, is_primary: false }); });
+          if (imgRows.length) await supabase.from("bb_images").insert(imgRows);
+
+          processed++;
+        } catch (e: any) {
+          errors.push(`${url}: ${e.message}`);
         }
-
-        // Images: wipe & reinsert
-        await supabase.from("bb_images").delete().eq("style_code", p.style_code);
-        const imgRows: any[] = [];
-        p.images.forEach((u, i) => imgRows.push({ style_code: p.style_code, color_name: null, url: u, sort_order: i, is_primary: i === 0 }));
-        p.colors.forEach((c, i) => { if (c.image) imgRows.push({ style_code: p.style_code, color_name: c.name, url: c.image, sort_order: 100 + i, is_primary: false }); });
-        if (imgRows.length) await supabase.from("bb_images").insert(imgRows);
-
-        processed++;
-      } catch (e: any) {
-        errors.push(`${url}: ${e.message}`);
       }
+
+      totalProcessed += processed;
+      allErrors.push(...errors);
+      summary.push({
+        brand: bcfg.brand,
+        total: urls.length,
+        offset,
+        processed,
+        next_offset: offset + slice.length,
+        done: offset + slice.length >= urls.length,
+        errors: errors.slice(0, 3),
+      });
     }
 
-    const nextOffset = offset + slice.length;
-    const done = nextOffset >= urls.length;
+    if (logId) {
+      await supabase.from("sync_logs").update({
+        status: "success",
+        finished_at: new Date().toISOString(),
+        products_updated: totalProcessed,
+        message: `Beechfield sync ok (${totalProcessed} preces)`,
+        details: { brands: summary } as any,
+      }).eq("id", logId);
+    }
 
-    return new Response(JSON.stringify({
-      brand: brandKey,
-      total: urls.length,
-      offset,
-      processed,
-      next_offset: nextOffset,
-      done,
-      errors: errors.slice(0, 5),
-    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ ok: true, processed: totalProcessed, brands: summary, errors: allErrors.slice(0, 5) }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (e: any) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (logId) {
+      await supabase.from("sync_logs").update({
+        status: "error", finished_at: new Date().toISOString(), message: e.message,
+      }).eq("id", logId);
+    }
+    return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
+
