@@ -1,275 +1,261 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import NwgSyncProgress from "@/components/admin/NwgSyncProgress";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Package, MessageSquare, FolderTree, TrendingUp, RefreshCw, CheckCircle2, AlertTriangle, Search } from "lucide-react";
+import { MessageSquare, FileText, TrendingUp, RefreshCw, CheckCircle2, AlertTriangle, BadgeEuro } from "lucide-react";
 
-interface PriceRow {
-  sku: string;
-  style_code: string;
-  purchase_price: number | null;
-  suggested_retail_price: number | null;
-  currency: string | null;
+interface SourceSummary {
+  source: string;
+  variants: number;
+  checked: number;
+  mismatches: number;
+  missing_base: number;
 }
+
+interface SyncRow {
+  source: string;
+  status: string;
+  message: string | null;
+  started_at: string;
+  finished_at: string | null;
+}
+
+const SOURCE_LABELS: Record<string, string> = {
+  ss: "Stanley/Stella",
+  nwg: "NWG (Craft, Clique, ProJob, C&B)",
+  pf: "PF Concept (prezentmateriāli)",
+  bb: "Beechfield / Bagbase",
+  mf: "Malfini",
+  ru: "Russell Europe",
+};
+
+/** Sinhronizācijas soļi tiek izsaukti ar taimautu, lai panelis nekad neuzkārtos. */
+const SYNC_TIMEOUT_MS = 120_000;
 
 const AdminDashboard = () => {
   const { toast } = useToast();
-  const [stats, setStats] = useState({ products: 0, categories: 0, quotes: 0, newQuotes: 0 });
-  const [ssStats, setSsStats] = useState({ styles: 0, variants: 0, stock: 0, prices: 0, images: 0 });
+  const [stats, setStats] = useState({ quotes: 0, newQuotes: 0, offers: 0, sentOffers: 0 });
+  const [sources, setSources] = useState<SourceSummary[]>([]);
+  const [syncLogs, setSyncLogs] = useState<SyncRow[]>([]);
+  const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [syncStep, setSyncStep] = useState<string | null>(null);
-  const [prices, setPrices] = useState<PriceRow[]>([]);
-  const [pricesLoading, setPricesLoading] = useState(false);
-  const [priceQuery, setPriceQuery] = useState("");
 
-  const [lastSync, setLastSync] = useState<{ status: string; message: string | null; finished_at: string | null } | null>(null);
-
-  const fetchStats = async () => {
-    const [p, c, q, nq, ssStyles, ssVariants, ssStock, ssPrices, ssImages] = await Promise.all([
-      supabase.from("products").select("*", { count: "exact", head: true }).eq("active", true),
-      supabase.from("categories").select("*", { count: "exact", head: true }),
+  const load = useCallback(async () => {
+    setLoading(true);
+    const [q, nq, o, so, sum, logs] = await Promise.all([
       supabase.from("quote_requests").select("*", { count: "exact", head: true }),
       supabase.from("quote_requests").select("*", { count: "exact", head: true }).eq("status", "new"),
-      supabase.from("ss_styles").select("*", { count: "exact", head: true }),
-      supabase.from("ss_variants").select("*", { count: "exact", head: true }),
-      supabase.from("ss_stock").select("*", { count: "exact", head: true }),
-      supabase.from("ss_prices").select("*", { count: "exact", head: true }),
-      supabase.from("ss_images").select("*", { count: "exact", head: true }),
+      supabase.from("pm_offers").select("*", { count: "exact", head: true }),
+      supabase.from("pm_offers").select("*", { count: "exact", head: true }).neq("status", "draft"),
+      supabase.rpc("price_audit_summary" as never),
+      supabase
+        .from("sync_logs")
+        .select("source,status,message,started_at,finished_at")
+        .order("started_at", { ascending: false })
+        .limit(60),
     ]);
+
     setStats({
-      products: p.count ?? 0,
-      categories: c.count ?? 0,
       quotes: q.count ?? 0,
       newQuotes: nq.count ?? 0,
+      offers: o.count ?? 0,
+      sentOffers: so.count ?? 0,
     });
-    setSsStats({
-      styles: ssStyles.count ?? 0,
-      variants: ssVariants.count ?? 0,
-      stock: ssStock.count ?? 0,
-      prices: ssPrices.count ?? 0,
-      images: ssImages.count ?? 0,
-    });
-  };
 
-  const fetchLastSync = async () => {
-    const { data } = await supabase
-      .from("sync_logs")
-      .select("source, status, message, finished_at")
-      .like("source", "stanley-stella%")
-      .order("started_at", { ascending: false })
-      .limit(5);
-    setLastSync(data?.[0] ? (data[0] as any) : null);
-  };
+    setSources(
+      ((sum.data as unknown as SourceSummary[]) || []).map((r) => ({
+        ...r,
+        variants: Number(r.variants),
+        checked: Number(r.checked),
+        mismatches: Number(r.mismatches),
+        missing_base: Number(r.missing_base),
+      })),
+    );
 
-  useEffect(() => {
-    fetchStats();
-    fetchLastSync();
-    loadPrices();
+    // Pēdējais ieraksts katram avotam (source var būt "stanley-stella:styles" u.tml.)
+    const latest = new Map<string, SyncRow>();
+    for (const row of ((logs.data as unknown as SyncRow[]) || [])) {
+      const key = row.source.split(":")[0];
+      if (!latest.has(key)) latest.set(key, row);
+    }
+    setSyncLogs([...latest.values()]);
+    setLoading(false);
   }, []);
 
-  const loadPrices = async () => {
-    setPricesLoading(true);
-    const { data } = await supabase
-      .from("ss_prices")
-      .select("sku,style_code,purchase_price,suggested_retail_price,currency")
-      .order("style_code", { ascending: true })
-      .limit(500);
-    setPrices((data || []) as PriceRow[]);
-    setPricesLoading(false);
-  };
-
-  const filteredPrices = useMemo(() => {
-    const n = priceQuery.trim().toLowerCase();
-    if (!n) return prices;
-    return prices.filter((p) => `${p.style_code} ${p.sku}`.toLowerCase().includes(n));
-  }, [prices, priceQuery]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const callSync = async (mode: string) => {
     const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stanley-stella-sync?mode=${mode}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-        Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-      },
-    });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error || "Sync failed");
-    return data;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), SYNC_TIMEOUT_MS);
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      const res = await fetch(url, {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+      });
+      const data = await res.json().catch(() => ({ ok: false, error: `HTTP ${res.status}` }));
+      if (!res.ok || !data.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      return data;
+    } catch (e) {
+      if ((e as Error).name === "AbortError") throw new Error("Solis pārsniedza 2 minūtes un tika apturēts");
+      throw e;
+    } finally {
+      clearTimeout(timer);
+    }
   };
 
   const runSync = async () => {
     setSyncing(true);
-    try {
-      const steps = [
-        ["colors", "Krāsu saraksts"],
-        ["sizes", "Izmēru saraksts"],
-        ["styles", "Produktu modeļi un varianti"],
-        ["stock", "Pieejamība klientu katalogam"],
-        ["prices", "Iepirkuma dati administrēšanai"],
-      ];
-      for (const [mode, label] of steps) {
-        setSyncStep(label);
+    const steps: [string, string][] = [
+      ["colors", "Krāsas"],
+      ["sizes", "Izmēri"],
+      ["styles", "Modeļi un varianti"],
+      ["stock", "Pieejamība"],
+      ["prices", "Iepirkuma cenas"],
+    ];
+    const failed: string[] = [];
+    for (const [mode, label] of steps) {
+      setSyncStep(label);
+      try {
         await callSync(mode);
+      } catch (e) {
+        failed.push(`${label}: ${(e as Error).message}`);
       }
-      toast({ title: "Stanley/Stella katalogs sinhronizēts", description: "Produkti, varianti, noliktavas pieejamība un piegādātāja cenas ir atjaunotas." });
-      await fetchStats();
-      await fetchLastSync();
-    } catch (e: any) {
-      toast({ title: "Sinhronizācija neizdevās", description: e.message, variant: "destructive" });
-    } finally {
-      setSyncStep(null);
-      setSyncing(false);
     }
-  };
-
-  const runImageSync = async () => {
-    setSyncing(true);
-    setSyncStep("Attēlu lejupielāde");
-    try {
-      await callSync("images&maxImages=200");
-      toast({ title: "Attēli papildināti", description: "Lejupielādēta nākamā drošā attēlu porcija lokālai glabāšanai." });
-      await fetchStats();
-      await fetchLastSync();
-    } catch (e: any) {
-      toast({ title: "Attēlu lejupielāde neizdevās", description: e.message, variant: "destructive" });
-    } finally {
-      setSyncStep(null);
-      setSyncing(false);
+    setSyncStep(null);
+    setSyncing(false);
+    if (failed.length) {
+      toast({
+        title: "Sinhronizācija pabeigta ar kļūdām",
+        description: failed.join(" · "),
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Stanley/Stella katalogs sinhronizēts" });
     }
+    await load();
   };
 
   const cards = [
-    { label: "Produkti", value: stats.products, icon: Package, color: "text-blue-500" },
-    { label: "Kategorijas", value: stats.categories, icon: FolderTree, color: "text-green-500" },
-    { label: "Pieprasījumi", value: stats.quotes, icon: MessageSquare, color: "text-purple-500" },
-    { label: "Jauni pieprasījumi", value: stats.newQuotes, icon: TrendingUp, color: "text-accent" },
+    { label: "Pieprasījumi", value: stats.quotes, icon: MessageSquare, to: "/admin/quotes" },
+    { label: "Jauni pieprasījumi", value: stats.newQuotes, icon: TrendingUp, to: "/admin/quotes" },
+    { label: "Piedāvājumi", value: stats.offers, icon: FileText, to: "/admin/offers" },
+    { label: "Nosūtīti piedāvājumi", value: stats.sentOffers, icon: FileText, to: "/admin/offers" },
   ];
 
   return (
     <AdminLayout>
-      <h1 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground">Galvenais panelis</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Ervitex pārskata skats</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="font-heading text-xl font-black uppercase tracking-wide text-foreground sm:text-2xl">Galvenais panelis</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Ervitex pārskata skats</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={load} disabled={loading}>
+          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          Atjaunot
+        </Button>
+      </div>
 
-      <div className="mt-8 grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {cards.map((card) => (
-          <div key={card.label} className="rounded-sm border border-border bg-card p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <p className="text-xs sm:text-sm text-muted-foreground">{card.label}</p>
-              <card.icon className={`h-4 w-4 sm:h-5 sm:w-5 ${card.color}`} />
+          <Link
+            key={card.label}
+            to={card.to}
+            className="rounded-sm border border-border bg-card p-4 transition-colors hover:border-accent sm:p-5"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground sm:text-sm">{card.label}</p>
+              <card.icon className="h-4 w-4 shrink-0 text-accent sm:h-5 sm:w-5" />
             </div>
-            <p className="mt-2 font-heading text-2xl sm:text-3xl font-black text-foreground">{card.value}</p>
-          </div>
+            <p className="mt-2 font-heading text-2xl font-black text-foreground sm:text-3xl">{card.value}</p>
+          </Link>
         ))}
       </div>
 
-      <NwgSyncProgress />
-
-
-
-      <div className="mt-10 rounded-sm border border-border bg-card p-5 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Stanley/Stella sinhronizācija</h2>
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Viena poga atjauno visu klientiem vajadzīgo katalogu: produktus, krāsas, izmērus, variantus, pieejamību un piegādātāja cenas.
-            </p>
-            {lastSync && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Pēdējā sinhronizācija: <span className="font-semibold text-foreground">{lastSync.status}</span>
-                {lastSync.finished_at && ` · ${new Date(lastSync.finished_at).toLocaleString("lv-LV")}`}
-                {lastSync.message && ` · ${lastSync.message}`}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={runSync} disabled={syncing} className="bg-accent text-accent-foreground hover:bg-accent/90">
-              <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-              {syncing ? syncStep ?? "Sinhronizē..." : "Sinhronizēt katalogu"}
-            </Button>
-            <Button onClick={runImageSync} disabled={syncing} variant="outline">
-              <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
-              Pievienot nākamos attēlus
-            </Button>
-          </div>
-        </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-5">
-          {[
-            ["Modeļi", ssStats.styles],
-            ["Varianti", ssStats.variants],
-            ["Pieejamība", ssStats.stock],
-            ["Piegādātāja cenas", ssStats.prices],
-            ["Attēli", ssStats.images],
-          ].map(([label, value]) => (
-            <div key={label} className="rounded-sm border border-border bg-background p-3">
-              <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</p>
-              <p className="mt-1 font-heading text-xl font-black text-foreground">{Number(value).toLocaleString("lv-LV")}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 flex items-start gap-2 text-xs text-muted-foreground">
-          {lastSync?.status === "error" ? <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" /> : <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-accent" />}
-          <p>
-            Pircējiem cenas netiek rādītas automātiski — tās paliek administrēšanai un uzcenojuma kontrolei. Klientiem redzams katalogs un pieprasījuma forma.
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-10 rounded-sm border border-border bg-card p-5 sm:p-6">
+      {/* Katalogu statuss */}
+      <div className="mt-8 rounded-sm border border-border bg-card p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Stanley/Stella cenas (API spogulis)</h2>
-            <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-              Šī tabula ir tikai lasāms Stanley/Stella API spogulis. Lauki tiek ņemti 1:1 no oficiālā <code className="font-mono">/webrequest/prices/get_json</code> izsaukuma:
-              <br />• <span className="font-semibold text-foreground">Iepirkuma cena</span> = <code className="font-mono">PurchasePrice</code> (mūsu B2B cena no S/S)
-              <br />• <span className="font-semibold text-foreground">Ieteicamā mazumcena</span> = <code className="font-mono">SuggestedRetailPrice</code> (S/S ieteikums, nav saistošs)
-              <br />Rediģēšana un dzēšana šeit ir bloķēta tāpēc, ka nākamā sinhronizācija to tāpat pārrakstītu. Lai mainītu klientam redzamo cenu, pievienojiet uzcenojumu atsevišķā vietā (nākotnē) vai mainiet manuāli iekšējos produktos.
-            </p>
-          </div>
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Meklēt SKU vai modeli"
-              value={priceQuery}
-              onChange={(e) => setPriceQuery(e.target.value)}
-              className="w-64 pl-8"
-            />
-          </div>
+          <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Katalogu statuss</h2>
+          <Link to="/admin/price-audit" className="inline-flex items-center gap-1.5 text-xs text-accent hover:underline">
+            <BadgeEuro className="h-3.5 w-3.5" /> Cenu audits
+          </Link>
         </div>
-        <div className="mt-4 max-h-[480px] overflow-y-auto border border-border">
-          <table className="w-full text-xs">
-            <thead className="sticky top-0 z-10 bg-muted text-[10px] uppercase tracking-wider text-muted-foreground">
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[560px] text-sm">
+            <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left">Modelis (StyleCode)</th>
-                <th className="px-3 py-2 text-left">SKU (B2BSKUREF)</th>
-                <th className="px-3 py-2 text-right">PurchasePrice</th>
-                <th className="px-3 py-2 text-right">SuggestedRetailPrice</th>
-                <th className="px-3 py-2 text-left">Valūta</th>
+                <th className="px-2 py-2 text-left">Piegādātājs</th>
+                <th className="px-2 py-2 text-right">Varianti ar cenu</th>
+                <th className="px-2 py-2 text-right">Bez bāzes cenas</th>
+                <th className="px-2 py-2 text-right">Neatbilstības</th>
+                <th className="px-2 py-2 text-left">Pēdējā sinhronizācija</th>
               </tr>
             </thead>
             <tbody>
-              {pricesLoading ? (
-                <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">Ielādē...</td></tr>
-              ) : filteredPrices.length === 0 ? (
-                <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">Nav datu</td></tr>
+              {loading && sources.length === 0 ? (
+                <tr><td colSpan={5} className="px-2 py-6 text-center text-muted-foreground">Ielādē...</td></tr>
+              ) : sources.length === 0 ? (
+                <tr><td colSpan={5} className="px-2 py-6 text-center text-muted-foreground">Nav datu</td></tr>
               ) : (
-                filteredPrices.map((p) => (
-                  <tr key={p.sku} className="border-t border-border hover:bg-muted/50">
-                    <td className="px-3 py-1.5 font-mono">{p.style_code}</td>
-                    <td className="px-3 py-1.5 font-mono">{p.sku}</td>
-                    <td className="px-3 py-1.5 text-right font-medium">{p.purchase_price != null ? Number(p.purchase_price).toFixed(2) : "—"}</td>
-                    <td className="px-3 py-1.5 text-right">{p.suggested_retail_price != null ? Number(p.suggested_retail_price).toFixed(2) : "—"}</td>
-                    <td className="px-3 py-1.5">{p.currency || "EUR"}</td>
-                  </tr>
-                ))
+                sources.map((s) => {
+                  const log = syncLogs.find((l) => l.source.startsWith(s.source) || (s.source === "ss" && l.source.startsWith("stanley-stella")));
+                  return (
+                    <tr key={s.source} className="border-t border-border">
+                      <td className="px-2 py-2 font-medium text-foreground">{SOURCE_LABELS[s.source] ?? s.source}</td>
+                      <td className="px-2 py-2 text-right">{s.variants.toLocaleString("lv-LV")}</td>
+                      <td className="px-2 py-2 text-right">{s.missing_base.toLocaleString("lv-LV")}</td>
+                      <td className={`px-2 py-2 text-right ${s.mismatches > 0 ? "font-semibold text-destructive" : ""}`}>
+                        {s.mismatches.toLocaleString("lv-LV")}
+                      </td>
+                      <td className="px-2 py-2 text-xs text-muted-foreground">
+                        {log ? (
+                          <span className="inline-flex items-center gap-1.5">
+                            {log.status === "error" ? (
+                              <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-destructive" />
+                            ) : (
+                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-accent" />
+                            )}
+                            {new Date(log.finished_at ?? log.started_at).toLocaleString("lv-LV")}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
-        <p className="mt-2 text-[11px] text-muted-foreground">Rāda pirmos 500 ierakstus pēc StyleCode. Izmantojiet meklēšanu, lai atrastu konkrētu modeli vai SKU.</p>
+      </div>
+
+      <NwgSyncProgress />
+
+      {/* Stanley/Stella sinhronizācija */}
+      <div className="mt-8 rounded-sm border border-border bg-card p-4 sm:p-6">
+        <h2 className="font-heading text-sm font-bold uppercase tracking-wider">Stanley/Stella sinhronizācija</h2>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          Atjauno krāsas, izmērus, modeļus, variantus, pieejamību un iepirkuma cenas. Katram solim ir 2 minūšu limits — ja kāds solis
+          neizdodas, pārējie tomēr izpildās un kļūda tiek parādīta.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button onClick={runSync} disabled={syncing} className="bg-accent text-accent-foreground hover:bg-accent/90">
+            <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+            {syncing ? syncStep ?? "Sinhronizē..." : "Sinhronizēt katalogu"}
+          </Button>
+        </div>
       </div>
     </AdminLayout>
   );

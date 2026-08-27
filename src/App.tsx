@@ -23,7 +23,6 @@ const NwgPage = lazy(() => import("./pages/NwgPage.tsx"));
 const PfConceptPage = lazy(() => import("./pages/PfConceptPage.tsx"));
 const BeechfieldBrandsPage = lazy(() => import("./pages/BeechfieldBrandsPage.tsx"));
 const MalfiniPage = lazy(() => import("./pages/MalfiniPage.tsx"));
-const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage.tsx"));
 const AboutPage = lazy(() => import("./pages/AboutPage.tsx"));
 const TechnologyPage = lazy(() => import("./pages/TechnologyPage.tsx"));
 const ContactPage = lazy(() => import("./pages/ContactPage.tsx"));
@@ -34,17 +33,12 @@ const TermsPage = lazy(() => import("./pages/TermsPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard.tsx"));
-const AdminProducts = lazy(() => import("./pages/admin/AdminProducts.tsx"));
-const AdminProductForm = lazy(() => import("./pages/admin/AdminProductForm.tsx"));
-const AdminCategories = lazy(() => import("./pages/admin/AdminCategories.tsx"));
 const AdminQuotes = lazy(() => import("./pages/admin/AdminQuotes.tsx"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers.tsx"));
-const AdminTranslate = lazy(() => import("./pages/admin/AdminTranslate.tsx"));
 const AdminMegaMenu = lazy(() => import("./pages/admin/AdminMegaMenu.tsx"));
 const AdminPriceAudit = lazy(() => import("./pages/admin/AdminPriceAudit.tsx"));
 const AdminOffers = lazy(() => import("./pages/admin/AdminOffers.tsx"));
 const AdminOfferEdit = lazy(() => import("./pages/admin/AdminOfferEdit.tsx"));
-const AdminBeechfieldImport = lazy(() => import("./pages/admin/AdminBeechfieldImport.tsx"));
 
 const queryClient = new QueryClient();
 const routerBase = import.meta.env.BASE_URL;
@@ -72,7 +66,6 @@ const App = () => (
               <Route path="/pf-concept" element={<PfConceptPage />} />
               <Route path="/beechfield-brands" element={<BeechfieldBrandsPage />} />
               <Route path="/malfini" element={<MalfiniPage />} />
-              <Route path="/product/:id" element={<ProductDetailPage />} />
               <Route path="/request" element={<RequestPage />} />
               <Route path="/services" element={<Navigate to="/#tehnologijas" replace />} />
               <Route path="/tehnologijas/:slug" element={<TechnologyPage />} />
@@ -87,13 +80,8 @@ const App = () => (
               <Route path="/admin/offers/:id" element={<ProtectedRoute><AdminOfferEdit /></ProtectedRoute>} />
 
 
-              <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
-              <Route path="/admin/products/:id" element={<ProtectedRoute><AdminProductForm /></ProtectedRoute>} />
-              <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
               <Route path="/admin/quotes" element={<ProtectedRoute><AdminQuotes /></ProtectedRoute>} />
               <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />
-              <Route path="/admin/translate" element={<ProtectedRoute><AdminTranslate /></ProtectedRoute>} />
-              <Route path="/admin/beechfield-import" element={<ProtectedRoute><AdminBeechfieldImport /></ProtectedRoute>} />
               <Route path="/admin/price-audit" element={<ProtectedRoute><AdminPriceAudit /></ProtectedRoute>} />
               <Route path="/admin/mega-menu" element={<ProtectedRoute><AdminMegaMenu /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />

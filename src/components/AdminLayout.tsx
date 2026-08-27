@@ -3,31 +3,28 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
-  Package, MessageSquare, LogOut, LayoutDashboard, FolderTree, Users, ArrowLeft,
-  Languages, Upload, LayoutGrid, BadgeEuro, FileText, MoreHorizontal,
+  MessageSquare, LogOut, LayoutDashboard, Users, ArrowLeft,
+  LayoutGrid, BadgeEuro, FileText, MoreHorizontal,
 } from "lucide-react";
 
 const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
 
-type NavItem = { to: string; icon: typeof Package; label: string; short?: string; superOnly?: boolean };
+type NavItem = { to: string; icon: typeof FileText; label: string; short?: string; superOnly?: boolean };
 
 /** Primary items — always visible (desktop strip + mobile bottom bar). */
 const primary: NavItem[] = [
   { to: "/admin", icon: LayoutDashboard, label: "Panelis", short: "Panelis" },
   { to: "/admin/offers", icon: FileText, label: "Piedāvājumi", short: "Piedāv." },
   { to: "/admin/quotes", icon: MessageSquare, label: "Pieprasījumi", short: "Pieprs." },
-  { to: "/admin/products", icon: Package, label: "Produkti", short: "Produkti" },
+  { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits", short: "Cenas" },
 ];
 
 /** Secondary items — desktop strip + mobile "Vairāk" sheet. */
 const secondary: NavItem[] = [
-  { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
   { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
-  { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits" },
-  { to: "/admin/beechfield-import", icon: Upload, label: "Beechfield imports" },
-  { to: "/admin/translate", icon: Languages, label: "Tulkošana", superOnly: true },
   { to: "/admin/users", icon: Users, label: "Lietotāji", superOnly: true },
 ];
+
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const { signOut, user } = useAuth();
