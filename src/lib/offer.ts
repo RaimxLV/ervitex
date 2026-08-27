@@ -71,7 +71,7 @@ export const offerPath = (token: string, search = "") =>
   `${(import.meta.env.BASE_URL || "/").replace(/\/+$/, "")}/piedavajums/${token}${search}`;
 
 export const PRINT_DISCLAIMER_LV =
-  "Norādītās cenas ir par apģērbu/preci bez apdrukas. Apdrukas (DTF, sietspiede, sublimācija) un izšuvumu izmaksas tiek aprēķinātas atsevišķi — atkarībā no izvēlētās tehnoloģijas, izmēra, krāsu skaita un tirāžas. Cenas ir informatīvas un spēkā 14 dienas, ja nav norādīts citādi.";
+  "Katalogā redzamās cenas ir norādītas par apģērbu bez apdrukas.\nVēlaties personalizāciju? Apdrukas izmaksas aprēķinām individuāli katram projektam — atkarībā no izvēlētās tehnikas, dizaina izmēra un vienību skaita.";
 
 export const PRINT_DISCLAIMER_EN =
   "Prices shown are for the garment/product only, without decoration. Printing (DTF, screen print, sublimation) and embroidery are quoted separately depending on technology, size, number of colours and quantity. Prices are indicative and valid for 14 days unless stated otherwise.";
