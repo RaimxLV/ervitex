@@ -332,10 +332,7 @@ const AdminOfferEdit = () => {
                 <Input type="number" value={offer.vat_rate} onChange={(e) => setOffer({ ...offer, vat_rate: Number(e.target.value) || 0 })} />
               </div>
 
-              <div>
-                <Label className="text-xs">PVN %</Label>
-                <Input type="number" value={offer.vat_rate} onChange={(e) => setOffer({ ...offer, vat_rate: Number(e.target.value) || 0 })} />
-              </div>
+
               <div>
                 <Label className="text-xs">Projektu vadītājs (atbildes saņēmējs)</Label>
                 <Select
