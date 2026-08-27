@@ -317,9 +317,6 @@ const RequestPage = () => {
                 <h2 className="font-heading text-lg font-black uppercase tracking-wide">
                   {t("Apdrukas informācija", "Print details")}
                 </h2>
-                <p className="text-xs text-muted-foreground">
-                  {t("Norādi, ja vēlies apdruku. Ja bez apdrukas — atstāj tukšu.", "Fill in if you want printing. Leave blank if no print is needed.")}
-                </p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
                     <Label className="text-xs uppercase tracking-wider">{t("Apdrukas metode", "Print method")}</Label>
@@ -332,23 +329,15 @@ const RequestPage = () => {
                       <option value="silkscreen">{t("Sietspiede", "Silkscreen")}</option>
                       <option value="dtf">{t("Termodruka / DTF", "Heat transfer / DTF")}</option>
                       <option value="embroidery">{t("Izšuvums", "Embroidery")}</option>
-                      <option value="digital">{t("Digitālā druka", "Digital print")}</option>
                       <option value="none">{t("Bez apdrukas", "No print")}</option>
                     </select>
-                  </div>
-                  <div>
-                    <Label className="text-xs uppercase tracking-wider">{t("Izvietojums", "Placement")}</Label>
-                    <Input value={print.placement} onChange={(e) => setPrint({ ...print, placement: e.target.value })} placeholder={t("piem. priekšpuse, uz muguras", "e.g. front, back")} />
-                  </div>
-                  <div>
-                    <Label className="text-xs uppercase tracking-wider">{t("Krāsu skaits", "Number of colors")}</Label>
-                    <Input value={print.colors} onChange={(e) => setPrint({ ...print, colors: e.target.value })} placeholder="1, 2, CMYK..." />
                   </div>
                   <div>
                     <Label className="text-xs uppercase tracking-wider">{t("Vēlamais termiņš", "Deadline")}</Label>
                     <Input value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
                   </div>
                 </div>
+
                 <div>
                   <Label className="text-xs uppercase tracking-wider">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
                   <Textarea rows={4} value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
