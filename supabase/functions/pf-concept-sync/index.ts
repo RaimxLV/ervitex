@@ -469,7 +469,11 @@ Deno.serve(async (req) => {
         throw new Error("process mode requires ?chunk=N or ?from=A&to=B");
       }
     } else if (mode === "prices") {
-      result = await syncPrices(sb);
+      result = await syncPrices(sb, {
+        start: Number(url.searchParams.get("start") || "0"),
+        chain: (url.searchParams.get("chain") || "1") !== "0",
+      });
+
     } else if (mode === "probe_prices") {
       result = await probePrices();
     } else if (mode === "ingest") {
