@@ -175,6 +175,23 @@ Deno.serve(async (req) => {
 
   try {
     if (mode === "seed") {
+      // Only signed-in admins may replace the stored NWG credential.
+      const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+      const isCron = req.headers.get("Lovable-Context") === "cron" || jwt === serviceRoleKey;
+      if (!isCron) {
+        const { data: userData } = await sb.auth.getUser(jwt);
+        const uid = userData?.user?.id;
+        let admin = false;
+        if (uid) {
+          const { data: ok } = await sb.rpc("has_role", { _user_id: uid, _role: "admin" });
+          admin = ok === true;
+        }
+        if (!admin) {
+          return new Response(JSON.stringify({ ok: false, error: "Nepieciešama admin piekļuve" }), {
+            status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
       const body = await req.json().catch(() => ({}));
       const rt = typeof body?.refresh_token === "string" ? body.refresh_token.trim() : "";
       if (rt.length < 20) {
@@ -182,6 +199,7 @@ Deno.serve(async (req) => {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
       const { error } = await sb.from("nwg_auth").upsert({ id: 1, refresh_token: rt, updated_at: new Date().toISOString() });
       if (error) throw new Error(error.message);
       // Validate immediately.
