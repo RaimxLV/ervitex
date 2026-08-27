@@ -33,10 +33,36 @@ interface CatalogHit {
 
 interface VariantPrice { color_code: string | null; size: string | null; retail_price: number }
 
+const STATUS_META: Record<string, { label: string; hint: string; cls: string }> = {
+  draft: {
+    label: "Melnraksts",
+    hint: "Saite vēl nedarbojas. Statuss mainīsies automātiski, tiklīdz nosūtīsi piedāvājumu klientam.",
+    cls: "border-amber-300 bg-amber-50 text-amber-700",
+  },
+  sent: {
+    label: "Nosūtīts",
+    hint: "Saite ir publicēta — klients var atvērt piedāvājumu.",
+    cls: "border-blue-300 bg-blue-50 text-blue-700",
+  },
+  accepted: {
+    label: "Apstiprināts",
+    hint: "Klients piedāvājumu apstiprināja. Saite paliek aktīva.",
+    cls: "border-emerald-300 bg-emerald-50 text-emerald-700",
+  },
+  closed: {
+    label: "Slēgts",
+    hint: "Piedāvājums arhivēts. Saite joprojām atveras.",
+    cls: "border-border bg-muted text-muted-foreground",
+  },
+};
+
+const STATUS_FLOW = ["draft", "sent", "accepted", "closed"];
+
 const emptyOffer: Offer = {
   id: "", title: "", client_name: "", client_company: null, client_email: null, client_phone: null,
   note: null, status: "draft", vat_rate: 21, items: [], created_at: "", updated_at: "",
 };
+
 
 const AdminOfferEdit = () => {
   const { id } = useParams<{ id: string }>();
@@ -197,6 +223,11 @@ const AdminOfferEdit = () => {
 
   const link = offer.token ? offerUrl(offer.token) : "";
 
+  // Any client-facing share must publish the link first (draft links do not work)
+  const publish = async () => {
+    if (offer.status === "draft") await save("sent");
+  };
+
   const copy = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -206,17 +237,20 @@ const AdminOfferEdit = () => {
     }
   };
 
-  const whatsapp = () => {
+  const whatsapp = async () => {
+    await publish();
     const text = `${offer.client_name ? `Sveiki, ${offer.client_name}!\n\n` : ""}${offerPlainText(offer, "lv")}`;
     const phone = (offer.client_phone || "").replace(/[^\d]/g, "");
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
-  const mail = () => {
+  const mail = async () => {
+    await publish();
     const subject = offer.title || "Ervitex piedāvājums";
     const body = `${offer.client_name ? `Sveiki, ${offer.client_name}!\n\n` : ""}${offerPlainText(offer, "lv")}`;
     window.location.href = `mailto:${offer.client_email || ""}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
+
 
   // Real send through the platform email system
   const sendEmail = async (mode: "client" | "test") => {
@@ -276,8 +310,15 @@ const AdminOfferEdit = () => {
       },
     });
     setSendingEmail(null);
-    if (error) toast({ title: "Neizdevās nosūtīt", description: error.message, variant: "destructive" });
-    else toast({ title: mode === "test" ? `Tests nosūtīts uz ${to}` : `Piedāvājums nosūtīts: ${to}` });
+    if (error) {
+      toast({ title: "Neizdevās nosūtīt", description: error.message, variant: "destructive" });
+      return;
+    }
+    if (mode === "client" && offer.status === "draft") {
+      // Status changes automatically on a successful send
+      await save("sent");
+    }
+    toast({ title: mode === "test" ? `Tests nosūtīts uz ${to}` : `Piedāvājums nosūtīts: ${to}` });
   };
 
 
@@ -285,21 +326,26 @@ const AdminOfferEdit = () => {
     return <AdminLayout><p className="py-10 text-center text-muted-foreground">Ielādē...</p></AdminLayout>;
   }
 
+  const st = STATUS_META[offer.status] || STATUS_META.draft;
+
   return (
     <AdminLayout>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button asChild variant="outline" size="sm">
-          <Link to="/admin/offers"><ArrowLeft className="mr-2 h-4 w-4" /> Visi piedāvājumi</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/admin/offers"><ArrowLeft className="mr-2 h-4 w-4" /> Visi piedāvājumi</Link>
+          </Button>
+          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${st.cls}`}>
+            <span className="h-1.5 w-1.5 rounded-full bg-current" /> {st.label}
+          </span>
+        </div>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" onClick={() => save()} disabled={saving}>
             <Save className="mr-2 h-4 w-4" /> Saglabāt
           </Button>
-          <Button size="sm" variant="outline" onClick={() => save("sent")} disabled={saving}>
-            Publicēt saiti
-          </Button>
         </div>
       </div>
+
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1fr,360px]">
         <div className="space-y-6">
@@ -328,21 +374,11 @@ const AdminOfferEdit = () => {
                 <Input value={offer.client_phone || ""} onChange={(e) => setOffer({ ...offer, client_phone: e.target.value })} placeholder="+371…" />
               </div>
               <div>
-                <Label className="text-xs">Statuss</Label>
-                <Select value={offer.status} onValueChange={(v) => setOffer({ ...offer, status: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Melnraksts (saite nedarbojas)</SelectItem>
-                    <SelectItem value="sent">Nosūtīts</SelectItem>
-                    <SelectItem value="accepted">Apstiprināts</SelectItem>
-                    <SelectItem value="closed">Slēgts</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
                 <Label className="text-xs">PVN %</Label>
                 <Input type="number" value={offer.vat_rate} onChange={(e) => setOffer({ ...offer, vat_rate: Number(e.target.value) || 0 })} />
               </div>
+
+
               <div>
                 <Label className="text-xs">Projektu vadītājs (atbildes saņēmējs)</Label>
                 <Select
@@ -509,6 +545,39 @@ const AdminOfferEdit = () => {
 
         {/* Sidebar */}
         <aside className="space-y-4">
+          {/* Status */}
+          <div className="rounded-sm border border-border p-4">
+            <h3 className="font-heading text-sm font-black uppercase tracking-widest">Statuss</h3>
+            <ol className="mt-3 flex items-center gap-1">
+              {STATUS_FLOW.map((s, i) => {
+                const active = STATUS_FLOW.indexOf(offer.status) >= i;
+                return (
+                  <li key={s} className="flex-1">
+                    <div className={`h-1.5 rounded-full ${active ? "bg-accent" : "bg-muted"}`} />
+                    <span className={`mt-1 block text-[10px] uppercase tracking-wide ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                      {STATUS_META[s].label}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">{st.hint}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {offer.status === "sent" && (
+                <Button size="sm" variant="outline" onClick={() => save("accepted")} disabled={saving}>Atzīmēt kā apstiprinātu</Button>
+              )}
+              {(offer.status === "sent" || offer.status === "accepted") && (
+                <Button size="sm" variant="outline" onClick={() => save("closed")} disabled={saving}>Slēgt</Button>
+              )}
+              {offer.status !== "draft" && (
+                <Button size="sm" variant="ghost" onClick={() => save("draft")} disabled={saving}>Atgriezt melnrakstā</Button>
+              )}
+              {offer.status === "draft" && (
+                <Button size="sm" variant="outline" onClick={() => save("sent")} disabled={saving}>Publicēt saiti bez e-pasta</Button>
+              )}
+            </div>
+          </div>
+
           <div className="rounded-sm border border-border p-4">
             <h3 className="font-heading text-sm font-black uppercase tracking-widest">Kopsavilkums</h3>
             <dl className="mt-3 space-y-1 text-sm">
@@ -522,8 +591,9 @@ const AdminOfferEdit = () => {
           <div className="rounded-sm border border-border p-4 space-y-2">
             <h3 className="font-heading text-sm font-black uppercase tracking-widest">Nosūtīt klientam</h3>
             {offer.status === "draft" && (
-              <p className="text-xs text-amber-600">Saite darbosies tikai pēc “Publicēt saiti”.</p>
+              <p className="text-xs text-amber-600">Saite kļūs aktīva automātiski, tiklīdz nosūtīsi vai kopēsi to klientam.</p>
             )}
+
             <Input readOnly value={link} className="text-xs" onFocus={(e) => e.currentTarget.select()} />
 
             <Button
@@ -549,7 +619,7 @@ const AdminOfferEdit = () => {
 
             <div className="grid grid-cols-2 gap-2">
 
-              <Button size="sm" variant="outline" onClick={() => copy(link, "Links")}><Copy className="mr-2 h-3 w-3" /> Saite</Button>
+              <Button size="sm" variant="outline" onClick={async () => { await publish(); copy(link, "Links"); }}><Copy className="mr-2 h-3 w-3" /> Saite</Button>
               <Button size="sm" variant="outline" onClick={() => copy(offerPlainText(offer, "lv"), "Teksts")}><Copy className="mr-2 h-3 w-3" /> Teksts</Button>
               <Button size="sm" variant="outline" onClick={whatsapp}><MessageCircle className="mr-2 h-3 w-3" /> WhatsApp</Button>
               <Button size="sm" variant="outline" onClick={mail}><Mail className="mr-2 h-3 w-3" /> E-pasts</Button>
