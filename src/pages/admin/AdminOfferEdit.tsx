@@ -545,6 +545,39 @@ const AdminOfferEdit = () => {
 
         {/* Sidebar */}
         <aside className="space-y-4">
+          {/* Status */}
+          <div className="rounded-sm border border-border p-4">
+            <h3 className="font-heading text-sm font-black uppercase tracking-widest">Statuss</h3>
+            <ol className="mt-3 flex items-center gap-1">
+              {STATUS_FLOW.map((s, i) => {
+                const active = STATUS_FLOW.indexOf(offer.status) >= i;
+                return (
+                  <li key={s} className="flex-1">
+                    <div className={`h-1.5 rounded-full ${active ? "bg-accent" : "bg-muted"}`} />
+                    <span className={`mt-1 block text-[10px] uppercase tracking-wide ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                      {STATUS_META[s].label}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">{st.hint}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {offer.status === "sent" && (
+                <Button size="sm" variant="outline" onClick={() => save("accepted")} disabled={saving}>Atzīmēt kā apstiprinātu</Button>
+              )}
+              {(offer.status === "sent" || offer.status === "accepted") && (
+                <Button size="sm" variant="outline" onClick={() => save("closed")} disabled={saving}>Slēgt</Button>
+              )}
+              {offer.status !== "draft" && (
+                <Button size="sm" variant="ghost" onClick={() => save("draft")} disabled={saving}>Atgriezt melnrakstā</Button>
+              )}
+              {offer.status === "draft" && (
+                <Button size="sm" variant="outline" onClick={() => save("sent")} disabled={saving}>Publicēt saiti bez e-pasta</Button>
+              )}
+            </div>
+          </div>
+
           <div className="rounded-sm border border-border p-4">
             <h3 className="font-heading text-sm font-black uppercase tracking-widest">Kopsavilkums</h3>
             <dl className="mt-3 space-y-1 text-sm">
@@ -558,8 +591,9 @@ const AdminOfferEdit = () => {
           <div className="rounded-sm border border-border p-4 space-y-2">
             <h3 className="font-heading text-sm font-black uppercase tracking-widest">Nosūtīt klientam</h3>
             {offer.status === "draft" && (
-              <p className="text-xs text-amber-600">Saite darbosies tikai pēc “Publicēt saiti”.</p>
+              <p className="text-xs text-amber-600">Saite kļūs aktīva automātiski, tiklīdz nosūtīsi vai kopēsi to klientam.</p>
             )}
+
             <Input readOnly value={link} className="text-xs" onFocus={(e) => e.currentTarget.select()} />
 
             <Button
