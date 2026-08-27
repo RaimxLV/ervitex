@@ -33,10 +33,36 @@ interface CatalogHit {
 
 interface VariantPrice { color_code: string | null; size: string | null; retail_price: number }
 
+const STATUS_META: Record<string, { label: string; hint: string; cls: string }> = {
+  draft: {
+    label: "Melnraksts",
+    hint: "Saite vēl nedarbojas. Statuss mainīsies automātiski, tiklīdz nosūtīsi piedāvājumu klientam.",
+    cls: "border-amber-300 bg-amber-50 text-amber-700",
+  },
+  sent: {
+    label: "Nosūtīts",
+    hint: "Saite ir publicēta — klients var atvērt piedāvājumu.",
+    cls: "border-blue-300 bg-blue-50 text-blue-700",
+  },
+  accepted: {
+    label: "Apstiprināts",
+    hint: "Klients piedāvājumu apstiprināja. Saite paliek aktīva.",
+    cls: "border-emerald-300 bg-emerald-50 text-emerald-700",
+  },
+  closed: {
+    label: "Slēgts",
+    hint: "Piedāvājums arhivēts. Saite joprojām atveras.",
+    cls: "border-border bg-muted text-muted-foreground",
+  },
+};
+
+const STATUS_FLOW = ["draft", "sent", "accepted", "closed"];
+
 const emptyOffer: Offer = {
   id: "", title: "", client_name: "", client_company: null, client_email: null, client_phone: null,
   note: null, status: "draft", vat_rate: 21, items: [], created_at: "", updated_at: "",
 };
+
 
 const AdminOfferEdit = () => {
   const { id } = useParams<{ id: string }>();
