@@ -345,14 +345,14 @@ const RequestPage = () => {
 
 
               {/* Files */}
-              <section className="rounded-md border border-border bg-card p-4 sm:p-6 space-y-3">
-                <h2 className="font-heading text-lg font-black uppercase tracking-wide">
+              <section className="space-y-4 rounded-md border border-border bg-card p-5 sm:p-6">
+                <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
                   {t("Faili (logo, dizains)", "Files (logo, artwork)")}
                 </h2>
-                <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border bg-background p-6 text-center hover:bg-muted/40 transition-colors">
-                  <Upload className="mb-2 h-6 w-6 text-muted-foreground" />
-                  <span className="text-sm font-medium">{t("Ievelc failus šeit vai spied, lai izvēlētos", "Drop files here or click to choose")}</span>
-                  <span className="mt-1 text-xs text-muted-foreground">
+                <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border bg-background px-4 py-7 text-center transition-colors hover:bg-muted/40">
+                  <Upload className="mb-2.5 h-6 w-6 text-muted-foreground" />
+                  <span className="text-sm font-medium leading-snug">{t("Ievelc failus šeit vai spied, lai izvēlētos", "Drop files here or click to choose")}</span>
+                  <span className="mt-1.5 text-[11px] text-muted-foreground">
                     {t(`Līdz ${MAX_FILES} failiem, katrs līdz ${MAX_FILE_MB}MB`, `Up to ${MAX_FILES} files, ${MAX_FILE_MB}MB each`)}
                   </span>
                   <input
@@ -364,11 +364,13 @@ const RequestPage = () => {
                   />
                 </label>
                 {files.length > 0 && (
-                  <ul className="space-y-1 text-sm">
+                  <ul className="space-y-1.5 text-sm">
                     {files.map((f, i) => (
-                      <li key={i} className="flex items-center justify-between rounded border border-border px-3 py-2">
-                        <span className="truncate">{f.name} <span className="text-xs text-muted-foreground">({(f.size / 1024 / 1024).toFixed(2)}MB)</span></span>
-                        <Button type="button" size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => removeFile(i)}>
+                      <li key={i} className="flex min-w-0 items-center gap-2 rounded-md border border-border py-1.5 pl-3 pr-1.5">
+                        <span className="min-w-0 flex-1 truncate">
+                          {f.name} <span className="text-[11px] text-muted-foreground">({(f.size / 1024 / 1024).toFixed(2)}MB)</span>
+                        </span>
+                        <Button type="button" size="icon" variant="ghost" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive" onClick={() => removeFile(i)}>
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </li>
@@ -379,40 +381,40 @@ const RequestPage = () => {
             </div>
 
             {/* Right column */}
-            <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+            <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
               {/* Contact */}
-              <section className="rounded-md border border-border bg-card p-4 sm:p-6 space-y-3">
-                <h2 className="font-heading text-lg font-black uppercase tracking-wide">
+              <section className="space-y-4 rounded-md border border-border bg-card p-5 sm:p-6">
+                <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
                   {t("Tavi kontakti", "Your contacts")}
                 </h2>
-                <div>
-                  <Label className="text-xs uppercase tracking-wider">{t("Vārds", "Name")} *</Label>
-                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Vārds", "Name")} *</Label>
+                  <Input className="h-10" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
                 </div>
-                <div>
-                  <Label className="text-xs uppercase tracking-wider">{t("E-pasts", "Email")} *</Label>
-                  <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("E-pasts", "Email")} *</Label>
+                  <Input type="email" className="h-10" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
                 </div>
-                <div>
-                  <Label className="text-xs uppercase tracking-wider">{t("Tālrunis", "Phone")}</Label>
-                  <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Tālrunis", "Phone")}</Label>
+                  <Input className="h-10" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                 </div>
-                <div>
-                  <Label className="text-xs uppercase tracking-wider">{t("Uzņēmums", "Company")}</Label>
-                  <Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Uzņēmums", "Company")}</Label>
+                  <Input className="h-10" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
                 </div>
               </section>
-
 
               <Button
                 type="submit"
                 disabled={sending || items.length === 0}
-                className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest h-12"
+                className="h-12 w-full bg-accent font-heading text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90"
               >
                 <Send className="mr-2 h-4 w-4" />
                 {sending ? t("Sūta...", "Sending...") : t("Nosūtīt pieprasījumu", "Send request")}
               </Button>
             </aside>
+
           </form>
         )}
       </div>
