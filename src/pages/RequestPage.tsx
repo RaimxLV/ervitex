@@ -311,19 +311,18 @@ const RequestPage = () => {
                 )}
               </section>
 
-
               {/* Print details */}
-              <section className="rounded-md border border-border bg-card p-4 sm:p-6 space-y-4">
-                <h2 className="font-heading text-lg font-black uppercase tracking-wide">
+              <section className="space-y-5 rounded-md border border-border bg-card p-5 sm:p-6">
+                <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
                   {t("Apdrukas informācija", "Print details")}
                 </h2>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <Label className="text-xs uppercase tracking-wider">{t("Apdrukas metode", "Print method")}</Label>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
                     <select
                       value={print.method}
                       onChange={(e) => setPrint({ ...print, method: e.target.value })}
-                      className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                     >
                       <option value="">{t("Nezinu / konsultēties", "Not sure / consult")}</option>
                       <option value="silkscreen">{t("Sietspiede", "Silkscreen")}</option>
@@ -332,17 +331,18 @@ const RequestPage = () => {
                       <option value="none">{t("Bez apdrukas", "No print")}</option>
                     </select>
                   </div>
-                  <div>
-                    <Label className="text-xs uppercase tracking-wider">{t("Vēlamais termiņš", "Deadline")}</Label>
-                    <Input value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
+                  <div className="space-y-1.5">
+                    <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Vēlamais termiņš", "Deadline")}</Label>
+                    <Input className="h-10" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
                   </div>
                 </div>
 
-                <div>
-                  <Label className="text-xs uppercase tracking-wider">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
-                  <Textarea rows={4} value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
+                  <Textarea rows={4} className="resize-none" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
                 </div>
               </section>
+
 
               {/* Files */}
               <section className="rounded-md border border-border bg-card p-4 sm:p-6 space-y-3">
