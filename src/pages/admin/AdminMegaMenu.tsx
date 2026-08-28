@@ -21,17 +21,14 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Plus, Trash2, Pencil, RefreshCw, Eye, EyeOff, GripVertical } from "lucide-react";
 import {
-  Plus,
-  Trash2,
-  Pencil,
-  RefreshCw,
-  Upload,
-  Eye,
-  EyeOff,
-  GripVertical,
-} from "lucide-react";
-import { resolveMenuImage } from "@/lib/megaMenuImages";
+  MEGA_MENU_SECTIONS,
+  SECTION_META,
+  buildCategoryHref,
+  buildSourceHref,
+  type MegaMenuSection,
+} from "@/lib/megaMenuConfig";
 import {
   DndContext,
   closestCenter,
@@ -51,7 +48,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-type Section = "apparel" | "bags" | "promo" | "promo_link";
+type Section = MegaMenuSection;
 
 interface Item {
   id: string;
@@ -64,13 +61,6 @@ interface Item {
   active: boolean;
   auto_added: boolean;
 }
-
-const SECTION_LABELS: Record<Section, string> = {
-  apparel: "Apģērbi (ar bildēm)",
-  bags: "Somas un ceļojumi (ar bildēm)",
-  promo: "Prezentmateriāli (ar bildēm)",
-  promo_link: "Prezentmateriāli (teksta saraksts)",
-};
 
 const emptyDraft = (section: Section): Partial<Item> => ({
   section,
@@ -88,13 +78,11 @@ function SortableRow({
   onEdit,
   onRemove,
   onToggleActive,
-  onUploadImage,
 }: {
   item: Item;
   onEdit: (i: Item) => void;
   onRemove: (id: string) => void;
   onToggleActive: (i: Item) => void;
-  onUploadImage: (i: Item, f: File) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.id,
@@ -105,12 +93,18 @@ function SortableRow({
     zIndex: isDragging ? 10 : undefined,
     opacity: isDragging ? 0.85 : 1,
   };
-  const img = resolveMenuImage(item.image_url, item.label_en);
+  const isSource = SECTION_META[item.section]?.kind === "source";
+  const href = isSource
+    ? buildSourceHref(item.categories[0] || "")
+    : buildCategoryHref(item.categories);
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 p-3 bg-card ${isDragging ? "shadow-lg" : ""}`}
+      className={`flex items-center gap-3 p-3 bg-card ${isDragging ? "shadow-lg" : ""} ${
+        item.active ? "" : "opacity-60"
+      }`}
     >
       <button
         {...attributes}
@@ -122,19 +116,9 @@ function SortableRow({
         <GripVertical className="h-4 w-4" />
       </button>
 
-      <div className="h-12 w-12 shrink-0 overflow-hidden rounded-sm bg-muted">
-        {img ? (
-          <img src={img} alt={item.label_en} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-[9px] text-muted-foreground">
-            nav
-          </div>
-        )}
-      </div>
-
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <p className="font-medium text-sm truncate">
+          <p className="truncate text-sm font-medium">
             {item.label_lv}
             <span className="ml-2 text-muted-foreground">/ {item.label_en}</span>
           </p>
@@ -144,26 +128,19 @@ function SortableRow({
             </span>
           )}
         </div>
-        <p className="text-[11px] text-muted-foreground truncate">
-          {item.categories.join(" · ")}
+        <p className="truncate text-[11px] text-muted-foreground">
+          {isSource ? `ražotāja filtrs: ${item.categories[0] || "—"}` : item.categories.join(" · ")}
         </p>
       </div>
 
-      <label className="cursor-pointer">
-        <input
-          type="file"
-          accept="image/*"
-          className="sr-only"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) onUploadImage(item, f);
-            e.target.value = "";
-          }}
-        />
-        <span className="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-1 text-xs hover:bg-muted">
-          <Upload className="h-3 w-3" /> Bilde
-        </span>
-      </label>
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className="hidden shrink-0 text-[11px] text-muted-foreground underline-offset-2 hover:underline sm:block"
+      >
+        Pārbaudīt
+      </a>
 
       <Button
         size="sm"
@@ -173,7 +150,6 @@ function SortableRow({
       >
         {item.active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 opacity-50" />}
       </Button>
-
       <Button size="sm" variant="ghost" onClick={() => onEdit(item)}>
         <Pencil className="h-4 w-4" />
       </Button>
@@ -232,7 +208,9 @@ export default function AdminMegaMenu() {
 
   const usedCategories = useMemo(() => {
     const s = new Set<string>();
-    items.forEach((i) => i.categories.forEach((c) => s.add(c)));
+    items
+      .filter((i) => SECTION_META[i.section]?.kind !== "source")
+      .forEach((i) => i.categories.forEach((c) => s.add(c)));
     return s;
   }, [items]);
 
@@ -242,8 +220,11 @@ export default function AdminMegaMenu() {
   );
 
   const bySection = useMemo(() => {
-    const g: Record<Section, Item[]> = { apparel: [], bags: [], promo: [], promo_link: [] };
-    items.forEach((i) => g[i.section].push(i));
+    const g = {} as Record<Section, Item[]>;
+    MEGA_MENU_SECTIONS.forEach((s) => (g[s.key] = []));
+    items.forEach((i) => {
+      if (g[i.section]) g[i.section].push(i);
+    });
     return g;
   }, [items]);
 
@@ -266,7 +247,11 @@ export default function AdminMegaMenu() {
       .map((s) => s.trim())
       .filter(Boolean);
     if (!draft.label_lv || !draft.label_en || cats.length === 0) {
-      toast({ title: "Aizpildi visus laukus", description: "LV, EN, kategorijas obligāti", variant: "destructive" });
+      toast({
+        title: "Aizpildi visus laukus",
+        description: "LV, EN un vismaz viena kategorija/filtrs obligāti",
+        variant: "destructive",
+      });
       return;
     }
     const payload = {
@@ -274,21 +259,23 @@ export default function AdminMegaMenu() {
       label_lv: draft.label_lv!,
       label_en: draft.label_en!,
       categories: cats,
-      image_url: draft.image_url ?? null,
+      image_url: null,
       sort_order: draft.sort_order ?? 999,
       active: draft.active ?? true,
       auto_added: false,
     };
     if (draft.id) {
       const { error } = await supabase.from("mega_menu_items").update(payload).eq("id", draft.id);
-      if (error) return toast({ title: "Kļūda", description: error.message, variant: "destructive" });
+      if (error)
+        return toast({ title: "Kļūda", description: error.message, variant: "destructive" });
     } else {
       const { error } = await supabase.from("mega_menu_items").insert(payload);
-      if (error) return toast({ title: "Kļūda", description: error.message, variant: "destructive" });
+      if (error)
+        return toast({ title: "Kļūda", description: error.message, variant: "destructive" });
     }
     setDialogOpen(false);
     load();
-    toast({ title: "Saglabāts" });
+    toast({ title: "Saglabāts", description: "Izmaiņas uzreiz redzamas mājaslapas izvēlnē." });
   };
 
   const remove = async (id: string) => {
@@ -312,9 +299,7 @@ export default function AdminMegaMenu() {
     const newIndex = list.findIndex((i) => i.id === over.id);
     if (oldIndex < 0 || newIndex < 0) return;
     const reordered = arrayMove(list, oldIndex, newIndex);
-    // Reassign sort_order sequentially (10, 20, 30, ...)
     const updates = reordered.map((it, idx) => ({ id: it.id, sort_order: (idx + 1) * 10 }));
-    // Optimistic update
     setItems((prev) => {
       const map = new Map(updates.map((u) => [u.id, u.sort_order]));
       return prev.map((it) => (map.has(it.id) ? { ...it, sort_order: map.get(it.id)! } : it));
@@ -331,29 +316,15 @@ export default function AdminMegaMenu() {
     load();
   };
 
-  const uploadImage = async (item: Item, file: File) => {
-    const ext = file.name.split(".").pop() || "jpg";
-    const path = `mega-menu/${item.id}-${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("product-images").upload(path, file, {
-      upsert: true,
-      contentType: file.type,
-    });
-    if (error) return toast({ title: "Augšupielādes kļūda", description: error.message, variant: "destructive" });
-    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-    await supabase.from("mega_menu_items").update({ image_url: data.publicUrl }).eq("id", item.id);
-    load();
-    toast({ title: "Bilde augšupielādēta" });
-  };
-
   const syncMissing = async () => {
     if (missingCategories.length === 0) {
-      toast({ title: "Nekas jauns", description: "Visas kategorijas jau ir izvēlnē" });
+      toast({ title: "Nekas jauns", description: "Visas kataloga kategorijas jau ir izvēlnē" });
       return;
     }
     setSyncing(true);
-    const maxSort = Math.max(0, ...items.filter((i) => i.section === "promo_link").map((i) => i.sort_order));
+    const maxSort = Math.max(0, ...items.filter((i) => i.section === "promo").map((i) => i.sort_order));
     const rows = missingCategories.map((c, i) => ({
-      section: "promo_link" as Section,
+      section: "promo" as Section,
       label_lv: c.category,
       label_en: c.category,
       categories: [c.category],
@@ -366,64 +337,84 @@ export default function AdminMegaMenu() {
     if (error) return toast({ title: "Kļūda", description: error.message, variant: "destructive" });
     toast({
       title: "Pievienotas",
-      description: `${rows.length} jaunas kategorijas pievienotas kā neaktīvas — aktivizē un pārkārto pēc vajadzības.`,
+      description: `${rows.length} jaunas kategorijas pievienotas sadaļā "Prezentmateriāli" kā neaktīvas — pārvieto un aktivizē pēc vajadzības.`,
     });
     load();
   };
 
+  const activeCount = items.filter((i) => i.active).length;
+
   return (
     <AdminLayout>
-      <div className="p-6 lg:p-8 space-y-6">
+      <div className="space-y-6 p-6 lg:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="font-heading text-2xl font-black uppercase tracking-wider">Mega izvēlne</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Sakārto kataloga mega izvēlni — sekcijas, secība, nosaukumi, bildes.
+            <h1 className="font-heading text-2xl font-black uppercase tracking-wider">
+              Mega izvēlne
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Šīs sadaļas veido mājaslapas “Katalogs” izvēlni. {activeCount} aktīvi ieraksti no{" "}
+              {items.length}.
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => { load(); loadDbCategories(); }} disabled={loading}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                load();
+                loadDbCategories();
+              }}
+              disabled={loading}
+            >
               <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Atsvaidzināt
             </Button>
             <Button onClick={syncMissing} disabled={syncing}>
               <Plus className="mr-2 h-4 w-4" />
-              Sinhronizēt trūkstošās ({missingCategories.length})
+              Trūkstošās kategorijas ({missingCategories.length})
             </Button>
           </div>
         </div>
 
-        {(["apparel", "bags", "promo", "promo_link"] as Section[]).map((section) => (
-          <section key={section} className="rounded-sm border border-border bg-card">
+        {MEGA_MENU_SECTIONS.map((meta) => (
+          <section key={meta.key} className="rounded-sm border border-border bg-card">
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
-              <h2 className="font-heading text-sm font-bold uppercase tracking-widest">
-                {SECTION_LABELS[section]}
-                <span className="ml-2 text-muted-foreground">({bySection[section].length})</span>
-              </h2>
-              <Button size="sm" variant="outline" onClick={() => openNew(section)}>
+              <div>
+                <h2 className="font-heading text-sm font-bold uppercase tracking-widest">
+                  {meta.lv}
+                  <span className="ml-2 text-muted-foreground">
+                    ({bySection[meta.key]?.length ?? 0})
+                  </span>
+                </h2>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  {meta.kind === "source"
+                    ? "Ražotāju rinda izvēlnes apakšā — filtrs pēc ražotāja"
+                    : `Kolonna “${meta.lv}” — filtrs pēc kategorijas`}
+                </p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => openNew(meta.key)}>
                 <Plus className="mr-2 h-3 w-3" /> Pievienot
               </Button>
             </div>
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
-              onDragEnd={(e) => handleDragEnd(section, e)}
+              onDragEnd={(e) => handleDragEnd(meta.key, e)}
             >
               <SortableContext
-                items={bySection[section].map((i) => i.id)}
+                items={(bySection[meta.key] || []).map((i) => i.id)}
                 strategy={verticalListSortingStrategy}
               >
                 <div className="divide-y divide-border">
-                  {bySection[section].length === 0 && (
+                  {(bySection[meta.key] || []).length === 0 && (
                     <p className="p-4 text-sm text-muted-foreground">Nav ierakstu.</p>
                   )}
-                  {bySection[section].map((item) => (
+                  {(bySection[meta.key] || []).map((item) => (
                     <SortableRow
                       key={item.id}
                       item={item}
                       onEdit={openEdit}
                       onRemove={remove}
                       onToggleActive={toggleActive}
-                      onUploadImage={uploadImage}
                     />
                   ))}
                 </div>
@@ -441,15 +432,19 @@ export default function AdminMegaMenu() {
           {draft && (
             <div className="space-y-3">
               <div>
-                <Label>Sekcija</Label>
+                <Label>Sadaļa</Label>
                 <Select
                   value={draft.section}
                   onValueChange={(v) => setDraft({ ...draft, section: v as Section })}
                 >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
-                    {(["apparel", "bags", "promo", "promo_link"] as Section[]).map((s) => (
-                      <SelectItem key={s} value={s}>{SECTION_LABELS[s]}</SelectItem>
+                    {MEGA_MENU_SECTIONS.map((s) => (
+                      <SelectItem key={s.key} value={s.key}>
+                        {s.lv}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -471,24 +466,27 @@ export default function AdminMegaMenu() {
                 </div>
               </div>
               <div>
-                <Label>Filtru kategorijas (atdala ar komatu)</Label>
+                <Label>
+                  {draft.section === "manufacturers"
+                    ? "Ražotāja filtra kods"
+                    : "Filtru kategorijas (atdala ar komatu)"}
+                </Label>
                 <Textarea
                   rows={3}
                   value={categoriesInput}
                   onChange={(e) => setCategoriesInput(e.target.value)}
-                  placeholder="T-shirts, Tops"
+                  placeholder={
+                    draft.section === "manufacturers" ? "stanley-stella" : "T-shirts, Tops"
+                  }
                 />
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Ieteikumi (top no filtriem): {dbCategories.slice(0, 12).map((c) => c.category).join(", ")}
+                  {draft.section === "manufacturers"
+                    ? "Pieejamie kodi: stanley-stella, nwg-craft, nwg-clique, nwg-projob, nwg-cutter, pf-elevate, pf-roly, ru, bb, mf, pf"
+                    : `Populārākās kategorijas: ${dbCategories
+                        .slice(0, 12)
+                        .map((c) => c.category)
+                        .join(", ")}`}
                 </p>
-              </div>
-              <div>
-                <Label>Bildes URL (neobligāts)</Label>
-                <Input
-                  value={draft.image_url || ""}
-                  onChange={(e) => setDraft({ ...draft, image_url: e.target.value })}
-                  placeholder="https://... vai atstāj tukšu un augšupielādē pēc saglabāšanas"
-                />
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="active">Aktīvs (redzams izvēlnē)</Label>
@@ -501,7 +499,9 @@ export default function AdminMegaMenu() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Atcelt</Button>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Atcelt
+            </Button>
             <Button onClick={save}>Saglabāt</Button>
           </DialogFooter>
         </DialogContent>
