@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { MegaMenuSection } from "@/lib/megaMenuConfig";
 
-export type MegaMenuSection = "apparel" | "bags" | "promo" | "promo_link";
+export type { MegaMenuSection };
 
 export interface MegaMenuItem {
   id: string;
