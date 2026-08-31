@@ -8,6 +8,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
+import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
   type FilterSection,
@@ -486,6 +488,24 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     };
 
     (async () => {
+      // 0) Disk cache (IndexedDB): render immediately from the previous visit
+      //    and revalidate in the background (stale-while-revalidate).
+      let servedFromCache = false;
+      const persisted = await readCatalogCache(cacheKey);
+      if (cancelled) return;
+      if (persisted) {
+        const cachedItems = enrich((persisted.entry.items as unknown) as CatalogItem[]);
+        const cachedRanges = toRanges((persisted.entry.prices as unknown) as any[]);
+        if (cachedItems.length) {
+          CATALOG_CACHE.set(cacheKey, { items: cachedItems, ranges: cachedRanges });
+          setItems(cachedItems);
+          setPriceRanges(cachedRanges);
+          setLoadError(false);
+          setLoaded(true);
+          servedFromCache = true;
+        }
+      }
+
       // 1) First batch of items + all prices: render as soon as these land so
       //    the grid appears in ~1 request instead of waiting for the whole
       //    catalog (~6 batches) to download.
@@ -498,17 +518,22 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       const itemRows = ((firstItems.data || []) as unknown) as CatalogItem[];
       const itemTotal = firstItems.count ?? itemRows.length;
       if (firstItems.error || (!lockedSource && itemTotal === 0)) {
-        setLoadError(true);
-        setLoaded(true);
+        if (!servedFromCache) {
+          setLoadError(true);
+          setLoaded(true);
+        }
         return;
       }
       let allItems = enrich(itemRows);
+      let rawItems: CatalogItem[] = itemRows;
       let priceRows = ((firstPrices.data || []) as unknown) as any[];
       const priceTotal = firstPrices.count ?? priceRows.length;
 
-      setItems(allItems);
-      setPriceRanges(toRanges(priceRows));
-      setLoaded(true);
+      if (!servedFromCache) {
+        setItems(allItems);
+        setPriceRanges(toRanges(priceRows));
+        setLoaded(true);
+      }
 
       // 2) Remaining batches in parallel, then merge in one update.
       const itemOffsets: number[] = [];
@@ -516,7 +541,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       const priceOffsets: number[] = [];
       for (let from = STEP; from < priceTotal; from += STEP) priceOffsets.push(from);
       if (!itemOffsets.length && !priceOffsets.length) {
-        CATALOG_CACHE.set(cacheKey, { items: allItems, ranges: toRanges(priceRows) });
+        const ranges = toRanges(priceRows);
+        CATALOG_CACHE.set(cacheKey, { items: allItems, ranges });
+        setItems(allItems);
+        setPriceRanges(ranges);
+        void writeCatalogCache(cacheKey, rawItems, priceRows);
         return;
       }
 
@@ -533,16 +562,19 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       for (const p of restPrices) if (!p.error && p.data) priceRows = priceRows.concat(p.data as any[]);
 
       allItems = allItems.concat(enrich(extra));
+      rawItems = rawItems.concat(extra);
       const ranges = toRanges(priceRows);
       CATALOG_CACHE.set(cacheKey, { items: allItems, ranges });
       setItems(allItems);
       setPriceRanges(ranges);
+      void writeCatalogCache(cacheKey, rawItems, priceRows);
     })().catch(() => {
       if (!cancelled) {
         setLoadError(true);
         setLoaded(true);
       }
     });
+
 
     return () => {
       cancelled = true;
