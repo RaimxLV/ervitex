@@ -10,10 +10,15 @@ import emb1 from "@/assets/services/embroidery-1.jpg";
 import emb2 from "@/assets/services/embroidery-2.jpg";
 import emb3 from "@/assets/services/embroidery-3.jpg";
 import emb4 from "@/assets/services/embroidery-4.jpg";
-import sub1 from "@/assets/services/sublimation-1.jpg";
-import sub2 from "@/assets/services/sublimation-2.jpg";
-import sub3 from "@/assets/services/sublimation-3.jpg";
-import sub4 from "@/assets/services/sublimation-4.jpg";
+import subA1 from "@/assets/services/sub-1.jpg.asset.json";
+import subA2 from "@/assets/services/sub-2.jpg.asset.json";
+import subA3 from "@/assets/services/sub-3.jpg.asset.json";
+import subA4 from "@/assets/services/sub-4.jpg.asset.json";
+import subA5 from "@/assets/services/sub-5.jpg.asset.json";
+import subA6 from "@/assets/services/sub-6.jpg.asset.json";
+import subA7 from "@/assets/services/sub-7.jpg.asset.json";
+import subA8 from "@/assets/services/sub-8.jpg.asset.json";
+import subA9 from "@/assets/services/sub-9.jpg.asset.json";
 
 export type Tech = {
   id: string;
