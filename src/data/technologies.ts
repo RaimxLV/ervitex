@@ -130,7 +130,17 @@ export const techs: Tech[] = [
       { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "3–7 darba dienas", en: "3–7 business days" } },
       { label: { lv: "Materiāls", en: "Material" }, value: { lv: "Poliesters, gaišas krāsas", en: "Polyester, light colours" } },
     ],
-    images: [sub1, sub2, sub3, sub4],
+    images: [
+      subA1.url,
+      subA2.url,
+      subA3.url,
+      subA4.url,
+      subA5.url,
+      subA6.url,
+      subA7.url,
+      subA8.url,
+      subA9.url,
+    ],
   },
 ];
 
