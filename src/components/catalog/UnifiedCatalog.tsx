@@ -8,6 +8,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
+import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
+
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
   type FilterSection,
