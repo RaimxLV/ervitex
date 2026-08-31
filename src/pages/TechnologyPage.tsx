@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import Layout from "@/components/Layout";
 import ServiceImageCarousel from "@/components/services/ServiceImageCarousel";
+import TechGallery from "@/components/services/TechGallery";
 import TechRelatedProducts from "@/components/services/TechRelatedProducts";
 
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -92,18 +93,9 @@ const TechnologyPage = () => {
 
           {/* Gallery */}
           <div className="mt-16 border-t border-border pt-12 md:mt-24">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {tech.images.map((src, i) => (
-                <img
-                  key={src}
-                  src={src}
-                  alt={`${tech.name[lang]} ${i + 1}`}
-                  loading="lazy"
-                  className="aspect-[4/3] w-full rounded-sm object-cover"
-                />
-              ))}
-            </div>
+            <TechGallery images={tech.images} alt={tech.name[lang]} />
           </div>
+
 
           <TechRelatedProducts techId={tech.id} />
 
