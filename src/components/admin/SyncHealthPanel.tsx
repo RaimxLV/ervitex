@@ -63,16 +63,28 @@ const SyncHealthPanel = () => {
       supabase
         .from("nwg_skus")
         .select("nwg_styles!inner(brand)", { count: "exact", head: true })
-        .in("nwg_styles.brand", NWG_BRANDS),
+        .in("nwg_styles.brand", NWG_BRANDS)
+        .eq("nwg_styles.published", true)
+        .eq("nwg_styles.archived", false)
+        .eq("active", true)
+        .eq("discontinued", false),
       supabase
         .from("nwg_skus")
         .select("nwg_styles!inner(brand)", { count: "exact", head: true })
         .in("nwg_styles.brand", NWG_BRANDS)
+        .eq("nwg_styles.published", true)
+        .eq("nwg_styles.archived", false)
+        .eq("active", true)
+        .eq("discontinued", false)
         .gt("purchase_price", 0),
       supabase
         .from("nwg_skus")
         .select("purchase_updated_at,nwg_styles!inner(brand)")
         .in("nwg_styles.brand", NWG_BRANDS)
+        .eq("nwg_styles.published", true)
+        .eq("nwg_styles.archived", false)
+        .eq("active", true)
+        .eq("discontinued", false)
         .not("purchase_updated_at", "is", null)
         .order("purchase_updated_at", { ascending: false })
         .limit(1)
@@ -243,7 +255,7 @@ const SyncHealthPanel = () => {
           <div className="flex items-end justify-between text-sm">
             <span className="font-heading text-2xl font-black text-foreground">{pct.toFixed(1)}%</span>
             <span className="text-muted-foreground">
-              {nwg.priced.toLocaleString("lv-LV")} / {nwg.total.toLocaleString("lv-LV")} SKU ar līgumcenu
+              {nwg.priced.toLocaleString("lv-LV")} / {nwg.total.toLocaleString("lv-LV")} aktuālie SKU ar līgumcenu
             </span>
           </div>
           <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
