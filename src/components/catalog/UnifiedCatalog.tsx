@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { SlidersHorizontal } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, SlidersHorizontal } from "lucide-react";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -609,6 +609,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       empty: lang === "lv" ? "Nav atrasts neviens produkts" : "No products found",
       prev: lang === "lv" ? "Iepriekšējā" : "Previous",
       next: lang === "lv" ? "Nākamā" : "Next",
+      first: lang === "lv" ? "Pirmā lapa" : "First page",
+      last: lang === "lv" ? "Pēdējā lapa" : "Last page",
+      page: lang === "lv" ? "Lapa" : "Page",
+      of: lang === "lv" ? "no" : "of",
       request: lang === "lv" ? "Cena pēc pieprasījuma" : "Request quote",
       loadFailed: lang === "lv" ? "Katalogu neizdevās ielādēt" : "Catalog could not be loaded",
       retry: lang === "lv" ? "Mēģināt vēlreiz" : "Try again",
@@ -653,6 +657,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   );
 
   // "Ražotājs" facet — virtual manufacturer taxonomy (see MANUFACTURERS above).
+  // Each manufacturer also exposes its real brands as a compact second level.
   const sourceItems = useMemo(() => {
     return MANUFACTURERS
       .map((m) => ({
@@ -663,6 +668,20 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       .filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
+
+  const sourceBrandItems = useMemo(() => {
+    const nested: Record<string, { label: string; value: string; count: number }[]> = {};
+    for (const manufacturer of sourceItems) {
+      const counts = new Map<string, number>();
+      for (const item of items) {
+        if (item.manufacturer !== manufacturer.value || !item.brand) continue;
+        counts.set(item.brand, (counts.get(item.brand) || 0) + 1);
+      }
+      nested[manufacturer.value] = Array.from(counts, ([label, count]) => ({ label, value: label, count }))
+        .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+    }
+    return nested;
+  }, [items, sourceItems]);
 
   // ── LV translations for facet values ──
   const CATEGORY_LV: Record<string, string> = {
@@ -775,7 +794,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const genLoc = localize(GENDER_LV);
   const grpLoc = localize(GROUP_LV);
 
-  const brandItems = useMemo(() => facet("brand", (it) => it.brand), [facet]);
   const categoryItems = useMemo(
     () => facet("category", (it) => it.category).map((x) => ({ value: x.label, label: catLoc(x.label), count: x.count })),
     [facet, lang]
@@ -840,7 +858,24 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   }, [items, q, sources, brands, categories, groups, genders, colors, sort, priceOf, lang]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const safePage = Math.min(page, totalPages);
+  const safePage = Number.isFinite(page) ? Math.min(Math.max(page, 1), totalPages) : 1;
+  const [pageInput, setPageInput] = useState(String(safePage));
+
+  useEffect(() => {
+    setPageInput(String(safePage));
+  }, [safePage]);
+
+  const goToPage = (value: number) => {
+    const nextPage = Math.min(Math.max(Math.round(value) || 1, 1), totalPages);
+    setPage(nextPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const submitPageInput = () => {
+    const requested = Number.parseInt(pageInput, 10);
+    goToPage(Number.isFinite(requested) ? requested : safePage);
+  };
+
   const paginated = useMemo(
     () => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
     [filtered, safePage]
@@ -863,7 +898,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       key: "source",
       title: t.source,
       items: sourceItems,
+      nestedItems: sourceBrandItems,
       selected: sources,
+      childSelected: brands,
+      onChildToggle: toggle(brands, setBrands),
       onToggle: toggle(sources, setSources),
     });
   }
@@ -895,13 +933,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         const b = COLOR_BUCKETS.find((x) => (lang === "lv" ? x.lv : x.en) === label);
         if (b) toggle(colors, setColors)(b.key);
       },
-    },
-    {
-      key: "brand",
-      title: t.brand,
-      items: brandItems,
-      selected: brands,
-      onToggle: toggle(brands, setBrands),
     },
     {
       key: "gender",
@@ -1060,35 +1091,67 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 </div>
 
                 {totalPages > 1 && (
-                  <div className="mt-8 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                  <nav className="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label={lang === "lv" ? "Kataloga lapas" : "Catalog pages"}>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      disabled={safePage <= 1}
+                      onClick={() => goToPage(1)}
+                      aria-label={t.first}
+                      title={t.first}
+                      className="h-9 w-9"
+                    >
+                      <ChevronsLeft className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="outline"
                       size="sm"
                       disabled={safePage <= 1}
-                      onClick={() => {
-                        setPage(safePage - 1);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
+                      onClick={() => goToPage(safePage - 1)}
                       className="font-heading text-xs uppercase tracking-wider"
                     >
                       ← {t.prev}
                     </Button>
-                    <span className="px-3 text-sm text-muted-foreground">
-                      {safePage} / {totalPages}
-                    </span>
+                    <div className="flex items-center gap-2 px-1">
+                      <label htmlFor="catalog-page-input" className="sr-only">{t.page}</label>
+                      <Input
+                        id="catalog-page-input"
+                        type="number"
+                        min={1}
+                        max={totalPages}
+                        inputMode="numeric"
+                        value={pageInput}
+                        onChange={(event) => setPageInput(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") submitPageInput();
+                        }}
+                        onBlur={submitPageInput}
+                        className="h-9 w-16 px-2 text-center text-sm tabular-nums"
+                        aria-label={t.page}
+                      />
+                      <span className="text-sm tabular-nums text-muted-foreground">{t.of} {totalPages}</span>
+                    </div>
                     <Button
                       variant="outline"
                       size="sm"
                       disabled={safePage >= totalPages}
-                      onClick={() => {
-                        setPage(safePage + 1);
-                        window.scrollTo({ top: 0, behavior: "smooth" });
-                      }}
+                      onClick={() => goToPage(safePage + 1)}
                       className="font-heading text-xs uppercase tracking-wider"
                     >
                       {t.next} →
                     </Button>
-                  </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      disabled={safePage >= totalPages}
+                      onClick={() => goToPage(totalPages)}
+                      aria-label={t.last}
+                      title={t.last}
+                      className="h-9 w-9"
+                    >
+                      <ChevronsRight className="h-4 w-4" />
+                    </Button>
+                  </nav>
                 )}
               </>
             )}

@@ -1,10 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Minus, Check, Search, SlidersHorizontal, X } from "lucide-react";
+import { Plus, Minus, Check, Search, SlidersHorizontal, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+
+export interface FilterItem {
+  label: string;
+  count: number;
+  value?: string;
+  swatch?: string | null;
+}
 
 export interface FilterSection {
   /** Stable key (e.g. "brand", "category") */
@@ -12,9 +19,13 @@ export interface FilterSection {
   /** Localized section title */
   title: string;
   /** Items. `value` optional — if omitted, `label` is used both to display and toggle. `swatch` renders a color circle. */
-  items: { label: string; count: number; value?: string; swatch?: string | null }[];
+  items: FilterItem[];
+  /** Optional second-level choices keyed by the parent item value. */
+  nestedItems?: Record<string, FilterItem[]>;
   selected: Set<string>;
   onToggle: (value: string) => void;
+  childSelected?: Set<string>;
+  onChildToggle?: (value: string) => void;
   /** When true, section behaves as single-select (radio-like) */
   single?: boolean;
   /** Optional: hide count numbers */
@@ -47,6 +58,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
     setInitialized(true);
   }, [isMobile, sections, initialized]);
   const [searchByKey, setSearchByKey] = useState<Record<string, string>>({});
+  const [expandedNested, setExpandedNested] = useState<Record<string, boolean>>({});
 
   const t = useMemo(
     () => ({
@@ -241,11 +253,92 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                           );
                         })}
                       </div>
+                    ) : section.key === "source" ? (
+                      <ul className="space-y-1 pr-1">
+                        {filtered.length === 0 && (
+                          <li className="text-[11px] text-muted-foreground">{t.empty}</li>
+                        )}
+                        {filtered.map((it) => {
+                          const val = it.value ?? it.label;
+                          const nested = section.nestedItems?.[val] ?? [];
+                          const isExpanded = !!expandedNested[`${section.key}:${val}`];
+                          const isSelected = section.selected.has(val);
+                          return (
+                            <li key={val}>
+                              <div
+                                className={cn(
+                                  "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition",
+                                  isSelected ? "bg-accent/5" : "hover:bg-muted/60"
+                                )}
+                              >
+                                <Checkbox
+                                  checked={isSelected}
+                                  onCheckedChange={() => section.onToggle(val)}
+                                  aria-label={it.label}
+                                  className="h-3.5 w-3.5"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => nested.length && setExpandedNested((current) => ({
+                                    ...current,
+                                    [`${section.key}:${val}`]: !isExpanded,
+                                  }))}
+                                  className={cn(
+                                    "flex min-w-0 flex-1 items-center gap-1.5 text-left",
+                                    nested.length ? "cursor-pointer" : "cursor-default"
+                                  )}
+                                  aria-expanded={nested.length ? isExpanded : undefined}
+                                >
+                                  <span className={cn("flex-1 truncate text-[12px]", isSelected && "font-semibold")} title={it.label}>
+                                    {it.label}
+                                  </span>
+                                  {nested.length > 0 && (isExpanded ? (
+                                    <ChevronDown className="h-3.5 w-3.5 shrink-0 text-accent" />
+                                  ) : (
+                                    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                                  ))}
+                                </button>
+                                {!section.hideCounts && (
+                                  <span className="text-[10px] tabular-nums text-muted-foreground">{it.count}</span>
+                                )}
+                              </div>
+                              {isExpanded && nested.length > 0 && (
+                                <div className="ml-7 mt-1 space-y-0.5 border-l border-border pl-2">
+                                  {nested.map((child) => {
+                                    const childVal = child.value ?? child.label;
+                                    const childSelected = section.childSelected?.has(childVal) ?? false;
+                                    return (
+                                      <label
+                                        key={childVal}
+                                        className={cn(
+                                          "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-[11px] transition",
+                                          childSelected ? "bg-accent/5 font-semibold" : "hover:bg-muted/60"
+                                        )}
+                                      >
+                                        <Checkbox
+                                          checked={childSelected}
+                                          onCheckedChange={() => section.onChildToggle?.(childVal)}
+                                          aria-label={child.label}
+                                          className="h-3 w-3"
+                                        />
+                                        <span className="min-w-0 flex-1 truncate" title={child.label}>{child.label}</span>
+                                        {!section.hideCounts && (
+                                          <span className="text-[9px] tabular-nums text-muted-foreground">{child.count}</span>
+                                        )}
+                                      </label>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </li>
+                          );
+                        })}
+                      </ul>
                     ) : (
                       <ul
                         className={cn(
                           "space-y-0.5 pr-1",
-                          section.key !== "source" && filtered.length > 10 && "max-h-72 overflow-y-auto"
+                          filtered.length > 10 && "max-h-72 overflow-y-auto"
                         )}
                       >
                         {filtered.length === 0 && (
