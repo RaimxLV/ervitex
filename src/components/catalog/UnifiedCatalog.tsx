@@ -677,8 +677,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         if (item.manufacturer !== manufacturer.value || !item.brand) continue;
         counts.set(item.brand, (counts.get(item.brand) || 0) + 1);
       }
-      nested[manufacturer.value] = Array.from(counts, ([label, count]) => ({ label, value: label, count }))
+      const list = Array.from(counts, ([label, count]) => ({ label, value: label, count }))
         .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+      // Manufacturers with a single brand (e.g. Stanley/Stella) get no sub-list.
+      if (list.length > 1) nested[manufacturer.value] = list;
     }
     return nested;
   }, [items, sourceItems]);
