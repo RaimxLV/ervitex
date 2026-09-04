@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const BLOBS = 20; // reused pool of circles forming the trail
+const BLOBS = 26; // reused pool of circles forming the trail
 
 /**
  * LAYER 3 — interactive "ink blot" trail (noth.in style).
@@ -58,7 +58,7 @@ const TrailMask = ({
       let py = my;
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
-        const k = i === 0 ? 0.16 : 0.3;
+        const k = i === 0 ? 0.11 : 0.22;
         n.x += (px - n.x) * k;
         n.y += (py - n.y) * k;
         px = n.x;
@@ -85,10 +85,10 @@ const TrailMask = ({
       aria-hidden="true"
       className={`absolute inset-0 pointer-events-none ${className}`}
     >
-      <svg className="h-full w-full" preserveAspectRatio="none">
+      <svg className="h-full w-full" preserveAspectRatio="xMidYMid meet">
         <defs>
           <filter id="hero-goo" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="30" result="b" />
             <feColorMatrix
               in="b"
               type="matrix"
@@ -105,7 +105,7 @@ const TrailMask = ({
             <feDisplacementMap
               in="goo"
               in2="noise"
-              scale="26"
+              scale="34"
               xChannelSelector="R"
               yChannelSelector="G"
             />
@@ -121,7 +121,7 @@ const TrailMask = ({
                   }}
                   cx={-400}
                   cy={-400}
-                  r={104 - i * 3.4}
+                  r={140 - i * 3.6}
                   fill="#fff"
                 />
               ))}
@@ -135,7 +135,7 @@ const TrailMask = ({
           y="0"
           width="100%"
           height="100%"
-          preserveAspectRatio="xMidYMid slice"
+          preserveAspectRatio="xMidYMid meet"
           mask="url(#hero-trail-mask)"
         />
       </svg>
