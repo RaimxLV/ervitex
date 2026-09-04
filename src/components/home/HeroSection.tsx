@@ -299,7 +299,7 @@ const HeroSection = () => {
       />
 
       {/* ── Interactive fluid / oil-paint layer (desktop pointer only) ── */}
-      <FluidCanvas className="z-[5] opacity-[0.55] mix-blend-screen [filter:grayscale(0.9)_contrast(1.45)_brightness(0.95)]" />
+      <FluidCanvas className="z-[5] [filter:contrast(1.6)_saturate(1.35)]" />
 
       {/* ── Content ── */}
        <div className="container relative z-10 py-20 sm:py-24 pointer-events-none">
