@@ -17,7 +17,7 @@ export type HeroLayout = Record<string, HeroPos>;
 
 /** Desktop (>= 768px) layout. Mobile keeps its own tuned classes. */
 export const DEFAULT_HERO_LAYOUT: HeroLayout = {
-  collage: { right: 2, y: 4, anchor: "bottom", width: 31, rotate: 0, z: 20 },
+  collage: { right: 3, y: 10, anchor: "top", width: 33, rotate: 0, z: 20 },
 };
 
 const KEY = "ervitex.heroLayout.v2";
