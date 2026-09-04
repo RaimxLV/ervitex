@@ -27,7 +27,7 @@ const TrailMask = ({
 
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!fine || reduced) return;
+    if (reduced) return;
 
     // trail nodes, each lagging behind the previous one
     const nodes = Array.from({ length: BLOBS }, () => ({ x: -400, y: -400 }));
@@ -35,19 +35,91 @@ const TrailMask = ({
     let my = -400;
     let seeded = false;
 
+    const seed = () => {
+      if (seeded) return;
+      seeded = true;
+      for (const n of nodes) {
+        n.x = mx;
+        n.y = my;
+      }
+    };
+
     const onMove = (e: PointerEvent) => {
       const rect = wrap.getBoundingClientRect();
       mx = e.clientX - rect.left;
       my = e.clientY - rect.top;
-      if (!seeded) {
-        seeded = true;
-        for (const n of nodes) {
-          n.x = mx;
-          n.y = my;
-        }
-      }
+      seed();
     };
-    window.addEventListener("pointermove", onMove, { passive: true });
+
+    const cleanups: Array<() => void> = [];
+
+    if (fine) {
+      window.addEventListener("pointermove", onMove, { passive: true });
+      cleanups.push(() => window.removeEventListener("pointermove", onMove));
+    } else {
+      // ── Mobile: tilt the phone to move the light blob ──
+      const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+
+      const onTilt = (e: DeviceOrientationEvent) => {
+        const rect = wrap.getBoundingClientRect();
+        if (!rect.width) return;
+        const gamma = e.gamma ?? 0; // left/right tilt, -90..90
+        const beta = e.beta ?? 45; // front/back tilt, -180..180
+        // map ±35° of gamma across the width, 15°..75° of beta across the height
+        const nx = clamp((gamma + 35) / 70, 0, 1);
+        const ny = clamp((beta - 15) / 60, 0, 1);
+        mx = nx * rect.width;
+        my = ny * rect.height;
+        seed();
+      };
+
+      const attachTilt = () => {
+        window.addEventListener("deviceorientation", onTilt, { passive: true });
+        cleanups.push(() => window.removeEventListener("deviceorientation", onTilt));
+      };
+
+      const Anyone = window.DeviceOrientationEvent as unknown as {
+        requestPermission?: () => Promise<string>;
+      } | undefined;
+
+      if (Anyone?.requestPermission) {
+        // iOS 13+: needs a user gesture to grant motion access
+        const ask = () => {
+          Anyone.requestPermission?.()
+            .then((state) => {
+              if (state === "granted") attachTilt();
+            })
+            .catch(() => {});
+          window.removeEventListener("touchstart", ask);
+        };
+        window.addEventListener("touchstart", ask, { passive: true, once: true });
+        cleanups.push(() => window.removeEventListener("touchstart", ask));
+      } else if (Anyone) {
+        attachTilt();
+      }
+
+      // touch drag also moves the blob
+      const onTouch = (e: TouchEvent) => {
+        const t = e.touches[0];
+        if (!t) return;
+        const rect = wrap.getBoundingClientRect();
+        mx = t.clientX - rect.left;
+        my = t.clientY - rect.top;
+        seed();
+      };
+      window.addEventListener("touchmove", onTouch, { passive: true });
+      window.addEventListener("touchstart", onTouch, { passive: true });
+      cleanups.push(() => {
+        window.removeEventListener("touchmove", onTouch);
+        window.removeEventListener("touchstart", onTouch);
+      });
+
+      // start centred so something is visible before the first tilt
+      const rect = wrap.getBoundingClientRect();
+      mx = rect.width / 2;
+      my = rect.height / 2;
+      seed();
+    }
 
     let raf = 0;
     const loop = () => {
@@ -75,7 +147,7 @@ const TrailMask = ({
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener("pointermove", onMove);
+      for (const fn of cleanups) fn();
     };
   }, []);
 

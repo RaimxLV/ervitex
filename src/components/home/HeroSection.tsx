@@ -22,9 +22,8 @@ const HeroSection = () => {
   const [interactive, setInteractive] = useState(false);
 
   useEffect(() => {
-    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setInteractive(fine && !reduced);
+    setInteractive(!reduced);
   }, []);
 
   const { scrollYProgress } = useScroll({
