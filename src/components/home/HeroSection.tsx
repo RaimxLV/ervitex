@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useRef } from "react";
 import FluidCanvas from "./FluidCanvas";
 
 import collageImg from "@/assets/hero/collage-hero.jpg";
