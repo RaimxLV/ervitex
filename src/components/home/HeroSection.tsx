@@ -57,7 +57,7 @@ const HeroSection = () => {
   const editMode = new URLSearchParams(location.search).has("hero-edit");
 
   const [layout, setLayout] = useState<HeroLayout>(() => loadHeroLayout());
-  const [selected, setSelected] = useState<string | null>("hoodie");
+  const [selected, setSelected] = useState<string | null>("collage");
   const [isDesktop, setIsDesktop] = useState(
     () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches,
   );
@@ -97,7 +97,6 @@ const HeroSection = () => {
 
   // Scroll parallax per depth
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 90]);
-  const rockY = useTransform(scrollYProgress, [0, 1], [0, 170]);
   const itemsY = useTransform(scrollYProgress, [0, 1], [0, 250]);
   const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
 
