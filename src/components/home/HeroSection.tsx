@@ -54,7 +54,7 @@ const HeroSection = () => {
           fetchPriority="high"
           decoding="async"
           className="absolute inset-0 h-full w-full object-cover object-center"
-          style={{ opacity: interactive ? 0.1 : 1 }}
+          style={{ opacity: interactive ? 0 : 1 }}
         />
       </motion.div>
 
