@@ -152,31 +152,7 @@ const HeroSection = () => {
         />
       </motion.div>
 
-      {/* ── Layer 3: floating rock platform ── */}
-      <motion.div
-        style={{ y: rockY, x: rockX, translateY: rockYm }}
-        className="absolute inset-0 pointer-events-none will-change-transform"
-      >
-        <picture>
-          <source srcSet={rockLayerSm} media="(max-width: 767px)" />
-          <motion.img
-            src={rockLayer}
-            alt=""
-            aria-hidden="true"
-            width={1200}
-            height={800}
-            decoding="async"
-            loading="eager"
-            fetchPriority="high"
-            initial={false}
-            animate={{ opacity: 0.95, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute right-[-34%] bottom-[-4%] w-[100vw] max-w-[1100px] select-none sm:right-[-14%] sm:w-[86vw] md:right-[-6%] md:bottom-[-6%] md:w-[72vw]"
-          />
-        </picture>
-      </motion.div>
-
-      {/* ── Layer 4: garments that flee the cursor ── */}
+      {/* ── Layer 3: collage visual that drifts from the cursor ── */}
       <motion.div
         style={{ y: editMode ? 0 : itemsY }}
         className={`absolute inset-0 will-change-transform ${editMode ? "z-[60]" : "pointer-events-none"}`}
