@@ -105,8 +105,6 @@ const HeroSection = () => {
   const bgYm = useTransform(my, (v) => v * 48);
   const hazeX = useTransform(mx, (v) => v * -60);
   const hazeY = useTransform(my, (v) => v * -40);
-  const rockX = useTransform(mx, (v) => v * -34);
-  const rockYm = useTransform(my, (v) => v * -20);
 
   return (
     <section
