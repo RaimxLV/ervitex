@@ -10,18 +10,7 @@ import FluidCanvas from "./FluidCanvas";
 
 
 import bgLayer from "@/assets/hero/layer-bg.jpg";
-import rockLayer from "@/assets/hero/layer-rock-hero.webp";
-import rockLayerSm from "@/assets/hero/layer-rock-hero-sm.webp";
-import jacketImg from "@/assets/hero/jacket-hero.webp";
-import jacketImgSm from "@/assets/hero/jacket-hero-sm.webp";
-import hoodieImg from "@/assets/hero/hoodie-hero.webp";
-import hoodieImgSm from "@/assets/hero/hoodie-hero-sm.webp";
-import pantsImg from "@/assets/hero/pants-hero.webp";
-import pantsImgSm from "@/assets/hero/pants-hero-sm.webp";
-import sneakerImg from "@/assets/hero/sneaker-hero.webp";
-import sneakerImgSm from "@/assets/hero/sneaker-hero-sm.webp";
-import teesImg from "@/assets/hero/tee-oversized-hero.webp";
-import teesImgSm from "@/assets/hero/tee-oversized-hero-sm.webp";
+import collageImg from "@/assets/hero/collage-hero.jpg";
 
 /**
  * Multi-layer parallax hero.
@@ -47,55 +36,15 @@ type Item = {
 
 const items: Item[] = [
   {
-    id: "jacket",
-    src: jacketImg,
-    mobileSrc: jacketImgSm,
+    id: "collage",
+    src: collageImg,
+    mobileSrc: collageImg,
     alt: "",
-    className: "right-[-38%] top-[8%] w-[72vw] max-w-[620px] sm:right-[-10%] sm:w-[62vw]",
-    push: [-46, -26],
-    float: 9,
-    delay: 0.15,
-  },
-  {
-    id: "pants",
-    src: pantsImg,
-    mobileSrc: pantsImgSm,
-    alt: "",
-    className: "right-[-36%] bottom-[-2%] w-[72vw] max-w-[645px] sm:right-[-12%] sm:w-[64vw]",
-    push: [34, 22],
-    float: 11,
-    delay: 0.3,
-  },
-  {
-    id: "hoodie",
-    src: hoodieImg,
-    mobileSrc: hoodieImgSm,
-    alt: "",
-    className: "right-[-8%] top-[40%] w-[52vw] max-w-[540px] sm:right-[18%] sm:top-[28%] sm:w-[54vw]",
-    imgClassName: "brightness-125",
-    push: [-28, 34],
-    float: 8,
-    delay: 0.45,
-  },
-  {
-    id: "tee",
-    src: teesImg,
-    mobileSrc: teesImgSm,
-    alt: "",
-    className: "right-[-18%] bottom-[12%] w-[52vw] max-w-[600px] sm:right-[2%] sm:bottom-[20%] sm:w-[52vw]",
-    push: [26, -18],
-    float: 10,
-    delay: 0.6,
-  },
-  {
-    id: "sneaker",
-    src: sneakerImg,
-    mobileSrc: sneakerImgSm,
-    alt: "",
-    className: "right-[43%] bottom-[18%] w-[24vw] max-w-[300px] hidden lg:block",
-    push: [-20, -30],
-    float: 7,
-    delay: 0.75,
+    className: "right-[-6%] bottom-0 w-[86vw] max-w-[520px] sm:right-[-2%] sm:w-[70vw]",
+    imgClassName: "rounded-[2rem]",
+    push: [-24, -14],
+    float: 12,
+    delay: 0.2,
   },
 ];
 
@@ -109,7 +58,7 @@ const HeroSection = () => {
   const editMode = new URLSearchParams(location.search).has("hero-edit");
 
   const [layout, setLayout] = useState<HeroLayout>(() => loadHeroLayout());
-  const [selected, setSelected] = useState<string | null>("hoodie");
+  const [selected, setSelected] = useState<string | null>("collage");
   const [isDesktop, setIsDesktop] = useState(
     () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches,
   );
@@ -149,7 +98,6 @@ const HeroSection = () => {
 
   // Scroll parallax per depth
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 90]);
-  const rockY = useTransform(scrollYProgress, [0, 1], [0, 170]);
   const itemsY = useTransform(scrollYProgress, [0, 1], [0, 250]);
   const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
 
@@ -158,8 +106,6 @@ const HeroSection = () => {
   const bgYm = useTransform(my, (v) => v * 48);
   const hazeX = useTransform(mx, (v) => v * -60);
   const hazeY = useTransform(my, (v) => v * -40);
-  const rockX = useTransform(mx, (v) => v * -34);
-  const rockYm = useTransform(my, (v) => v * -20);
 
   return (
     <section
@@ -204,31 +150,7 @@ const HeroSection = () => {
         />
       </motion.div>
 
-      {/* ── Layer 3: floating rock platform ── */}
-      <motion.div
-        style={{ y: rockY, x: rockX, translateY: rockYm }}
-        className="absolute inset-0 pointer-events-none will-change-transform"
-      >
-        <picture>
-          <source srcSet={rockLayerSm} media="(max-width: 767px)" />
-          <motion.img
-            src={rockLayer}
-            alt=""
-            aria-hidden="true"
-            width={1200}
-            height={800}
-            decoding="async"
-            loading="eager"
-            fetchPriority="high"
-            initial={false}
-            animate={{ opacity: 0.95, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute right-[-34%] bottom-[-4%] w-[100vw] max-w-[1100px] select-none sm:right-[-14%] sm:w-[86vw] md:right-[-6%] md:bottom-[-6%] md:w-[72vw]"
-          />
-        </picture>
-      </motion.div>
-
-      {/* ── Layer 4: garments that flee the cursor ── */}
+      {/* ── Layer 3: collage visual that drifts from the cursor ── */}
       <motion.div
         style={{ y: editMode ? 0 : itemsY }}
         className={`absolute inset-0 will-change-transform ${editMode ? "z-[60]" : "pointer-events-none"}`}
@@ -515,7 +437,13 @@ const ParallaxItem = ({
             fetchPriority="high"
             draggable={false}
             className={`h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)] ${item.imgClassName ?? ""}`}
-            style={{ rotate }}
+            style={{
+              rotate,
+              maskImage:
+                "radial-gradient(125% 105% at 68% 45%, #000 55%, transparent 92%)",
+              WebkitMaskImage:
+                "radial-gradient(125% 105% at 68% 45%, #000 55%, transparent 92%)",
+            }}
             animate={editMode ? { y: 0 } : { y: [0, -14, 0] }}
             transition={editMode ? { duration: 0 } : { duration: item.float, repeat: Infinity, ease: "easeInOut" }}
           />
