@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const BLOBS = 26; // reused pool of circles forming the trail
+const BLOBS = 20; // reused pool of circles forming the trail
 
 /**
  * LAYER 3 — interactive "ink blot" trail (noth.in style).
@@ -58,8 +58,9 @@ const TrailMask = ({
       let py = my;
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
-        n.x += (px - n.x) * 0.34;
-        n.y += (py - n.y) * 0.34;
+        const k = i === 0 ? 0.16 : 0.3;
+        n.x += (px - n.x) * k;
+        n.y += (py - n.y) * k;
         px = n.x;
         py = n.y;
 
@@ -87,24 +88,24 @@ const TrailMask = ({
       <svg className="h-full w-full" preserveAspectRatio="none">
         <defs>
           <filter id="hero-goo" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="b" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="22" result="b" />
             <feColorMatrix
               in="b"
               type="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 44 -20"
               result="goo"
             />
             <feTurbulence
               type="fractalNoise"
-              baseFrequency="0.012 0.02"
-              numOctaves={2}
+              baseFrequency="0.006 0.009"
+              numOctaves={1}
               seed={7}
               result="noise"
             />
             <feDisplacementMap
               in="goo"
               in2="noise"
-              scale="34"
+              scale="26"
               xChannelSelector="R"
               yChannelSelector="G"
             />
@@ -120,7 +121,7 @@ const TrailMask = ({
                   }}
                   cx={-400}
                   cy={-400}
-                  r={78 - i * 2.2}
+                  r={104 - i * 3.4}
                   fill="#fff"
                 />
               ))}
