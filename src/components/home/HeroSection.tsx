@@ -178,11 +178,11 @@ const HeroSection = () => {
           height={1080}
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 h-full w-full object-cover object-center opacity-100 brightness-[1.55] contrast-[0.95] saturate-[0.9]"
+          className="absolute inset-0 h-full w-full object-cover object-center opacity-100 brightness-[0.28] contrast-[1.1] saturate-0"
           animate={{ scale: [1.04, 1.1, 1.04], x: [0, -22, 0] }}
           transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
         />
-        <div className="absolute inset-0 bg-primary/15" />
+        <div className="absolute inset-0 bg-primary/70" />
       </motion.div>
 
       {/* ── Layer 2: atmosphere / light leaks ── */}
@@ -299,7 +299,7 @@ const HeroSection = () => {
       />
 
       {/* ── Interactive fluid / oil-paint layer (desktop pointer only) ── */}
-      <FluidCanvas className="z-[5] opacity-[0.55] mix-blend-screen [filter:grayscale(0.9)_contrast(1.45)_brightness(0.95)]" />
+      <FluidCanvas className="z-[5] [filter:contrast(1.6)_saturate(1.35)]" />
 
       {/* ── Content ── */}
        <div className="container relative z-10 py-20 sm:py-24 pointer-events-none">
