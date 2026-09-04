@@ -1,180 +1,56 @@
-import { Link, useLocation } from "react-router-dom";
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
+import { Link } from "react-router-dom";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useCallback, useEffect, useRef, useState } from "react";
-import HeroLayoutEditor from "./HeroLayoutEditor";
-import { DEFAULT_HERO_LAYOUT, HeroLayout, HeroPos, heroPosStyle, loadHeroLayout } from "./heroLayout";
+import { useRef } from "react";
 import FluidCanvas from "./FluidCanvas";
 
-
-import bgLayer from "@/assets/hero/layer-bg.jpg";
 import collageImg from "@/assets/hero/collage-hero.jpg";
 
 /**
- * Multi-layer parallax hero.
- * Depth is built from 5 stacked layers (backdrop -> haze -> rock -> garments -> dust).
- * Garments drift away from the cursor, each with its own direction and strength.
+ * Hero section with a full-bleed collage image and an interactive
+ * oil-paint fluid layer on top. No darkening overlays — the image
+ * stays bright and visible behind the content.
  */
-
-type Item = {
-  id: string;
-  src: string;
-  mobileSrc: string;
-  alt: string;
-  /** tailwind position + size classes used below md (desktop comes from heroLayout) */
-  className: string;
-  /** extra visual classes on the image */
-  imgClassName?: string;
-  /** repel strength & direction multiplier (x, y) */
-  push: [number, number];
-  /** idle float duration */
-  float: number;
-  delay?: number;
-};
-
-const items: Item[] = [
-  {
-    id: "collage",
-    src: collageImg,
-    mobileSrc: collageImg,
-    alt: "",
-    className: "right-[-6%] bottom-0 w-[86vw] max-w-[520px] sm:right-[-2%] sm:w-[70vw]",
-    imgClassName: "rounded-[2rem]",
-    push: [-24, -14],
-    float: 12,
-    delay: 0.2,
-  },
-];
-
-
-const springCfg = { stiffness: 60, damping: 18, mass: 0.6 };
 
 const HeroSection = () => {
   const { lang } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
-  const location = useLocation();
-  const editMode = new URLSearchParams(location.search).has("hero-edit");
-
-  const [layout, setLayout] = useState<HeroLayout>(() => loadHeroLayout());
-  const [selected, setSelected] = useState<string | null>("collage");
-  const [isDesktop, setIsDesktop] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches,
-  );
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)");
-    const onChange = () => setIsDesktop(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  // Normalized pointer position (-0.5 .. 0.5)
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  const mx = useSpring(px, springCfg);
-  const my = useSpring(py, springCfg);
-
-
-  const handleMove = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      const r = e.currentTarget.getBoundingClientRect();
-      px.set((e.clientX - r.left) / r.width - 0.5);
-      py.set((e.clientY - r.top) / r.height - 0.5);
-    },
-    [px, py],
-  );
-
-  const handleLeave = useCallback(() => {
-    px.set(0);
-    py.set(0);
-  }, [px, py]);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
-  // Scroll parallax per depth
+  // Subtle parallax for the full-bleed background
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 90]);
-  const itemsY = useTransform(scrollYProgress, [0, 1], [0, 250]);
-  const darkOverlayOpacity = useTransform(scrollYProgress, [0, 0.3], [0, 1]);
-
-  // Layer drifts driven by pointer (background moves with, objects move away)
-  const bgX = useTransform(mx, (v) => v * 70);
-  const bgYm = useTransform(my, (v) => v * 48);
-  const hazeX = useTransform(mx, (v) => v * -60);
-  const hazeY = useTransform(my, (v) => v * -40);
 
   return (
     <section
       ref={sectionRef}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
       className="relative min-h-[100svh] flex items-center overflow-hidden bg-primary"
     >
-      {/* ── Layer 1: industrial backdrop ── */}
-      <motion.div style={{ y: bgY, x: bgX, translateY: bgYm }} className="absolute -inset-16 will-change-transform">
+      {/* ── Layer 1: full-bleed collage background ── */}
+      <motion.div
+        style={{ y: bgY }}
+        className="absolute inset-0 will-change-transform"
+      >
         <motion.img
-          src={bgLayer}
+          src={collageImg}
           alt=""
           aria-hidden="true"
-          width={1920}
-          height={1080}
+          width={1024}
+          height={1280}
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 h-full w-full object-cover object-center opacity-100 brightness-[0.28] contrast-[1.1] saturate-0"
-          animate={{ scale: [1.04, 1.1, 1.04], x: [0, -22, 0] }}
-          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <div className="absolute inset-0 bg-primary/70" />
-      </motion.div>
-
-      {/* ── Layer 2: atmosphere / light leaks ── */}
-      <motion.div
-        style={{ x: hazeX, y: hazeY }}
-        className="absolute -inset-10 pointer-events-none will-change-transform"
-      >
-        <div
-          className="absolute top-[6%] right-[12%] h-[62%] w-[55%] rounded-full opacity-[0.22] blur-[130px]"
-          style={{ background: "radial-gradient(circle, hsl(84 90% 55% / 0.75), transparent 70%)" }}
-        />
-        <div
-          className="absolute bottom-[4%] right-[6%] h-[45%] w-[40%] rounded-full opacity-25 blur-[110px]"
-          style={{ background: "radial-gradient(circle, hsl(84 80% 45% / 0.5), transparent 70%)" }}
-        />
-        <div
-          className="absolute bottom-[10%] left-[-8%] h-[40%] w-[40%] rounded-full opacity-10 blur-[120px]"
-          style={{ background: "radial-gradient(circle, hsl(0 0% 100% / 0.4), transparent 70%)" }}
+          className="absolute inset-0 h-full w-full object-cover object-center"
+          animate={{ scale: [1, 1.06, 1] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
         />
       </motion.div>
 
-      {/* ── Layer 3: collage visual that drifts from the cursor ── */}
-      <motion.div
-        style={{ y: editMode ? 0 : itemsY }}
-        className={`absolute inset-0 will-change-transform ${editMode ? "z-[60]" : "pointer-events-none"}`}
-      >
-        {items.map((item) => (
-          <ParallaxItem
-            key={item.id}
-            item={item}
-            mx={mx}
-            my={my}
-            pos={isDesktop ? layout[item.id] : undefined}
-            editMode={editMode}
-            selected={selected === item.id}
-            onSelect={() => setSelected(item.id)}
-            onDrag={(right, y) =>
-              setLayout((prev) => ({ ...prev, [item.id]: { ...prev[item.id], right, y } }))
-            }
-            sectionRef={sectionRef}
-          />
-        ))}
-      </motion.div>
-
-
-      {/* ── Layer 5: drifting dust sparks ── */}
+      {/* ── Layer 2: drifting dust sparks ── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {Array.from({ length: 18 }).map((_, i) => (
           <motion.span
@@ -198,33 +74,11 @@ const HeroSection = () => {
         ))}
       </div>
 
-      {/* ── Readability gradient (left) ── */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(to right, hsl(var(--primary) / 0.94) 0%, hsl(var(--primary) / 0.82) 38%, hsl(var(--primary) / 0.42) 66%, transparent 86%)",
-        }}
-      />
-      <div
-        className="absolute inset-0 pointer-events-none md:hidden"
-        style={{
-          background:
-            "linear-gradient(to bottom, hsl(var(--primary) / 0.2) 0%, hsl(var(--primary) / 0.58) 36%, hsl(var(--primary) / 0.9) 86%, hsl(var(--primary) / 0.98) 100%)",
-        }}
-      />
-
-      {/* ── Scroll-driven fade-to-black ── */}
-      <motion.div
-        style={{ opacity: darkOverlayOpacity }}
-        className="absolute inset-0 bg-primary pointer-events-none"
-      />
-
       {/* ── Interactive fluid / oil-paint layer (desktop pointer only) ── */}
       <FluidCanvas className="z-[5] [filter:contrast(1.6)_saturate(1.35)]" />
 
       {/* ── Content ── */}
-       <div className="container relative z-10 py-20 sm:py-24 pointer-events-none">
+      <div className="container relative z-10 py-20 sm:py-24 pointer-events-none">
         <div className="max-w-[min(37rem,86vw)] md:max-w-3xl">
           {/* Eyebrow */}
           <motion.div
@@ -348,110 +202,8 @@ const HeroSection = () => {
 
       {/* Bottom accent line */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-accent" />
-
-      {editMode && (
-        <HeroLayoutEditor layout={layout} setLayout={setLayout} selected={selected} setSelected={setSelected} />
-      )}
     </section>
   );
 };
-
-type MV = ReturnType<typeof useSpring>;
-
-const ParallaxItem = ({
-  item,
-  mx,
-  my,
-  pos,
-  editMode,
-  selected,
-  onSelect,
-  onDrag,
-  sectionRef,
-}: {
-  item: Item;
-  mx: MV;
-  my: MV;
-  pos?: HeroPos;
-  editMode: boolean;
-  selected: boolean;
-  onSelect: () => void;
-  onDrag: (right: number, y: number) => void;
-  sectionRef: React.RefObject<HTMLElement>;
-}) => {
-  const x = useTransform(mx, (v) => (editMode ? 0 : v * item.push[0]));
-  const y = useTransform(my, (v) => (editMode ? 0 : v * item.push[1]));
-  const rotate = (pos ?? DEFAULT_HERO_LAYOUT[item.id]).rotate;
-
-  const startDrag = (e: React.PointerEvent) => {
-    if (!editMode || !pos) return;
-    e.preventDefault();
-    onSelect();
-    const rect = sectionRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const el = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const offX = e.clientX - el.left;
-    const offY = e.clientY - el.top;
-
-    const move = (ev: PointerEvent) => {
-      const left = ev.clientX - offX - rect.left;
-      const top = ev.clientY - offY - rect.top;
-      const right = ((rect.width - left - el.width) / rect.width) * 100;
-      const yPct =
-        pos.anchor === "top"
-          ? (top / rect.height) * 100
-          : ((rect.height - top - el.height) / rect.height) * 100;
-      onDrag(Math.round(right * 10) / 10, Math.round(yPct * 10) / 10);
-    };
-    const up = () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-    };
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
-  };
-
-  return (
-    <motion.div
-      onPointerDown={startDrag}
-      style={{ x, y, ...(pos ? heroPosStyle(pos) : {}) }}
-      className={`absolute ${pos ? "" : item.className} will-change-transform ${
-        editMode ? `cursor-grab ${selected ? "outline outline-2 outline-accent" : "outline-dashed outline-1 outline-white/30"}` : ""
-      }`}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 60, scale: 0.94 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 1, delay: item.delay ?? 0, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <picture>
-          <source srcSet={item.mobileSrc} media="(max-width: 767px)" />
-          <motion.img
-            src={item.src}
-            alt={item.alt}
-            aria-hidden="true"
-            width={900}
-            height={900}
-            decoding="async"
-            loading="eager"
-            fetchPriority="high"
-            draggable={false}
-            className={`h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)] ${item.imgClassName ?? ""}`}
-            style={{
-              rotate,
-              maskImage:
-                "radial-gradient(125% 105% at 68% 45%, #000 55%, transparent 92%)",
-              WebkitMaskImage:
-                "radial-gradient(125% 105% at 68% 45%, #000 55%, transparent 92%)",
-            }}
-            animate={editMode ? { y: 0 } : { y: [0, -14, 0] }}
-            transition={editMode ? { duration: 0 } : { duration: item.float, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </picture>
-      </motion.div>
-    </motion.div>
-  );
-};
-
 
 export default HeroSection;
