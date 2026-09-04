@@ -437,7 +437,13 @@ const ParallaxItem = ({
             fetchPriority="high"
             draggable={false}
             className={`h-auto w-full select-none drop-shadow-[0_35px_60px_rgba(0,0,0,0.65)] ${item.imgClassName ?? ""}`}
-            style={{ rotate }}
+            style={{
+              rotate,
+              maskImage:
+                "radial-gradient(125% 105% at 68% 45%, #000 55%, transparent 92%)",
+              WebkitMaskImage:
+                "radial-gradient(125% 105% at 68% 45%, #000 55%, transparent 92%)",
+            }}
             animate={editMode ? { y: 0 } : { y: [0, -14, 0] }}
             transition={editMode ? { duration: 0 } : { duration: item.float, repeat: Infinity, ease: "easeInOut" }}
           />
