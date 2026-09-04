@@ -92,45 +92,49 @@ const TrailMask = ({
       t += 0.016;
 
       if (target && seeded) {
-        cursor.x += (target.x - cursor.x) * 0.16;
-        cursor.y += (target.y - cursor.y) * 0.16;
-        const base = Math.min(w, h) * 0.19;
+        cursor.x += (target.x - cursor.x) * 0.14;
+        cursor.y += (target.y - cursor.y) * 0.14;
+        const base = Math.min(w, h) * 0.16;
         points.push({
-          x: cursor.x + Math.sin(t * 2.1) * 14,
-          y: cursor.y + Math.cos(t * 1.7) * 14,
-          r: base * (0.75 + Math.sin(t * 3.3) * 0.2),
+          x: cursor.x,
+          y: cursor.y,
+          r: base * (0.85 + Math.sin(t * 2.4) * 0.15),
           life: 1,
         });
       }
 
       for (let i = points.length - 1; i >= 0; i--) {
-        points[i].life -= 0.013;
+        points[i].life -= 0.006;
         if (points[i].life <= 0) points.splice(i, 1);
       }
-      if (points.length > 90) points.splice(0, points.length - 90);
+      if (points.length > 200) points.splice(0, points.length - 200);
 
       ctx.clearRect(0, 0, w, h);
       mctx.clearRect(0, 0, w, h);
 
       if (points.length && img.complete && img.naturalWidth) {
-        // Soft, merging blob shapes
+        // Metaball-style oil-blot mask: blur + hard contrast merges the
+        // trail into one gooey, organic paint shape with liquid edges.
         mctx.save();
-        mctx.filter = "blur(26px)";
+        mctx.filter = "blur(22px) contrast(26)";
         mctx.fillStyle = "#fff";
         for (const p of points) {
-          const e = p.life * p.life;
-          mctx.globalAlpha = Math.min(1, e * 1.6);
-          mctx.beginPath();
-          mctx.ellipse(
-            p.x,
-            p.y,
-            p.r * (0.5 + e * 0.7),
-            p.r * (0.45 + e * 0.75),
-            Math.sin(p.life * 4) * 0.6,
-            0,
-            Math.PI * 2,
-          );
-          mctx.fill();
+          const e = Math.pow(p.life, 0.55);
+          const rr = p.r * e;
+          if (rr < 1) continue;
+          // a few offset lobes per point => irregular, paint-like outline
+          for (let k = 0; k < 3; k++) {
+            const a = t * 0.9 + k * 2.1 + p.life * 3;
+            mctx.beginPath();
+            mctx.arc(
+              p.x + Math.cos(a) * rr * 0.28,
+              p.y + Math.sin(a * 1.3) * rr * 0.28,
+              rr * (0.8 - k * 0.12),
+              0,
+              Math.PI * 2,
+            );
+            mctx.fill();
+          }
         }
         mctx.restore();
 
