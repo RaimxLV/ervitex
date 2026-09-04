@@ -6,6 +6,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCallback, useEffect, useRef, useState } from "react";
 import HeroLayoutEditor from "./HeroLayoutEditor";
 import { DEFAULT_HERO_LAYOUT, HeroLayout, HeroPos, heroPosStyle, loadHeroLayout } from "./heroLayout";
+import FluidCanvas from "./FluidCanvas";
 
 
 import bgLayer from "@/assets/hero/layer-bg.jpg";
@@ -297,8 +298,11 @@ const HeroSection = () => {
         className="absolute inset-0 bg-primary pointer-events-none"
       />
 
+      {/* ── Interactive fluid / oil-paint layer (desktop pointer only) ── */}
+      <FluidCanvas className="z-[5] opacity-80 mix-blend-screen" />
+
       {/* ── Content ── */}
-       <div className="container relative z-10 py-20 sm:py-24">
+       <div className="container relative z-10 py-20 sm:py-24 pointer-events-none">
         <div className="max-w-[min(37rem,86vw)] md:max-w-3xl">
           {/* Eyebrow */}
           <motion.div
