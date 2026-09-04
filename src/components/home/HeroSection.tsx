@@ -126,11 +126,11 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
-            className="mt-8 flex flex-col gap-3 pointer-events-auto sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4"
+            className="mt-8 flex flex-col gap-3 pointer-events-auto mix-blend-difference sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4"
           >
             <Button
               size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase rounded-none px-8 py-4 h-14 w-full justify-center shadow-[0_0_30px_hsl(var(--accent)/0.3)] sm:w-auto sm:min-w-[220px] sm:px-14"
+              className="bg-transparent border border-accent text-accent hover:bg-accent/15 font-heading text-xs uppercase rounded-none px-8 py-4 h-14 w-full justify-center sm:w-auto sm:min-w-[220px] sm:px-14"
               asChild
             >
               <Link to="/catalog">
@@ -141,13 +141,14 @@ const HeroSection = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border border-primary-foreground/20 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent hover:text-accent font-heading text-xs uppercase rounded-none px-8 py-4 h-14 w-full justify-center sm:w-auto sm:min-w-[220px] sm:px-14"
+              className="border border-primary-foreground/35 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent font-heading text-xs uppercase rounded-none px-8 py-4 h-14 w-full justify-center sm:w-auto sm:min-w-[220px] sm:px-14"
               asChild
             >
               <Link to="/services">
                 {lang === "lv" ? "Mūsu pakalpojumi" : "Our Services"}
               </Link>
             </Button>
+
           </motion.div>
 
           {/* Stats */}
