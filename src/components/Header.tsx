@@ -86,8 +86,33 @@ const Header = () => {
     }
   };
 
+  const handlePointerMove = (e: React.MouseEvent<HTMLElement>) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty("--mx", `${e.clientX - rect.left}px`);
+    el.style.setProperty("--my", `${e.clientY - rect.top}px`);
+    el.style.setProperty("--mo", "1");
+  };
+
+  const handlePointerLeave = (e: React.MouseEvent<HTMLElement>) => {
+    e.currentTarget.style.setProperty("--mo", "0");
+  };
+
   return (
-    <header className="sticky top-0 z-50 bg-primary/95 backdrop-blur-md text-primary-foreground">
+    <header
+      onMouseMove={handlePointerMove}
+      onMouseLeave={handlePointerLeave}
+      className="header-aurora sticky top-0 z-50 bg-primary/95 text-primary-foreground backdrop-blur-md"
+    >
+      {/* Interactive background layers */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="header-grid absolute inset-0" />
+        <div className="header-spotlight absolute inset-0" />
+        <div className="header-spotlight-core absolute inset-0" />
+        <div className="header-noise absolute inset-0" />
+        <div className="header-hairline absolute inset-x-0 bottom-0 h-px" />
+      </div>
+
       <div className="relative flex h-16 items-center justify-between gap-2 px-4 sm:px-6 md:h-20">
         <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
           <img src={ervitexLogo} alt="Ervitex" className="h-7 w-auto shrink-0 sm:h-8 md:h-10" />
