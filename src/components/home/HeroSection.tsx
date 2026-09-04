@@ -10,18 +10,7 @@ import FluidCanvas from "./FluidCanvas";
 
 
 import bgLayer from "@/assets/hero/layer-bg.jpg";
-import rockLayer from "@/assets/hero/layer-rock-hero.webp";
-import rockLayerSm from "@/assets/hero/layer-rock-hero-sm.webp";
-import jacketImg from "@/assets/hero/jacket-hero.webp";
-import jacketImgSm from "@/assets/hero/jacket-hero-sm.webp";
-import hoodieImg from "@/assets/hero/hoodie-hero.webp";
-import hoodieImgSm from "@/assets/hero/hoodie-hero-sm.webp";
-import pantsImg from "@/assets/hero/pants-hero.webp";
-import pantsImgSm from "@/assets/hero/pants-hero-sm.webp";
-import sneakerImg from "@/assets/hero/sneaker-hero.webp";
-import sneakerImgSm from "@/assets/hero/sneaker-hero-sm.webp";
-import teesImg from "@/assets/hero/tee-oversized-hero.webp";
-import teesImgSm from "@/assets/hero/tee-oversized-hero-sm.webp";
+import collageImg from "@/assets/hero/collage-hero.jpg";
 
 /**
  * Multi-layer parallax hero.
