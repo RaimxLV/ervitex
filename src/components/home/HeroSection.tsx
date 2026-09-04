@@ -3,40 +3,49 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useRef } from "react";
-import FluidCanvas from "./FluidCanvas";
+import { useEffect, useRef, useState } from "react";
+import TrailMask from "./TrailMask";
 
 import collageImg from "@/assets/hero/collage-hero.jpg";
 
 /**
- * Hero section with a full-bleed collage image and an interactive
- * oil-paint fluid layer on top. No darkening overlays — the image
- * stays bright and visible behind the content.
+ * Hero — strict 4-layer stack:
+ *  1. solid deep-charcoal background
+ *  2. static subject image (collage)
+ *  3. interactive trailing blob mask that reveals layer 2
+ *  4. text + buttons (blend-difference, fully clickable)
  */
 
 const HeroSection = () => {
   const { lang } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
+  const [interactive, setInteractive] = useState(false);
+
+  useEffect(() => {
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setInteractive(fine && !reduced);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
-  // Subtle parallax for the full-bleed background
+  // Subtle parallax for the subject image
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 90]);
 
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[100svh] flex items-center overflow-hidden bg-primary"
+      className="relative min-h-[100svh] flex items-center overflow-hidden bg-[hsl(0_0%_7%)]"
     >
-      {/* ── Layer 1: full-bleed collage background ── */}
+      {/* ── LAYER 2: static subject image ── */}
       <motion.div
         style={{ y: bgY }}
-        className="absolute inset-0 will-change-transform"
+        className="absolute inset-0 z-[1] will-change-transform"
       >
-        <motion.img
+        <img
           src={collageImg}
           alt=""
           aria-hidden="true"
@@ -45,40 +54,16 @@ const HeroSection = () => {
           fetchPriority="high"
           decoding="async"
           className="absolute inset-0 h-full w-full object-cover object-center"
-          animate={{ scale: [1, 1.06, 1] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          style={{ opacity: interactive ? 0.1 : 1 }}
         />
       </motion.div>
 
-      {/* ── Layer 2: drifting dust sparks ── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 18 }).map((_, i) => (
-          <motion.span
-            key={i}
-            className="absolute rounded-full bg-accent"
-            style={{
-              left: `${45 + ((i * 37) % 55)}%`,
-              top: `${8 + ((i * 53) % 84)}%`,
-              width: i % 3 === 0 ? 3 : 2,
-              height: i % 3 === 0 ? 3 : 2,
-              filter: "blur(0.5px)",
-            }}
-            animate={{ y: [0, -28, 0], opacity: [0, 0.7, 0] }}
-            transition={{
-              duration: 6 + (i % 5),
-              repeat: Infinity,
-              delay: i * 0.4,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </div>
+      {/* ── LAYER 3: interactive trailing mask reveal ── */}
+      <TrailMask src={collageImg} className="z-[2]" />
 
-      {/* ── Interactive fluid / oil-paint layer (desktop pointer only) ── */}
-      <FluidCanvas className="z-[5] [filter:contrast(1.6)_saturate(1.35)]" />
-
-      {/* ── Content ── */}
+      {/* ── LAYER 4: content ── */}
       <div className="container relative z-10 py-20 sm:py-24 pointer-events-none">
+
         <div className="max-w-[min(37rem,86vw)] md:max-w-3xl">
           {/* Eyebrow */}
           <motion.div
