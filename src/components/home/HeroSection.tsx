@@ -41,6 +41,8 @@ const items: Item[] = [
     mobileSrc: collageImg,
     alt: "",
     className: "right-[-6%] bottom-0 w-[86vw] max-w-[520px] sm:right-[-2%] sm:w-[70vw]",
+    imgClassName:
+      "[mask-image:radial-gradient(120%_100%_at_70%_50%,#000_52%,transparent_88%)] [-webkit-mask-image:radial-gradient(120%_100%_at_70%_50%,#000_52%,transparent_88%)]",
     push: [-24, -14],
     float: 12,
     delay: 0.2,
