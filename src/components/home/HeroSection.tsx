@@ -38,7 +38,7 @@ const HeroSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[100svh] flex items-center overflow-hidden bg-[hsl(0_0%_7%)]"
+      className="relative min-h-[100svh] flex items-center overflow-hidden bg-black"
     >
       {/* ── LAYER 2: static subject image ── */}
       <motion.div
