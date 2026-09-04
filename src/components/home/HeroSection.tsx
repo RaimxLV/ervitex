@@ -6,6 +6,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCallback, useEffect, useRef, useState } from "react";
 import HeroLayoutEditor from "./HeroLayoutEditor";
 import { DEFAULT_HERO_LAYOUT, HeroLayout, HeroPos, heroPosStyle, loadHeroLayout } from "./heroLayout";
+import FluidCanvas from "./FluidCanvas";
 
 
 import bgLayer from "@/assets/hero/layer-bg.jpg";
@@ -297,8 +298,11 @@ const HeroSection = () => {
         className="absolute inset-0 bg-primary pointer-events-none"
       />
 
+      {/* ── Interactive fluid / oil-paint layer (desktop pointer only) ── */}
+      <FluidCanvas className="z-[5] opacity-[0.55] mix-blend-screen [filter:grayscale(0.9)_contrast(1.45)_brightness(0.95)]" />
+
       {/* ── Content ── */}
-       <div className="container relative z-10 py-20 sm:py-24">
+       <div className="container relative z-10 py-20 sm:py-24 pointer-events-none">
         <div className="max-w-[min(37rem,86vw)] md:max-w-3xl">
           {/* Eyebrow */}
           <motion.div
@@ -318,7 +322,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="font-heading text-[2.55rem] font-bold leading-[0.98] text-primary-foreground sm:text-5xl md:text-7xl lg:text-[5.5rem]"
+            className="font-heading text-[2.55rem] font-bold leading-[0.98] text-primary-foreground mix-blend-difference sm:text-5xl md:text-7xl lg:text-[5.5rem]"
           >
             {lang === "lv" ? "Tekstila" : "Textile"}
             <br />
@@ -334,7 +338,7 @@ const HeroSection = () => {
           </motion.h1>
 
           {/* Subtitle */}
-          <p className="mt-6 max-w-[22rem] text-sm leading-relaxed text-primary-foreground/55 md:max-w-md md:text-base">
+          <p className="mt-6 max-w-[22rem] text-sm leading-relaxed text-primary-foreground/55 mix-blend-difference md:max-w-md md:text-base">
             {lang === "lv" ? (
               <>
                 <span className="block font-heading font-bold uppercase tracking-wide text-primary-foreground">
@@ -361,7 +365,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
-            className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4"
+            className="mt-8 flex flex-col gap-3 pointer-events-auto sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4"
           >
             <Button
               size="lg"
@@ -386,7 +390,7 @@ const HeroSection = () => {
           </motion.div>
 
           {/* Stats */}
-          <div className="mt-10 grid max-w-[23rem] grid-cols-3 gap-4 border-t border-primary-foreground/10 pt-6 sm:mt-14 sm:flex sm:max-w-none sm:gap-10 sm:pt-7">
+          <div className="mt-10 grid max-w-[23rem] grid-cols-3 gap-4 border-t border-primary-foreground/10 pt-6 mix-blend-difference sm:mt-14 sm:flex sm:max-w-none sm:gap-10 sm:pt-7">
             {[
               { value: "20+", label: lang === "lv" ? "Gadi pieredzē" : "Years Experience" },
               { value: "3000+", label: lang === "lv" ? "Produkti" : "Products" },
