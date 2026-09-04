@@ -53,7 +53,7 @@ const HeroSection = () => {
           height={1280}
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 h-full w-full object-contain object-center"
+          className="absolute inset-0 h-full w-full object-cover object-center"
           style={{ opacity: interactive ? 0 : 1 }}
         />
       </motion.div>
