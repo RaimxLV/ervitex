@@ -135,7 +135,7 @@ const TrailMask = ({
           y="0"
           width="100%"
           height="100%"
-          preserveAspectRatio="xMidYMid meet"
+          preserveAspectRatio="xMidYMid slice"
           mask="url(#hero-trail-mask)"
         />
       </svg>
