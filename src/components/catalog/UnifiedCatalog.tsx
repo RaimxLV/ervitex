@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/co
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
+import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
