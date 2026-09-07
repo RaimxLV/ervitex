@@ -227,11 +227,17 @@ const CATEGORY_MAP: Record<string, string> = {
   "bottom": "Bottoms", "bottoms": "Bottoms",
   "top": "Tops", "tops": "Tops",
 };
-const normalizeCategory = (raw?: string | null): string | null => {
-  if (!raw) return null;
-  const trimmed = raw.trim();
-  if (!trimmed || trimmed === "-" || trimmed.toLowerCase() === "none") return null;
-  return CATEGORY_MAP[trimmed.toLowerCase()] || trimmed;
+const normalizeCategory = (raw?: string | null, name?: string | null): string | null => {
+  const trimmed = (raw || "").trim();
+  const clean = !trimmed || trimmed === "-" || trimmed.toLowerCase() === "none" ? null : trimmed;
+  // Vispārīgām piegādātāju kategorijām ("Tops", "Jackets", ...) īsto tipu
+  // nolasām no produkta nosaukuma, citādi T-krekli un vestes ir vienā grupā.
+  if (!clean || isCoarseCategory(clean)) {
+    const refined = categoryFromName(name);
+    if (refined) return refined;
+  }
+  if (!clean) return null;
+  return CATEGORY_MAP[clean.toLowerCase()] || clean;
 };
 const normalizeText = (raw?: string | null): string | null => {
   if (!raw) return null;
@@ -461,7 +467,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           return {
             ...it,
             brand,
-            category: normalizeCategory(it.category),
+            category: normalizeCategory(it.category, it.name),
             group_name: normalizeText(it.group_name),
             gender: normalizeGender(it.gender),
             colors: colorList,
