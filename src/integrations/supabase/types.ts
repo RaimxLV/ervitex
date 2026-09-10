@@ -1834,42 +1834,6 @@ export type Database = {
         }
         Relationships: []
       }
-      ss_price_list_2026: {
-        Row: {
-          color_group: string
-          created_at: string
-          id: string
-          is_large_size: boolean
-          price: number
-          price_vat: number | null
-          size_range: string | null
-          style_code: string
-          updated_at: string
-        }
-        Insert: {
-          color_group: string
-          created_at?: string
-          id?: string
-          is_large_size?: boolean
-          price: number
-          price_vat?: number | null
-          size_range?: string | null
-          style_code: string
-          updated_at?: string
-        }
-        Update: {
-          color_group?: string
-          created_at?: string
-          id?: string
-          is_large_size?: boolean
-          price?: number
-          price_vat?: number | null
-          size_range?: string | null
-          style_code?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       ss_prices: {
         Row: {
           currency: string | null
