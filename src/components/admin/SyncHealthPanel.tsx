@@ -31,7 +31,7 @@ const SUPPLIERS: { key: string; label: string; fn: string }[] = [
 ];
 
 const NWG_BRANDS = ["Craft", "Clique", "ProJob", "Cutter & Buck"];
-const STUCK_MS = 60 * 60 * 1000;
+const STUCK_MS = 30 * 60 * 1000;
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleString("lv-LV") : "—");
 
