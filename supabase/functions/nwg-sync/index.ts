@@ -825,7 +825,7 @@ Deno.serve(async (req) => {
       result.assortments = step;
       if (step.pending_left > 0) {
         // Discovery unfinished — continue it before touching products.
-        if (chain) chainSelf(url, { mode: "assortments", chain: "1" });
+        if (chain) await chainSelf(sb, { mode: "assortments", chain: "1" });
         await finishLog(sb, logId, {
           status: "success",
           message: `NWG assortment discovery daļa pabeigta (atlicis ${step.pending_left})`,
