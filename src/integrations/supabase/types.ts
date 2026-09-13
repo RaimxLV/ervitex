@@ -2570,6 +2570,10 @@ export type Database = {
           read_ct: number
         }[]
       }
+      reap_stale_syncs: {
+        Args: { _older_than_minutes?: number }
+        Returns: number
+      }
       refresh_catalog_items_mv: { Args: never; Returns: undefined }
       refresh_catalog_prices: { Args: never; Returns: undefined }
       refresh_mf_public_retail_prices: { Args: never; Returns: undefined }

@@ -440,6 +440,29 @@ async function ingest(sb: SupabaseClient, models: any[]) {
   return { received: models.length, styles: s, variants: v, images: i };
 }
 
+// Fire-and-forget continuation, so a full product refresh can span as many
+// invocations as it needs instead of dying at the edge time limit.
+function chainSelf(params: Record<string, string>) {
+  const qs = new URLSearchParams(params).toString();
+  const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/pf-concept-sync?${qs}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}`, apikey: key, "Content-Type": "application/json" },
+    body: "{}",
+  }).catch(() => { /* the weekly job retries */ });
+}
+
+// Full product refresh: cache the feed into chunks, then walk the chunks.
+const CHUNK_SPAN = 15;
+
+async function refreshProducts(sb: SupabaseClient, lang: string, chunkSize: number) {
+  const manifest = await cacheAndSplit(sb, { lang, chunkSize });
+  if ((manifest.total_chunks ?? 0) > 0) {
+    chainSelf({ mode: "process", lang, from: "0", chain: "1", span: String(CHUNK_SPAN) });
+  }
+  return { ...manifest, processing_started: (manifest.total_chunks ?? 0) > 0 };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
@@ -455,16 +478,31 @@ Deno.serve(async (req) => {
     } else if (mode === "cache") {
       const chunkSize = Number(url.searchParams.get("chunkSize") || "150");
       result = await cacheAndSplit(sb, { lang, chunkSize });
+    } else if (mode === "refresh") {
+      const chunkSize = Number(url.searchParams.get("chunkSize") || "150");
+      result = await refreshProducts(sb, lang, chunkSize);
     } else if (mode === "manifest") {
       result = await readManifest(sb, lang);
     } else if (mode === "process") {
       const chunk = url.searchParams.get("chunk");
       const from = url.searchParams.get("from");
       const to = url.searchParams.get("to");
+      const chain = url.searchParams.get("chain") === "1";
+      const span = Math.max(1, Math.min(Number(url.searchParams.get("span") || CHUNK_SPAN), 60));
       if (chunk !== null) {
         result = await processChunk(sb, lang, Number(chunk));
       } else if (from !== null && to !== null) {
         result = await processRange(sb, lang, Number(from), Number(to));
+      } else if (from !== null && chain) {
+        const manifest = await readManifest(sb, lang);
+        const total = Number(manifest.total_chunks || 0);
+        const start = Number(from);
+        const end = Math.min(start + span - 1, total - 1);
+        const range = await processRange(sb, lang, start, end);
+        const next = end + 1;
+        const done = next >= total;
+        if (!done) chainSelf({ mode: "process", lang, from: String(next), chain: "1", span: String(span) });
+        result = { ...range, total_chunks: total, next_from: done ? null : next, done };
       } else {
         throw new Error("process mode requires ?chunk=N or ?from=A&to=B");
       }

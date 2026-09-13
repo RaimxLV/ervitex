@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Paperclip, RefreshCw } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Mail, Paperclip, RefreshCw } from "lucide-react";
 
 interface QuoteItem {
   source?: string;
@@ -56,9 +56,24 @@ const statusColors: Record<string, string> = {
 const statusLabel = (val: string) => STATUS_OPTIONS.find((s) => s.value === val)?.label || val;
 const eur = (n: number) => `${n.toFixed(2)} €`;
 
+const OPEN_STATUSES = ["new", "contacted", "quoted"];
+const daysSince = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
+
+type FilterKey = "open" | "all" | "new" | "contacted" | "quoted" | "closed";
+
+const FILTERS: { key: FilterKey; label: string }[] = [
+  { key: "open", label: "Neapstrādātie" },
+  { key: "new", label: "Jauni" },
+  { key: "contacted", label: "Sazināti" },
+  { key: "quoted", label: "Piedāvājums nosūtīts" },
+  { key: "closed", label: "Slēgti" },
+  { key: "all", label: "Visi" },
+];
+
 const AdminQuotes = () => {
   const [quotes, setQuotes] = useState<QuoteRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<FilterKey>("open");
   const { toast } = useToast();
 
   const fetchQuotes = async () => {
@@ -93,6 +108,22 @@ const AdminQuotes = () => {
     window.open(data.signedUrl, "_blank", "noopener");
   };
 
+  const countFor = (key: FilterKey) =>
+    key === "all"
+      ? quotes.length
+      : key === "open"
+        ? quotes.filter((q) => OPEN_STATUSES.includes(q.status)).length
+        : quotes.filter((q) => q.status === key).length;
+
+  const visible =
+    filter === "all"
+      ? quotes
+      : filter === "open"
+        ? quotes.filter((q) => OPEN_STATUSES.includes(q.status))
+        : quotes.filter((q) => q.status === filter);
+
+  const overdue = quotes.filter((q) => q.status === "new" && daysSince(q.created_at) >= 2).length;
+
   return (
     <AdminLayout>
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -106,23 +137,62 @@ const AdminQuotes = () => {
         </Button>
       </div>
 
+      {overdue > 0 && (
+        <div className="mt-4 flex items-start gap-2 rounded-sm border border-destructive/40 bg-destructive/5 p-3 text-sm">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+          <p className="text-foreground">
+            <span className="font-semibold text-destructive">{overdue}</span> pieprasījumi stāv neapstrādāti ilgāk par
+            2 dienām. Pēc saziņas ar klientu nomaini statusu, lai saraksts atspoguļo patieso stāvokli.
+          </p>
+        </div>
+      )}
+
+      <div className="mt-5 flex flex-wrap gap-2">
+        {FILTERS.map((f) => (
+          <Button
+            key={f.key}
+            variant={filter === f.key ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilter(f.key)}
+            className="text-xs font-bold uppercase tracking-wider"
+          >
+            {f.label} ({countFor(f.key)})
+          </Button>
+        ))}
+      </div>
+
       <div className="mt-6 space-y-4">
         {loading ? (
           <p className="py-8 text-center text-muted-foreground">Ielādē...</p>
-        ) : quotes.length === 0 ? (
-          <p className="py-8 text-center text-muted-foreground">Nav cenu pieprasījumu</p>
+        ) : visible.length === 0 ? (
+          <p className="py-8 text-center text-muted-foreground">Šajā sadaļā nav pieprasījumu</p>
         ) : (
-          quotes.map((q) => {
+          visible.map((q) => {
             const items = Array.isArray(q.items) ? q.items : [];
             const totalQty = items.reduce((s, i) => s + (i.qty || 0), 0);
             const totalNet = items.reduce((s, i) => s + (i.unitPrice || 0) * (i.qty || 0), 0);
+            const age = daysSince(q.created_at);
+            const isOpen = OPEN_STATUSES.includes(q.status);
             return (
-              <div key={q.id} className="space-y-3 rounded-sm border border-border p-4 sm:p-5">
+              <div
+                key={q.id}
+                className={`space-y-3 rounded-sm border p-4 sm:p-5 ${
+                  q.status === "new" && age >= 2 ? "border-destructive/50" : "border-border"
+                }`}
+              >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="font-medium text-foreground">{q.name}</p>
                       <Badge className={statusColors[q.status] || ""}>{statusLabel(q.status)}</Badge>
+                      {isOpen && (
+                        <Badge
+                          variant="outline"
+                          className={age >= 2 ? "border-destructive/60 text-destructive" : "text-muted-foreground"}
+                        >
+                          {age === 0 ? "Šodien" : `Atvērts ${age} d.`}
+                        </Badge>
+                      )}
                     </div>
                     <p className="break-words text-sm text-muted-foreground">
                       {q.email}
@@ -146,10 +216,25 @@ const AdminQuotes = () => {
                       </SelectContent>
                     </Select>
                     <Button asChild variant="outline" size="sm" className="w-full">
-                      <a href={`mailto:${q.email}?subject=${encodeURIComponent("Ervitex piedāvājums")}`}>
+                      <a
+                        href={`mailto:${q.email}?subject=${encodeURIComponent("Ervitex piedāvājums")}`}
+                        onClick={() => {
+                          if (q.status === "new") updateStatus(q.id, "contacted");
+                        }}
+                      >
                         <Mail className="mr-2 h-4 w-4" /> Atbildēt e-pastā
                       </a>
                     </Button>
+                    {isOpen && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => updateStatus(q.id, "closed")}
+                      >
+                        <CheckCircle2 className="mr-2 h-4 w-4" /> Slēgt
+                      </Button>
+                    )}
                   </div>
                 </div>
 

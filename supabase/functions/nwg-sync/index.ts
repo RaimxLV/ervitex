@@ -463,89 +463,154 @@ function mapProduct(row: any, assortmentId: string, seenProductNumbers: Set<stri
 }
 
 // ------------------------------------------------------------------ syncers
+//
+// Both phases are resumable. An edge function has a hard wall-clock limit, so
+// every phase works inside a time budget, persists what it managed to do, and
+// (with ?chain=1) re-invokes itself to continue where it stopped. That is why
+// the nightly job no longer dies half way and leaves a "running" log behind.
 
-async function syncAssortments(sb: SupabaseClient) {
+const DEFAULT_BUDGET_MS = 50_000;
+const overBudget = (startedAt: number, budgetMs: number) => Date.now() - startedAt > budgetMs;
+
+const DISCOVERY_PRODUCTS = ["010177", "1900095", "351033", "641006"];
+
+async function loadStoredAssortments(sb: SupabaseClient) {
+  const rows: any[] = [];
+  const size = 1000;
+  for (let from = 0; ; from += size) {
+    const { data, error } = await sb
+      .from("nwg_assortments")
+      .select("id, name, parent_id, raw")
+      .order("id")
+      .range(from, from + size - 1);
+    if (error) throw new Error(`nwg_assortments read: ${error.message}`);
+    rows.push(...(data ?? []));
+    if (!data || data.length < size) break;
+  }
+  return rows;
+}
+
+async function seedAssortments(sb: SupabaseClient, startedAt: number, budgetMs: number) {
   const collected = new Map<string, any>();
-  const queuedNodeIds: string[] = [];
-  const visitedNodeIds = new Set<string>();
-  const discoveryProducts = ["010177", "1900095", "351033", "641006"];
-  for (const productNumber of discoveryProducts) {
+  for (const productNumber of DISCOVERY_PRODUCTS) {
     const data = await gql<any>(Q_DISCOVER_ASSORTMENTS, { q: productNumber });
     for (const product of data.productSearch?.result ?? []) {
       for (const a of product.assortmentNodes ?? []) {
         const id = toStr(a.id);
         if (!id) continue;
-        collected.set(id, {
-          id,
-          name: toStr(a.name),
-          parent_id: toStr(a.parentId),
-          raw: a,
-        });
-        queuedNodeIds.push(id);
-        for (const childId of Array.isArray(a.childNodeIds) ? a.childNodeIds : []) {
-          const child = toStr(childId);
-          if (child) queuedNodeIds.push(child);
-        }
+        collected.set(id, { id, name: toStr(a.name), parent_id: toStr(a.parentId), raw: a });
       }
     }
+    if (overBudget(startedAt, budgetMs)) break;
   }
+  if (!collected.size) throw new Error("NWG returned no assortment nodes; catalog was left unchanged");
+  await chunkUpsert(sb, "nwg_assortments", [...collected.values()], "id");
+
+  // Expand the seeds page by page (also persisted incrementally).
   for (const seed of [...collected.values()]) {
     const assortmentId = toStr(seed.raw?.assortmentId);
     if (!assortmentId) continue;
     let page = 1;
-    while (true) {
+    while (!overBudget(startedAt, budgetMs)) {
       const data = await gql<any>(Q_ASSORTMENT_PAGE, { assortmentId, lang: LANG, page, size: 100 });
       const res = data.assortment?.result ?? [];
       if (!res.length) break;
-      for (const a of res) {
-      const id = toStr(a.id) ?? toStr(a.assortmentId);
-      if (!id) continue;
-      collected.set(id, {
-        id,
-        name: toStr(a.name),
-        parent_id: toStr(a.parentId),
-        raw: a,
-      });
-      for (const childId of Array.isArray(a.childNodeIds) ? a.childNodeIds : []) {
-        const child = toStr(childId);
-        if (child) queuedNodeIds.push(child);
-      }
-      }
+      const rows = res
+        .map((a: any) => {
+          const id = toStr(a.id) ?? toStr(a.assortmentId);
+          return id ? { id, name: toStr(a.name), parent_id: toStr(a.parentId), raw: a } : null;
+        })
+        .filter(Boolean);
+      if (rows.length) await chunkUpsert(sb, "nwg_assortments", rows as any[], "id");
       if (res.length < 100) break;
       page++;
       if (page > 100) break;
     }
+    if (overBudget(startedAt, budgetMs)) break;
   }
-  while (queuedNodeIds.length) {
-    const nodeId = queuedNodeIds.shift();
-    if (!nodeId || visitedNodeIds.has(nodeId)) continue;
-    visitedNodeIds.add(nodeId);
-    const data = await gql<any>(Q_ASSORTMENT_NODE, { id: nodeId, lang: LANG });
-    const a = data.assortmentNodeById;
-    if (!a) continue;
-    const id = toStr(a.id) ?? toStr(a.assortmentId) ?? nodeId;
-    collected.set(id, {
-      id,
-      name: toStr(a.name),
-      parent_id: toStr(a.parentId),
-      raw: a,
-    });
-    for (const childId of Array.isArray(a.childNodeIds) ? a.childNodeIds : []) {
-      const child = toStr(childId);
-      if (child && !visitedNodeIds.has(child)) queuedNodeIds.push(child);
-    }
+  return collected.size;
+}
+
+async function discoverAssortmentsStep(sb: SupabaseClient, startedAt: number, budgetMs: number) {
+  let stored = await loadStoredAssortments(sb);
+  let seeded = 0;
+  if (!stored.length) {
+    seeded = await seedAssortments(sb, startedAt, budgetMs);
+    stored = await loadStoredAssortments(sb);
   }
 
-  const rows = [...collected.values()];
-  if (!rows.length) throw new Error("NWG returned no assortment nodes; catalog was left unchanged");
-  await chunkUpsert(sb, "nwg_assortments", rows, "id");
-  return rows;
+  const known = new Set(stored.map((r) => String(r.id)));
+  const queued = new Set<string>();
+  const pending: string[] = [];
+  const enqueue = (raw: any) => {
+    for (const child of Array.isArray(raw?.childNodeIds) ? raw.childNodeIds : []) {
+      const id = toStr(child);
+      if (id && !known.has(id) && !queued.has(id)) {
+        queued.add(id);
+        pending.push(id);
+      }
+    }
+  };
+  for (const row of stored) enqueue(row.raw);
+
+  let fetched = 0;
+  const batch: any[] = [];
+  while (pending.length && !overBudget(startedAt, budgetMs)) {
+    const id = pending.shift()!;
+    if (known.has(id)) continue;
+    known.add(id);
+    let node: any = null;
+    try {
+      node = (await gql<any>(Q_ASSORTMENT_NODE, { id, lang: LANG })).assortmentNodeById;
+    } catch (_) {
+      node = null; // a single unreachable node must not kill the whole crawl
+    }
+    batch.push({
+      id,
+      name: toStr(node?.name),
+      parent_id: toStr(node?.parentId),
+      raw: node ?? { assortmentId: id },
+    });
+    fetched++;
+    enqueue(node);
+    if (batch.length >= 200) await chunkUpsert(sb, "nwg_assortments", batch.splice(0), "id");
+  }
+  if (batch.length) await chunkUpsert(sb, "nwg_assortments", batch, "id");
+
+  return { seeded, fetched, total: known.size, pending_left: pending.length };
+}
+
+async function assortmentIdsForCrawl(sb: SupabaseClient, opts: { only?: string[]; full?: boolean }) {
+  const stored = await loadStoredAssortments(sb);
+  const all = Array.from(
+    new Set(
+      stored
+        .map((node) => toStr(node.raw?.assortmentId) ?? toStr(node.id))
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ).sort();
+  if (opts.only?.length) {
+    const wanted = new Set(opts.only);
+    const filtered = all.filter((id) => wanted.has(id));
+    return { ids: filtered.length ? filtered : opts.only.slice(), narrowed: true };
+  }
+  if (!opts.full) {
+    const productive = new Set(
+      stored
+        .filter((r: any) => toInt(r.raw?.partner_hits, 0) > 0)
+        .map((r: any) => toStr(r.raw?.assortmentId) ?? toStr(r.id))
+        .filter((id): id is string => Boolean(id)),
+    );
+    const filtered = all.filter((id) => productive.has(id));
+    if (filtered.length) return { ids: filtered, narrowed: true };
+  }
+  return { ids: all, narrowed: false };
 }
 
 async function syncStyles(
   sb: SupabaseClient,
-  assortmentNodes: any[],
-  opts: { only?: string[]; full?: boolean } = {},
+  assortmentIds: string[],
+  opts: { startedAt: number; budgetMs: number },
 ) {
   const seen = new Set<string>();
   let styles: any[] = [];
@@ -584,35 +649,11 @@ async function syncStyles(
   };
 
   let pagesFetched = 0;
+  let processed = 0;
   const perAssortment: Record<string, { pages: number; count: number; partner_hits: number }> = {};
-  let assortmentIds = Array.from(new Set(assortmentNodes
-    .map((node) => toStr(node.raw?.assortmentId) ?? toStr(node.id))
-    .filter((id): id is string => Boolean(id))));
-  if (!assortmentIds.length) throw new Error("No usable NWG assortment IDs; catalog was left unchanged");
-
-  // Only crawl assortments that actually contain our partner brands. The list is
-  // learned on the first (full) run and cached in nwg_assortments.raw.partner_hits,
-  // so later runs skip the rest of the NWG tree entirely.
-  let narrowed = false;
-  if (opts.only?.length) {
-    const wanted = new Set(opts.only);
-    assortmentIds = assortmentIds.filter((id) => wanted.has(id));
-    if (!assortmentIds.length) assortmentIds = opts.only.slice();
-    narrowed = true;
-  } else if (!opts.full) {
-    const { data } = await sb.from("nwg_assortments").select("id, raw");
-    const productive = (data ?? [])
-      .filter((r: any) => toInt(r.raw?.partner_hits, 0) > 0)
-      .map((r: any) => toStr(r.raw?.assortmentId) ?? toStr(r.id))
-      .filter((id): id is string => Boolean(id));
-    if (productive.length) {
-      const set = new Set(productive);
-      const filtered = assortmentIds.filter((id) => set.has(id));
-      if (filtered.length) { assortmentIds = filtered; narrowed = true; }
-    }
-  }
 
   for (const assortmentId of assortmentIds) {
+    if (overBudget(opts.startedAt, opts.budgetMs)) break;
     let page = 1;
     let assortmentCount = 0;
     let assortmentPages = 0;
@@ -642,6 +683,7 @@ async function syncStyles(
       if (page > 1000) throw new Error(`Pagination safety limit reached for assortment ${assortmentId}`);
     }
     perAssortment[assortmentId] = { pages: assortmentPages, count: assortmentCount, partner_hits: hits };
+    processed++;
     await flush();
   }
 
@@ -665,39 +707,51 @@ async function syncStyles(
     await chunkUpsert(sb, "nwg_assortments", rows, "id");
   }
 
-  if (!seen.size) throw new Error("NWG assortments returned no supported products; catalog was left unchanged");
-
-
-
-  let stale: string[] = [];
-  if (!opts.only?.length) {
-    const { data: existing, error: existingError } = await sb
-      .from("nwg_styles")
-      .select("product_number")
-      .in("brand", ["Craft", "Craft AP", "Clique", "Clique Retail", "ProJob", "Cutter & Buck"])
-      .eq("archived", false);
-    if (existingError) throw new Error(`archive candidate fetch: ${existingError.message}`);
-    stale = (existing ?? []).map((row: any) => toStr(row.product_number)).filter((pn): pn is string => Boolean(pn) && !seen.has(pn));
-    for (let i = 0; i < stale.length; i += 200) {
-      const { error } = await sb.from("nwg_styles").update({
-        archived: true,
-        archived_at: new Date().toISOString(),
-      }).in("product_number", stale.slice(i, i + 200));
-      if (error) throw new Error(`archive stale styles: ${error.message}`);
-    }
-  }
-
   return {
     pages_fetched: pagesFetched,
-    narrowed,
-    assortments_crawled: assortmentIds.length,
+    assortments_processed: processed,
     unique_styles: seen.size,
-    archived_styles: stale.length,
     assortments: perAssortment,
   };
-
 }
 
+// Anything our brands still have locally but the full pass no longer returned
+// is archived. Runs only after the last chunk of a full pass.
+async function archiveStaleStyles(sb: SupabaseClient, sinceIso: string) {
+  const { data: existing, error } = await sb
+    .from("nwg_styles")
+    .select("product_number, last_synced_at")
+    .in("brand", ["Craft", "Craft AP", "Clique", "Clique Retail", "ProJob", "Cutter & Buck"])
+    .eq("archived", false);
+  if (error) throw new Error(`archive candidate fetch: ${error.message}`);
+  const stale = (existing ?? [])
+    .filter((row: any) => !row.last_synced_at || row.last_synced_at < sinceIso)
+    .map((row: any) => toStr(row.product_number))
+    .filter((pn): pn is string => Boolean(pn));
+  for (let i = 0; i < stale.length; i += 200) {
+    const { error: upErr } = await sb.from("nwg_styles").update({
+      archived: true,
+      archived_at: new Date().toISOString(),
+    }).in("product_number", stale.slice(i, i + 200));
+    if (upErr) throw new Error(`archive stale styles: ${upErr.message}`);
+  }
+  return stale.length;
+}
+
+function chainSelf(baseUrl: URL, params: Record<string, string>) {
+  const next = new URL(baseUrl.toString());
+  for (const [k, v] of Object.entries(params)) next.searchParams.set(k, v);
+  // Fire and forget: the current invocation returns immediately afterwards.
+  fetch(next.toString(), {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+      "Content-Type": "application/json",
+      "Lovable-Context": "chain",
+    },
+    body: "{}",
+  }).catch(() => {});
+}
 
 async function inspectApi(q?: string) {
   const schema = await gql<any>(`{
@@ -756,26 +810,54 @@ Deno.serve(async (req) => {
   const q = url.searchParams.get("q") || undefined;
   const only = (url.searchParams.get("ids") || "").split(",").map((s) => s.trim()).filter(Boolean);
   const full = url.searchParams.get("full") === "1";
-  const auditOffset = toInt(url.searchParams.get("offset"), 0);
+  const chain = url.searchParams.get("chain") === "1";
+  const offset = toInt(url.searchParams.get("offset"), 0);
   const auditLimit = toInt(url.searchParams.get("limit"), 500);
-
+  const budgetMs = Math.max(10_000, Math.min(toInt(url.searchParams.get("budget"), DEFAULT_BUDGET_MS), 110_000));
+  const since = url.searchParams.get("since");
+  const startedAt = Date.now();
 
   const logId = await startLog(sb, `nwg:${mode}`);
   const result: Record<string, unknown> = {};
 
   try {
     if (mode === "inspect") result.inspect = await inspectApi(q);
-    if (mode === "audit") result.audit = await auditPublicCards(sb, auditOffset, auditLimit);
-    let assortmentNodes: any[] | null = null;
-    if (mode === "assortments" || mode === "styles" || mode === "all") {
-      assortmentNodes = await syncAssortments(sb);
-      result.assortments = assortmentNodes.length;
+    if (mode === "audit") result.audit = await auditPublicCards(sb, offset, auditLimit);
+
+    if (mode === "assortments" || mode === "all") {
+      const step = await discoverAssortmentsStep(sb, startedAt, budgetMs);
+      result.assortments = step;
+      if (step.pending_left > 0) {
+        // Discovery unfinished — continue it before touching products.
+        if (chain) chainSelf(url, { mode: "assortments", chain: "1" });
+        await finishLog(sb, logId, {
+          status: "success",
+          message: `NWG assortment discovery daļa pabeigta (atlicis ${step.pending_left})`,
+          details: result,
+        });
+        return new Response(JSON.stringify({ ok: true, mode, result, continued: chain }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
+
     if (mode === "styles" || mode === "all") {
-      if (!assortmentNodes) throw new Error("NWG assortment discovery failed");
-      result.catalog = await syncStyles(sb, assortmentNodes, { only, full });
-      const { error: itemsError } = await sb.rpc("refresh_catalog_items_mv");
-      if (itemsError) throw new Error(`catalog refresh: ${itemsError.message}`);
+      const { ids, narrowed } = await assortmentIdsForCrawl(sb, { only, full });
+      if (!ids.length) throw new Error("No usable NWG assortment IDs; catalog was left unchanged");
+      const passSince = since ?? new Date(startedAt).toISOString();
+      const slice = ids.slice(offset);
+      const crawl = await syncStyles(sb, slice, { startedAt, budgetMs });
+      const nextOffset = offset + crawl.assortments_processed;
+      const done = nextOffset >= ids.length;
+      result.catalog = { ...crawl, narrowed, total_assortments: ids.length, offset, next_offset: done ? null : nextOffset };
+
+      if (done) {
+        if (!only.length) result.archived_styles = await archiveStaleStyles(sb, passSince);
+        const { error: itemsError } = await sb.rpc("refresh_catalog_items_mv");
+        if (itemsError) throw new Error(`catalog refresh: ${itemsError.message}`);
+      } else if (chain) {
+        chainSelf(url, { mode: "styles", chain: "1", offset: String(nextOffset), since: passSince });
+      }
     }
 
     await finishLog(sb, logId, { status: "success", message: `NWG sync (${mode}) ok`, details: result });
