@@ -500,7 +500,7 @@ Deno.serve(async (req) => {
         const range = await processRange(sb, lang, start, end);
         const next = end + 1;
         const done = next >= total;
-        if (!done) chainSelf({ mode: "process", lang, from: String(next), chain: "1", span: String(span) });
+        if (!done) await chainSelf(sb, { mode: "process", lang, from: String(next), chain: "1", span: String(span) });
         result = { ...range, total_chunks: total, next_from: done ? null : next, done };
       } else {
         throw new Error("process mode requires ?chunk=N or ?from=A&to=B");
