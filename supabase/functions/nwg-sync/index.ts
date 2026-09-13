@@ -738,19 +738,15 @@ async function archiveStaleStyles(sb: SupabaseClient, sinceIso: string) {
   return stale.length;
 }
 
-function chainSelf(baseUrl: URL, params: Record<string, string>) {
-  const next = new URL(baseUrl.toString());
-  for (const [k, v] of Object.entries(params)) next.searchParams.set(k, v);
-  // Fire and forget: the current invocation returns immediately afterwards.
-  fetch(next.toString(), {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
-      "Content-Type": "application/json",
-      "Lovable-Context": "chain",
-    },
-    body: "{}",
-  }).catch(() => {});
+/**
+ * Continue the run in a fresh invocation. A plain fetch() is cancelled when this
+ * worker shuts down, so the next step is dispatched from the database (pg_net),
+ * which is independent of this function's lifetime.
+ */
+async function chainSelf(sb: any, params: Record<string, string>) {
+  const qs = "?" + new URLSearchParams(params).toString();
+  const { error } = await sb.rpc("invoke_sync_function", { fn: "nwg-sync", qs });
+  if (error) console.error(`[nwg-sync] chain failed: ${error.message}`);
 }
 
 async function inspectApi(q?: string) {
