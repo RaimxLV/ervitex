@@ -849,8 +849,10 @@ Deno.serve(async (req) => {
 
       if (done) {
         if (!only.length) result.archived_styles = await archiveStaleStyles(sb, passSince);
+        // The catalog view rebuild is heavy; a slow rebuild must not mark an
+        // otherwise successful product import as failed — the nightly job retries it.
         const { error: itemsError } = await sb.rpc("refresh_catalog_items_mv");
-        if (itemsError) throw new Error(`catalog refresh: ${itemsError.message}`);
+        result.catalog_view_refresh = itemsError ? `deferred: ${itemsError.message}` : "ok";
       } else if (chain) {
         await chainSelf(sb, { mode: "styles", chain: "1", offset: String(nextOffset), since: passSince });
       }
