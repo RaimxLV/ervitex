@@ -852,7 +852,7 @@ Deno.serve(async (req) => {
         const { error: itemsError } = await sb.rpc("refresh_catalog_items_mv");
         if (itemsError) throw new Error(`catalog refresh: ${itemsError.message}`);
       } else if (chain) {
-        chainSelf(url, { mode: "styles", chain: "1", offset: String(nextOffset), since: passSince });
+        await chainSelf(sb, { mode: "styles", chain: "1", offset: String(nextOffset), since: passSince });
       }
     }
 
