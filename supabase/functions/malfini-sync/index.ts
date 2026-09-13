@@ -217,6 +217,8 @@ Deno.serve(async (req) => {
       await admin.from("sync_logs").insert({
         source: "malfini",
         status: "success",
+        message: "Malfini sync ok",
+        finished_at: summary.finished,
         details: summary,
       });
     } catch (_) { /* ignore */ }
@@ -230,6 +232,8 @@ Deno.serve(async (req) => {
       await admin.from("sync_logs").insert({
         source: "malfini",
         status: "error",
+        message: msg,
+        finished_at: new Date().toISOString(),
         details: { error: msg },
       });
     } catch (_) { /* ignore */ }

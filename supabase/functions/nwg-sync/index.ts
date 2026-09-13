@@ -717,17 +717,37 @@ async function syncStyles(
 
 // Anything our brands still have locally but the full pass no longer returned
 // is archived. Runs only after the last chunk of a full pass.
+const ARCHIVE_BRANDS = ["Craft", "Craft AP", "Clique", "Clique Retail", "ProJob", "Cutter & Buck"];
+/** A pass must have re-seen at least this share of live styles before we trust it to archive. */
+const ARCHIVE_MIN_COVERAGE = 0.9;
+
 async function archiveStaleStyles(sb: SupabaseClient, sinceIso: string) {
-  const { data: existing, error } = await sb
-    .from("nwg_styles")
-    .select("product_number, last_synced_at")
-    .in("brand", ["Craft", "Craft AP", "Clique", "Clique Retail", "ProJob", "Cutter & Buck"])
-    .eq("archived", false);
-  if (error) throw new Error(`archive candidate fetch: ${error.message}`);
-  const stale = (existing ?? [])
-    .filter((row: any) => !row.last_synced_at || row.last_synced_at < sinceIso)
-    .map((row: any) => toStr(row.product_number))
+  const rows: { product_number: unknown; last_synced_at: string | null }[] = [];
+  for (let page = 0; ; page++) {
+    const { data, error } = await sb
+      .from("nwg_styles")
+      .select("product_number, last_synced_at")
+      .in("brand", ARCHIVE_BRANDS)
+      .eq("archived", false)
+      .order("product_number")
+      .range(page * 1000, page * 1000 + 999);
+    if (error) throw new Error(`archive candidate fetch: ${error.message}`);
+    rows.push(...((data as any[]) ?? []));
+    if (!data || data.length < 1000) break;
+  }
+
+  const stale = rows
+    .filter((row) => !row.last_synced_at || row.last_synced_at < sinceIso)
+    .map((row) => toStr(row.product_number))
     .filter((pn): pn is string => Boolean(pn));
+
+  // Safety net: a partial crawl must never wipe the catalog. If this pass did not
+  // re-see most of the live styles, we leave everything visible and try again later.
+  const coverage = rows.length ? (rows.length - stale.length) / rows.length : 0;
+  if (coverage < ARCHIVE_MIN_COVERAGE) {
+    return { archived: 0, skipped: true, coverage: Number(coverage.toFixed(3)), candidates: stale.length };
+  }
+
   for (let i = 0; i < stale.length; i += 200) {
     const { error: upErr } = await sb.from("nwg_styles").update({
       archived: true,
@@ -735,7 +755,7 @@ async function archiveStaleStyles(sb: SupabaseClient, sinceIso: string) {
     }).in("product_number", stale.slice(i, i + 200));
     if (upErr) throw new Error(`archive stale styles: ${upErr.message}`);
   }
-  return stale.length;
+  return { archived: stale.length, skipped: false, coverage: Number(coverage.toFixed(3)) };
 }
 
 /**
