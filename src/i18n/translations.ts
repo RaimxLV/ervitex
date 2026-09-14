@@ -71,7 +71,7 @@ export const translations = {
   // About page
   "about.title": { lv: "Par Ervitex", en: "About Ervitex" },
   "about.heroText": {
-    lv: "Vairāk nekā 20 gadus SIA Ervitex ir uzticams partneris Latvijas uzņēmumiem, kas meklē kvalitatīvu vairumtirdzniecības apģērbu un profesionālus apdrukas pakalpojumus.",
+    lv: "\n",
     en: "For over 20 years, Ervitex has been the trusted partner for Latvian businesses seeking premium wholesale apparel and professional textile printing.",
 
   },
