@@ -179,7 +179,10 @@ async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise
         }),
       });
       const text = await res.text();
-      if (!res.ok) throw new Error(`NWG token refresh failed [${res.status}]: ${text.slice(0, 200)}`);
+      if (!res.ok) {
+        if (res.status === 400 && text.includes("invalid_grant")) return await passwordGrant(sb);
+        throw new Error(`NWG token refresh failed [${res.status}]: ${text.slice(0, 200)}`);
+      }
       const json = JSON.parse(text);
       if (!json.access_token) throw new Error("NWG token refresh returned no access_token");
       const expiresIn = Math.max(Number(json.expires_in ?? 300), 60);
