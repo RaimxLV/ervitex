@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChevronsLeft, ChevronsRight, SlidersHorizontal } from "lucide-react";
 import Layout from "@/components/Layout";
+import PageIntro from "@/components/PageIntro";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -958,14 +959,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   return (
     <Layout>
+      <PageIntro
+        title={t.title}
+        subtitle={t.subtitle}
+        eyebrow={lang === "lv" ? "Produktu atlase" : "Product selection"}
+      />
       <div className="container px-4 py-8 md:py-14">
-        <div className="mb-6">
-          <h1 className="font-heading text-2xl font-black uppercase tracking-wide text-foreground md:text-4xl">
-            {t.title}
-          </h1>
-          {t.subtitle ? <p className="mt-1 text-sm text-muted-foreground">{t.subtitle}</p> : null}
-        </div>
-
         <div className="mb-6 space-y-3">
           <div className="relative w-full md:max-w-xl">
             <Input

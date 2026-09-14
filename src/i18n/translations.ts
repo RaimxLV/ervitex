@@ -143,7 +143,7 @@ export const translations = {
   "about.quality": { lv: "Kvalitāte", en: "Quality" },
   "about.qualityDesc": { lv: "Tikai sertificēti materiāli no uzticamiem Eiropas piegādātājiem.", en: "Only certified materials from trusted European suppliers." },
   "about.capacity": { lv: "Jauda", en: "Capacity" },
-  "about.capacityDesc": { lv: "Iekšējā ražošana apstrādā pasūtījumus no 10 līdz 10 000 vienībām.", en: "In-house production handles runs from 10 to 10,000 pieces." },
+  "about.capacityDesc": { lv: "Vairāk nekā 6000 produktu modeļu vienotajā katalogā.", en: "More than 6,000 product models in one catalog." },
 
   // Contact
   "contact.title": { lv: "Kontakti", en: "Contact Us" },

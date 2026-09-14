@@ -1,4 +1,5 @@
 import Layout from "@/components/Layout";
+import PageIntro from "@/components/PageIntro";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 const PrivacyPage = () => {
@@ -6,14 +7,10 @@ const PrivacyPage = () => {
 
   return (
     <Layout>
-      <section className="bg-primary py-16 text-primary-foreground">
-        <div className="container">
-          <h1 className="font-heading text-3xl font-bold uppercase md:text-5xl">
-            {lang === "lv" ? "Privātuma politika" : "Privacy Policy"}
-          </h1>
-          <div className="mt-1 h-1 w-16 bg-accent" />
-        </div>
-      </section>
+      <PageIntro
+        title={lang === "lv" ? "Privātuma politika" : "Privacy Policy"}
+        eyebrow={lang === "lv" ? "Juridiskā informācija" : "Legal information"}
+      />
 
       <section className="container max-w-3xl py-16 md:py-24">
         <div className="prose prose-sm max-w-none text-foreground prose-headings:font-heading prose-headings:uppercase prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground">
