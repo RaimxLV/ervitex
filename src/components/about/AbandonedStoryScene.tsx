@@ -1,4 +1,4 @@
-import { type PointerEvent, type ReactNode, useRef } from "react";
+import { type PointerEvent, type ReactNode, useEffect, useRef } from "react";
 import abandonedStore from "@/assets/ervitex-store-abandoned-wide.jpg";
 
 type AbandonedStorySceneProps = {
@@ -10,6 +10,37 @@ const DRIPS = [9, 18, 31, 47, 61, 76, 88];
 const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
   const sceneRef = useRef<HTMLElement>(null);
   const frameRef = useRef<number | null>(null);
+  const scrollFrameRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const updateParallax = () => {
+      scrollFrameRef.current = null;
+      const scene = sceneRef.current;
+      if (!scene) return;
+
+      const rect = scene.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
+      const clamped = Math.min(1, Math.max(0, progress));
+      scene.style.setProperty("--scene-scroll-y", `${(clamped - 0.5) * 96}px`);
+    };
+
+    const requestParallax = () => {
+      if (scrollFrameRef.current !== null) return;
+      scrollFrameRef.current = requestAnimationFrame(updateParallax);
+    };
+
+    updateParallax();
+    window.addEventListener("scroll", requestParallax, { passive: true });
+    window.addEventListener("resize", requestParallax);
+
+    return () => {
+      window.removeEventListener("scroll", requestParallax);
+      window.removeEventListener("resize", requestParallax);
+      if (scrollFrameRef.current !== null) cancelAnimationFrame(scrollFrameRef.current);
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+    };
+  }, []);
 
   const updateLight = (event: PointerEvent<HTMLElement>) => {
     const scene = sceneRef.current;
@@ -18,8 +49,8 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
     const { left, top } = scene.getBoundingClientRect();
     const x = event.clientX - left;
     const y = event.clientY - top;
-    const shiftX = (x / scene.clientWidth - 0.5) * -14;
-    const shiftY = (y / scene.clientHeight - 0.5) * -10;
+    const shiftX = (x / scene.clientWidth - 0.5) * -44;
+    const shiftY = (y / scene.clientHeight - 0.5) * -28;
 
     if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
     frameRef.current = requestAnimationFrame(() => {
