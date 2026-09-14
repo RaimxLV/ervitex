@@ -41,26 +41,22 @@ const StoreLocations = () => {
   const { lang } = useLanguage();
 
   return (
-    <section className="bg-background py-16 md:py-24">
+    <section className="bg-background py-10 md:py-14">
       <div className="container">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          transition={{ duration: 0.5 }}
+          className="mb-8"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="h-px w-12 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase text-accent">
-              T-Bode
-            </span>
-            <div className="h-px w-12 bg-accent" />
-          </div>
-          <h2 className="font-heading text-2xl font-black uppercase text-foreground">
+          <p className="font-heading text-[10px] font-bold uppercase tracking-widest text-accent/80">
+            T-Bode
+          </p>
+          <h2 className="mt-1 font-heading text-lg font-bold uppercase text-foreground/90">
             {lang === "lv" ? "Mūsu Veikali" : "Our Stores"}
           </h2>
-          <p className="mt-3 text-muted-foreground">
+          <p className="mt-1 max-w-md text-xs text-muted-foreground">
             {lang === "lv"
               ? "T-Shirt Store By T-Bode mazumtirdzniecības vietas Rīgā"
               : "T-Shirt Store By T-Bode retail locations in Riga"}
@@ -68,7 +64,7 @@ const StoreLocations = () => {
         </motion.div>
 
         {/* Store cards grid */}
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stores.map((store, i) => (
             <motion.div
               key={i}
@@ -78,7 +74,7 @@ const StoreLocations = () => {
               transition={{ duration: 0.4, delay: i * 0.08 }}
               className="group overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5"
             >
-              <div className="aspect-[16/10] overflow-hidden bg-muted">
+              <div className="aspect-[4/3] overflow-hidden bg-muted">
                 <img
                   src={store.image}
                   alt={`${store.name} T-Bode veikals`}
@@ -86,32 +82,32 @@ const StoreLocations = () => {
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                 />
               </div>
-              <div className="p-5">
-                <div className="mb-4 flex items-center gap-2">
-                  <StoreIcon className="h-4 w-4 text-accent" strokeWidth={1.5} />
-                  <h3 className="font-heading text-sm font-bold uppercase text-foreground">
+              <div className="p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <StoreIcon className="h-3.5 w-3.5 text-accent" strokeWidth={1.5} />
+                  <h3 className="font-heading text-xs font-bold uppercase text-foreground">
                     {store.name}
                   </h3>
                 </div>
-                <div className="space-y-3">
-                <div className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60" strokeWidth={1.5} />
-                  <span>{store.address}</span>
-                </div>
-                <a
-                  href={`mailto:${store.email}`}
-                  className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
-                >
-                  <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
-                  {store.email}
-                </a>
-                <a
-                  href={`tel:${store.phone.replace(/\s/g, "")}`}
-                  className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
-                >
-                  <Phone className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
-                  {store.phone}
-                </a>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2 text-[11px] leading-relaxed text-muted-foreground">
+                    <MapPin className="h-3 w-3 shrink-0 mt-0.5 text-muted-foreground/60" strokeWidth={1.5} />
+                    <span>{store.address}</span>
+                  </div>
+                  <a
+                    href={`mailto:${store.email}`}
+                    className="flex items-center gap-2 text-[11px] text-muted-foreground hover:text-accent transition-colors"
+                  >
+                    <Mail className="h-3 w-3 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
+                    {store.email}
+                  </a>
+                  <a
+                    href={`tel:${store.phone.replace(/\s/g, "")}`}
+                    className="flex items-center gap-2 text-[11px] text-muted-foreground hover:text-accent transition-colors"
+                  >
+                    <Phone className="h-3 w-3 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
+                    {store.phone}
+                  </a>
                 </div>
               </div>
             </motion.div>
