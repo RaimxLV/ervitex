@@ -71,46 +71,70 @@ export const translations = {
   // About page
   "about.title": { lv: "Par Ervitex", en: "About Ervitex" },
   "about.heroText": {
-    lv: "\n",
+    lv: "Divas desmitgades tekstila un apdrukas industrijas virsotnē — apģērbu vairumtirdzniecība un industriālā apdruka vienā vietā.",
     en: "For over 20 years, Ervitex has been the trusted partner for Latvian businesses seeking premium wholesale apparel and professional textile printing.",
-
   },
   "about.storyTitle": { lv: "Mūsu stāsts", en: "Our Story" },
+  "about.storyKicker": {
+    lv: "Kopš 2003. gada",
+    en: "Since 2003",
+  },
+  "about.storyHeadline": {
+    lv: "Divas desmitgades tekstila un apdrukas industrijas virsotnē",
+    en: "Two decades at the top of the textile and printing industry",
+  },
   "about.story1": {
-    lv: `DIVAS DESMITGADES TEKSTILA UN APDRUKAS INDUSTRIJAS VIRSNĒ
-
-Pirms vairāk nekā 20 gadiem mēs uzsākām savu ceļu ar skaidru vīziju — nodrošināt Latvijas uzņēmumiem augstākās klases reklāmas un korporatīvo apģērbu.
-
-Šo divu gadu desmitu laikā Ervitex ir izaudzis no ambicioza projekta par vienu no vadošajiem un uzticamākajiem nozares spēlētājiem, apvienojot liela mēroga apģērbu vairumtirdzniecību ar modernāko industriālās apdrukas servisu.
-
-20+ gadu pieredze | Pārbaudīta stabilitāte un nozares ekspertīze kopš pirmsākumiem
-
-Pasaules klases tekstils | Tieša sadarbība tikai ar vadošajiem apģērbu ražotājiem
-
-Rūpnieciskā jauda | Jaunākās paaudzes automatizētas iekārtas lieliem sērijveida pasūtījumiem
-
-Drošība un ekoloģija | Sertificētas industriālās krāsas ar maksimālu drukas noturību
-
-Pieredze, kas pārtop stabilitātē Mūsu ilgā vēsture tirgū ir mūsu lielākā kvalitātes zīme. Mēs esam piedzīvojuši nozares evolūciju, izpētījuši neskaitāmus materiālus un noslīpējuši savus procesus līdz pilnībai. Šī uzkrātā ekspertīze ļauj mums piedāvāt saviem partneriem to, kas biznesā ir vissvarīgākais — absolūtu stabilitāti un prognozējamību ilgtermiņā.
-
-Mūsu klienti zina, ka mēs esam droša aizmugure, kas nekad nepievils — ne kvalitātes, ne termiņu ziņā.
-
-Pasaules klases materiāli un rūpnieciskā jauda Mēs nestāvam uz vietas un pastāvīgi investējam nākotnē. Lai nodrošinātu nevainojamu rezultātu, Ervitex šodien strādā tikai ar pasaules vadošajiem tekstila ražotājiem.
-
-Mūsu ražotne ir aprīkota ar jaunākās paaudzes automatizētajām iekārtām, kas nodrošina milzīgu ražošanas jaudu un spēj operatīvi apkalpot pat ļoti liela apjoma un sarežģītības sērijveida pasūtījumus. Apdrukas procesos mēs izmantojam tikai sertificētas industriālās krāsas. Tas garantē ne vien izcilu attēla spilgtumu un ilgmūžību, bet arī atbilstību augstākajiem drošības un vides standartiem.
-
-JŪSU STRATĒĢISKAIS PARTNERIS Ervitex nav vienkārši apģērbu piegādātājs. Mēs esam ilgtermiņa partneris, kurš palīdz augt jūsu biznesam, stiprināt jūsu zīmola identitāti un realizēt pat visizaicinošākos projektus ar vieglumu un pārliecību.`,
+    lv: "Pirms vairāk nekā 20 gadiem mēs uzsākām savu ceļu ar skaidru vīziju — nodrošināt Latvijas uzņēmumiem augstākās klases reklāmas un korporatīvo apģērbu.",
     en: "Founded in 2003 in Riga, Ervitex set out with a clear mission: to give businesses access to premium apparel at competitive wholesale prices.",
   },
   "about.story2": {
-    lv: "\n",
+    lv: "Šo divu gadu desmitu laikā Ervitex ir izaudzis no ambicioza projekta par vienu no vadošajiem un uzticamākajiem nozares spēlētājiem, apvienojot liela mēroga apģērbu vairumtirdzniecību ar modernāko industriālās apdrukas servisu.",
     en: "Over the years, we expanded into professional screen printing, embroidery, and sublimation — becoming a one-stop solution for branded corporate and promotional apparel.",
   },
   "about.story3": {
-    lv: "\n",
-    en: "Today, we serve hundreds of clients across Latvia — from startups to major corporations.",
-
+    lv: "Ervitex nav vienkārši apģērbu piegādātājs. Mēs esam ilgtermiņa partneris, kurš palīdz augt jūsu biznesam, stiprināt zīmola identitāti un realizēt pat visizaicinošākos projektus ar vieglumu un pārliecību.",
+    en: "Ervitex is not just an apparel supplier. We are a long-term partner that helps your business grow, strengthens your brand identity and delivers even the most demanding projects with ease.",
   },
+  "about.highlight1Title": { lv: "20+ gadu pieredze", en: "20+ years of experience" },
+  "about.highlight1Desc": {
+    lv: "Pārbaudīta stabilitāte un nozares ekspertīze kopš pirmsākumiem.",
+    en: "Proven stability and industry expertise from day one.",
+  },
+  "about.highlight2Title": { lv: "Pasaules klases tekstils", en: "World-class textiles" },
+  "about.highlight2Desc": {
+    lv: "Tieša sadarbība tikai ar vadošajiem apģērbu ražotājiem.",
+    en: "Direct cooperation only with leading apparel manufacturers.",
+  },
+  "about.highlight3Title": { lv: "Rūpnieciskā jauda", en: "Industrial capacity" },
+  "about.highlight3Desc": {
+    lv: "Jaunākās paaudzes automatizētas iekārtas lieliem sērijveida pasūtījumiem.",
+    en: "Latest-generation automated equipment for large production runs.",
+  },
+  "about.highlight4Title": { lv: "Drošība un ekoloģija", en: "Safety and ecology" },
+  "about.highlight4Desc": {
+    lv: "Sertificētas industriālās krāsas ar maksimālu drukas noturību.",
+    en: "Certified industrial inks with maximum print durability.",
+  },
+  "about.blockStabilityTitle": { lv: "Pieredze, kas pārtop stabilitātē", en: "Experience that becomes stability" },
+  "about.blockStabilityBody1": {
+    lv: "Mūsu ilgā vēsture tirgū ir mūsu lielākā kvalitātes zīme. Esam piedzīvojuši nozares evolūciju, izpētījuši neskaitāmus materiālus un noslīpējuši savus procesus līdz pilnībai. Šī uzkrātā ekspertīze ļauj piedāvāt partneriem to, kas biznesā ir vissvarīgākais — absolūtu stabilitāti un prognozējamību ilgtermiņā.",
+    en: "Our long history in the market is our strongest quality mark. We have lived through the industry's evolution, tested countless materials and refined our processes to perfection.",
+  },
+  "about.blockStabilityBody2": {
+    lv: "Mūsu klienti zina, ka mēs esam droša aizmugure, kas nekad nepievils — ne kvalitātes, ne termiņu ziņā.",
+    en: "Our clients know we are a dependable backbone that never lets them down — neither in quality nor in deadlines.",
+  },
+  "about.blockCapacityTitle": { lv: "Pasaules klases materiāli un rūpnieciskā jauda", en: "World-class materials and industrial capacity" },
+  "about.blockCapacityBody1": {
+    lv: "Mēs nestāvam uz vietas un pastāvīgi investējam nākotnē. Lai nodrošinātu nevainojamu rezultātu, Ervitex šodien strādā tikai ar pasaules vadošajiem tekstila ražotājiem.",
+    en: "We keep investing in the future. To guarantee flawless results, Ervitex works only with the world's leading textile manufacturers.",
+  },
+  "about.blockCapacityBody2": {
+    lv: "Mūsu ražotne ir aprīkota ar jaunākās paaudzes automatizētajām iekārtām, kas nodrošina augstu ražošanas jaudu un spēj operatīvi izpildīt pat ļoti liela apjoma un sarežģītības pasūtījumus. Apdrukā izmantojam tikai sertificētas industriālās krāsas — tas garantē izcilu attēla spilgtumu, ilgmūžību un atbilstību augstākajiem drošības un vides standartiem.",
+    en: "Our production site runs latest-generation automated equipment, delivering high capacity and fast turnaround even for large, complex orders. We print only with certified industrial inks.",
+  },
+  "about.blockPartnerTitle": { lv: "Jūsu stratēģiskais partneris", en: "Your strategic partner" },
+
   "about.valuesTitle": { lv: "Kas mūs virza", en: "What Drives Us" },
   "about.precision": { lv: "Precizitāte", en: "Precision" },
   "about.precisionDesc": { lv: "Katra detaļa ir svarīga — no diegu skaita līdz drukas izlīdzināšanai.", en: "Every detail matters — from thread count to print alignment." },
