@@ -222,6 +222,42 @@ async function releasePriceSync(sb: SupabaseClient) {
   await sb.from("nwg_auth").update({ price_sync_in_progress: false, price_sync_started_at: null }).eq("id", 1);
 }
 
+async function passwordGrant(sb: SupabaseClient): Promise<string> {
+  const username = Deno.env.get("NWG_USERNAME");
+  const password = Deno.env.get("NWG_PASSWORD");
+  if (!username || !password) {
+    throw new Error("NWG portal session expired and automatic login is not configured");
+  }
+  const res = await fetch(TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "password",
+      client_id: CLIENT_ID,
+      username,
+      password,
+      scope: "openid profile roles FI offline_access",
+    }),
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`NWG automatic login failed [${res.status}]: ${text.slice(0, 200)}`);
+  const json = JSON.parse(text);
+  if (!json.access_token || !json.refresh_token) {
+    throw new Error("NWG automatic login returned an incomplete session");
+  }
+  const expiresIn = Math.max(Number(json.expires_in ?? 300), 60);
+  const { error } = await sb.from("nwg_auth").update({
+    refresh_token: json.refresh_token,
+    access_token: json.access_token,
+    access_token_expires_at: new Date(Date.now() + expiresIn * 1000).toISOString(),
+    refresh_in_progress: false,
+    refresh_started_at: null,
+    updated_at: new Date().toISOString(),
+  }).eq("id", 1);
+  if (error) throw new Error(`NWG automatic session save: ${error.message}`);
+  return json.access_token as string;
+}
+
 async function fetchPrices(token: string, skus: string[]) {
   const res = await fetch(PRICE_URL, {
     method: "POST",
