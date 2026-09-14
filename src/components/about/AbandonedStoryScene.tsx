@@ -1,5 +1,5 @@
 import { type PointerEvent, type ReactNode, useEffect, useRef } from "react";
-import abandonedStore from "@/assets/ervitex-store-abandoned-wide.jpg";
+import abandonedStoreAsset from "@/assets/ervitex-abandoned-store.jpg.asset.json";
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
@@ -70,9 +70,9 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       onPointerLeave={dimLight}
     >
       <img
-        src={abandonedStore}
+        src={abandonedStoreAsset.url}
         alt="Pamesta Ervitex apģērbu ekspozīcija naktī"
-        className="abandoned-scene-image absolute -inset-4 -z-30 h-[calc(100%+2rem)] w-[calc(100%+2rem)] object-cover object-center"
+        className="abandoned-scene-image absolute -inset-[12%] -z-30 h-[124%] w-[124%] object-cover object-center"
         loading="eager"
         decoding="async"
       />
@@ -82,9 +82,9 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       <div className="abandoned-lamp abandoned-lamp-c absolute -z-10" aria-hidden="true" />
       <div className="abandoned-flashlight absolute inset-0 -z-10" aria-hidden="true">
         <img
-          src={abandonedStore}
+          src={abandonedStoreAsset.url}
           alt=""
-          className="abandoned-scene-image h-full w-full scale-[1.025] object-cover object-center"
+          className="abandoned-scene-image absolute -inset-[12%] h-[124%] w-[124%] object-cover object-center"
           aria-hidden="true"
         />
       </div>
