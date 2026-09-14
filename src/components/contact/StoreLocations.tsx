@@ -41,26 +41,22 @@ const StoreLocations = () => {
   const { lang } = useLanguage();
 
   return (
-    <section className="bg-background py-16 md:py-24">
+    <section className="bg-background py-10 md:py-14">
       <div className="container">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          transition={{ duration: 0.5 }}
+          className="mb-8"
         >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="h-px w-12 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase text-accent">
-              T-Bode
-            </span>
-            <div className="h-px w-12 bg-accent" />
-          </div>
-          <h2 className="font-heading text-2xl font-black uppercase text-foreground">
+          <p className="font-heading text-[10px] font-bold uppercase tracking-widest text-accent/80">
+            T-Bode
+          </p>
+          <h2 className="mt-1 font-heading text-lg font-bold uppercase text-foreground/90">
             {lang === "lv" ? "Mūsu Veikali" : "Our Stores"}
           </h2>
-          <p className="mt-3 text-muted-foreground">
+          <p className="mt-1 max-w-md text-xs text-muted-foreground">
             {lang === "lv"
               ? "T-Shirt Store By T-Bode mazumtirdzniecības vietas Rīgā"
               : "T-Shirt Store By T-Bode retail locations in Riga"}
