@@ -1,5 +1,5 @@
 import { type PointerEvent, type ReactNode, useRef } from "react";
-import abandonedStore from "@/assets/ervitex-store-abandoned.jpg";
+import abandonedStore from "@/assets/ervitex-store-abandoned-wide.jpg";
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
@@ -9,7 +9,7 @@ const DRIPS = [9, 18, 31, 47, 61, 76, 88];
 
 const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
   const sceneRef = useRef<HTMLElement>(null);
-  const frameRef = useRef<number>();
+  const frameRef = useRef<number | null>(null);
 
   const updateLight = (event: PointerEvent<HTMLElement>) => {
     const scene = sceneRef.current;
@@ -19,7 +19,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
     const x = event.clientX - left;
     const y = event.clientY - top;
 
-    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
     frameRef.current = requestAnimationFrame(() => {
       scene.style.setProperty("--flashlight-x", `${x}px`);
       scene.style.setProperty("--flashlight-y", `${y}px`);
@@ -46,8 +46,10 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
         loading="eager"
         decoding="async"
       />
-      <div className="absolute inset-0 -z-20 bg-primary/80" />
-      <div className="abandoned-flicker absolute inset-0 -z-10" aria-hidden="true" />
+      <div className="absolute inset-0 -z-20 bg-primary/85" />
+      <div className="abandoned-lamp abandoned-lamp-a absolute -z-10" aria-hidden="true" />
+      <div className="abandoned-lamp abandoned-lamp-b absolute -z-10" aria-hidden="true" />
+      <div className="abandoned-lamp abandoned-lamp-c absolute -z-10" aria-hidden="true" />
       <div className="abandoned-flashlight absolute inset-0 -z-10" aria-hidden="true">
         <img
           src={abandonedStore}
@@ -56,6 +58,10 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
           aria-hidden="true"
         />
       </div>
+      <div className="abandoned-flashlight-beam pointer-events-none absolute inset-0 -z-[9]" aria-hidden="true" />
+
+      <div className="abandoned-spark abandoned-spark-a pointer-events-none absolute -z-[4]" aria-hidden="true" />
+      <div className="abandoned-spark abandoned-spark-b pointer-events-none absolute -z-[4]" aria-hidden="true" />
 
       <div className="pointer-events-none absolute inset-0 -z-[5] overflow-hidden" aria-hidden="true">
         {DRIPS.map((left, index) => (
