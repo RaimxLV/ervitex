@@ -105,6 +105,35 @@
   .promo-cta:hover {
     box-shadow: 0 14px 42px -8px hsl(var(--accent) / 0.75);
   }
+
+  .abandoned-story-scene {
+    --flashlight-x: 64%;
+    --flashlight-y: 24rem;
+    cursor: crosshair;
+  }
+
+  .abandoned-flashlight {
+    opacity: 0.18;
+    mask-image: radial-gradient(circle 250px at var(--flashlight-x) var(--flashlight-y), black 0%, rgb(0 0 0 / 0.88) 32%, transparent 72%);
+    -webkit-mask-image: radial-gradient(circle 250px at var(--flashlight-x) var(--flashlight-y), black 0%, rgb(0 0 0 / 0.88) 32%, transparent 72%);
+    transition: opacity 350ms ease;
+    will-change: mask-position, opacity;
+  }
+
+  .abandoned-story-scene[data-light-active="true"] .abandoned-flashlight {
+    opacity: 1;
+  }
+
+  .abandoned-flicker {
+    background: radial-gradient(ellipse 20% 8% at 74% 4%, hsl(var(--primary-foreground) / 0.14), transparent 70%);
+    animation: abandoned-light-flicker 8s steps(1, end) infinite;
+  }
+
+  .abandoned-drip {
+    height: 4.5rem;
+    opacity: 0;
+    animation: abandoned-drip-fall linear infinite;
+  }
 }
 
 @layer base {
@@ -117,6 +146,19 @@
 }
 
 @layer utilities {
+  @keyframes abandoned-light-flicker {
+    0%, 8%, 10%, 12%, 63%, 65%, 100% { opacity: 0.28; }
+    9%, 11%, 64% { opacity: 0.85; }
+    66% { opacity: 0.08; }
+  }
+
+  @keyframes abandoned-drip-fall {
+    0% { opacity: 0; transform: translateY(-5rem) scaleY(0.25); }
+    12% { opacity: 0.55; }
+    88% { opacity: 0.2; }
+    100% { opacity: 0; transform: translateY(72rem) scaleY(1); }
+  }
+
   @keyframes promo-drift {
     0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
     50% { transform: translate3d(6%, -8%, 0) scale(1.15); }
@@ -210,6 +252,29 @@
   .glitch-layer-main { animation: glitch-flicker 4s steps(1, end) infinite; }
   .glitch-layer-slice { animation: glitch-slice 3.4s steps(1, end) infinite; }
 
+}
+
+@media (pointer: coarse) {
+  .abandoned-story-scene {
+    cursor: auto;
+  }
+
+  .abandoned-flashlight {
+    opacity: 0.72;
+    mask-image: radial-gradient(circle 220px at 72% 18rem, black 0%, rgb(0 0 0 / 0.8) 38%, transparent 76%);
+    -webkit-mask-image: radial-gradient(circle 220px at 72% 18rem, black 0%, rgb(0 0 0 / 0.8) 38%, transparent 76%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .abandoned-flicker,
+  .abandoned-drip {
+    animation: none;
+  }
+
+  .abandoned-drip {
+    display: none;
+  }
 }
 
 
