@@ -135,8 +135,8 @@ const AboutPage = () => {
             className="mt-4 max-w-xl leading-relaxed text-muted-foreground"
           >
             {lang === "lv"
-              ? "Precīzs darbs, uzticamas partnerības un pārbaudāma izvēle vairāk nekā 3000 produktu katalogā."
-              : "Precise work, trusted partnerships and a verified selection of more than 3,000 catalog products."}
+              ? "Precīzs darbs, uzticamas partnerības un pārbaudāma izvēle vairāk nekā 6000 produktu modeļu katalogā."
+              : "Precise work, trusted partnerships and a verified selection of more than 6,000 product models."}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -146,10 +146,10 @@ const AboutPage = () => {
             className="mt-12 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-2 lg:grid-cols-4"
           >
             {[
-              { icon: Crosshair, motionClass: "group-hover:scale-110", title: t("about.precision"), desc: t("about.precisionDesc"), stat: "01" },
+              { icon: Crosshair, motionClass: "motion-safe:group-hover:animate-pulse", title: t("about.precision"), desc: t("about.precisionDesc"), stat: "01" },
               { icon: Handshake, motionClass: "group-hover:-translate-y-1", title: t("about.partnership"), desc: t("about.partnershipDesc"), stat: "02" },
-              { icon: BadgeCheck, motionClass: "group-hover:scale-110", title: t("about.quality"), desc: t("about.qualityDesc"), stat: "03" },
-              { icon: Cog, motionClass: "motion-safe:group-hover:animate-[spin_3s_linear_infinite]", title: t("about.capacity"), desc: t("about.capacityDesc"), stat: "3000+" },
+              { icon: BadgeCheck, motionClass: "group-hover:-rotate-6 group-hover:scale-110", title: t("about.quality"), desc: t("about.qualityDesc"), stat: "03" },
+              { icon: Cog, motionClass: "motion-safe:group-hover:animate-[spin_3s_linear_infinite]", title: t("about.capacity"), desc: t("about.capacityDesc"), stat: "6000+" },
             ].map((item, i) => (
               <motion.article
                 key={item.title}
@@ -180,7 +180,7 @@ const AboutPage = () => {
             {[
               { num: "20+", label: t("stats.years") },
               { num: "500+", label: t("stats.clients") },
-              { num: "3000+", label: lang === "lv" ? "Produkti katalogā" : "Products in Catalog" },
+              { num: "6000+", label: lang === "lv" ? "Produktu modeļi" : "Product Models" },
               { num: "4", label: lang === "lv" ? "Drukas tehnoloģijas" : "Printing Technologies" },
             ].map((stat, i) => (
               <div key={i} className="bg-background px-4 py-7">
