@@ -108,7 +108,10 @@ const SyncHealthPanel = () => {
   const suppliers = useMemo<SupplierState[]>(
     () =>
       SUPPLIERS.map((s) => {
-        const rows = logs.filter((l) => l.source.split(":")[0] === s.key);
+        const rows = logs.filter((l) => {
+          if (s.key === "nwg") return l.source === "nwg" || l.source === "nwg:all" || l.source === "nwg:styles" || l.source === "nwg:assortments";
+          return l.source === s.key || l.source.startsWith(`${s.key}:`);
+        });
         return {
           ...s,
           latest: rows[0],
@@ -119,7 +122,7 @@ const SyncHealthPanel = () => {
   );
 
   const nwgPriceLog = useMemo(() => logs.find((l) => l.source === "nwg:prices"), [logs]);
-  const tokenExpired = !!nwgPriceLog?.message?.includes("invalid_grant");
+  const tokenExpired = !!nwgPriceLog?.message?.includes("automatic login failed");
 
   const callFn = async (fn: string, query = "", body?: unknown) => {
     const session = (await supabase.auth.getSession()).data.session;
@@ -274,9 +277,8 @@ const SyncHealthPanel = () => {
               <p className="text-sm font-medium text-destructive">NWG pieejas atļauja beigusies</p>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              NWG vairs neatzīst mūsu pieslēgšanās atļauju, tāpēc procents stāv uz vietas — jaunas cenas netiek
-              saņemtas. Ielogojies NWG portālā, nokopē jauno pieejas kodu (refresh token) un ievieto to šeit. Pēc
-              saglabāšanas cenu sinhronizācija tiek palaista automātiski.
+              NWG vairs neatzīst saglabāto konta piekļuvi, tāpēc jaunas cenas netiek saņemtas. Atjauno NWG
+              lietotājvārdu un paroli projekta drošajos iestatījumos; pēc tam cenu sinhronizācija atjaunosies automātiski.
             </p>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">
               <Input
