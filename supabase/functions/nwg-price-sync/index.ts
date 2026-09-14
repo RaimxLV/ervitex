@@ -1,6 +1,8 @@
 // NWG contract (purchase) price sync.
 // Uses the NWG commerce API (commerce.gateway.nwg.se) with an OAuth refresh
-// token stored in public.nwg_auth. Only our four partner brands are synced.
+// token stored in public.nwg_auth. Access-token caching plus short database
+// leases prevent concurrent invocations from consuming the same rotating
+// refresh token or starting overlapping full price runs.
 //
 // Modes:
 //   ?mode=seed  (POST { refresh_token }) -> store/replace the refresh token
@@ -18,6 +20,9 @@ const WEBSITE_CATALOG_URL = "https://commerce.gateway.nwg.se/assortment/en/produ
 const CONTEXT_ID = "C58B7BDF-CCA1-4655-8BD2-438E91964DB0";
 const BRANDS = ["Craft", "Clique", "ProJob", "Cutter & Buck"];
 const BLOCKED_PRODUCT_NUMBERS = new Set(["1903482", "1904160"]);
+const AUTH_LEASE_MS = 45_000;
+const PRICE_SYNC_LEASE_MS = 20 * 60_000;
+const ACCESS_TOKEN_SKEW_MS = 60_000;
 
 type WebsiteProduct = {
   productNumber?: string | null;
@@ -111,28 +116,110 @@ async function validateWebsiteCatalog(sb: SupabaseClient) {
   return { checked: productNumbers.length, found: found.size, missing, allowed: found };
 }
 
-async function getAccessToken(sb: SupabaseClient): Promise<string> {
-  const { data, error } = await sb.from("nwg_auth").select("refresh_token").eq("id", 1).maybeSingle();
+type AuthRow = {
+  refresh_token: string | null;
+  access_token: string | null;
+  access_token_expires_at: string | null;
+  refresh_in_progress: boolean;
+  refresh_started_at: string | null;
+};
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const isFuture = (iso: string | null, skewMs = 0) =>
+  Boolean(iso && new Date(iso).getTime() - skewMs > Date.now());
+const leaseIsLive = (startedAt: string | null, ttlMs: number) =>
+  Boolean(startedAt && Date.now() - new Date(startedAt).getTime() < ttlMs);
+
+async function readAuth(sb: SupabaseClient): Promise<AuthRow> {
+  const { data, error } = await sb
+    .from("nwg_auth")
+    .select("refresh_token,access_token,access_token_expires_at,refresh_in_progress,refresh_started_at")
+    .eq("id", 1)
+    .maybeSingle();
   if (error) throw new Error(`nwg_auth read: ${error.message}`);
   if (!data?.refresh_token) throw new Error("No NWG refresh token stored — run mode=seed first");
+  return data as AuthRow;
+}
 
-  const res = await fetch(TOKEN_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "refresh_token",
-      client_id: CLIENT_ID,
-      refresh_token: data.refresh_token,
-    }),
-  });
-  const text = await res.text();
-  if (!res.ok) throw new Error(`NWG token refresh failed [${res.status}]: ${text.slice(0, 200)}`);
-  const json = JSON.parse(text);
-  if (json.refresh_token) {
-    await sb.from("nwg_auth").upsert({ id: 1, refresh_token: json.refresh_token, updated_at: new Date().toISOString() });
+async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise<string> {
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const auth = await readAuth(sb);
+    if (!forceRefresh && auth.access_token && isFuture(auth.access_token_expires_at, ACCESS_TOKEN_SKEW_MS)) {
+      return auth.access_token;
+    }
+
+    if (auth.refresh_in_progress && leaseIsLive(auth.refresh_started_at, AUTH_LEASE_MS)) {
+      await sleep(500);
+      continue;
+    }
+
+    const leaseAt = new Date().toISOString();
+    let claim = sb
+      .from("nwg_auth")
+      .update({ refresh_in_progress: true, refresh_started_at: leaseAt })
+      .eq("id", 1)
+      .eq("refresh_token", auth.refresh_token);
+    if (auth.refresh_started_at) claim = claim.eq("refresh_started_at", auth.refresh_started_at);
+    else claim = claim.is("refresh_started_at", null);
+    const { data: claimed, error: claimError } = await claim.select("refresh_token").maybeSingle();
+    if (claimError) throw new Error(`NWG auth lease: ${claimError.message}`);
+    if (!claimed) {
+      await sleep(300);
+      continue;
+    }
+
+    try {
+      const res = await fetch(TOKEN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          grant_type: "refresh_token",
+          client_id: CLIENT_ID,
+          refresh_token: auth.refresh_token,
+        }),
+      });
+      const text = await res.text();
+      if (!res.ok) throw new Error(`NWG token refresh failed [${res.status}]: ${text.slice(0, 200)}`);
+      const json = JSON.parse(text);
+      if (!json.access_token) throw new Error("NWG token refresh returned no access_token");
+      const expiresIn = Math.max(Number(json.expires_in ?? 300), 60);
+      const { error: saveError } = await sb.from("nwg_auth").update({
+        refresh_token: json.refresh_token || auth.refresh_token,
+        access_token: json.access_token,
+        access_token_expires_at: new Date(Date.now() + expiresIn * 1000).toISOString(),
+        refresh_in_progress: false,
+        refresh_started_at: null,
+        updated_at: new Date().toISOString(),
+      }).eq("id", 1).eq("refresh_started_at", leaseAt);
+      if (saveError) throw new Error(`NWG token save: ${saveError.message}`);
+      return json.access_token as string;
+    } catch (error) {
+      await sb.from("nwg_auth").update({ refresh_in_progress: false, refresh_started_at: null })
+        .eq("id", 1).eq("refresh_started_at", leaseAt);
+      throw error;
+    }
   }
-  if (!json.access_token) throw new Error("NWG token refresh returned no access_token");
-  return json.access_token as string;
+  throw new Error("NWG authorization is busy — retry shortly");
+}
+
+async function claimPriceSync(sb: SupabaseClient): Promise<boolean> {
+  const { data, error } = await sb.from("nwg_auth")
+    .select("price_sync_in_progress,price_sync_started_at").eq("id", 1).maybeSingle();
+  if (error) throw new Error(`NWG sync lease read: ${error.message}`);
+  if (data?.price_sync_in_progress && leaseIsLive(data.price_sync_started_at, PRICE_SYNC_LEASE_MS)) return false;
+  const startedAt = new Date().toISOString();
+  let claim = sb.from("nwg_auth")
+    .update({ price_sync_in_progress: true, price_sync_started_at: startedAt })
+    .eq("id", 1);
+  if (data?.price_sync_started_at) claim = claim.eq("price_sync_started_at", data.price_sync_started_at);
+  else claim = claim.is("price_sync_started_at", null);
+  const { data: claimed, error: claimError } = await claim.select("id").maybeSingle();
+  if (claimError) throw new Error(`NWG sync lease: ${claimError.message}`);
+  return Boolean(claimed);
+}
+
+async function releasePriceSync(sb: SupabaseClient) {
+  await sb.from("nwg_auth").update({ price_sync_in_progress: false, price_sync_started_at: null }).eq("id", 1);
 }
 
 async function fetchPrices(token: string, skus: string[]) {
@@ -200,7 +287,15 @@ Deno.serve(async (req) => {
         });
       }
 
-      const { error } = await sb.from("nwg_auth").upsert({ id: 1, refresh_token: rt, updated_at: new Date().toISOString() });
+      const { error } = await sb.from("nwg_auth").upsert({
+        id: 1,
+        refresh_token: rt,
+        access_token: null,
+        access_token_expires_at: null,
+        refresh_in_progress: false,
+        refresh_started_at: null,
+        updated_at: new Date().toISOString(),
+      });
       if (error) throw new Error(error.message);
       // Validate immediately.
       const token = await getAccessToken(sb);
@@ -224,6 +319,8 @@ Deno.serve(async (req) => {
     const background = url.searchParams.get("background") !== "0";
 
     const work = async () => {
+      const claimed = await claimPriceSync(sb);
+      if (!claimed) return { skipped: true, reason: "NWG price sync already running" };
       const logId = await startLog(sb, "nwg:prices");
       try {
         // The customer-facing NWG website is the source of truth for whether a
@@ -265,6 +362,13 @@ Deno.serve(async (req) => {
         let rejected = 0;
         const now = new Date().toISOString();
         let token = await getAccessToken(sb);
+        let sharedRefresh: Promise<string> | null = null;
+        const refreshTokenOnce = async () => {
+          if (!sharedRefresh) {
+            sharedRefresh = getAccessToken(sb, true).finally(() => { sharedRefresh = null; });
+          }
+          return await sharedRefresh;
+        };
 
         const processSlice = async (slice: string[]) => {
           let rows: Array<{ sku: string; num: number | null; valid: boolean }>;
@@ -273,7 +377,7 @@ Deno.serve(async (req) => {
           } catch (e) {
             const msg = (e as Error).message;
             if (msg.includes("[401]")) {
-              token = await getAccessToken(sb);
+              token = await refreshTokenOnce();
               rows = await fetchPrices(token, slice);
             } else {
               console.error(msg);
@@ -391,21 +495,18 @@ Deno.serve(async (req) => {
         });
 
         // Self-chain so the whole assortment is covered across invocations.
+        await releasePriceSync(sb);
         if (more && chain) {
-          const next = `${supabaseUrl}/functions/v1/nwg-price-sync?limit=${limit}&batch=${batchSize}&onlyMissing=${onlyMissing ? "1" : "0"}`;
-          fetch(next, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${serviceRoleKey}`,
-            },
-          }).catch((e) => console.error(`chain: ${(e as Error).message}`));
+          const qs = `?limit=${limit}&batch=${batchSize}&onlyMissing=${onlyMissing ? "1" : "0"}`;
+          const { error: chainError } = await sb.rpc("invoke_sync_function", { fn: "nwg-price-sync", qs });
+          if (chainError) console.error(`chain: ${chainError.message}`);
         }
         return result;
       } catch (e) {
         const msg = (e as Error).message;
         console.error(msg);
         await finishLog(sb, logId, { status: "error", message: msg });
+        await releasePriceSync(sb);
         throw e;
       }
     };
