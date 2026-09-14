@@ -4,3 +4,4 @@
 - [x] Aiz teksta ievietot jauno ainu ar jaudīgu peles lukturi.
 - [x] Pievienot bojātu lampu mirgošanu un retas elektriskās dzirksteles.
 - [x] Pārbaudīt izskatu datorā un telefonā.
+- [x] Pievienot vieglu fona parallax kustību, platāku lukturi un caurspīdīgākus teksta laukumus.
