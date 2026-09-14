@@ -22,7 +22,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       const viewportHeight = window.innerHeight;
       const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
       const clamped = Math.min(1, Math.max(0, progress));
-      scene.style.setProperty("--scene-scroll-y", `${(clamped - 0.5) * 96}px`);
+      scene.style.setProperty("--scene-scroll-y", `${(clamped - 0.5) * 220}px`);
     };
 
     const requestParallax = () => {
@@ -49,15 +49,10 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
     const { left, top } = scene.getBoundingClientRect();
     const x = event.clientX - left;
     const y = event.clientY - top;
-    const shiftX = (x / scene.clientWidth - 0.5) * -44;
-    const shiftY = (y / scene.clientHeight - 0.5) * -28;
-
     if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
     frameRef.current = requestAnimationFrame(() => {
       scene.style.setProperty("--flashlight-x", `${x}px`);
       scene.style.setProperty("--flashlight-y", `${y}px`);
-      scene.style.setProperty("--scene-shift-x", `${shiftX}px`);
-      scene.style.setProperty("--scene-shift-y", `${shiftY}px`);
       scene.dataset.lightActive = "true";
     });
   };

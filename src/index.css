@@ -109,15 +109,13 @@
   .abandoned-story-scene {
     --flashlight-x: 64%;
     --flashlight-y: 24rem;
-    --scene-shift-x: 0px;
-    --scene-shift-y: 0px;
     --scene-scroll-y: 0px;
     cursor: crosshair;
   }
 
   .abandoned-scene-image {
-    transform: translate3d(var(--scene-shift-x), calc(var(--scene-shift-y) + var(--scene-scroll-y)), 0) scale(1.09);
-    transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform: translate3d(0, var(--scene-scroll-y), 0) scale(1.16);
+    transition: transform 120ms linear;
     will-change: transform;
   }
 
@@ -352,7 +350,7 @@
   }
 
   .abandoned-scene-image {
-    transform: translate3d(0, var(--scene-scroll-y), 0) scale(1.09);
+    transform: translate3d(0, var(--scene-scroll-y), 0) scale(1.16);
   }
 
   .abandoned-flashlight {
