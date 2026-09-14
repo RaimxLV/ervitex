@@ -77,23 +77,29 @@ export const translations = {
   },
   "about.storyTitle": { lv: "Mūsu stāsts", en: "Our Story" },
   "about.story1": {
-    lv: `Divas desmitgades tekstila un apdrukas industrijas virsotnē
+    lv: `DIVAS DESMITGADES TEKSTILA UN APDRUKAS INDUSTRIJAS VIRSNĒ
 
-Pirms vairāk nekā 20 gadiem mēs uzsākām savu ceļu ar skaidru vīziju — nodrošināt Latvijas uzņēmumiem augstākās klases reklāmas un korporatīvo apģērbu. Šo divu gadu desmitu laikā Ervitex ir izaudzis no ambicioza projekta par vienu no vadošajiem un uzticamākajiem nozares līderiem, apvienojot liela mēroga apģērbu vairumtirdzniecību ar modernāko industriālās apdrukas servisu.
+Pirms vairāk nekā 20 gadiem mēs uzsākām savu ceļu ar skaidru vīziju — nodrošināt Latvijas uzņēmumiem augstākās klases reklāmas un korporatīvo apģērbu.
 
-Pieredze, kas pārtop stabilitātē
+Šo divu gadu desmitu laikā Ervitex ir izaudzis no ambicioza projekta par vienu no vadošajiem un uzticamākajiem nozares spēlētājiem, apvienojot liela mēroga apģērbu vairumtirdzniecību ar modernāko industriālās apdrukas servisu.
 
-Mūsu ilgstošā klātbūtne tirgū ir uzņēmuma augstākā kvalitātes zīme. Esam piedzīvojuši nozares evolūciju, padziļināti izpētījuši neskaitāmus tekstila materiālus un noslīpējuši ražošanas procesus līdz pilnībai. Uzkrātā ekspertīze ļauj mums piedāvāt partneriem to, kas biznesā ir vissvarīgākais — absolūtu stabilitāti un prognozējamību ilgtermiņā. Mūsu klienti zina, ka mēs esam uzticama aizmugure, kas nekad nepieviļ — ne kvalitātes, ne izpildes termiņu ziņā.
+20+ gadu pieredze | Pārbaudīta stabilitāte un nozares ekspertīze kopš pirmsākumiem
 
-Pasaules klases materiāli un rūpnieciskā jauda
+Pasaules klases tekstils | Tieša sadarbība tikai ar vadošajiem apģērbu ražotājiem
 
-Mēs nestāvam uz vietas un mērķtiecīgi investējam attīstībā. Lai garantētu nevainojamu rezultātu, Ervitex šodien sadarbojas tikai ar pasaulē vadošajiem tekstila ražotājiem.
+Rūpnieciskā jauda | Jaunākās paaudzes automatizētas iekārtas lieliem sērijveida pasūtījumiem
 
-Mūsu ražotne ir aprīkota ar jaunākās paaudzes automatizētajām iekārtām, kas nodrošina augstu ražošanas jaudu un spēj operatīvi izpildīt pat ļoti liela apjoma un augstas sarežģītības sērijveida pasūtījumus. Tekstila apdrukas procesos izmantojam tikai sertificētas industriālās krāsas. Tas garantē ne vien izcilu drukas spilgtumu un noturību, bet arī pilnīgu atbilstību augstākajiem drošības un vides standartiem.
+Drošība un ekoloģija | Sertificētas industriālās krāsas ar maksimālu drukas noturību
 
-Jūsu stratēģiskais partneris
+Pieredze, kas pārtop stabilitātē Mūsu ilgā vēsture tirgū ir mūsu lielākā kvalitātes zīme. Mēs esam piedzīvojuši nozares evolūciju, izpētījuši neskaitāmus materiālus un noslīpējuši savus procesus līdz pilnībai. Šī uzkrātā ekspertīze ļauj mums piedāvāt saviem partneriem to, kas biznesā ir vissvarīgākais — absolūtu stabilitāti un prognozējamību ilgtermiņā.
 
-Ervitex nav vienkārši apģērbu piegādātājs. Mēs esam stratēģisks ilgtermiņa partneris, kurš palīdz attīstīt jūsu biznesu, stiprināt zīmola identitāti un realizēt pat visizaicinošākos projektus ar vieglumu un pārliecību.`,
+Mūsu klienti zina, ka mēs esam droša aizmugure, kas nekad nepievils — ne kvalitātes, ne termiņu ziņā.
+
+Pasaules klases materiāli un rūpnieciskā jauda Mēs nestāvam uz vietas un pastāvīgi investējam nākotnē. Lai nodrošinātu nevainojamu rezultātu, Ervitex šodien strādā tikai ar pasaules vadošajiem tekstila ražotājiem.
+
+Mūsu ražotne ir aprīkota ar jaunākās paaudzes automatizētajām iekārtām, kas nodrošina milzīgu ražošanas jaudu un spēj operatīvi apkalpot pat ļoti liela apjoma un sarežģītības sērijveida pasūtījumus. Apdrukas procesos mēs izmantojam tikai sertificētas industriālās krāsas. Tas garantē ne vien izcilu attēla spilgtumu un ilgmūžību, bet arī atbilstību augstākajiem drošības un vides standartiem.
+
+JŪSU STRATĒĢISKAIS PARTNERIS Ervitex nav vienkārši apģērbu piegādātājs. Mēs esam ilgtermiņa partneris, kurš palīdz augt jūsu biznesam, stiprināt jūsu zīmola identitāti un realizēt pat visizaicinošākos projektus ar vieglumu un pārliecību.`,
     en: "Founded in 2003 in Riga, Ervitex set out with a clear mission: to give businesses access to premium apparel at competitive wholesale prices.",
   },
   "about.story2": {
