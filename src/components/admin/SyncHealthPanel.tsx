@@ -122,7 +122,7 @@ const SyncHealthPanel = () => {
   );
 
   const nwgPriceLog = useMemo(() => logs.find((l) => l.source === "nwg:prices"), [logs]);
-  const tokenExpired = !!nwgPriceLog?.message?.includes("automatic login failed");
+  const tokenExpired = !!nwgPriceLog?.message?.includes("invalid_grant");
 
   const callFn = async (fn: string, query = "", body?: unknown) => {
     const session = (await supabase.auth.getSession()).data.session;
@@ -277,8 +277,8 @@ const SyncHealthPanel = () => {
               <p className="text-sm font-medium text-destructive">NWG pieejas atļauja beigusies</p>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              NWG vairs neatzīst saglabāto konta piekļuvi, tāpēc jaunas cenas netiek saņemtas. Atjauno NWG
-              lietotājvārdu un paroli projekta drošajos iestatījumos; pēc tam cenu sinhronizācija atjaunosies automātiski.
+              NWG portāla sesija jāatjauno vienu reizi. Pēc tam sistēma glabās īslaicīgo piekļuvi un neļaus
+              vienlaicīgiem atjauninājumiem to savstarpēji sabojāt.
             </p>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">
               <Input
