@@ -86,6 +86,67 @@ const ContactPage = () => {
         eyebrow={lang === "lv" ? "Sāksim sarunu" : "Start a conversation"}
       />
 
+      {/* Specialists Section — single container animation */}
+      <section className="bg-muted py-16 md:py-24">
+        <div className="container">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="h-px w-12 bg-accent" />
+              <span className="font-heading text-[10px] font-bold uppercase text-accent">
+                {lang === "lv" ? "Komanda" : "Team"}
+              </span>
+              <div className="h-px w-12 bg-accent" />
+            </div>
+            <h2 className="font-heading text-2xl font-bold uppercase text-foreground">{t("contact.specialistsTitle")}</h2>
+            <p className="mt-3 text-muted-foreground">{t("team.subtitle")}</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          >
+            {specialists.map((member, i) => (
+              <div
+                key={i}
+                className="group relative overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5"
+              >
+                <div className="absolute top-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
+
+                <div
+                  className={`relative aspect-[4/3] w-full overflow-hidden bg-muted ${member.photo ? "cursor-pointer" : ""}`}
+                  onClick={() => member.photo && setLightboxImg(member.photo)}
+                >
+                  {member.photo ? (
+                    <img src={member.photo} alt={member.name} className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-accent/5 text-accent font-heading text-3xl font-bold">
+                      {member.name.split(" ").map((n) => n[0]).join("")}
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                </div>
+
+                <div className="relative -mt-4 mx-4 mb-4 bg-card/95 backdrop-blur-sm p-4 shadow-sm border border-border/50">
+                  <h3 className="font-heading text-sm font-bold uppercase text-foreground">{member.name}</h3>
+                  <p className="text-xs text-accent font-medium mt-0.5">{member.title[lang]}</p>
+                  <div className="mt-3 space-y-1.5 border-t border-border pt-3">
+                    <a href={`mailto:${member.email}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
+                      <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={1.2} /> {member.email}
+                    </a>
+                    <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors">
+                      <Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={1.2} /> {member.phoneLabel[lang]}: {member.phone}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       {/* General Office Info + Form */}
       <section className="container py-16 md:py-24">
         <div className="grid gap-12 lg:grid-cols-5">
@@ -188,67 +249,6 @@ const ContactPage = () => {
               <HausmanaKvartalsMap />
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Specialists Section — single container animation */}
-      <section className="bg-muted py-16 md:py-24">
-        <div className="container">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="h-px w-12 bg-accent" />
-              <span className="font-heading text-[10px] font-bold uppercase text-accent">
-                {lang === "lv" ? "Komanda" : "Team"}
-              </span>
-              <div className="h-px w-12 bg-accent" />
-            </div>
-            <h2 className="font-heading text-2xl font-bold uppercase text-foreground">{t("contact.specialistsTitle")}</h2>
-            <p className="mt-3 text-muted-foreground">{t("team.subtitle")}</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-          >
-            {specialists.map((member, i) => (
-              <div
-                key={i}
-                className="group relative overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5"
-              >
-                <div className="absolute top-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
-
-                <div
-                  className={`relative aspect-[4/3] w-full overflow-hidden bg-muted ${member.photo ? "cursor-pointer" : ""}`}
-                  onClick={() => member.photo && setLightboxImg(member.photo)}
-                >
-                  {member.photo ? (
-                    <img src={member.photo} alt={member.name} className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-accent/5 text-accent font-heading text-3xl font-bold">
-                      {member.name.split(" ").map((n) => n[0]).join("")}
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                </div>
-
-                <div className="relative -mt-4 mx-4 mb-4 bg-card/95 backdrop-blur-sm p-4 shadow-sm border border-border/50">
-                  <h3 className="font-heading text-sm font-bold uppercase text-foreground">{member.name}</h3>
-                  <p className="text-xs text-accent font-medium mt-0.5">{member.title[lang]}</p>
-                  <div className="mt-3 space-y-1.5 border-t border-border pt-3">
-                    <a href={`mailto:${member.email}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
-                      <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={1.2} /> {member.email}
-                    </a>
-                    <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors">
-                      <Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={1.2} /> {member.phoneLabel[lang]}: {member.phone}
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </motion.div>
         </div>
       </section>
 
