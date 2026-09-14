@@ -29,12 +29,15 @@ const AboutPage = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="font-heading text-2xl font-bold uppercase text-foreground">{t("about.storyTitle")}</h2>
-            <div className="mt-6 space-y-4 text-muted-foreground leading-relaxed">
-              <p>{t("about.story1")}</p>
+            <p className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
+              {t("about.storyKicker")}
+            </p>
+            <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:text-3xl [text-wrap:balance]">
+              {t("about.storyHeadline")}
+            </h2>
+            <div className="mt-6 max-w-prose space-y-4 leading-relaxed text-muted-foreground [text-wrap:pretty]">
+              <p className="text-lg text-foreground/80">{t("about.story1")}</p>
               <p>{t("about.story2")}</p>
-              <p>{t("about.story3")}</p>
-              <p className="font-medium text-foreground/80">{"\n"}</p>
             </div>
           </motion.div>
           <motion.div
@@ -48,7 +51,73 @@ const AboutPage = () => {
             <div className="absolute bottom-0 left-0 h-1 w-full bg-accent" />
           </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mt-16 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-2 lg:grid-cols-4"
+        >
+          {[
+            { title: t("about.highlight1Title"), desc: t("about.highlight1Desc") },
+            { title: t("about.highlight2Title"), desc: t("about.highlight2Desc") },
+            { title: t("about.highlight3Title"), desc: t("about.highlight3Desc") },
+            { title: t("about.highlight4Title"), desc: t("about.highlight4Desc") },
+          ].map((item, i) => (
+            <div key={i} className="bg-background p-6">
+              <div className="h-1 w-8 bg-accent" />
+              <h3 className="mt-4 font-heading text-sm font-bold uppercase text-foreground [text-wrap:balance]">
+                {item.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground [text-wrap:pretty]">{item.desc}</p>
+            </div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mt-16 grid gap-12 md:grid-cols-2"
+        >
+          <article>
+            <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
+              {t("about.blockStabilityTitle")}
+            </h3>
+            <div className="mt-4 space-y-4 max-w-prose leading-relaxed text-muted-foreground [text-wrap:pretty]">
+              <p>{t("about.blockStabilityBody1")}</p>
+              <p>{t("about.blockStabilityBody2")}</p>
+            </div>
+          </article>
+          <article>
+            <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
+              {t("about.blockCapacityTitle")}
+            </h3>
+            <div className="mt-4 space-y-4 max-w-prose leading-relaxed text-muted-foreground [text-wrap:pretty]">
+              <p>{t("about.blockCapacityBody1")}</p>
+              <p>{t("about.blockCapacityBody2")}</p>
+            </div>
+          </article>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mt-16 border-l-4 border-accent bg-muted p-8 md:p-10"
+        >
+          <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
+            {t("about.blockPartnerTitle")}
+          </h3>
+          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-foreground/80 [text-wrap:pretty]">
+            {t("about.story3")}
+          </p>
+        </motion.div>
       </section>
+
 
       <section className="bg-muted py-16 md:py-24">
         <div className="container">
