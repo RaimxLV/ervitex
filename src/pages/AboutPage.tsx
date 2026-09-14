@@ -53,7 +53,7 @@ const AboutPage = () => {
             { title: t("about.highlight3Title"), desc: t("about.highlight3Desc") },
             { title: t("about.highlight4Title"), desc: t("about.highlight4Desc") },
           ].map((item, i) => (
-            <div key={i} className="bg-primary/80 p-6">
+            <div key={i} className="bg-primary/55 p-6 backdrop-blur-[2px]">
               <div className="h-1 w-8 bg-accent" />
               <h3 className="mt-4 font-heading text-sm font-bold uppercase text-primary-foreground [text-wrap:balance]">
                 {item.title}
@@ -95,7 +95,7 @@ const AboutPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-16 border-l-4 border-accent bg-primary/85 p-8 backdrop-blur-sm md:p-10"
+          className="mt-16 border-l-4 border-accent bg-primary/55 p-8 backdrop-blur-[2px] md:p-10"
         >
           <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
             {t("about.blockPartnerTitle")}

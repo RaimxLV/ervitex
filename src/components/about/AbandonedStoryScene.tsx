@@ -18,11 +18,15 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
     const { left, top } = scene.getBoundingClientRect();
     const x = event.clientX - left;
     const y = event.clientY - top;
+    const shiftX = (x / scene.clientWidth - 0.5) * -14;
+    const shiftY = (y / scene.clientHeight - 0.5) * -10;
 
     if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
     frameRef.current = requestAnimationFrame(() => {
       scene.style.setProperty("--flashlight-x", `${x}px`);
       scene.style.setProperty("--flashlight-y", `${y}px`);
+      scene.style.setProperty("--scene-shift-x", `${shiftX}px`);
+      scene.style.setProperty("--scene-shift-y", `${shiftY}px`);
       scene.dataset.lightActive = "true";
     });
   };
@@ -42,7 +46,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       <img
         src={abandonedStore}
         alt="Pamesta Ervitex apģērbu ekspozīcija naktī"
-        className="absolute inset-0 -z-30 h-full w-full object-cover object-center"
+        className="abandoned-scene-image absolute -inset-4 -z-30 h-[calc(100%+2rem)] w-[calc(100%+2rem)] object-cover object-center"
         loading="eager"
         decoding="async"
       />
@@ -54,7 +58,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
         <img
           src={abandonedStore}
           alt=""
-          className="h-full w-full object-cover object-center"
+          className="abandoned-scene-image h-full w-full scale-[1.025] object-cover object-center"
           aria-hidden="true"
         />
       </div>

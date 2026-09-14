@@ -109,14 +109,22 @@
   .abandoned-story-scene {
     --flashlight-x: 64%;
     --flashlight-y: 24rem;
+    --scene-shift-x: 0px;
+    --scene-shift-y: 0px;
     cursor: crosshair;
+  }
+
+  .abandoned-scene-image {
+    transform: translate3d(var(--scene-shift-x), var(--scene-shift-y), 0) scale(1.025);
+    transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
   }
 
   .abandoned-flashlight {
     filter: brightness(1.65) contrast(1.08) saturate(0.78);
     opacity: 0.24;
-    mask-image: radial-gradient(circle 360px at var(--flashlight-x) var(--flashlight-y), black 0%, black 27%, rgb(0 0 0 / 0.82) 48%, transparent 78%);
-    -webkit-mask-image: radial-gradient(circle 360px at var(--flashlight-x) var(--flashlight-y), black 0%, black 27%, rgb(0 0 0 / 0.82) 48%, transparent 78%);
+    mask-image: radial-gradient(circle 470px at var(--flashlight-x) var(--flashlight-y), black 0%, black 25%, rgb(0 0 0 / 0.82) 50%, transparent 82%);
+    -webkit-mask-image: radial-gradient(circle 470px at var(--flashlight-x) var(--flashlight-y), black 0%, black 25%, rgb(0 0 0 / 0.82) 50%, transparent 82%);
     transition: opacity 350ms ease;
     will-change: mask-position, opacity;
   }
@@ -127,7 +135,7 @@
 
   .abandoned-flashlight-beam {
     opacity: 0.12;
-    background: radial-gradient(circle 165px at var(--flashlight-x) var(--flashlight-y), hsl(var(--primary-foreground) / 0.52), hsl(var(--primary-foreground) / 0.14) 40%, transparent 72%);
+    background: radial-gradient(circle 230px at var(--flashlight-x) var(--flashlight-y), hsl(var(--primary-foreground) / 0.46), hsl(var(--primary-foreground) / 0.12) 42%, transparent 76%);
     mix-blend-mode: screen;
     transition: opacity 350ms ease;
     will-change: background;
@@ -344,8 +352,8 @@
 
   .abandoned-flashlight {
     opacity: 0.72;
-    mask-image: radial-gradient(circle 270px at 72% 18rem, black 0%, black 26%, rgb(0 0 0 / 0.8) 48%, transparent 78%);
-    -webkit-mask-image: radial-gradient(circle 270px at 72% 18rem, black 0%, black 26%, rgb(0 0 0 / 0.8) 48%, transparent 78%);
+    mask-image: radial-gradient(circle 340px at 72% 18rem, black 0%, black 25%, rgb(0 0 0 / 0.8) 50%, transparent 82%);
+    -webkit-mask-image: radial-gradient(circle 340px at 72% 18rem, black 0%, black 25%, rgb(0 0 0 / 0.8) 50%, transparent 82%);
   }
 
   .abandoned-flashlight-beam {
@@ -359,6 +367,11 @@
   .abandoned-spark,
   .abandoned-drip {
     animation: none;
+  }
+
+  .abandoned-scene-image {
+    transform: none;
+    transition: none;
   }
 
   .abandoned-drip {
