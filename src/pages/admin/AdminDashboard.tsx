@@ -30,6 +30,7 @@ const SOURCE_LABELS: Record<string, string> = {
   mf: "Malfini",
   ru: "Russell Europe",
 };
+const STUCK_MS = 30 * 60 * 1000;
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({ quotes: 0, newQuotes: 0, offers: 0, sentOffers: 0 });
@@ -145,7 +146,14 @@ const AdminDashboard = () => {
                 <tr><td colSpan={5} className="px-2 py-6 text-center text-muted-foreground">Nav datu</td></tr>
               ) : (
                 sources.map((s) => {
-                  const log = syncLogs.find((l) => l.source.startsWith(s.source) || (s.source === "ss" && l.source.startsWith("stanley-stella")));
+                  const log = syncLogs.find((l) =>
+                    s.source === "ss"
+                      ? l.source.startsWith("stanley-stella")
+                      : s.source === "nwg"
+                        ? l.source === "nwg" || l.source === "nwg:all" || l.source === "nwg:styles" || l.source === "nwg:assortments"
+                        : l.source.startsWith(s.source),
+                  );
+                  const stuck = log?.status === "running" && Date.now() - new Date(log.started_at).getTime() > STUCK_MS;
                   return (
                     <tr key={s.source} className="border-t border-border">
                       <td className="px-2 py-2 font-medium text-foreground">{SOURCE_LABELS[s.source] ?? s.source}</td>
@@ -157,10 +165,12 @@ const AdminDashboard = () => {
                       <td className="px-2 py-2 text-xs text-muted-foreground">
                         {log ? (
                           <span className="inline-flex items-center gap-1.5">
-                            {log.status === "error" ? (
+                            {log.status === "error" || stuck ? (
                               <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-destructive" />
-                            ) : (
+                            ) : log.status === "success" ? (
                               <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-accent" />
+                            ) : (
+                              <RefreshCw className="h-3.5 w-3.5 shrink-0 animate-spin text-muted-foreground" />
                             )}
                             {new Date(log.finished_at ?? log.started_at).toLocaleString("lv-LV")}
                           </span>

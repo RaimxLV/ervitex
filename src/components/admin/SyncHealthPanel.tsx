@@ -108,7 +108,10 @@ const SyncHealthPanel = () => {
   const suppliers = useMemo<SupplierState[]>(
     () =>
       SUPPLIERS.map((s) => {
-        const rows = logs.filter((l) => l.source.split(":")[0] === s.key);
+        const rows = logs.filter((l) => {
+          if (s.key === "nwg") return l.source === "nwg" || l.source === "nwg:all" || l.source === "nwg:styles" || l.source === "nwg:assortments";
+          return l.source === s.key || l.source.startsWith(`${s.key}:`);
+        });
         return {
           ...s,
           latest: rows[0],
@@ -274,9 +277,8 @@ const SyncHealthPanel = () => {
               <p className="text-sm font-medium text-destructive">NWG pieejas atļauja beigusies</p>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              NWG vairs neatzīst mūsu pieslēgšanās atļauju, tāpēc procents stāv uz vietas — jaunas cenas netiek
-              saņemtas. Ielogojies NWG portālā, nokopē jauno pieejas kodu (refresh token) un ievieto to šeit. Pēc
-              saglabāšanas cenu sinhronizācija tiek palaista automātiski.
+              NWG portāla sesija jāatjauno vienu reizi. Pēc tam sistēma glabās īslaicīgo piekļuvi un neļaus
+              vienlaicīgiem atjauninājumiem to savstarpēji sabojāt.
             </p>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">
               <Input
