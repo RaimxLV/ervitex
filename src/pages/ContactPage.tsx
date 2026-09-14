@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
+import PageIntro from "@/components/PageIntro";
 import { useLanguage } from "@/i18n/LanguageContext";
 import GoogleMapEmbed from "@/components/GoogleMapEmbed";
 import HausmanaKvartalsMap from "@/components/HausmanaKvartalsMap";
@@ -79,15 +80,11 @@ const ContactPage = () => {
 
   return (
     <Layout>
-      <section className="bg-primary py-16 text-primary-foreground md:py-24">
-        <div className="container">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <h1 className="font-heading text-3xl font-bold uppercase md:text-5xl">{t("contact.title")}</h1>
-            <p className="mt-4 max-w-lg text-lg text-primary-foreground/60">{t("contact.subtitle")}</p>
-          </motion.div>
-        </div>
-        <div className="mt-0 h-1 bg-accent" />
-      </section>
+      <PageIntro
+        title={t("contact.title")}
+        subtitle={t("contact.subtitle")}
+        eyebrow={lang === "lv" ? "Sāksim sarunu" : "Start a conversation"}
+      />
 
       {/* General Office Info + Form */}
       <section className="container py-16 md:py-24">
