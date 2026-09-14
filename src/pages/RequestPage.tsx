@@ -173,8 +173,7 @@ const RequestPage = () => {
         eyebrow={t("Pasūtījuma sagatavošana", "Preparing your order")}
       />
       <div className="container mx-auto max-w-5xl px-4 py-10 sm:py-16">
-        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-          <div />
+        <div className="mb-8 flex flex-wrap items-start justify-end gap-4">
           <div className="flex flex-wrap gap-2">
             {isAdmin && items.length > 0 && (
               <Button
