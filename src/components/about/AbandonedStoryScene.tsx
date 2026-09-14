@@ -64,7 +64,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
   return (
     <section
       ref={sceneRef}
-      className="abandoned-story-scene relative isolate overflow-hidden"
+      className="abandoned-story-scene relative isolate min-h-screen w-full overflow-hidden"
       onPointerMove={updateLight}
       onPointerEnter={updateLight}
       onPointerLeave={dimLight}
@@ -72,11 +72,11 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       <img
         src={abandonedStoreAsset.url}
         alt="Pamesta Ervitex apģērbu ekspozīcija naktī"
-        className="abandoned-scene-image absolute -inset-[12%] -z-30 h-[124%] w-[124%] object-cover object-center"
+        className="abandoned-scene-image absolute inset-x-0 -inset-y-28 -z-30 h-[calc(100%+14rem)] w-full object-cover object-center"
         loading="eager"
         decoding="async"
       />
-      <div className="absolute inset-0 -z-20 bg-primary/85" />
+      <div className="absolute inset-0 -z-20 bg-primary/65" />
       <div className="abandoned-lamp abandoned-lamp-a absolute -z-10" aria-hidden="true" />
       <div className="abandoned-lamp abandoned-lamp-b absolute -z-10" aria-hidden="true" />
       <div className="abandoned-lamp abandoned-lamp-c absolute -z-10" aria-hidden="true" />
@@ -84,7 +84,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
         <img
           src={abandonedStoreAsset.url}
           alt=""
-          className="abandoned-scene-image absolute -inset-[12%] h-[124%] w-[124%] object-cover object-center"
+          className="abandoned-scene-image absolute inset-x-0 -inset-y-28 h-[calc(100%+14rem)] w-full object-cover object-center"
           aria-hidden="true"
         />
       </div>
