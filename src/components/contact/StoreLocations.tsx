@@ -68,7 +68,7 @@ const StoreLocations = () => {
         </motion.div>
 
         {/* Store cards grid */}
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {stores.map((store, i) => (
             <motion.div
               key={i}
@@ -78,7 +78,7 @@ const StoreLocations = () => {
               transition={{ duration: 0.4, delay: i * 0.08 }}
               className="group overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5"
             >
-              <div className="aspect-[16/10] overflow-hidden bg-muted">
+              <div className="aspect-[4/3] overflow-hidden bg-muted">
                 <img
                   src={store.image}
                   alt={`${store.name} T-Bode veikals`}
@@ -86,32 +86,32 @@ const StoreLocations = () => {
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                 />
               </div>
-              <div className="p-5">
-                <div className="mb-4 flex items-center gap-2">
-                  <StoreIcon className="h-4 w-4 text-accent" strokeWidth={1.5} />
-                  <h3 className="font-heading text-sm font-bold uppercase text-foreground">
+              <div className="p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <StoreIcon className="h-3.5 w-3.5 text-accent" strokeWidth={1.5} />
+                  <h3 className="font-heading text-xs font-bold uppercase text-foreground">
                     {store.name}
                   </h3>
                 </div>
-                <div className="space-y-3">
-                <div className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground/60" strokeWidth={1.5} />
-                  <span>{store.address}</span>
-                </div>
-                <a
-                  href={`mailto:${store.email}`}
-                  className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
-                >
-                  <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
-                  {store.email}
-                </a>
-                <a
-                  href={`tel:${store.phone.replace(/\s/g, "")}`}
-                  className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors"
-                >
-                  <Phone className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
-                  {store.phone}
-                </a>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2 text-[11px] leading-relaxed text-muted-foreground">
+                    <MapPin className="h-3 w-3 shrink-0 mt-0.5 text-muted-foreground/60" strokeWidth={1.5} />
+                    <span>{store.address}</span>
+                  </div>
+                  <a
+                    href={`mailto:${store.email}`}
+                    className="flex items-center gap-2 text-[11px] text-muted-foreground hover:text-accent transition-colors"
+                  >
+                    <Mail className="h-3 w-3 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
+                    {store.email}
+                  </a>
+                  <a
+                    href={`tel:${store.phone.replace(/\s/g, "")}`}
+                    className="flex items-center gap-2 text-[11px] text-muted-foreground hover:text-accent transition-colors"
+                  >
+                    <Phone className="h-3 w-3 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
+                    {store.phone}
+                  </a>
                 </div>
               </div>
             </motion.div>
