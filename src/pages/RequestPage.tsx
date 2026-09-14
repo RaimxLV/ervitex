@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import PageIntro from "@/components/PageIntro";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -163,16 +164,17 @@ const RequestPage = () => {
 
   return (
     <Layout>
+      <PageIntro
+        title={t("Mans pieprasījums", "My request")}
+        subtitle={t(
+          "Pārbaudi preces un nosūti pieprasījumu — mēs sazināsimies tuvākajā laikā.",
+          "Review items and send the request — we'll get back to you shortly.",
+        )}
+        eyebrow={t("Pasūtījuma sagatavošana", "Preparing your order")}
+      />
       <div className="container mx-auto max-w-5xl px-4 py-10 sm:py-16">
         <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="font-heading text-3xl sm:text-4xl font-black uppercase tracking-tight">
-              {t("Mans pieprasījums", "My request")}
-            </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {t("Pārbaudi preces un nosūti pieprasījumu — mēs sazināsimies tuvākajā laikā.", "Review items and send the request — we'll get back to you shortly.")}
-            </p>
-          </div>
+          <div />
           <div className="flex flex-wrap gap-2">
             {isAdmin && items.length > 0 && (
               <Button
