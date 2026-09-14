@@ -64,7 +64,7 @@ const StoreLocations = () => {
         </motion.div>
 
         {/* Store cards grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           {stores.map((store, i) => (
             <motion.div
               key={i}
