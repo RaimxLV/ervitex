@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
 import { MapPin, Mail, Phone, Store as StoreIcon } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
-import origoAsset from "@/assets/stores/Origo.jpg.asset.json";
-import dominaAsset from "@/assets/stores/Domina.jpg.asset.json";
-import alfaAsset from "@/assets/stores/Alfa.jpg.asset.json";
-import acropoleAsset from "@/assets/stores/Acropole.jpg.asset.json";
+import origoPhoto from "@/assets/stores/Origo.jpg";
+import dominaPhoto from "@/assets/stores/Domina.jpg";
+import alfaPhoto from "@/assets/stores/Alfa.jpg";
+import acropolePhoto from "@/assets/stores/Acropole.jpg";
 
 const stores = [
   {
@@ -12,28 +12,28 @@ const stores = [
     address: "Stacijas laukums 2, Rīga LV-1050",
     email: "origo@t-bode.lv",
     phone: "+371 28603383",
-    image: origoAsset.url,
+    image: origoPhoto,
   },
   {
     name: "T/C DOMINA",
     address: "Ieriķu iela 3, Rīga LV-1084",
     email: "domina@t-bode.lv",
     phone: "+371 67130030",
-    image: dominaAsset.url,
+    image: dominaPhoto,
   },
   {
     name: "AKROPOLE RĪGA | ALFA",
     address: "Brīvības gatve 372, Rīga LV-1006",
     email: "alfa@t-bode.lv",
     phone: "+371 25486124",
-    image: alfaAsset.url,
+    image: alfaPhoto,
   },
   {
     name: "T/C AKROPOLE",
     address: "Maskavas iela 257, Rīga LV-1019",
     email: "akropole@t-bode.lv",
     phone: "+371 20219844",
-    image: acropoleAsset.url,
+    image: acropolePhoto,
   },
 ];
 
