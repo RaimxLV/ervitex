@@ -720,17 +720,35 @@ export type Database = {
       }
       nwg_auth: {
         Row: {
+          access_token: string | null
+          access_token_expires_at: string | null
           id: number
+          price_sync_in_progress: boolean
+          price_sync_started_at: string | null
+          refresh_in_progress: boolean
+          refresh_started_at: string | null
           refresh_token: string
           updated_at: string
         }
         Insert: {
+          access_token?: string | null
+          access_token_expires_at?: string | null
           id?: number
+          price_sync_in_progress?: boolean
+          price_sync_started_at?: string | null
+          refresh_in_progress?: boolean
+          refresh_started_at?: string | null
           refresh_token: string
           updated_at?: string
         }
         Update: {
+          access_token?: string | null
+          access_token_expires_at?: string | null
           id?: number
+          price_sync_in_progress?: boolean
+          price_sync_started_at?: string | null
+          refresh_in_progress?: boolean
+          refresh_started_at?: string | null
           refresh_token?: string
           updated_at?: string
         }
