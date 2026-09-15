@@ -61,6 +61,9 @@ const loadImage = (src: string) => new Promise<HTMLImageElement>((resolve, rejec
   image.src = src;
 });
 
+const EASING = 0.11;
+const SETTLED_THRESHOLD = 0.00008;
+
 const DepthMapScene = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -89,9 +92,11 @@ const DepthMapScene = () => {
     gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
     let disposed = false;
-    let frame = 0;
+    let frame: number | null = null;
     let currentShift = 0;
     let targetShift = 0;
+    let ready = false;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const addTexture = (image: HTMLImageElement, unit: number, uniform: string) => {
       const texture = gl.createTexture();
@@ -117,13 +122,34 @@ const DepthMapScene = () => {
       }
     };
 
+    const draw = () => {
+      frame = null;
+      if (!ready || disposed) return;
+      resize();
+      currentShift += (targetShift - currentShift) * EASING;
+      gl.uniform2f(gl.getUniformLocation(program, "u_resolution"), canvas.width, canvas.height);
+      gl.uniform1f(gl.getUniformLocation(program, "u_shift"), currentShift);
+      gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+      if (Math.abs(targetShift - currentShift) > SETTLED_THRESHOLD) {
+        frame = requestAnimationFrame(draw);
+      } else {
+        currentShift = targetShift;
+      }
+    };
+
+    const requestDraw = () => {
+      if (frame === null) frame = requestAnimationFrame(draw);
+    };
+
     const updateScroll = () => {
-      const scene = canvas.closest(".abandoned-story-scene");
+      const scene = canvas.closest(".about-depth-scene");
       if (!scene) return;
       const rect = scene.getBoundingClientRect();
-      const range = Math.max(1, rect.height - window.innerHeight);
-      const progress = Math.min(1, Math.max(0, -rect.top / range));
-      targetShift = (progress - 0.5) * 0.085;
+      const travel = Math.max(1, rect.height + window.innerHeight);
+      const progress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / travel));
+      targetShift = reduceMotion.matches ? 0 : (progress - 0.5) * 0.1;
+      requestDraw();
     };
 
     Promise.all([loadImage(showroomImage), loadImage(depthImage)]).then(([image, depth]) => {
@@ -131,32 +157,30 @@ const DepthMapScene = () => {
       addTexture(image, 0, "u_image");
       addTexture(depth, 1, "u_depth");
       gl.uniform2f(gl.getUniformLocation(program, "u_imageSize"), image.width, image.height);
-
-      const render = () => {
-        if (disposed) return;
-        resize();
-        currentShift += (targetShift - currentShift) * 0.065;
-        gl.uniform2f(gl.getUniformLocation(program, "u_resolution"), canvas.width, canvas.height);
-        gl.uniform1f(gl.getUniformLocation(program, "u_shift"), currentShift);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-        frame = requestAnimationFrame(render);
-      };
+      ready = true;
       updateScroll();
-      render();
     }).catch(() => undefined);
 
     window.addEventListener("scroll", updateScroll, { passive: true });
+    window.addEventListener("resize", updateScroll);
+    reduceMotion.addEventListener("change", updateScroll);
+    const observer = new ResizeObserver(updateScroll);
+    observer.observe(canvas);
+
     return () => {
       disposed = true;
       window.removeEventListener("scroll", updateScroll);
-      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", updateScroll);
+      reduceMotion.removeEventListener("change", updateScroll);
+      observer.disconnect();
+      if (frame !== null) cancelAnimationFrame(frame);
       gl.deleteProgram(program);
       gl.deleteShader(vertex);
       gl.deleteShader(fragment);
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="h-full w-full" aria-label="Ervitex tekstila ekspozīcija" />;
+  return <canvas ref={canvasRef} className="block h-full w-full" aria-label="Ervitex tekstila ekspozīcija" />;
 };
 
 export default DepthMapScene;

@@ -13,6 +13,6 @@
 - [x] Aizvietot “Par mums” luktura ainu ar depth-map vadītu 2.5D ainu no iesūtītajiem attēliem.
 - [x] Saglabāt un sinhronizēt lukturi, ritināšanas kustību, lampu mirgošanu un dzirksteles.
 - [x] Pārbaudīt jauno ainu datorā un telefonā.
-- [ ] Noņemt no “Par Ervitex” ainas lukturi, mirgojošās gaismas, dzirksteles un pilienus.
-- [ ] Sakārtot depth-map parallax, lai aina aizpilda visu stāsta bloku visās ierīcēs.
-- [ ] Pārbaudīt ainu datorā, planšetē un telefonā.
+- [x] Noņemt no “Par Ervitex” ainas lukturi, mirgojošās gaismas, dzirksteles un pilienus.
+- [x] Sakārtot depth-map parallax, lai aina aizpilda visu stāsta bloku visās ierīcēs.
+- [x] Pārbaudīt ainu datorā, planšetē un telefonā.
