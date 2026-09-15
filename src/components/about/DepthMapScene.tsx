@@ -123,6 +123,7 @@ const DepthMapScene = () => {
     };
 
     const draw = () => {
+      frame = null;
       if (!ready || disposed) return;
       resize();
       currentShift += (targetShift - currentShift) * EASING;
@@ -134,7 +135,6 @@ const DepthMapScene = () => {
         frame = requestAnimationFrame(draw);
       } else {
         currentShift = targetShift;
-        frame = null;
       }
     };
 
