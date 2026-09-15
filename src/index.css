@@ -113,6 +113,12 @@
     cursor: crosshair;
   }
 
+  .depth-scene-shade {
+    background: hsl(var(--primary) / 0.76);
+    mask-image: radial-gradient(circle 620px at var(--flashlight-x) var(--flashlight-y), transparent 0%, rgb(0 0 0 / 0.2) 32%, black 78%);
+    -webkit-mask-image: radial-gradient(circle 620px at var(--flashlight-x) var(--flashlight-y), transparent 0%, rgb(0 0 0 / 0.2) 32%, black 78%);
+  }
+
   .abandoned-scene-image {
     transform: translate3d(0, var(--scene-scroll-y), 0);
     transition: transform 120ms linear;

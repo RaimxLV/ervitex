@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Phone, Send, X, PhoneCall, Loader2 } from "lucide-react";
+import { Building2, Clock3, Mail, MapPin, Phone, Send, X, PhoneCall, Loader2, ReceiptText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -148,77 +148,74 @@ const ContactPage = () => {
       </section>
 
       {/* General Office Info + Form */}
-      <section className="container py-16 md:py-24">
-        <div className="grid gap-12 lg:grid-cols-5">
-          <div className="lg:col-span-2">
-            <h2 className="font-heading text-xl font-bold uppercase text-foreground">{t("contact.officeTitle")}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">{t("contact.responseTime")}</p>
+      <section className="bg-muted/40 py-16 md:py-24">
+        <div className="container">
+          <div className="grid items-start gap-6 lg:grid-cols-12">
+            <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-lg border border-border bg-card p-6 shadow-sm lg:col-span-5 md:p-8">
+              <span className="font-heading text-[10px] font-bold uppercase text-accent">{lang === "lv" ? "Šovrūms un birojs" : "Showroom and office"}</span>
+              <h2 className="mt-2 font-heading text-2xl font-bold uppercase text-foreground">{t("contact.officeTitle")}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("contact.responseTime")}</p>
 
-            <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-6">
-              <div>
-                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{t("contact.address")}</p>
-                <p className="mt-1 text-sm text-foreground leading-snug">Braslas Biznesa Centrs,{"\n"}ieeja "D", 2. stāvs{"\n"}Braslas ielā 29, Rīga, LV-1084</p>
+              <div className="mt-8 divide-y divide-border">
+                {[
+                  { icon: MapPin, label: t("contact.address"), content: <>Braslas Biznesa Centrs, ieeja “D”, 2. stāvs<br />Braslas iela 29, Rīga, LV-1084</> },
+                  { icon: Clock3, label: t("contact.hours"), content: <>{t("contact.hoursValue")}<br /><span className="text-muted-foreground">{lang === "lv" ? "Se., Sv.: Slēgts" : "Sat, Sun: Closed"}</span></> },
+                  { icon: Mail, label: t("contact.officeEmail"), content: <a href="mailto:birojs@ervitex.lv" className="transition-colors hover:text-accent">birojs@ervitex.lv</a> },
+                  { icon: Building2, label: t("contact.accounting"), content: <a href="tel:+37167552540" className="transition-colors hover:text-accent">+371 67552540</a> },
+                  { icon: Phone, label: lang === "lv" ? "Tālrunis" : "Phone", content: <a href="tel:+37129475227" className="transition-colors hover:text-accent">+371 29475227</a> },
+                  { icon: ReceiptText, label: t("contact.regNr"), content: <>LV40002074377</> },
+                ].map((item) => (
+                  <div key={item.label} className="group flex gap-4 py-4 first:pt-0 last:pb-0">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors group-hover:bg-accent group-hover:text-accent-foreground">
+                      <item.icon className="h-4 w-4" strokeWidth={1.5} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground">{item.label}</p>
+                      <div className="mt-1 text-sm leading-relaxed text-foreground">{item.content}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div>
-                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{t("contact.hours")}</p>
-                <p className="mt-1 text-sm text-foreground">{t("contact.hoursValue")}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{lang === "lv" ? "Se., Sv.: Slēgts" : "Sat, Sun: Closed"}</p>
-              </div>
-              <div>
-                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{t("contact.officeEmail")}</p>
-                <a href="mailto:birojs@ervitex.lv" className="mt-1 block text-sm text-foreground hover:text-accent transition-colors">birojs@ervitex.lv</a>
-              </div>
-              <div>
-                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{t("contact.accounting")}</p>
-                <a href="tel:+37167552540" className="mt-1 block text-sm text-foreground hover:text-accent transition-colors">+371 67552540</a>
-              </div>
-              <div>
-                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{lang === "lv" ? "Tālrunis" : "Phone"}</p>
-                <a href="tel:+37129475227" className="mt-1 block text-sm text-foreground hover:text-accent transition-colors">+371 29475227</a>
-              </div>
-              <div className="col-span-2 mt-2">
-                <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest" asChild>
-                  <a href="tel:+37129475227">
-                    <PhoneCall className="mr-2 h-4 w-4" />
-                    {lang === "lv" ? "Zvanīt tūlīt" : "Call Now"}
-                  </a>
-                </Button>
-              </div>
-              <div className="col-span-2">
-                <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground/60">{t("contact.regNr")}</p>
-                <p className="mt-1 text-sm text-foreground">LV40002074377</p>
-              </div>
-            </div>
-          </div>
 
-          <div className="lg:col-span-3">
-            <form onSubmit={handleSubmit} className="space-y-5 border border-border p-6 md:p-8">
+              <Button size="lg" className="mt-8 w-full rounded-lg bg-accent font-heading text-xs uppercase text-accent-foreground hover:bg-accent/90" asChild>
+                <a href="tel:+37129475227"><PhoneCall className="h-4 w-4" />{lang === "lv" ? "Zvanīt tūlīt" : "Call Now"}</a>
+              </Button>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.08 }} className="rounded-lg border border-border bg-card p-6 shadow-sm lg:col-span-7 md:p-8 lg:p-10">
+              <div className="mb-8">
+                <span className="font-heading text-[10px] font-bold uppercase text-accent">{lang === "lv" ? "Sazinieties" : "Get in touch"}</span>
+                <h2 className="mt-2 font-heading text-2xl font-bold uppercase text-foreground">{lang === "lv" ? "Jautājiet mums" : "Ask us a question"}</h2>
+                <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">{lang === "lv" ? "Pastāstiet par savu projektu — atbildēsim vienas darba dienas laikā." : "Tell us about your project — we will reply within one business day."}</p>
+              </div>
+              <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.name")}</label>
-                  <Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                  <Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-12 rounded-lg bg-muted/40 px-4 focus-visible:ring-accent" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.emailLabel")}</label>
-                  <Input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                  <Input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="h-12 rounded-lg bg-muted/40 px-4 focus-visible:ring-accent" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.company")}</label>
-                  <Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                  <Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="h-12 rounded-lg bg-muted/40 px-4 focus-visible:ring-accent" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.phoneLabel")}</label>
-                  <Input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                  <Input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="h-12 rounded-lg bg-muted/40 px-4 focus-visible:ring-accent" />
                 </div>
               </div>
               <div className="space-y-1.5">
                 <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.message")}</label>
-                <Textarea required rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={t("contact.messagePlaceholder")} />
+                <Textarea required rows={6} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={t("contact.messagePlaceholder")} className="resize-none rounded-lg bg-muted/40 px-4 py-3 focus-visible:ring-accent" />
               </div>
-              <Button type="submit" size="lg" disabled={sending} className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase sm:w-auto">
+              <Button type="submit" size="lg" disabled={sending} className="w-full rounded-lg bg-foreground px-7 font-heading text-xs uppercase text-background hover:bg-accent hover:text-accent-foreground sm:w-auto">
                 {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" strokeWidth={1.2} />} {sending ? (lang === "lv" ? "Sūta..." : "Sending...") : t("contact.send")}
               </Button>
-            </form>
+              </form>
+            </motion.div>
           </div>
         </div>
       </section>

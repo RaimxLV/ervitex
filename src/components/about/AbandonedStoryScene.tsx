@@ -1,5 +1,5 @@
 import { type PointerEvent, type ReactNode, useEffect, useRef } from "react";
-import abandonedStore from "@/assets/ervitex-abandoned-store.jpg";
+import DepthMapScene from "@/components/about/DepthMapScene";
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
@@ -19,10 +19,8 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       if (!scene) return;
 
       const rect = scene.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
-      const clamped = Math.min(1, Math.max(0, progress));
-      scene.style.setProperty("--scene-scroll-y", `${(clamped - 0.5) * 220}px`);
+      const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height - window.innerHeight)));
+      scene.style.setProperty("--scene-scroll-y", `${(progress - 0.5) * 24}px`);
     };
 
     const requestParallax = () => {
@@ -69,25 +67,13 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       onPointerEnter={updateLight}
       onPointerLeave={dimLight}
     >
-      <img
-        src={abandonedStore}
-        alt="Pamesta Ervitex apģērbu ekspozīcija naktī"
-        className="abandoned-scene-image absolute inset-x-0 -inset-y-28 -z-30 h-[calc(100%+14rem)] w-full object-cover object-center"
-        loading="eager"
-        decoding="async"
-      />
-      <div className="absolute inset-0 -z-20 bg-primary/65" />
+      <div className="pointer-events-none sticky top-0 -z-30 h-screen w-full overflow-hidden" aria-hidden="true">
+        <DepthMapScene />
+      </div>
+      <div className="depth-scene-shade pointer-events-none absolute inset-0 -z-20" aria-hidden="true" />
       <div className="abandoned-lamp abandoned-lamp-a absolute -z-10" aria-hidden="true" />
       <div className="abandoned-lamp abandoned-lamp-b absolute -z-10" aria-hidden="true" />
       <div className="abandoned-lamp abandoned-lamp-c absolute -z-10" aria-hidden="true" />
-      <div className="abandoned-flashlight absolute inset-0 -z-10" aria-hidden="true">
-        <img
-          src={abandonedStore}
-          alt=""
-          className="abandoned-scene-image absolute inset-x-0 -inset-y-28 h-[calc(100%+14rem)] w-full object-cover object-center"
-          aria-hidden="true"
-        />
-      </div>
       <div className="abandoned-flashlight-beam pointer-events-none absolute inset-0 -z-[9]" aria-hidden="true" />
 
       <div className="abandoned-spark abandoned-spark-a pointer-events-none absolute -z-[4]" aria-hidden="true" />
@@ -103,7 +89,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
         ))}
       </div>
 
-      <div className="relative z-10">{children}</div>
+      <div className="relative z-10 -mt-[100vh]">{children}</div>
     </section>
   );
 };
