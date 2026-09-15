@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import showroomAsset from "@/assets/about/ervitex-showroom.jpg.asset.json";
-import depthAsset from "@/assets/about/ervitex-showroom-depth.png.asset.json";
+import showroomImage from "@/assets/about/ervitex-showroom.jpg";
+import depthImage from "@/assets/about/ervitex-showroom-depth.png";
 
 const vertexShader = `
   attribute vec2 a_position;
@@ -126,7 +126,7 @@ const DepthMapScene = () => {
       targetShift = (progress - 0.5) * 0.085;
     };
 
-    Promise.all([loadImage(showroomAsset.url), loadImage(depthAsset.url)]).then(([image, depth]) => {
+    Promise.all([loadImage(showroomImage), loadImage(depthImage)]).then(([image, depth]) => {
       if (disposed) return;
       addTexture(image, 0, "u_image");
       addTexture(depth, 1, "u_depth");

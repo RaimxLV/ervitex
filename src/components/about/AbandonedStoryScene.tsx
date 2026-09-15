@@ -70,7 +70,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       <div className="pointer-events-none sticky top-0 -z-30 h-screen w-full overflow-hidden" aria-hidden="true">
         <DepthMapScene />
       </div>
-      <div className="depth-scene-shade pointer-events-none fixed inset-0 -z-20" aria-hidden="true" />
+      <div className="depth-scene-shade pointer-events-none absolute inset-0 -z-20" aria-hidden="true" />
       <div className="abandoned-lamp abandoned-lamp-a absolute -z-10" aria-hidden="true" />
       <div className="abandoned-lamp abandoned-lamp-b absolute -z-10" aria-hidden="true" />
       <div className="abandoned-lamp abandoned-lamp-c absolute -z-10" aria-hidden="true" />
