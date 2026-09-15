@@ -148,7 +148,7 @@ const DepthMapScene = () => {
       const rect = scene.getBoundingClientRect();
       const travel = Math.max(1, rect.height + window.innerHeight);
       const progress = Math.min(1, Math.max(0, (window.innerHeight - rect.top) / travel));
-      targetShift = reduceMotion.matches ? 0 : (progress - 0.5) * 0.1;
+      targetShift = reduceMotion.matches ? 0 : (progress - 0.5) * 0.15;
       requestDraw();
     };
 
