@@ -20,10 +20,10 @@
 ## No audita — jāsalabo
 
 ### P0
-- [ ] NWG cenu sinhronizācija: vienota ilgtermiņa autorizācija, lease aizsardzība un kļūdu paziņojums.
+- [ ] NWG katalogā parādīt visus produktus ar visām pieejamajām cenām; bez manuālas paroles vai sesijas atjaunošanas.
   - [x] Deterministiska modeļu un SKU lapošana bez izlaistām rindām.
   - [x] Rotējošā tokena un paralēlo procesu lease aizsardzība kodā.
-  - [ ] Iegūt derīgu Finland veikala sesiju un pārbaudīt pilnu cenu ciklu.
+  - [ ] Pārbaudīt pilnu produktu un cenu ciklu.
 - [ ] Izlemt par SEO: noņemt `noindex` un `robots.txt Disallow: /`, pievienot og/twitter/canonical/sitemap.
 - [ ] Automātiski aizvērt karājošos “running” sinhronizāciju ierakstus (nwg:all, nwg:styles, pf:refresh).
 
