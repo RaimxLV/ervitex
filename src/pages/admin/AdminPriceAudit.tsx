@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { RefreshCw, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
 
 const SOURCES: { code: string; label: string; formula: string }[] = [
-  { code: "nwg", label: "NWG (Craft, Clique, ProJob, Cutter & Buck)", formula: "līgumcena × 1,67 (bez PVN)" },
+  { code: "nwg", label: "NWG (Craft, Clique, ProJob, Cutter & Buck)", formula: "līgumcena × 1,65 (bez PVN)" },
   { code: "ss", label: "Stanley/Stella", formula: "SS26 cenu lapas cena (jau ar uzcenojumu)" },
   { code: "mf", label: "Malfini", formula: "piegādātāja cena × 1,65" },
   { code: "pf", label: "PF Concept (prezentmateriāli)", formula: "piegādātāja cena × 1,65" },
