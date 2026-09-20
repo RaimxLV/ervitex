@@ -845,7 +845,9 @@ Deno.serve(async (req) => {
       result.assortments = step;
       if (step.pending_left > 0) {
         // Discovery unfinished — continue it before touching products.
-        if (chain) await chainSelf(sb, { mode: "assortments", chain: "1" });
+        // Preserve `all`: switching it to `assortments` here silently skipped
+        // the styles phase after discovery eventually completed.
+        if (chain) await chainSelf(sb, { mode, chain: "1", full: full ? "1" : "0" });
         await finishLog(sb, logId, {
           status: "success",
           message: `NWG assortment discovery daļa pabeigta (atlicis ${step.pending_left})`,
@@ -874,7 +876,13 @@ Deno.serve(async (req) => {
         const { error: itemsError } = await sb.rpc("refresh_catalog_items_mv");
         result.catalog_view_refresh = itemsError ? `deferred: ${itemsError.message}` : "ok";
       } else if (chain) {
-        await chainSelf(sb, { mode: "styles", chain: "1", offset: String(nextOffset), since: passSince });
+        await chainSelf(sb, {
+          mode: "styles",
+          chain: "1",
+          full: full ? "1" : "0",
+          offset: String(nextOffset),
+          since: passSince,
+        });
       }
     }
 

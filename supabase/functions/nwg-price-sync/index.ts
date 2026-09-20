@@ -21,7 +21,9 @@ const CONTEXT_ID = "C58B7BDF-CCA1-4655-8BD2-438E91964DB0";
 const BRANDS = ["Craft", "Clique", "ProJob", "Cutter & Buck"];
 const BLOCKED_PRODUCT_NUMBERS = new Set(["1903482", "1904160"]);
 const AUTH_LEASE_MS = 45_000;
-const PRICE_SYNC_LEASE_MS = 20 * 60_000;
+// A full 64k+ SKU run can legitimately exceed 20 minutes. Keep one owner for
+// the entire run so a retry cannot overlap it and consume rotating auth state.
+const PRICE_SYNC_LEASE_MS = 60 * 60_000;
 const ACCESS_TOKEN_SKEW_MS = 60_000;
 
 type WebsiteProduct = {

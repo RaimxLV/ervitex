@@ -251,7 +251,7 @@ const SyncHealthPanel = () => {
       <div className="rounded-sm border border-border bg-card p-4 sm:p-6">
         <h2 className="font-heading text-sm font-bold uppercase tracking-wider">NWG līgumcenas</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Craft, Clique, ProJob, Cutter &amp; Buck — līgumcena × 1,67 (bez PVN).
+          Craft, Clique, ProJob, Cutter &amp; Buck — līgumcena × 1,65 (bez PVN).
         </p>
 
         <div className="mt-4">
