@@ -37,6 +37,7 @@ async function getPartnerProductNumbers(sb: SupabaseClient): Promise<string[]> {
       .from("nwg_styles")
       .select("product_number")
       .in("brand", BRANDS)
+      .order("product_number", { ascending: true })
       .range(offset, offset + pageSize - 1);
     if (error) throw new Error(`NWG style validation read: ${error.message}`);
     for (const row of data ?? []) {
@@ -345,14 +346,16 @@ Deno.serve(async (req) => {
         const itemBySku = new Map<string, string>();
 
         const page = 1000; // PostgREST caps RPC rows, so page through targets.
+        let scanned = 0;
         for (let off = 0; skus.length < limit; off += page) {
           const { data: targets, error: targetErr } = await sb.rpc("nwg_price_targets", {
             only_missing: onlyMissing,
-            lim: Math.min(page, limit - skus.length),
+            lim: page,
             off,
           });
           if (targetErr) throw new Error(`target fetch: ${targetErr.message}`);
           const rows = (targets ?? []) as any[];
+          scanned += rows.length;
           for (const r of rows) {
             if (!r?.sku) continue;
             if (!websiteCatalog.allowed.has(r.product_number)) continue;
@@ -362,6 +365,10 @@ Deno.serve(async (req) => {
           }
           if (rows.length < page) break;
         }
+
+        // The website filter can make the accepted set smaller than the scan.
+        // Never send more than the requested run limit.
+        skus.splice(limit);
 
 
 
@@ -459,7 +466,9 @@ Deno.serve(async (req) => {
           await Promise.all(group);
         }
 
-        const more = onlyMissing && skus.length >= limit;
+        // With onlyMissing, processed rows disappear from the next invocation.
+        // A full page means another deterministic pass from offset zero is needed.
+        const more = onlyMissing && scanned >= page;
 
         // Kept as a compatibility hook. The database function intentionally
         // performs no propagation because every SKU is priced independently.
@@ -486,6 +495,7 @@ Deno.serve(async (req) => {
           website_checked: websiteCatalog.checked,
           website_found: websiteCatalog.found,
           website_removed: websiteCatalog.missing.length,
+          targets_scanned: scanned,
           skus_requested: skus.length,
           updated,
           rejected,
