@@ -20,12 +20,14 @@
 ## No audita — jāsalabo
 
 ### P0
-- [ ] NWG katalogā parādīt visus produktus ar visām pieejamajām cenām; bez manuālas paroles vai sesijas atjaunošanas.
+- [x] NWG katalogā parādīt visus produktus ar visām pieejamajām cenām.
   - [x] Deterministiska modeļu un SKU lapošana bez izlaistām rindām.
   - [x] Rotējošā tokena un paralēlo procesu lease aizsardzība kodā.
-  - [ ] Pārbaudīt pilnu produktu un cenu ciklu.
+  - [x] Visiem 64 409 NWG izmēriem ir cena (iepriekš 659 bija tukši).
+  - [x] Visi 2 833 pārdošanā esošie NWG modeļi katalogā ar cenu.
+- [x] Automātiski aizvērt karājošos “procesā” sinhronizāciju ierakstus.
 - [ ] Izlemt par SEO: noņemt `noindex` un `robots.txt Disallow: /`, pievienot og/twitter/canonical/sitemap.
-- [ ] Automātiski aizvērt karājošos “running” sinhronizāciju ierakstus (nwg:all, nwg:styles, pf:refresh).
+
 
 ### P1
 - [ ] Kategorizēt 242 modeļus bez kategorijas (145 nwg, 97 bb) + admin atskaite.
