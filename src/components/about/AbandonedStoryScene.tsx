@@ -1,6 +1,6 @@
 import { useRef, type ReactNode } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import horizonImage from "@/assets/about/anatol-horizon-lineart.png";
+import horizonImage from "@/assets/about/horizon-carousel-photo.png";
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
