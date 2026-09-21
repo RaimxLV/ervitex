@@ -4,7 +4,6 @@ type PageIntroProps = {
   title: string;
   subtitle?: string;
   eyebrow?: string;
-  index?: string;
 };
 
 const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
