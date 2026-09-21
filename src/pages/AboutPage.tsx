@@ -157,7 +157,7 @@ const AboutPage = () => {
                   <item.icon className={`h-6 w-6 transition-transform duration-500 ${item.motionClass}`} strokeWidth={SW} />
                 </div>
                 <h3 className="mt-12 font-heading text-sm font-bold uppercase text-foreground">{item.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
+                <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
                 <div className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-accent transition-transform duration-500 group-hover:scale-x-100" />
               </motion.article>
             ))}
