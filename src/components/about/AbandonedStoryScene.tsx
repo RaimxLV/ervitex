@@ -25,8 +25,8 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
         >
           <img src={horizonImage} alt="" className="h-full w-full object-cover" />
         </motion.div>
-        {/* Light darkening so white panel text stays readable */}
-        <div className="absolute inset-0 bg-primary/20" />
+        {/* 40% black overlay over the parallax image */}
+        <div className="absolute inset-0 bg-black/40" />
       </div>
       <div className="relative z-10">{children}</div>
     </section>
