@@ -30,7 +30,7 @@ const AboutPage = () => {
           <p className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
             {t("about.storyKicker")}
           </p>
-          <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:text-4xl [text-wrap:balance]">
+          <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-primary-foreground md:text-4xl [text-wrap:balance]">
             {t("about.storyHeadline")}
           </h2>
           <div className="mt-6 space-y-4 leading-relaxed text-primary-foreground/80 [text-wrap:pretty]">
