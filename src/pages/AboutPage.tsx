@@ -71,6 +71,15 @@ const AboutPage = () => {
         >
           <article className="rounded-xl bg-primary/25 p-7 md:p-10">
             <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
+              {t("about.blockStabilityTitle")}
+            </h3>
+            <div className="mt-4 space-y-4 leading-relaxed text-primary-foreground/75 [text-wrap:pretty]">
+              <p>{t("about.blockStabilityBody1")}</p>
+              <p>{t("about.blockStabilityBody2")}</p>
+            </div>
+          </article>
+          <article className="rounded-xl bg-primary/25 p-7 md:p-10">
+            <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
               {t("about.blockCapacityTitle")}
             </h3>
             <div className="mt-4 space-y-4 leading-relaxed text-primary-foreground/75 [text-wrap:pretty]">
