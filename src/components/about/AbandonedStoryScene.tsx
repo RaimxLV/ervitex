@@ -1,19 +1,33 @@
-import { type ReactNode } from "react";
-import ScreenPrintingCarousel from "@/components/about/ScreenPrintingCarousel";
+import { useRef, type ReactNode } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import horizonImage from "@/assets/about/anatol-horizon-lineart.png";
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
 };
 
 const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const imageY = useTransform(scrollYProgress, [0, 1], reduceMotion ? ["0%", "0%"] : ["-7%", "7%"]);
+
   return (
-    <section className="relative isolate min-h-screen w-full overflow-hidden bg-background">
+    <section ref={sectionRef} className="relative isolate min-h-screen w-full overflow-hidden bg-background">
       <div className="pointer-events-none absolute inset-0 -z-20" aria-hidden="true">
-        <div className="sticky top-0 h-screen min-h-[100svh] w-full overflow-hidden">
-          <ScreenPrintingCarousel />
+        <div className="sticky top-0 flex h-screen min-h-[100svh] w-full items-center justify-center overflow-hidden">
+          <motion.img
+            src={horizonImage}
+            alt=""
+            style={{ y: imageY }}
+            className="h-auto w-[190%] max-w-none opacity-20 sm:w-[145%] lg:w-[112%]"
+          />
         </div>
       </div>
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-background/60" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-background/35" aria-hidden="true" />
       <div className="relative z-10">{children}</div>
     </section>
   );
