@@ -69,20 +69,20 @@ const AboutPage = () => {
           transition={{ duration: 0.6 }}
           className="grid gap-px overflow-hidden rounded-xl border border-primary-foreground/15 bg-primary-foreground/20 shadow-xl shadow-black/20 md:grid-cols-2"
         >
-          <article className="bg-background/95 p-7 backdrop-blur-md md:p-10">
-            <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
+          <article className="bg-primary/75 p-7 backdrop-blur-md md:p-10">
+            <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
               {t("about.blockStabilityTitle")}
             </h3>
-            <div className="mt-4 space-y-4 leading-relaxed text-muted-foreground [text-wrap:pretty]">
+            <div className="mt-4 space-y-4 leading-relaxed text-primary-foreground/75 [text-wrap:pretty]">
               <p>{t("about.blockStabilityBody1")}</p>
               <p>{t("about.blockStabilityBody2")}</p>
             </div>
           </article>
-          <article className="bg-background/95 p-7 backdrop-blur-md md:p-10">
-            <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
+          <article className="bg-primary/75 p-7 backdrop-blur-md md:p-10">
+            <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
               {t("about.blockCapacityTitle")}
             </h3>
-            <div className="mt-4 space-y-4 leading-relaxed text-muted-foreground [text-wrap:pretty]">
+            <div className="mt-4 space-y-4 leading-relaxed text-primary-foreground/75 [text-wrap:pretty]">
               <p>{t("about.blockCapacityBody1")}</p>
               <p>{t("about.blockCapacityBody2")}</p>
             </div>
@@ -94,12 +94,12 @@ const AboutPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="rounded-xl border border-border border-l-4 border-l-accent bg-background/95 p-7 shadow-xl shadow-foreground/5 backdrop-blur-md md:p-10"
+          className="rounded-xl border border-primary-foreground/15 border-l-4 border-l-accent bg-primary/75 p-7 shadow-xl shadow-black/20 backdrop-blur-md md:p-10"
         >
-          <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
+          <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
             {t("about.blockPartnerTitle")}
           </h3>
-          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground [text-wrap:pretty]">
+          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-primary-foreground/80 [text-wrap:pretty]">
             {t("about.story3")}
           </p>
         </motion.div>
