@@ -136,14 +136,14 @@ export const translations = {
   "about.blockPartnerTitle": { lv: "Jūsu stratēģiskais partneris", en: "Your strategic partner" },
 
   "about.valuesTitle": { lv: "Kas mūs virza", en: "What Drives Us" },
-  "about.precision": { lv: "Precizitāte", en: "Precision" },
-  "about.precisionDesc": { lv: "Katra detaļa ir svarīga — no diegu skaita līdz drukas izlīdzināšanai.", en: "Every detail matters — from thread count to print alignment." },
-  "about.partnership": { lv: "Partnerība", en: "Partnership" },
-  "about.partnershipDesc": { lv: "Augam kopā ar klientiem. Jūsu panākumi ir mūsu misija.", en: "We grow alongside our clients. Your success is our mission." },
+  "about.precision": { lv: "Pieredze", en: "Experience" },
+  "about.precisionDesc": { lv: "Vairāk nekā 20 gadu pieredze tekstila un apdrukas industrijā ir mūsu lielākā kvalitātes zīme. Šo gadu laikā SIA Ervitex ir kļuvis par vienu no vadošajiem promo apģērbu vairumtirgotājiem un apdrukas servisiem Latvijā.", en: "More than 20 years of experience in the textile and printing industry is our strongest mark of quality. Over the years, SIA Ervitex has become one of Latvia’s leading promotional apparel wholesalers and printing services." },
+  "about.partnership": { lv: "Tehnoloģijas", en: "Technologies" },
+  "about.partnershipDesc": { lv: "Plašas apstrādes iespējas: sietspiede, DTF, izšūšana, termodruka un sublimācija. Piemeklējam efektīvāko risinājumu tieši Jūsu idejai. Nodrošinām pilnu apdrukas un apstrādes spektru, piemeklējot optimālāko izpildi.", en: "A wide range of production options: screen printing, DTF, embroidery, heat transfer printing and sublimation. We select the most effective solution for your idea and provide a complete range of printing and finishing services." },
   "about.quality": { lv: "Kvalitāte", en: "Quality" },
-  "about.qualityDesc": { lv: "Tikai sertificēti materiāli no uzticamiem Eiropas piegādātājiem.", en: "Only certified materials from trusted European suppliers." },
-  "about.capacity": { lv: "Jauda", en: "Capacity" },
-  "about.capacityDesc": { lv: "Vairāk nekā 6000 produktu modeļu vienotajā katalogā.", en: "More than 6,000 product models in one catalog." },
+  "about.qualityDesc": { lv: "Bezkompromisa kvalitāte.\n\nPasaules labākie tekstila zīmoli, pilna servisa apģērbu vairumtirdzniecība, rūpnieciska apdruka. Izmantojam augstas veiktspējas sietspiedes, sublimācijas un izšūšanas iekārtas, nodrošinot stabilu kvalitāti un ātrus izpildes termiņus jebkurā apjomā.", en: "Quality without compromise.\n\nThe world’s best textile brands, full-service apparel wholesale and industrial printing. We use high-performance screen-printing, sublimation and embroidery equipment to ensure consistent quality and fast turnaround at any volume." },
+  "about.capacity": { lv: "Stabilitāte", en: "Stability" },
+  "about.capacityDesc": { lv: "Uzticams partneris, termiņi un atbildība. Nodrošinām punktualitāti izpildē, nemainīgus standartus, stabilas piegādes un individuāli pielāgotu pieeju katram projektam, kas padara mūs par uzticamu sabiedroto jūsu biznesa izaugsmē.", en: "A dependable partner, firm deadlines and accountability. We ensure punctual delivery, consistent standards, reliable supply and an individually tailored approach to every project, making us a trusted ally in your business growth." },
 
   // Contact
   "contact.title": { lv: "Kontakti", en: "Contact Us" },
