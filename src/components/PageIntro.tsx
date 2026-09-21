@@ -4,10 +4,9 @@ type PageIntroProps = {
   title: string;
   subtitle?: string;
   eyebrow?: string;
-  index?: string;
 };
 
-const PageIntro = ({ title, subtitle, eyebrow, index = "01" }: PageIntroProps) => {
+const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
   const reduceMotion = useReducedMotion();
   const words = title.split(" ");
 
@@ -55,15 +54,6 @@ const PageIntro = ({ title, subtitle, eyebrow, index = "01" }: PageIntroProps) =
             )}
           </div>
 
-          <motion.span
-            aria-hidden="true"
-            initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="hidden select-none font-heading text-9xl font-black leading-none text-primary-foreground/[0.045] md:block"
-          >
-            {index}
-          </motion.span>
         </div>
       </div>
     </section>

@@ -138,10 +138,10 @@ const AboutPage = () => {
             className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
           >
             {[
-              { icon: BriefcaseBusiness, motionClass: "group-hover:-translate-y-0.5", title: t("about.precision"), desc: t("about.precisionDesc"), stat: "20+", surface: "bg-value-blue-soft", accent: "text-value-blue", border: "group-hover:border-value-blue/35" },
-              { icon: Printer, motionClass: "group-hover:scale-110", title: t("about.partnership"), desc: t("about.partnershipDesc"), stat: "05", surface: "bg-value-cyan-soft", accent: "text-value-cyan", border: "group-hover:border-value-cyan/35" },
-              { icon: BadgeCheck, motionClass: "group-hover:-rotate-6 group-hover:scale-110", title: t("about.quality"), desc: t("about.qualityDesc"), stat: "03", surface: "bg-value-emerald-soft", accent: "text-value-emerald", border: "group-hover:border-value-emerald/35" },
-              { icon: ShieldCheck, motionClass: "group-hover:scale-110", title: t("about.capacity"), desc: t("about.capacityDesc"), stat: "04", surface: "bg-value-slate-soft", accent: "text-value-slate", border: "group-hover:border-value-slate/35" },
+              { icon: BriefcaseBusiness, motionClass: "group-hover:-translate-y-0.5", title: t("about.precision"), desc: t("about.precisionDesc"), surface: "bg-value-blue-soft", accent: "text-value-blue", border: "group-hover:border-value-blue/35" },
+              { icon: Printer, motionClass: "group-hover:scale-110", title: t("about.partnership"), desc: t("about.partnershipDesc"), surface: "bg-value-cyan-soft", accent: "text-value-cyan", border: "group-hover:border-value-cyan/35" },
+              { icon: BadgeCheck, motionClass: "group-hover:-rotate-6 group-hover:scale-110", title: t("about.quality"), desc: t("about.qualityDesc"), surface: "bg-value-emerald-soft", accent: "text-value-emerald", border: "group-hover:border-value-emerald/35" },
+              { icon: ShieldCheck, motionClass: "group-hover:scale-110", title: t("about.capacity"), desc: t("about.capacityDesc"), surface: "bg-value-slate-soft", accent: "text-value-slate", border: "group-hover:border-value-slate/35" },
             ].map((item, i) => {
               const [lead, detail] = item.desc.split("\n\n");
 
@@ -155,7 +155,6 @@ const AboutPage = () => {
                 whileHover={{ y: -6 }}
                 className={`values-card group relative flex min-h-[390px] flex-col overflow-hidden rounded-lg border border-border bg-card p-7 transition-[border-color,box-shadow] duration-300 ${item.border}`}
               >
-                <span className={`absolute right-6 top-5 font-heading text-5xl font-bold opacity-10 ${item.accent}`}>{item.stat}</span>
                 <div className={`relative flex h-14 w-14 items-center justify-center rounded-lg ${item.surface} ${item.accent}`}>
                   <item.icon className={`h-6 w-6 transition-transform duration-500 ${item.motionClass}`} strokeWidth={SW} />
                 </div>
