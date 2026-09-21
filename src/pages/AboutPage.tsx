@@ -119,17 +119,6 @@ const AboutPage = () => {
           >
             {t("about.valuesTitle")}
           </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.55, delay: 0.08 }}
-            className="mt-4 max-w-xl leading-relaxed text-muted-foreground"
-          >
-            {lang === "lv"
-              ? "Vairāk nekā 20 gadu pieredze, modernas apdrukas tehnoloģijas un stabila kvalitāte — no reklāmas tekstila izvēles līdz gatavam pasūtījumam."
-              : "More than 20 years of experience, modern printing technologies and consistent quality — from promotional textiles to the finished order."}
-          </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
