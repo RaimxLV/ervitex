@@ -1,6 +1,6 @@
 import { useRef, type ReactNode } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import horizonAsset from "@/assets/about/anatol-horizon-lineart.png.asset.json";
+import horizonImage from "@/assets/about/anatol-horizon-lineart.png";
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
@@ -20,10 +20,10 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       <div className="pointer-events-none absolute inset-0 -z-20" aria-hidden="true">
         <div className="sticky top-0 flex h-screen min-h-[100svh] w-full items-center justify-center overflow-hidden">
           <motion.img
-            src={horizonAsset.url}
+            src={horizonImage}
             alt=""
             style={{ y: imageY }}
-            className="h-auto w-[190%] max-w-none opacity-[0.15] sm:w-[145%] lg:w-[112%]"
+            className="h-auto w-[190%] max-w-none opacity-20 sm:w-[145%] lg:w-[112%]"
           />
         </div>
       </div>
