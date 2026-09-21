@@ -19,33 +19,32 @@ const AboutPage = () => {
       />
 
       <AbandonedStoryScene>
-      <div className="container py-16 text-foreground md:py-24">
-        <div className="max-w-3xl rounded-lg border border-border bg-background/85 p-6 backdrop-blur-sm md:p-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <p className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
-              {t("about.storyKicker")}
-            </p>
-            <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:text-4xl [text-wrap:balance]">
-              {t("about.storyHeadline")}
-            </h2>
-            <div className="mt-6 max-w-prose space-y-4 leading-relaxed text-foreground/70 [text-wrap:pretty]">
-              <p className="text-lg text-foreground/90">{t("about.story1")}</p>
-              <p>{t("about.story2")}</p>
-            </div>
-          </motion.div>
-        </div>
+      <div className="container space-y-8 py-20 text-foreground md:space-y-10 md:py-28">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="max-w-3xl rounded-xl border border-border bg-background/95 p-7 shadow-xl shadow-foreground/5 backdrop-blur-md md:p-10"
+        >
+          <p className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
+            {t("about.storyKicker")}
+          </p>
+          <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:text-4xl [text-wrap:balance]">
+            {t("about.storyHeadline")}
+          </h2>
+          <div className="mt-6 space-y-4 leading-relaxed text-muted-foreground [text-wrap:pretty]">
+            <p className="text-lg text-foreground">{t("about.story1")}</p>
+            <p>{t("about.story2")}</p>
+          </div>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-16 grid gap-px overflow-hidden border border-border bg-border/80 backdrop-blur-sm sm:grid-cols-2 lg:grid-cols-4"
+          className="grid gap-px overflow-hidden rounded-xl border border-border bg-border shadow-xl shadow-foreground/5 sm:grid-cols-2 lg:grid-cols-4"
         >
           {[
             { title: t("about.highlight1Title"), desc: t("about.highlight1Desc") },
@@ -53,7 +52,7 @@ const AboutPage = () => {
             { title: t("about.highlight3Title"), desc: t("about.highlight3Desc") },
             { title: t("about.highlight4Title"), desc: t("about.highlight4Desc") },
           ].map((item, i) => (
-            <div key={i} className="bg-background/85 p-6 backdrop-blur-[2px]">
+            <div key={i} className="bg-background/95 p-6 backdrop-blur-md">
               <div className="h-1 w-8 bg-accent" />
               <h3 className="mt-4 font-heading text-sm font-bold uppercase text-foreground [text-wrap:balance]">
                 {item.title}
@@ -68,22 +67,22 @@ const AboutPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-16 grid gap-12 md:grid-cols-2"
+          className="grid gap-px overflow-hidden rounded-xl border border-border bg-border shadow-xl shadow-foreground/5 md:grid-cols-2"
         >
-          <article className="rounded-lg border border-border bg-background/85 p-6 backdrop-blur-sm md:p-8">
+          <article className="bg-background/95 p-7 backdrop-blur-md md:p-10">
             <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
               {t("about.blockStabilityTitle")}
             </h3>
-            <div className="mt-4 max-w-prose space-y-4 leading-relaxed text-foreground/70 [text-wrap:pretty]">
+            <div className="mt-4 space-y-4 leading-relaxed text-muted-foreground [text-wrap:pretty]">
               <p>{t("about.blockStabilityBody1")}</p>
               <p>{t("about.blockStabilityBody2")}</p>
             </div>
           </article>
-          <article className="rounded-lg border border-border bg-background/85 p-6 backdrop-blur-sm md:p-8">
+          <article className="bg-background/95 p-7 backdrop-blur-md md:p-10">
             <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
               {t("about.blockCapacityTitle")}
             </h3>
-            <div className="mt-4 max-w-prose space-y-4 leading-relaxed text-foreground/70 [text-wrap:pretty]">
+            <div className="mt-4 space-y-4 leading-relaxed text-muted-foreground [text-wrap:pretty]">
               <p>{t("about.blockCapacityBody1")}</p>
               <p>{t("about.blockCapacityBody2")}</p>
             </div>
@@ -95,12 +94,12 @@ const AboutPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-16 border-l-4 border-accent bg-background/85 p-8 backdrop-blur-sm md:p-10"
+          className="rounded-xl border border-border border-l-4 border-l-accent bg-background/95 p-7 shadow-xl shadow-foreground/5 backdrop-blur-md md:p-10"
         >
           <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
             {t("about.blockPartnerTitle")}
           </h3>
-          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-foreground/75 [text-wrap:pretty]">
+          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground [text-wrap:pretty]">
             {t("about.story3")}
           </p>
         </motion.div>

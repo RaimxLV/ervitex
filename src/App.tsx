@@ -12,6 +12,7 @@ import QuoteCartButton from "@/components/quote/QuoteCartButton";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
 import ScrollToTop from "./components/ScrollToTop.tsx";
+import SmoothScroll from "./components/SmoothScroll.tsx";
 
 // Everything except the landing page is code-split so the first visit only
 // downloads the home-page bundle instead of the whole app.
@@ -59,6 +60,7 @@ const App = () => (
 
           <Sonner />
           <BrowserRouter basename={routerBase}>
+            <SmoothScroll />
             <ScrollToTop />
             <Suspense fallback={<RouteFallback />}>
             <Routes>
