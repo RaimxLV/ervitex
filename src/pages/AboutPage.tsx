@@ -20,7 +20,7 @@ const AboutPage = () => {
 
       <AbandonedStoryScene>
       <div className="container py-16 text-foreground md:py-24">
-        <div className="max-w-3xl">
+        <div className="max-w-3xl rounded-lg border border-border bg-background/85 p-6 backdrop-blur-sm md:p-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
