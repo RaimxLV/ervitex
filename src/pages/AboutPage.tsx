@@ -154,25 +154,6 @@ const AboutPage = () => {
               );
             })}
           </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mt-12 grid gap-px border border-border bg-border text-center sm:grid-cols-4"
-          >
-            {[
-              { num: "20+", label: t("stats.years") },
-              { num: "500+", label: t("stats.clients") },
-              { num: "6000+", label: lang === "lv" ? "Produktu modeļi" : "Product Models" },
-              { num: "4", label: lang === "lv" ? "Drukas tehnoloģijas" : "Printing Technologies" },
-            ].map((stat, i) => (
-              <div key={i} className="bg-background px-4 py-7">
-                <p className="font-heading text-4xl font-bold text-accent">{stat.num}</p>
-                <p className="mt-1 text-sm text-muted-foreground uppercase">{stat.label}</p>
-              </div>
-            ))}
-          </motion.div>
         </div>
       </section>
     </Layout>
