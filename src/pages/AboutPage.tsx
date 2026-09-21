@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BadgeCheck, Cog, Crosshair, Handshake } from "lucide-react";
+import { BadgeCheck, BriefcaseBusiness, Printer, ShieldCheck } from "lucide-react";
 import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import AbandonedStoryScene from "@/components/about/AbandonedStoryScene";
@@ -127,40 +127,45 @@ const AboutPage = () => {
             className="mt-4 max-w-xl leading-relaxed text-muted-foreground"
           >
             {lang === "lv"
-              ? "Precīzs darbs, uzticamas partnerības un pārbaudāma izvēle vairāk nekā 6000 produktu modeļu katalogā."
-              : "Precise work, trusted partnerships and a verified selection of more than 6,000 product models."}
+              ? "Vairāk nekā 20 gadu pieredze, modernas apdrukas tehnoloģijas un stabila kvalitāte — no reklāmas tekstila izvēles līdz gatavam pasūtījumam."
+              : "More than 20 years of experience, modern printing technologies and consistent quality — from promotional textiles to the finished order."}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-12 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-2 lg:grid-cols-4"
+            className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
           >
             {[
-              { icon: Crosshair, motionClass: "motion-safe:group-hover:animate-pulse", title: t("about.precision"), desc: t("about.precisionDesc"), stat: "01" },
-              { icon: Handshake, motionClass: "group-hover:-translate-y-1", title: t("about.partnership"), desc: t("about.partnershipDesc"), stat: "02" },
-              { icon: BadgeCheck, motionClass: "group-hover:-rotate-6 group-hover:scale-110", title: t("about.quality"), desc: t("about.qualityDesc"), stat: "03" },
-              { icon: Cog, motionClass: "motion-safe:group-hover:animate-[spin_3s_linear_infinite]", title: t("about.capacity"), desc: t("about.capacityDesc"), stat: "6000+" },
-            ].map((item, i) => (
+              { icon: BriefcaseBusiness, motionClass: "group-hover:-translate-y-0.5", title: t("about.precision"), desc: t("about.precisionDesc"), stat: "20+", surface: "bg-value-blue-soft", accent: "text-value-blue", border: "group-hover:border-value-blue/35" },
+              { icon: Printer, motionClass: "group-hover:scale-110", title: t("about.partnership"), desc: t("about.partnershipDesc"), stat: "05", surface: "bg-value-cyan-soft", accent: "text-value-cyan", border: "group-hover:border-value-cyan/35" },
+              { icon: BadgeCheck, motionClass: "group-hover:-rotate-6 group-hover:scale-110", title: t("about.quality"), desc: t("about.qualityDesc"), stat: "03", surface: "bg-value-emerald-soft", accent: "text-value-emerald", border: "group-hover:border-value-emerald/35" },
+              { icon: ShieldCheck, motionClass: "group-hover:scale-110", title: t("about.capacity"), desc: t("about.capacityDesc"), stat: "04", surface: "bg-value-slate-soft", accent: "text-value-slate", border: "group-hover:border-value-slate/35" },
+            ].map((item, i) => {
+              const [lead, detail] = item.desc.split("\n\n");
+
+              return (
               <motion.article
                 key={item.title}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.35 }}
                 transition={{ duration: 0.55, delay: i * 0.09 }}
-                whileHover={{ y: -4 }}
-                className="group relative min-h-[260px] overflow-hidden bg-background p-7 transition-colors duration-500 hover:bg-card"
+                whileHover={{ y: -6 }}
+                className={`values-card group relative flex min-h-[390px] flex-col overflow-hidden rounded-lg border border-border bg-card p-7 transition-[border-color,box-shadow] duration-300 ${item.border}`}
               >
-                <span className="absolute right-5 top-3 font-heading text-5xl font-black text-foreground/[0.045]">{item.stat}</span>
-                <div className="relative flex h-11 w-11 items-center justify-center border border-border bg-muted text-accent transition-colors duration-300 group-hover:border-accent/50">
+                <span className={`absolute right-6 top-5 font-heading text-5xl font-bold opacity-10 ${item.accent}`}>{item.stat}</span>
+                <div className={`relative flex h-14 w-14 items-center justify-center rounded-lg ${item.surface} ${item.accent}`}>
                   <item.icon className={`h-6 w-6 transition-transform duration-500 ${item.motionClass}`} strokeWidth={SW} />
                 </div>
-                <h3 className="mt-12 font-heading text-sm font-bold uppercase text-foreground">{item.title}</h3>
-                <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
-                <div className="absolute inset-x-0 bottom-0 h-0.5 origin-left scale-x-0 bg-accent transition-transform duration-500 group-hover:scale-x-100" />
+                <h3 className="mt-8 font-heading text-lg font-bold uppercase text-foreground">{item.title}</h3>
+                <p className="mt-4 text-sm font-semibold leading-relaxed text-foreground/80">{lead}</p>
+                {detail && <p className="mt-3 text-sm leading-relaxed text-muted-foreground [text-wrap:pretty]">{detail}</p>}
+                <div className={`absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 ${item.surface} transition-transform duration-500 group-hover:scale-x-100`} />
               </motion.article>
-            ))}
+              );
+            })}
           </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 30 }}

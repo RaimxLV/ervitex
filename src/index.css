@@ -33,6 +33,16 @@
     --ring: 0 85% 50%;
     --catalog-card-media: 0 0% 100%;
 
+    --value-blue: 215 72% 42%;
+    --value-blue-soft: 214 70% 96%;
+    --value-cyan: 190 72% 34%;
+    --value-cyan-soft: 188 58% 95%;
+    --value-emerald: 158 58% 32%;
+    --value-emerald-soft: 152 45% 95%;
+    --value-slate: 218 23% 34%;
+    --value-slate-soft: 216 24% 95%;
+    --values-shadow: 218 30% 20%;
+
     --radius: 0.125rem;
 
     --font-heading: 'Space Grotesk', sans-serif;
@@ -69,6 +79,15 @@
     --input: 0 0% 15%;
     --ring: 0 85% 50%;
     --catalog-card-media: 0 0% 100%;
+    --value-blue: 211 78% 64%;
+    --value-blue-soft: 215 35% 14%;
+    --value-cyan: 187 66% 56%;
+    --value-cyan-soft: 190 36% 13%;
+    --value-emerald: 156 55% 55%;
+    --value-emerald-soft: 157 34% 13%;
+    --value-slate: 215 24% 70%;
+    --value-slate-soft: 218 22% 15%;
+    --values-shadow: 0 0% 0%;
   }
 }
 
@@ -104,6 +123,14 @@
 
   .promo-cta:hover {
     box-shadow: 0 14px 42px -8px hsl(var(--accent) / 0.75);
+  }
+
+  .values-card {
+    box-shadow: 0 8px 26px -22px hsl(var(--values-shadow) / 0.4);
+  }
+
+  .values-card:hover {
+    box-shadow: 0 24px 50px -26px hsl(var(--values-shadow) / 0.38);
   }
 
 }
