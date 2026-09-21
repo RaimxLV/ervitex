@@ -25,7 +25,7 @@ const AboutPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="max-w-3xl rounded-xl bg-primary/5 p-7 shadow-xl shadow-black/20 md:p-10"
+          className="max-w-3xl rounded-xl bg-primary/25 p-7 shadow-xl shadow-black/20 md:p-10"
         >
           <p className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
             {t("about.storyKicker")}
@@ -52,7 +52,7 @@ const AboutPage = () => {
             { title: t("about.highlight3Title"), desc: t("about.highlight3Desc") },
             { title: t("about.highlight4Title"), desc: t("about.highlight4Desc") },
           ].map((item, i) => (
-            <div key={i} className="rounded-xl bg-primary/5 p-6">
+            <div key={i} className="rounded-xl bg-primary/25 p-6">
               <div className="h-1 w-8 bg-accent" />
               <h3 className="mt-4 font-heading text-sm font-bold uppercase text-primary-foreground [text-wrap:balance]">
                 {item.title}
@@ -69,16 +69,7 @@ const AboutPage = () => {
           transition={{ duration: 0.6 }}
           className="grid gap-4 md:grid-cols-2"
         >
-          <article className="rounded-xl bg-primary/5 p-7 md:p-10">
-            <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
-              {t("about.blockStabilityTitle")}
-            </h3>
-            <div className="mt-4 space-y-4 leading-relaxed text-primary-foreground/75 [text-wrap:pretty]">
-              <p>{t("about.blockStabilityBody1")}</p>
-              <p>{t("about.blockStabilityBody2")}</p>
-            </div>
-          </article>
-          <article className="rounded-xl bg-primary/5 p-7 md:p-10">
+          <article className="rounded-xl bg-primary/25 p-7 md:p-10">
             <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
               {t("about.blockCapacityTitle")}
             </h3>
@@ -94,7 +85,7 @@ const AboutPage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="rounded-xl border-l-4 border-l-accent bg-primary/5 p-7 shadow-xl shadow-black/20 md:p-10"
+          className="rounded-xl border-l-4 border-l-accent bg-primary/25 p-7 shadow-xl shadow-black/20 md:p-10"
         >
           <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
             {t("about.blockPartnerTitle")}
