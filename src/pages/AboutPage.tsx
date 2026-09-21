@@ -20,7 +20,7 @@ const AboutPage = () => {
 
       <AbandonedStoryScene>
       <div className="container py-16 text-foreground md:py-24">
-        <div className="max-w-3xl">
+        <div className="max-w-3xl rounded-lg border border-border bg-background/85 p-6 backdrop-blur-sm md:p-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -70,7 +70,7 @@ const AboutPage = () => {
           transition={{ duration: 0.6 }}
           className="mt-16 grid gap-12 md:grid-cols-2"
         >
-          <article>
+          <article className="rounded-lg border border-border bg-background/85 p-6 backdrop-blur-sm md:p-8">
             <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
               {t("about.blockStabilityTitle")}
             </h3>
@@ -79,7 +79,7 @@ const AboutPage = () => {
               <p>{t("about.blockStabilityBody2")}</p>
             </div>
           </article>
-          <article>
+          <article className="rounded-lg border border-border bg-background/85 p-6 backdrop-blur-sm md:p-8">
             <h3 className="font-heading text-xl font-bold uppercase text-foreground [text-wrap:balance]">
               {t("about.blockCapacityTitle")}
             </h3>
