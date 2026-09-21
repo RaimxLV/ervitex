@@ -13,18 +13,22 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
     target: sectionRef,
     offset: ["start end", "end start"],
   });
-  const imageY = useTransform(scrollYProgress, [0, 1], reduceMotion ? ["0%", "0%"] : ["-7%", "7%"]);
+  const imageY = useTransform(scrollYProgress, [0, 1], reduceMotion ? ["0%", "0%"] : ["-14%", "14%"]);
 
   return (
     <section ref={sectionRef} className="relative isolate min-h-screen w-full overflow-hidden bg-background">
       <div className="pointer-events-none absolute inset-0 -z-20" aria-hidden="true">
-        <div className="sticky top-0 flex h-screen min-h-[100svh] w-full items-center justify-center overflow-hidden">
-          <motion.img
-            src={horizonImage}
-            alt=""
+        <div className="sticky top-0 h-screen min-h-[100svh] w-full overflow-hidden">
+          <motion.div
             style={{ y: imageY }}
-            className="h-auto w-[190%] max-w-none opacity-20 sm:w-[145%] lg:w-[112%]"
-          />
+            className="absolute -top-[20%] left-0 h-[140%] w-[133%] max-w-none"
+          >
+            <img
+              src={horizonImage}
+              alt=""
+              className="h-full w-full object-cover opacity-20"
+            />
+          </motion.div>
         </div>
       </div>
       <div className="pointer-events-none absolute inset-0 -z-10 bg-background/35" aria-hidden="true" />
