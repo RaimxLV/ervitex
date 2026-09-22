@@ -79,6 +79,7 @@ const QuoteAssignedEmail = ({
   deadline = '',
   completeUrl = '',
   adminUrl = '',
+  worksheetUrl = '',
 }: Props) => {
   const totalQty = items.reduce((s, it) => s + (Number(it.qty) || 0), 0)
   const hasPrint = !!(print_method || print_placement || print_colors || deadline)
@@ -166,6 +167,17 @@ const QuoteAssignedEmail = ({
                   <li key={i}><Link href={u}>{(u.split('?')[0] || u).split('/').pop() || u}</Link></li>
                 ))}
               </ul>
+            </>
+          ) : null}
+
+          {worksheetUrl ? (
+            <>
+              <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
+              <Text style={{ fontSize: '12px', color: '#666', margin: '0 0 10px' }}>
+                Kopīgais preču saraksts ar klientu — maini skaitus, izmērus un apdrukas cenas.
+                Summa bez PVN un ar PVN pārrēķinās uzreiz.
+              </Text>
+              <Button href={worksheetUrl} style={doneBtn}>ATVĒRT PREČU SARAKSTU</Button>
             </>
           ) : null}
 

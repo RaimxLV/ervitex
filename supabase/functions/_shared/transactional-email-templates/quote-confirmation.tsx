@@ -138,6 +138,28 @@ const QuoteConfirmationEmail = ({
             </>
           ) : null}
 
+          {worksheetUrl ? (
+            <>
+              <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
+              <Heading as="h3" style={h3}>Tavs preču saraksts tiešsaistē</Heading>
+              <Text style={{ fontSize: '13px', color: '#444', margin: '0 0 10px' }}>
+                Šo sarakstu redzam gan Tu, gan Tavs Ervitex cilvēks. Tur vari mainīt izmērus un skaitus,
+                izvēlēties apdrukas veidu un uzreiz redzēt summu bez PVN un ar PVN.
+              </Text>
+              <Section>
+                <a
+                  href={worksheetUrl}
+                  style={{
+                    display: 'inline-block', background: '#111', color: '#fff', fontSize: '13px',
+                    fontWeight: 'bold', padding: '11px 16px', borderRadius: '4px', textDecoration: 'none',
+                  }}
+                >
+                  Atvērt preču sarakstu
+                </a>
+              </Section>
+            </>
+          ) : null}
+
           <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
           <Text style={{ fontSize: '12px', color: '#666' }}>
             Ja Tev ir papildu jautājumi, raksti mums uz <a href="mailto:birojs@ervitex.lv">birojs@ervitex.lv</a> vai zvani +371 67436899.
