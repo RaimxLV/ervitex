@@ -2,13 +2,16 @@ import { Link, useLocation } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useWorksheetPick } from "@/lib/worksheetPick";
 
 const QuoteCartButton = () => {
   const { items, totalQty } = useQuoteCart();
   const { lang } = useLanguage();
   const location = useLocation();
+  const pick = useWorksheetPick();
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
 
+  if (pick) return null;
   if (totalQty === 0) return null;
   if (location.pathname.startsWith("/request")) return null;
   if (location.pathname.startsWith("/admin")) return null;

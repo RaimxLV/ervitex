@@ -9,6 +9,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { QuoteCartProvider } from "@/hooks/useQuoteCart";
 
 import QuoteCartButton from "@/components/quote/QuoteCartButton";
+import WorksheetPickBar from "@/components/worksheet/WorksheetPickBar";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
 import ScrollToTop from "./components/ScrollToTop.tsx";
@@ -100,6 +101,7 @@ const App = () => (
             </Routes>
             </Suspense>
             <QuoteCartButton />
+            <WorksheetPickBar />
             
           </BrowserRouter>
           </QuoteCartProvider>
