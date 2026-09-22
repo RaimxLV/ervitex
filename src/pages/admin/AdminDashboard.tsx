@@ -42,7 +42,11 @@ const AdminDashboard = () => {
     setLoading(true);
     const [q, nq, o, so, sum, logs] = await Promise.all([
       supabase.from("quote_requests").select("*", { count: "exact", head: true }),
-      supabase.from("quote_requests").select("*", { count: "exact", head: true }).eq("status", "new"),
+      supabase
+        .from("quote_requests")
+        .select("*", { count: "exact", head: true })
+        .is("assigned_pm_slug", null)
+        .neq("status", "closed"),
       supabase.from("pm_offers").select("*", { count: "exact", head: true }),
       supabase.from("pm_offers").select("*", { count: "exact", head: true }).neq("status", "draft"),
       supabase.rpc("price_audit_summary" as never),
