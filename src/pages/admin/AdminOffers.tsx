@@ -75,6 +75,39 @@ const AdminOffers = () => {
     navigate(`/admin/offers/${data.id}`);
   };
 
+  /** Viena poga: no groza izveido publicētu piedāvājumu un nokopē saiti e-pasta vēstulei. */
+  const copyLinkFromCart = async () => {
+    const items: OfferItem[] = cartItems.map((i) => ({
+      id: i.id,
+      source: i.source,
+      productId: i.productId,
+      name: i.name,
+      code: i.code,
+      brand: i.brand,
+      image: i.image,
+      colorName: i.colorName,
+      colorHex: i.colorHex,
+      size: i.size,
+      qty: i.qty,
+      unitPrice: i.unitPrice ?? null,
+    }));
+    const { data, error } = await supabase
+      .from("pm_offers")
+      .insert({ title: "Piedāvājums", items: items as any, status: "sent" })
+      .select("token")
+      .single();
+    if (error || !data?.token) {
+      return toast({ title: "Kļūda", description: error?.message, variant: "destructive" });
+    }
+    try {
+      await navigator.clipboard.writeText(offerUrl(data.token));
+      toast({ title: "Saite nokopēta", description: "Ielīmē to savā e-pasta vēstulē klientam." });
+    } catch {
+      toast({ title: "Neizdevās nokopēt", variant: "destructive" });
+    }
+    load();
+  };
+
   const remove = async (id: string) => {
     if (!confirm("Dzēst piedāvājumu?")) return;
     const { error } = await supabase.from("pm_offers").delete().eq("id", id);
