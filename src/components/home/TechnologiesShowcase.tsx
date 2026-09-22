@@ -51,8 +51,8 @@ const TechnologiesShowcase = () => {
                     alt={t.name[lang]}
                     width={640}
                     height={480}
-                    loading="eager"
-                    fetchPriority="high"
+                    loading="lazy"
+                    fetchPriority="low"
                     decoding="async"
                     className="h-full w-full bg-muted object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
@@ -77,8 +77,8 @@ const TechnologiesShowcase = () => {
             width={1400}
             height={1050}
             alt={isLv ? "Apdrukāts krekls ar individualizētu dizainu" : "Printed t-shirt with a custom design"}
-            loading="eager"
-            fetchPriority="auto"
+            loading="lazy"
+            fetchPriority="low"
             decoding="async"
             className="aspect-[4/3] w-full rounded-sm bg-muted object-cover"
           />

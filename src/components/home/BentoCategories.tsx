@@ -149,8 +149,8 @@ const BentoCategories = () => {
                   alt={tile[lang]}
                   width={640}
                   height={640}
-                  loading={i < 4 ? "eager" : "lazy"}
-                  fetchPriority={i < 4 ? "high" : "low"}
+                  loading={i < 2 ? "eager" : "lazy"}
+                  fetchPriority={i < 2 ? "high" : "low"}
                   decoding="async"
                   className="h-full w-full bg-muted object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
