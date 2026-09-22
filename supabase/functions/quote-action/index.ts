@@ -39,19 +39,34 @@ Deno.serve(async (req) => {
 
   if (!quote) return page('Pieprasījums nav atrasts', 'Iespējams, tas ir dzēsts.', false)
 
+  const wantsJson = url.searchParams.get('format') === 'json'
+  const json = (status: number, body: Record<string, unknown>) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+
   if (action === 'complete') {
-    await supabase
+    const { error: closeErr } = await supabase
       .from('quote_requests')
       .update({ status: 'closed', completed_at: new Date().toISOString(), worksheet_locked: true })
       .eq('id', quote.id)
+    if (closeErr) {
+      if (wantsJson) return json(500, { ok: false, error: closeErr.message })
+      return page('Neizdevās pabeigt', 'Mēģini vēlreiz pēc mirkļa.', false)
+    }
+    if (wantsJson) return json(200, { ok: true, emailed: null })
     return page('Pabeigts', 'Pieprasījums atzīmēts kā pabeigts. Vari aizvērt šo logu.')
   }
 
   const slug = action.split(':')[1]
   const person = assigneeBySlug(slug)
-  if (!person) return page('Nezināma persona', 'Šo saiti vairs neizmanto.', false)
+  if (!person) {
+    if (wantsJson) return json(400, { ok: false, error: 'unknown assignee' })
+    return page('Nezināma persona', 'Šo saiti vairs neizmanto.', false)
+  }
 
-  await supabase
+  const { error: assignErr } = await supabase
     .from('quote_requests')
     .update({
       assigned_pm_slug: person.slug,
@@ -61,6 +76,11 @@ Deno.serve(async (req) => {
       status: quote.status === 'new' ? 'contacted' : quote.status,
     })
     .eq('id', quote.id)
+
+  if (assignErr) {
+    if (wantsJson) return json(500, { ok: false, error: assignErr.message })
+    return page('Neizdevās nodot', 'Mēģini vēlreiz pēc mirkļa.', false)
+  }
 
   // 30-day signed links for attachments so the assignee can open them from e-mail.
   const files: string[] = []
@@ -73,7 +93,7 @@ Deno.serve(async (req) => {
     if (signed?.signedUrl) files.push(signed.signedUrl)
   }
 
-  await supabase.functions.invoke('send-transactional-email', {
+  const { data: mailData, error: mailErr } = await supabase.functions.invoke('send-transactional-email', {
     body: {
       templateName: 'quote-assigned',
       recipientEmail: person.email,
@@ -97,9 +117,23 @@ Deno.serve(async (req) => {
     },
   })
 
+  const emailed = !mailErr && (mailData as { error?: unknown } | null)?.error == null
+
+  if (wantsJson) {
+    return json(200, {
+      ok: true,
+      emailed,
+      assignee: { name: person.name, email: person.email },
+      error: emailed ? null : (mailErr?.message || 'email failed'),
+    })
+  }
+
   return page(
     `Nodots ${person.name}`,
-    `${person.name} tikko saņēma pieprasījumu uz ${person.email}. Vari aizvērt šo logu.`,
+    emailed
+      ? `${person.name} tikko saņēma pieprasījumu uz ${person.email}. Vari aizvērt šo logu.`
+      : `Pieprasījums nodots ${person.name}, bet vēstuli uz ${person.email} nosūtīt neizdevās — paziņo par to birojam.`,
+    emailed,
   )
 })
 
