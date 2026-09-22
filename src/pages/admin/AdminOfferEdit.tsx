@@ -81,6 +81,7 @@ const AdminOfferEdit = () => {
   const [prices, setPrices] = useState<VariantPrice[]>([]);
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [qtyBySize, setQtyBySize] = useState<Record<string, number>>({});
+  const [swapKey, setSwapKey] = useState<string | null>(null);
   const debounce = useRef<number>();
 
   useEffect(() => {
