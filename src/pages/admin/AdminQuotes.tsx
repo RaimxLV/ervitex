@@ -9,10 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
+import { worksheetPath, worksheetUrl } from "@/lib/worksheet";
 import {
   AlertTriangle,
   CheckCircle2,
   ChevronDown,
+  ClipboardList,
   Copy,
   FileText,
   Mail,
