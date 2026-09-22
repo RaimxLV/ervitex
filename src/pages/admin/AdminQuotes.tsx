@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +15,6 @@ import {
   ChevronDown,
   ClipboardList,
   Copy,
-  FileText,
   Mail,
   Paperclip,
   RefreshCw,
@@ -56,9 +54,9 @@ interface QuoteRow {
   print_placement: string | null;
   print_colors: string | null;
   deadline: string | null;
+  worksheet_locked?: boolean;
 }
 
-const eur = (n: number) => `${n.toFixed(2)} €`;
 const daysSince = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
 const isDone = (q: QuoteRow) => q.status === "closed";
 
@@ -92,7 +90,6 @@ const AdminQuotes = () => {
   const [expanded, setExpanded] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   const fetchQuotes = async () => {
     setLoading(true);
@@ -170,9 +167,10 @@ const AdminQuotes = () => {
   };
 
   const complete = (row: QuoteRow) =>
-    patch(row.id, { status: "closed", completed_at: new Date().toISOString() });
+    patch(row.id, { status: "closed", completed_at: new Date().toISOString(), worksheet_locked: true } as Partial<QuoteRow>);
 
-  const reopen = (row: QuoteRow) => patch(row.id, { status: "contacted", completed_at: null });
+  const reopen = (row: QuoteRow) =>
+    patch(row.id, { status: "contacted", completed_at: null, worksheet_locked: false } as Partial<QuoteRow>);
 
   /** Dzēš pieprasījumu un tam pievienotos failus. */
   const remove = async (row: QuoteRow) => {
@@ -187,44 +185,6 @@ const AdminQuotes = () => {
     if (error) return toast({ title: "Kļūda", description: error.message, variant: "destructive" });
     setQuotes((prev) => prev.filter((x) => x.id !== row.id));
     toast({ title: "Pieprasījums izdzēsts" });
-  };
-
-  /** No pieprasījuma izveido piedāvājumu ar tām pašām precēm un klienta datiem. */
-  const makeOffer = async (row: QuoteRow) => {
-    setBusy(row.id);
-    const items = (Array.isArray(row.items) ? row.items : []).map((i, idx) => ({
-      id: `${row.id}-${idx}`,
-      source: "quote",
-      productId: "",
-      name: i.name || "",
-      code: i.code || "",
-      brand: i.brand ?? null,
-      image: null,
-      colorName: i.colorName ?? null,
-      colorHex: null,
-      size: i.size ?? null,
-      qty: i.qty || 1,
-      unitPrice: i.unitPrice ?? null,
-    }));
-    const { data, error } = await supabase
-      .from("pm_offers")
-      .insert({
-        title: `Piedāvājums — ${row.company || row.name}`,
-        client_name: row.name,
-        client_company: row.company,
-        client_email: row.email,
-        client_phone: row.phone,
-        note: row.message,
-        items: items as never,
-        quote_request_id: row.id,
-        pm_name: row.assigned_pm_name,
-        pm_email: row.assigned_pm_email,
-      } as never)
-      .select("id")
-      .single();
-    setBusy(null);
-    if (error || !data) return toast({ title: "Kļūda", description: error?.message, variant: "destructive" });
-    navigate(`/admin/offers/${(data as { id: string }).id}`);
   };
 
   const copyText = async (text: string, title: string) => {
@@ -548,15 +508,6 @@ const AdminQuotes = () => {
                         </Button>
                       </>
                     )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      disabled={busy === row.id}
-                      onClick={() => makeOffer(row)}
-                    >
-                      <FileText className="mr-2 h-4 w-4" /> Izveidot piedāvājumu
-                    </Button>
                     {done ? (
                       <Button variant="ghost" size="sm" className="w-full" onClick={() => reopen(row)}>
                         Atvērt atkal
@@ -601,50 +552,6 @@ const AdminQuotes = () => {
                     {row.print_placement && <span>Vieta: <span className="text-foreground">{row.print_placement}</span></span>}
                     {row.print_colors && <span>Krāsas: <span className="text-foreground">{row.print_colors}</span></span>}
                     {row.deadline && <span>Termiņš: <span className="text-foreground">{row.deadline}</span></span>}
-                  </div>
-                )}
-
-                {items.length > 0 && (
-                  <div className="border-t border-border pt-3">
-                    <p className="mb-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-                      Preces ({items.length} rindas · {totalQty} gab.)
-                    </p>
-                    <div className="overflow-x-auto">
-                      <table className="w-full min-w-[520px] text-xs">
-                        <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                          <tr>
-                            <th className="px-2 py-1 text-left">Prece</th>
-                            <th className="px-2 py-1 text-left">Kods</th>
-                            <th className="px-2 py-1 text-left">Krāsa</th>
-                            <th className="px-2 py-1 text-left">Izmērs</th>
-                            <th className="px-2 py-1 text-right">Skaits</th>
-                            <th className="px-2 py-1 text-right">Cena/gab.</th>
-                            <th className="px-2 py-1 text-right">Summa</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {items.map((it, i) => (
-                            <tr key={i} className="border-t border-border">
-                              <td className="px-2 py-1.5 text-foreground">{it.name || "—"}</td>
-                              <td className="px-2 py-1.5 font-mono">{it.code || "—"}</td>
-                              <td className="px-2 py-1.5">{it.colorName || it.colorCode || "—"}</td>
-                              <td className="px-2 py-1.5">{it.size || "—"}</td>
-                              <td className="px-2 py-1.5 text-right">{it.qty ?? 0}</td>
-                              <td className="px-2 py-1.5 text-right">{it.unitPrice ? eur(it.unitPrice) : "—"}</td>
-                              <td className="px-2 py-1.5 text-right">
-                                {it.unitPrice ? eur(it.unitPrice * (it.qty || 0)) : "—"}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    {totalNet > 0 && (
-                      <p className="mt-2 text-right text-xs text-muted-foreground">
-                        Kopā bez PVN: <span className="font-semibold text-foreground">{eur(totalNet)}</span> · ar PVN
-                        21%: <span className="font-semibold text-foreground">{eur(totalNet * 1.21)}</span>
-                      </p>
-                    )}
                   </div>
                 )}
 

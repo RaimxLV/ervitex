@@ -42,22 +42,23 @@
 
 ## Pieprasījumu plūsma (pabeigts 22.09.2026)
 - [x] Numurs `ERV-DDMM-NNN` katram pieteikumam, tēmā `[#ERV-...]`
-- [x] 5 pogas Lauras e-pastā (Ilona, Santa, Justīne, Evita, Ņemu es) + `Pabeigts`
+- [x] E-pastā vairs nav nodošanas un pabeigšanas pogu; nodošana notiek pie konkrētā pasūtījuma
 - [x] `quote-action` funkcija: nodod, sūta pieteikumu darbiniecei ar Reply-To uz klientu, atzīmē pabeigtu
 - [x] Admina cilnes: Nenodotie / Mani / Visi aktīvie / Pabeigtie + brīdinājums >2 dienām
 - [x] Katalogā/piedāvājumos poga „Kopēt piedāvājuma saiti”
-- [ ] Apstiprināt Evitas e-pastu (pagaidām evita@ervitex.lv)
+- [x] Evitas e-pasts: info@t-bode.lv; Raimonds: ofsetadruka@gmail.com
 
 ## Kopīgais preču saraksts (pie pieprasījuma)
 - [x] Saraksta bloks dzīvo pie pieprasījuma, atveras pēc saites (/saraksts/:token).
 - [x] Rediģēšana tiešsaistē: izmērs, skaits, preces cena, piezīme, rindas dzēšana.
 - [x] Apdruka: Sietspiede / DTF / Izšūšana / Sublimācija / Cita, vairākas vienā precē, cena ar roku.
 - [x] Summas bez PVN un ar PVN pārrēķinās uzreiz.
-- [x] Pogas e-pastos: klientam, birojam un atbildīgajai kolēģei.
+- [x] E-pastos paliek viena poga uz individuālo preču sarakstu.
 - [x] Adminā: "Preču saraksts" un "Kopēt saraksta saiti".
 
 ## Vienotā klienta–preču saraksta plūsma
-- [ ] Pilns esošās klienta, e-pasta, kopīgā saraksta un admina plūsmas audits.
-- [ ] Konkurentu un B2B piedāvājumu rīku UI/UX salīdzinājums.
-- [ ] Apstiprināts vienotas plūsmas pārbūves plāns: viena saraksta datu vieta un viena galvenā e-pasta poga.
-- [ ] Pārbūvēt plūsmu pēc apstiprinātā plāna.
+- [x] Pilns esošās klienta, e-pasta, kopīgā saraksta un admina plūsmas audits.
+- [x] Konkurentu un B2B piedāvājumu rīku UI/UX salīdzinājums.
+- [x] Apstiprināts vienotas plūsmas pārbūves plāns: viena saraksta datu vieta un viena galvenā e-pasta poga.
+- [ ] Pārbūvēt plūsmu līdz galam: modeļa maiņa un jaunu preču pievienošana pašā preču sarakstā.
+- [x] E-pasti: noņemt preču tabulas/nosaukumus un visas dublētās pogas; atstāt vienu pogu uz individuālo preču sarakstu, saraksti neveidojot mājaslapā.

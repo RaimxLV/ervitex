@@ -3,7 +3,6 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 import { ASSIGNEES, assigneeBySlug } from '../_shared/assignees.ts'
 
 const OFFICE_EMAIL = 'birojs@ervitex.lv'
-const FN_BASE = `${Deno.env.get('SUPABASE_URL')}/functions/v1/quote-action`
 
 const page = (title: string, body: string, ok = true) =>
   new Response(
@@ -43,7 +42,7 @@ Deno.serve(async (req) => {
   if (action === 'complete') {
     await supabase
       .from('quote_requests')
-      .update({ status: 'closed', completed_at: new Date().toISOString() })
+      .update({ status: 'closed', completed_at: new Date().toISOString(), worksheet_locked: true })
       .eq('id', quote.id)
     return page('Pabeigts', 'Pieprasījums atzīmēts kā pabeigts. Vari aizvērt šo logu.')
   }
@@ -88,14 +87,11 @@ Deno.serve(async (req) => {
         phone: quote.phone || '',
         company: quote.company || '',
         message: quote.message || '',
-        items: Array.isArray(quote.items) ? quote.items : [],
         files,
         print_method: quote.print_method || '',
         print_placement: quote.print_placement || '',
         print_colors: quote.print_colors || '',
         deadline: quote.deadline || '',
-        completeUrl: `${FN_BASE}?token=${token}&action=complete`,
-        adminUrl: 'https://raimxlv.github.io/ervitex/admin/quotes',
         worksheetUrl: `https://raimxlv.github.io/ervitex/saraksts/${token}`,
       },
     },
