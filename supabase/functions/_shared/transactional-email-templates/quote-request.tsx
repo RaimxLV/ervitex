@@ -74,6 +74,7 @@ const QuoteRequestEmail = ({
   ref: _ref = '',
   assignLinks = [],
   completeUrl = '',
+  worksheetUrl = '',
   name = '',
   email = '',
   phone = '',
