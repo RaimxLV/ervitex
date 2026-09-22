@@ -132,22 +132,45 @@ const WorksheetPage = () => {
 
           </header>
 
-          <div className="mt-5 space-y-4">
+          <div className="mt-5 space-y-2">
             {items.length === 0 && (
               <p className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                 Sarakstā nav preču.
               </p>
             )}
 
-            {items.map((i) => (
-              <div key={i.id} className="rounded-md border border-border bg-background p-3 sm:p-4">
-                <div className="flex gap-3">
-                  {i.image && (
-                    <img src={i.image} alt={i.name} loading="lazy" className="h-20 w-20 shrink-0 rounded-sm border border-border object-contain p-0.5" />
+            {items.map((i) => {
+              const open = openId === i.id;
+              return (
+              <div key={i.id} className="overflow-hidden rounded-md border border-border bg-background">
+                <button
+                  type="button"
+                  onClick={() => setOpenId(open ? null : i.id)}
+                  className="flex w-full items-center gap-3 p-2.5 text-left hover:bg-muted/50 sm:p-3"
+                >
+                  {i.image ? (
+                    <img src={i.image} alt={i.name} loading="lazy" className="h-11 w-11 shrink-0 rounded-sm border border-border object-contain p-0.5" />
+                  ) : (
+                    <span className="h-11 w-11 shrink-0 rounded-sm border border-dashed border-border" />
                   )}
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium leading-snug">{i.name}</p>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium">{i.name}</span>
+                    <span className="block truncate text-[11px] text-muted-foreground">
+                      {[i.colorName, i.size, `${i.qty} gab.`, (i.prints || []).map((p) => p.method).join(" + ")].filter(Boolean).join(" · ")}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-right">
+                    <span className="block font-heading text-sm font-black tabular-nums">{money(lineNet(i))}</span>
+                    <span className="block text-[11px] text-muted-foreground tabular-nums">
+                      ar PVN {money(lineNet(i) * (1 + (sheet.vat_rate || 21) / 100))}
+                    </span>
+                  </span>
+                  <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+                </button>
+
+                {open && (
+                  <div className="border-t border-border p-3 sm:p-4">
+                    <p className="text-[11px] text-muted-foreground">
                       {[i.code, i.brand, i.colorName].filter(Boolean).join(" · ")}
                     </p>
 
@@ -193,11 +216,10 @@ const WorksheetPage = () => {
 
                       {(i.prints || []).length === 0 ? (
                         <p className="mt-2 text-xs text-muted-foreground">Bez apdrukas</p>
-
                       ) : (
                         <div className="mt-2 space-y-2">
                           {(i.prints || []).map((p, idx) => (
-                            <div key={idx} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_120px_auto]">
+                            <div key={idx} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_130px_120px_auto]">
                               <select
                                 className="h-10 rounded-md border border-input bg-background px-3 text-sm"
                                 value={p.method}
@@ -212,10 +234,18 @@ const WorksheetPage = () => {
                                 disabled={readOnly}
                                 onChange={(e) => patchPrint(i.id, idx, { placement: e.target.value })}
                               />
-
+                              <select
+                                className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                                value={p.mode === "total" ? "total" : "unit"}
+                                disabled={readOnly}
+                                onChange={(e) => patchPrint(i.id, idx, { mode: e.target.value === "total" ? "total" : "unit" })}
+                              >
+                                <option value="unit">€ par gabalu</option>
+                                <option value="total">€ kopā</option>
+                              </select>
                               <Input
                                 inputMode="decimal"
-                                placeholder="€/gab."
+                                placeholder={p.mode === "total" ? "€ kopā" : "€/gab."}
                                 value={p.price ?? ""}
                                 disabled={readOnly}
                                 onChange={(e) => patchPrint(i.id, idx, { price: e.target.value === "" ? null : num(e.target.value) })}
@@ -228,7 +258,7 @@ const WorksheetPage = () => {
                             </div>
                           ))}
                           <p className="text-[11px] text-muted-foreground">
-                            Apdruka kopā {money(printTotalPerUnit(i))} par gabalu (bez PVN).
+                            Apdruka kopā {money(printNet(i))} bez PVN
                           </p>
                         </div>
                       )}
@@ -239,9 +269,10 @@ const WorksheetPage = () => {
                       <Input value={i.note || ""} disabled={readOnly} onChange={(e) => patch(i.id, { note: e.target.value })} />
                     </label>
                   </div>
-                </div>
+                )}
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Kopsummas */}
