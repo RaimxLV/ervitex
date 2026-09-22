@@ -189,6 +189,61 @@ const AdminOfferEdit = () => {
     toast({ title: `Pievienots: ${lines.length} rindas` });
   };
 
+  /** Viena modeļa + krāsas grupa piedāvājumā */
+  const groupKey = (i: OfferItem) => `${i.source}|${i.productId}|${i.colorName || ""}`;
+  const swapTarget = useMemo(
+    () => (swapKey ? offer.items.find((i) => groupKey(i) === swapKey) || null : null),
+    [swapKey, offer.items],
+  );
+  const firstOfGroup = useMemo(() => {
+    const seen = new Set<string>();
+    const ids = new Set<string>();
+    for (const i of offer.items) {
+      const k = groupKey(i);
+      if (!seen.has(k)) { seen.add(k); ids.add(i.id); }
+    }
+    return ids;
+  }, [offer.items]);
+
+  /** Nomaina modeli/krāsu visai grupai, saglabājot izmērus un daudzumus */
+  const swapPicked = () => {
+    if (!picked || !swapKey) return;
+    const color = colorRows.find((c) => c.c === activeColor) || colorRows[0] || null;
+    const priceBySize = new Map(sizeRows.map((r) => [r.size, r.price]));
+    let missing = 0;
+    setOffer((o) => ({
+      ...o,
+      items: o.items.map((i) => {
+        if (groupKey(i) !== swapKey) return i;
+        const s = i.size || "-";
+        const has = priceBySize.has(s);
+        if (!has) missing += 1;
+        return {
+          ...i,
+          source: picked.source,
+          productId: picked.id,
+          name: picked.name,
+          code: picked.id,
+          brand: picked.brand,
+          image: color?.u || picked.image_url || null,
+          colorName: color?.n || null,
+          colorHex: color?.h || null,
+          unitPrice: has ? (priceBySize.get(s) ?? null) : i.unitPrice,
+        };
+      }),
+    }));
+    setSwapKey(null);
+    setPicked(null);
+    setQtyBySize({});
+    setQ("");
+    toast({
+      title: "Modelis nomainīts",
+      description: missing
+        ? `Izmēri un skaiti saglabāti. ${missing} izmēriem jaunajam modelim nav cenas — pārbaudi.`
+        : "Izmēri un skaiti saglabāti, cenas atjaunotas.",
+    });
+  };
+
   const patchItem = (itemId: string, patch: Partial<OfferItem>) =>
     setOffer((o) => ({ ...o, items: o.items.map((i) => (i.id === itemId ? { ...i, ...patch } : i)) }));
   const removeItem = (itemId: string) =>
