@@ -47,7 +47,6 @@ const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', colo
 const container = { maxWidth: '680px', margin: '0 auto', padding: '20px' }
 const headerBar = { borderBottom: '3px solid #E11D2E', paddingBottom: '12px', marginBottom: '16px' }
 const h1 = { fontSize: '20px', margin: '0', color: '#111' }
-const subtle = { color: '#666', fontSize: '12px', margin: '4px 0 0' }
 const h3 = { fontSize: '14px', margin: '20px 0 6px', color: '#111' }
 const label = { color: '#666', paddingRight: '12px' as const }
 const rowCell = { padding: '8px', borderBottom: '1px solid #eee', fontSize: '13px' as const }
