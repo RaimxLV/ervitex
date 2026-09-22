@@ -62,6 +62,17 @@ const isDone = (q: QuoteRow) => q.status === "closed";
 
 type TabKey = "unassigned" | "mine" | "active" | "done";
 
+type SortKey = "newest" | "oldest" | "name" | "company" | "assignee" | "qty";
+
+const SORTS: { key: SortKey; label: string }[] = [
+  { key: "newest", label: "Jaunākie pirmie" },
+  { key: "oldest", label: "Vecākie pirmie" },
+  { key: "name", label: "Klients (A–Z)" },
+  { key: "company", label: "Uzņēmums (A–Z)" },
+  { key: "assignee", label: "Atbildīgais" },
+  { key: "qty", label: "Lielākais daudzums" },
+];
+
 const TABS: { key: TabKey; label: string }[] = [
   { key: "unassigned", label: "Nenodotie" },
   { key: "mine", label: "Mani" },
