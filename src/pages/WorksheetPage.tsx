@@ -81,6 +81,44 @@ const WorksheetPage = () => {
     setDirty(true);
   };
 
+  const addItems = (rows: WorksheetItem[]) => {
+    setItems((prev) => [...prev, ...rows]);
+    setDirty(true);
+    setOpenId(rows[0]?.id ?? null);
+    toast.success(`Pievienots: ${rows.length}`);
+  };
+
+  const swapModel: React.ComponentProps<typeof ItemPickerDialog>["onSwap"] = (next) => {
+    if (!swapId) return;
+    let missing = false;
+    setItems((prev) =>
+      prev.map((i) => {
+        if (i.id !== swapId) return i;
+        const key = i.size || "-";
+        const has = next.priceBySize.has(key);
+        if (!has) missing = true;
+        return {
+          ...i,
+          source: next.source,
+          productId: next.productId,
+          name: next.name,
+          code: next.code,
+          brand: next.brand,
+          image: next.image,
+          colorName: next.colorName,
+          colorHex: next.colorHex,
+          unitPrice: has ? next.priceBySize.get(key) ?? null : null,
+        };
+      }),
+    );
+    setDirty(true);
+    setSwapId(null);
+    toast[missing ? "warning" : "success"](
+      missing ? "Modelis nomainīts — izvēlies pieejamu izmēru" : "Modelis nomainīts",
+    );
+  };
+
+
   const save = async () => {
     setSaving(true);
     const { data, error } = await supabase.rpc("save_quote_worksheet" as any, {
