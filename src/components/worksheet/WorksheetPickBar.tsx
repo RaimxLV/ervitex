@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { endWorksheetPick, useWorksheetPick } from "@/lib/worksheetPick";
 import type { WorksheetItem } from "@/lib/worksheet";
-import { fetchVariantPrices } from "@/components/worksheet/useVariants";
+import { fetchVariantPrices, priceForVariant } from "@/components/worksheet/useVariants";
 import { ArrowLeft, Check, Loader2, Repeat, X } from "lucide-react";
 
 const WorksheetPickBar = () => {
@@ -50,22 +50,34 @@ const WorksheetPickBar = () => {
     setBusy(true);
     try {
       const current = await loadSheet();
-      const rows: WorksheetItem[] = items.map((c) => ({
-        id: `${c.source}-${c.productId}-${c.colorCode || "x"}-${c.size || "x"}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        source: c.source,
-        productId: c.productId,
-        name: c.name,
-        code: c.code,
-        brand: c.brand,
-        image: c.image,
-        colorName: c.colorName,
-        colorHex: c.colorHex,
-        size: c.size,
-        qty: c.qty,
-        unitPrice: c.unitPrice ?? null,
-        prints: [],
-      }));
+      // Cenu no kataloga pārbaudām vēlreiz, lai sarakstā nenonāk 0,00 €.
+      const priceCache = new Map<string, Awaited<ReturnType<typeof fetchVariantPrices>>>();
+      const rows: WorksheetItem[] = [];
+      for (const c of items) {
+        let unitPrice = c.unitPrice ?? null;
+        if (!unitPrice) {
+          const key = `${c.source}|${c.productId}`;
+          if (!priceCache.has(key)) priceCache.set(key, await fetchVariantPrices(c.source, c.productId));
+          unitPrice = priceForVariant(c.source, priceCache.get(key)!, c.colorCode, c.size).price;
+        }
+        rows.push({
+          id: `${c.source}-${c.productId}-${c.colorCode || "x"}-${c.size || "x"}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          source: c.source,
+          productId: c.productId,
+          name: c.name,
+          code: c.code,
+          brand: c.brand,
+          image: c.image,
+          colorName: c.colorName,
+          colorHex: c.colorHex,
+          size: c.size,
+          qty: c.qty,
+          unitPrice,
+          prints: [],
+        });
+      }
       await persist([...current, ...rows]);
+
       clear();
       toast.success(`Pievienots sarakstam: ${rows.length}`);
       back();
@@ -86,14 +98,8 @@ const WorksheetPickBar = () => {
       let missing = false;
       const next = current.map((i) => {
         if (i.id !== pick.rowId) return i;
-        const size = i.size || null;
-        const sameSize = prices.filter((p) => (p.size || null) === size);
-        // Exact colour + size first; only fall back to colourless price rows.
-        const exact = c.colorCode ? sameSize.filter((p) => p.color_code === c.colorCode) : sameSize;
-        const match = exact.length ? exact : sameSize.filter((p) => !p.color_code);
-        const candidates = match.map((p) => Number(p.retail_price) || 0).filter((n) => n > 0);
-        const price = candidates.length ? Math.min(...candidates) : 0;
-        if (!price) missing = true;
+        const hit = priceForVariant(c.source, prices, c.colorCode, i.size);
+        if (!hit.price) missing = true;
         return {
           ...i,
           source: c.source,
@@ -104,9 +110,11 @@ const WorksheetPickBar = () => {
           image: c.image,
           colorName: c.colorName,
           colorHex: c.colorHex,
-          unitPrice: price > 0 ? price : null,
+          size: hit.size ?? i.size,
+          unitPrice: hit.price,
         };
       });
+
       await persist(next);
       clear();
       toast[missing ? "warning" : "success"](

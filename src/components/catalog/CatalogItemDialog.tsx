@@ -1537,7 +1537,7 @@ const CatalogItemDialog = ({
                     return (
                       <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
                         <span className="font-semibold text-foreground">
-                          {lang === "lv" ? "Cenas pa izmēriem (ar PVN): " : "Prices by size (incl. VAT): "}
+                          {lang === "lv" ? "Cenas pa izmēriem (bez PVN): " : "Prices by size (excl. VAT): "}
                         </span>
                         {groups
                           .map((g) =>

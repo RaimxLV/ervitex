@@ -24,6 +24,55 @@ export const sizeIdx = (s: string) => {
   return Number.isFinite(n) ? 100 + n : 900;
 };
 
+const norm = (s?: string | null) => (s ?? "").toString().trim().toLowerCase();
+
+/** NWG numeric size codes -> labels. */
+const NWG_SIZE_CODES: Record<string, string> = {
+  "1": "3XS", "2": "XXS", "3": "XS", "4": "S", "5": "M", "6": "L",
+  "7": "XL", "8": "XXL", "9": "3XL", "10": "4XL", "11": "5XL", "12": "6XL",
+};
+
+/** Catalog colour codes carry the style prefix (0200910-55), price rows only the suffix (55). */
+export const colorMatches = (priceColor?: string | null, pickColor?: string | null) => {
+  const a = norm(priceColor);
+  const b = norm(pickColor);
+  if (!a || !b) return false;
+  return a === b || b.endsWith(`-${a}`) || a.endsWith(`-${b}`);
+};
+
+/** Size label mapper for one model's price rows. */
+export const sizeLabeller = (source: string | null | undefined, rows: VariantPrice[]) => {
+  const all = [...new Set(rows.map((r) => (r.size || "").trim()).filter(Boolean))];
+  const coded =
+    source === "nwg" && all.length > 0 && all.every((s) => /^\d{1,2}$/.test(s) && +s >= 1 && +s <= 12);
+  return (s: string) => (coded ? NWG_SIZE_CODES[s] || s : s);
+};
+
+/** Cena precīzam izmēram un krāsai; atgriež arī izmēra nosaukumu. */
+export const priceForVariant = (
+  source: string,
+  rows: VariantPrice[],
+  colorCode: string | null | undefined,
+  size: string | null | undefined,
+) => {
+  const label = sizeLabeller(source, rows);
+  const want = norm(size) || "-";
+  const bySize = rows.filter((r) => {
+    const raw = (r.size || "-").trim() || "-";
+    return norm(raw) === want || norm(label(raw)) === want;
+  });
+  const pool = bySize.length ? bySize : [];
+  const byColor = colorCode ? pool.filter((r) => colorMatches(r.color_code, colorCode)) : [];
+  const chosen = byColor.length ? byColor : pool;
+  const values = chosen.map((r) => Number(r.retail_price)).filter((n) => Number.isFinite(n) && n > 0);
+  const raw = chosen[0]?.size || null;
+  return {
+    price: values.length ? Math.min(...values) : null,
+    size: raw ? label((raw || "").trim()) : size ?? null,
+  };
+};
+
+
 export const fetchVariantPrices = async (source: string, styleCode: string) => {
   const rows: VariantPrice[] = [];
   let from = 0;
@@ -79,17 +128,25 @@ export const useVariants = (source?: string | null, styleCode?: string | null) =
   const colors = useMemo(() => (item?.colors || []).filter((c) => c?.n || c?.c), [item]);
 
   const sizesFor = (colorCode?: string | null) => {
-    const forColor = prices.filter((p) => !colorCode || !p.color_code || p.color_code === colorCode);
-    const map = new Map<string, number | null>();
+    const label = sizeLabeller(source, prices);
+    const forColor = prices.filter(
+      (p) => !colorCode || !p.color_code || colorMatches(p.color_code, colorCode),
+    );
+    const map = new Map<string, { raw: string; price: number | null }>();
     for (const p of forColor.length ? forColor : prices) {
-      const s = p.size || "-";
-      const price = Number(p.retail_price);
-      if (!map.has(s) || (map.get(s) ?? 0) < price) map.set(s, Number.isFinite(price) && price > 0 ? price : null);
+      const raw = (p.size || "-").trim() || "-";
+      const key = label(raw);
+      const n = Number(p.retail_price);
+      const price = Number.isFinite(n) && n > 0 ? n : null;
+      const cur = map.get(key);
+      if (!cur) map.set(key, { raw, price });
+      else if (price !== null && (cur.price === null || price < cur.price)) map.set(key, { raw, price });
     }
     return [...map.entries()]
-      .map(([size, price]) => ({ size, price }))
+      .map(([size, v]) => ({ size, raw: v.raw, price: v.price }))
       .sort((a, b) => sizeIdx(a.size) - sizeIdx(b.size) || a.size.localeCompare(b.size));
   };
+
 
   return { item, prices, colors, sizesFor, loading };
 };
