@@ -71,10 +71,12 @@ const TABS: { key: TabKey; label: string }[] = [
 const AdminQuotes = () => {
   const [quotes, setQuotes] = useState<QuoteRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
   const [tab, setTab] = useState<TabKey>("unassigned");
   const [q, setQ] = useState("");
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const fetchQuotes = async () => {
     setLoading(true);
