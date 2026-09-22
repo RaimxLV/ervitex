@@ -3,14 +3,18 @@ import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { money } from "@/lib/offer";
 import {
   PRINT_METHODS, lineNet, printNet, worksheetTotals,
   type PrintLine, type Worksheet, type WorksheetItem,
 } from "@/lib/worksheet";
-import { ChevronDown, Loader2, Plus, Printer, Save, Store, Trash2, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, Loader2, Plus, Printer, Save, Store, Trash2, UserCheck, X } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
+import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
+import { useAuth } from "@/hooks/useAuth";
 
 const num = (v: string) => {
   const n = Number(String(v).replace(",", "."));
@@ -26,6 +30,8 @@ const WorksheetPage = () => {
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [actionBusy, setActionBusy] = useState(false);
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     (async () => {
@@ -47,6 +53,11 @@ const WorksheetPage = () => {
 
   const totals = useMemo(() => worksheetTotals(items, sheet?.vat_rate ?? 21), [items, sheet?.vat_rate]);
   const readOnly = !!sheet?.locked;
+  const assignedSlug = useMemo(() => {
+    const byEmail = ASSIGNEES.find((a) => a.email.toLowerCase() === (sheet?.assigned_pm_email || "").toLowerCase());
+    return byEmail?.slug || "";
+  }, [sheet?.assigned_pm_email]);
+  const statusLabel = sheet?.status === "closed" ? "Pabeigts" : sheet?.assigned_pm_email ? "Darbā" : "Jauns";
 
   const patch = (id: string, changes: Partial<WorksheetItem>) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...changes } : i)));
@@ -82,6 +93,43 @@ const WorksheetPage = () => {
     toast.success("Saglabāts");
 
   };
+  const assign = async (slug: string) => {
+    if (!token || !sheet) return;
+    const person = assigneeBySlug(slug);
+    if (!person) return;
+    setActionBusy(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quote-action?token=${token}&action=assign:${person.slug}`);
+      if (!res.ok) throw new Error("Neizdevās nodot");
+      setSheet((s) => (s ? {
+        ...s,
+        assigned_pm_name: person.name,
+        assigned_pm_email: person.email,
+        status: s.status === "new" ? "contacted" : s.status,
+      } : s));
+      toast.success(`Nodots ${person.name}`);
+    } catch {
+      toast.error("Neizdevās nodot");
+    } finally {
+      setActionBusy(false);
+    }
+  };
+
+  const complete = async () => {
+    if (!sheet) return;
+    setActionBusy(true);
+    const { error } = await supabase
+      .from("quote_requests")
+      .update({ status: "closed", completed_at: new Date().toISOString() } as never)
+      .eq("id", sheet.id);
+    setActionBusy(false);
+    if (error) {
+      toast.error("Neizdevās pabeigt");
+      return;
+    }
+    setSheet((s) => (s ? { ...s, status: "closed", locked: true } : s));
+    toast.success("Pabeigts");
+  };
 
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Ielādē…</div>;
@@ -114,10 +162,37 @@ const WorksheetPage = () => {
         <article className="rounded-md border border-border bg-card p-4 sm:p-7">
           <header className="border-b border-border pb-5">
             <img src={logo} alt="Ervitex" className="h-7 w-auto" />
-            <h1 className="mt-4 font-heading text-xl font-black uppercase leading-tight sm:text-3xl">Preču saraksts</h1>
-            <p className="mt-1.5 text-sm text-muted-foreground">
-              {[sheet.company, sheet.name, sheet.email, sheet.phone].filter(Boolean).join(" · ")}
-            </p>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <h1 className="font-heading text-xl font-black uppercase leading-tight sm:text-3xl">Preču saraksts</h1>
+                <p className="mt-1.5 break-words text-sm text-muted-foreground">
+                  {[sheet.company, sheet.name, sheet.email, sheet.phone].filter(Boolean).join(" · ")}
+                </p>
+              </div>
+              <Badge variant={sheet.status === "closed" ? "secondary" : sheet.assigned_pm_email ? "default" : "outline"} className="w-fit shrink-0">
+                {statusLabel}
+              </Badge>
+            </div>
+            {isAdmin && (
+              <div className="mt-4 grid gap-2 border-t border-border pt-4 sm:grid-cols-[minmax(180px,240px)_auto] sm:items-center">
+                <Select value={assignedSlug} onValueChange={assign} disabled={actionBusy}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Atbildīgais" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ASSIGNEES.map((a) => (
+                      <SelectItem key={a.slug} value={a.slug}>{a.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {sheet.status !== "closed" && (
+                  <Button variant="outline" size="sm" onClick={complete} disabled={actionBusy}>
+                    {actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+                    Pabeigts
+                  </Button>
+                )}
+              </div>
+            )}
             {sheet.worksheet_updated_at && (
               <p className="mt-2 text-xs text-muted-foreground">
                 Pēdējās izmaiņas: {new Date(sheet.worksheet_updated_at).toLocaleString("lv-LV")}
