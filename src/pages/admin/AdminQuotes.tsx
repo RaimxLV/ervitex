@@ -427,10 +427,32 @@ const AdminQuotes = () => {
                   onClick={() => setExpanded(isOpen ? null : row.id)}
                   className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
                 >
-                  <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`} />
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{row.name}</span>
-                  <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+                  <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`} />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-baseline gap-x-2">
+                      <span className="truncate text-sm font-semibold text-foreground">
+                        {row.company || row.name}
+                      </span>
+                      {row.company && (
+                        <span className="truncate text-xs text-muted-foreground">{row.name}</span>
+                      )}
+                    </span>
+                    <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+                      <span className="truncate">{row.email}</span>
+                      {row.phone && <span>· {row.phone}</span>}
+                      {items.length > 0 && (
+                        <span>
+                          · {items.length} preces, {totalQty} gab.
+                        </span>
+                      )}
+                      <span>
+                        · {row.assigned_pm_name ? `Atbildīgais: ${row.assigned_pm_name}` : "Nav atbildīgā"}
+                      </span>
+                    </span>
+                  </span>
+                  <span className="hidden shrink-0 text-right text-xs text-muted-foreground sm:block">
                     {new Date(row.created_at).toLocaleDateString("lv")}
+                    <span className="block">{age === 0 ? "šodien" : `${age} d. atpakaļ`}</span>
                   </span>
                   <Badge className={`shrink-0 ${badgeClass}`}>{statusLabel}</Badge>
                   <ChevronDown
