@@ -50,22 +50,34 @@ const WorksheetPickBar = () => {
     setBusy(true);
     try {
       const current = await loadSheet();
-      const rows: WorksheetItem[] = items.map((c) => ({
-        id: `${c.source}-${c.productId}-${c.colorCode || "x"}-${c.size || "x"}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        source: c.source,
-        productId: c.productId,
-        name: c.name,
-        code: c.code,
-        brand: c.brand,
-        image: c.image,
-        colorName: c.colorName,
-        colorHex: c.colorHex,
-        size: c.size,
-        qty: c.qty,
-        unitPrice: c.unitPrice ?? null,
-        prints: [],
-      }));
+      // Cenu no kataloga pārbaudām vēlreiz, lai sarakstā nenonāk 0,00 €.
+      const priceCache = new Map<string, Awaited<ReturnType<typeof fetchVariantPrices>>>();
+      const rows: WorksheetItem[] = [];
+      for (const c of items) {
+        let unitPrice = c.unitPrice ?? null;
+        if (!unitPrice) {
+          const key = `${c.source}|${c.productId}`;
+          if (!priceCache.has(key)) priceCache.set(key, await fetchVariantPrices(c.source, c.productId));
+          unitPrice = priceForVariant(c.source, priceCache.get(key)!, c.colorCode, c.size).price;
+        }
+        rows.push({
+          id: `${c.source}-${c.productId}-${c.colorCode || "x"}-${c.size || "x"}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          source: c.source,
+          productId: c.productId,
+          name: c.name,
+          code: c.code,
+          brand: c.brand,
+          image: c.image,
+          colorName: c.colorName,
+          colorHex: c.colorHex,
+          size: c.size,
+          qty: c.qty,
+          unitPrice,
+          prints: [],
+        });
+      }
       await persist([...current, ...rows]);
+
       clear();
       toast.success(`Pievienots sarakstam: ${rows.length}`);
       back();
