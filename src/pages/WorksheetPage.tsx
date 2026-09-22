@@ -33,6 +33,9 @@ const WorksheetPage = () => {
   const [dirty, setDirty] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState(false);
+  const [pickerMode, setPickerMode] = useState<"add" | "swap" | null>(null);
+  const [swapId, setSwapId] = useState<string | null>(null);
+  const [savedOnce, setSavedOnce] = useState(false);
   const { isAdmin } = useAuth();
 
   useEffect(() => {
