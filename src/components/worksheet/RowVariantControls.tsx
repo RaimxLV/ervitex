@@ -82,7 +82,7 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
           <span className="mb-1.5 block text-[10px] uppercase tracking-wider text-muted-foreground">Izmērs</span>
           <div className="flex flex-wrap gap-1.5">
             {sizes.map((s) => {
-              const active = (item.size || "-") === s.size;
+              const active = isCurrent(s);
               return (
                 <button
                   key={s.size}
@@ -99,11 +99,12 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
               );
             })}
           </div>
-          {!sizes.some((s) => (item.size || "-") === s.size) && (
+          {!sizes.some((s) => isCurrent(s)) && (
             <p className="mt-1.5 text-[11px] font-semibold text-destructive">
               Izmērs {item.size || "—"} šim modelim nav pieejams — izvēlies citu.
             </p>
           )}
+
         </div>
       )}
     </div>
