@@ -94,6 +94,35 @@ export const useVariants = (source?: string | null, styleCode?: string | null) =
   return { item, prices, colors, sizesFor, loading };
 };
 
+/** Latviešu vārdi -> kataloga angļu nosaukumi. */
+const SYNONYMS: Record<string, string[]> = {
+  krekls: ["t-shirt", "tee", "shirt"],
+  krekli: ["t-shirt", "tee", "shirt"],
+  tkrekls: ["t-shirt"],
+  polo: ["polo"],
+  jaka: ["jacket"],
+  jakas: ["jacket"],
+  cepure: ["cap", "beanie", "hat"],
+  cepures: ["cap", "beanie", "hat"],
+  bikses: ["trousers", "pants"],
+  šorti: ["shorts"],
+  veste: ["vest", "bodywarmer"],
+  džemperis: ["sweat", "sweater", "hoodie"],
+  jaciņa: ["jacket"],
+  kapučjaka: ["hoodie"],
+  hūdijs: ["hoodie"],
+  soma: ["bag"],
+  somas: ["bag"],
+  mugursoma: ["backpack"],
+  krūze: ["mug"],
+  pudele: ["bottle"],
+  dvielis: ["towel"],
+  zeķes: ["socks"],
+  priekšauts: ["apron"],
+  lietussargs: ["umbrella"],
+  cimdi: ["gloves"],
+};
+
 /** Kataloga meklēšana ar aizturi. */
 export const useCatalogSearch = (q: string) => {
   const [hits, setHits] = useState<CatalogHit[]>([]);
@@ -108,10 +137,16 @@ export const useCatalogSearch = (q: string) => {
     }
     setSearching(true);
     const t = window.setTimeout(async () => {
+      const words = SYNONYMS[term.toLowerCase()] || [term];
+      const filter = [
+        ...words.map((w) => `name.ilike.%${w}%`),
+        `id.ilike.%${term}%`,
+        `brand.ilike.%${term}%`,
+      ].join(",");
       const { data } = await supabase
         .from("catalog_items" as never)
         .select("source,id,name,brand,image_url,colors")
-        .or(`name.ilike.%${term}%,id.ilike.%${term}%`)
+        .or(filter)
         .limit(25);
       setHits((data || []) as unknown as CatalogHit[]);
       setSearching(false);
