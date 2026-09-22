@@ -581,6 +581,8 @@ const AdminQuotes = () => {
                     {row.message}
                   </p>
                 )}
+                  </div>
+                )}
               </div>
             );
           })
