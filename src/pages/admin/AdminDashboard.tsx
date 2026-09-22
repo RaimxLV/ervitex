@@ -90,7 +90,7 @@ const AdminDashboard = () => {
 
   const cards = [
     { label: "Pieprasījumi", value: stats.quotes, icon: MessageSquare, to: "/admin/quotes" },
-    { label: "Jauni pieprasījumi", value: stats.newQuotes, icon: TrendingUp, to: "/admin/quotes" },
+    { label: "Nenodotie pieprasījumi", value: stats.newQuotes, icon: TrendingUp, to: "/admin/quotes" },
     { label: "Piedāvājumi", value: stats.offers, icon: FileText, to: "/admin/offers" },
     { label: "Nosūtīti piedāvājumi", value: stats.sentOffers, icon: FileText, to: "/admin/offers" },
   ];
