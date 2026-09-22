@@ -9,10 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
+import { worksheetPath, worksheetUrl } from "@/lib/worksheet";
 import {
   AlertTriangle,
   CheckCircle2,
   ChevronDown,
+  ClipboardList,
   Copy,
   FileText,
   Mail,
@@ -529,6 +531,23 @@ const AdminQuotes = () => {
                         <Mail className="mr-2 h-4 w-4" /> Rakstīt klientam
                       </a>
                     </Button>
+                    {row.action_token && (
+                      <>
+                        <Button asChild size="sm" className="w-full">
+                          <a href={worksheetPath(row.action_token)} target="_blank" rel="noreferrer">
+                            <ClipboardList className="mr-2 h-4 w-4" /> Preču saraksts
+                          </a>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full text-xs"
+                          onClick={() => copyText(worksheetUrl(row.action_token!), "Saraksta saite nokopēta")}
+                        >
+                          <Copy className="mr-1.5 h-3.5 w-3.5" /> Kopēt saraksta saiti
+                        </Button>
+                      </>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"

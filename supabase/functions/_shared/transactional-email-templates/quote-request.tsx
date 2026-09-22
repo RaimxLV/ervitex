@@ -33,6 +33,7 @@ interface Props {
   ref?: string
   assignLinks?: AssignLink[]
   completeUrl?: string
+  worksheetUrl?: string
   name?: string
   email?: string
   phone?: string
@@ -73,6 +74,7 @@ const QuoteRequestEmail = ({
   ref: _ref = '',
   assignLinks = [],
   completeUrl = '',
+  worksheetUrl = '',
   name = '',
   email = '',
   phone = '',
@@ -135,6 +137,18 @@ const QuoteRequestEmail = ({
               ))}
             </tbody>
           </table>
+
+          {worksheetUrl ? (
+            <>
+              <Text style={{ fontSize: '12px', color: '#666', margin: '14px 0 8px' }}>
+                Kopīgais preču saraksts — atver, maini modeļus, izmērus, skaitus un apdrukas cenas.
+                Summa bez PVN un ar PVN pārrēķinās uzreiz. Klients redz to pašu sarakstu.
+              </Text>
+              <Section>
+                <Link href={worksheetUrl} style={doneBtn}>Atvērt preču sarakstu</Link>
+              </Section>
+            </>
+          ) : null}
 
           {hasPrint ? (
             <>

@@ -29,6 +29,7 @@ const TechnologyPage = lazy(() => import("./pages/TechnologyPage.tsx"));
 const ContactPage = lazy(() => import("./pages/ContactPage.tsx"));
 const LoginPage = lazy(() => import("./pages/LoginPage.tsx"));
 const OfferPage = lazy(() => import("./pages/OfferPage.tsx"));
+const WorksheetPage = lazy(() => import("./pages/WorksheetPage.tsx"));
 const PrivacyPage = lazy(() => import("./pages/PrivacyPage.tsx"));
 const TermsPage = lazy(() => import("./pages/TermsPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
@@ -81,6 +82,7 @@ const App = () => (
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/piedavajums/:token" element={<OfferPage />} />
+              <Route path="/saraksts/:token" element={<WorksheetPage />} />
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/offers" element={<ProtectedRoute><AdminOffers /></ProtectedRoute>} />
               <Route path="/admin/offers/:id" element={<ProtectedRoute><AdminOfferEdit /></ProtectedRoute>} />

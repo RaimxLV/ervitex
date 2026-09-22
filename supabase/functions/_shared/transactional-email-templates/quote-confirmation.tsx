@@ -34,6 +34,7 @@ interface Props {
   print_colors?: string
   deadline?: string
   submittedAt?: string
+  worksheetUrl?: string
 }
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
@@ -57,6 +58,7 @@ const QuoteConfirmationEmail = ({
   print_colors = '',
   deadline = '',
   submittedAt = '',
+  worksheetUrl = '',
 }: Props) => {
   const totalQty = items.reduce((s, it) => s + (Number(it.qty) || 0), 0)
   const hasPrint = !!(print_method || print_placement || print_colors || deadline)
@@ -133,6 +135,28 @@ const QuoteConfirmationEmail = ({
             <>
               <Heading as="h3" style={h3}>Tavas piezīmes</Heading>
               <Text style={{ whiteSpace: 'pre-line', fontSize: '13px', background: '#f7f7f7', padding: '10px', borderRadius: '4px' }}>{message}</Text>
+            </>
+          ) : null}
+
+          {worksheetUrl ? (
+            <>
+              <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
+              <Heading as="h3" style={h3}>Tavs preču saraksts tiešsaistē</Heading>
+              <Text style={{ fontSize: '13px', color: '#444', margin: '0 0 10px' }}>
+                Šo sarakstu redzam gan Tu, gan Tavs Ervitex cilvēks. Tur vari mainīt izmērus un skaitus,
+                izvēlēties apdrukas veidu un uzreiz redzēt summu bez PVN un ar PVN.
+              </Text>
+              <Section>
+                <a
+                  href={worksheetUrl}
+                  style={{
+                    display: 'inline-block', background: '#111', color: '#fff', fontSize: '13px',
+                    fontWeight: 'bold', padding: '11px 16px', borderRadius: '4px', textDecoration: 'none',
+                  }}
+                >
+                  Atvērt preču sarakstu
+                </a>
+              </Section>
             </>
           ) : null}
 
