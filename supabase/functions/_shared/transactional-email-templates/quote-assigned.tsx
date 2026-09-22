@@ -184,7 +184,7 @@ const QuoteAssignedEmail = ({
 export const template = {
   component: QuoteAssignedEmail,
   subject: (d: Props) =>
-    `[#${d.ref || 'ERV'}] Cenu pieprasījums — ${d.company || d.name || 'klients'}`,
+    `Cenu pieprasījums — ${d.company || d.name || 'klients'}`,
   displayName: 'Pieprasījums nodots',
   previewData: {
     ref: 'ERV-2209-014',
