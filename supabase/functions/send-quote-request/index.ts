@@ -1,5 +1,6 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { ASSIGNEES } from "../_shared/assignees.ts";
 
 const OFFICE_EMAIL = "birojs@ervitex.lv";
 
@@ -52,7 +53,20 @@ Deno.serve(async (req) => {
       if (signed?.signedUrl) signedUrls.push(signed.signedUrl);
     }
 
+    const fnBase = `${Deno.env.get("SUPABASE_URL")}/functions/v1/quote-action`;
+    const assignLinks = quote.action_token
+      ? ASSIGNEES.map((a) => ({
+          slug: a.slug,
+          name: a.name,
+          url: `${fnBase}?token=${quote.action_token}&action=assign:${a.slug}`,
+        }))
+      : [];
+    const completeUrl = quote.action_token
+      ? `${fnBase}?token=${quote.action_token}&action=complete`
+      : "";
+
     const baseData = {
+      ref: quote.ref || "",
       name: quote.name,
       email: quote.email,
       phone: quote.phone || "",
@@ -76,7 +90,7 @@ Deno.serve(async (req) => {
         recipientEmail: OFFICE_EMAIL,
         replyTo: quote.email,
         idempotencyKey: `quote-${quote.id}-office`,
-        templateData: { ...baseData, files: signedUrls },
+        templateData: { ...baseData, files: signedUrls, assignLinks, completeUrl },
       },
     });
     results.push({ to: OFFICE_EMAIL, template: "quote-request", ok: !officeErr, error: officeErr?.message });

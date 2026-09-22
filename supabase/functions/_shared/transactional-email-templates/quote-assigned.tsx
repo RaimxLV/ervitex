@@ -2,6 +2,7 @@
 import * as React from 'npm:react@18.3.1'
 import {
   Body,
+  Button,
   Container,
   Head,
   Heading,
@@ -23,16 +24,9 @@ interface QuoteItem {
   qty?: number | string
 }
 
-interface AssignLink {
-  slug?: string
-  name?: string
-  url?: string
-}
-
 interface Props {
   ref?: string
-  assignLinks?: AssignLink[]
-  completeUrl?: string
+  assigneeName?: string
   name?: string
   email?: string
   phone?: string
@@ -44,35 +38,32 @@ interface Props {
   print_placement?: string
   print_colors?: string
   deadline?: string
-  submittedAt?: string
+  completeUrl?: string
 }
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
 const container = { maxWidth: '680px', margin: '0 auto', padding: '20px' }
 const headerBar = { borderBottom: '3px solid #E11D2E', paddingBottom: '12px', marginBottom: '16px' }
-const h1 = { fontSize: '20px', margin: '0', letterSpacing: '0.5px', color: '#111' }
+const h1 = { fontSize: '20px', margin: '0', color: '#111' }
 const subtle = { color: '#666', fontSize: '12px', margin: '4px 0 0' }
 const h3 = { fontSize: '14px', margin: '20px 0 6px', color: '#111' }
 const label = { color: '#666', paddingRight: '12px' as const }
 const rowCell = { padding: '8px', borderBottom: '1px solid #eee', fontSize: '13px' as const }
 const th = { padding: '8px', textAlign: 'left' as const, fontSize: '12px', color: '#fff', background: '#111' }
-const assignBtn = {
-  display: 'inline-block',
-  background: '#E11D2E',
+const doneBtn = {
+  background: '#111',
   color: '#fff',
   fontSize: '13px',
   fontWeight: 'bold' as const,
-  padding: '11px 16px',
+  padding: '11px 18px',
   borderRadius: '4px',
   textDecoration: 'none',
-  margin: '0 8px 8px 0',
+  display: 'inline-block',
 }
-const doneBtn = { ...assignBtn, background: '#111' }
 
-const QuoteRequestEmail = ({
+const QuoteAssignedEmail = ({
   ref: refNo = '',
-  assignLinks = [],
-  completeUrl = '',
+  assigneeName = '',
   name = '',
   email = '',
   phone = '',
@@ -84,7 +75,7 @@ const QuoteRequestEmail = ({
   print_placement = '',
   print_colors = '',
   deadline = '',
-  submittedAt = '',
+  completeUrl = '',
 }: Props) => {
   const totalQty = items.reduce((s, it) => s + (Number(it.qty) || 0), 0)
   const hasPrint = !!(print_method || print_placement || print_colors || deadline)
@@ -92,12 +83,15 @@ const QuoteRequestEmail = ({
   return (
     <Html lang="lv">
       <Head />
-      <Preview>{`Jauns pieprasījums no ${name || email || 'klienta'}`}</Preview>
+      <Preview>{`${refNo} — pieprasījums nodots ${assigneeName}`}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={headerBar}>
-            <Heading style={h1}>{refNo ? `${refNo} · JAUNS PIEPRASĪJUMS` : 'JAUNS PIEPRASĪJUMS'}</Heading>
-            <Text style={subtle}>ervitex.lv{submittedAt ? ` · ${submittedAt}` : ''}</Text>
+            <Heading style={h1}>{`${refNo} · PIEPRASĪJUMS TEV`}</Heading>
+            <Text style={subtle}>
+              {assigneeName ? `${assigneeName}, ` : ''}šis pieprasījums ir Tavs. Spied “Atbildēt”, un vēstule aiziet
+              tieši klientam.
+            </Text>
           </Section>
 
           <Heading as="h3" style={h3}>Klients</Heading>
@@ -126,7 +120,9 @@ const QuoteRequestEmail = ({
                   <td style={rowCell}>
                     <strong>{it.name || '-'}</strong>
                     <br />
-                    <span style={{ color: '#666', fontSize: '12px' }}>{[it.code, it.brand].filter(Boolean).join(' · ')}</span>
+                    <span style={{ color: '#666', fontSize: '12px' }}>
+                      {[it.code, it.brand].filter(Boolean).join(' · ')}
+                    </span>
                   </td>
                   <td style={rowCell}>{it.colorName || '-'}</td>
                   <td style={rowCell}>{it.size || '-'}</td>
@@ -138,7 +134,7 @@ const QuoteRequestEmail = ({
 
           {hasPrint ? (
             <>
-              <Heading as="h3" style={h3}>Apdrukas informācija</Heading>
+              <Heading as="h3" style={h3}>Apdruka</Heading>
               <table style={{ fontSize: '13px' }}>
                 <tbody>
                   {print_method ? <tr><td style={label}>Metode:</td><td>{print_method}</td></tr> : null}
@@ -153,13 +149,15 @@ const QuoteRequestEmail = ({
           {message ? (
             <>
               <Heading as="h3" style={h3}>Piezīmes</Heading>
-              <Text style={{ whiteSpace: 'pre-line', fontSize: '13px', background: '#f7f7f7', padding: '10px', borderRadius: '4px' }}>{message}</Text>
+              <Text style={{ whiteSpace: 'pre-line', fontSize: '13px', background: '#f7f7f7', padding: '10px', borderRadius: '4px' }}>
+                {message}
+              </Text>
             </>
           ) : null}
 
           {files.length > 0 ? (
             <>
-              <Heading as="h3" style={h3}>Pievienotie faili</Heading>
+              <Heading as="h3" style={h3}>Faili</Heading>
               <ul style={{ paddingLeft: '18px', fontSize: '13px' }}>
                 {files.map((u, i) => (
                   <li key={i}><Link href={u}>{(u.split('?')[0] || u).split('/').pop() || u}</Link></li>
@@ -168,32 +166,15 @@ const QuoteRequestEmail = ({
             </>
           ) : null}
 
-          {assignLinks.length > 0 ? (
+          {completeUrl ? (
             <>
               <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
-              <Heading as="h3" style={h3}>Kas to paņem?</Heading>
               <Text style={{ fontSize: '12px', color: '#666', margin: '0 0 10px' }}>
-                Spied vienu pogu — attiecīgā saņems visu pieprasījumu savā pastā.
+                Kad pasūtījums nodots ražošanā:
               </Text>
-              <Section>
-                {assignLinks.map((a, i) => (
-                  <Link key={i} href={a.url} style={assignBtn}>
-                    {a.slug === 'laura' ? 'Ņemu es (Laura)' : `Nodot ${a.name}`}
-                  </Link>
-                ))}
-              </Section>
-              {completeUrl ? (
-                <Section style={{ marginTop: '6px' }}>
-                  <Link href={completeUrl} style={doneBtn}>Pabeigts</Link>
-                </Section>
-              ) : null}
+              <Button href={completeUrl} style={doneBtn}>PABEIGTS</Button>
             </>
           ) : null}
-
-          <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
-          <Text style={{ fontSize: '11px', color: '#999' }}>
-            Šis pieprasījums saglabāts arī Ervitex administrācijas panelī. Atbildi klientam tieši uz {email}.
-          </Text>
         </Container>
       </Body>
     </Html>
@@ -201,19 +182,17 @@ const QuoteRequestEmail = ({
 }
 
 export const template = {
-  component: QuoteRequestEmail,
+  component: QuoteAssignedEmail,
   subject: (d: Props) =>
     `[#${d.ref || 'ERV'}] Cenu pieprasījums — ${d.company || d.name || 'klients'}`,
-  displayName: 'Cenu pieprasījums',
+  displayName: 'Pieprasījums nodots',
   previewData: {
     ref: 'ERV-2209-014',
+    assigneeName: 'Ilona',
     name: 'Jānis Bērziņš',
     email: 'janis@example.com',
-    phone: '+371 20000000',
     company: 'SIA Piemērs',
-    message: 'Lūdzu piedāvājumu ar apdruku.',
-    items: [{ name: 'T-krekls', code: 'STTU755', brand: 'Stanley/Stella', colorName: 'Black', size: 'M', qty: 10 }],
-    files: [],
-    submittedAt: new Date().toLocaleString('lv-LV'),
+    items: [{ name: 'T-krekls', code: 'STTU755', colorName: 'Black', size: 'M', qty: 10 }],
+    completeUrl: 'https://example.com',
   },
 } satisfies TemplateEntry

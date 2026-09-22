@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
-import { money, offerTotals, type OfferItem } from "@/lib/offer";
-import { Plus, Trash2, Pencil, ClipboardList } from "lucide-react";
+import { money, offerTotals, offerUrl, type OfferItem } from "@/lib/offer";
+import { Plus, Trash2, Pencil, ClipboardList, Link2 } from "lucide-react";
 
 interface Row {
   id: string;
@@ -75,6 +75,39 @@ const AdminOffers = () => {
     navigate(`/admin/offers/${data.id}`);
   };
 
+  /** Viena poga: no groza izveido publicētu piedāvājumu un nokopē saiti e-pasta vēstulei. */
+  const copyLinkFromCart = async () => {
+    const items: OfferItem[] = cartItems.map((i) => ({
+      id: i.id,
+      source: i.source,
+      productId: i.productId,
+      name: i.name,
+      code: i.code,
+      brand: i.brand,
+      image: i.image,
+      colorName: i.colorName,
+      colorHex: i.colorHex,
+      size: i.size,
+      qty: i.qty,
+      unitPrice: i.unitPrice ?? null,
+    }));
+    const { data, error } = await supabase
+      .from("pm_offers")
+      .insert({ title: "Piedāvājums", items: items as any, status: "sent" })
+      .select("token")
+      .single();
+    if (error || !data?.token) {
+      return toast({ title: "Kļūda", description: error?.message, variant: "destructive" });
+    }
+    try {
+      await navigator.clipboard.writeText(offerUrl(data.token));
+      toast({ title: "Saite nokopēta", description: "Ielīmē to savā e-pasta vēstulē klientam." });
+    } catch {
+      toast({ title: "Neizdevās nokopēt", variant: "destructive" });
+    }
+    load();
+  };
+
   const remove = async (id: string) => {
     if (!confirm("Dzēst piedāvājumu?")) return;
     const { error } = await supabase.from("pm_offers").delete().eq("id", id);
@@ -98,9 +131,14 @@ const AdminOffers = () => {
         </div>
         <div className="flex flex-wrap gap-2">
           {cartItems.length > 0 && (
-            <Button variant="outline" size="sm" onClick={() => create(true)}>
-              <ClipboardList className="mr-2 h-4 w-4" /> No pieprasījuma groza ({cartItems.length})
-            </Button>
+            <>
+              <Button variant="outline" size="sm" onClick={() => create(true)}>
+                <ClipboardList className="mr-2 h-4 w-4" /> No pieprasījuma groza ({cartItems.length})
+              </Button>
+              <Button variant="outline" size="sm" onClick={copyLinkFromCart}>
+                <Link2 className="mr-2 h-4 w-4" /> Kopēt piedāvājuma saiti
+              </Button>
+            </>
           )}
           <Button size="sm" onClick={() => create(false)}>
             <Plus className="mr-2 h-4 w-4" /> Jauns piedāvājums
