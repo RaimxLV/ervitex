@@ -1,5 +1,6 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { ASSIGNEES } from "../_shared/assignees.ts";
 
 const OFFICE_EMAIL = "birojs@ervitex.lv";
 
@@ -89,7 +90,7 @@ Deno.serve(async (req) => {
         recipientEmail: OFFICE_EMAIL,
         replyTo: quote.email,
         idempotencyKey: `quote-${quote.id}-office`,
-        templateData: { ...baseData, files: signedUrls },
+        templateData: { ...baseData, files: signedUrls, assignLinks, completeUrl },
       },
     });
     results.push({ to: OFFICE_EMAIL, template: "quote-request", ok: !officeErr, error: officeErr?.message });
