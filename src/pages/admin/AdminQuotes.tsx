@@ -34,6 +34,7 @@ interface QuoteItem {
 interface QuoteRow {
   id: string;
   ref: string | null;
+  action_token: string | null;
   name: string;
   email: string;
   phone: string | null;
