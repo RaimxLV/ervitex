@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
-import { money, offerTotals, type OfferItem } from "@/lib/offer";
-import { Plus, Trash2, Pencil, ClipboardList } from "lucide-react";
+import { money, offerTotals, offerUrl, type OfferItem } from "@/lib/offer";
+import { Plus, Trash2, Pencil, ClipboardList, Link2 } from "lucide-react";
 
 interface Row {
   id: string;
@@ -131,9 +131,14 @@ const AdminOffers = () => {
         </div>
         <div className="flex flex-wrap gap-2">
           {cartItems.length > 0 && (
-            <Button variant="outline" size="sm" onClick={() => create(true)}>
-              <ClipboardList className="mr-2 h-4 w-4" /> No pieprasījuma groza ({cartItems.length})
-            </Button>
+            <>
+              <Button variant="outline" size="sm" onClick={() => create(true)}>
+                <ClipboardList className="mr-2 h-4 w-4" /> No pieprasījuma groza ({cartItems.length})
+              </Button>
+              <Button variant="outline" size="sm" onClick={copyLinkFromCart}>
+                <Link2 className="mr-2 h-4 w-4" /> Kopēt piedāvājuma saiti
+              </Button>
+            </>
           )}
           <Button size="sm" onClick={() => create(false)}>
             <Plus className="mr-2 h-4 w-4" /> Jauns piedāvājums
