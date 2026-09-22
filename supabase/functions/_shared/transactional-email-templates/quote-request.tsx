@@ -23,7 +23,16 @@ interface QuoteItem {
   qty?: number | string
 }
 
+interface AssignLink {
+  slug?: string
+  name?: string
+  url?: string
+}
+
 interface Props {
+  ref?: string
+  assignLinks?: AssignLink[]
+  completeUrl?: string
   name?: string
   email?: string
   phone?: string
@@ -47,8 +56,23 @@ const h3 = { fontSize: '14px', margin: '20px 0 6px', color: '#111' }
 const label = { color: '#666', paddingRight: '12px' as const }
 const rowCell = { padding: '8px', borderBottom: '1px solid #eee', fontSize: '13px' as const }
 const th = { padding: '8px', textAlign: 'left' as const, fontSize: '12px', color: '#fff', background: '#111' }
+const assignBtn = {
+  display: 'inline-block',
+  background: '#E11D2E',
+  color: '#fff',
+  fontSize: '13px',
+  fontWeight: 'bold' as const,
+  padding: '11px 16px',
+  borderRadius: '4px',
+  textDecoration: 'none',
+  margin: '0 8px 8px 0',
+}
+const doneBtn = { ...assignBtn, background: '#111' }
 
 const QuoteRequestEmail = ({
+  ref: refNo = '',
+  assignLinks = [],
+  completeUrl = '',
   name = '',
   email = '',
   phone = '',
@@ -72,7 +96,7 @@ const QuoteRequestEmail = ({
       <Body style={main}>
         <Container style={container}>
           <Section style={headerBar}>
-            <Heading style={h1}>JAUNS PIEPRASĪJUMS</Heading>
+            <Heading style={h1}>{refNo ? `${refNo} · JAUNS PIEPRASĪJUMS` : 'JAUNS PIEPRASĪJUMS'}</Heading>
             <Text style={subtle}>ervitex.lv{submittedAt ? ` · ${submittedAt}` : ''}</Text>
           </Section>
 
@@ -144,6 +168,28 @@ const QuoteRequestEmail = ({
             </>
           ) : null}
 
+          {assignLinks.length > 0 ? (
+            <>
+              <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
+              <Heading as="h3" style={h3}>Kas to paņem?</Heading>
+              <Text style={{ fontSize: '12px', color: '#666', margin: '0 0 10px' }}>
+                Spied vienu pogu — attiecīgā saņems visu pieprasījumu savā pastā.
+              </Text>
+              <Section>
+                {assignLinks.map((a, i) => (
+                  <Link key={i} href={a.url} style={assignBtn}>
+                    {a.slug === 'laura' ? 'Ņemu es (Laura)' : `Nodot ${a.name}`}
+                  </Link>
+                ))}
+              </Section>
+              {completeUrl ? (
+                <Section style={{ marginTop: '6px' }}>
+                  <Link href={completeUrl} style={doneBtn}>Pabeigts</Link>
+                </Section>
+              ) : null}
+            </>
+          ) : null}
+
           <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
           <Text style={{ fontSize: '11px', color: '#999' }}>
             Šis pieprasījums saglabāts arī Ervitex administrācijas panelī. Atbildi klientam tieši uz {email}.
@@ -156,9 +202,11 @@ const QuoteRequestEmail = ({
 
 export const template = {
   component: QuoteRequestEmail,
-  subject: (d: Props) => `[Ervitex pieprasījums] ${d.name || ''}${d.company ? ' · ' + d.company : ''}`,
+  subject: (d: Props) =>
+    `[#${d.ref || 'ERV'}] Cenu pieprasījums — ${d.company || d.name || 'klients'}`,
   displayName: 'Cenu pieprasījums',
   previewData: {
+    ref: 'ERV-2209-014',
     name: 'Jānis Bērziņš',
     email: 'janis@example.com',
     phone: '+371 20000000',
