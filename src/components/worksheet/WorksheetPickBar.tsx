@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { endWorksheetPick, useWorksheetPick } from "@/lib/worksheetPick";
-import { worksheetPath, type WorksheetItem } from "@/lib/worksheet";
+import type { WorksheetItem } from "@/lib/worksheet";
 import { fetchVariantPrices } from "@/components/worksheet/useVariants";
 import { ArrowLeft, Check, Loader2, Repeat, X } from "lucide-react";
 
@@ -18,15 +18,11 @@ const WorksheetPickBar = () => {
   if (!pick) return null;
 
   const back = () => {
-    const path = worksheetPath(pick.token);
     endWorksheetPick();
-    navigate(path);
+    navigate(`/saraksts/${pick.token}`);
   };
 
-  const cancel = () => {
-    endWorksheetPick();
-    navigate(worksheetPath(pick.token));
-  };
+  const cancel = back;
 
   const loadSheet = async () => {
     const { data } = await supabase.rpc("get_quote_worksheet" as never, { _token: pick.token } as never);
