@@ -92,11 +92,8 @@ const QuoteAssignedEmail = ({
         <Container style={container}>
           <Section style={headerBar}>
             <Heading style={h1}>PIEPRASĪJUMS TEV</Heading>
-            <Text style={subtle}>
-              {assigneeName ? `${assigneeName}, ` : ''}šis pieprasījums ir Tavs. Spied “Atbildēt”, un vēstule aiziet
-              tieši klientam.
-            </Text>
           </Section>
+
 
           <Heading as="h3" style={h3}>Klients</Heading>
           <table style={{ fontSize: '14px' }}>
@@ -173,10 +170,6 @@ const QuoteAssignedEmail = ({
           {worksheetUrl ? (
             <>
               <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
-              <Text style={{ fontSize: '12px', color: '#666', margin: '0 0 10px' }}>
-                Kopīgais preču saraksts ar klientu — maini skaitus, izmērus un apdrukas cenas.
-                Summa bez PVN un ar PVN pārrēķinās uzreiz.
-              </Text>
               <Button href={worksheetUrl} style={doneBtn}>ATVĒRT PREČU SARAKSTU</Button>
             </>
           ) : null}
@@ -184,23 +177,17 @@ const QuoteAssignedEmail = ({
           {adminUrl ? (
             <>
               <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
-              <Text style={{ fontSize: '12px', color: '#666', margin: '0 0 10px' }}>
-                Ja klients izvēlējies nepiemērotu modeli — atver pieprasījumu mājaslapā,
-                izveido piedāvājumu un nomaini modeli. Izmēri un skaiti paliek.
-              </Text>
-              <Button href={adminUrl} style={doneBtn}>ATVĒRT UN NOMAINĪT MODELI</Button>
+              <Button href={adminUrl} style={doneBtn}>NOMAINĪT MODELI</Button>
             </>
           ) : null}
 
           {completeUrl ? (
             <>
               <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
-              <Text style={{ fontSize: '12px', color: '#666', margin: '0 0 10px' }}>
-                Kad pasūtījums nodots ražošanā:
-              </Text>
               <Button href={completeUrl} style={doneBtn}>PABEIGTS</Button>
             </>
           ) : null}
+
         </Container>
       </Body>
     </Html>
