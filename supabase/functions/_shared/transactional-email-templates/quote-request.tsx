@@ -70,7 +70,7 @@ const assignBtn = {
 const doneBtn = { ...assignBtn, background: '#111' }
 
 const QuoteRequestEmail = ({
-  ref: refNo = '',
+  ref: _ref = '',
   assignLinks = [],
   completeUrl = '',
   name = '',
@@ -96,7 +96,7 @@ const QuoteRequestEmail = ({
       <Body style={main}>
         <Container style={container}>
           <Section style={headerBar}>
-            <Heading style={h1}>{refNo ? `${refNo} · JAUNS PIEPRASĪJUMS` : 'JAUNS PIEPRASĪJUMS'}</Heading>
+            <Heading style={h1}>JAUNS PIEPRASĪJUMS</Heading>
             <Text style={subtle}>ervitex.lv{submittedAt ? ` · ${submittedAt}` : ''}</Text>
           </Section>
 
@@ -203,7 +203,7 @@ const QuoteRequestEmail = ({
 export const template = {
   component: QuoteRequestEmail,
   subject: (d: Props) =>
-    `[#${d.ref || 'ERV'}] Cenu pieprasījums — ${d.company || d.name || 'klients'}`,
+    `Cenu pieprasījums — ${d.company || d.name || 'klients'}`,
   displayName: 'Cenu pieprasījums',
   previewData: {
     ref: 'ERV-2209-014',

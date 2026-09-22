@@ -62,7 +62,7 @@ const doneBtn = {
 }
 
 const QuoteAssignedEmail = ({
-  ref: refNo = '',
+  ref: _ref = '',
   assigneeName = '',
   name = '',
   email = '',
@@ -83,11 +83,11 @@ const QuoteAssignedEmail = ({
   return (
     <Html lang="lv">
       <Head />
-      <Preview>{`${refNo} — pieprasījums nodots ${assigneeName}`}</Preview>
+      <Preview>{`Pieprasījums nodots ${assigneeName}`}</Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={headerBar}>
-            <Heading style={h1}>{`${refNo} · PIEPRASĪJUMS TEV`}</Heading>
+            <Heading style={h1}>PIEPRASĪJUMS TEV</Heading>
             <Text style={subtle}>
               {assigneeName ? `${assigneeName}, ` : ''}šis pieprasījums ir Tavs. Spied “Atbildēt”, un vēstule aiziet
               tieši klientam.
@@ -184,7 +184,7 @@ const QuoteAssignedEmail = ({
 export const template = {
   component: QuoteAssignedEmail,
   subject: (d: Props) =>
-    `[#${d.ref || 'ERV'}] Cenu pieprasījums — ${d.company || d.name || 'klients'}`,
+    `Cenu pieprasījums — ${d.company || d.name || 'klients'}`,
   displayName: 'Pieprasījums nodots',
   previewData: {
     ref: 'ERV-2209-014',

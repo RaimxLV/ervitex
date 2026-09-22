@@ -11,6 +11,7 @@ export const ASSIGNEES: Assignee[] = [
   { slug: "justine", name: "Justīne", email: "justine@ervitex.lv" },
   { slug: "evita", name: "Evita", email: "info@t-bode.lv" },
   { slug: "laura", name: "Laura", email: "laura@ervitex.lv" },
+  { slug: "raimonds", name: "Raimonds", email: "ofsetadruka@gmail.com" },
 ];
 
 export const assigneeBySlug = (slug?: string | null) =>
