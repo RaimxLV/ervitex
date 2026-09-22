@@ -344,12 +344,26 @@ const AdminQuotes = () => {
         ))}
       </div>
 
-      <Input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Meklēt pēc numura, klienta vai atbildīgā…"
-        className="mt-4 max-w-sm"
-      />
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Meklēt: klients, uzņēmums, e-pasts, telefons, prece…"
+          className="sm:max-w-sm"
+        />
+        <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+          <SelectTrigger className="sm:w-56">
+            <SelectValue placeholder="Kārtot" />
+          </SelectTrigger>
+          <SelectContent>
+            {SORTS.map((s) => (
+              <SelectItem key={s.key} value={s.key}>
+                {s.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
