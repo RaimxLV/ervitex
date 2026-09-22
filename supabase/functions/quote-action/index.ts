@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
       .from('quote_requests')
       .update({ status: 'closed', completed_at: new Date().toISOString() })
       .eq('id', quote.id)
-    return page(`${quote.ref} — pabeigts`, 'Pieprasījums atzīmēts kā pabeigts. Vari aizvērt šo logu.')
+    return page('Pabeigts', 'Pieprasījums atzīmēts kā pabeigts. Vari aizvērt šo logu.')
   }
 
   const slug = action.split(':')[1]
@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
   })
 
   return page(
-    `${quote.ref} — nodots ${person.name}`,
+    `Nodots ${person.name}`,
     `${person.name} tikko saņēma pieprasījumu uz ${person.email}. Vari aizvērt šo logu.`,
   )
 })
