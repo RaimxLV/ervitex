@@ -2523,21 +2523,6 @@ export type Database = {
       }
     }
     Functions: {
-      catalog_items_lite: {
-        Args: { _from?: number; _limit?: number; _source?: string }
-        Returns: {
-          brand: string
-          category: string
-          colors: Json
-          gender: string
-          group_name: string
-          hover_image_url: string
-          id: string
-          image_url: string
-          name: string
-          source: string
-        }[]
-      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
