@@ -1,6 +1,6 @@
 import { useRef, type ReactNode } from "react";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
-import horizonImage from "@/assets/about/horizon-carousel-photo.png";
+import horizonImage from "@/assets/about/horizon-carousel-photo.webp";
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
