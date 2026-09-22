@@ -52,7 +52,20 @@ Deno.serve(async (req) => {
       if (signed?.signedUrl) signedUrls.push(signed.signedUrl);
     }
 
+    const fnBase = `${Deno.env.get("SUPABASE_URL")}/functions/v1/quote-action`;
+    const assignLinks = quote.action_token
+      ? ASSIGNEES.map((a) => ({
+          slug: a.slug,
+          name: a.name,
+          url: `${fnBase}?token=${quote.action_token}&action=assign:${a.slug}`,
+        }))
+      : [];
+    const completeUrl = quote.action_token
+      ? `${fnBase}?token=${quote.action_token}&action=complete`
+      : "";
+
     const baseData = {
+      ref: quote.ref || "",
       name: quote.name,
       email: quote.email,
       phone: quote.phone || "",
