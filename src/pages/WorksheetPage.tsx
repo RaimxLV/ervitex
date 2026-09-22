@@ -92,7 +92,7 @@ const WorksheetPage = () => {
   /** Aizved uz parasto katalogu ar visiem filtriem; izvēlētās preces atgriežas sarakstā. */
   const goCatalog = async (mode: "add" | "swap", row?: WorksheetItem) => {
     if (!token) return;
-    if (dirty) await save();
+    if (dirty && !(await save())) return;
     startWorksheetPick({
       token,
       mode,
@@ -111,14 +111,14 @@ const WorksheetPage = () => {
     });
     setSaving(false);
     if (error || data === false) {
-      toast.error("Neizdevās saglabāt");
-      return;
+      toast.error(error?.message ? `Neizdevās saglabāt: ${error.message}` : "Neizdevās saglabāt — saraksts ir slēgts");
+      return false;
     }
     setDirty(false);
     setSavedOnce(true);
     setSheet((s) => (s ? { ...s, worksheet_updated_at: new Date().toISOString(), worksheet_updated_by: editor || null } : s));
     toast.success("Saglabāts");
-
+    return true;
   };
   const assign = async (slug: string) => {
     if (!token || !sheet) return;
@@ -126,15 +126,14 @@ const WorksheetPage = () => {
     if (!person) return;
     setActionBusy(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quote-action?token=${token}&action=assign:${person.slug}`);
-      if (!res.ok) throw new Error("Neizdevās nodot");
-      setSheet((s) => (s ? {
-        ...s,
-        assigned_pm_name: person.name,
-        assigned_pm_email: person.email,
-        status: s.status === "new" ? "contacted" : s.status,
-      } : s));
-      toast.success(`Nodots ${person.name}`);
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quote-action?token=${token}&action=assign:${person.slug}&format=json`,
+      );
+      const out = (await res.json().catch(() => null)) as { ok?: boolean; emailed?: boolean } | null;
+      if (!res.ok || !out?.ok) throw new Error("Neizdevās nodot");
+      await reload(false);
+      if (out.emailed === false) toast.warning(`Nodots ${person.name} — vēstule uz ${person.email} neaizgāja`);
+      else toast.success(`Nodots ${person.name}`);
     } catch {
       toast.error("Neizdevās nodot");
     } finally {
@@ -145,6 +144,10 @@ const WorksheetPage = () => {
   const complete = async () => {
     if (!sheet) return;
     setActionBusy(true);
+    if (dirty && !(await save())) {
+      setActionBusy(false);
+      return;
+    }
     const { error } = await supabase
       .from("quote_requests")
       .update({ status: "closed", completed_at: new Date().toISOString(), worksheet_locked: true } as never)
@@ -154,7 +157,7 @@ const WorksheetPage = () => {
       toast.error("Neizdevās pabeigt");
       return;
     }
-    setSheet((s) => (s ? { ...s, status: "closed", locked: true } : s));
+    await reload(true);
     toast.success("Pabeigts");
   };
 
