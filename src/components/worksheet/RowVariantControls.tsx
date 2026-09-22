@@ -18,16 +18,20 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
     [colors, item.colorName],
   );
   const sizes = useMemo(() => sizesFor(activeColor), [activeColor, sizesFor]);
+  const isCurrent = (s: { size: string; raw: string }) =>
+    (item.size || "-").trim().toLowerCase() === s.size.toLowerCase() ||
+    (item.size || "-").trim().toLowerCase() === s.raw.toLowerCase();
 
   const pickColor = (code?: string | null) => {
     const c = colors.find((x) => x.c === code);
     if (!c) return;
-    const price = sizesFor(c.c ?? null).find((s) => s.size === (item.size || "-"))?.price;
+    const match = sizesFor(c.c ?? null).find((s) => isCurrent(s));
     onChange({
       colorName: c.n || null,
       colorHex: c.h || null,
       image: c.u || item.image,
-      unitPrice: price ?? item.unitPrice,
+      size: match ? (match.size === "-" ? null : match.size) : item.size,
+      unitPrice: match?.price ?? item.unitPrice,
     });
   };
 
@@ -35,6 +39,7 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
     const price = sizes.find((s) => s.size === size)?.price;
     onChange({ size: size === "-" ? null : size, unitPrice: price ?? item.unitPrice });
   };
+
 
   if (loading) return <p className="text-[11px] text-muted-foreground">Ielādē krāsas un izmērus…</p>;
 
