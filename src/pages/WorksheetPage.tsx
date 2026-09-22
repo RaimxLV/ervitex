@@ -11,10 +11,12 @@ import {
   PRINT_METHODS, lineNet, printNet, worksheetTotals,
   type PrintLine, type Worksheet, type WorksheetItem,
 } from "@/lib/worksheet";
-import { CheckCircle2, ChevronDown, Loader2, Plus, Printer, Save, Store, Trash2, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, Loader2, Mail, Plus, Printer, Repeat, Save, Store, Trash2, X } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { useAuth } from "@/hooks/useAuth";
+import ItemPickerDialog from "@/components/worksheet/ItemPickerDialog";
+import RowVariantControls from "@/components/worksheet/RowVariantControls";
 
 const num = (v: string) => {
   const n = Number(String(v).replace(",", "."));
