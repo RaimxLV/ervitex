@@ -141,17 +141,24 @@ const RequestPage = () => {
 
       // Trigger email send (non-blocking on failure — DB row is safety net).
       // The edge function (service role) will patch file_urls onto the request.
+      let delivered = false;
       try {
-        await supabase.functions.invoke("send-quote-request", {
+        const { data: mailOut, error: mailErr } = await supabase.functions.invoke("send-quote-request", {
           body: { request_id: requestId, file_urls: uploadedPaths },
         });
+        delivered = !mailErr && (mailOut as { delivered?: boolean } | null)?.delivered === true;
       } catch (mailErr) {
         console.warn("Email send failed, but request stored", mailErr);
       }
 
       toast({
         title: t("Pieprasījums nosūtīts!", "Request sent!"),
-        description: t(`${assignedName} sazināsies ar Tevi tuvākajā laikā.`, `${assignedName} will contact you shortly.`),
+        description: delivered
+          ? t(`${assignedName} sazināsies ar Tevi tuvākajā laikā.`, `${assignedName} will contact you shortly.`)
+          : t(
+              `Pieprasījums saglabāts. Ja neredzi apstiprinājumu e-pastā, zvani mums.`,
+              `Request saved. If you don't see a confirmation e-mail, please call us.`,
+            ),
       });
       clear();
       navigate("/");
