@@ -425,7 +425,7 @@ const AdminQuotes = () => {
                 <button
                   type="button"
                   onClick={() => setExpanded(isOpen ? null : row.id)}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
+                  className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
                 >
                   <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`} />
                   <span className="min-w-0 flex-1">
