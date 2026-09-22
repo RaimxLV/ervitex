@@ -24,6 +24,55 @@ export const sizeIdx = (s: string) => {
   return Number.isFinite(n) ? 100 + n : 900;
 };
 
+const norm = (s?: string | null) => (s ?? "").toString().trim().toLowerCase();
+
+/** NWG numeric size codes -> labels. */
+const NWG_SIZE_CODES: Record<string, string> = {
+  "1": "3XS", "2": "XXS", "3": "XS", "4": "S", "5": "M", "6": "L",
+  "7": "XL", "8": "XXL", "9": "3XL", "10": "4XL", "11": "5XL", "12": "6XL",
+};
+
+/** Catalog colour codes carry the style prefix (0200910-55), price rows only the suffix (55). */
+export const colorMatches = (priceColor?: string | null, pickColor?: string | null) => {
+  const a = norm(priceColor);
+  const b = norm(pickColor);
+  if (!a || !b) return false;
+  return a === b || b.endsWith(`-${a}`) || a.endsWith(`-${b}`);
+};
+
+/** Size label mapper for one model's price rows. */
+export const sizeLabeller = (source: string | null | undefined, rows: VariantPrice[]) => {
+  const all = [...new Set(rows.map((r) => (r.size || "").trim()).filter(Boolean))];
+  const coded =
+    source === "nwg" && all.length > 0 && all.every((s) => /^\d{1,2}$/.test(s) && +s >= 1 && +s <= 12);
+  return (s: string) => (coded ? NWG_SIZE_CODES[s] || s : s);
+};
+
+/** Cena precīzam izmēram un krāsai; atgriež arī izmēra nosaukumu. */
+export const priceForVariant = (
+  source: string,
+  rows: VariantPrice[],
+  colorCode: string | null | undefined,
+  size: string | null | undefined,
+) => {
+  const label = sizeLabeller(source, rows);
+  const want = norm(size) || "-";
+  const bySize = rows.filter((r) => {
+    const raw = (r.size || "-").trim() || "-";
+    return norm(raw) === want || norm(label(raw)) === want;
+  });
+  const pool = bySize.length ? bySize : [];
+  const byColor = colorCode ? pool.filter((r) => colorMatches(r.color_code, colorCode)) : [];
+  const chosen = byColor.length ? byColor : pool;
+  const values = chosen.map((r) => Number(r.retail_price)).filter((n) => Number.isFinite(n) && n > 0);
+  const raw = chosen[0]?.size || null;
+  return {
+    price: values.length ? Math.min(...values) : null,
+    size: raw ? label((raw || "").trim()) : size ?? null,
+  };
+};
+
+
 export const fetchVariantPrices = async (source: string, styleCode: string) => {
   const rows: VariantPrice[] = [];
   let from = 0;
