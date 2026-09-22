@@ -12,6 +12,7 @@ import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import {
   AlertTriangle,
   CheckCircle2,
+  ChevronDown,
   Copy,
   FileText,
   Mail,
@@ -74,6 +75,7 @@ const AdminQuotes = () => {
   const [busy, setBusy] = useState<string | null>(null);
   const [tab, setTab] = useState<TabKey>("unassigned");
   const [q, setQ] = useState("");
+  const [expanded, setExpanded] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -311,6 +313,21 @@ const AdminQuotes = () => {
         placeholder="Meklēt pēc numura, klienta vai atbildīgā…"
         className="mt-4 max-w-sm"
       />
+
+      <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-green-500" /> Jauns
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-blue-500" /> Darbā
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-destructive" /> Kavējas (nenodots vairāk par 2 dienām)
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-muted-foreground/50" /> Pabeigts
+        </span>
+      </div>
 
       <div className="mt-6 space-y-4">
         {loading ? (
