@@ -251,11 +251,23 @@ const WorksheetPage = () => {
           </header>
 
           <div className="mt-5 space-y-2">
+            {!readOnly && (
+              <div className="flex items-center justify-between gap-2 print:hidden">
+                <span className="font-heading text-[11px] font-black uppercase tracking-widest text-muted-foreground">
+                  Preces ({items.length})
+                </span>
+                <Button size="sm" variant="outline" onClick={() => { setSwapId(null); setPickerMode("add"); }}>
+                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Pievienot preci
+                </Button>
+              </div>
+            )}
+
             {items.length === 0 && (
               <p className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                 Sarakstā nav preču.
               </p>
             )}
+
 
             {items.map((i) => {
               const open = openId === i.id;
