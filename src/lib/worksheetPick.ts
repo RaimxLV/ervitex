@@ -32,3 +32,20 @@ export const endWorksheetPick = () => {
     window.dispatchEvent(new Event("worksheet-pick"));
   } catch { /* ignore */ }
 };
+
+/* eslint-disable react-hooks/rules-of-hooks */
+import { useEffect, useState } from "react";
+
+export const useWorksheetPick = () => {
+  const [pick, setPick] = useState<WorksheetPick | null>(() => readWorksheetPick());
+  useEffect(() => {
+    const sync = () => setPick(readWorksheetPick());
+    window.addEventListener("worksheet-pick", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("worksheet-pick", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+  return pick;
+};
