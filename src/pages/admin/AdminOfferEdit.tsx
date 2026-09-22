@@ -536,20 +536,28 @@ const AdminOfferEdit = () => {
                     <div key={r.size} className="rounded-sm border border-border bg-background p-2">
                       <p className="text-xs font-semibold text-foreground">{r.size}</p>
                       <p className="text-[11px] text-muted-foreground">{r.price ? money(r.price) : "cena pēc pieprasījuma"}</p>
-                      <Input
-                        type="number"
-                        min={0}
-                        className="mt-1 h-8"
-                        value={qtyBySize[r.size] ?? ""}
-                        onChange={(e) => setQtyBySize({ ...qtyBySize, [r.size]: Math.max(0, Number(e.target.value) || 0) })}
-                      />
+                      {!swapTarget && (
+                        <Input
+                          type="number"
+                          min={0}
+                          className="mt-1 h-8"
+                          value={qtyBySize[r.size] ?? ""}
+                          onChange={(e) => setQtyBySize({ ...qtyBySize, [r.size]: Math.max(0, Number(e.target.value) || 0) })}
+                        />
+                      )}
                     </div>
                   ))}
                 </div>
 
-                <Button size="sm" className="mt-3" onClick={addPicked}>
-                  <Plus className="mr-2 h-4 w-4" /> Pievienot piedāvājumam
-                </Button>
+                {swapTarget ? (
+                  <Button size="sm" className="mt-3" onClick={swapPicked}>
+                    <Repeat className="mr-2 h-4 w-4" /> Nomainīt uz šo modeli
+                  </Button>
+                ) : (
+                  <Button size="sm" className="mt-3" onClick={addPicked}>
+                    <Plus className="mr-2 h-4 w-4" /> Pievienot piedāvājumam
+                  </Button>
+                )}
               </div>
             )}
           </section>
