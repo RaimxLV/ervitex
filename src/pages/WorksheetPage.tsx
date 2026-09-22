@@ -11,10 +11,12 @@ import {
   PRINT_METHODS, lineNet, printNet, worksheetTotals,
   type PrintLine, type Worksheet, type WorksheetItem,
 } from "@/lib/worksheet";
-import { CheckCircle2, ChevronDown, Loader2, Plus, Printer, Save, Store, Trash2, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, Loader2, Mail, Plus, Printer, Repeat, Save, Store, Trash2, X } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { useAuth } from "@/hooks/useAuth";
+import ItemPickerDialog, { type SwapPayload } from "@/components/worksheet/ItemPickerDialog";
+import RowVariantControls from "@/components/worksheet/RowVariantControls";
 
 const num = (v: string) => {
   const n = Number(String(v).replace(",", "."));
@@ -31,6 +33,9 @@ const WorksheetPage = () => {
   const [dirty, setDirty] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState(false);
+  const [pickerMode, setPickerMode] = useState<"add" | "swap" | null>(null);
+  const [swapId, setSwapId] = useState<string | null>(null);
+  const [savedOnce, setSavedOnce] = useState(false);
   const { isAdmin } = useAuth();
 
   useEffect(() => {
@@ -76,6 +81,44 @@ const WorksheetPage = () => {
     setDirty(true);
   };
 
+  const addItems = (rows: WorksheetItem[]) => {
+    setItems((prev) => [...prev, ...rows]);
+    setDirty(true);
+    setOpenId(rows[0]?.id ?? null);
+    toast.success(`Pievienots: ${rows.length}`);
+  };
+
+  const swapModel = (next: SwapPayload) => {
+    if (!swapId) return;
+    let missing = false;
+    setItems((prev) =>
+      prev.map((i) => {
+        if (i.id !== swapId) return i;
+        const key = i.size || "-";
+        const has = next.priceBySize.has(key);
+        if (!has) missing = true;
+        return {
+          ...i,
+          source: next.source,
+          productId: next.productId,
+          name: next.name,
+          code: next.code,
+          brand: next.brand,
+          image: next.image,
+          colorName: next.colorName,
+          colorHex: next.colorHex,
+          unitPrice: has ? next.priceBySize.get(key) ?? null : null,
+        };
+      }),
+    );
+    setDirty(true);
+    setSwapId(null);
+    toast[missing ? "warning" : "success"](
+      missing ? "Modelis nomainīts — izvēlies pieejamu izmēru" : "Modelis nomainīts",
+    );
+  };
+
+
   const save = async () => {
     setSaving(true);
     const { data, error } = await supabase.rpc("save_quote_worksheet" as any, {
@@ -89,6 +132,7 @@ const WorksheetPage = () => {
       return;
     }
     setDirty(false);
+    setSavedOnce(true);
     setSheet((s) => (s ? { ...s, worksheet_updated_at: new Date().toISOString(), worksheet_updated_by: editor || null } : s));
     toast.success("Saglabāts");
 
@@ -146,6 +190,9 @@ const WorksheetPage = () => {
   }
 
   const pmEmail = sheet.assigned_pm_email || "birojs@ervitex.lv";
+  const mailtoNext = `mailto:${isAdmin ? sheet.email || "" : pmEmail}?subject=${encodeURIComponent(
+    `Preču saraksts — ${sheet.company || sheet.name || ""}`,
+  )}&body=${encodeURIComponent(`${window.location.href}\n\nKopā bez PVN ${totals.net.toFixed(2)} EUR\nKopā ar PVN ${totals.gross.toFixed(2)} EUR\n`)}`;
 
   return (
     <div className="min-h-screen bg-muted/30 py-4 sm:py-8 print:bg-white print:py-0">
@@ -208,11 +255,23 @@ const WorksheetPage = () => {
           </header>
 
           <div className="mt-5 space-y-2">
+            {!readOnly && (
+              <div className="flex items-center justify-between gap-2 print:hidden">
+                <span className="font-heading text-[11px] font-black uppercase tracking-widest text-muted-foreground">
+                  Preces ({items.length})
+                </span>
+                <Button size="sm" variant="outline" onClick={() => { setSwapId(null); setPickerMode("add"); }}>
+                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Pievienot preci
+                </Button>
+              </div>
+            )}
+
             {items.length === 0 && (
               <p className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
                 Sarakstā nav preču.
               </p>
             )}
+
 
             {items.map((i) => {
               const open = openId === i.id;
@@ -245,15 +304,22 @@ const WorksheetPage = () => {
 
                 {open && (
                   <div className="border-t border-border p-3 sm:p-4">
-                    <p className="text-[11px] text-muted-foreground">
-                      {[i.code, i.brand, i.colorName].filter(Boolean).join(" · ")}
-                    </p>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-[11px] text-muted-foreground">
+                        {[i.code, i.brand].filter(Boolean).join(" · ")}
+                      </p>
+                      {!readOnly && (
+                        <Button size="sm" variant="outline" onClick={() => { setSwapId(i.id); setPickerMode("swap"); }}>
+                          <Repeat className="mr-1.5 h-3.5 w-3.5" /> Mainīt modeli
+                        </Button>
+                      )}
+                    </div>
 
-                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                      <label className="block">
-                        <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Izmērs</span>
-                        <Input value={i.size || ""} disabled={readOnly} onChange={(e) => patch(i.id, { size: e.target.value })} />
-                      </label>
+                    <div className="mt-3">
+                      <RowVariantControls item={i} disabled={readOnly} onChange={(changes) => patch(i.id, changes)} />
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
                       <label className="block">
                         <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Skaits</span>
                         <Input type="number" min={0} value={i.qty} disabled={readOnly} onChange={(e) => patch(i.id, { qty: Math.max(0, Math.round(num(e.target.value))) })} />
@@ -371,15 +437,33 @@ const WorksheetPage = () => {
                 <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Kas labo? (vārds)</span>
                 <Input value={editor} placeholder="Piem. Jānis" onChange={(e) => setEditor(e.target.value)} />
               </label>
-              <Button onClick={save} disabled={saving || !dirty} className="sm:w-auto">
-                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                {dirty ? "Saglabāt" : "Nav ko saglabāt"}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={save} disabled={saving || !dirty}>
+                  {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                  {dirty ? "Saglabāt" : "Saglabāts"}
+                </Button>
+                {savedOnce && !dirty && (
+                  <Button variant="outline" asChild>
+                    <a href={mailtoNext}>
+                      <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}
+                    </a>
+                  </Button>
+                )}
+              </div>
             </div>
           )}
         </article>
 
       </div>
+
+      <ItemPickerDialog
+        open={pickerMode !== null}
+        onOpenChange={(v) => { if (!v) { setPickerMode(null); setSwapId(null); } }}
+        mode={pickerMode === "swap" ? "swap" : "add"}
+        target={items.find((i) => i.id === swapId) || null}
+        onAdd={addItems}
+        onSwap={swapModel}
+      />
     </div>
   );
 };
