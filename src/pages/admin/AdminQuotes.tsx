@@ -75,6 +75,7 @@ const AdminQuotes = () => {
   const [busy, setBusy] = useState<string | null>(null);
   const [tab, setTab] = useState<TabKey>("unassigned");
   const [q, setQ] = useState("");
+  const [sort, setSort] = useState<SortKey>("newest");
   const [expanded, setExpanded] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
