@@ -15,15 +15,6 @@ import {
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
 
-interface QuoteItem {
-  name?: string
-  code?: string
-  brand?: string
-  colorName?: string
-  size?: string
-  qty?: number | string
-}
-
 interface Props {
   ref?: string
   assigneeName?: string
@@ -32,103 +23,72 @@ interface Props {
   phone?: string
   company?: string
   message?: string
-  items?: QuoteItem[]
   files?: string[]
   print_method?: string
   print_placement?: string
   print_colors?: string
   deadline?: string
-  completeUrl?: string
-  adminUrl?: string
   worksheetUrl?: string
 }
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
-const container = { maxWidth: '680px', margin: '0 auto', padding: '20px' }
-const headerBar = { borderBottom: '3px solid #E11D2E', paddingBottom: '12px', marginBottom: '16px' }
-const h1 = { fontSize: '20px', margin: '0', color: '#111' }
-const h3 = { fontSize: '14px', margin: '20px 0 6px', color: '#111' }
-const label = { color: '#666', paddingRight: '12px' as const }
-const rowCell = { padding: '8px', borderBottom: '1px solid #eee', fontSize: '13px' as const }
-const th = { padding: '8px', textAlign: 'left' as const, fontSize: '12px', color: '#fff', background: '#111' }
-const doneBtn = {
+const container = { maxWidth: '640px', margin: '0 auto', padding: '22px' }
+const header = { borderBottom: '1px solid #111', paddingBottom: '12px', marginBottom: '18px' }
+const h1 = { fontSize: '20px', margin: '0', letterSpacing: '0.4px', color: '#111' }
+const h3 = { fontSize: '13px', margin: '18px 0 8px', color: '#111' }
+const label = { color: '#666', paddingRight: '12px' as const, paddingBottom: '5px' }
+const value = { paddingBottom: '5px' }
+const cta = {
+  display: 'inline-block',
   background: '#111',
   color: '#fff',
   fontSize: '13px',
   fontWeight: 'bold' as const,
-  padding: '11px 18px',
-  borderRadius: '4px',
+  padding: '12px 18px',
+  borderRadius: '3px',
   textDecoration: 'none',
-  display: 'inline-block',
 }
+const noteBox = { whiteSpace: 'pre-line' as const, fontSize: '13px', background: '#f6f6f6', padding: '10px', borderRadius: '3px' }
 
 const QuoteAssignedEmail = ({
-  ref: _ref = '',
   assigneeName = '',
   name = '',
   email = '',
   phone = '',
   company = '',
   message = '',
-  items = [],
   files = [],
   print_method = '',
   print_placement = '',
   print_colors = '',
   deadline = '',
-  completeUrl = '',
-  adminUrl = '',
   worksheetUrl = '',
 }: Props) => {
-  const totalQty = items.reduce((s, it) => s + (Number(it.qty) || 0), 0)
   const hasPrint = !!(print_method || print_placement || print_colors || deadline)
 
   return (
     <Html lang="lv">
       <Head />
-      <Preview>{`Pieprasījums nodots ${assigneeName}`}</Preview>
+      <Preview>{`Pieprasījums nodots ${assigneeName || 'tev'}`}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Section style={headerBar}>
+          <Section style={header}>
             <Heading style={h1}>PIEPRASĪJUMS TEV</Heading>
           </Section>
 
+          {worksheetUrl ? (
+            <Section>
+              <Button href={worksheetUrl} style={cta}>ATVĒRT PREČU SARAKSTU</Button>
+            </Section>
+          ) : null}
 
           <Heading as="h3" style={h3}>Klients</Heading>
           <table style={{ fontSize: '14px' }}>
             <tbody>
-              <tr><td style={label}>Vārds:</td><td><strong>{name}</strong></td></tr>
-              <tr><td style={label}>E-pasts:</td><td><Link href={`mailto:${email}`}>{email}</Link></td></tr>
-              {phone ? <tr><td style={label}>Tālrunis:</td><td>{phone}</td></tr> : null}
-              {company ? <tr><td style={label}>Uzņēmums:</td><td>{company}</td></tr> : null}
-            </tbody>
-          </table>
-
-          <Heading as="h3" style={h3}>{`Preces (${totalQty} gab.)`}</Heading>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={th}>Prece</th>
-                <th style={th}>Krāsa</th>
-                <th style={th}>Izmērs</th>
-                <th style={{ ...th, textAlign: 'right' as const }}>Skaits</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it, i) => (
-                <tr key={i}>
-                  <td style={rowCell}>
-                    <strong>{it.name || '-'}</strong>
-                    <br />
-                    <span style={{ color: '#666', fontSize: '12px' }}>
-                      {[it.code, it.brand].filter(Boolean).join(' · ')}
-                    </span>
-                  </td>
-                  <td style={rowCell}>{it.colorName || '-'}</td>
-                  <td style={rowCell}>{it.size || '-'}</td>
-                  <td style={{ ...rowCell, textAlign: 'right' as const, fontWeight: 'bold' }}>{it.qty ?? 0}</td>
-                </tr>
-              ))}
+              <tr><td style={label}>Vārds:</td><td style={value}><strong>{name}</strong></td></tr>
+              <tr><td style={label}>E-pasts:</td><td style={value}><Link href={`mailto:${email}`}>{email}</Link></td></tr>
+              {phone ? <tr><td style={label}>Tālrunis:</td><td style={value}>{phone}</td></tr> : null}
+              {company ? <tr><td style={label}>Uzņēmums:</td><td style={value}>{company}</td></tr> : null}
             </tbody>
           </table>
 
@@ -137,10 +97,10 @@ const QuoteAssignedEmail = ({
               <Heading as="h3" style={h3}>Apdruka</Heading>
               <table style={{ fontSize: '13px' }}>
                 <tbody>
-                  {print_method ? <tr><td style={label}>Metode:</td><td>{print_method}</td></tr> : null}
-                  {print_placement ? <tr><td style={label}>Izvietojums:</td><td>{print_placement}</td></tr> : null}
-                  {print_colors ? <tr><td style={label}>Krāsu skaits:</td><td>{print_colors}</td></tr> : null}
-                  {deadline ? <tr><td style={label}>Termiņš:</td><td>{deadline}</td></tr> : null}
+                  {print_method ? <tr><td style={label}>Metode:</td><td style={value}>{print_method}</td></tr> : null}
+                  {print_placement ? <tr><td style={label}>Vieta:</td><td style={value}>{print_placement}</td></tr> : null}
+                  {print_colors ? <tr><td style={label}>Krāsas:</td><td style={value}>{print_colors}</td></tr> : null}
+                  {deadline ? <tr><td style={label}>Termiņš:</td><td style={value}>{deadline}</td></tr> : null}
                 </tbody>
               </table>
             </>
@@ -149,9 +109,7 @@ const QuoteAssignedEmail = ({
           {message ? (
             <>
               <Heading as="h3" style={h3}>Piezīmes</Heading>
-              <Text style={{ whiteSpace: 'pre-line', fontSize: '13px', background: '#f7f7f7', padding: '10px', borderRadius: '4px' }}>
-                {message}
-              </Text>
+              <Text style={noteBox}>{message}</Text>
             </>
           ) : null}
 
@@ -166,27 +124,7 @@ const QuoteAssignedEmail = ({
             </>
           ) : null}
 
-          {worksheetUrl ? (
-            <>
-              <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
-              <Button href={worksheetUrl} style={doneBtn}>ATVĒRT PREČU SARAKSTU</Button>
-            </>
-          ) : null}
-
-          {adminUrl ? (
-            <>
-              <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
-              <Button href={adminUrl} style={doneBtn}>NOMAINĪT MODELI</Button>
-            </>
-          ) : null}
-
-          {completeUrl ? (
-            <>
-              <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
-              <Button href={completeUrl} style={doneBtn}>PABEIGTS</Button>
-            </>
-          ) : null}
-
+          <Hr style={{ borderColor: '#eee', margin: '22px 0 0' }} />
         </Container>
       </Body>
     </Html>
@@ -195,16 +133,13 @@ const QuoteAssignedEmail = ({
 
 export const template = {
   component: QuoteAssignedEmail,
-  subject: (d: Props) =>
-    `Cenu pieprasījums — ${d.company || d.name || 'klients'}`,
+  subject: (d: Props) => `Cenu pieprasījums — ${d.company || d.name || 'klients'}`,
   displayName: 'Pieprasījums nodots',
   previewData: {
-    ref: 'ERV-2209-014',
     assigneeName: 'Ilona',
     name: 'Jānis Bērziņš',
     email: 'janis@example.com',
     company: 'SIA Piemērs',
-    items: [{ name: 'T-krekls', code: 'STTU755', colorName: 'Black', size: 'M', qty: 10 }],
-    completeUrl: 'https://example.com',
+    worksheetUrl: 'https://example.com/saraksts/token',
   },
 } satisfies TemplateEntry
