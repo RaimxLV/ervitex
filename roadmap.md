@@ -47,3 +47,11 @@
 - [x] Admina cilnes: Nenodotie / Mani / Visi aktīvie / Pabeigtie + brīdinājums >2 dienām
 - [x] Katalogā/piedāvājumos poga „Kopēt piedāvājuma saiti”
 - [ ] Apstiprināt Evitas e-pastu (pagaidām evita@ervitex.lv)
+
+## Kopīgais preču saraksts (pie pieprasījuma)
+- [x] Saraksta bloks dzīvo pie pieprasījuma, atveras pēc saites (/saraksts/:token).
+- [x] Rediģēšana tiešsaistē: izmērs, skaits, preces cena, piezīme, rindas dzēšana.
+- [x] Apdruka: Sietspiede / DTF / Izšūšana / Sublimācija / Cita, vairākas vienā precē, cena ar roku.
+- [x] Summas bez PVN un ar PVN pārrēķinās uzreiz.
+- [x] Pogas e-pastos: klientam, birojam un atbildīgajai kolēģei.
+- [x] Adminā: "Preču saraksts" un "Kopēt saraksta saiti".
