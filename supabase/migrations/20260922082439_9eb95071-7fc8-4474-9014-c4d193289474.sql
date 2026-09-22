@@ -1,0 +1,2 @@
+ALTER TABLE public.pm_offers ADD COLUMN IF NOT EXISTS quote_request_id uuid REFERENCES public.quote_requests(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS pm_offers_quote_request_id_idx ON public.pm_offers(quote_request_id);

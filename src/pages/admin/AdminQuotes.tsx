@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
-import { AlertTriangle, CheckCircle2, Mail, Paperclip, RefreshCw } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Copy,
+  FileText,
+  Mail,
+  Paperclip,
+  RefreshCw,
+  Trash2,
+} from "lucide-react";
 
 interface QuoteItem {
   name?: string;
@@ -24,6 +34,7 @@ interface QuoteItem {
 interface QuoteRow {
   id: string;
   ref: string | null;
+  action_token: string | null;
   name: string;
   email: string;
   phone: string | null;
@@ -60,10 +71,12 @@ const TABS: { key: TabKey; label: string }[] = [
 const AdminQuotes = () => {
   const [quotes, setQuotes] = useState<QuoteRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
   const [tab, setTab] = useState<TabKey>("unassigned");
   const [q, setQ] = useState("");
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const fetchQuotes = async () => {
     setLoading(true);
@@ -86,21 +99,126 @@ const AdminQuotes = () => {
     else setQuotes((prev) => prev.map((x) => (x.id === id ? { ...x, ...values } : x)));
   };
 
-  const assign = (row: QuoteRow, slug: string) => {
+  /**
+   * Nodod pieprasījumu cilvēkam. Ja ir darbības žetons, izmantojam to pašu ceļu kā e-pasta pogas,
+   * lai izvēlētais cilvēks uzreiz saņem vēstuli ar visu informāciju.
+   */
+  const assign = async (row: QuoteRow, slug: string) => {
     const p = assigneeBySlug(slug);
     if (!p) return;
-    patch(row.id, {
-      assigned_pm_slug: p.slug,
-      assigned_pm_name: p.name,
-      assigned_pm_email: p.email,
-      assigned_at: new Date().toISOString(),
-    });
+    setBusy(row.id);
+    if (row.action_token) {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quote-action?token=${row.action_token}&action=assign:${p.slug}`,
+        );
+        if (!res.ok) throw new Error("Neizdevās nodot");
+        setQuotes((prev) =>
+          prev.map((x) =>
+            x.id === row.id
+              ? {
+                  ...x,
+                  assigned_pm_slug: p.slug,
+                  assigned_pm_name: p.name,
+                  assigned_pm_email: p.email,
+                  assigned_at: new Date().toISOString(),
+                  status: x.status === "new" ? "contacted" : x.status,
+                }
+              : x,
+          ),
+        );
+        toast({ title: `Nodots ${p.name}`, description: `Vēstule aizgāja uz ${p.email}.` });
+      } catch (e) {
+        toast({ title: "Kļūda", description: (e as Error).message, variant: "destructive" });
+      }
+    } else {
+      await patch(row.id, {
+        assigned_pm_slug: p.slug,
+        assigned_pm_name: p.name,
+        assigned_pm_email: p.email,
+        assigned_at: new Date().toISOString(),
+        status: row.status === "new" ? "contacted" : row.status,
+      });
+      toast({ title: `Nodots ${p.name}`, description: "Vēstule netika sūtīta (nav darbības saites)." });
+    }
+    setBusy(null);
+  };
+
+  const takeMine = (row: QuoteRow) => {
+    const me = ASSIGNEES.find((a) => a.email.toLowerCase() === (user?.email || "").toLowerCase());
+    if (!me) {
+      toast({ title: "Tavs e-pasts nav sarakstā", variant: "destructive" });
+      return;
+    }
+    assign(row, me.slug);
   };
 
   const complete = (row: QuoteRow) =>
     patch(row.id, { status: "closed", completed_at: new Date().toISOString() });
 
   const reopen = (row: QuoteRow) => patch(row.id, { status: "contacted", completed_at: null });
+
+  /** Dzēš pieprasījumu un tam pievienotos failus. */
+  const remove = async (row: QuoteRow) => {
+    if (!confirm(`Dzēst pieprasījumu ${row.ref ? `#${row.ref}` : ""} (${row.name})? To nevar atsaukt.`)) return;
+    setBusy(row.id);
+    const paths = (row.file_urls || [])
+      .map((u) => (u.includes("/quote-attachments/") ? u.split("/quote-attachments/")[1] : u))
+      .filter((p) => p && !/^https?:\/\//i.test(p));
+    if (paths.length) await supabase.storage.from("quote-attachments").remove(paths);
+    const { error } = await supabase.from("quote_requests").delete().eq("id", row.id);
+    setBusy(null);
+    if (error) return toast({ title: "Kļūda", description: error.message, variant: "destructive" });
+    setQuotes((prev) => prev.filter((x) => x.id !== row.id));
+    toast({ title: "Pieprasījums izdzēsts" });
+  };
+
+  /** No pieprasījuma izveido piedāvājumu ar tām pašām precēm un klienta datiem. */
+  const makeOffer = async (row: QuoteRow) => {
+    setBusy(row.id);
+    const items = (Array.isArray(row.items) ? row.items : []).map((i, idx) => ({
+      id: `${row.id}-${idx}`,
+      source: "quote",
+      productId: "",
+      name: i.name || "",
+      code: i.code || "",
+      brand: i.brand ?? null,
+      image: null,
+      colorName: i.colorName ?? null,
+      colorHex: null,
+      size: i.size ?? null,
+      qty: i.qty || 1,
+      unitPrice: i.unitPrice ?? null,
+    }));
+    const { data, error } = await supabase
+      .from("pm_offers")
+      .insert({
+        title: `Piedāvājums ${row.ref ? `#${row.ref}` : ""}`.trim(),
+        client_name: row.name,
+        client_company: row.company,
+        client_email: row.email,
+        client_phone: row.phone,
+        note: row.message,
+        items: items as never,
+        quote_request_id: row.id,
+        pm_name: row.assigned_pm_name,
+        pm_email: row.assigned_pm_email,
+      } as never)
+      .select("id")
+      .single();
+    setBusy(null);
+    if (error || !data) return toast({ title: "Kļūda", description: error?.message, variant: "destructive" });
+    navigate(`/admin/offers/${(data as { id: string }).id}`);
+  };
+
+  const copyText = async (text: string, title: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ title });
+    } catch {
+      toast({ title: "Neizdevās nokopēt", variant: "destructive" });
+    }
+  };
 
   /** Pielikumi glabājas privātā glabātavā — atveram ar parakstītu, laikā ierobežotu saiti. */
   const openAttachment = async (url: string) => {
@@ -245,7 +363,11 @@ const AdminQuotes = () => {
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 sm:w-52">
-                    <Select value={row.assigned_pm_slug ?? ""} onValueChange={(v) => assign(row, v)}>
+                    <Select
+                      value={row.assigned_pm_slug ?? ""}
+                      onValueChange={(v) => assign(row, v)}
+                      disabled={busy === row.id}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Nodot…" />
                       </SelectTrigger>
@@ -257,6 +379,17 @@ const AdminQuotes = () => {
                         ))}
                       </SelectContent>
                     </Select>
+                    {!row.assigned_pm_slug && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="w-full"
+                        disabled={busy === row.id}
+                        onClick={() => takeMine(row)}
+                      >
+                        Ņemu es
+                      </Button>
+                    )}
                     <Button asChild variant="outline" size="sm" className="w-full">
                       <a
                         href={`mailto:${row.email}?subject=${encodeURIComponent(
@@ -265,6 +398,15 @@ const AdminQuotes = () => {
                       >
                         <Mail className="mr-2 h-4 w-4" /> Rakstīt klientam
                       </a>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      disabled={busy === row.id}
+                      onClick={() => makeOffer(row)}
+                    >
+                      <FileText className="mr-2 h-4 w-4" /> Izveidot piedāvājumu
                     </Button>
                     {done ? (
                       <Button variant="ghost" size="sm" className="w-full" onClick={() => reopen(row)}>
@@ -275,6 +417,32 @@ const AdminQuotes = () => {
                         <CheckCircle2 className="mr-2 h-4 w-4" /> Pabeigts
                       </Button>
                     )}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex-1 text-xs"
+                        onClick={() =>
+                          copyText(
+                            [row.ref ? `#${row.ref}` : "", row.name, row.email, row.phone, row.company]
+                              .filter(Boolean)
+                              .join(" · "),
+                            "Klienta dati nokopēti",
+                          )
+                        }
+                      >
+                        <Copy className="mr-1.5 h-3.5 w-3.5" /> Kopēt
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex-1 text-xs text-destructive"
+                        disabled={busy === row.id}
+                        onClick={() => remove(row)}
+                      >
+                        <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Dzēst
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
