@@ -342,11 +342,57 @@ const AdminQuotes = () => {
             const age = daysSince(row.created_at);
             const done = isDone(row);
             const late = !done && age >= 2 && !row.assigned_pm_slug;
+            const isOpen = expanded === row.id;
+            const dotClass = done
+              ? "bg-muted-foreground/50"
+              : late
+                ? "bg-destructive"
+                : row.assigned_pm_slug
+                  ? "bg-blue-500"
+                  : "bg-green-500";
+            const badgeClass = done
+              ? "bg-muted text-muted-foreground"
+              : late
+                ? "bg-destructive text-white"
+                : row.assigned_pm_slug
+                  ? "bg-blue-500 text-white"
+                  : "bg-green-600 text-white";
+            const statusLabel = done
+              ? "Pabeigts"
+              : late
+                ? "Kavējas"
+                : row.assigned_pm_slug
+                  ? "Darbā"
+                  : "Jauns";
             return (
               <div
                 key={row.id}
-                className={`space-y-3 rounded-sm border p-4 sm:p-5 ${late ? "border-destructive/50" : "border-border"}`}
+                className={`overflow-hidden rounded-sm border bg-card ${
+                  late && !done ? "border-destructive/50" : "border-border"
+                }`}
               >
+                <button
+                  type="button"
+                  onClick={() => setExpanded(isOpen ? null : row.id)}
+                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
+                >
+                  <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`} />
+                  {row.ref && (
+                    <span className="hidden font-mono text-xs font-bold text-accent sm:inline">#{row.ref}</span>
+                  )}
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{row.name}</span>
+                  <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+                    {new Date(row.created_at).toLocaleDateString("lv")}
+                  </span>
+                  <Badge className={`shrink-0 ${badgeClass}`}>{statusLabel}</Badge>
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                {isOpen && (
+                <div className="space-y-3 p-4 sm:p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
