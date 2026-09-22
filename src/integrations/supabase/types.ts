@@ -1510,9 +1510,13 @@ export type Database = {
       }
       quote_requests: {
         Row: {
+          action_token: string | null
+          assigned_at: string | null
           assigned_pm_email: string | null
           assigned_pm_name: string | null
+          assigned_pm_slug: string | null
           company: string | null
+          completed_at: string | null
           created_at: string
           deadline: string | null
           email: string
@@ -1526,13 +1530,18 @@ export type Database = {
           print_method: string | null
           print_placement: string | null
           product_id: string | null
+          ref: string | null
           status: string
           updated_at: string
         }
         Insert: {
+          action_token?: string | null
+          assigned_at?: string | null
           assigned_pm_email?: string | null
           assigned_pm_name?: string | null
+          assigned_pm_slug?: string | null
           company?: string | null
+          completed_at?: string | null
           created_at?: string
           deadline?: string | null
           email: string
@@ -1546,13 +1555,18 @@ export type Database = {
           print_method?: string | null
           print_placement?: string | null
           product_id?: string | null
+          ref?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
+          action_token?: string | null
+          assigned_at?: string | null
           assigned_pm_email?: string | null
           assigned_pm_name?: string | null
+          assigned_pm_slug?: string | null
           company?: string | null
+          completed_at?: string | null
           created_at?: string
           deadline?: string | null
           email?: string
@@ -1566,6 +1580,7 @@ export type Database = {
           print_method?: string | null
           print_placement?: string | null
           product_id?: string | null
+          ref?: string | null
           status?: string
           updated_at?: string
         }
