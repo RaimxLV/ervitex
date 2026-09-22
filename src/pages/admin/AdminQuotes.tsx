@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +9,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
-import { AlertTriangle, CheckCircle2, Mail, Paperclip, RefreshCw } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  Copy,
+  FileText,
+  Mail,
+  Paperclip,
+  RefreshCw,
+  Trash2,
+} from "lucide-react";
 
 interface QuoteItem {
   name?: string;
