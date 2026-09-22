@@ -843,6 +843,7 @@ export type Database = {
           retail_price: number | null
           sales_price: number | null
           size: string | null
+          size_name: string | null
           size_sequence: string | null
           sku: string
         }
@@ -861,6 +862,7 @@ export type Database = {
           retail_price?: number | null
           sales_price?: number | null
           size?: string | null
+          size_name?: string | null
           size_sequence?: string | null
           sku: string
         }
@@ -879,6 +881,7 @@ export type Database = {
           retail_price?: number | null
           sales_price?: number | null
           size?: string | null
+          size_name?: string | null
           size_sequence?: string | null
           sku?: string
         }

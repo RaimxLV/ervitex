@@ -160,7 +160,7 @@ const PRODUCT_FIELDS = `
     skus {
       sku productNumber active discontinued availability
       eanCode sizeSequence
-      skuSize { size }
+      skuSize { size webtext }
       prices { currency salesPrice retailPrice priceList }
       retailPrice { price currency }
     }
@@ -447,7 +447,9 @@ function mapProduct(row: any, assortmentId: string, seenProductNumbers: Set<stri
         product_number: pn,
         item_number: itemNumber,
         size: toStr(s.skuSize?.size),
+        size_name: toStr(s.skuSize?.webtext),
         size_sequence: toStr(s.sizeSequence),
+
         ean: toStr(s.eanCode),
         availability: toInt(s.availability, 0),
         sales_price: toNum(price?.salesPrice),
