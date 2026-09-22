@@ -300,15 +300,22 @@ const WorksheetPage = () => {
 
                 {open && (
                   <div className="border-t border-border p-3 sm:p-4">
-                    <p className="text-[11px] text-muted-foreground">
-                      {[i.code, i.brand, i.colorName].filter(Boolean).join(" · ")}
-                    </p>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-[11px] text-muted-foreground">
+                        {[i.code, i.brand].filter(Boolean).join(" · ")}
+                      </p>
+                      {!readOnly && (
+                        <Button size="sm" variant="outline" onClick={() => { setSwapId(i.id); setPickerMode("swap"); }}>
+                          <Repeat className="mr-1.5 h-3.5 w-3.5" /> Mainīt modeli
+                        </Button>
+                      )}
+                    </div>
 
-                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                      <label className="block">
-                        <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Izmērs</span>
-                        <Input value={i.size || ""} disabled={readOnly} onChange={(e) => patch(i.id, { size: e.target.value })} />
-                      </label>
+                    <div className="mt-3">
+                      <RowVariantControls item={i} disabled={readOnly} onChange={(changes) => patch(i.id, changes)} />
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
                       <label className="block">
                         <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Skaits</span>
                         <Input type="number" min={0} value={i.qty} disabled={readOnly} onChange={(e) => patch(i.id, { qty: Math.max(0, Math.round(num(e.target.value))) })} />
