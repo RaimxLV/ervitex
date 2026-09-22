@@ -15,7 +15,7 @@ import { CheckCircle2, ChevronDown, Loader2, Mail, Plus, Printer, Repeat, Save, 
 import logo from "@/assets/ervitex-logo-2.svg";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { useAuth } from "@/hooks/useAuth";
-import ItemPickerDialog, { type SwapPayload } from "@/components/worksheet/ItemPickerDialog";
+import WorksheetCatalog, { type SwapPayload } from "@/components/worksheet/WorksheetCatalog";
 import RowVariantControls from "@/components/worksheet/RowVariantControls";
 
 const num = (v: string) => {
@@ -456,14 +456,6 @@ const WorksheetPage = () => {
 
       </div>
 
-      <ItemPickerDialog
-        open={pickerMode !== null}
-        onOpenChange={(v) => { if (!v) { setPickerMode(null); setSwapId(null); } }}
-        mode={pickerMode === "swap" ? "swap" : "add"}
-        target={items.find((i) => i.id === swapId) || null}
-        onAdd={addItems}
-        onSwap={swapModel}
-      />
     </div>
   );
 };
