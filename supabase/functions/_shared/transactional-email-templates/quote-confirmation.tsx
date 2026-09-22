@@ -34,6 +34,7 @@ interface Props {
   print_colors?: string
   deadline?: string
   submittedAt?: string
+  worksheetUrl?: string
 }
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
@@ -57,6 +58,7 @@ const QuoteConfirmationEmail = ({
   print_colors = '',
   deadline = '',
   submittedAt = '',
+  worksheetUrl = '',
 }: Props) => {
   const totalQty = items.reduce((s, it) => s + (Number(it.qty) || 0), 0)
   const hasPrint = !!(print_method || print_placement || print_colors || deadline)

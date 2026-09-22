@@ -40,6 +40,7 @@ interface Props {
   deadline?: string
   completeUrl?: string
   adminUrl?: string
+  worksheetUrl?: string
 }
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
