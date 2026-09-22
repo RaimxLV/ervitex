@@ -15,7 +15,7 @@ import { CheckCircle2, ChevronDown, Loader2, Mail, Plus, Printer, Repeat, Save, 
 import logo from "@/assets/ervitex-logo-2.svg";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { useAuth } from "@/hooks/useAuth";
-import ItemPickerDialog from "@/components/worksheet/ItemPickerDialog";
+import ItemPickerDialog, { type SwapPayload } from "@/components/worksheet/ItemPickerDialog";
 import RowVariantControls from "@/components/worksheet/RowVariantControls";
 
 const num = (v: string) => {
@@ -88,7 +88,7 @@ const WorksheetPage = () => {
     toast.success(`Pievienots: ${rows.length}`);
   };
 
-  const swapModel: React.ComponentProps<typeof ItemPickerDialog>["onSwap"] = (next) => {
+  const swapModel = (next: SwapPayload) => {
     if (!swapId) return;
     let missing = false;
     setItems((prev) =>

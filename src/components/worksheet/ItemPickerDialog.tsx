@@ -7,6 +7,18 @@ import type { WorksheetItem } from "@/lib/worksheet";
 import { fetchVariantPrices, sizeIdx, useCatalogSearch, type CatalogHit, type VariantPrice } from "./useVariants";
 import { Loader2, Plus, Repeat, Search } from "lucide-react";
 
+export interface SwapPayload {
+  source: string;
+  productId: string;
+  name: string;
+  code: string;
+  brand: string | null;
+  image: string | null;
+  colorName: string | null;
+  colorHex: string | null;
+  priceBySize: Map<string, number | null>;
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -15,17 +27,7 @@ interface Props {
   /** Rinda, ko nomaina (mode="swap") */
   target?: WorksheetItem | null;
   onAdd?: (items: WorksheetItem[]) => void;
-  onSwap?: (next: {
-    source: string;
-    productId: string;
-    name: string;
-    code: string;
-    brand: string | null;
-    image: string | null;
-    colorName: string | null;
-    colorHex: string | null;
-    priceBySize: Map<string, number | null>;
-  }) => void;
+  onSwap?: (next: SwapPayload) => void;
 }
 
 const ItemPickerDialog = ({ open, onOpenChange, mode, target, onAdd, onSwap }: Props) => {
