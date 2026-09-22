@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 /** Aktīvais preču saraksts, kuram katalogā izvēlas preces. */
 export interface WorksheetPick {
   token: string;
@@ -32,9 +34,6 @@ export const endWorksheetPick = () => {
     window.dispatchEvent(new Event("worksheet-pick"));
   } catch { /* ignore */ }
 };
-
-/* eslint-disable react-hooks/rules-of-hooks */
-import { useEffect, useState } from "react";
 
 export const useWorksheetPick = () => {
   const [pick, setPick] = useState<WorksheetPick | null>(() => readWorksheetPick());
