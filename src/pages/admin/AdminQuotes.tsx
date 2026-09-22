@@ -62,6 +62,17 @@ const isDone = (q: QuoteRow) => q.status === "closed";
 
 type TabKey = "unassigned" | "mine" | "active" | "done";
 
+type SortKey = "newest" | "oldest" | "name" | "company" | "assignee" | "qty";
+
+const SORTS: { key: SortKey; label: string }[] = [
+  { key: "newest", label: "Jaunākie pirmie" },
+  { key: "oldest", label: "Vecākie pirmie" },
+  { key: "name", label: "Klients (A–Z)" },
+  { key: "company", label: "Uzņēmums (A–Z)" },
+  { key: "assignee", label: "Atbildīgais" },
+  { key: "qty", label: "Lielākais daudzums" },
+];
+
 const TABS: { key: TabKey; label: string }[] = [
   { key: "unassigned", label: "Nenodotie" },
   { key: "mine", label: "Mani" },
@@ -75,6 +86,7 @@ const AdminQuotes = () => {
   const [busy, setBusy] = useState<string | null>(null);
   const [tab, setTab] = useState<TabKey>("unassigned");
   const [q, setQ] = useState("");
+  const [sort, setSort] = useState<SortKey>("newest");
   const [expanded, setExpanded] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -253,16 +265,41 @@ const AdminQuotes = () => {
   );
 
   const search = q.trim().toLowerCase();
-  const visible = quotes.filter(
-    (row) =>
-      inTab(row, tab) &&
-      (!search ||
-        [row.ref, row.name, row.company, row.email, row.assigned_pm_name]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(search)),
-  );
+  const matches = (row: QuoteRow) => {
+    if (!search) return true;
+    const itemText = (Array.isArray(row.items) ? row.items : [])
+      .map((i) => [i.name, i.code, i.brand, i.colorName, i.size].filter(Boolean).join(" "))
+      .join(" ");
+    return [
+      row.name,
+      row.company,
+      row.email,
+      row.phone,
+      row.assigned_pm_name,
+      row.message,
+      itemText,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(search);
+  };
+
+  const qtyOf = (row: QuoteRow) =>
+    (Array.isArray(row.items) ? row.items : []).reduce((s, i) => s + (i.qty || 0), 0);
+
+  const visible = quotes
+    .filter((row) => inTab(row, tab) && matches(row))
+    .sort((a, b) => {
+      if (sort === "oldest") return +new Date(a.created_at) - +new Date(b.created_at);
+      if (sort === "name") return a.name.localeCompare(b.name, "lv");
+      if (sort === "company")
+        return (a.company || a.name).localeCompare(b.company || b.name, "lv");
+      if (sort === "assignee")
+        return (a.assigned_pm_name || "Ω").localeCompare(b.assigned_pm_name || "Ω", "lv");
+      if (sort === "qty") return qtyOf(b) - qtyOf(a);
+      return +new Date(b.created_at) - +new Date(a.created_at);
+    });
 
   const stale = quotes.filter((x) => !isDone(x) && !x.assigned_pm_slug && daysSince(x.created_at) >= 2).length;
 
@@ -307,12 +344,26 @@ const AdminQuotes = () => {
         ))}
       </div>
 
-      <Input
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Meklēt pēc numura, klienta vai atbildīgā…"
-        className="mt-4 max-w-sm"
-      />
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Meklēt: klients, uzņēmums, e-pasts, telefons, prece…"
+          className="sm:max-w-sm"
+        />
+        <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+          <SelectTrigger className="sm:w-56">
+            <SelectValue placeholder="Kārtot" />
+          </SelectTrigger>
+          <SelectContent>
+            {SORTS.map((s) => (
+              <SelectItem key={s.key} value={s.key}>
+                {s.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
@@ -374,12 +425,34 @@ const AdminQuotes = () => {
                 <button
                   type="button"
                   onClick={() => setExpanded(isOpen ? null : row.id)}
-                  className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
+                  className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
                 >
-                  <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`} />
-                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{row.name}</span>
-                  <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+                  <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`} />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex flex-wrap items-baseline gap-x-2">
+                      <span className="truncate text-sm font-semibold text-foreground">
+                        {row.company || row.name}
+                      </span>
+                      {row.company && (
+                        <span className="truncate text-xs text-muted-foreground">{row.name}</span>
+                      )}
+                    </span>
+                    <span className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+                      <span className="truncate">{row.email}</span>
+                      {row.phone && <span>· {row.phone}</span>}
+                      {items.length > 0 && (
+                        <span>
+                          · {items.length} preces, {totalQty} gab.
+                        </span>
+                      )}
+                      <span>
+                        · {row.assigned_pm_name ? `Atbildīgais: ${row.assigned_pm_name}` : "Nav atbildīgā"}
+                      </span>
+                    </span>
+                  </span>
+                  <span className="hidden shrink-0 text-right text-xs text-muted-foreground sm:block">
                     {new Date(row.created_at).toLocaleDateString("lv")}
+                    <span className="block">{age === 0 ? "šodien" : `${age} d. atpakaļ`}</span>
                   </span>
                   <Badge className={`shrink-0 ${badgeClass}`}>{statusLabel}</Badge>
                   <ChevronDown
