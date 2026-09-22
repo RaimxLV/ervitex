@@ -96,6 +96,7 @@ Deno.serve(async (req) => {
         deadline: quote.deadline || '',
         completeUrl: `${FN_BASE}?token=${token}&action=complete`,
         adminUrl: 'https://raimxlv.github.io/ervitex/admin/quotes',
+        worksheetUrl: `https://raimxlv.github.io/ervitex/saraksts/${token}`,
       },
     },
   })

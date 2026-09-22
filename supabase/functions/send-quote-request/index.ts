@@ -61,6 +61,9 @@ Deno.serve(async (req) => {
           url: `${fnBase}?token=${quote.action_token}&action=assign:${a.slug}`,
         }))
       : [];
+    const worksheetUrl = quote.action_token
+      ? `https://raimxlv.github.io/ervitex/saraksts/${quote.action_token}`
+      : "";
     const completeUrl = quote.action_token
       ? `${fnBase}?token=${quote.action_token}&action=complete`
       : "";
@@ -78,6 +81,7 @@ Deno.serve(async (req) => {
       print_colors: quote.print_colors || "",
       deadline: quote.deadline || "",
       submittedAt: new Date().toLocaleString("lv-LV"),
+      worksheetUrl,
     };
 
     const results: Array<{ to: string; template: string; ok: boolean; error?: string }> = [];
