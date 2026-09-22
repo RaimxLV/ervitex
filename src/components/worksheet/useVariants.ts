@@ -128,17 +128,25 @@ export const useVariants = (source?: string | null, styleCode?: string | null) =
   const colors = useMemo(() => (item?.colors || []).filter((c) => c?.n || c?.c), [item]);
 
   const sizesFor = (colorCode?: string | null) => {
-    const forColor = prices.filter((p) => !colorCode || !p.color_code || p.color_code === colorCode);
-    const map = new Map<string, number | null>();
+    const label = sizeLabeller(source, prices);
+    const forColor = prices.filter(
+      (p) => !colorCode || !p.color_code || colorMatches(p.color_code, colorCode),
+    );
+    const map = new Map<string, { raw: string; price: number | null }>();
     for (const p of forColor.length ? forColor : prices) {
-      const s = p.size || "-";
-      const price = Number(p.retail_price);
-      if (!map.has(s) || (map.get(s) ?? 0) < price) map.set(s, Number.isFinite(price) && price > 0 ? price : null);
+      const raw = (p.size || "-").trim() || "-";
+      const key = label(raw);
+      const n = Number(p.retail_price);
+      const price = Number.isFinite(n) && n > 0 ? n : null;
+      const cur = map.get(key);
+      if (!cur) map.set(key, { raw, price });
+      else if (price !== null && (cur.price === null || price < cur.price)) map.set(key, { raw, price });
     }
     return [...map.entries()]
-      .map(([size, price]) => ({ size, price }))
+      .map(([size, v]) => ({ size, raw: v.raw, price: v.price }))
       .sort((a, b) => sizeIdx(a.size) - sizeIdx(b.size) || a.size.localeCompare(b.size));
   };
+
 
   return { item, prices, colors, sizesFor, loading };
 };
