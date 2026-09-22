@@ -61,4 +61,4 @@
 - [ ] Konkurentu un B2B piedāvājumu rīku UI/UX salīdzinājums.
 - [ ] Apstiprināts vienotas plūsmas pārbūves plāns: viena saraksta datu vieta un viena galvenā e-pasta poga.
 - [ ] Pārbūvēt plūsmu pēc apstiprinātā plāna.
-- [ ] E-pasti: noņemt preču tabulas/nosaukumus un visas dublētās pogas; atstāt vienu pogu uz individuālo preču sarakstu, saraksti neveidojot mājaslapā.
+- [x] E-pasti: noņemt preču tabulas/nosaukumus un visas dublētās pogas; atstāt vienu pogu uz individuālo preču sarakstu, saraksti neveidojot mājaslapā.

@@ -11,7 +11,7 @@ import {
   PRINT_METHODS, lineNet, printNet, worksheetTotals,
   type PrintLine, type Worksheet, type WorksheetItem,
 } from "@/lib/worksheet";
-import { CheckCircle2, ChevronDown, Loader2, Plus, Printer, Save, Store, Trash2, UserCheck, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, Loader2, Plus, Printer, Save, Store, Trash2, X } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { useAuth } from "@/hooks/useAuth";
@@ -120,7 +120,7 @@ const WorksheetPage = () => {
     setActionBusy(true);
     const { error } = await supabase
       .from("quote_requests")
-      .update({ status: "closed", completed_at: new Date().toISOString() } as never)
+      .update({ status: "closed", completed_at: new Date().toISOString(), worksheet_locked: true } as never)
       .eq("id", sheet.id);
     setActionBusy(false);
     if (error) {
