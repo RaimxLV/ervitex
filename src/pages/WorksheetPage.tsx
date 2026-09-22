@@ -132,6 +132,7 @@ const WorksheetPage = () => {
       return;
     }
     setDirty(false);
+    setSavedOnce(true);
     setSheet((s) => (s ? { ...s, worksheet_updated_at: new Date().toISOString(), worksheet_updated_by: editor || null } : s));
     toast.success("Saglabāts");
 
@@ -189,6 +190,9 @@ const WorksheetPage = () => {
   }
 
   const pmEmail = sheet.assigned_pm_email || "birojs@ervitex.lv";
+  const mailtoNext = `mailto:${isAdmin ? sheet.email || "" : pmEmail}?subject=${encodeURIComponent(
+    `Preču saraksts — ${sheet.company || sheet.name || ""}`,
+  )}&body=${encodeURIComponent(`${window.location.href}\n\nKopā bez PVN ${totals.net.toFixed(2)} EUR\nKopā ar PVN ${totals.gross.toFixed(2)} EUR\n`)}`;
 
   return (
     <div className="min-h-screen bg-muted/30 py-4 sm:py-8 print:bg-white print:py-0">
