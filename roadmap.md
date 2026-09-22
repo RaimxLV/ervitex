@@ -55,3 +55,9 @@
 - [x] Summas bez PVN un ar PVN pārrēķinās uzreiz.
 - [x] Pogas e-pastos: klientam, birojam un atbildīgajai kolēģei.
 - [x] Adminā: "Preču saraksts" un "Kopēt saraksta saiti".
+
+## Vienotā klienta–preču saraksta plūsma
+- [ ] Pilns esošās klienta, e-pasta, kopīgā saraksta un admina plūsmas audits.
+- [ ] Konkurentu un B2B piedāvājumu rīku UI/UX salīdzinājums.
+- [ ] Apstiprināts vienotas plūsmas pārbūves plāns: viena saraksta datu vieta un viena galvenā e-pasta poga.
+- [ ] Pārbūvēt plūsmu pēc apstiprinātā plāna.
