@@ -77,6 +77,7 @@ const QuoteAssignedEmail = ({
   print_colors = '',
   deadline = '',
   completeUrl = '',
+  adminUrl = '',
 }: Props) => {
   const totalQty = items.reduce((s, it) => s + (Number(it.qty) || 0), 0)
   const hasPrint = !!(print_method || print_placement || print_colors || deadline)
