@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ import { CheckCircle2, ChevronDown, Loader2, Mail, Plus, Printer, Repeat, Save, 
 import logo from "@/assets/ervitex-logo-2.svg";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { useAuth } from "@/hooks/useAuth";
-import WorksheetCatalog, { type SwapPayload } from "@/components/worksheet/WorksheetCatalog";
+import { startWorksheetPick } from "@/lib/worksheetPick";
 import RowVariantControls from "@/components/worksheet/RowVariantControls";
 
 const num = (v: string) => {
@@ -33,10 +33,9 @@ const WorksheetPage = () => {
   const [dirty, setDirty] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState(false);
-  const [pickerMode, setPickerMode] = useState<"add" | "swap" | null>(null);
-  const [swapId, setSwapId] = useState<string | null>(null);
   const [savedOnce, setSavedOnce] = useState(false);
   const { isAdmin } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -81,43 +80,18 @@ const WorksheetPage = () => {
     setDirty(true);
   };
 
-  const addItems = (rows: WorksheetItem[]) => {
-    setItems((prev) => [...prev, ...rows]);
-    setDirty(true);
-    setOpenId(rows[0]?.id ?? null);
-    toast.success(`Pievienots: ${rows.length}`);
+  /** Aizved uz parasto katalogu ar visiem filtriem; izvēlētās preces atgriežas sarakstā. */
+  const goCatalog = async (mode: "add" | "swap", row?: WorksheetItem) => {
+    if (!token) return;
+    if (dirty) await save();
+    startWorksheetPick({
+      token,
+      mode,
+      rowId: row?.id ?? null,
+      label: row ? [row.name, row.colorName, row.size, `${row.qty} gab.`].filter(Boolean).join(" · ") : null,
+    });
+    navigate("/catalog");
   };
-
-  const swapModel = (next: SwapPayload) => {
-    if (!swapId) return;
-    let missing = false;
-    setItems((prev) =>
-      prev.map((i) => {
-        if (i.id !== swapId) return i;
-        const key = i.size || "-";
-        const has = next.priceBySize.has(key);
-        if (!has) missing = true;
-        return {
-          ...i,
-          source: next.source,
-          productId: next.productId,
-          name: next.name,
-          code: next.code,
-          brand: next.brand,
-          image: next.image,
-          colorName: next.colorName,
-          colorHex: next.colorHex,
-          unitPrice: has ? next.priceBySize.get(key) ?? null : null,
-        };
-      }),
-    );
-    setDirty(true);
-    setSwapId(null);
-    toast[missing ? "warning" : "success"](
-      missing ? "Modelis nomainīts — izvēlies pieejamu izmēru" : "Modelis nomainīts",
-    );
-  };
-
 
   const save = async () => {
     setSaving(true);
@@ -206,18 +180,6 @@ const WorksheetPage = () => {
           </Button>
         </div>
 
-        {pickerMode !== null && (
-          <div className="mb-3 print:hidden">
-            <WorksheetCatalog
-              mode={pickerMode}
-              target={items.find((i) => i.id === swapId) || null}
-              onAdd={addItems}
-              onSwap={swapModel}
-              onClose={() => { setPickerMode(null); setSwapId(null); }}
-            />
-          </div>
-        )}
-
         <article className="rounded-md border border-border bg-card p-4 sm:p-7">
           <header className="border-b border-border pb-5">
             <img src={logo} alt="Ervitex" className="h-7 w-auto" />
@@ -272,8 +234,8 @@ const WorksheetPage = () => {
                 <span className="font-heading text-[11px] font-black uppercase tracking-widest text-muted-foreground">
                   Preces ({items.length})
                 </span>
-                <Button size="sm" variant="outline" onClick={() => { setSwapId(null); setPickerMode("add"); }}>
-                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Pievienot preci
+                <Button size="sm" variant="outline" onClick={() => goCatalog("add")}>
+                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Pievienot no kataloga
                 </Button>
               </div>
             )}
@@ -321,7 +283,7 @@ const WorksheetPage = () => {
                         {[i.code, i.brand].filter(Boolean).join(" · ")}
                       </p>
                       {!readOnly && (
-                        <Button size="sm" variant="outline" onClick={() => { setSwapId(i.id); setPickerMode("swap"); }}>
+                        <Button size="sm" variant="outline" onClick={() => goCatalog("swap", i)}>
                           <Repeat className="mr-1.5 h-3.5 w-3.5" /> Mainīt modeli
                         </Button>
                       )}
