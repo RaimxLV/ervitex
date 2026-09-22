@@ -206,6 +206,18 @@ const WorksheetPage = () => {
           </Button>
         </div>
 
+        {pickerMode !== null && (
+          <div className="mb-3 print:hidden">
+            <WorksheetCatalog
+              mode={pickerMode}
+              target={items.find((i) => i.id === swapId) || null}
+              onAdd={addItems}
+              onSwap={swapModel}
+              onClose={() => { setPickerMode(null); setSwapId(null); }}
+            />
+          </div>
+        )}
+
         <article className="rounded-md border border-border bg-card p-4 sm:p-7">
           <header className="border-b border-border pb-5">
             <img src={logo} alt="Ervitex" className="h-7 w-auto" />
