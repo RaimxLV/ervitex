@@ -33,6 +33,7 @@ interface Props {
   ref?: string
   assignLinks?: AssignLink[]
   completeUrl?: string
+  worksheetUrl?: string
   name?: string
   email?: string
   phone?: string
