@@ -60,5 +60,5 @@
 - [x] Pilns esošās klienta, e-pasta, kopīgā saraksta un admina plūsmas audits.
 - [x] Konkurentu un B2B piedāvājumu rīku UI/UX salīdzinājums.
 - [x] Apstiprināts vienotas plūsmas pārbūves plāns: viena saraksta datu vieta un viena galvenā e-pasta poga.
-- [ ] Pārbūvēt plūsmu līdz galam: modeļa maiņa un jaunu preču pievienošana pašā preču sarakstā.
+- [x] Pārbūvēt plūsmu līdz galam: modeļa maiņa, krāsas/izmēra maiņa un jaunu preču pievienošana pašā preču sarakstā.
 - [x] E-pasti: noņemt preču tabulas/nosaukumus un visas dublētās pogas; atstāt vienu pogu uz individuālo preču sarakstu, saraksti neveidojot mājaslapā.
