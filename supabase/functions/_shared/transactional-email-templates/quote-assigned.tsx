@@ -39,6 +39,7 @@ interface Props {
   print_colors?: string
   deadline?: string
   completeUrl?: string
+  adminUrl?: string
 }
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
