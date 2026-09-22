@@ -581,6 +581,20 @@ const AdminOfferEdit = () => {
                           {i.code}{i.colorName && ` · ${i.colorName}`}{i.size && ` · ${i.size}`}
                         </p>
                       </div>
+                      {firstOfGroup.has(i.id) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSwapKey(groupKey(i));
+                            setPicked(null);
+                            setQ("");
+                            document.getElementById("preces-izvele")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                          }}
+                          className="inline-flex shrink-0 items-center gap-1 rounded-sm border border-border px-2 py-1 text-[11px] font-semibold text-foreground hover:border-accent hover:text-accent"
+                        >
+                          <Repeat className="h-3.5 w-3.5" /> Cits modelis
+                        </button>
+                      )}
                       <button
                         type="button"
                         aria-label="Dzēst pozīciju"
