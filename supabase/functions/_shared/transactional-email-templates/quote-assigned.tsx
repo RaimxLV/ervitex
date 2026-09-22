@@ -83,11 +83,7 @@ const QuoteAssignedEmail = ({
   return (
     <Html lang="lv">
       <Head />
-      <Preview>{`${refNo} — pieprasījums nodots ${assigneeName}`}</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Section style={headerBar}>
-            <Heading style={h1}>{`${refNo} · PIEPRASĪJUMS TEV`}</Heading>
+      <Preview>{`Pieprasījums nodots ${assigneeName}`}</Preview>
             <Text style={subtle}>
               {assigneeName ? `${assigneeName}, ` : ''}šis pieprasījums ir Tavs. Spied “Atbildēt”, un vēstule aiziet
               tieši klientam.

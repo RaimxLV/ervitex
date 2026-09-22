@@ -162,7 +162,7 @@ const AdminQuotes = () => {
 
   /** Dzēš pieprasījumu un tam pievienotos failus. */
   const remove = async (row: QuoteRow) => {
-    if (!confirm(`Dzēst pieprasījumu ${row.ref ? `#${row.ref}` : ""} (${row.name})? To nevar atsaukt.`)) return;
+    if (!confirm(`Dzēst pieprasījumu (${row.name})? To nevar atsaukt.`)) return;
     setBusy(row.id);
     const paths = (row.file_urls || [])
       .map((u) => (u.includes("/quote-attachments/") ? u.split("/quote-attachments/")[1] : u))
@@ -195,7 +195,7 @@ const AdminQuotes = () => {
     const { data, error } = await supabase
       .from("pm_offers")
       .insert({
-        title: `Piedāvājums ${row.ref ? `#${row.ref}` : ""}`.trim(),
+        title: `Piedāvājums — ${row.company || row.name}`,
         client_name: row.name,
         client_company: row.company,
         client_email: row.email,
@@ -377,9 +377,6 @@ const AdminQuotes = () => {
                   className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
                 >
                   <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`} />
-                  {row.ref && (
-                    <span className="hidden font-mono text-xs font-bold text-accent sm:inline">#{row.ref}</span>
-                  )}
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{row.name}</span>
                   <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
                     {new Date(row.created_at).toLocaleDateString("lv")}
@@ -396,9 +393,6 @@ const AdminQuotes = () => {
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      {row.ref && (
-                        <span className="font-mono text-xs font-bold text-accent">#{row.ref}</span>
-                      )}
                       <p className="font-medium text-foreground">{row.name}</p>
                       {done ? (
                         <Badge className="bg-muted text-muted-foreground">Pabeigts</Badge>
@@ -456,7 +450,7 @@ const AdminQuotes = () => {
                     <Button asChild variant="outline" size="sm" className="w-full">
                       <a
                         href={`mailto:${row.email}?subject=${encodeURIComponent(
-                          `[#${row.ref || "ERV"}] Cenu pieprasījums`,
+                          "Cenu pieprasījums",
                         )}`}
                       >
                         <Mail className="mr-2 h-4 w-4" /> Rakstīt klientam
@@ -487,7 +481,7 @@ const AdminQuotes = () => {
                         className="flex-1 text-xs"
                         onClick={() =>
                           copyText(
-                            [row.ref ? `#${row.ref}` : "", row.name, row.email, row.phone, row.company]
+                            [row.name, row.email, row.phone, row.company]
                               .filter(Boolean)
                               .join(" · "),
                             "Klienta dati nokopēti",
