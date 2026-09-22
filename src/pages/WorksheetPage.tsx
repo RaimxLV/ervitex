@@ -433,15 +433,33 @@ const WorksheetPage = () => {
                 <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Kas labo? (vārds)</span>
                 <Input value={editor} placeholder="Piem. Jānis" onChange={(e) => setEditor(e.target.value)} />
               </label>
-              <Button onClick={save} disabled={saving || !dirty} className="sm:w-auto">
-                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                {dirty ? "Saglabāt" : "Nav ko saglabāt"}
-              </Button>
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={save} disabled={saving || !dirty}>
+                  {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                  {dirty ? "Saglabāt" : "Saglabāts"}
+                </Button>
+                {savedOnce && !dirty && (
+                  <Button variant="outline" asChild>
+                    <a href={mailtoNext}>
+                      <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}
+                    </a>
+                  </Button>
+                )}
+              </div>
             </div>
           )}
         </article>
 
       </div>
+
+      <ItemPickerDialog
+        open={pickerMode !== null}
+        onOpenChange={(v) => { if (!v) { setPickerMode(null); setSwapId(null); } }}
+        mode={pickerMode === "swap" ? "swap" : "add"}
+        target={items.find((i) => i.id === swapId) || null}
+        onAdd={addItems}
+        onSwap={swapModel}
+      />
     </div>
   );
 };
