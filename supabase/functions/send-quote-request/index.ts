@@ -63,7 +63,6 @@ Deno.serve(async (req) => {
       phone: quote.phone || "",
       company: quote.company || "",
       message: quote.message || "",
-      items: Array.isArray(quote.items) ? quote.items : [],
       print_method: quote.print_method || "",
       print_placement: quote.print_placement || "",
       print_colors: quote.print_colors || "",

@@ -54,9 +54,9 @@ interface QuoteRow {
   print_placement: string | null;
   print_colors: string | null;
   deadline: string | null;
+  worksheet_locked?: boolean;
 }
 
-const eur = (n: number) => `${n.toFixed(2)} €`;
 const daysSince = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
 const isDone = (q: QuoteRow) => q.status === "closed";
 

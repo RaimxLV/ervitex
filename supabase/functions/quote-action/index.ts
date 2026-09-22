@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
   if (action === 'complete') {
     await supabase
       .from('quote_requests')
-      .update({ status: 'closed', completed_at: new Date().toISOString() })
+      .update({ status: 'closed', completed_at: new Date().toISOString(), worksheet_locked: true })
       .eq('id', quote.id)
     return page('Pabeigts', 'Pieprasījums atzīmēts kā pabeigts. Vari aizvērt šo logu.')
   }
