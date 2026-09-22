@@ -37,22 +37,31 @@ const WorksheetPage = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase.rpc("get_quote_worksheet" as any, { _token: token });
-      const row = (Array.isArray(data) ? data[0] : data) as Worksheet | undefined;
-      if (row) {
-        const list = (Array.isArray(row.items) ? row.items : []).map((i, idx) => ({
+  /** Reads the live sheet. `withItems` is false after status actions so local edits survive. */
+  const reload = async (withItems: boolean) => {
+    const { data } = await supabase.rpc("get_quote_worksheet" as any, { _token: token });
+    const row = (Array.isArray(data) ? data[0] : data) as Worksheet | undefined;
+    if (!row) return null;
+    setSheet(row);
+    if (withItems) {
+      setItems(
+        (Array.isArray(row.items) ? row.items : []).map((i, idx) => ({
           ...i,
           id: i.id || `row-${idx}`,
           qty: Number(i.qty) || 0,
           prints: Array.isArray(i.prints) ? i.prints : [],
-        }));
-        setSheet(row);
-        setItems(list);
-      }
+        })),
+      );
+    }
+    return row;
+  };
+
+  useEffect(() => {
+    (async () => {
+      await reload(true);
       setLoading(false);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const totals = useMemo(() => worksheetTotals(items, sheet?.vat_rate ?? 21), [items, sheet?.vat_rate]);
