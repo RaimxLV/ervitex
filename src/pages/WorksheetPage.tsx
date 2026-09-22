@@ -6,10 +6,10 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { money } from "@/lib/offer";
 import {
-  PRINT_METHODS, lineNet, printTotalPerUnit, worksheetTotals,
+  PRINT_METHODS, lineNet, printNet, worksheetTotals,
   type PrintLine, type Worksheet, type WorksheetItem,
 } from "@/lib/worksheet";
-import { Loader2, Plus, Printer, Save, Store, Trash2, X } from "lucide-react";
+import { ChevronDown, Loader2, Plus, Printer, Save, Store, Trash2, X } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
 
 const num = (v: string) => {
