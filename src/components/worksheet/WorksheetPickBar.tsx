@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { endWorksheetPick, useWorksheetPick } from "@/lib/worksheetPick";
 import type { WorksheetItem } from "@/lib/worksheet";
-import { fetchVariantPrices } from "@/components/worksheet/useVariants";
+import { fetchVariantPrices, priceForVariant } from "@/components/worksheet/useVariants";
 import { ArrowLeft, Check, Loader2, Repeat, X } from "lucide-react";
 
 const WorksheetPickBar = () => {
