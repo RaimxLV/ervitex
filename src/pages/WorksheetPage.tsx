@@ -15,7 +15,7 @@ import { CheckCircle2, ChevronDown, Loader2, Mail, Plus, Printer, Repeat, Save, 
 import logo from "@/assets/ervitex-logo-2.svg";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { useAuth } from "@/hooks/useAuth";
-import ItemPickerDialog, { type SwapPayload } from "@/components/worksheet/ItemPickerDialog";
+import WorksheetCatalog, { type SwapPayload } from "@/components/worksheet/WorksheetCatalog";
 import RowVariantControls from "@/components/worksheet/RowVariantControls";
 
 const num = (v: string) => {
@@ -205,6 +205,18 @@ const WorksheetPage = () => {
             <Printer className="mr-2 h-3.5 w-3.5" /> Drukāt / PDF
           </Button>
         </div>
+
+        {pickerMode !== null && (
+          <div className="mb-3 print:hidden">
+            <WorksheetCatalog
+              mode={pickerMode}
+              target={items.find((i) => i.id === swapId) || null}
+              onAdd={addItems}
+              onSwap={swapModel}
+              onClose={() => { setPickerMode(null); setSwapId(null); }}
+            />
+          </div>
+        )}
 
         <article className="rounded-md border border-border bg-card p-4 sm:p-7">
           <header className="border-b border-border pb-5">
@@ -456,14 +468,6 @@ const WorksheetPage = () => {
 
       </div>
 
-      <ItemPickerDialog
-        open={pickerMode !== null}
-        onOpenChange={(v) => { if (!v) { setPickerMode(null); setSwapId(null); } }}
-        mode={pickerMode === "swap" ? "swap" : "add"}
-        target={items.find((i) => i.id === swapId) || null}
-        onAdd={addItems}
-        onSwap={swapModel}
-      />
     </div>
   );
 };
