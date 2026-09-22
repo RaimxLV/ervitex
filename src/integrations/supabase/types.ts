@@ -1258,6 +1258,7 @@ export type Database = {
           note: string | null
           pm_email: string | null
           pm_name: string | null
+          quote_request_id: string | null
           status: string
           title: string
           token: string
@@ -1276,6 +1277,7 @@ export type Database = {
           note?: string | null
           pm_email?: string | null
           pm_name?: string | null
+          quote_request_id?: string | null
           status?: string
           title?: string
           token?: string
@@ -1294,13 +1296,22 @@ export type Database = {
           note?: string | null
           pm_email?: string | null
           pm_name?: string | null
+          quote_request_id?: string | null
           status?: string
           title?: string
           token?: string
           updated_at?: string
           vat_rate?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "pm_offers_quote_request_id_fkey"
+            columns: ["quote_request_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_colors: {
         Row: {
