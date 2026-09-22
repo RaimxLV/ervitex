@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { money, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
 import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
-import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Save, Search, Send, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Repeat, Save, Search, Send, Trash2, Plus } from "lucide-react";
 
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
@@ -81,6 +81,7 @@ const AdminOfferEdit = () => {
   const [prices, setPrices] = useState<VariantPrice[]>([]);
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [qtyBySize, setQtyBySize] = useState<Record<string, number>>({});
+  const [swapKey, setSwapKey] = useState<string | null>(null);
   const debounce = useRef<number>();
 
   useEffect(() => {
@@ -186,6 +187,61 @@ const AdminOfferEdit = () => {
     setOffer((o) => ({ ...o, items: [...o.items, ...lines] }));
     setQtyBySize({});
     toast({ title: `Pievienots: ${lines.length} rindas` });
+  };
+
+  /** Viena modeļa + krāsas grupa piedāvājumā */
+  const groupKey = (i: OfferItem) => `${i.source}|${i.productId}|${i.colorName || ""}`;
+  const swapTarget = useMemo(
+    () => (swapKey ? offer.items.find((i) => groupKey(i) === swapKey) || null : null),
+    [swapKey, offer.items],
+  );
+  const firstOfGroup = useMemo(() => {
+    const seen = new Set<string>();
+    const ids = new Set<string>();
+    for (const i of offer.items) {
+      const k = groupKey(i);
+      if (!seen.has(k)) { seen.add(k); ids.add(i.id); }
+    }
+    return ids;
+  }, [offer.items]);
+
+  /** Nomaina modeli/krāsu visai grupai, saglabājot izmērus un daudzumus */
+  const swapPicked = () => {
+    if (!picked || !swapKey) return;
+    const color = colorRows.find((c) => c.c === activeColor) || colorRows[0] || null;
+    const priceBySize = new Map(sizeRows.map((r) => [r.size, r.price]));
+    let missing = 0;
+    setOffer((o) => ({
+      ...o,
+      items: o.items.map((i) => {
+        if (groupKey(i) !== swapKey) return i;
+        const s = i.size || "-";
+        const has = priceBySize.has(s);
+        if (!has) missing += 1;
+        return {
+          ...i,
+          source: picked.source,
+          productId: picked.id,
+          name: picked.name,
+          code: picked.id,
+          brand: picked.brand,
+          image: color?.u || picked.image_url || null,
+          colorName: color?.n || null,
+          colorHex: color?.h || null,
+          unitPrice: has ? (priceBySize.get(s) ?? null) : i.unitPrice,
+        };
+      }),
+    }));
+    setSwapKey(null);
+    setPicked(null);
+    setQtyBySize({});
+    setQ("");
+    toast({
+      title: "Modelis nomainīts",
+      description: missing
+        ? `Izmēri un skaiti saglabāti. ${missing} izmēriem jaunajam modelim nav cenas — pārbaudi.`
+        : "Izmēri un skaiti saglabāti, cenas atjaunotas.",
+    });
   };
 
   const patchItem = (itemId: string, patch: Partial<OfferItem>) =>
@@ -413,8 +469,21 @@ const AdminOfferEdit = () => {
           </section>
 
           {/* Picker */}
-          <section className="rounded-sm border border-border p-4 sm:p-5">
-            <h2 className="font-heading text-sm font-black uppercase tracking-widest text-foreground">Pievienot preci</h2>
+          <section id="preces-izvele" className="rounded-sm border border-border p-4 sm:p-5">
+            <h2 className="font-heading text-sm font-black uppercase tracking-widest text-foreground">
+              {swapTarget ? "Nomainīt modeli" : "Pievienot preci"}
+            </h2>
+            {swapTarget && (
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-sm border border-accent/50 bg-accent/5 p-3">
+                <p className="text-xs text-foreground">
+                  Nomaina: <span className="font-semibold">{swapTarget.name}</span>
+                  {swapTarget.colorName ? ` · ${swapTarget.colorName}` : ""} — izmēri un skaiti paliek tie paši.
+                </p>
+                <Button size="sm" variant="ghost" onClick={() => { setSwapKey(null); setPicked(null); }}>
+                  Atcelt
+                </Button>
+              </div>
+            )}
             <div className="relative mt-3">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input className="pl-9" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Meklēt pēc nosaukuma vai koda…" />
@@ -467,20 +536,28 @@ const AdminOfferEdit = () => {
                     <div key={r.size} className="rounded-sm border border-border bg-background p-2">
                       <p className="text-xs font-semibold text-foreground">{r.size}</p>
                       <p className="text-[11px] text-muted-foreground">{r.price ? money(r.price) : "cena pēc pieprasījuma"}</p>
-                      <Input
-                        type="number"
-                        min={0}
-                        className="mt-1 h-8"
-                        value={qtyBySize[r.size] ?? ""}
-                        onChange={(e) => setQtyBySize({ ...qtyBySize, [r.size]: Math.max(0, Number(e.target.value) || 0) })}
-                      />
+                      {!swapTarget && (
+                        <Input
+                          type="number"
+                          min={0}
+                          className="mt-1 h-8"
+                          value={qtyBySize[r.size] ?? ""}
+                          onChange={(e) => setQtyBySize({ ...qtyBySize, [r.size]: Math.max(0, Number(e.target.value) || 0) })}
+                        />
+                      )}
                     </div>
                   ))}
                 </div>
 
-                <Button size="sm" className="mt-3" onClick={addPicked}>
-                  <Plus className="mr-2 h-4 w-4" /> Pievienot piedāvājumam
-                </Button>
+                {swapTarget ? (
+                  <Button size="sm" className="mt-3" onClick={swapPicked}>
+                    <Repeat className="mr-2 h-4 w-4" /> Nomainīt uz šo modeli
+                  </Button>
+                ) : (
+                  <Button size="sm" className="mt-3" onClick={addPicked}>
+                    <Plus className="mr-2 h-4 w-4" /> Pievienot piedāvājumam
+                  </Button>
+                )}
               </div>
             )}
           </section>
@@ -504,6 +581,20 @@ const AdminOfferEdit = () => {
                           {i.code}{i.colorName && ` · ${i.colorName}`}{i.size && ` · ${i.size}`}
                         </p>
                       </div>
+                      {firstOfGroup.has(i.id) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSwapKey(groupKey(i));
+                            setPicked(null);
+                            setQ("");
+                            document.getElementById("preces-izvele")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                          }}
+                          className="inline-flex shrink-0 items-center gap-1 rounded-sm border border-border px-2 py-1 text-[11px] font-semibold text-foreground hover:border-accent hover:text-accent"
+                        >
+                          <Repeat className="h-3.5 w-3.5" /> Cits modelis
+                        </button>
+                      )}
                       <button
                         type="button"
                         aria-label="Dzēst pozīciju"

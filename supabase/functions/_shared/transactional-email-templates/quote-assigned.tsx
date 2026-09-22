@@ -39,6 +39,7 @@ interface Props {
   print_colors?: string
   deadline?: string
   completeUrl?: string
+  adminUrl?: string
 }
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
@@ -76,6 +77,7 @@ const QuoteAssignedEmail = ({
   print_colors = '',
   deadline = '',
   completeUrl = '',
+  adminUrl = '',
 }: Props) => {
   const totalQty = items.reduce((s, it) => s + (Number(it.qty) || 0), 0)
   const hasPrint = !!(print_method || print_placement || print_colors || deadline)
@@ -163,6 +165,17 @@ const QuoteAssignedEmail = ({
                   <li key={i}><Link href={u}>{(u.split('?')[0] || u).split('/').pop() || u}</Link></li>
                 ))}
               </ul>
+            </>
+          ) : null}
+
+          {adminUrl ? (
+            <>
+              <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
+              <Text style={{ fontSize: '12px', color: '#666', margin: '0 0 10px' }}>
+                Ja klients izvēlējies nepiemērotu modeli — atver pieprasījumu mājaslapā,
+                izveido piedāvājumu un nomaini modeli. Izmēri un skaiti paliek.
+              </Text>
+              <Button href={adminUrl} style={doneBtn}>ATVĒRT UN NOMAINĪT MODELI</Button>
             </>
           ) : null}
 

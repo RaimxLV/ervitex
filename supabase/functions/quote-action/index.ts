@@ -95,6 +95,7 @@ Deno.serve(async (req) => {
         print_colors: quote.print_colors || '',
         deadline: quote.deadline || '',
         completeUrl: `${FN_BASE}?token=${token}&action=complete`,
+        adminUrl: 'https://raimxlv.github.io/ervitex/admin/quotes',
       },
     },
   })
