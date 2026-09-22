@@ -253,16 +253,41 @@ const AdminQuotes = () => {
   );
 
   const search = q.trim().toLowerCase();
-  const visible = quotes.filter(
-    (row) =>
-      inTab(row, tab) &&
-      (!search ||
-        [row.ref, row.name, row.company, row.email, row.assigned_pm_name]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(search)),
-  );
+  const matches = (row: QuoteRow) => {
+    if (!search) return true;
+    const itemText = (Array.isArray(row.items) ? row.items : [])
+      .map((i) => [i.name, i.code, i.brand, i.colorName, i.size].filter(Boolean).join(" "))
+      .join(" ");
+    return [
+      row.name,
+      row.company,
+      row.email,
+      row.phone,
+      row.assigned_pm_name,
+      row.message,
+      itemText,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(search);
+  };
+
+  const qtyOf = (row: QuoteRow) =>
+    (Array.isArray(row.items) ? row.items : []).reduce((s, i) => s + (i.qty || 0), 0);
+
+  const visible = quotes
+    .filter((row) => inTab(row, tab) && matches(row))
+    .sort((a, b) => {
+      if (sort === "oldest") return +new Date(a.created_at) - +new Date(b.created_at);
+      if (sort === "name") return a.name.localeCompare(b.name, "lv");
+      if (sort === "company")
+        return (a.company || a.name).localeCompare(b.company || b.name, "lv");
+      if (sort === "assignee")
+        return (a.assigned_pm_name || "Ω").localeCompare(b.assigned_pm_name || "Ω", "lv");
+      if (sort === "qty") return qtyOf(b) - qtyOf(a);
+      return +new Date(b.created_at) - +new Date(a.created_at);
+    });
 
   const stale = quotes.filter((x) => !isDone(x) && !x.assigned_pm_slug && daysSince(x.created_at) >= 2).length;
 
