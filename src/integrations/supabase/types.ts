@@ -1544,6 +1544,11 @@ export type Database = {
           ref: string | null
           status: string
           updated_at: string
+          worksheet_items: Json
+          worksheet_locked: boolean
+          worksheet_updated_at: string | null
+          worksheet_updated_by: string | null
+          worksheet_vat_rate: number
         }
         Insert: {
           action_token?: string | null
@@ -1569,6 +1574,11 @@ export type Database = {
           ref?: string | null
           status?: string
           updated_at?: string
+          worksheet_items?: Json
+          worksheet_locked?: boolean
+          worksheet_updated_at?: string | null
+          worksheet_updated_by?: string | null
+          worksheet_vat_rate?: number
         }
         Update: {
           action_token?: string | null
@@ -1594,6 +1604,11 @@ export type Database = {
           ref?: string | null
           status?: string
           updated_at?: string
+          worksheet_items?: Json
+          worksheet_locked?: boolean
+          worksheet_updated_at?: string | null
+          worksheet_updated_by?: string | null
+          worksheet_vat_rate?: number
         }
         Relationships: [
           {
@@ -2542,6 +2557,26 @@ export type Database = {
           wholesale_price: number
         }[]
       }
+      get_quote_worksheet: {
+        Args: { _token: string }
+        Returns: {
+          assigned_pm_email: string
+          assigned_pm_name: string
+          company: string
+          created_at: string
+          email: string
+          id: string
+          items: Json
+          locked: boolean
+          message: string
+          name: string
+          phone: string
+          status: string
+          vat_rate: number
+          worksheet_updated_at: string
+          worksheet_updated_by: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2623,6 +2658,10 @@ export type Database = {
       refresh_mf_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
+      save_quote_worksheet: {
+        Args: { _by?: string; _items: Json; _token: string }
+        Returns: boolean
+      }
       ss_fill_missing_variant_prices: { Args: never; Returns: number }
       ss_sku_retail_prices: {
         Args: never
