@@ -168,6 +168,17 @@ const QuoteAssignedEmail = ({
             </>
           ) : null}
 
+          {adminUrl ? (
+            <>
+              <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
+              <Text style={{ fontSize: '12px', color: '#666', margin: '0 0 10px' }}>
+                Ja klients izvēlējies nepiemērotu modeli — atver pieprasījumu mājaslapā,
+                izveido piedāvājumu un nomaini modeli. Izmēri un skaiti paliek.
+              </Text>
+              <Button href={adminUrl} style={doneBtn}>ATVĒRT UN NOMAINĪT MODELI</Button>
+            </>
+          ) : null}
+
           {completeUrl ? (
             <>
               <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
