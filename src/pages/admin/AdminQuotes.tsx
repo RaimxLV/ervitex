@@ -96,7 +96,8 @@ const AdminQuotes = () => {
     const { data, error } = await supabase
       .from("quote_requests")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(500);
     if (error) toast({ title: "Kļūda", description: error.message, variant: "destructive" });
     else setQuotes((data as unknown as QuoteRow[]) || []);
     setLoading(false);
@@ -123,9 +124,10 @@ const AdminQuotes = () => {
     if (row.action_token) {
       try {
         const res = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quote-action?token=${row.action_token}&action=assign:${p.slug}`,
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quote-action?token=${row.action_token}&action=assign:${p.slug}&format=json`,
         );
-        if (!res.ok) throw new Error("Neizdevās nodot");
+        const out = (await res.json().catch(() => null)) as { ok?: boolean; emailed?: boolean } | null;
+        if (!res.ok || !out?.ok) throw new Error("Neizdevās nodot");
         setQuotes((prev) =>
           prev.map((x) =>
             x.id === row.id
@@ -140,7 +142,15 @@ const AdminQuotes = () => {
               : x,
           ),
         );
-        toast({ title: `Nodots ${p.name}`, description: `Vēstule aizgāja uz ${p.email}.` });
+        if (out.emailed === false) {
+          toast({
+            title: `Nodots ${p.name}`,
+            description: `Vēstule uz ${p.email} neaizgāja.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({ title: `Nodots ${p.name}`, description: `Vēstule aizgāja uz ${p.email}.` });
+        }
       } catch (e) {
         toast({ title: "Kļūda", description: (e as Error).message, variant: "destructive" });
       }

@@ -87,10 +87,12 @@ const WorksheetPickBar = () => {
       const next = current.map((i) => {
         if (i.id !== pick.rowId) return i;
         const size = i.size || null;
-        const match = prices.filter(
-          (p) => (!c.colorCode || !p.color_code || p.color_code === c.colorCode) && (p.size || null) === size,
-        );
-        const price = match.length ? Math.max(...match.map((p) => Number(p.retail_price) || 0)) : 0;
+        const sameSize = prices.filter((p) => (p.size || null) === size);
+        // Exact colour + size first; only fall back to colourless price rows.
+        const exact = c.colorCode ? sameSize.filter((p) => p.color_code === c.colorCode) : sameSize;
+        const match = exact.length ? exact : sameSize.filter((p) => !p.color_code);
+        const candidates = match.map((p) => Number(p.retail_price) || 0).filter((n) => n > 0);
+        const price = candidates.length ? Math.min(...candidates) : 0;
         if (!price) missing = true;
         return {
           ...i,
