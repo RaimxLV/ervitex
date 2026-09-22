@@ -39,3 +39,11 @@
 - [ ] Sašaurināt publisko piekļuvi `catalog_overrides`, `mf_stock`, `ss_stock`.
 - [ ] Dzēst dublējošo service worker un 6 neizmantotās komponentes.
 - [ ] Noņemt `no-store` meta tagus; sakārtot ESLint kļūdas edge funkcijās; sadalīt `CatalogItemDialog.tsx`.
+
+## Pieprasījumu plūsma (pabeigts 22.09.2026)
+- [x] Numurs `ERV-DDMM-NNN` katram pieteikumam, tēmā `[#ERV-...]`
+- [x] 5 pogas Lauras e-pastā (Ilona, Santa, Justīne, Evita, Ņemu es) + `Pabeigts`
+- [x] `quote-action` funkcija: nodod, sūta pieteikumu darbiniecei ar Reply-To uz klientu, atzīmē pabeigtu
+- [x] Admina cilnes: Nenodotie / Mani / Visi aktīvie / Pabeigtie + brīdinājums >2 dienām
+- [x] Katalogā/piedāvājumos poga „Kopēt piedāvājuma saiti”
+- [ ] Apstiprināt Evitas e-pastu (pagaidām evita@ervitex.lv)
