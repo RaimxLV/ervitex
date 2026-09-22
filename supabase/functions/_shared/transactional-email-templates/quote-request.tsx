@@ -70,7 +70,7 @@ const assignBtn = {
 const doneBtn = { ...assignBtn, background: '#111' }
 
 const QuoteRequestEmail = ({
-  ref: refNo = '',
+  ref: _ref = '',
   assignLinks = [],
   completeUrl = '',
   name = '',

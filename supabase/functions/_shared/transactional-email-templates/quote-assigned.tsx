@@ -62,7 +62,7 @@ const doneBtn = {
 }
 
 const QuoteAssignedEmail = ({
-  ref: refNo = '',
+  ref: _ref = '',
   assigneeName = '',
   name = '',
   email = '',
