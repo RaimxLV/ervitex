@@ -141,11 +141,6 @@ const QuoteConfirmationEmail = ({
           {worksheetUrl ? (
             <>
               <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
-              <Heading as="h3" style={h3}>Tavs preču saraksts tiešsaistē</Heading>
-              <Text style={{ fontSize: '13px', color: '#444', margin: '0 0 10px' }}>
-                Šo sarakstu redzam gan Tu, gan Tavs Ervitex cilvēks. Tur vari mainīt izmērus un skaitus,
-                izvēlēties apdrukas veidu un uzreiz redzēt summu bez PVN un ar PVN.
-              </Text>
               <Section>
                 <a
                   href={worksheetUrl}
@@ -159,6 +154,7 @@ const QuoteConfirmationEmail = ({
               </Section>
             </>
           ) : null}
+
 
           <Hr style={{ borderColor: '#eee', margin: '24px 0 12px' }} />
           <Text style={{ fontSize: '12px', color: '#666' }}>

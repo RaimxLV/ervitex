@@ -139,16 +139,11 @@ const QuoteRequestEmail = ({
           </table>
 
           {worksheetUrl ? (
-            <>
-              <Text style={{ fontSize: '12px', color: '#666', margin: '14px 0 8px' }}>
-                Kopīgais preču saraksts — atver, maini modeļus, izmērus, skaitus un apdrukas cenas.
-                Summa bez PVN un ar PVN pārrēķinās uzreiz. Klients redz to pašu sarakstu.
-              </Text>
-              <Section>
-                <Link href={worksheetUrl} style={doneBtn}>Atvērt preču sarakstu</Link>
-              </Section>
-            </>
+            <Section>
+              <Link href={worksheetUrl} style={doneBtn}>Atvērt preču sarakstu</Link>
+            </Section>
           ) : null}
+
 
           {hasPrint ? (
             <>

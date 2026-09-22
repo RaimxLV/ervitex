@@ -73,12 +73,13 @@ const WorksheetPage = () => {
     });
     setSaving(false);
     if (error || data === false) {
-      toast.error("Neizdevās saglabāt. Pārlādē lapu un mēģini vēlreiz.");
+      toast.error("Neizdevās saglabāt");
       return;
     }
     setDirty(false);
     setSheet((s) => (s ? { ...s, worksheet_updated_at: new Date().toISOString(), worksheet_updated_by: editor || null } : s));
-    toast.success("Saglabāts. Abi redz vienu un to pašu sarakstu.");
+    toast.success("Saglabāts");
+
   };
 
   if (loading) {
@@ -116,9 +117,6 @@ const WorksheetPage = () => {
             <p className="mt-1.5 text-sm text-muted-foreground">
               {[sheet.company, sheet.name, sheet.email, sheet.phone].filter(Boolean).join(" · ")}
             </p>
-            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-              Šis saraksts ir kopīgs — tu un tavs Ervitex cilvēks redzat vienu un to pašu. Maini skaitus, izmērus un apdruku, summa pārrēķinās uzreiz. Beigās nospied <strong>Saglabāt</strong>.
-            </p>
             {sheet.worksheet_updated_at && (
               <p className="mt-2 text-xs text-muted-foreground">
                 Pēdējās izmaiņas: {new Date(sheet.worksheet_updated_at).toLocaleString("lv-LV")}
@@ -127,9 +125,10 @@ const WorksheetPage = () => {
             )}
             {readOnly && (
               <p className="mt-3 rounded-sm border border-dashed border-border p-3 text-xs text-muted-foreground">
-                Saraksts ir aizvērts labošanai. Ja kaut kas jāmaina, raksti uz {pmEmail}.
+                Labošana slēgta. Raksti uz {pmEmail}.
               </p>
             )}
+
           </header>
 
           <div className="mt-5 space-y-4">
@@ -192,7 +191,8 @@ const WorksheetPage = () => {
                       </div>
 
                       {(i.prints || []).length === 0 ? (
-                        <p className="mt-2 text-xs text-muted-foreground">Bez apdrukas. Var pievienot vienu vai vairākas (piem. sietspiede priekšā + izšūšana uz piedurknes).</p>
+                        <p className="mt-2 text-xs text-muted-foreground">Bez apdrukas</p>
+
                       ) : (
                         <div className="mt-2 space-y-2">
                           {(i.prints || []).map((p, idx) => (
@@ -206,11 +206,12 @@ const WorksheetPage = () => {
                                 {PRINT_METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
                               </select>
                               <Input
-                                placeholder="Vieta (piem. priekšpuse)"
+                                placeholder="Vieta"
                                 value={p.placement || ""}
                                 disabled={readOnly}
                                 onChange={(e) => patchPrint(i.id, idx, { placement: e.target.value })}
                               />
+
                               <Input
                                 inputMode="decimal"
                                 placeholder="€/gab."
@@ -265,16 +266,12 @@ const WorksheetPage = () => {
               </label>
               <Button onClick={save} disabled={saving || !dirty} className="sm:w-auto">
                 {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                {dirty ? "Saglabāt izmaiņas" : "Nav ko saglabāt"}
+                {dirty ? "Saglabāt" : "Nav ko saglabāt"}
               </Button>
             </div>
           )}
-
-          <p className="mt-4 text-xs text-muted-foreground">
-            Jautājumi? Raksti {sheet.assigned_pm_name ? `${sheet.assigned_pm_name} · ` : ""}
-            <a className="underline" href={`mailto:${pmEmail}`}>{pmEmail}</a>
-          </p>
         </article>
+
       </div>
     </div>
   );
