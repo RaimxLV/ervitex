@@ -17,8 +17,10 @@ export interface PrintLine {
   method: string;
   /** Vieta uz preces, piem. "Priekšpuse" */
   placement?: string | null;
-  /** Cena par vienu gabalu, bez PVN — ievada ar roku */
+  /** Cena bez PVN — ievada ar roku */
   price: number | null;
+  /** "unit" = cena par gabalu, "total" = cena kopā par visu apdruku */
+  mode?: "unit" | "total";
 }
 
 export interface WorksheetItem extends OfferItem {
