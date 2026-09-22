@@ -363,7 +363,11 @@ const AdminQuotes = () => {
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 sm:w-52">
-                    <Select value={row.assigned_pm_slug ?? ""} onValueChange={(v) => assign(row, v)}>
+                    <Select
+                      value={row.assigned_pm_slug ?? ""}
+                      onValueChange={(v) => assign(row, v)}
+                      disabled={busy === row.id}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Nodot…" />
                       </SelectTrigger>
@@ -375,6 +379,17 @@ const AdminQuotes = () => {
                         ))}
                       </SelectContent>
                     </Select>
+                    {!row.assigned_pm_slug && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="w-full"
+                        disabled={busy === row.id}
+                        onClick={() => takeMine(row)}
+                      >
+                        Ņemu es
+                      </Button>
+                    )}
                     <Button asChild variant="outline" size="sm" className="w-full">
                       <a
                         href={`mailto:${row.email}?subject=${encodeURIComponent(
@@ -383,6 +398,15 @@ const AdminQuotes = () => {
                       >
                         <Mail className="mr-2 h-4 w-4" /> Rakstīt klientam
                       </a>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      disabled={busy === row.id}
+                      onClick={() => makeOffer(row)}
+                    >
+                      <FileText className="mr-2 h-4 w-4" /> Izveidot piedāvājumu
                     </Button>
                     {done ? (
                       <Button variant="ghost" size="sm" className="w-full" onClick={() => reopen(row)}>
@@ -393,6 +417,32 @@ const AdminQuotes = () => {
                         <CheckCircle2 className="mr-2 h-4 w-4" /> Pabeigts
                       </Button>
                     )}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex-1 text-xs"
+                        onClick={() =>
+                          copyText(
+                            [row.ref ? `#${row.ref}` : "", row.name, row.email, row.phone, row.company]
+                              .filter(Boolean)
+                              .join(" · "),
+                            "Klienta dati nokopēti",
+                          )
+                        }
+                      >
+                        <Copy className="mr-1.5 h-3.5 w-3.5" /> Kopēt
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex-1 text-xs text-destructive"
+                        disabled={busy === row.id}
+                        onClick={() => remove(row)}
+                      >
+                        <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Dzēst
+                      </Button>
+                    </div>
                   </div>
                 </div>
 
