@@ -469,8 +469,21 @@ const AdminOfferEdit = () => {
           </section>
 
           {/* Picker */}
-          <section className="rounded-sm border border-border p-4 sm:p-5">
-            <h2 className="font-heading text-sm font-black uppercase tracking-widest text-foreground">Pievienot preci</h2>
+          <section id="preces-izvele" className="rounded-sm border border-border p-4 sm:p-5">
+            <h2 className="font-heading text-sm font-black uppercase tracking-widest text-foreground">
+              {swapTarget ? "Nomainīt modeli" : "Pievienot preci"}
+            </h2>
+            {swapTarget && (
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-sm border border-accent/50 bg-accent/5 p-3">
+                <p className="text-xs text-foreground">
+                  Nomaina: <span className="font-semibold">{swapTarget.name}</span>
+                  {swapTarget.colorName ? ` · ${swapTarget.colorName}` : ""} — izmēri un skaiti paliek tie paši.
+                </p>
+                <Button size="sm" variant="ghost" onClick={() => { setSwapKey(null); setPicked(null); }}>
+                  Atcelt
+                </Button>
+              </div>
+            )}
             <div className="relative mt-3">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input className="pl-9" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Meklēt pēc nosaukuma vai koda…" />
