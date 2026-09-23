@@ -71,8 +71,8 @@ export const translations = {
   // About page
   "about.title": { lv: "Par Ervitex", en: "About Ervitex" },
   "about.heroText": {
-    lv: "Divas desmitgades tekstila un apdrukas industrijas virsotnē — apģērbu vairumtirdzniecība un industriālā apdruka vienā vietā.",
-    en: "For over 20 years, Ervitex has been the trusted partner for Latvian businesses seeking premium wholesale apparel and professional textile printing.",
+    lv: "Vairāk nekā 28 gadu laikā esam kļuvuši par vienu no vadošajiem tekstila un industriālās apdrukas uzņēmumiem Latvijā. Apvienojot augstākās kvalitātes materiālus, modernākās tehnoloģijas un uzkrāto pieredzi, nodrošinām uzticamus risinājumus uzņēmumiem un sadarbības partneriem Latvijā, Baltijā, kā arī Eiropā.",
+    en: "Over more than 28 years, we have become one of the leading textile and industrial printing companies in Latvia. By combining the highest quality materials, state-of-the-art technology and expertise, we provide reliable solutions for companies and partners in Latvia, the Baltics and Europe.",
   },
   "about.storyTitle": { lv: "Mūsu stāsts", en: "Our Story" },
   "about.storyKicker": {
