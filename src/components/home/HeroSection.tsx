@@ -26,6 +26,13 @@ const HeroSection = () => {
       {/* ── LAYER 2: depth-map parallax scene ── */}
       <HeroDepthScene className="z-[1]" />
 
+      <div
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 z-[2] w-full md:w-[55%] bg-gradient-to-r from-black/90 via-black/60 to-transparent"
+      />
+
+
+
 
 
       {/* ── LAYER 4: content ── */}

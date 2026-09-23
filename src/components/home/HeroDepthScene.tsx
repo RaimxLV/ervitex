@@ -33,11 +33,14 @@ const fragmentShader = `
       uv.x = uv.x * scale + (1.0 - scale) * 0.5;
     }
 
-    float depth = texture2D(u_depth, uv).r;
-    float parallax = depth - 0.45;
-    vec2 displaced = clamp(uv + u_shift * parallax, 0.002, 0.998);
+    vec2 displaced = uv;
+    for (int i = 0; i < 8; i++) {
+      float d = texture2D(u_depth, displaced).r - 0.45;
+      displaced = clamp(uv + u_shift * d, 0.002, 0.998);
+    }
     vec3 color = texture2D(u_image, displaced).rgb;
     gl_FragColor = vec4(color, 1.0);
+
   }
 `;
 
@@ -136,8 +139,9 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
       frame = null;
       if (!ready || disposed) return;
       resize();
-      const targetX = reduceMotion.matches ? 0 : pointerX * 0.05;
-      const targetY = reduceMotion.matches ? 0 : pointerY * 0.04 + scrollY * 0.12;
+      const targetX = reduceMotion.matches ? 0 : pointerX * 0.028;
+      const targetY = reduceMotion.matches ? 0 : pointerY * 0.022 + scrollY * 0.07;
+
       currentX += (targetX - currentX) * EASING;
       currentY += (targetY - currentY) * EASING;
       gl.uniform2f(uResolution, canvas.width, canvas.height);
