@@ -46,18 +46,22 @@ const AboutPage = () => {
               { icon: Monitor, title: t("about.highlight2Title"), desc: t("about.highlight2Desc") },
               { icon: Leaf, title: t("about.highlight3Title"), desc: t("about.highlight3Desc") },
             ].map((item, i) => (
-              <div
+              <motion.div
                 key={i}
-                className="group border border-primary-foreground/10 bg-primary/60 p-8 backdrop-blur-md transition-colors duration-300 hover:border-accent/50"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.55, delay: 0.1 + i * 0.12 }}
+                className="group border border-primary-foreground/10 bg-primary-foreground/[0.06] p-8 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-primary-foreground/35 hover:bg-primary-foreground/[0.09]"
               >
-                <div className="mb-6 text-accent">
+                <div className="mb-6 text-primary-foreground/70 transition-colors duration-300 group-hover:text-primary-foreground">
                   <item.icon className="h-10 w-10 transition-transform duration-500 group-hover:scale-110" strokeWidth={SW} />
                 </div>
                 <h3 className="font-heading text-xl font-semibold text-primary-foreground [text-wrap:balance]">
                   {item.title}
                 </h3>
                 <p className="mt-4 text-sm leading-relaxed text-primary-foreground/60 [text-wrap:pretty]">{item.desc}</p>
-              </div>
+              </motion.div>
             ))}
           </motion.div>
 
