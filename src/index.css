@@ -281,8 +281,8 @@
 
 @media (min-width: 768px) {
   .about-grid {
-    grid-template-columns: repeat(18, minmax(0, 1fr));
-    grid-template-rows: repeat(12, minmax(0, 1fr));
+    grid-template-columns: repeat(72, minmax(0, 1fr));
+    grid-template-rows: repeat(48, minmax(0, 1fr));
   }
 }
 
