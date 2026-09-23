@@ -263,16 +263,13 @@
 
   .about-spark {
     position: absolute;
-    background-color: hsl(var(--about-grid-light) / 0.22);
+    background-color: hsl(var(--about-grid-light) / 0.3);
     opacity: 0;
-    animation-name: about-cell-twinkle;
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: infinite;
   }
 
   @keyframes about-cell-twinkle {
-    0%, 82%, 100% { opacity: 0; }
-    88%, 94% { opacity: 1; }
+    0%, 100% { opacity: 0; }
+    35%, 55% { opacity: 1; }
   }
 }
 
