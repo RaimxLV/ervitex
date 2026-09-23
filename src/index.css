@@ -44,8 +44,8 @@
     --values-shadow: 218 30% 20%;
     --about-surface: 205 45% 99%;
     --about-surface-deep: 207 38% 96%;
-    --about-grid-line: 208 35% 70%;
-    --about-grid-light: 199 78% 52%;
+    --about-fabric-warp: 207 40% 70%;
+    --about-fabric-weft: 216 24% 76%;
    --glow-sky: 199 90% 66%;
    --glow-teal: 168 68% 58%;
    --glow-lime: 96 58% 62%;
@@ -99,6 +99,10 @@
 }
 
 @layer base {
+  html {
+    font-size: 18px;
+  }
+
   * {
     @apply border-border;
   }
@@ -245,7 +249,7 @@
   .glitch-layer-main { animation: glitch-flicker 4s steps(1, end) infinite; }
   .glitch-layer-slice { animation: glitch-slice 3.4s steps(1, end) infinite; }
 
-  /* --- Interactive pale-blue grid (About scene) --- */
+  /* --- Light woven fabric texture (About scene) --- */
   .about-scene-bg {
     background: linear-gradient(145deg, hsl(var(--about-surface)) 0%, hsl(var(--about-surface-deep)) 100%);
   }
@@ -254,24 +258,14 @@
     background: hsl(0 0% 3% / 0.92);
   }
 
-  .about-grid {
+  .about-fabric {
     pointer-events: none;
     background-image:
-      linear-gradient(to right, hsl(var(--about-grid-line) / 0.2) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--about-grid-line) / 0.2) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-
-  .about-spark {
-    position: absolute;
-    background-color: hsl(var(--about-grid-light) / 0.48);
-    box-shadow: inset 0 0 0 1px hsl(var(--about-grid-light) / 0.65);
-    opacity: 0;
-  }
-
-  @keyframes about-cell-twinkle {
-    0%, 100% { opacity: 0; }
-    18%, 48% { opacity: 1; }
+      repeating-linear-gradient(0deg, hsl(var(--about-fabric-weft) / 0.16) 0 1px, transparent 1px 4px),
+      repeating-linear-gradient(90deg, hsl(var(--about-fabric-warp) / 0.18) 0 1px, transparent 1px 4px),
+      repeating-linear-gradient(135deg, transparent 0 3px, hsl(var(--about-fabric-warp) / 0.08) 3px 4px);
+    background-size: 4px 4px, 4px 4px, 8px 8px;
+    opacity: 0.78;
   }
 }
 
