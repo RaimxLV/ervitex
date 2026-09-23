@@ -19,6 +19,10 @@
 
 ## No audita — jāsalabo
 
+## Vizuālie uzlabojumi
+- [x] Aizstāt “Par Ervitex” rūtiņu fonu ar vieglu auduma tekstūru.
+- [x] Palielināt visas mājaslapas fontus par 2 px.
+
 ### P0
 - [x] NWG katalogā parādīt visus produktus ar visām pieejamajām cenām.
   - [x] Deterministiska modeļu un SKU lapošana bez izlaistām rindām.
