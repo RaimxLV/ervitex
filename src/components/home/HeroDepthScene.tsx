@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import heroAsset from "@/assets/hero/hero-screenprint.png.asset.json";
-import heroDepthAsset from "@/assets/hero/hero-screenprint-depth.png.asset.json";
+import heroImage from "@/assets/hero/screenprint-hero.jpg";
+import heroDepth from "@/assets/hero/screenprint-hero-depth.png";
 
 const vertexShader = `
   attribute vec2 a_position;
@@ -179,7 +179,7 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
       requestDraw();
     };
 
-    Promise.all([loadImage(heroAsset.url), loadImage(heroDepthAsset.url)])
+    Promise.all([loadImage(heroImage), loadImage(heroDepth)])
       .then(([image, depth]) => {
         if (disposed) return;
         addTexture(image, 0, "u_image");
@@ -219,7 +219,7 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
     <div className={`absolute inset-0 ${className}`} aria-hidden="true">
       <canvas ref={canvasRef} className="block h-full w-full" />
       <img
-        src={heroAsset.url}
+        src={heroImage}
         alt=""
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0"
         fetchPriority="high"
