@@ -80,16 +80,12 @@ export const translations = {
     en: "Since 2003",
   },
   "about.storyHeadline": {
-    lv: "Divas desmitgades tekstila un apdrukas industrijas virsotnē",
-    en: "Two decades at the top of the textile and printing industry",
+    lv: "Kāpēc izvēlēties mūs?",
+    en: "Why choose us?",
   },
   "about.story1": {
-    lv: "Pirms vairāk nekā 20 gadiem mēs uzsākām savu ceļu ar skaidru vīziju — nodrošināt Latvijas uzņēmumiem augstākās klases reklāmas un korporatīvo apģērbu.",
-    en: "Founded in 2003 in Riga, Ervitex set out with a clear mission: to give businesses access to premium apparel at competitive wholesale prices.",
-  },
-  "about.story2": {
-    lv: "Šo divu gadu desmitu laikā Ervitex ir izaudzis no ambicioza projekta par vienu no vadošajiem un uzticamākajiem nozares spēlētājiem, apvienojot liela mēroga apģērbu vairumtirdzniecību ar modernāko industriālās apdrukas servisu.",
-    en: "Over the years, we expanded into professional screen printing, embroidery, and sublimation — becoming a one-stop solution for branded corporate and promotional apparel.",
+    lv: "Ilggadēja pieredze, padziļinātas zināšanas, pārbaudīti risinājumi, profesionāls serviss, kā arī nemainīga uzmanība kvalitātei.",
+    en: "Years of experience, in-depth knowledge, proven solutions, professional service and a constant focus on quality.",
   },
   "about.story3": {
     lv: "Ervitex nav vienkārši apģērbu piegādātājs. Mēs esam ilgtermiņa partneris, kurš palīdz augt jūsu biznesam, stiprināt zīmola identitāti un realizēt pat visizaicinošākos projektus ar vieglumu un pārliecību.",
@@ -107,15 +103,15 @@ export const translations = {
   },
   "about.highlight3Title": { lv: "ATBILDĪGA PIEEJA", en: "RESPONSIBLE APPROACH" },
   "about.highlight3Desc": {
-    lv: "Jaunākās paaudzes automatizētas iekārtas lieliem sērijveida pasūtījumiem.",
-    en: "Latest-generation automated equipment for large production runs.",
+    lv: "Izvēlamies pārbaudītus izstrādājumus un izmantojam sertificētas krāsas, domājot par vidi, ilgmūžību un atbildīgu resursu izmantošanu.",
+    en: "We choose proven products and certified inks, caring for the environment, longevity and responsible use of resources.",
   },
   "about.highlight4Title": { lv: "Drošība un ekoloģija", en: "Safety and ecology" },
   "about.highlight4Desc": {
     lv: "Sertificētas industriālās krāsas ar maksimālu drukas noturību.",
     en: "Certified industrial inks with maximum print durability.",
   },
-  "about.blockStabilityTitle": { lv: "Pieredze, kas pārtop stabilitātē", en: "Experience that becomes stability" },
+  "about.blockCapacityTitle": { lv: "Kvalitāte, ko nodrošina tehnoloģijas", en: "Quality driven by technology" },
   "about.blockStabilityBody1": {
     lv: "Mūsu ilgā vēsture tirgū ir mūsu lielākā kvalitātes zīme. Esam piedzīvojuši nozares evolūciju, izpētījuši neskaitāmus materiālus un noslīpējuši savus procesus līdz pilnībai. Šī uzkrātā ekspertīze ļauj piedāvāt partneriem to, kas biznesā ir vissvarīgākais — absolūtu stabilitāti un prognozējamību ilgtermiņā.",
     en: "Our long history in the market is our strongest quality mark. We have lived through the industry's evolution, tested countless materials and refined our processes to perfection.",
