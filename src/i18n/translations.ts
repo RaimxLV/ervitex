@@ -80,20 +80,16 @@ export const translations = {
     en: "Since 2003",
   },
   "about.storyHeadline": {
-    lv: "Divas desmitgades tekstila un apdrukas industrijas virsotnē",
-    en: "Two decades at the top of the textile and printing industry",
+    lv: "Kāpēc izvēlēties mūs?",
+    en: "Why choose us?",
   },
   "about.story1": {
-    lv: "Pirms vairāk nekā 20 gadiem mēs uzsākām savu ceļu ar skaidru vīziju — nodrošināt Latvijas uzņēmumiem augstākās klases reklāmas un korporatīvo apģērbu.",
-    en: "Founded in 2003 in Riga, Ervitex set out with a clear mission: to give businesses access to premium apparel at competitive wholesale prices.",
-  },
-  "about.story2": {
-    lv: "Šo divu gadu desmitu laikā Ervitex ir izaudzis no ambicioza projekta par vienu no vadošajiem un uzticamākajiem nozares spēlētājiem, apvienojot liela mēroga apģērbu vairumtirdzniecību ar modernāko industriālās apdrukas servisu.",
-    en: "Over the years, we expanded into professional screen printing, embroidery, and sublimation — becoming a one-stop solution for branded corporate and promotional apparel.",
+    lv: "Ilggadēja pieredze, padziļinātas zināšanas, pārbaudīti risinājumi, profesionāls serviss, kā arī nemainīga uzmanība kvalitātei.",
+    en: "Years of experience, in-depth knowledge, proven solutions, professional service and a constant focus on quality.",
   },
   "about.story3": {
-    lv: "Ervitex nav vienkārši apģērbu piegādātājs. Mēs esam ilgtermiņa partneris, kurš palīdz augt jūsu biznesam, stiprināt zīmola identitāti un realizēt pat visizaicinošākos projektus ar vieglumu un pārliecību.",
-    en: "Ervitex is not just an apparel supplier. We are a long-term partner that helps your business grow, strengthens your brand identity and delivers even the most demanding projects with ease.",
+    lv: "„Ervitex" nodrošina pilna cikla reklāmas apģērbu risinājumus — no piemērotu izstrādājumu izvēles līdz profesionālai apdrukai un gatavam rezultātam. Mūsu pieredze, tehnoloģijas un profesionālā komanda ļauj īstenot gan ikdienas, gan sarežģītus un individuālus projektus.",
+    en: "Ervitex provides full-cycle promotional apparel solutions — from selecting the right products to professional printing and a finished result. Our experience, technology and professional team make both everyday and complex, individual projects possible.",
   },
   "about.highlight1Title": { lv: "KVALITATĪVI REKLĀMAS APĢĒRBI", en: "QUALITY PROMOTIONAL APPAREL" },
   "about.highlight1Desc": {
@@ -107,43 +103,30 @@ export const translations = {
   },
   "about.highlight3Title": { lv: "ATBILDĪGA PIEEJA", en: "RESPONSIBLE APPROACH" },
   "about.highlight3Desc": {
-    lv: "Jaunākās paaudzes automatizētas iekārtas lieliem sērijveida pasūtījumiem.",
-    en: "Latest-generation automated equipment for large production runs.",
+    lv: "Izvēlamies pārbaudītus izstrādājumus un izmantojam sertificētas krāsas, domājot par vidi, ilgmūžību un atbildīgu resursu izmantošanu.",
+    en: "We choose proven products and certified inks, caring for the environment, longevity and responsible use of resources.",
   },
-  "about.highlight4Title": { lv: "Drošība un ekoloģija", en: "Safety and ecology" },
-  "about.highlight4Desc": {
-    lv: "Sertificētas industriālās krāsas ar maksimālu drukas noturību.",
-    en: "Certified industrial inks with maximum print durability.",
-  },
-  "about.blockStabilityTitle": { lv: "Pieredze, kas pārtop stabilitātē", en: "Experience that becomes stability" },
+  "about.blockStabilityTitle": { lv: "Pieredze, kurai var uzticēties", en: "Experience you can trust" },
   "about.blockStabilityBody1": {
-    lv: "Mūsu ilgā vēsture tirgū ir mūsu lielākā kvalitātes zīme. Esam piedzīvojuši nozares evolūciju, izpētījuši neskaitāmus materiālus un noslīpējuši savus procesus līdz pilnībai. Šī uzkrātā ekspertīze ļauj piedāvāt partneriem to, kas biznesā ir vissvarīgākais — absolūtu stabilitāti un prognozējamību ilgtermiņā.",
-    en: "Our long history in the market is our strongest quality mark. We have lived through the industry's evolution, tested countless materials and refined our processes to perfection.",
+    lv: "Vairāk nekā 28 gados esam pilnveidojuši katru ražošanas posmu, lai klientiem nodrošinātu nemainīgi augstu kvalitāti, precīzus termiņus un prognozējamu rezultātu. Mūsu reputācija balstās uz uzticamību, profesionālu attieksmi un ilgtermiņa sadarbību.",
+    en: "Over more than 28 years we have refined every stage of production to give clients consistently high quality, precise deadlines and predictable results. Our reputation rests on reliability, professionalism and long-term cooperation.",
   },
-  "about.blockStabilityBody2": {
-    lv: "Mūsu klienti zina, ka mēs esam droša aizmugure, kas nekad nepievils — ne kvalitātes, ne termiņu ziņā.",
-    en: "Our clients know we are a dependable backbone that never lets them down — neither in quality nor in deadlines.",
-  },
-  "about.blockCapacityTitle": { lv: "Pasaules klases materiāli un rūpnieciskā jauda", en: "World-class materials and industrial capacity" },
+  "about.blockCapacityTitle": { lv: "Kvalitāte, ko nodrošina tehnoloģijas", en: "Quality driven by technology" },
   "about.blockCapacityBody1": {
-    lv: "Mēs nestāvam uz vietas un pastāvīgi investējam nākotnē. Lai nodrošinātu nevainojamu rezultātu, Ervitex šodien strādā tikai ar pasaules vadošajiem tekstila ražotājiem.",
-    en: "We keep investing in the future. To guarantee flawless results, Ervitex works only with the world's leading textile manufacturers.",
+    lv: "Investējam modernās tehnoloģijās un sadarbojamies ar vadošajiem tekstila piegādātājiem. Jaunākās paaudzes ražošanas iekārtas ļauj efektīvi izpildīt gan nelielus, gan liela apjoma pasūtījumus, saglabājot augstāko kvalitātes līmeni.",
+    en: "We invest in modern technologies and work with leading textile suppliers. Latest-generation production equipment efficiently handles both small and large-volume orders while maintaining the highest quality.",
   },
-  "about.blockCapacityBody2": {
-    lv: "Mūsu ražotne ir aprīkota ar jaunākās paaudzes automatizētajām iekārtām, kas nodrošina augstu ražošanas jaudu un spēj operatīvi izpildīt pat ļoti liela apjoma un sarežģītības pasūtījumus. Apdrukā izmantojam tikai sertificētas industriālās krāsas — tas garantē izcilu attēla spilgtumu, ilgmūžību un atbilstību augstākajiem drošības un vides standartiem.",
-    en: "Our production site runs latest-generation automated equipment, delivering high capacity and fast turnaround even for large, complex orders. We print only with certified industrial inks.",
-  },
-  "about.blockPartnerTitle": { lv: "Jūsu stratēģiskais partneris", en: "Your strategic partner" },
+  "about.blockPartnerTitle": { lv: "Vairāk nekā apģērbu piegādātājs", en: "More than an apparel supplier" },
 
   "about.valuesTitle": { lv: "Kas mūs virza", en: "What Drives Us" },
   "about.precision": { lv: "Pieredze", en: "Experience" },
-  "about.precisionDesc": { lv: "Vairāk nekā 20 gadu pieredze tekstila un apdrukas nozarē ir mūsu kvalitātes zīme.\n\nŠajā laikā SIA Ervitex ir kļuvis par vienu no vadošajiem reklāmas apģērbu vairumtirgotājiem un apģērbu apdrukas pakalpojumu sniedzējiem Latvijā.", en: "More than 20 years of experience in the textile and printing industry is our mark of quality.\n\nDuring this time, SIA Ervitex has become one of Latvia’s leading promotional apparel wholesalers and garment printing service providers." },
+  "about.precisionDesc": { lv: "Vairāk nekā 28 gadu pieredze tekstila un apdrukas nozarē.\n\nGadu gaitā esam uzkrājuši plašas zināšanas un izpratni par nozari, klientu vajadzībām un kvalitatīva rezultāta nodrošināšanu. Pieredze ļauj mums profesionāli īstenot gan ikdienas, gan individuālus projektus.", en: "More than 28 years of experience in the textile and printing industry.\n\nOver the years we have built broad knowledge and understanding of the industry, client needs and delivering quality results. This experience lets us professionally carry out both everyday and individual projects." },
   "about.partnership": { lv: "Tehnoloģijas", en: "Technologies" },
-  "about.partnershipDesc": { lv: "Pilns tekstila apdrukas un apstrādes pakalpojumu klāsts.\n\nNodrošinām sietspiedi, DTF druku, izšūšanu, termodruku un sublimāciju. Katram projektam izvēlamies efektīvāko tehnoloģiju un optimālāko izpildījumu.", en: "A complete range of textile printing and finishing services.\n\nWe provide screen printing, DTF printing, embroidery, heat transfer printing and sublimation, selecting the most effective technology and execution for every project." },
+  "about.partnershipDesc": { lv: "Mūsdienīgas tehnoloģijas precīzam rezultātam.\n\nIzmantojam sietspiedes, digitālās transfērdrukas (DTF), mašīnizšūšanas, termodrukas, sublimācijas un citas apdrukas tehnoloģijas. Katram projektam izvēlamies piemērotāko risinājumu, ņemot vērā izstrādājumu, dizainu un paredzēto lietojumu.", en: "Modern technology for a precise result.\n\nWe use screen printing, digital transfer (DTF), machine embroidery, heat transfer, sublimation and other printing technologies. For every project we choose the most suitable solution based on the product, design and intended use." },
   "about.quality": { lv: "Kvalitāte", en: "Quality" },
-  "about.qualityDesc": { lv: "Bezkompromisa kvalitāte ikvienā pasūtījumā.\n\nPiedāvājam pasaules vadošo zīmolu tekstilu, pilna servisa apģērbu vairumtirdzniecību un rūpniecisku apdruku. Augstas veiktspējas sietspiedes, sublimācijas un izšūšanas iekārtas nodrošina stabilu kvalitāti un ātru izpildi jebkurā apjomā.", en: "Quality without compromise in every order.\n\nWe offer textiles from the world’s leading brands, full-service apparel wholesale and industrial printing. High-performance screen-printing, sublimation and embroidery equipment ensures consistent quality and fast turnaround at any volume." },
+  "about.qualityDesc": { lv: "Kvalitāte katrā izstrādājumā un darba procesā.\n\nIzvēlamies kvalitatīvus reklāmas apģērbus un pārbaudītus ražotājus, savukārt apdrukā izmantojam profesionālas tehnoloģijas un sertificētus izejmateriālus. Tas nodrošina precīzu, vizuāli pievilcīgu un noturīgu rezultātu.", en: "Quality in every product and process.\n\nWe choose quality promotional apparel and proven manufacturers, and print with professional technologies and certified materials. This ensures a precise, visually attractive and durable result." },
   "about.capacity": { lv: "Stabilitāte", en: "Stability" },
-  "about.capacityDesc": { lv: "Uzticams partneris ar atbildību par termiņiem.\n\nNodrošinām precīzu izpildi, nemainīgus kvalitātes standartus, stabilas piegādes un individuāli pielāgotu pieeju katram projektam. Tāpēc Ervitex ir drošs partneris jūsu uzņēmuma izaugsmei.", en: "A dependable partner accountable for every deadline.\n\nWe ensure precise execution, consistent quality standards, reliable supply and an individually tailored approach to every project, making Ervitex a trusted partner in your company’s growth." },
+  "about.capacityDesc": { lv: "Uzticams partneris ilgtermiņa sadarbībai.\n\nNodrošinām pārdomātu darba procesu, skaidru komunikāciju un precīzu pasūtījumu izpildi. Mūsu mērķis ir veidot ilgtermiņa sadarbību, uz kuru klienti var droši paļauties arī apjomīgos un tehnoloģiski sarežģītos projektos.", en: "A reliable partner for long-term cooperation.\n\nWe ensure a well-planned process, clear communication and precise order execution. Our goal is long-term cooperation that clients can rely on, also for large and technologically complex projects." },
 
   // Contact
   "contact.title": { lv: "Kontakti", en: "Contact Us" },

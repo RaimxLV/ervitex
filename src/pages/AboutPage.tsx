@@ -35,7 +35,6 @@ const AboutPage = () => {
           </h2>
           <div className="mt-6 space-y-4 leading-relaxed text-primary-foreground/80 [text-wrap:pretty]">
             <p className="text-lg text-primary-foreground">{t("about.story1")}</p>
-            <p>{t("about.story2")}</p>
           </div>
         </motion.div>
 
@@ -50,7 +49,6 @@ const AboutPage = () => {
             { title: t("about.highlight1Title"), desc: t("about.highlight1Desc") },
             { title: t("about.highlight2Title"), desc: t("about.highlight2Desc") },
             { title: t("about.highlight3Title"), desc: t("about.highlight3Desc") },
-            { title: t("about.highlight4Title"), desc: t("about.highlight4Desc") },
           ].map((item, i) => (
             <div key={i} className="rounded-xl bg-primary/25 p-6">
               <div className="h-1 w-8 bg-accent" />
