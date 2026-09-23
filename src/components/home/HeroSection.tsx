@@ -26,11 +26,6 @@ const HeroSection = () => {
       {/* ── LAYER 2: depth-map parallax scene ── */}
       <HeroDepthScene className="z-[1]" />
 
-      {/* ── LAYER 3: legibility overlay ── */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 z-[2] bg-gradient-to-r from-black/85 via-black/60 to-black/30"
-      />
 
 
       {/* ── LAYER 4: content ── */}
