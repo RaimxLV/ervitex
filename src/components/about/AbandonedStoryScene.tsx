@@ -1,4 +1,4 @@
-import { useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { useRef, type PointerEvent, type ReactNode } from "react";
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
@@ -6,17 +6,19 @@ type AbandonedStorySceneProps = {
 
 const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
   const sectionRef = useRef<HTMLElement>(null);
-  const [activeCell, setActiveCell] = useState<number | null>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
     const bounds = sectionRef.current?.getBoundingClientRect();
-    if (!bounds) return;
+    if (!bounds || !glowRef.current) return;
 
-    const columns = window.innerWidth >= 768 ? 18 : 12;
-    const rows = window.innerWidth >= 768 ? 12 : 18;
-    const column = Math.min(columns - 1, Math.max(0, Math.floor(((event.clientX - bounds.left) / bounds.width) * columns)));
-    const row = Math.min(rows - 1, Math.max(0, Math.floor(((event.clientY - bounds.top) / bounds.height) * rows)));
-    setActiveCell(row * columns + column);
+    glowRef.current.style.setProperty("--mx", `${event.clientX - bounds.left}px`);
+    glowRef.current.style.setProperty("--my", `${event.clientY - bounds.top}px`);
+    glowRef.current.style.opacity = "1";
+  };
+
+  const handlePointerLeave = () => {
+    if (glowRef.current) glowRef.current.style.opacity = "0";
   };
 
   return (
@@ -24,13 +26,14 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       ref={sectionRef}
       className="about-scene-bg relative isolate w-full overflow-hidden text-primary-foreground"
       onPointerMove={handlePointerMove}
-      onPointerLeave={() => setActiveCell(null)}
+      onPointerLeave={handlePointerLeave}
     >
       <div className="about-grid absolute inset-0 z-0" aria-hidden="true">
-        {Array.from({ length: 216 }, (_, index) => (
-          <span className={`about-grid-cell${activeCell === index ? " is-active" : ""}`} key={index} />
+        {Array.from({ length: 3456 }, (_, index) => (
+          <span className="about-grid-cell" key={index} />
         ))}
       </div>
+      <div ref={glowRef} className="about-grid-glow absolute inset-0 z-0" aria-hidden="true" />
       <div className="relative z-10">{children}</div>
     </section>
   );

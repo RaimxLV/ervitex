@@ -95,7 +95,7 @@ const AboutPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-16 border-y border-primary-foreground/10 py-12 text-center"
+            className="about-quote-block mt-16 px-6 py-12 text-center"
           >
             <h3 className="font-heading text-2xl font-light italic tracking-wide text-primary-foreground/90 md:text-4xl">
               {t("about.blockPartnerTitle")}
