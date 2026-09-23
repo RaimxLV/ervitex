@@ -42,10 +42,10 @@
     --value-slate: 218 23% 34%;
     --value-slate-soft: 216 24% 95%;
     --values-shadow: 218 30% 20%;
-    --about-surface: 205 45% 99%;
-    --about-surface-deep: 207 38% 96%;
-    --about-fabric-warp: 207 40% 70%;
-    --about-fabric-weft: 216 24% 76%;
+    --about-surface: 205 45% 100%;
+    --about-surface-deep: 207 38% 98.5%;
+    --about-fabric-warp: 207 40% 82%;
+    --about-fabric-weft: 216 24% 86%;
    --glow-sky: 199 90% 66%;
    --glow-teal: 168 68% 58%;
    --glow-lime: 96 58% 62%;
@@ -261,11 +261,11 @@
   .about-fabric {
     pointer-events: none;
     background-image:
-      repeating-linear-gradient(0deg, hsl(var(--about-fabric-weft) / 0.16) 0 1px, transparent 1px 4px),
-      repeating-linear-gradient(90deg, hsl(var(--about-fabric-warp) / 0.18) 0 1px, transparent 1px 4px),
-      repeating-linear-gradient(135deg, transparent 0 3px, hsl(var(--about-fabric-warp) / 0.08) 3px 4px);
+      repeating-linear-gradient(0deg, hsl(var(--about-fabric-weft) / 0.12) 0 1px, transparent 1px 4px),
+      repeating-linear-gradient(90deg, hsl(var(--about-fabric-warp) / 0.13) 0 1px, transparent 1px 4px),
+      repeating-linear-gradient(135deg, transparent 0 3px, hsl(var(--about-fabric-warp) / 0.05) 3px 4px);
     background-size: 4px 4px, 4px 4px, 8px 8px;
-    opacity: 0.78;
+    opacity: 0.6;
   }
 }
 
