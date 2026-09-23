@@ -3,7 +3,6 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import featureImage from "@/assets/megamenu-feature.jpg";
 import { useMegaMenuItems, type MegaMenuItem } from "@/hooks/useMegaMenuItems";
 import {
   MEGA_MENU_COLUMNS,
@@ -74,7 +73,6 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
       .filter((i) => i.section === section)
       .sort((a, b) => a.sort_order - b.sort_order);
 
-  const manufacturers = bySection("manufacturers");
 
   return (
     <div
