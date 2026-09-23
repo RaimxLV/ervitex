@@ -870,7 +870,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     return base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, q, sources, brands, categories, groups, genders, colors, sort, priceOf, lang]);
+  }, [items, q, sources, brands, categories, groups, genders, colors, sort, priceOf, priceRanges, lang]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Number.isFinite(page) ? Math.min(Math.max(page, 1), totalPages) : 1;
