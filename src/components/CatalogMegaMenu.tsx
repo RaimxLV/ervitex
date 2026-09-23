@@ -82,7 +82,7 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
       aria-label={t("Kataloga izvēlne", "Catalog menu")}
       className="overflow-hidden bg-primary text-primary-foreground"
     >
-      <div className="flex max-h-[70vh] overflow-y-auto">
+      <div className="flex">
         {/* Feature image */}
         <div className="relative hidden w-[210px] shrink-0 lg:block">
           <img
@@ -111,10 +111,10 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
         </div>
 
         {/* Text columns */}
-        <div className="min-w-0 flex-1 px-6 py-6">
-          <div className="grid grid-cols-2 gap-x-7 gap-y-7 md:grid-cols-4">
+        <div className="min-w-0 flex-1 px-5 py-5 2xl:px-7 2xl:py-6">
+          <div className="grid grid-cols-4 gap-x-6 gap-y-5 2xl:gap-x-8 2xl:gap-y-7">
             {MEGA_MENU_COLUMNS.map((col, i) => (
-              <div key={i} className="space-y-6">
+              <div key={i} className="space-y-5 2xl:space-y-6">
                 {col.map((section) => (
                   <GroupBlock
                     key={section}
@@ -129,7 +129,7 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
 
           {/* Manufacturers */}
           {manufacturers.length > 0 && (
-            <div className="mt-6 border-t border-primary-foreground/10 pt-4">
+            <div className="mt-5 border-t border-primary-foreground/10 pt-3.5 2xl:mt-6 2xl:pt-4">
               <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
                 <span className="font-heading text-[12px] font-bold uppercase tracking-[0.28em] text-primary-foreground/40">
                   {t("Ražotāji", "Manufacturers")}

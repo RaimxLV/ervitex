@@ -95,7 +95,7 @@ const Header = () => {
                     onClick={() => setMegaOpen((v) => !v)}
                     aria-haspopup="menu"
                     aria-expanded={megaOpen}
-                    className={`flex items-center gap-1 text-sm font-medium uppercase transition-colors hover:text-accent ${
+                    className={`flex items-center gap-1 text-base font-medium uppercase transition-colors hover:text-accent ${
                       active ? "text-accent" : "text-primary-foreground/70"
                     }`}
                   >
@@ -112,7 +112,7 @@ const Header = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`text-sm font-medium uppercase transition-colors hover:text-accent ${
+                className={`text-base font-medium uppercase transition-colors hover:text-accent ${
                   active ? "text-accent" : "text-primary-foreground/70"
                 }`}
               >
@@ -250,7 +250,7 @@ const Header = () => {
         }`}
       >
         <div className="w-full overflow-hidden rounded-b-sm border border-primary-foreground/10 border-t-0 bg-primary text-primary-foreground shadow-2xl shadow-black/60">
-          <CatalogMegaMenu onNavigate={() => setMegaOpen(false)} />
+          {megaOpen && <CatalogMegaMenu onNavigate={() => setMegaOpen(false)} />}
         </div>
       </div>
 
