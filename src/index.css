@@ -255,51 +255,24 @@
   }
 
   .about-grid {
-    display: grid;
-    grid-template-columns: repeat(48, minmax(0, 1fr));
-    grid-template-rows: repeat(72, minmax(0, 1fr));
+    background-image:
+      linear-gradient(to right, hsl(var(--about-grid-line) / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--about-grid-line) / 0.045) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 
-  .about-grid-cell {
-    border-bottom: 1px solid hsl(var(--about-grid-line) / 0.045);
-    border-right: 1px solid hsl(var(--about-grid-line) / 0.045);
-    background-color: transparent;
-  }
-
-  .about-grid-glow {
-    --mx: 50%;
-    --my: 50%;
-    display: grid;
-    grid-template-columns: repeat(48, minmax(0, 1fr));
-    grid-template-rows: repeat(72, minmax(0, 1fr));
+  .about-spark {
+    position: absolute;
+    background-color: hsl(var(--about-grid-light) / 0.22);
     opacity: 0;
-    transition: opacity 400ms ease;
-    -webkit-mask-image: radial-gradient(180px circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, 0.5) 45%, transparent 72%);
-    mask-image: radial-gradient(180px circle at var(--mx) var(--my), #000 0%, rgba(0, 0, 0, 0.5) 45%, transparent 72%);
+    animation-name: about-cell-twinkle;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
   }
-
-  .about-grid-glow > span {
-    background-color: hsl(var(--about-grid-light) / 0.18);
-    animation: about-cell-twinkle 1.8s ease-in-out infinite;
-  }
-
-  .about-grid-glow > span:nth-child(3n) { animation-duration: 2.6s; animation-delay: 0.2s; }
-  .about-grid-glow > span:nth-child(4n) { animation-duration: 1.2s; animation-delay: 0.45s; }
-  .about-grid-glow > span:nth-child(5n) { animation-duration: 3.1s; animation-delay: 0.1s; }
-  .about-grid-glow > span:nth-child(7n) { animation-duration: 0.9s; animation-delay: 0.7s; }
-  .about-grid-glow > span:nth-child(11n) { animation-duration: 2.1s; animation-delay: 0.9s; }
 
   @keyframes about-cell-twinkle {
-    0%, 100% { opacity: 0.05; }
-    50% { opacity: 1; }
-  }
-}
-
-@media (min-width: 768px) {
-  .about-grid,
-  .about-grid-glow {
-    grid-template-columns: repeat(72, minmax(0, 1fr));
-    grid-template-rows: repeat(48, minmax(0, 1fr));
+    0%, 82%, 100% { opacity: 0; }
+    88%, 94% { opacity: 1; }
   }
 }
 
