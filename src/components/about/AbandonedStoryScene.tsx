@@ -33,7 +33,11 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
           <span className="about-grid-cell" key={index} />
         ))}
       </div>
-      <div ref={glowRef} className="about-grid-glow absolute inset-0 z-0" aria-hidden="true" />
+      <div ref={glowRef} className="about-grid-glow absolute inset-0 z-0" aria-hidden="true">
+        {Array.from({ length: 3456 }, (_, index) => (
+          <span key={index} />
+        ))}
+      </div>
       <div className="relative z-10">{children}</div>
     </section>
   );

@@ -61,6 +61,11 @@ export default {
           slate: "hsl(var(--value-slate))",
           "slate-soft": "hsl(var(--value-slate-soft))",
         },
+        glow: {
+          sky: "hsl(var(--glow-sky))",
+          teal: "hsl(var(--glow-teal))",
+          lime: "hsl(var(--glow-lime))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

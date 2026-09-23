@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BadgeCheck, BriefcaseBusiness, Leaf, Monitor, Printer, ShieldCheck, Shirt } from "lucide-react";
+import { BadgeCheck, BriefcaseBusiness, Leaf, Printer, ShieldCheck, Shirt, UsersRound } from "lucide-react";
 import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import AbandonedStoryScene from "@/components/about/AbandonedStoryScene";
@@ -19,7 +19,7 @@ const AboutPage = () => {
       />
 
       <AbandonedStoryScene>
-        <div className="container py-20 text-primary-foreground md:py-28">
+        <div className="container pb-20 pt-20 text-primary-foreground md:pb-24 md:pt-28">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -42,22 +42,23 @@ const AboutPage = () => {
             className="mt-14 grid gap-6 md:grid-cols-3"
           >
             {[
-              { icon: Shirt, title: t("about.highlight1Title"), desc: t("about.highlight1Desc") },
-              { icon: Monitor, title: t("about.highlight2Title"), desc: t("about.highlight2Desc") },
-              { icon: Leaf, title: t("about.highlight3Title"), desc: t("about.highlight3Desc") },
+              { icon: Shirt, title: t("about.highlight1Title"), desc: t("about.highlight1Desc"), tile: "bg-glow-sky/15", accent: "text-glow-sky", tileHover: "group-hover:bg-glow-sky/25" },
+              { icon: UsersRound, title: t("about.highlight2Title"), desc: t("about.highlight2Desc"), tile: "bg-glow-teal/15", accent: "text-glow-teal", tileHover: "group-hover:bg-glow-teal/25" },
+              { icon: Leaf, title: t("about.highlight3Title"), desc: t("about.highlight3Desc"), tile: "bg-glow-lime/15", accent: "text-glow-lime", tileHover: "group-hover:bg-glow-lime/25" },
             ].map((item, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                viewport={{ once: true, amount: 0.35 }}
                 transition={{ duration: 0.55, delay: 0.1 + i * 0.12 }}
-                className="group border border-primary-foreground/10 bg-primary-foreground/[0.06] p-8 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-primary-foreground/35 hover:bg-primary-foreground/[0.09]"
+                whileHover={{ y: -6 }}
+                className="group flex flex-col items-center border border-primary-foreground/10 bg-primary-foreground/[0.06] p-10 text-center backdrop-blur-md transition-colors duration-300 hover:border-primary-foreground/35 hover:bg-primary-foreground/[0.09]"
               >
-                <div className="mb-6 text-primary-foreground/70 transition-colors duration-300 group-hover:text-primary-foreground">
+                <div className={`flex h-20 w-20 items-center justify-center rounded-md transition-colors duration-300 ${item.tile} ${item.accent} ${item.tileHover}`}>
                   <item.icon className="h-10 w-10 transition-transform duration-500 group-hover:scale-110" strokeWidth={SW} />
                 </div>
-                <h3 className="font-heading text-xl font-semibold text-primary-foreground [text-wrap:balance]">
+                <h3 className="mt-7 font-heading text-xl font-semibold text-primary-foreground [text-wrap:balance]">
                   {item.title}
                 </h3>
                 <p className="mt-4 text-sm leading-relaxed text-primary-foreground/60 [text-wrap:pretty]">{item.desc}</p>
@@ -90,21 +91,22 @@ const AboutPage = () => {
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="about-quote-block mt-16 px-6 py-12 text-center"
-          >
-            <h3 className="font-heading text-2xl font-light italic tracking-wide text-primary-foreground/90 md:text-4xl">
-              {t("about.blockPartnerTitle")}
-            </h3>
-            <p className="mx-auto mt-6 max-w-3xl leading-relaxed text-primary-foreground/70 [text-wrap:pretty]">
-              {t("about.story3")}
-            </p>
-          </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="about-quote-block w-full px-6 py-16 text-center md:py-20"
+        >
+          <h3 className="font-heading text-2xl font-light italic tracking-wide text-primary-foreground/90 md:text-4xl">
+            {t("about.blockPartnerTitle")}
+          </h3>
+          <p className="mx-auto mt-6 max-w-3xl leading-relaxed text-primary-foreground/70 [text-wrap:pretty]">
+            {t("about.story3")}
+          </p>
+        </motion.div>
       </AbandonedStoryScene>
 
       <section className="bg-muted py-16 md:py-24">
