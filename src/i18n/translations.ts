@@ -88,7 +88,7 @@ export const translations = {
     en: "Years of experience, in-depth knowledge, proven solutions, professional service and a constant focus on quality.",
   },
   "about.story3": {
-    lv: "„Ervitex" nodrošina pilna cikla reklāmas apģērbu risinājumus — no piemērotu izstrādājumu izvēles līdz profesionālai apdrukai un gatavam rezultātam. Mūsu pieredze, tehnoloģijas un profesionālā komanda ļauj īstenot gan ikdienas, gan sarežģītus un individuālus projektus.",
+    lv: "„Ervitex” nodrošina pilna cikla reklāmas apģērbu risinājumus — no piemērotu izstrādājumu izvēles līdz profesionālai apdrukai un gatavam rezultātam. Mūsu pieredze, tehnoloģijas un profesionālā komanda ļauj īstenot gan ikdienas, gan sarežģītus un individuālus projektus.",
     en: "Ervitex provides full-cycle promotional apparel solutions — from selecting the right products to professional printing and a finished result. Our experience, technology and professional team make both everyday and complex, individual projects possible.",
   },
   "about.highlight1Title": { lv: "KVALITATĪVI REKLĀMAS APĢĒRBI", en: "QUALITY PROMOTIONAL APPAREL" },

@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { BadgeCheck, BriefcaseBusiness, Printer, ShieldCheck } from "lucide-react";
+import { BadgeCheck, BriefcaseBusiness, Leaf, Monitor, Printer, ShieldCheck, Shirt } from "lucide-react";
 import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import AbandonedStoryScene from "@/components/about/AbandonedStoryScene";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-const SW = 1.2;
+const SW = 1.5;
 
 const AboutPage = () => {
   const { t, lang } = useLanguage();
@@ -19,91 +19,89 @@ const AboutPage = () => {
       />
 
       <AbandonedStoryScene>
-      <div className="container space-y-8 py-20 text-primary-foreground md:space-y-10 md:py-28">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="max-w-3xl rounded-xl bg-primary/25 p-7 shadow-xl shadow-black/20 md:p-10"
-        >
-          <p className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
-            {t("about.storyKicker")}
-          </p>
-          <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-primary-foreground md:text-4xl [text-wrap:balance]">
-            {t("about.storyHeadline")}
-          </h2>
-          <div className="mt-6 space-y-4 leading-relaxed text-primary-foreground/80 [text-wrap:pretty]">
-            <p className="text-lg text-primary-foreground">{t("about.story1")}</p>
-          </div>
-        </motion.div>
+        <div className="container py-20 text-primary-foreground md:py-28">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="font-heading text-4xl font-bold tracking-tight text-primary-foreground [text-wrap:balance] md:text-6xl">
+              {t("about.storyHeadline")}
+            </h2>
+            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-primary-foreground/70 [text-wrap:pretty]">
+              {t("about.story1")}
+            </p>
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          {[
-            { title: t("about.highlight1Title"), desc: t("about.highlight1Desc") },
-            { title: t("about.highlight2Title"), desc: t("about.highlight2Desc") },
-            { title: t("about.highlight3Title"), desc: t("about.highlight3Desc") },
-          ].map((item, i) => (
-            <div key={i} className="rounded-xl bg-primary/25 p-6">
-              <div className="h-1 w-8 bg-accent" />
-              <h3 className="mt-4 font-heading text-sm font-bold uppercase text-primary-foreground [text-wrap:balance]">
-                {item.title}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="mt-14 grid gap-6 md:grid-cols-3"
+          >
+            {[
+              { icon: Shirt, title: t("about.highlight1Title"), desc: t("about.highlight1Desc") },
+              { icon: Monitor, title: t("about.highlight2Title"), desc: t("about.highlight2Desc") },
+              { icon: Leaf, title: t("about.highlight3Title"), desc: t("about.highlight3Desc") },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="group border border-primary-foreground/10 bg-primary/60 p-8 backdrop-blur-md transition-colors duration-300 hover:border-accent/50"
+              >
+                <div className="mb-6 text-accent">
+                  <item.icon className="h-10 w-10 transition-transform duration-500 group-hover:scale-110" strokeWidth={SW} />
+                </div>
+                <h3 className="font-heading text-xl font-semibold text-primary-foreground [text-wrap:balance]">
+                  {item.title}
+                </h3>
+                <p className="mt-4 text-sm leading-relaxed text-primary-foreground/60 [text-wrap:pretty]">{item.desc}</p>
+              </div>
+            ))}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="mt-16 grid gap-6 md:grid-cols-2"
+          >
+            <div className="border-l-2 border-l-accent bg-primary/75 p-8 backdrop-blur-md md:p-10">
+              <h3 className="font-heading text-2xl font-bold text-primary-foreground [text-wrap:balance]">
+                {t("about.blockStabilityTitle")}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-primary-foreground/75 [text-wrap:pretty]">{item.desc}</p>
+              <p className="mt-5 font-light leading-relaxed text-primary-foreground/75 [text-wrap:pretty]">
+                {t("about.blockStabilityBody1")}
+              </p>
             </div>
-          ))}
-        </motion.div>
+            <div className="border-l-2 border-l-accent bg-primary/75 p-8 backdrop-blur-md md:p-10">
+              <h3 className="font-heading text-2xl font-bold text-primary-foreground [text-wrap:balance]">
+                {t("about.blockCapacityTitle")}
+              </h3>
+              <p className="mt-5 font-light leading-relaxed text-primary-foreground/75 [text-wrap:pretty]">
+                {t("about.blockCapacityBody1")}
+              </p>
+            </div>
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="grid gap-4 md:grid-cols-2"
-        >
-          <article className="rounded-xl bg-primary/25 p-7 md:p-10">
-            <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
-              {t("about.blockStabilityTitle")}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-16 border-y border-primary-foreground/10 py-12 text-center"
+          >
+            <h3 className="font-heading text-2xl font-light italic tracking-wide text-primary-foreground/90 md:text-4xl">
+              {t("about.blockPartnerTitle")}
             </h3>
-            <div className="mt-4 space-y-4 leading-relaxed text-primary-foreground/75 [text-wrap:pretty]">
-              <p>{t("about.blockStabilityBody1")}</p>
-              <p>{t("about.blockStabilityBody2")}</p>
-            </div>
-          </article>
-          <article className="rounded-xl bg-primary/25 p-7 md:p-10">
-            <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
-              {t("about.blockCapacityTitle")}
-            </h3>
-            <div className="mt-4 space-y-4 leading-relaxed text-primary-foreground/75 [text-wrap:pretty]">
-              <p>{t("about.blockCapacityBody1")}</p>
-              <p>{t("about.blockCapacityBody2")}</p>
-            </div>
-          </article>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="rounded-xl border-l-4 border-l-accent bg-primary/25 p-7 shadow-xl shadow-black/20 md:p-10"
-        >
-          <h3 className="font-heading text-xl font-bold uppercase text-primary-foreground [text-wrap:balance]">
-            {t("about.blockPartnerTitle")}
-          </h3>
-          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-primary-foreground/80 [text-wrap:pretty]">
-            {t("about.story3")}
-          </p>
-        </motion.div>
-      </div>
+            <p className="mx-auto mt-6 max-w-3xl leading-relaxed text-primary-foreground/70 [text-wrap:pretty]">
+              {t("about.story3")}
+            </p>
+          </motion.div>
+        </div>
       </AbandonedStoryScene>
-
 
       <section className="bg-muted py-16 md:py-24">
         <div className="container">
@@ -112,43 +110,42 @@ const AboutPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="font-heading text-3xl font-bold uppercase text-foreground md:text-4xl"
+            className="font-heading text-3xl font-bold uppercase tracking-tight text-foreground md:text-4xl"
           >
             {t("about.valuesTitle")}
           </motion.h2>
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
           >
             {[
-              { icon: BriefcaseBusiness, motionClass: "group-hover:-translate-y-0.5", title: t("about.precision"), desc: t("about.precisionDesc"), surface: "bg-value-blue-soft", accent: "text-value-blue", border: "group-hover:border-value-blue/35" },
-              { icon: Printer, motionClass: "group-hover:scale-110", title: t("about.partnership"), desc: t("about.partnershipDesc"), surface: "bg-value-cyan-soft", accent: "text-value-cyan", border: "group-hover:border-value-cyan/35" },
-              { icon: BadgeCheck, motionClass: "group-hover:-rotate-6 group-hover:scale-110", title: t("about.quality"), desc: t("about.qualityDesc"), surface: "bg-value-emerald-soft", accent: "text-value-emerald", border: "group-hover:border-value-emerald/35" },
-              { icon: ShieldCheck, motionClass: "group-hover:scale-110", title: t("about.capacity"), desc: t("about.capacityDesc"), surface: "bg-value-slate-soft", accent: "text-value-slate", border: "group-hover:border-value-slate/35" },
+              { icon: BriefcaseBusiness, title: t("about.precision"), desc: t("about.precisionDesc"), surface: "bg-value-blue-soft", accent: "text-value-blue", tileHover: "group-hover:bg-value-blue/15" },
+              { icon: Printer, title: t("about.partnership"), desc: t("about.partnershipDesc"), surface: "bg-value-cyan-soft", accent: "text-value-cyan", tileHover: "group-hover:bg-value-cyan/15" },
+              { icon: BadgeCheck, title: t("about.quality"), desc: t("about.qualityDesc"), surface: "bg-value-emerald-soft", accent: "text-value-emerald", tileHover: "group-hover:bg-value-emerald/15" },
+              { icon: ShieldCheck, title: t("about.capacity"), desc: t("about.capacityDesc"), surface: "bg-value-slate-soft", accent: "text-value-slate", tileHover: "group-hover:bg-value-slate/15" },
             ].map((item, i) => {
               const [lead, detail] = item.desc.split("\n\n");
 
               return (
-              <motion.article
-                key={item.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.35 }}
-                transition={{ duration: 0.55, delay: i * 0.09 }}
-                whileHover={{ y: -6 }}
-                className={`values-card group relative flex min-h-[390px] flex-col overflow-hidden rounded-lg border border-border bg-card p-7 transition-[border-color,box-shadow] duration-300 ${item.border}`}
-              >
-                <div className={`relative flex h-14 w-14 items-center justify-center rounded-lg ${item.surface} ${item.accent}`}>
-                  <item.icon className={`h-6 w-6 transition-transform duration-500 ${item.motionClass}`} strokeWidth={SW} />
-                </div>
-                <h3 className="mt-8 font-heading text-lg font-bold uppercase text-foreground">{item.title}</h3>
-                <p className="mt-4 text-sm font-semibold leading-relaxed text-foreground/80">{lead}</p>
-                {detail && <p className="mt-3 text-sm leading-relaxed text-muted-foreground [text-wrap:pretty]">{detail}</p>}
-                <div className={`absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 ${item.surface} transition-transform duration-500 group-hover:scale-x-100`} />
-              </motion.article>
+                <motion.article
+                  key={item.title}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.35 }}
+                  transition={{ duration: 0.55, delay: i * 0.09 }}
+                  whileHover={{ y: -6 }}
+                  className="group flex min-h-[390px] flex-col border border-border bg-card p-7 shadow-sm transition-shadow duration-300 hover:shadow-xl"
+                >
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-md transition-colors duration-300 ${item.surface} ${item.accent} ${item.tileHover}`}>
+                    <item.icon className="h-6 w-6" strokeWidth={SW} />
+                  </div>
+                  <h3 className="mt-7 font-heading text-lg font-bold uppercase text-foreground">{item.title}</h3>
+                  <p className="mt-4 text-sm font-semibold leading-relaxed text-foreground/80">{lead}</p>
+                  {detail && <p className="mt-3 text-sm leading-relaxed text-muted-foreground [text-wrap:pretty]">{detail}</p>}
+                </motion.article>
               );
             })}
           </motion.div>
