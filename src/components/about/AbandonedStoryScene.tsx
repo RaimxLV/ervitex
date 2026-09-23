@@ -1,6 +1,7 @@
 import { useRef, type ReactNode } from "react";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
-import horizonImage from "@/assets/about/horizon-carousel-photo.webp";
+import halftoneTexture from "@/assets/about/halftone-texture.png.asset.json";
+const textureImage = halftoneTexture.url;
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
@@ -23,7 +24,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
           style={{ y: imageY }}
           className="absolute -top-[15%] left-0 h-[130%] w-full max-w-none will-change-transform"
         >
-          <img src={horizonImage} alt="" className="h-full w-full object-cover" />
+          <img src={textureImage} alt="" className="h-full w-full object-cover" />
         </motion.div>
         {/* 40% black overlay over the parallax image */}
         <div className="absolute inset-0 bg-black/40" />
