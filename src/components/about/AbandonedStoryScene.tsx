@@ -1,6 +1,7 @@
 import { useRef, type ReactNode } from "react";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
-import horizonImage from "@/assets/about/horizon-carousel-photo.webp";
+import halftoneTexture from "@/assets/about/halftone-texture.png.asset.json";
+const textureImage = halftoneTexture.url;
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
