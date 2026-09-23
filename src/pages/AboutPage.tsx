@@ -91,21 +91,22 @@ const AboutPage = () => {
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="about-quote-block mt-16 px-6 py-12 text-center"
-          >
-            <h3 className="font-heading text-2xl font-light italic tracking-wide text-primary-foreground/90 md:text-4xl">
-              {t("about.blockPartnerTitle")}
-            </h3>
-            <p className="mx-auto mt-6 max-w-3xl leading-relaxed text-primary-foreground/70 [text-wrap:pretty]">
-              {t("about.story3")}
-            </p>
-          </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="about-quote-block w-full px-6 py-16 text-center md:py-20"
+        >
+          <h3 className="font-heading text-2xl font-light italic tracking-wide text-primary-foreground/90 md:text-4xl">
+            {t("about.blockPartnerTitle")}
+          </h3>
+          <p className="mx-auto mt-6 max-w-3xl leading-relaxed text-primary-foreground/70 [text-wrap:pretty]">
+            {t("about.story3")}
+          </p>
+        </motion.div>
       </AbandonedStoryScene>
 
       <section className="bg-muted py-16 md:py-24">
