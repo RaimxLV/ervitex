@@ -139,8 +139,9 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
       frame = null;
       if (!ready || disposed) return;
       resize();
-      const targetX = reduceMotion.matches ? 0 : pointerX * 0.05;
-      const targetY = reduceMotion.matches ? 0 : pointerY * 0.04 + scrollY * 0.12;
+      const targetX = reduceMotion.matches ? 0 : pointerX * 0.028;
+      const targetY = reduceMotion.matches ? 0 : pointerY * 0.022 + scrollY * 0.07;
+
       currentX += (targetX - currentX) * EASING;
       currentY += (targetY - currentY) * EASING;
       gl.uniform2f(uResolution, canvas.width, canvas.height);
