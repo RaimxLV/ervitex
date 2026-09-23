@@ -1,41 +1,41 @@
-import { useRef, type PointerEvent, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
 };
 
+const CELL = 24;
+const SPARK_COUNT = 22;
+
 const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
-
-  const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
-    const bounds = sectionRef.current?.getBoundingClientRect();
-    if (!bounds || !glowRef.current) return;
-
-    glowRef.current.style.setProperty("--mx", `${event.clientX - bounds.left}px`);
-    glowRef.current.style.setProperty("--my", `${event.clientY - bounds.top}px`);
-    glowRef.current.style.opacity = "1";
-  };
-
-  const handlePointerLeave = () => {
-    if (glowRef.current) glowRef.current.style.opacity = "0";
-  };
+  const sparks = useMemo(
+    () =>
+      Array.from({ length: SPARK_COUNT }, (_, index) => ({
+        key: index,
+        left: `${Math.round(Math.random() * 96)}%`,
+        top: `${Math.round(Math.random() * 96)}%`,
+        delay: `${(Math.random() * 9).toFixed(2)}s`,
+        duration: `${(4 + Math.random() * 6).toFixed(2)}s`,
+      })),
+    [],
+  );
 
   return (
-    <section
-      ref={sectionRef}
-      className="about-scene-bg relative isolate w-full overflow-hidden text-primary-foreground"
-      onPointerMove={handlePointerMove}
-      onPointerLeave={handlePointerLeave}
-    >
+    <section className="about-scene-bg relative isolate w-full overflow-hidden text-primary-foreground">
       <div className="about-grid absolute inset-0 z-0" aria-hidden="true">
-        {Array.from({ length: 3456 }, (_, index) => (
-          <span className="about-grid-cell" key={index} />
-        ))}
-      </div>
-      <div ref={glowRef} className="about-grid-glow absolute inset-0 z-0" aria-hidden="true">
-        {Array.from({ length: 3456 }, (_, index) => (
-          <span key={index} />
+        {sparks.map((spark) => (
+          <span
+            className="about-spark"
+            key={spark.key}
+            style={{
+              left: spark.left,
+              top: spark.top,
+              width: CELL,
+              height: CELL,
+              animationDelay: spark.delay,
+              animationDuration: spark.duration,
+            }}
+          />
         ))}
       </div>
       <div className="relative z-10">{children}</div>
