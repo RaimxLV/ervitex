@@ -1,5 +1,4 @@
-import { useRef, type ReactNode } from "react";
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
+import { useRef, useState, type PointerEvent, type ReactNode } from "react";
 
 type AbandonedStorySceneProps = {
   children: ReactNode;
@@ -7,29 +6,30 @@ type AbandonedStorySceneProps = {
 
 const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
   const sectionRef = useRef<HTMLElement>(null);
-  const reduceMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-  const smooth = useSpring(scrollYProgress, { stiffness: 90, damping: 24, mass: 0.4 });
-  const glowY = useTransform(smooth, [0, 1], reduceMotion ? ["0%", "0%"] : ["-8%", "8%"]);
+  const [activeCell, setActiveCell] = useState<number | null>(null);
+
+  const handlePointerMove = (event: PointerEvent<HTMLElement>) => {
+    const bounds = sectionRef.current?.getBoundingClientRect();
+    if (!bounds) return;
+
+    const columns = window.innerWidth >= 768 ? 18 : 12;
+    const rows = window.innerWidth >= 768 ? 12 : 18;
+    const column = Math.min(columns - 1, Math.max(0, Math.floor(((event.clientX - bounds.left) / bounds.width) * columns)));
+    const row = Math.min(rows - 1, Math.max(0, Math.floor(((event.clientY - bounds.top) / bounds.height) * rows)));
+    setActiveCell(row * columns + column);
+  };
 
   return (
-    <section ref={sectionRef} className="about-scene-bg relative isolate w-full overflow-hidden text-primary-foreground">
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-        <motion.div
-          style={{ y: glowY }}
-          className="absolute -top-[20%] left-0 h-[140%] w-full will-change-transform"
-        >
-          <div className="about-glow about-glow-a" />
-          <div className="about-glow about-glow-b" />
-          <div className="about-glow about-glow-c" />
-          <div className="about-glow about-glow-d" />
-        </motion.div>
-        <div className="about-sheen" />
-        {/* Gentle vignette so text stays readable over the glow */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/25" />
+    <section
+      ref={sectionRef}
+      className="about-scene-bg relative isolate w-full overflow-hidden text-primary-foreground"
+      onPointerMove={handlePointerMove}
+      onPointerLeave={() => setActiveCell(null)}
+    >
+      <div className="about-grid absolute inset-0 z-0" aria-hidden="true">
+        {Array.from({ length: 216 }, (_, index) => (
+          <span className={`about-grid-cell${activeCell === index ? " is-active" : ""}`} key={index} />
+        ))}
       </div>
       <div className="relative z-10">{children}</div>
     </section>
