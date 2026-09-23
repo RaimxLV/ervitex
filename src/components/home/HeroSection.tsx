@@ -1,64 +1,37 @@
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, Mouse } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useEffect, useRef, useState } from "react";
-import TrailMask from "./TrailMask";
-
-import collageImg from "@/assets/hero/collage-hero.jpg";
+import { useRef } from "react";
+import HeroDepthScene from "./HeroDepthScene";
 
 /**
- * Hero — strict 4-layer stack:
+ * Hero — depth-map parallax stack:
  *  1. solid deep-charcoal background
- *  2. static subject image (collage)
- *  3. interactive trailing blob mask that reveals layer 2
- *  4. text + buttons (blend-difference, fully clickable)
+ *  2. WebGL depth-map scene (scroll + pointer parallax)
+ *  3. darkening overlay for text legibility
+ *  4. text + buttons
  */
 
 const HeroSection = () => {
   const { lang } = useLanguage();
   const sectionRef = useRef<HTMLElement>(null);
-  const [interactive, setInteractive] = useState(false);
-
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setInteractive(!reduced);
-  }, []);
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-
-  // Subtle parallax for the subject image
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, 90]);
 
   return (
     <section
       ref={sectionRef}
       className="relative min-h-[100svh] flex items-center overflow-hidden bg-black"
     >
-      {/* ── LAYER 2: static subject image ── */}
-      <motion.div
-        style={{ y: bgY }}
-        className="absolute inset-0 z-[1] will-change-transform"
-      >
-        <img
-          src={collageImg}
-          alt=""
-          aria-hidden="true"
-          width={1024}
-          height={1280}
-          fetchPriority="high"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          style={{ opacity: interactive ? 0 : 1 }}
-        />
-      </motion.div>
+      {/* ── LAYER 2: depth-map parallax scene ── */}
+      <HeroDepthScene className="z-[1]" />
 
-      {/* ── LAYER 3: interactive trailing mask reveal ── */}
-      <TrailMask src={collageImg} className="z-[2]" />
+      {/* ── LAYER 3: legibility overlay ── */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 z-[2] bg-gradient-to-r from-black/85 via-black/60 to-black/30"
+      />
+
 
       {/* ── LAYER 4: content ── */}
       <div className="container relative z-10 py-20 sm:py-24 pointer-events-none">
