@@ -8,11 +8,13 @@ const CELL = 24;
 const SPARK_COUNT = 8;
 
 const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
+  const sceneRef = useRef<HTMLElement>(null);
   const layerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const scene = sceneRef.current;
     const layer = layerRef.current;
-    if (!layer) return;
+    if (!scene || !layer) return;
     const sparks = Array.from(layer.children) as HTMLElement[];
     let index = 0;
     let frame = 0;
@@ -31,7 +33,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
     };
 
     const onMove = (event: PointerEvent) => {
-      const rect = layer.getBoundingClientRect();
+      const rect = scene.getBoundingClientRect();
       pending = { x: event.clientX - rect.left, y: event.clientY - rect.top };
       if (frame) return;
       frame = requestAnimationFrame(() => {
@@ -40,15 +42,15 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
       });
     };
 
-    layer.parentElement?.addEventListener("pointermove", onMove);
+    scene.addEventListener("pointermove", onMove);
     return () => {
-      layer.parentElement?.removeEventListener("pointermove", onMove);
+      scene.removeEventListener("pointermove", onMove);
       if (frame) cancelAnimationFrame(frame);
     };
   }, []);
 
   return (
-    <section className="about-scene-bg relative isolate w-full overflow-hidden text-foreground">
+    <section ref={sceneRef} className="about-scene-bg relative isolate w-full overflow-hidden text-foreground">
       <div className="about-grid absolute inset-0 z-0" aria-hidden="true">
         <div ref={layerRef} className="absolute inset-0">
           {Array.from({ length: SPARK_COUNT }, (_, i) => (
