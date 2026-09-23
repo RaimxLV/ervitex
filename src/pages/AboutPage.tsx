@@ -72,7 +72,7 @@ const AboutPage = () => {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="mt-16 grid gap-6 md:grid-cols-2"
           >
-            <div className="border-l-2 border-l-accent bg-primary/75 p-8 backdrop-blur-md md:p-10">
+            <div className="border border-primary-foreground/10 border-l-2 border-l-primary-foreground/45 bg-primary-foreground/[0.05] p-8 backdrop-blur-md md:p-10">
               <h3 className="font-heading text-2xl font-bold text-primary-foreground [text-wrap:balance]">
                 {t("about.blockStabilityTitle")}
               </h3>
@@ -80,7 +80,7 @@ const AboutPage = () => {
                 {t("about.blockStabilityBody1")}
               </p>
             </div>
-            <div className="border-l-2 border-l-accent bg-primary/75 p-8 backdrop-blur-md md:p-10">
+            <div className="border border-primary-foreground/10 border-l-2 border-l-primary-foreground/45 bg-primary-foreground/[0.05] p-8 backdrop-blur-md md:p-10">
               <h3 className="font-heading text-2xl font-bold text-primary-foreground [text-wrap:balance]">
                 {t("about.blockCapacityTitle")}
               </h3>
