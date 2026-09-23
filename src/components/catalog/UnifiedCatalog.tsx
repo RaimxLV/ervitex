@@ -841,7 +841,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
 
   const filtered = useMemo(() => {
-    const base = items.filter((it) => passesExcept(it, "__none__"));
+    // Items without a supplier price are hidden instead of showing 0.00 €.
+    // Skip the check while prices are still loading so the grid is not empty.
+    const hasPrices = priceRanges.size > 0;
+    const base = items.filter(
+      (it) => passesExcept(it, "__none__") && (!hasPrices || (priceRanges.get(`${it.source}:${it.id}`)?.price ?? 0) > 0)
+    );
     const cmpName = (a: EnrichedItem, b: EnrichedItem) =>
       (a.name || a.id).localeCompare(b.name || b.id, lang === "lv" ? "lv" : "en", { sensitivity: "base" });
     if (sort === "az") return [...base].sort(cmpName);
