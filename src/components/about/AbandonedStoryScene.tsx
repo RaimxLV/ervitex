@@ -16,7 +16,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
   const glowY = useTransform(smooth, [0, 1], reduceMotion ? ["0%", "0%"] : ["-8%", "8%"]);
 
   return (
-    <section ref={sectionRef} className="relative isolate w-full overflow-hidden bg-primary text-primary-foreground">
+    <section ref={sectionRef} className="about-scene-bg relative isolate w-full overflow-hidden text-primary-foreground">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
         <motion.div
           style={{ y: glowY }}
@@ -25,9 +25,11 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
           <div className="about-glow about-glow-a" />
           <div className="about-glow about-glow-b" />
           <div className="about-glow about-glow-c" />
+          <div className="about-glow about-glow-d" />
         </motion.div>
-        {/* Subtle vignette so text stays readable over the glow */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/50" />
+        <div className="about-sheen" />
+        {/* Gentle vignette so text stays readable over the glow */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-transparent to-black/25" />
       </div>
       <div className="relative z-10">{children}</div>
     </section>
