@@ -22,6 +22,7 @@
 ## Vizuālie uzlabojumi
 - [x] Aizstāt “Par Ervitex” rūtiņu fonu ar vieglu auduma tekstūru.
 - [x] Palielināt visas mājaslapas fontus par 2 px.
+- [x] Paplašināt mega izvēlni līdz 95%, palielināt tās tekstus un sakārtot mobilo izvēlni.
 
 ### P0
 - [x] NWG katalogā parādīt visus produktus ar visām pieejamajām cenām.

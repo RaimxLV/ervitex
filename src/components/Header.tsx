@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { toast } from "sonner";
-import CatalogMegaMenu from "@/components/CatalogMegaMenu";
+import CatalogMegaMenu, { MobileCatalogMenu } from "@/components/CatalogMegaMenu";
 
 const navItems = [
   { key: "nav.home" as const, path: "/" },
@@ -15,19 +15,6 @@ const navItems = [
   
   { key: "nav.about" as const, path: "/about" },
   { key: "nav.contact" as const, path: "/contact" },
-];
-
-const catalogSubItems = [
-  { path: "/catalog?source=stanley-stella", lv: "Stanley/Stella", en: "Stanley/Stella" },
-  { path: "/catalog?source=nwg-craft", lv: "Craft", en: "Craft" },
-  { path: "/catalog?source=nwg-clique", lv: "Clique", en: "Clique" },
-  { path: "/catalog?source=nwg-projob", lv: "ProJob", en: "ProJob" },
-  { path: "/catalog?source=nwg-cutter", lv: "Cutter & Buck", en: "Cutter & Buck" },
-  { path: "/catalog?source=pf-elevate", lv: "Elevate", en: "Elevate" },
-  { path: "/catalog?source=pf-roly", lv: "Roly", en: "Roly" },
-  { path: "/catalog?source=bb", lv: "Beechfield Brands", en: "Beechfield Brands" },
-  { path: "/catalog?source=mf", lv: "Malfini", en: "Malfini" },
-  { path: "/catalog?source=pf", lv: "Prezentmateriāli", en: "Business gifts" },
 ];
 
 const Header = () => {
@@ -256,13 +243,13 @@ const Header = () => {
       {/* Desktop Mega Menu */}
       <div
         ref={megaPanelRef}
-        className={`hidden xl:block absolute left-0 right-0 top-full origin-top px-4 lg:px-8 transition-all duration-200 ${
+        className={`hidden xl:block absolute left-1/2 top-full w-[95vw] max-w-none -translate-x-1/2 origin-top transition-all duration-200 ${
           megaOpen
             ? "pointer-events-auto opacity-100 translate-y-0"
             : "pointer-events-none opacity-0 -translate-y-2"
         }`}
       >
-        <div className="mx-auto w-full max-w-[1120px] overflow-hidden rounded-b-sm border border-primary-foreground/10 border-t-0 bg-primary text-primary-foreground shadow-2xl shadow-black/60">
+        <div className="w-full overflow-hidden rounded-b-sm border border-primary-foreground/10 border-t-0 bg-primary text-primary-foreground shadow-2xl shadow-black/60">
           <CatalogMegaMenu onNavigate={() => setMegaOpen(false)} />
         </div>
       </div>
@@ -271,7 +258,7 @@ const Header = () => {
 
       {/* Mobile nav */}
       {isOpen && (
-        <div className="border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 xl:hidden">
+        <div className="max-h-[calc(100svh-4rem)] overflow-y-auto overscroll-contain border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 xl:hidden md:max-h-[calc(100svh-5rem)]">
           <form onSubmit={handleSearch} className="mb-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-foreground/40" strokeWidth={1.5} />
@@ -283,38 +270,27 @@ const Header = () => {
               />
             </div>
           </form>
-          <nav className="flex flex-col gap-4">
-            {navItems.map((item) => (
-              <div key={item.path}>
+          <nav>
+            <div className="grid grid-cols-3 border-y border-primary-foreground/10">
+              {navItems.filter((item) => item.path !== "/catalog").map((item) => (
                 <Link
+                  key={item.path}
                   to={item.path}
                   onClick={() => setIsOpen(false)}
-                  className={`text-base font-medium uppercase transition-colors ${
-                    location.pathname === item.path
-                      ? "text-accent"
-                      : "text-primary-foreground/70"
+                  className={`py-4 text-center text-base font-semibold uppercase transition-colors ${
+                    location.pathname === item.path ? "text-accent" : "text-primary-foreground/75"
                   }`}
                 >
                   {t(item.key)}
                 </Link>
-                {item.path === "/catalog" && (
-                  <div className="ml-4 mt-2 flex flex-col gap-2 border-l border-primary-foreground/10 pl-3">
-                    {catalogSubItems.map((s) => (
-                      <Link
-                        key={s.path}
-                        to={s.path}
-                        onClick={() => setIsOpen(false)}
-                        className={`text-sm transition-colors ${
-                          location.pathname === s.path ? "text-accent" : "text-primary-foreground/70 hover:text-accent"
-                        }`}
-                      >
-                        {lang === "lv" ? s.lv : s.en}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="pt-5">
+              <p className="mb-3 font-heading text-lg font-bold uppercase text-primary-foreground">
+                {t("nav.catalog")}
+              </p>
+              <MobileCatalogMenu onNavigate={() => setIsOpen(false)} />
+            </div>
           </nav>
         </div>
       )}
