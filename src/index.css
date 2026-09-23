@@ -42,10 +42,10 @@
     --value-slate: 218 23% 34%;
     --value-slate-soft: 216 24% 95%;
     --values-shadow: 218 30% 20%;
-   --about-surface: 218 8% 20%;
-   --about-surface-deep: 220 8% 14%;
-   --about-grid-line: 0 0% 100%;
-   --about-grid-light: 0 0% 100%;
+    --about-surface: 205 45% 99%;
+    --about-surface-deep: 207 38% 96%;
+    --about-grid-line: 208 35% 70%;
+    --about-grid-light: 199 78% 52%;
    --glow-sky: 199 90% 66%;
    --glow-teal: 168 68% 58%;
    --glow-lime: 96 58% 62%;
@@ -245,7 +245,7 @@
   .glitch-layer-main { animation: glitch-flicker 4s steps(1, end) infinite; }
   .glitch-layer-slice { animation: glitch-slice 3.4s steps(1, end) infinite; }
 
-  /* --- Interactive graphite grid (About scene) --- */
+  /* --- Interactive pale-blue grid (About scene) --- */
   .about-scene-bg {
     background: linear-gradient(145deg, hsl(var(--about-surface)) 0%, hsl(var(--about-surface-deep)) 100%);
   }
@@ -255,21 +255,23 @@
   }
 
   .about-grid {
+    pointer-events: none;
     background-image:
-      linear-gradient(to right, hsl(var(--about-grid-line) / 0.045) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--about-grid-line) / 0.045) 1px, transparent 1px);
+      linear-gradient(to right, hsl(var(--about-grid-line) / 0.2) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--about-grid-line) / 0.2) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
   .about-spark {
     position: absolute;
-    background-color: hsl(var(--about-grid-light) / 0.3);
+    background-color: hsl(var(--about-grid-light) / 0.48);
+    box-shadow: inset 0 0 0 1px hsl(var(--about-grid-light) / 0.65);
     opacity: 0;
   }
 
   @keyframes about-cell-twinkle {
     0%, 100% { opacity: 0; }
-    35%, 55% { opacity: 1; }
+    18%, 48% { opacity: 1; }
   }
 }
 

@@ -5,7 +5,7 @@ type AbandonedStorySceneProps = {
 };
 
 const CELL = 24;
-const SPARK_COUNT = 10;
+const SPARK_COUNT = 8;
 
 const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
   const layerRef = useRef<HTMLDivElement>(null);
@@ -21,13 +21,13 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
     const place = (x: number, y: number) => {
       const spark = sparks[index % sparks.length];
       index += 1;
-      const col = Math.floor(x / CELL) + Math.floor(Math.random() * 5) - 2;
-      const row = Math.floor(y / CELL) + Math.floor(Math.random() * 5) - 2;
+      const col = Math.floor(x / CELL);
+      const row = Math.floor(y / CELL);
       spark.style.animation = "none";
       spark.style.left = `${col * CELL}px`;
       spark.style.top = `${row * CELL}px`;
       void spark.offsetWidth;
-      spark.style.animation = `about-cell-twinkle ${(0.5 + Math.random() * 0.6).toFixed(2)}s ease-in-out 1`;
+      spark.style.animation = "about-cell-twinkle 0.8s ease-out 1";
     };
 
     const onMove = (event: PointerEvent) => {
@@ -48,7 +48,7 @@ const AbandonedStoryScene = ({ children }: AbandonedStorySceneProps) => {
   }, []);
 
   return (
-    <section className="about-scene-bg relative isolate w-full overflow-hidden text-primary-foreground">
+    <section className="about-scene-bg relative isolate w-full overflow-hidden text-foreground">
       <div className="about-grid absolute inset-0 z-0" aria-hidden="true">
         <div ref={layerRef} className="absolute inset-0">
           {Array.from({ length: SPARK_COUNT }, (_, i) => (
