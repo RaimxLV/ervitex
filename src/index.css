@@ -238,9 +238,70 @@
   .glitch-layer-main { animation: glitch-flicker 4s steps(1, end) infinite; }
   .glitch-layer-slice { animation: glitch-slice 3.4s steps(1, end) infinite; }
 
+  /* --- Animated gradient glow (About scene) --- */
+  .about-glow {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(110px);
+    will-change: transform, opacity;
+  }
+
+  .about-glow-a {
+    top: -12%;
+    left: -18%;
+    width: 62vw;
+    height: 62vw;
+    max-width: 950px;
+    max-height: 950px;
+    background: radial-gradient(circle, hsl(var(--accent) / 0.75) 0%, transparent 70%);
+    animation: glow-drift-a 22s ease-in-out infinite;
+  }
+
+  .about-glow-b {
+    top: 28%;
+    right: -20%;
+    width: 55vw;
+    height: 55vw;
+    max-width: 820px;
+    max-height: 820px;
+    background: radial-gradient(circle, hsl(0 85% 32% / 0.8) 0%, transparent 70%);
+    animation: glow-drift-b 26s ease-in-out infinite;
+  }
+
+  .about-glow-c {
+    bottom: -18%;
+    left: 22%;
+    width: 48vw;
+    height: 48vw;
+    max-width: 720px;
+    max-height: 720px;
+    background: radial-gradient(circle, hsl(18 90% 45% / 0.5) 0%, transparent 70%);
+    animation: glow-pulse 16s ease-in-out infinite;
+  }
+
+  @keyframes glow-drift-a {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.7; }
+    50% { transform: translate3d(14%, 10%, 0) scale(1.18); opacity: 0.95; }
+  }
+
+  @keyframes glow-drift-b {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.1); opacity: 0.8; }
+    50% { transform: translate3d(-12%, -8%, 0) scale(0.92); opacity: 0.55; }
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.12); opacity: 0.75; }
+  }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .about-glow-a,
+  .about-glow-b,
+  .about-glow-c {
+    animation: none;
+  }
 }
 
 
