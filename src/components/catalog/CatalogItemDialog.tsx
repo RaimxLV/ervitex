@@ -307,7 +307,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     supabase.from("nwg_styles").select("product_number,name,brand,category,gender,fit,fabrics,commerce_text,catalog_text,usp,weight,country_of_origin,raw").eq("product_number", productNumber).maybeSingle(),
     supabase.from("nwg_variants").select("item_number,color_name,color_code,filter_color,shade_color,main_picture_url").eq("product_number", productNumber),
     supabase.from("nwg_images").select("item_number,image_url,high_res_url,large_thumbnail_url,standard_url,sort_order").eq("product_number", productNumber).order("sort_order", { ascending: true }),
-    supabase.from("nwg_skus").select("sku,item_number,size,size_sequence").eq("product_number", productNumber),
+    supabase.from("nwg_skus").select("sku,item_number,size,size_name,size_sequence").eq("product_number", productNumber),
   ]);
   const style = styleRes.data;
   if (!style) return null;
@@ -339,6 +339,15 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     imgByItem.get(key)!.push(url as string);
   }
 
+  // The supplier ships a human size name (XS, M, 3XL, 158/164, 42 (UK8)).
+  // Prefer it; fall back to translating numeric codes when it is missing.
+  const nameBySize = new Map<string, string>();
+  for (const sk of skus) {
+    const code = ((sk as any).size || "").toString();
+    const nm = ((sk as any).size_name || "").toString().trim();
+    if (code && nm && !nameBySize.has(code)) nameBySize.set(code, nm);
+  }
+
   const rawSkuSizes = skus
     .map((sk: any) => ({ s: sk.size as string | null, seq: Number(sk.size_sequence) }))
     .filter((x) => x.s);
@@ -361,7 +370,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
       if (n < 1 || n > 12) return false;
       return !Number.isFinite(x.seq) || x.seq === n * 10 || x.seq === n;
     });
-  const sizeLabel = (s: string) => (codeSized ? NWG_SIZE_CODES[s] || s : s);
+  const sizeLabel = (s: string) => nameBySize.get(s) || (codeSized ? NWG_SIZE_CODES[s] || s : s);
 
 
   const sizesByItem = new Map<string, { s: string; seq: number }[]>();

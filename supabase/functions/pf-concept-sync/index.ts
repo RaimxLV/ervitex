@@ -369,7 +369,7 @@ async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: bool
     const codeEnd = seg.indexOf('"');
     if (codeEnd <= 0) continue;
     const item_code = seg.slice(0, codeEnd);
-    if (!/^\d+$/.test(item_code)) continue;
+    if (!/^[A-Za-z0-9-]+$/.test(item_code)) continue;
     const cur = seg.match(/"currency":"([A-Z]{3})"/);
     let price: number | null = null;
     let lowestBar = Number.MAX_SAFE_INTEGER;
