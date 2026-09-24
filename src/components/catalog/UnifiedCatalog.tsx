@@ -851,8 +851,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       (a.name || a.id).localeCompare(b.name || b.id, lang === "lv" ? "lv" : "en", { sensitivity: "base" });
     if (sort === "az") return [...base].sort(cmpName);
     if (sort === "za") return [...base].sort((a, b) => cmpName(b, a));
-    if (sort === "newest") {
+    if (sort === "newest" || sort === "featured") {
       return [...base].sort((a, b) =>
+        Number(b.source === "ss") - Number(a.source === "ss") ||
         (b.id || "").localeCompare(a.id || "", "en", { numeric: true, sensitivity: "base" })
       );
     }
