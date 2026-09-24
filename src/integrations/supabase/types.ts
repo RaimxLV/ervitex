@@ -2238,6 +2238,30 @@ export type Database = {
         }
         Relationships: []
       }
+      team_photo_settings: {
+        Row: {
+          position_x: number
+          position_y: number
+          slug: string
+          updated_at: string
+          zoom: number
+        }
+        Insert: {
+          position_x?: number
+          position_y?: number
+          slug: string
+          updated_at?: string
+          zoom?: number
+        }
+        Update: {
+          position_x?: number
+          position_y?: number
+          slug?: string
+          updated_at?: string
+          zoom?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
