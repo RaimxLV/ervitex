@@ -36,7 +36,7 @@ export const translations = {
   "featured.viewAll": { lv: "Skatīt visus", en: "View All" },
 
   // Services
-  "services.title": { lv: "Mūsu pakalpojumi", en: "Our Services" },
+  "services.title": { lv: "APDRUKAS RISINĀJUMI", en: "DECORATION SOLUTIONS" },
   "services.subtitle": { lv: "No idejas līdz gatavam produktam — apdruka, izšūšana un dizains", en: "From concept to finished product — printing, embroidery, and design" },
   "services.learnMore": { lv: "Uzzināt vairāk", en: "Learn More" },
 
