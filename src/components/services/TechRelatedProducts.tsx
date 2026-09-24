@@ -73,6 +73,10 @@ const TECH_CATEGORIES: Record<string, { cats: string[]; link: string }> = {
     ],
     link: "/catalog?category=Mugs,Bottles",
   },
+  termodruka: {
+    cats: ["T-shirts", "Tops", "Hoodies", "Hoodie sweatshirts", "Sweatshirts", "Crew neck sweatshirts", "Sportswear"],
+    link: "/catalog?category=T-shirts,Hoodies,Sweatshirts,Sportswear",
+  },
 };
 
 const pickRandom = <T,>(arr: T[], n: number): T[] => {

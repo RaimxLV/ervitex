@@ -152,8 +152,8 @@ const Footer = () => {
               {[
                 { key: "nav.home" as const, path: "/" },
                 { key: "nav.catalog" as const, path: "/catalog" },
-                { key: "nav.services" as const, path: "/services" },
                 { key: "nav.about" as const, path: "/about" },
+                { key: "nav.services" as const, path: "/services" },
                 { key: "nav.contact" as const, path: "/contact" },
               ].map((item) => (
                 <Link key={item.path} to={item.path} className="text-primary-foreground/80 transition-colors hover:text-accent">
@@ -199,13 +199,17 @@ const Footer = () => {
             </h4>
             <ul className="flex flex-col gap-3 text-[15px] text-primary-foreground/80">
               {[
-                { lv: "Sietspiede", en: "Screen Printing" },
-                { lv: "Izšūšana", en: "Embroidery" },
-                { lv: "Sublimācija", en: "Sublimation" },
-                { lv: "DTF druka", en: "DTF Printing" },
-                { lv: "Termodruka", en: "Heat Transfer" },
+                { lv: "Sietspiede", en: "Screen Printing", path: "/tehnologijas/sietspiede" },
+                { lv: "Izšūšana", en: "Embroidery", path: "/tehnologijas/izsusana" },
+                { lv: "Sublimācija", en: "Sublimation", path: "/tehnologijas/sublimacija" },
+                { lv: "DTF druka", en: "DTF Printing", path: "/tehnologijas/dtf" },
+                { lv: "Termodruka", en: "Heat Transfer", path: "/tehnologijas/termodruka" },
               ].map((s) => (
-                <li key={s.en}>{lang === "lv" ? s.lv : s.en}</li>
+                <li key={s.en}>
+                  <Link to={s.path} className="transition-colors hover:text-accent">
+                    {lang === "lv" ? s.lv : s.en}
+                  </Link>
+                </li>
               ))}
             </ul>
           </div>

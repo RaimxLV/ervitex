@@ -6,7 +6,7 @@ export const translations = {
   "nav.catalog": { lv: "Katalogs", en: "Catalog" },
  "nav.stanleyStella": { lv: "Stanley/Stella", en: "Stanley/Stella" },
  "nav.nwg": { lv: "NWG apģērbi", en: "NWG Apparel" },
-  "nav.services": { lv: "Pakalpojumi", en: "Services" },
+  "nav.services": { lv: "Apdrukas risinājumi", en: "Decoration solutions" },
   "nav.about": { lv: "Par mums", en: "About" },
   "nav.contact": { lv: "Kontakti", en: "Contact" },
 
@@ -168,7 +168,7 @@ export const translations = {
     en: "Wholesale apparel and accessories with professional printing and embroidery since 2003.",
   },
   "footer.navigation": { lv: "Navigācija", en: "Navigation" },
-  "footer.services": { lv: "Pakalpojumi", en: "Services" },
+  "footer.services": { lv: "Apdrukas risinājumi", en: "Decoration solutions" },
   "footer.contact": { lv: "Kontakti", en: "Contact" },
   "footer.rights": { lv: "Visas tiesības aizsargātas.", en: "All rights reserved." },
 

@@ -19,6 +19,7 @@ import subA6 from "@/assets/services/sub-6.jpg.asset.json";
 import subA7 from "@/assets/services/sub-7.jpg.asset.json";
 import subA8 from "@/assets/services/sub-8.jpg.asset.json";
 import subA9 from "@/assets/services/sub-9.jpg.asset.json";
+import heatTransfer from "@/assets/services/vinyl-flock-1.jpg";
 
 export type Tech = {
   id: string;
@@ -141,6 +142,31 @@ export const techs: Tech[] = [
       subA8.url,
       subA9.url,
     ],
+  },
+  {
+    id: "termodruka",
+    name: { lv: "Termodruka", en: "Heat transfer" },
+    tagline: { lv: "Precīziem uzrakstiem un simboliem", en: "For precise lettering and symbols" },
+    short: {
+      lv: "No speciālas plēves izgriezts dizains, ko ar karstumu un spiedienu nostiprina uz tekstila.",
+      en: "A design cut from specialist film and bonded to the textile using heat and pressure.",
+    },
+    desc: {
+      lv: "Termodruka ir apdrukas veids, kurā dizainu izgriež no speciālas termoplēves un ar termopresi augstā temperatūrā nostiprina uz auduma. Tā ir īpaši piemērota vienkrāsainiem logotipiem, uzrakstiem, vārdiem un numuriem. Pieejamas gludas, elastīgas, atstarojošas, metāliskas un samtainas flokplēves. Šo risinājumu var izmantot arī nelieliem pasūtījumiem un individuāli personalizētam apģērbam.",
+      en: "Heat transfer is a decoration method where a design is cut from specialist film and bonded to fabric with a heat press at high temperature. It is especially suitable for single-colour logos, lettering, names and numbers. Smooth, stretch, reflective, metallic and velvet flock finishes are available. It also works well for small orders and individually personalised garments.",
+    },
+    features: [
+      { lv: "No 1 gabala", en: "From a single piece" },
+      { lv: "Vārdi, numuri un vienkrāsaini logotipi", en: "Names, numbers and single-colour logos" },
+      { lv: "Atstarojošas, metāliskas un flokplēves", en: "Reflective, metallic and flock films" },
+      { lv: "Piemērota kokvilnai, poliesteram un jauktiem audumiem", en: "Suitable for cotton, polyester and blended fabrics" },
+    ],
+    specs: [
+      { label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "1 gab.", en: "1 pc" } },
+      { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "2–5 darba dienas", en: "2–5 business days" } },
+      { label: { lv: "Faili", en: "Files" }, value: { lv: "AI, EPS, PDF (vektors)", en: "AI, EPS, PDF (vector)" } },
+    ],
+    images: [heatTransfer],
   },
 ];
 
