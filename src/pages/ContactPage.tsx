@@ -27,7 +27,7 @@ const specialists = [
   { slug: "ilona", name: "Ilona Romanovska", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "ilona@ervitex.lv", phone: "+371 29494626", phoneLabel: { lv: "Mob", en: "Mob" }, photo: ilonaPhoto },
   { slug: "santa", name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "+371 67436899", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaPhoto },
   { slug: "justine", name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "+371 29725412", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justinePhoto },
-  { slug: "evita", name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: evitaPhoto as string | null },
+  { slug: "evita", name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: evitaPhoto },
 ];
 
 type PhotoSettings = { zoom: number; position_x: number; position_y: number };
