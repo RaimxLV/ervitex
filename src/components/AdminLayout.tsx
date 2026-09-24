@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   MessageSquare, LogOut, LayoutDashboard, Users, ArrowLeft,
-  LayoutGrid, BadgeEuro, FileText, MoreHorizontal, Package, FolderTree,
+  LayoutGrid, BadgeEuro, FileText, MoreHorizontal, Package, FolderTree, Images,
 } from "lucide-react";
 
 const SUPER_ADMIN_EMAIL = "ofsetadruka@gmail.com";
@@ -24,6 +24,7 @@ const secondary: NavItem[] = [
   { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits" },
   { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
   { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
+  { to: "/admin/team-photos", icon: Images, label: "Komandas foto" },
   { to: "/admin/users", icon: Users, label: "Lietotāji", superOnly: true },
 ];
 

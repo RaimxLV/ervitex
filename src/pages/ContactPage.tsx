@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, Clock3, Mail, MapPin, Phone, Send, X, PhoneCall, Loader2, ReceiptText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,22 +21,35 @@ import justinePhoto from "@/assets/team/justine-strunka.jpg";
 import evitaPhoto from "@/assets/team/evita-nesterova.jpg";
 
 const specialists = [
-  { name: "Vilnis Lācis", title: { lv: "Valdes priekšsēdētājs", en: "Chairman of the Board" }, email: "vilnis@ervitex.lv", phone: "+371 67543384", phoneLabel: { lv: "Tel", en: "Tel" }, photo: vilnisPhoto },
-  { name: "Ēriks Lācis", title: { lv: "Tirdzniecības direktors", en: "Sales Director" }, email: "eriks@ervitex.lv", phone: "+371 29395600", phoneLabel: { lv: "Mob", en: "Mob" }, photo: eriksPhoto },
-  { name: "Laura Daukšte", title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" }, email: "laura@ervitex.lv", phone: "+371 26164635", phoneLabel: { lv: "Mob", en: "Mob" }, photo: lauraPhoto },
-  { name: "Ilona Romanovska", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "ilona@ervitex.lv", phone: "+371 29494626", phoneLabel: { lv: "Mob", en: "Mob" }, photo: ilonaPhoto },
-  { name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "+371 67436899", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaPhoto },
-  { name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "+371 29725412", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justinePhoto },
-  { name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: evitaPhoto as string | null },
+  { slug: "vilnis", name: "Vilnis Lācis", title: { lv: "Valdes priekšsēdētājs", en: "Chairman of the Board" }, email: "vilnis@ervitex.lv", phone: "+371 67543384", phoneLabel: { lv: "Tel", en: "Tel" }, photo: vilnisPhoto },
+  { slug: "eriks", name: "Ēriks Lācis", title: { lv: "Tirdzniecības direktors", en: "Sales Director" }, email: "eriks@ervitex.lv", phone: "+371 29395600", phoneLabel: { lv: "Mob", en: "Mob" }, photo: eriksPhoto },
+  { slug: "laura", name: "Laura Daukšte", title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" }, email: "laura@ervitex.lv", phone: "+371 26164635", phoneLabel: { lv: "Mob", en: "Mob" }, photo: lauraPhoto },
+  { slug: "ilona", name: "Ilona Romanovska", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "ilona@ervitex.lv", phone: "+371 29494626", phoneLabel: { lv: "Mob", en: "Mob" }, photo: ilonaPhoto },
+  { slug: "santa", name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "+371 67436899", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaPhoto },
+  { slug: "justine", name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "+371 29725412", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justinePhoto },
+  { slug: "evita", name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: evitaPhoto as string | null },
 ];
+
+type PhotoSettings = { zoom: number; position_x: number; position_y: number };
 
 const ContactPage = () => {
   const { toast } = useToast();
   const { t, lang } = useLanguage();
   const [form, setForm] = useState({ name: "", email: "", company: "", phone: "", message: "" });
   const [lightboxImg, setLightboxImg] = useState<string | null>(null);
+  const [photoSettings, setPhotoSettings] = useState<Record<string, PhotoSettings>>({});
 
   const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    supabase.from("team_photo_settings").select("slug, zoom, position_x, position_y").then(({ data }) => {
+      const next: Record<string, PhotoSettings> = {};
+      data?.forEach((row) => {
+        next[row.slug] = { zoom: Number(row.zoom), position_x: Number(row.position_x), position_y: Number(row.position_y) };
+      });
+      setPhotoSettings(next);
+    });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,7 +134,15 @@ const ContactPage = () => {
                   onClick={() => member.photo && setLightboxImg(member.photo)}
                 >
                   {member.photo ? (
-                    <img src={member.photo} alt={member.name} className="h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105" />
+                    <img
+                      src={member.photo}
+                      alt={member.name}
+                      className="h-full w-full max-w-none object-cover transition-transform duration-700"
+                      style={{
+                        objectPosition: `${photoSettings[member.slug]?.position_x ?? 50}% ${photoSettings[member.slug]?.position_y ?? 50}%`,
+                        transform: `scale(${photoSettings[member.slug]?.zoom ?? 1})`,
+                      }}
+                    />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-accent/5 text-accent font-heading text-3xl font-bold">
                       {member.name.split(" ").map((n) => n[0]).join("")}
