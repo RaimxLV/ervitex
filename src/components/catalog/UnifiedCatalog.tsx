@@ -356,7 +356,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [colors, setColors] = useState<Set<string>>(
     new Set((searchParams.get("color") || "").split(",").filter(Boolean))
   );
-  const [sort, setSort] = useState<string>(searchParams.get("sort") || "featured");
+  const [sort, setSort] = useState<string>(searchParams.get("sort") || "newest");
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
   // Tracks the query string this component itself wrote, so that navigations
@@ -373,7 +373,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (groups.size) p.set("group", [...groups].join(","));
     if (genders.size) p.set("gender", [...genders].join(","));
     if (colors.size) p.set("color", [...colors].join(","));
-    if (sort && sort !== "featured") p.set("sort", sort);
+    if (sort && sort !== "newest") p.set("sort", sort);
     if (page > 1) p.set("page", String(page));
     lastWrittenSearch.current = p.toString();
     setSearchParams(p, { replace: true });
@@ -399,7 +399,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     setGroups(new Set((searchParams.get("group") || "").split(",").filter(Boolean)));
     setGenders(new Set((searchParams.get("gender") || "").split(",").filter(Boolean)));
     setColors(new Set((searchParams.get("color") || "").split(",").filter(Boolean)));
-    setSort(searchParams.get("sort") || "featured");
+    setSort(searchParams.get("sort") || "newest");
     setPage(parseInt(searchParams.get("page") || "1", 10));
   }, [searchParams, lockedSource]);
 
