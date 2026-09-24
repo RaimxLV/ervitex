@@ -139,8 +139,7 @@ const ContactPage = () => {
                       alt={member.name}
                       className="h-full w-full max-w-none object-cover transition-transform duration-700"
                       style={{
-                        objectPosition: `${photoSettings[member.slug]?.position_x ?? 50}% ${photoSettings[member.slug]?.position_y ?? 50}%`,
-                        transform: `scale(${photoSettings[member.slug]?.zoom ?? 1})`,
+                        transform: `translate(${((photoSettings[member.slug]?.position_x ?? 50) - 50) * 0.5}%, ${((photoSettings[member.slug]?.position_y ?? 50) - 50) * 0.5}%) scale(${photoSettings[member.slug]?.zoom ?? 1})`,
                       }}
                     />
                   ) : (
