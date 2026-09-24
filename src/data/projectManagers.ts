@@ -1,7 +1,7 @@
-import lauraPhoto from "@/assets/team/laura-daukste.jpg";
-import ilonaPhoto from "@/assets/team/ilona-romanovska.jpg";
-import santaPhoto from "@/assets/team/santa-zvaigzne.jpg";
-import justinePhoto from "@/assets/team/justine-strunka.jpg";
+import lauraPhotoAsset from "@/assets/team/laura-daukste.png.asset.json";
+import ilonaPhotoAsset from "@/assets/team/ilona-romanovska.png.asset.json";
+import santaPhotoAsset from "@/assets/team/santa-zvaigzne.png.asset.json";
+import justinePhotoAsset from "@/assets/team/justine-strunka.png.asset.json";
 
 export interface ProjectManager {
   slug: string;
@@ -19,7 +19,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" },
     email: "laura@ervitex.lv",
     phone: "+371 26164635",
-    photo: lauraPhoto,
+    photo: lauraPhotoAsset.url,
   },
   {
     slug: "ilona",
@@ -27,7 +27,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Projektu vadītāja", en: "Project Manager" },
     email: "ilona@ervitex.lv",
     phone: "+371 29494626",
-    photo: ilonaPhoto,
+    photo: ilonaPhotoAsset.url,
   },
   {
     slug: "santa",
@@ -35,7 +35,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Projektu vadītāja", en: "Project Manager" },
     email: "santa.k@ervitex.lv",
     phone: "+371 67436899",
-    photo: santaPhoto,
+    photo: santaPhotoAsset.url,
   },
   {
     slug: "justine",
@@ -43,7 +43,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Projektu vadītāja", en: "Project Manager" },
     email: "justine@ervitex.lv",
     phone: "+371 29725412",
-    photo: justinePhoto,
+    photo: justinePhotoAsset.url,
   },
 ];
 
