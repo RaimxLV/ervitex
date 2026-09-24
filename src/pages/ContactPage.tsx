@@ -18,6 +18,7 @@ import lauraPhoto from "@/assets/team/laura-daukste.jpg";
 import ilonaPhoto from "@/assets/team/ilona-romanovska.jpg";
 import santaPhoto from "@/assets/team/santa-zvaigzne.jpg";
 import justinePhoto from "@/assets/team/justine-strunka.jpg";
+import evitaPhoto from "@/assets/team/evita-nesterova.jpg";
 
 const specialists = [
   { name: "Vilnis Lācis", title: { lv: "Valdes priekšsēdētājs", en: "Chairman of the Board" }, email: "vilnis@ervitex.lv", phone: "+371 67543384", phoneLabel: { lv: "Tel", en: "Tel" }, photo: vilnisPhoto },
@@ -26,7 +27,7 @@ const specialists = [
   { name: "Ilona Romanovska", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "ilona@ervitex.lv", phone: "+371 29494626", phoneLabel: { lv: "Mob", en: "Mob" }, photo: ilonaPhoto },
   { name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "+371 67436899", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaPhoto },
   { name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "+371 29725412", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justinePhoto },
-  { name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: null as string | null },
+  { name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: evitaPhoto as string | null },
 ];
 
 const ContactPage = () => {
@@ -116,7 +117,7 @@ const ContactPage = () => {
                 <div className="absolute top-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
 
                 <div
-                  className={`relative aspect-[4/3] w-full overflow-hidden bg-muted ${member.photo ? "cursor-pointer" : ""}`}
+                  className={`relative aspect-[4/5] w-full overflow-hidden bg-muted ${member.photo ? "cursor-pointer" : ""}`}
                   onClick={() => member.photo && setLightboxImg(member.photo)}
                 >
                   {member.photo ? (
