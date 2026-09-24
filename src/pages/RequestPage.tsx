@@ -335,7 +335,8 @@ const RequestPage = () => {
                     >
                       <option value="">{t("Nezinu / konsultēties", "Not sure / consult")}</option>
                       <option value="silkscreen">{t("Sietspiede", "Silkscreen")}</option>
-                      <option value="dtf">{t("Termodruka / DTF", "Heat transfer / DTF")}</option>
+                      <option value="dtf">{t("DTF druka", "DTF printing")}</option>
+                      <option value="termodruka">{t("Termodruka", "Heat transfer")}</option>
                       <option value="embroidery">{t("Izšuvums", "Embroidery")}</option>
                       <option value="none">{t("Bez apdrukas", "No print")}</option>
                     </select>
@@ -432,3 +433,4 @@ const RequestPage = () => {
 };
 
 export default RequestPage;
+

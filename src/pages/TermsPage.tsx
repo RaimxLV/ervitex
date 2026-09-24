@@ -19,7 +19,7 @@ const TermsPage = () => {
               <p className="text-xs text-muted-foreground/60">Spēkā no: 2025. gada 1. janvāra</p>
               <h2>1. Vispārīgi noteikumi</h2>
               <p>Šī mājaslapa pieder SIA "Ervitex". Lietojot mājaslapu, jūs piekrītat šiem noteikumiem.</p>
-              <h2>2. Pakalpojumi</h2>
+              <h2>2. Apdrukas risinājumi</h2>
               <p>Ervitex nodrošina vairumtirdzniecības apģērbu un tekstildruku pakalpojumus. Cenas un pieejamība var mainīties bez iepriekšēja brīdinājuma.</p>
               <h2>3. Cenu pieprasījumi</h2>
               <p>Caur mājaslapu iesniegtie cenu pieprasījumi nav saistoši līgumi. Galīgā cena tiek apstiprināta individuāli.</p>

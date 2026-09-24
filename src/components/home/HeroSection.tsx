@@ -119,7 +119,7 @@ const HeroSection = () => {
               asChild
             >
               <Link to="/services">
-                {lang === "lv" ? "Mūsu pakalpojumi" : "Our Services"}
+                {lang === "lv" ? "Apdrukas risinājumi" : "Decoration Solutions"}
               </Link>
             </Button>
 
@@ -130,7 +130,7 @@ const HeroSection = () => {
             {[
               { value: "20+", label: lang === "lv" ? "Gadi pieredzē" : "Years Experience" },
               { value: "3000+", label: lang === "lv" ? "Produkti" : "Products" },
-              { value: "4", label: lang === "lv" ? "Drukas tehnoloģijas" : "Print Technologies" },
+              { value: "5", label: lang === "lv" ? "Drukas tehnoloģijas" : "Print Technologies" },
             ].map((stat, i) => (
               <div key={i}>
                 <div className="font-heading text-2xl font-bold text-accent md:text-3xl">
@@ -167,3 +167,4 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
+
