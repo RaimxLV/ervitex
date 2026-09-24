@@ -95,8 +95,7 @@ export default function AdminTeamPhotos() {
                   alt={person.name}
                   className="h-full w-full max-w-none object-cover"
                   style={{
-                    objectPosition: `${value.position_x}% ${value.position_y}%`,
-                    transform: `scale(${value.zoom})`,
+                    transform: `translate(${(value.position_x - 50) * 0.5}%, ${(value.position_y - 50) * 0.5}%) scale(${value.zoom})`,
                   }}
                 />
               </div>
