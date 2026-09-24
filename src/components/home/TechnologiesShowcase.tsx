@@ -22,7 +22,7 @@ const TechnologiesShowcase = () => {
           className="mx-auto max-w-2xl text-center"
         >
           <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-accent">
-            {isLv ? "Mūsu pakalpojumi" : "Our services"}
+            {isLv ? "Mūsu iespējas" : "Our capabilities"}
           </span>
           <h2 className="mt-4 font-heading text-3xl font-bold uppercase tracking-tight text-foreground md:text-5xl">
             {isLv ? "APDRUKAS RISINĀJUMI" : "Decoration technologies"}
@@ -35,7 +35,7 @@ const TechnologiesShowcase = () => {
         </motion.div>
 
         {/* Overview cards */}
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 md:mt-16">
+        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 md:mt-16">
           {techs.map((t, i) => (
             <motion.div
               key={t.id}

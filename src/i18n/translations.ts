@@ -6,7 +6,7 @@ export const translations = {
   "nav.catalog": { lv: "Katalogs", en: "Catalog" },
  "nav.stanleyStella": { lv: "Stanley/Stella", en: "Stanley/Stella" },
  "nav.nwg": { lv: "NWG apģērbi", en: "NWG Apparel" },
-  "nav.services": { lv: "Pakalpojumi", en: "Services" },
+  "nav.services": { lv: "Apdrukas risinājumi", en: "Decoration solutions" },
   "nav.about": { lv: "Par mums", en: "About" },
   "nav.contact": { lv: "Kontakti", en: "Contact" },
 
@@ -36,7 +36,7 @@ export const translations = {
   "featured.viewAll": { lv: "Skatīt visus", en: "View All" },
 
   // Services
-  "services.title": { lv: "Mūsu pakalpojumi", en: "Our Services" },
+  "services.title": { lv: "APDRUKAS RISINĀJUMI", en: "DECORATION SOLUTIONS" },
   "services.subtitle": { lv: "No idejas līdz gatavam produktam — apdruka, izšūšana un dizains", en: "From concept to finished product — printing, embroidery, and design" },
   "services.learnMore": { lv: "Uzzināt vairāk", en: "Learn More" },
 
@@ -168,7 +168,7 @@ export const translations = {
     en: "Wholesale apparel and accessories with professional printing and embroidery since 2003.",
   },
   "footer.navigation": { lv: "Navigācija", en: "Navigation" },
-  "footer.services": { lv: "Pakalpojumi", en: "Services" },
+  "footer.services": { lv: "Apdrukas risinājumi", en: "Decoration solutions" },
   "footer.contact": { lv: "Kontakti", en: "Contact" },
   "footer.rights": { lv: "Visas tiesības aizsargātas.", en: "All rights reserved." },
 

@@ -12,8 +12,8 @@ import CatalogMegaMenu, { MobileCatalogMenu } from "@/components/CatalogMegaMenu
 const navItems = [
   { key: "nav.home" as const, path: "/" },
   { key: "nav.catalog" as const, path: "/catalog" },
-  
   { key: "nav.about" as const, path: "/about" },
+  { key: "nav.services" as const, path: "/services" },
   { key: "nav.contact" as const, path: "/contact" },
 ];
 
@@ -271,7 +271,7 @@ const Header = () => {
             </div>
           </form>
           <nav>
-            <div className="grid grid-cols-3 border-y border-primary-foreground/10">
+            <div className="grid grid-cols-2 border-y border-primary-foreground/10 sm:grid-cols-4">
               {navItems.filter((item) => item.path !== "/catalog").map((item) => (
                 <Link
                   key={item.path}

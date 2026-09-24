@@ -105,7 +105,7 @@ const TechnologyPage = () => {
             <h2 className="font-heading text-xl font-bold uppercase text-foreground md:text-2xl">
               {isLv ? "Citas tehnoloģijas" : "Other technologies"}
             </h2>
-            <div className="mt-6 grid gap-8 sm:grid-cols-3">
+            <div className="mt-6 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {others.map((t) => (
                 <Link key={t.id} to={`/tehnologijas/${t.id}`} className="group block">
                   <div className="overflow-hidden rounded-sm">
