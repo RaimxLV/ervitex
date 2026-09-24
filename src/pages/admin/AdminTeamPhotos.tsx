@@ -7,11 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import vilnisPhoto from "@/assets/team/vilnis-lacis.jpg";
 import eriksPhoto from "@/assets/team/eriks-lacis.jpg";
-import lauraPhotoAsset from "@/assets/team/laura-daukste.png.asset.json";
-import ilonaPhotoAsset from "@/assets/team/ilona-romanovska.png.asset.json";
-import santaPhotoAsset from "@/assets/team/santa-zvaigzne.png.asset.json";
-import justinePhotoAsset from "@/assets/team/justine-strunka.png.asset.json";
-import evitaPhotoAsset from "@/assets/team/evita-nesterova.png.asset.json";
+import lauraPhoto from "@/assets/team/laura-daukste.jpg";
+import ilonaPhoto from "@/assets/team/ilona-romanovska.jpg";
+import santaPhoto from "@/assets/team/santa-zvaigzne.jpg";
+import justinePhoto from "@/assets/team/justine-strunka.jpg";
+import evitaPhoto from "@/assets/team/evita-nesterova.jpg";
 
 type PhotoSettings = {
   slug: string;
@@ -23,11 +23,11 @@ type PhotoSettings = {
 const people = [
   { slug: "vilnis", name: "Vilnis Lācis", photo: vilnisPhoto },
   { slug: "eriks", name: "Ēriks Lācis", photo: eriksPhoto },
-  { slug: "laura", name: "Laura Daukšte", photo: lauraPhotoAsset.url },
-  { slug: "ilona", name: "Ilona Romanovska", photo: ilonaPhotoAsset.url },
-  { slug: "santa", name: "Santa Zvaigzne", photo: santaPhotoAsset.url },
-  { slug: "justine", name: "Justīne Strunka", photo: justinePhotoAsset.url },
-  { slug: "evita", name: "Evita Ņesterova", photo: evitaPhotoAsset.url },
+  { slug: "laura", name: "Laura Daukšte", photo: lauraPhoto },
+  { slug: "ilona", name: "Ilona Romanovska", photo: ilonaPhoto },
+  { slug: "santa", name: "Santa Zvaigzne", photo: santaPhoto },
+  { slug: "justine", name: "Justīne Strunka", photo: justinePhoto },
+  { slug: "evita", name: "Evita Ņesterova", photo: evitaPhoto },
 ];
 
 const defaults = (slug: string): PhotoSettings => ({ slug, zoom: 1, position_x: 50, position_y: 50 });
