@@ -969,8 +969,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         title={t.title}
         subtitle={t.subtitle}
         eyebrow={lang === "lv" ? "Produktu atlase" : "Product selection"}
+        compact
       />
-      <div className="container px-4 py-8 md:py-14">
+      <div className="container px-4 py-6 md:py-10">
         <div className="mb-6 space-y-3">
           <div className="relative w-full md:max-w-xl">
             <Input
@@ -1045,7 +1046,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         </div>
 
         <div className="flex flex-col gap-8 md:flex-row">
-          <div className="hidden md:block md:w-72 md:shrink-0">
+          <div className="hidden md:block md:w-80 md:shrink-0">
             <CatalogFiltersSidebar
               sections={filterSections}
               onClearAll={clearAll}

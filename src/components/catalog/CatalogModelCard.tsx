@@ -173,7 +173,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
                 <span
                   onClick={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
-                  className="truncate font-mono text-[11px] font-bold uppercase tracking-wider select-all cursor-text sm:text-sm"
+                  className="codebar-code truncate font-mono font-bold uppercase select-all cursor-text"
                 >
                   {code}
                 </span>
@@ -190,15 +190,15 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
                       window.setTimeout(() => setCopied(false), 1500);
                     });
                   }}
-                  className="shrink-0 rounded p-0.5 opacity-70 transition hover:bg-primary-foreground/15 hover:opacity-100"
+                  className="hidden shrink-0 rounded p-0.5 opacity-70 transition hover:bg-primary-foreground/15 hover:opacity-100 sm:block"
                 >
                   {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                 </span>
               </span>
             )}
             {brandBadge && (
-              <span className="flex max-w-[45%] items-center truncate border-l border-primary-foreground/20 px-2 py-1 font-heading text-[9px] font-bold uppercase tracking-wider sm:px-2.5 sm:py-1.5 sm:text-[10px]">
-                {brandBadge}
+              <span className="codebar-brand hidden max-w-[60%] shrink-0 items-center overflow-hidden border-l border-primary-foreground/20 px-2 py-1 text-right font-heading font-bold uppercase sm:px-3 sm:py-1.5 md:flex">
+                <span className="truncate">{brandBadge}</span>
               </span>
             )}
           </div>

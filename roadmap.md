@@ -26,6 +26,7 @@
 - [x] Paplašināt mega izvēlni līdz 95%, palielināt tās tekstus un sakārtot mobilo izvēlni.
 - [x] Pārsaukt “Pakalpojumi” par “Apdrukas risinājumi”, sakārtot izvēlnes un pievienot Termodruku.
 - [x] Sakārtot “Apdrukas risinājumi” kartīšu izkārtojumu (3+2, centrēts).
+- [x] Sakārtot katalogu: kompaktāka augšējā laukuma, lielāki filtri, tīrākas produktu kartītes.
 
 ### P0
 - [x] NWG katalogā parādīt visus produktus ar visām pieejamajām cenām.

@@ -130,6 +130,17 @@
     line-height: 1.35 !important;
   }
 
+  /* Product-card code bar stays compact: code + brand must fit in one row */
+  .public-readable .codebar-code {
+    font-size: 0.7rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .public-readable .codebar-brand {
+    font-size: 0.6rem !important;
+    line-height: 1.4 !important;
+  }
+
   .catalog-card-media {
     background-color: hsl(var(--catalog-card-media));
   }
