@@ -342,7 +342,8 @@ const RetailSection = () => {
             <a href={DESIGNER_URL} target="_blank" rel="noopener noreferrer" className="inline-block w-full sm:w-auto">
               <Button
                 size="lg"
-                className="promo-cta group h-16 w-full justify-center gap-4 rounded-none border-0 px-12 font-heading text-base font-bold uppercase tracking-[0.15em] text-accent-foreground transition-transform duration-300 motion-safe:animate-promo-pulse-cta hover:scale-[1.04] sm:h-[4.25rem] sm:w-auto sm:text-lg"
+                style={{ transitionDuration: "300ms", animationDuration: "2.4s" }}
+                className="promo-cta group h-16 w-full justify-center gap-4 rounded-none border-0 px-12 font-heading text-base font-bold uppercase tracking-[0.15em] text-accent-foreground transition-transform motion-safe:animate-promo-pulse-cta hover:scale-[1.04] sm:h-[4.25rem] sm:w-auto sm:text-lg"
               >
                 <span className="whitespace-nowrap">
                   {lang === "lv" ? "Izveidot dizainu" : "Create your design"}
