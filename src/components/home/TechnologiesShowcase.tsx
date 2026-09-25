@@ -75,9 +75,9 @@ const TechnologiesShowcase = () => {
         <div className="mt-20 grid gap-10 border-t border-border pt-16 lg:grid-cols-2 lg:items-center lg:gap-16 md:mt-28">
           <img
             src={guaranteeImg}
-            width={1400}
-            height={1050}
-            alt={isLv ? "Apdrukāts krekls ar individualizētu dizainu" : "Printed t-shirt with a custom design"}
+            width={1200}
+            height={900}
+            alt={isLv ? "Latvijas izlases basketbola spēle" : "Latvian national basketball team game"}
             loading="lazy"
             fetchPriority="low"
             decoding="async"
