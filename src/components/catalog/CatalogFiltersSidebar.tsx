@@ -159,7 +159,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                   <div className="space-y-3 px-4 pb-4">
                     {showSearch && !isColor && (
                       <div className="relative">
-                        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                        <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                           value={search}
                           onChange={(e) =>
@@ -169,7 +169,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                             }))
                           }
                           placeholder={`${t.searchIn} ${section.title.toLowerCase()}…`}
-                          className="h-8 rounded-md pl-8 pr-7 text-xs"
+                          className="h-9 rounded-md pl-9 pr-8 text-sm"
                         />
                         {search && (
                           <button
@@ -207,7 +207,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                               aria-pressed={isSelected}
                               title={`${it.label} (${it.count})`}
                               className={cn(
-                                "group/chip flex items-center gap-2 rounded-md border px-2 py-1.5 text-left text-xs transition",
+                                "group/chip flex items-center gap-2 rounded-md border px-2.5 py-2 text-left text-sm transition",
                                 isSelected
                                   ? "border-accent bg-accent/5 shadow-sm"
                                   : "border-border hover:border-foreground/30 hover:bg-muted/60"
@@ -238,14 +238,14 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                               </span>
                               <span
                                 className={cn(
-                                  "flex-1 truncate text-[11px]",
+                                  "flex-1 truncate text-sm",
                                   isSelected && "font-semibold"
                                 )}
                               >
                                 {it.label}
                               </span>
                               {!section.hideCounts && (
-                                <span className="text-[9px] tabular-nums text-muted-foreground">
+                                <span className="text-xs tabular-nums text-muted-foreground">
                                   {it.count}
                                 </span>
                               )}
