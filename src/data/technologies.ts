@@ -10,15 +10,15 @@ import emb1 from "@/assets/services/embroidery-1.jpg";
 import emb2 from "@/assets/services/embroidery-2.jpg";
 import emb3 from "@/assets/services/embroidery-3.jpg";
 import emb4 from "@/assets/services/embroidery-4.jpg";
-import sub1Asset from "@/assets/services/sublimation-gallery-1.webp.asset.json";
-import sub2Asset from "@/assets/services/sublimation-gallery-2.webp.asset.json";
-import sub3Asset from "@/assets/services/sublimation-gallery-3.webp.asset.json";
-import sub4Asset from "@/assets/services/sublimation-gallery-4.webp.asset.json";
-import sub5Asset from "@/assets/services/sublimation-gallery-5.webp.asset.json";
-import sub6Asset from "@/assets/services/sublimation-gallery-6.webp.asset.json";
-import sub7Asset from "@/assets/services/sublimation-gallery-7.webp.asset.json";
-import subHeroAsset from "@/assets/services/sublimation-hero.webp.asset.json";
-import sub8Asset from "@/assets/services/sublimation-gallery-8.webp.asset.json";
+import sub1Asset from "@/assets/services/sublimation-gallery-1.webp";
+import sub2Asset from "@/assets/services/sublimation-gallery-2.webp";
+import sub3Asset from "@/assets/services/sublimation-gallery-3.webp";
+import sub4Asset from "@/assets/services/sublimation-gallery-4.webp";
+import sub5Asset from "@/assets/services/sublimation-gallery-5.webp";
+import sub6Asset from "@/assets/services/sublimation-gallery-6.webp";
+import sub7Asset from "@/assets/services/sublimation-gallery-7.webp";
+import subHeroAsset from "@/assets/services/sublimation-hero.webp";
+import sub8Asset from "@/assets/services/sublimation-gallery-8.webp";
 import heatTransfer from "@/assets/services/vinyl-flock-1.jpg";
 
 export type Tech = {
@@ -132,15 +132,15 @@ export const techs: Tech[] = [
       { label: { lv: "Materiāls", en: "Material" }, value: { lv: "Poliesters, gaišas krāsas", en: "Polyester, light colours" } },
     ],
     images: [
-      subHeroAsset.url,
-      sub1Asset.url,
-      sub2Asset.url,
-      sub3Asset.url,
-      sub4Asset.url,
-      sub5Asset.url,
-      sub6Asset.url,
-      sub7Asset.url,
-      sub8Asset.url,
+      subHeroAsset,
+      sub1Asset,
+      sub2Asset,
+      sub3Asset,
+      sub4Asset,
+      sub5Asset,
+      sub6Asset,
+      sub7Asset,
+      sub8Asset,
     ],
   },
   {
