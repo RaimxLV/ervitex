@@ -4,14 +4,22 @@ type PageIntroProps = {
   title: string;
   subtitle?: string;
   eyebrow?: string;
+  /** Slimmer banner for utility pages (e.g. the catalog) so products start higher. */
+  compact?: boolean;
 };
 
-const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
+const PageIntro = ({ title, subtitle, eyebrow, compact }: PageIntroProps) => {
   const reduceMotion = useReducedMotion();
   const words = title.split(" ");
 
   return (
-    <section className="relative overflow-hidden bg-primary text-primary-foreground">
+    <section
+      className={
+        compact
+          ? "relative overflow-hidden bg-primary text-primary-foreground"
+          : "relative overflow-hidden bg-primary text-primary-foreground"
+      }
+    >
       <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(hsl(var(--primary-foreground))_0.7px,transparent_0.7px)] [background-size:12px_12px]" />
       <div className="container relative flex min-h-[290px] items-end py-12 md:min-h-[360px] md:py-16">
         <div className="grid w-full gap-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
