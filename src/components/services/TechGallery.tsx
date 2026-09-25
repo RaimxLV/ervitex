@@ -72,7 +72,7 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
                 key={`${slot}-${index}-${src}`}
                 src={src}
                 alt={`${alt} ${index + 1}`}
-                loading="lazy"
+                loading={slot < 2 ? "eager" : "lazy"}
                 decoding="async"
                 custom={direction}
                 initial={{ opacity: 0, x: direction > 0 ? 24 : -24, scale: 1.025 }}
