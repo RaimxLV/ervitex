@@ -20,6 +20,7 @@
 ## No audita — jāsalabo
 
 ## Vizuālie uzlabojumi
+- [x] Pacelt publisko lapu mazos tekstus līdz vienotam, salasāmam izmēram.
 - [x] Aizstāt “Par Ervitex” rūtiņu fonu ar vieglu auduma tekstūru.
 - [x] Palielināt visas mājaslapas fontus par 2 px.
 - [x] Paplašināt mega izvēlni līdz 95%, palielināt tās tekstus un sakārtot mobilo izvēlni.
