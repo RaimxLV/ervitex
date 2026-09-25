@@ -8,7 +8,7 @@ type PageIntroProps = {
   compact?: boolean;
 };
 
-const PageIntro = ({ title, subtitle, eyebrow, compact }: PageIntroProps) => {
+const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
   const reduceMotion = useReducedMotion();
   const words = title.split(" ");
 
