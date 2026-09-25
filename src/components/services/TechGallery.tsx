@@ -75,7 +75,7 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
             type="button"
             variant="ghost"
             onClick={() => setLightbox(index)}
-            className={`group relative h-full w-full overflow-hidden rounded-none border border-border bg-muted p-0 hover:bg-muted ${slotClasses[slot] ?? ""}`}
+            className={`group relative h-full w-full overflow-hidden rounded-none border border-border bg-muted p-0 hover:bg-muted ${slotClasses[visibleCount]?.[slot] ?? ""}`}
             aria-label={`${alt} ${index + 1}`}
           >
             <AnimatePresence initial={false} mode="popLayout" custom={direction}>
