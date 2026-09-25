@@ -197,7 +197,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
               </span>
             )}
             {brandBadge && (
-              <span className="codebar-brand flex max-w-[60%] shrink-0 items-center overflow-hidden border-l border-primary-foreground/20 px-2 py-1 text-right font-heading font-bold uppercase sm:px-3 sm:py-1.5">
+              <span className="codebar-brand hidden max-w-[60%] shrink-0 items-center overflow-hidden border-l border-primary-foreground/20 px-2 py-1 text-right font-heading font-bold uppercase sm:px-3 sm:py-1.5 md:flex">
                 <span className="truncate">{brandBadge}</span>
               </span>
             )}
