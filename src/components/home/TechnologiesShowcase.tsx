@@ -45,7 +45,7 @@ const TechnologiesShowcase = () => {
               transition={{ duration: 0.25 }}
               className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1.1rem)]"
             >
-              <Link to={`/tehnologijas/${t.id}`} className="group block w-full text-left">
+              <Link to={`/tehnologijas/${t.id}`} className="group block h-full w-full text-left">
                 <div className="aspect-[4/3] overflow-hidden rounded-sm bg-muted">
                   <img
                     src={t.images[0]}
