@@ -55,7 +55,7 @@ const PageIntro = ({ title, subtitle, eyebrow, compact }: PageIntroProps) => {
                 initial={reduceMotion ? false : { opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.65, delay: 0.28 }}
-                className="mt-7 max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:text-lg"
+                className={`mt-7 max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:text-lg ${compact ? "md:mt-5" : ""}`}
               >
                 {subtitle}
               </motion.p>
