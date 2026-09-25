@@ -12,8 +12,8 @@ interface TechGalleryProps {
 
 const slotClasses: Record<number, string[]> = {
   2: [
-    "col-span-1 row-span-3 md:col-span-2 md:row-span-2",
-    "col-span-1 row-span-3 md:col-span-2 md:row-span-2",
+    "min-h-[16rem] md:col-span-2 md:row-span-2 md:min-h-0",
+    "min-h-[16rem] md:col-span-2 md:row-span-2 md:min-h-0",
   ],
   3: [
     "col-span-2 row-span-2 min-h-[22rem] md:min-h-0",
@@ -26,6 +26,12 @@ const slotClasses: Record<number, string[]> = {
     "min-h-44 md:min-h-0",
     "min-h-44 md:min-h-0",
   ],
+};
+
+const gridClasses: Record<number, string> = {
+  2: "grid grid-cols-1 gap-3 md:h-[36rem] md:min-h-0 md:grid-cols-4 md:grid-rows-2 md:gap-4",
+  3: "grid min-h-[42rem] grid-cols-2 grid-rows-[2fr_1fr_1fr] gap-3 md:h-[36rem] md:min-h-0 md:grid-cols-4 md:grid-rows-2 md:gap-4",
+  4: "grid min-h-[42rem] grid-cols-2 grid-rows-[2fr_1fr_1fr] gap-3 md:h-[36rem] md:min-h-0 md:grid-cols-4 md:grid-rows-2 md:gap-4",
 };
 
 const TechGallery = ({ images, alt }: TechGalleryProps) => {
