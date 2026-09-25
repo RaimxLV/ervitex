@@ -120,12 +120,12 @@ const ContactPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            className="mt-12 flex flex-wrap justify-center gap-5"
           >
             {specialists.map((member, i) => (
               <div
                 key={i}
-                className="group relative overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5"
+                className="group relative flex w-full shrink-0 grow-0 basis-full flex-col overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5 sm:basis-[calc(50%-0.625rem)] lg:basis-[calc(33.333%-0.8333rem)] xl:basis-[calc(25%-0.9375rem)]"
               >
                 <div className="absolute top-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
 
@@ -150,9 +150,9 @@ const ContactPage = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 </div>
 
-                <div className="relative -mt-4 mx-4 mb-4 bg-card/95 backdrop-blur-sm p-4 shadow-sm border border-border/50">
-                  <h3 className="font-heading text-sm font-bold uppercase text-foreground">{member.name}</h3>
-                  <p className="text-xs text-accent font-medium mt-0.5">{member.title[lang]}</p>
+                <div className="relative -mt-4 mx-4 mb-4 flex grow flex-col bg-card/95 backdrop-blur-sm p-4 shadow-sm border border-border/50">
+                  <h3 className="min-h-[1.6rem] font-heading text-sm font-bold uppercase leading-[1.6rem] text-foreground">{member.name}</h3>
+                  <p className="mt-0.5 line-clamp-2 min-h-[2.4rem] text-xs text-accent font-medium">{member.title[lang]}</p>
                   <div className="mt-3 space-y-1.5 border-t border-border pt-3">
                     <a href={`mailto:${member.email}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
                       <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={1.2} /> {member.email}
