@@ -109,10 +109,14 @@ export default function CatalogMegaMenu({ onNavigate, open = true }: MegaMenuPro
           to="/catalog"
           onClick={onNavigate}
           role="menuitem"
-          className={`cta-drift group mt-6 inline-flex items-center gap-3 px-7 py-3 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+          className={`cta-drift group mt-6 inline-flex items-center gap-3 px-7 py-3 transition-[opacity,transform] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
             open ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
           }`}
-          style={{ transitionDelay: open ? "220ms" : "0ms" }}
+          style={{
+            transitionDuration: "700ms",
+            transitionDelay: open ? "220ms" : "0ms",
+            animationDuration: "24s",
+          }}
         >
           <span className="font-heading text-[15px] font-bold uppercase tracking-[0.24em] text-accent-foreground">
             {t("Skatīt visus produktus", "Browse all products")}
