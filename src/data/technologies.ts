@@ -14,7 +14,7 @@ import sub1 from "@/assets/services/sublimation-1.jpg";
 import sub2 from "@/assets/services/sublimation-2.jpg";
 import sub3 from "@/assets/services/sublimation-3.jpg";
 import sub4 from "@/assets/services/sublimation-4.jpg";
-import sub5 from "@/assets/services/rt-sublimation.jpg";
+import sub5 from "@/assets/services/rt-sublimation.webp";
 import heatTransfer from "@/assets/services/vinyl-flock-1.jpg";
 
 export type Tech = {
