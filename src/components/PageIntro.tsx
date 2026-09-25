@@ -21,7 +21,7 @@ const PageIntro = ({ title, subtitle, eyebrow, compact }: PageIntroProps) => {
       }
     >
       <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(hsl(var(--primary-foreground))_0.7px,transparent_0.7px)] [background-size:12px_12px]" />
-      <div className="container relative flex min-h-[290px] items-end py-12 md:min-h-[360px] md:py-16">
+      <div className={`container relative flex ${compact ? "min-h-[160px] items-end py-9 md:min-h-[190px] md:py-11" : "min-h-[290px] items-end py-12 md:min-h-[360px] md:py-16"}`}>
         <div className="grid w-full gap-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <div className="max-w-3xl">
             {eyebrow && (
@@ -35,7 +35,7 @@ const PageIntro = ({ title, subtitle, eyebrow, compact }: PageIntroProps) => {
               </motion.p>
             )}
 
-            <h1 className="flex flex-wrap gap-x-[0.24em] overflow-hidden font-heading text-4xl font-bold uppercase leading-[0.94] md:text-6xl lg:text-7xl">
+            <h1 className={`flex flex-wrap gap-x-[0.24em] overflow-hidden font-heading font-bold uppercase leading-[0.94] ${compact ? "text-3xl md:text-5xl" : "text-4xl md:text-6xl lg:text-7xl"}`}>
               {words.map((word, wordIndex) => (
                 <span key={`${word}-${wordIndex}`} className="overflow-hidden pb-1">
                   <motion.span
