@@ -8,22 +8,16 @@ type PageIntroProps = {
   compact?: boolean;
 };
 
-const PageIntro = ({ title, subtitle, eyebrow, compact }: PageIntroProps) => {
+const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
   const reduceMotion = useReducedMotion();
   const words = title.split(" ");
 
   return (
-    <section
-      className={
-        compact
-          ? "relative overflow-hidden bg-primary text-primary-foreground"
-          : "relative overflow-hidden bg-primary text-primary-foreground"
-      }
-    >
+    <section className="relative overflow-hidden bg-primary text-primary-foreground">
       <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(hsl(var(--primary-foreground))_0.7px,transparent_0.7px)] [background-size:12px_12px]" />
-      <div className={`container relative flex ${compact ? "min-h-[160px] items-end py-9 md:min-h-[190px] md:py-11" : "min-h-[290px] items-end py-12 md:min-h-[360px] md:py-16"}`}>
-        <div className="grid w-full gap-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-          <div className="max-w-3xl">
+      <div className="container relative flex min-h-[160px] items-end py-7 md:min-h-[190px] md:py-8">
+        <div className="grid w-full gap-5 md:grid-cols-[minmax(0,0.9fr)_minmax(280px,1.1fr)] md:items-end md:gap-12">
+          <div className="min-w-0">
             {eyebrow && (
               <motion.p
                 initial={reduceMotion ? false : { opacity: 0, y: 12 }}
@@ -35,7 +29,7 @@ const PageIntro = ({ title, subtitle, eyebrow, compact }: PageIntroProps) => {
               </motion.p>
             )}
 
-            <h1 className={`flex flex-wrap gap-x-[0.24em] overflow-hidden font-heading font-bold uppercase leading-[0.94] ${compact ? "text-3xl md:text-5xl" : "text-4xl md:text-6xl lg:text-7xl"}`}>
+            <h1 className="flex flex-wrap gap-x-[0.24em] overflow-hidden font-heading text-3xl font-bold uppercase leading-[0.94] md:text-5xl">
               {words.map((word, wordIndex) => (
                 <span key={`${word}-${wordIndex}`} className="overflow-hidden pb-1">
                   <motion.span
@@ -50,18 +44,17 @@ const PageIntro = ({ title, subtitle, eyebrow, compact }: PageIntroProps) => {
               ))}
             </h1>
 
-            {subtitle && (
-              <motion.p
-                initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, delay: 0.28 }}
-                className={`mt-7 max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:text-lg ${compact ? "md:mt-5" : ""}`}
-              >
-                {subtitle}
-              </motion.p>
-            )}
           </div>
-
+          {subtitle && (
+            <motion.p
+              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.28 }}
+              className="max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:pb-1"
+            >
+              {subtitle}
+            </motion.p>
+          )}
         </div>
       </div>
     </section>
