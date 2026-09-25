@@ -189,7 +189,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                       // Color swatch grid — no scroll, everything visible
                       <div className="grid grid-cols-2 gap-1.5">
                         {filtered.length === 0 && (
-                          <p className="col-span-2 text-[11px] text-muted-foreground">
+                          <p className="col-span-2 text-sm text-muted-foreground">
                             {t.empty}
                           </p>
                         )}
@@ -342,7 +342,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                         )}
                       >
                         {filtered.length === 0 && (
-                          <li className="text-[11px] text-muted-foreground">
+                          <li className="text-sm text-muted-foreground">
                             {t.empty}
                           </li>
                         )}
@@ -356,7 +356,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                             <li key={val}>
                               <label
                                 className={cn(
-                                  "flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition",
+                                  "flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm transition",
                                   isSelected ? "bg-accent/5" : "hover:bg-muted/60"
                                 )}
                               >
@@ -364,7 +364,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                                   checked={isSelected}
                                   onCheckedChange={() => section.onToggle(val)}
                                   aria-label={it.label}
-                                  className="h-3.5 w-3.5"
+                                  className="h-4 w-4"
                                 />
                                 {sw && (
                                   <span
@@ -378,7 +378,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                                 )}
                                 <span
                                   className={cn(
-                                    "flex-1 truncate text-[12px]",
+                                    "flex-1 truncate text-sm",
                                     isSelected && "font-semibold"
                                   )}
                                   title={it.label}
@@ -386,7 +386,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                                   {it.label}
                                 </span>
                                 {!section.hideCounts && (
-                                  <span className="text-[10px] tabular-nums text-muted-foreground">
+                                  <span className="text-xs tabular-nums text-muted-foreground">
                                     {it.count}
                                   </span>
                                 )}
