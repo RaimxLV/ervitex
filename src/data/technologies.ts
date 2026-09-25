@@ -17,6 +17,7 @@ import sub4Asset from "@/assets/services/sublimation-gallery-4.webp.asset.json";
 import sub5Asset from "@/assets/services/sublimation-gallery-5.webp.asset.json";
 import sub6Asset from "@/assets/services/sublimation-gallery-6.webp.asset.json";
 import sub7Asset from "@/assets/services/sublimation-gallery-7.webp.asset.json";
+import subHeroAsset from "@/assets/services/sublimation-hero.webp.asset.json";
 import sub8Asset from "@/assets/services/sublimation-gallery-8.webp.asset.json";
 import heatTransfer from "@/assets/services/vinyl-flock-1.jpg";
 
