@@ -32,7 +32,7 @@ const Header = () => {
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
   const megaRef = useRef<HTMLDivElement>(null);
   const megaPanelRef = useRef<HTMLDivElement>(null);
-  const megaCloseTimer = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+  const megaCloseTimer = useRef<number | null>(null);
 
   const cancelMegaClose = () => {
     if (megaCloseTimer.current !== null) {
