@@ -2,6 +2,8 @@ import screen1 from "@/assets/services/screen-printing-1.jpg";
 import screen2 from "@/assets/services/screen-printing-2.jpg";
 import screen3 from "@/assets/services/screen-printing-3.jpg";
 import screen4 from "@/assets/services/screen-printing-4.jpg";
+import screen5 from "@/assets/services/screen-printing-5.webp";
+import screen6 from "@/assets/services/screen-printing-6.webp";
 import dtf1 from "@/assets/services/dtf-main.webp";
 import dtf2 from "@/assets/services/dtf-2.jpg";
 import dtf3 from "@/assets/services/dtf-3.jpg";
@@ -60,7 +62,7 @@ export const techs: Tech[] = [
       { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "5–8 darba dienas", en: "5–8 business days" } },
       { label: { lv: "Faili", en: "Files" }, value: { lv: "AI, EPS, PDF (vektors)", en: "AI, EPS, PDF (vector)" } },
     ],
-    images: [screen1, screen2, screen3, screen4],
+    images: [screen1, screen2, screen3, screen4, screen5, screen6],
   },
   {
     id: "dtf",
