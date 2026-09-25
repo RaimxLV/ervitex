@@ -14,6 +14,7 @@ import {
 
 interface MegaMenuProps {
   onNavigate?: () => void;
+  open?: boolean;
 }
 
 function GroupBlock({
@@ -63,7 +64,7 @@ function GroupBlock({
   );
 }
 
-export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
+export default function CatalogMegaMenu({ onNavigate, open = true }: MegaMenuProps) {
   const { lang } = useLanguage();
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
   const { items } = useMegaMenuItems();
@@ -84,7 +85,13 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
       <div className="min-w-0 flex-1 px-5 py-5 2xl:px-7 2xl:py-6">
         <div className="grid grid-cols-4 gap-x-6 gap-y-5 2xl:gap-x-8 2xl:gap-y-7">
           {MEGA_MENU_COLUMNS.map((col, i) => (
-            <div key={i} className="space-y-5 2xl:space-y-6">
+            <div
+              key={i}
+              className={`space-y-5 transition-all duration-500 ease-out motion-reduce:transition-none 2xl:space-y-6 ${
+                open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+              }`}
+              style={{ transitionDelay: open ? `${60 + i * 45}ms` : "0ms" }}
+            >
               {col.map((section) => (
                 <GroupBlock
                   key={section}
@@ -102,7 +109,10 @@ export default function CatalogMegaMenu({ onNavigate }: MegaMenuProps) {
           to="/catalog"
           onClick={onNavigate}
           role="menuitem"
-          className="cta-drift group mt-6 inline-flex items-center gap-3 px-7 py-3"
+          className={`cta-drift group mt-6 inline-flex items-center gap-3 px-7 py-3 transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none ${
+            open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+          }`}
+          style={{ transitionDelay: open ? "220ms" : "0ms" }}
         >
           <span className="font-heading text-[15px] font-bold uppercase tracking-[0.24em] text-accent-foreground">
             {t("Skatīt visus produktus", "Browse all products")}

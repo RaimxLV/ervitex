@@ -32,6 +32,24 @@ const Header = () => {
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
   const megaRef = useRef<HTMLDivElement>(null);
   const megaPanelRef = useRef<HTMLDivElement>(null);
+  const megaCloseTimer = useRef<ReturnType<typeof window.setTimeout> | null>(null);
+
+  const cancelMegaClose = () => {
+    if (megaCloseTimer.current !== null) {
+      window.clearTimeout(megaCloseTimer.current);
+      megaCloseTimer.current = null;
+    }
+  };
+
+  const openMega = () => {
+    cancelMegaClose();
+    setMegaOpen(true);
+  };
+
+  const scheduleMegaClose = () => {
+    cancelMegaClose();
+    megaCloseTimer.current = window.setTimeout(() => setMegaOpen(false), 120);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -56,6 +74,12 @@ const Header = () => {
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, []);
+
+  useEffect(() => {
+    setMegaOpen(false);
+  }, [location.pathname, location.search]);
+
+  useEffect(() => () => cancelMegaClose(), []);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(currentUrl);
@@ -89,22 +113,37 @@ const Header = () => {
             const active = location.pathname === item.path;
             if (isCatalog) {
               return (
-                <div key={item.path} className="relative" ref={megaRef}>
-                  <button
-                    type="button"
-                    onClick={() => setMegaOpen((v) => !v)}
-                    aria-haspopup="menu"
-                    aria-expanded={megaOpen}
-                    className={`flex items-center gap-1 text-base font-medium uppercase transition-colors hover:text-accent ${
+                <div
+                  key={item.path}
+                  className="relative flex items-center"
+                  ref={megaRef}
+                  onMouseEnter={openMega}
+                  onMouseLeave={scheduleMegaClose}
+                >
+                  <Link
+                    to={item.path}
+                    onFocus={openMega}
+                    className={`text-base font-medium uppercase transition-colors hover:text-accent ${
                       active ? "text-accent" : "text-primary-foreground/70"
                     }`}
                   >
                     {t(item.key)}
+                  </Link>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setMegaOpen((v) => !v)}
+                    aria-haspopup="menu"
+                    aria-expanded={megaOpen}
+                    aria-label={lang === "lv" ? "Atvērt kataloga izvēlni" : "Open catalog menu"}
+                    className="ml-0.5 h-7 w-7 text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-accent"
+                  >
                     <ChevronDown
-                      className={`h-3.5 w-3.5 transition-transform duration-200 ${megaOpen ? "rotate-180" : ""}`}
+                      className={`h-3.5 w-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`}
                       strokeWidth={2}
                     />
-                  </button>
+                  </Button>
                 </div>
               );
             }
@@ -243,14 +282,16 @@ const Header = () => {
       {/* Desktop Mega Menu */}
       <div
         ref={megaPanelRef}
-        className={`hidden xl:block absolute left-1/2 top-full w-[95vw] max-w-none -translate-x-1/2 origin-top transition-all duration-200 ${
+        onMouseEnter={openMega}
+        onMouseLeave={scheduleMegaClose}
+        className={`hidden xl:block absolute left-1/2 top-full w-[95vw] max-w-none -translate-x-1/2 origin-top transition-[opacity,transform,filter] duration-300 ease-out motion-reduce:transition-none ${
           megaOpen
-            ? "pointer-events-auto opacity-100 translate-y-0"
-            : "pointer-events-none opacity-0 -translate-y-2"
+            ? "pointer-events-auto translate-y-0 scale-y-100 opacity-100 blur-0"
+            : "pointer-events-none -translate-y-2 scale-y-[0.98] opacity-0 blur-[2px]"
         }`}
       >
         <div className="w-full overflow-hidden rounded-b-sm border border-primary-foreground/10 border-t-0 bg-primary text-primary-foreground shadow-2xl shadow-black/60">
-          {megaOpen && <CatalogMegaMenu onNavigate={() => setMegaOpen(false)} />}
+          <CatalogMegaMenu open={megaOpen} onNavigate={() => setMegaOpen(false)} />
         </div>
       </div>
 
