@@ -19,7 +19,7 @@ import sub6Asset from "@/assets/services/sublimation-gallery-6.webp";
 import sub7Asset from "@/assets/services/sublimation-gallery-7.webp";
 import subHeroAsset from "@/assets/services/sublimation-hero.webp";
 import sub8Asset from "@/assets/services/sublimation-gallery-8.webp";
-import heatTransfer from "@/assets/services/vinyl-flock-1.jpg";
+import heatTransfer from "@/assets/services/termodruka-hero.webp";
 
 export type Tech = {
   id: string;
