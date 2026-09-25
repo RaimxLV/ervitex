@@ -16,8 +16,8 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
     <section className="relative overflow-hidden bg-primary text-primary-foreground">
       <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(hsl(var(--primary-foreground))_0.7px,transparent_0.7px)] [background-size:12px_12px]" />
       <div className="container relative flex min-h-[160px] items-end py-9 md:min-h-[190px] md:py-11">
-        <div className="grid w-full gap-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-          <div className="max-w-3xl">
+        <div className="grid w-full gap-5 md:grid-cols-[minmax(0,0.9fr)_minmax(280px,1.1fr)] md:items-end md:gap-12">
+          <div className="min-w-0">
             {eyebrow && (
               <motion.p
                 initial={reduceMotion ? false : { opacity: 0, y: 12 }}
@@ -44,18 +44,17 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
               ))}
             </h1>
 
-            {subtitle && (
-              <motion.p
-                initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.65, delay: 0.28 }}
-                className="mt-5 max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:text-lg"
-              >
-                {subtitle}
-              </motion.p>
-            )}
           </div>
-
+          {subtitle && (
+            <motion.p
+              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.28 }}
+              className="max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:pb-1 md:text-lg"
+            >
+              {subtitle}
+            </motion.p>
+          )}
         </div>
       </div>
     </section>
