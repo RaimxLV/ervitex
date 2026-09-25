@@ -43,7 +43,7 @@ const TechnologiesShowcase = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.25 }}
-              className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1.1rem)]"
+              className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc((100%-4rem)/3)]"
             >
               <Link to={`/tehnologijas/${t.id}`} className="group block h-full w-full text-left">
                 <div className="aspect-[4/3] overflow-hidden rounded-sm bg-muted">
