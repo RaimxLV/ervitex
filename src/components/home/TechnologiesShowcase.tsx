@@ -35,7 +35,7 @@ const TechnologiesShowcase = () => {
         </motion.div>
 
         {/* Overview cards */}
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 md:mt-16">
+        <div className="mt-12 flex flex-wrap justify-center gap-6 md:mt-16 md:gap-8">
           {techs.map((t, i) => (
             <motion.div
               key={t.id}
@@ -43,8 +43,9 @@ const TechnologiesShowcase = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.25 }}
+              className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc((100%-4rem)/3)]"
             >
-              <Link to={`/tehnologijas/${t.id}`} className="group block w-full text-left">
+              <Link to={`/tehnologijas/${t.id}`} className="group block h-full w-full text-left">
                 <div className="aspect-[4/3] overflow-hidden rounded-sm bg-muted">
                   <img
                     src={t.images[0]}

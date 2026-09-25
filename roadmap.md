@@ -25,6 +25,7 @@
 - [x] Palielināt visas mājaslapas fontus par 2 px.
 - [x] Paplašināt mega izvēlni līdz 95%, palielināt tās tekstus un sakārtot mobilo izvēlni.
 - [x] Pārsaukt “Pakalpojumi” par “Apdrukas risinājumi”, sakārtot izvēlnes un pievienot Termodruku.
+- [x] Sakārtot “Apdrukas risinājumi” kartīšu izkārtojumu (3+2, centrēts).
 
 ### P0
 - [x] NWG katalogā parādīt visus produktus ar visām pieejamajām cenām.
