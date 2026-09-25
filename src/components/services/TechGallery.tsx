@@ -10,12 +10,29 @@ interface TechGalleryProps {
   perPage?: number;
 }
 
-const slotClasses = [
-  "col-span-2 row-span-2 min-h-[22rem] md:min-h-0",
-  "col-span-2 min-h-52 md:min-h-0",
-  "min-h-44 md:min-h-0",
-  "min-h-44 md:min-h-0",
-];
+const slotClasses: Record<number, string[]> = {
+  2: [
+    "min-h-[16rem] md:col-span-2 md:row-span-2 md:min-h-0",
+    "min-h-[16rem] md:col-span-2 md:row-span-2 md:min-h-0",
+  ],
+  3: [
+    "col-span-2 row-span-2 min-h-[22rem] md:min-h-0",
+    "col-span-2 min-h-44 md:min-h-0",
+    "col-span-2 min-h-44 md:min-h-0",
+  ],
+  4: [
+    "col-span-2 row-span-2 min-h-[22rem] md:min-h-0",
+    "col-span-2 min-h-52 md:min-h-0",
+    "min-h-44 md:min-h-0",
+    "min-h-44 md:min-h-0",
+  ],
+};
+
+const gridClasses: Record<number, string> = {
+  2: "grid grid-cols-1 gap-3 md:h-[36rem] md:min-h-0 md:grid-cols-4 md:grid-rows-2 md:gap-4",
+  3: "grid min-h-[42rem] grid-cols-2 grid-rows-[2fr_1fr_1fr] gap-3 md:h-[36rem] md:min-h-0 md:grid-cols-4 md:grid-rows-2 md:gap-4",
+  4: "grid min-h-[42rem] grid-cols-2 grid-rows-[2fr_1fr_1fr] gap-3 md:h-[36rem] md:min-h-0 md:grid-cols-4 md:grid-rows-2 md:gap-4",
+};
 
 const TechGallery = ({ images, alt }: TechGalleryProps) => {
   const [start, setStart] = useState(0);
@@ -57,14 +74,14 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
 
   return (
     <div>
-      <div className="grid min-h-[42rem] grid-cols-2 grid-rows-[2fr_1fr_1fr] gap-3 md:h-[36rem] md:min-h-0 md:grid-cols-4 md:grid-rows-2 md:gap-4">
+      <div className={gridClasses[visibleCount] ?? gridClasses[4]}>
         {visible.map(({ src, index, slot }) => (
           <Button
             key={`slot-${slot}`}
             type="button"
             variant="ghost"
             onClick={() => setLightbox(index)}
-            className={`group relative h-full w-full overflow-hidden rounded-none border border-border bg-muted p-0 hover:bg-muted ${slotClasses[slot] ?? ""}`}
+            className={`group relative h-full w-full overflow-hidden rounded-none border border-border bg-muted p-0 hover:bg-muted ${slotClasses[visibleCount]?.[slot] ?? ""}`}
             aria-label={`${alt} ${index + 1}`}
           >
             <AnimatePresence initial={false} mode="popLayout" custom={direction}>
