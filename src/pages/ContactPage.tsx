@@ -120,12 +120,12 @@ const ContactPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            className="mt-12 flex flex-wrap justify-center gap-5"
           >
             {specialists.map((member, i) => (
               <div
                 key={i}
-                className="group relative overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5"
+                className="group relative flex w-full shrink-0 grow-0 basis-full flex-col overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5 sm:basis-[calc(50%-0.625rem)] lg:basis-[calc(33.333%-0.8333rem)] xl:basis-[calc(25%-0.9375rem)]"
               >
                 <div className="absolute top-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
 
