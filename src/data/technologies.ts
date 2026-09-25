@@ -10,6 +10,9 @@ import emb1 from "@/assets/services/embroidery-1.jpg";
 import emb2 from "@/assets/services/embroidery-2.jpg";
 import emb3 from "@/assets/services/embroidery-3.jpg";
 import emb4 from "@/assets/services/embroidery-4.jpg";
+import emb5 from "@/assets/services/embroidery-5.webp";
+import emb6 from "@/assets/services/embroidery-6.webp";
+import emb7 from "@/assets/services/embroidery-7.webp";
 import sub1Asset from "@/assets/services/sublimation-gallery-1.webp";
 import sub2Asset from "@/assets/services/sublimation-gallery-2.webp";
 import sub3Asset from "@/assets/services/sublimation-gallery-3.webp";
@@ -106,7 +109,7 @@ export const techs: Tech[] = [
       { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "5–10 darba dienas", en: "5–10 business days" } },
       { label: { lv: "Ieteicamais izmērs", en: "Recommended size" }, value: { lv: "līdz 25 × 25 cm", en: "up to 25 × 25 cm" } },
     ],
-    images: [emb1, emb2, emb3, emb4],
+    images: [emb1, emb2, emb3, emb4, emb5, emb6, emb7],
   },
   {
     id: "sublimacija",
