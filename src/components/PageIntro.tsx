@@ -18,8 +18,17 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
       <div className="pointer-events-none absolute inset-0 opacity-[0.045] [background-image:radial-gradient(hsl(var(--primary-foreground))_0.55px,transparent_0.55px)] [background-size:14px_14px]" />
       {/* Depth: soft light falling from the left edge */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,hsl(var(--primary-foreground))_0%,transparent_38%,transparent_72%,hsl(var(--primary-foreground)/0.05)_100%)] opacity-[0.07]" />
-      {/* Oversized ghosted weave crosses the far right edge */}
-      <div className="pointer-events-none absolute -right-24 -top-16 h-[calc(100%+8rem)] w-[26rem] opacity-[0.05] [background-image:repeating-linear-gradient(90deg,hsl(var(--primary-foreground))_0_1px,transparent_1px_16px),repeating-linear-gradient(0deg,hsl(var(--primary-foreground))_0_1px,transparent_1px_16px)]" />
+      {/* Fine weave rotated 15deg, full width, fading out from right to the middle */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-y-[60%] -inset-x-[20%] opacity-[0.06] [background-image:repeating-linear-gradient(90deg,hsl(var(--primary-foreground))_0_1px,transparent_1px_8px),repeating-linear-gradient(0deg,hsl(var(--primary-foreground))_0_1px,transparent_1px_8px)]"
+        style={{
+          transform: "rotate(15deg)",
+          maskImage: "linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.55) 28%, rgba(0,0,0,0) 50%)",
+          WebkitMaskImage: "linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.55) 28%, rgba(0,0,0,0) 50%)",
+        }}
+      />
+
       {/* Hairline highlight along the bottom edge */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent_0%,hsl(var(--primary-foreground)/0.18)_35%,hsl(var(--primary-foreground)/0.18)_65%,transparent_100%)]" />
 
@@ -64,8 +73,8 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
               className="relative"
             >
               {/* Registration-mark corner accents frame the text block */}
-              <span aria-hidden className="absolute -left-3 -top-2 h-2.5 w-2.5 border-l border-t border-primary-foreground/25" />
-              <span aria-hidden className="absolute -right-3 bottom-0 h-2.5 w-2.5 border-b border-r border-primary-foreground/25" />
+              <span aria-hidden className="absolute -left-3 -top-2 h-3 w-3 border-l-2 border-t-2 border-primary-foreground/35" />
+              <span aria-hidden className="absolute -right-3 bottom-0 h-3 w-3 border-b-2 border-r-2 border-primary-foreground/35" />
               <p className="max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:pb-1">
                 {subtitle}
               </p>
