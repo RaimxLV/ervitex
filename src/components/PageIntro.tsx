@@ -15,7 +15,7 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
   return (
     <section className="relative overflow-hidden bg-primary text-primary-foreground">
       <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:radial-gradient(hsl(var(--primary-foreground))_0.7px,transparent_0.7px)] [background-size:12px_12px]" />
-      <div className="container relative flex min-h-[160px] items-end py-9 md:min-h-[190px] md:py-11">
+      <div className="container relative flex min-h-[160px] items-end py-7 md:min-h-[190px] md:py-8">
         <div className="grid w-full gap-5 md:grid-cols-[minmax(0,0.9fr)_minmax(280px,1.1fr)] md:items-end md:gap-12">
           <div className="min-w-0">
             {eyebrow && (
@@ -50,7 +50,7 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
               initial={reduceMotion ? false : { opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, delay: 0.28 }}
-              className="max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:pb-1 md:text-lg"
+              className="max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:pb-1"
             >
               {subtitle}
             </motion.p>
