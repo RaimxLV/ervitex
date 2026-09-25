@@ -109,8 +109,8 @@ export default function CatalogMegaMenu({ onNavigate, open = true }: MegaMenuPro
           to="/catalog"
           onClick={onNavigate}
           role="menuitem"
-          className={`cta-drift group mt-6 inline-flex items-center gap-3 px-7 py-3 transition-[opacity,transform] duration-500 ease-out motion-reduce:transition-none ${
-            open ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0"
+          className={`cta-drift group mt-6 inline-flex items-center gap-3 px-7 py-3 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+            open ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
           }`}
           style={{ transitionDelay: open ? "220ms" : "0ms" }}
         >
