@@ -10,12 +10,23 @@ interface TechGalleryProps {
   perPage?: number;
 }
 
-const slotClasses = [
-  "col-span-2 row-span-2 min-h-[22rem] md:min-h-0",
-  "col-span-2 min-h-52 md:min-h-0",
-  "min-h-44 md:min-h-0",
-  "min-h-44 md:min-h-0",
-];
+const slotClasses: Record<number, string[]> = {
+  2: [
+    "col-span-1 row-span-3 md:col-span-2 md:row-span-2",
+    "col-span-1 row-span-3 md:col-span-2 md:row-span-2",
+  ],
+  3: [
+    "col-span-2 row-span-2 min-h-[22rem] md:min-h-0",
+    "col-span-2 min-h-44 md:min-h-0",
+    "col-span-2 min-h-44 md:min-h-0",
+  ],
+  4: [
+    "col-span-2 row-span-2 min-h-[22rem] md:min-h-0",
+    "col-span-2 min-h-52 md:min-h-0",
+    "min-h-44 md:min-h-0",
+    "min-h-44 md:min-h-0",
+  ],
+};
 
 const TechGallery = ({ images, alt }: TechGalleryProps) => {
   const [start, setStart] = useState(0);
