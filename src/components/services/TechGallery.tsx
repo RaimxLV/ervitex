@@ -74,7 +74,7 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
 
   return (
     <div>
-      <div className="grid min-h-[42rem] grid-cols-2 grid-rows-[2fr_1fr_1fr] gap-3 md:h-[36rem] md:min-h-0 md:grid-cols-4 md:grid-rows-2 md:gap-4">
+      <div className={gridClasses[visibleCount] ?? gridClasses[4]}>
         {visible.map(({ src, index, slot }) => (
           <Button
             key={`slot-${slot}`}
