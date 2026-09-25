@@ -73,8 +73,8 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
               className="relative"
             >
               {/* Registration-mark corner accents frame the text block */}
-              <span aria-hidden className="absolute -left-3 -top-2 h-2.5 w-2.5 border-l border-t border-primary-foreground/25" />
-              <span aria-hidden className="absolute -right-3 bottom-0 h-2.5 w-2.5 border-b border-r border-primary-foreground/25" />
+              <span aria-hidden className="absolute -left-3 -top-2 h-3 w-3 border-l-2 border-t-2 border-primary-foreground/35" />
+              <span aria-hidden className="absolute -right-3 bottom-0 h-3 w-3 border-b-2 border-r-2 border-primary-foreground/35" />
               <p className="max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:pb-1">
                 {subtitle}
               </p>
