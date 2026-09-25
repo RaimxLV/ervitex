@@ -82,9 +82,6 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
               />
             </AnimatePresence>
-            <span className="absolute left-3 top-3 border border-border/70 bg-background/90 px-2.5 py-1 font-heading text-xs font-bold tabular-nums text-foreground backdrop-blur-sm">
-              {String(index + 1).padStart(2, "0")}
-            </span>
           </Button>
         ))}
       </div>
