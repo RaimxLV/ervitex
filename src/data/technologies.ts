@@ -10,11 +10,14 @@ import emb1 from "@/assets/services/embroidery-1.jpg";
 import emb2 from "@/assets/services/embroidery-2.jpg";
 import emb3 from "@/assets/services/embroidery-3.jpg";
 import emb4 from "@/assets/services/embroidery-4.jpg";
-import sub1 from "@/assets/services/sublimation-1.jpg";
-import sub2 from "@/assets/services/sublimation-2.jpg";
-import sub3 from "@/assets/services/sublimation-3.jpg";
-import sub4 from "@/assets/services/sublimation-4.jpg";
-import sub5 from "@/assets/services/rt-sublimation.webp";
+import sub1Asset from "@/assets/services/sublimation-gallery-1.webp.asset.json";
+import sub2Asset from "@/assets/services/sublimation-gallery-2.webp.asset.json";
+import sub3Asset from "@/assets/services/sublimation-gallery-3.webp.asset.json";
+import sub4Asset from "@/assets/services/sublimation-gallery-4.webp.asset.json";
+import sub5Asset from "@/assets/services/sublimation-gallery-5.webp.asset.json";
+import sub6Asset from "@/assets/services/sublimation-gallery-6.webp.asset.json";
+import sub7Asset from "@/assets/services/sublimation-gallery-7.webp.asset.json";
+import sub8Asset from "@/assets/services/sublimation-gallery-8.webp.asset.json";
 import heatTransfer from "@/assets/services/vinyl-flock-1.jpg";
 
 export type Tech = {
@@ -127,7 +130,16 @@ export const techs: Tech[] = [
       { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "3–7 darba dienas", en: "3–7 business days" } },
       { label: { lv: "Materiāls", en: "Material" }, value: { lv: "Poliesters, gaišas krāsas", en: "Polyester, light colours" } },
     ],
-    images: [sub5, sub1, sub2, sub3, sub4],
+    images: [
+      sub1Asset.url,
+      sub2Asset.url,
+      sub3Asset.url,
+      sub4Asset.url,
+      sub5Asset.url,
+      sub6Asset.url,
+      sub7Asset.url,
+      sub8Asset.url,
+    ],
   },
   {
     id: "termodruka",
