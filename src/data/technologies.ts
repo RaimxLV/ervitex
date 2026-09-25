@@ -2,7 +2,7 @@ import screen1 from "@/assets/services/screen-printing-1.jpg";
 import screen2 from "@/assets/services/screen-printing-2.jpg";
 import screen3 from "@/assets/services/screen-printing-3.jpg";
 import screen4 from "@/assets/services/screen-printing-4.jpg";
-import dtf1 from "@/assets/services/dtf-1.jpg";
+import dtf1 from "@/assets/services/dtf-main.webp";
 import dtf2 from "@/assets/services/dtf-2.jpg";
 import dtf3 from "@/assets/services/dtf-3.jpg";
 import dtf4 from "@/assets/services/dtf-4.jpg";
