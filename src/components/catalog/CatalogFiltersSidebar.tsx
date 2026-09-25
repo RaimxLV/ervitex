@@ -80,12 +80,12 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
       {!hideHeader && (
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="h-3.5 w-3.5 text-accent" />
-            <h2 className="font-heading text-[11px] font-bold uppercase tracking-[0.18em]">
+            <SlidersHorizontal className="h-4 w-4 text-accent" />
+            <h2 className="font-heading text-sm font-bold uppercase tracking-[0.18em]">
               {t.filters}
             </h2>
             {totalSelected > 0 && (
-              <span className="rounded-full bg-accent px-2 py-[1px] text-[10px] font-bold text-accent-foreground">
+              <span className="rounded-full bg-accent px-2 py-[2px] text-xs font-bold text-accent-foreground">
                 {totalSelected}
               </span>
             )}
@@ -93,7 +93,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
           {totalSelected > 0 && onClearAll && (
             <button
               onClick={onClearAll}
-              className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground transition hover:text-accent"
+              className="text-xs font-medium uppercase tracking-wider text-muted-foreground transition hover:text-accent"
             >
               {t.clear}
             </button>
@@ -128,24 +128,24 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                 onClick={() =>
                   setCollapsed((c) => ({ ...c, [section.key]: !c[section.key] }))
                 }
-                className="group flex w-full items-center justify-between gap-2 px-4 py-3 text-left transition hover:bg-muted/40"
+                className="group flex w-full items-center justify-between gap-2 px-4 py-3.5 text-left transition hover:bg-muted/40"
                 aria-expanded={!isCollapsed}
               >
                 <span className="flex items-center gap-2">
-                  <span className="font-heading text-[11px] font-bold uppercase tracking-[0.15em]">
+                  <span className="font-heading text-xs font-bold uppercase tracking-[0.15em]">
                     {section.title}
                   </span>
                   {section.selected.size > 0 && (
-                    <span className="rounded-full bg-accent px-1.5 py-[1px] text-[9px] font-bold text-accent-foreground">
+                    <span className="rounded-full bg-accent px-1.5 py-[1px] text-[11px] font-bold text-accent-foreground">
                       {section.selected.size}
                     </span>
                   )}
                 </span>
                 <span
                   aria-hidden
-                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors group-hover:border-accent group-hover:text-accent"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground transition-colors group-hover:border-accent group-hover:text-accent"
                 >
-                  {isCollapsed ? <Plus className="h-3.5 w-3.5" strokeWidth={2.5} /> : <Minus className="h-3.5 w-3.5" strokeWidth={2.5} />}
+                  {isCollapsed ? <Plus className="h-4 w-4" strokeWidth={2.5} /> : <Minus className="h-4 w-4" strokeWidth={2.5} />}
                 </span>
               </button>
 
