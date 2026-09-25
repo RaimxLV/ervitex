@@ -132,6 +132,7 @@ export const techs: Tech[] = [
       { label: { lv: "Materiāls", en: "Material" }, value: { lv: "Poliesters, gaišas krāsas", en: "Polyester, light colours" } },
     ],
     images: [
+      subHeroAsset.url,
       sub1Asset.url,
       sub2Asset.url,
       sub3Asset.url,
