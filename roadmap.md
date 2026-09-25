@@ -21,7 +21,7 @@
 
 ## Vizuālie uzlabojumi
 - [x] Aizvietot DTF galerijas dubulto attēlu ar jauno optimizēto foto.
-- [ ] Pārbūvēt tehnoloģiju galerijas modernākā, nepārtrauktā struktūrā bez tukšas pēdējās lapas.
+- [x] Pārbūvēt tehnoloģiju galerijas modernākā, nepārtrauktā struktūrā bez tukšas pēdējās lapas.
 - [x] Pacelt publisko lapu mazos tekstus līdz vienotam, salasāmam izmēram.
 - [x] Aizstāt “Par Ervitex” rūtiņu fonu ar vieglu auduma tekstūru.
 - [x] Palielināt visas mājaslapas fontus par 2 px.
