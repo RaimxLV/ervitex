@@ -181,7 +181,7 @@ const WorksheetPage = () => {
   )}&body=${encodeURIComponent(`${window.location.href}\n\nKopā bez PVN ${totals.net.toFixed(2)} EUR\nKopā ar PVN ${totals.gross.toFixed(2)} EUR\n`)}`;
 
   return (
-    <div className="min-h-screen bg-muted/30 py-4 sm:py-8 print:bg-white print:py-0">
+    <div className="public-readable min-h-screen bg-muted/30 py-4 sm:py-8 print:bg-white print:py-0">
       <div className="mx-auto max-w-5xl px-3 sm:px-4">
         <div className="mb-3 flex items-center justify-between print:hidden">
           <Link to="/catalog" className="inline-flex items-center gap-1.5 font-heading text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground">

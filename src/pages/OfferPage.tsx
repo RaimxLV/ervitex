@@ -61,7 +61,7 @@ const OfferPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30 py-4 sm:py-8 print:bg-white print:py-0">
+    <div className="public-readable min-h-screen bg-muted/30 py-4 sm:py-8 print:bg-white print:py-0">
       <div className="mx-auto max-w-4xl px-3 sm:px-4 print:max-w-none print:px-0">
         {/* Actions — hidden in print */}
         <div className="mb-3 sm:mb-5 print:hidden">
