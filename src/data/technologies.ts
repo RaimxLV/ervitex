@@ -23,6 +23,7 @@ import sub7Asset from "@/assets/services/sublimation-gallery-7.webp";
 import subHeroAsset from "@/assets/services/sublimation-hero.webp";
 import sub8Asset from "@/assets/services/sublimation-gallery-8.webp";
 import heatTransfer from "@/assets/services/termodruka-hero.webp";
+import heatTransfer2 from "@/assets/services/termodruka-2.webp";
 
 export type Tech = {
   id: string;
@@ -169,7 +170,7 @@ export const techs: Tech[] = [
       { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "2–5 darba dienas", en: "2–5 business days" } },
       { label: { lv: "Faili", en: "Files" }, value: { lv: "AI, EPS, PDF (vektors)", en: "AI, EPS, PDF (vector)" } },
     ],
-    images: [heatTransfer],
+    images: [heatTransfer, heatTransfer2],
   },
 ];
 
