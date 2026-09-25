@@ -195,6 +195,8 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
         );
         ready = true;
         onScroll();
+        draw();
+        canvas.style.opacity = "1";
         requestDraw();
       })
       .catch(() => undefined);
@@ -221,13 +223,16 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
 
   return (
     <div className={`absolute inset-0 ${className}`} aria-hidden="true">
-      <canvas ref={canvasRef} className="block h-full w-full" />
       <img
-        src={heroImage}
+        src={`${import.meta.env.BASE_URL}hero-poster.jpg`}
         alt=""
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
         fetchPriority="high"
-        decoding="async"
+        decoding="sync"
+      />
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 block h-full w-full opacity-0 transition-opacity duration-500"
       />
     </div>
   );
