@@ -73,3 +73,4 @@
 - [x] Pārbūvēt plūsmu līdz galam: modeļa maiņa, krāsas/izmēra maiņa un jaunu preču pievienošana pašā preču sarakstā.
 - [x] E-pasti: noņemt preču tabulas/nosaukumus un visas dublētās pogas; atstāt vienu pogu uz individuālo preču sarakstu, saraksti neveidojot mājaslapā.
 - [x] Mega izvēlnes sarkanās pogas krāsojums: 24 s plūstošs cikls (duration-* klase to paātrināja līdz 0,7 s)
+- [x] Vienādot visas publisko lapu melnās ievadjoslas ar kompakto kataloga galveni.
