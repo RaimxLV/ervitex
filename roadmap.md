@@ -33,6 +33,7 @@
 
 ### P0
 - [x] Salabot PF Concept cenu sinhronizāciju un NWG automātisko pieejas atjaunošanu.
+- [x] Rādīt katra piegādātāja cenu pārklājumu un novērst NWG noraidīto SKU bezgalīgu atkārtošanu.
 - [x] NWG katalogā parādīt visus produktus ar visām pieejamajām cenām.
   - [x] Deterministiska modeļu un SKU lapošana bez izlaistām rindām.
   - [x] Rotējošā tokena un paralēlo procesu lease aizsardzība kodā.

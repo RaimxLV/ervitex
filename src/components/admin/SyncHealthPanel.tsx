@@ -19,6 +19,15 @@ interface SupplierState {
   fn: string;
   latest?: SyncRow;
   lastSuccess?: SyncRow;
+  coverage?: PriceHealth;
+}
+
+interface PriceHealth {
+  source: string;
+  total_variants: number;
+  priced_variants: number;
+  contract_priced: number;
+  fallback_priced: number;
 }
 
 const SUPPLIERS: { key: string; label: string; fn: string }[] = [
@@ -29,7 +38,6 @@ const SUPPLIERS: { key: string; label: string; fn: string }[] = [
   { key: "malfini", label: "Malfini", fn: "malfini-sync" },
 ];
 
-const NWG_BRANDS = ["Craft", "Clique", "ProJob", "Cutter & Buck"];
 const STUCK_MS = 30 * 60 * 1000;
 
 const fmt = (iso?: string | null) => (iso ? new Date(iso).toLocaleString("lv-LV") : "—");
@@ -45,54 +53,22 @@ const ago = (iso?: string | null) => {
 const SyncHealthPanel = () => {
   const { toast } = useToast();
   const [logs, setLogs] = useState<SyncRow[]>([]);
-  const [nwg, setNwg] = useState({ total: 0, priced: 0, lastUpdate: null as string | null });
+  const [coverage, setCoverage] = useState<PriceHealth[]>([]);
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [logRes, total, priced, last] = await Promise.all([
+    const [logRes, coverageRes] = await Promise.all([
       supabase
         .from("sync_logs")
         .select("source,status,message,started_at,finished_at,products_updated")
         .order("started_at", { ascending: false })
         .limit(300),
-      supabase
-        .from("nwg_skus")
-        .select("nwg_styles!inner(brand)", { count: "exact", head: true })
-        .in("nwg_styles.brand", NWG_BRANDS)
-        .eq("nwg_styles.published", true)
-        .eq("nwg_styles.archived", false)
-        .eq("active", true)
-        .eq("discontinued", false),
-      supabase
-        .from("nwg_skus")
-        .select("nwg_styles!inner(brand)", { count: "exact", head: true })
-        .in("nwg_styles.brand", NWG_BRANDS)
-        .eq("nwg_styles.published", true)
-        .eq("nwg_styles.archived", false)
-        .eq("active", true)
-        .eq("discontinued", false)
-        .gt("purchase_price", 0),
-      supabase
-        .from("nwg_skus")
-        .select("purchase_updated_at,nwg_styles!inner(brand)")
-        .in("nwg_styles.brand", NWG_BRANDS)
-        .eq("nwg_styles.published", true)
-        .eq("nwg_styles.archived", false)
-        .eq("active", true)
-        .eq("discontinued", false)
-        .not("purchase_updated_at", "is", null)
-        .order("purchase_updated_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
+      supabase.rpc("supplier_price_health" as never),
     ]);
     setLogs((logRes.data as unknown as SyncRow[]) ?? []);
-    setNwg({
-      total: total.count ?? 0,
-      priced: priced.count ?? 0,
-      lastUpdate: (last.data as { purchase_updated_at: string } | null)?.purchase_updated_at ?? null,
-    });
+    setCoverage((coverageRes.data as unknown as PriceHealth[]) ?? []);
     setLoading(false);
   }, []);
 
@@ -113,14 +89,11 @@ const SyncHealthPanel = () => {
           ...s,
           latest: rows[0],
           lastSuccess: rows.find((r) => r.status === "success"),
+          coverage: coverage.find((item) => item.source === s.key),
         };
       }),
-    [logs],
+    [coverage, logs],
   );
-
-  const nwgPriceLog = useMemo(() => logs.find((l) => l.source === "nwg:prices"), [logs]);
-  const tokenExpired =
-    nwgPriceLog?.status === "error" && !!nwgPriceLog.message?.includes("invalid_grant");
 
   const callFn = async (fn: string, query = "", body?: unknown) => {
     const session = (await supabase.auth.getSession()).data.session;
@@ -151,8 +124,6 @@ const SyncHealthPanel = () => {
     }
   };
 
-  const pct = nwg.total ? (nwg.priced / nwg.total) * 100 : 0;
-
   return (
     <div className="mt-8 space-y-4">
       <div className="rounded-sm border border-border bg-card p-4 sm:p-6">
@@ -172,9 +143,12 @@ const SyncHealthPanel = () => {
         <div className="mt-4 space-y-3">
           {suppliers.map((s) => {
             const latest = s.latest;
+            const health = s.coverage;
+            const missing = Math.max(0, (health?.total_variants ?? 0) - (health?.priced_variants ?? 0));
+            const pct = health?.total_variants ? (health.priced_variants / health.total_variants) * 100 : 0;
             const stuck =
               latest?.status === "running" && Date.now() - new Date(latest.started_at).getTime() > STUCK_MS;
-            const state = !latest
+            const processState = !latest
               ? "none"
               : stuck
                 ? "stuck"
@@ -183,13 +157,14 @@ const SyncHealthPanel = () => {
                   : latest.status === "running"
                     ? "running"
                     : "ok";
+            const state = processState === "ok" && missing > 0 ? "warning" : processState;
             return (
               <div key={s.key} className="rounded-sm border border-border p-3 sm:p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       {state === "ok" && <CheckCircle2 className="h-4 w-4 shrink-0 text-accent" />}
-                      {(state === "error" || state === "stuck") && (
+                      {(state === "error" || state === "stuck" || state === "warning") && (
                         <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
                       )}
                       {state === "running" && <Loader2 className="h-4 w-4 shrink-0 animate-spin text-muted-foreground" />}
@@ -212,6 +187,32 @@ const SyncHealthPanel = () => {
                     {state === "running" && !stuck && (
                       <p className="mt-1 text-xs text-muted-foreground">Šobrīd darbojas…</p>
                     )}
+                    {health && (
+                      <div className="mt-3 max-w-2xl">
+                        <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1 text-sm">
+                          <span className="font-heading text-xl font-black text-foreground">{pct.toFixed(1)}%</span>
+                          <span className={missing > 0 ? "text-destructive" : "text-muted-foreground"}>
+                            {health.priced_variants.toLocaleString("lv-LV")} / {health.total_variants.toLocaleString("lv-LV")} variācijas ar cenu
+                          </span>
+                        </div>
+                        <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-muted">
+                          <div
+                            className={`h-full transition-all ${missing > 0 ? "bg-destructive" : "bg-accent"}`}
+                            style={{ width: `${Math.min(pct, 100)}%` }}
+                          />
+                        </div>
+                        {s.key === "nwg" && (
+                          <p className="mt-2 text-xs text-muted-foreground">
+                            {health.contract_priced.toLocaleString("lv-LV")} līgumcenas · {health.fallback_priced.toLocaleString("lv-LV")} piegādātāja rezerves cenas
+                          </p>
+                        )}
+                        {missing > 0 && (
+                          <p className="mt-2 text-xs font-medium text-destructive">
+                            {missing.toLocaleString("lv-LV")} publicējamām variācijām trūkst cenas.
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <Button
                     variant="outline"
@@ -228,64 +229,6 @@ const SyncHealthPanel = () => {
             );
           })}
         </div>
-      </div>
-
-      {/* NWG contract prices */}
-      <div className="rounded-sm border border-border bg-card p-4 sm:p-6">
-        <h2 className="font-heading text-sm font-bold uppercase tracking-wider">NWG līgumcenas</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Craft, Clique, ProJob, Cutter &amp; Buck — līgumcena × 1,65 (bez PVN).
-        </p>
-
-        <div className="mt-4">
-          <div className="flex items-end justify-between text-sm">
-            <span className="font-heading text-2xl font-black text-foreground">{pct.toFixed(1)}%</span>
-            <span className="text-muted-foreground">
-              {nwg.priced.toLocaleString("lv-LV")} / {nwg.total.toLocaleString("lv-LV")} aktuālie SKU ar līgumcenu
-            </span>
-          </div>
-          <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted">
-            <div className="h-full bg-accent transition-all" style={{ width: `${pct}%` }} />
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Pēdējā cena saņemta: {fmt(nwg.lastUpdate)} · pēdējais mēģinājums: {fmt(nwgPriceLog?.started_at)} (
-            {nwgPriceLog?.status === "error" ? "kļūda" : nwgPriceLog?.status === "running" ? "darbojas" : "labi"})
-          </p>
-        </div>
-
-        {tokenExpired ? (
-          <div className="mt-4 rounded-sm border border-destructive/40 bg-destructive/5 p-3 sm:p-4">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
-              <p className="text-sm font-medium text-destructive">NWG līgumcenu atjaunošana jāpārbauda</p>
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Preču katalogs turpina darboties. Cenu pieeju pārbaudi, palaižot cenu sinhronizāciju vēlreiz.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => run({ key: "nwg-prices", label: "NWG līgumcenas", fn: "nwg-price-sync" })}
-              disabled={running === "nwg-prices"}
-              className="mt-3"
-            >
-              <RefreshCw className={`mr-2 h-3.5 w-3.5 ${running === "nwg-prices" ? "animate-spin" : ""}`} />
-              Atjaunot līgumcenas
-            </Button>
-          </div>
-        ) : (
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => run({ key: "nwg-prices", label: "NWG līgumcenas", fn: "nwg-price-sync" })}
-              disabled={running === "nwg-prices"}
-            >
-              <RefreshCw className={`mr-2 h-3.5 w-3.5 ${running === "nwg-prices" ? "animate-spin" : ""}`} />
-              Palaist cenu sinhronizāciju
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );

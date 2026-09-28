@@ -501,9 +501,11 @@ Deno.serve(async (req) => {
           await Promise.all(group);
         }
 
-        // With onlyMissing, processed rows disappear from the next invocation.
-        // A full page means another deterministic pass from offset zero is needed.
-        const more = onlyMissing && scanned >= page;
+        // Every attempted missing SKU receives purchase_updated_at, including
+        // rejected ones. The target RPC excludes rows attempted in the current
+        // daily run, so a full page means another deterministic pass is useful
+        // without looping forever over the same supplier-rejected SKUs.
+        const more = onlyMissing && skus.length >= limit;
 
         // Kept as a compatibility hook. The database function intentionally
         // performs no propagation because every SKU is priced independently.
