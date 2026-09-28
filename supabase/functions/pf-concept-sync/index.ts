@@ -22,8 +22,6 @@
 // reads/writes it. No public exposure.
 
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { JSONParser } from "https://esm.sh/@streamparser/json@0.0.21";
-
 const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
