@@ -27,21 +27,23 @@ const WorksheetPickBar = () => {
   const loadSheet = async () => {
     const { data } = await supabase.rpc("get_quote_worksheet" as never, { _token: pick.token } as never);
     const raw = data as unknown;
-    const rows = (Array.isArray(raw) ? raw[0] : raw) as { items?: WorksheetItem[]; draft_items?: WorksheetItem[] | null } | null | undefined;
+    const rows = (Array.isArray(raw) ? raw[0] : raw) as { items?: WorksheetItem[]; draft_items?: WorksheetItem[] | null; revision?: number } | null | undefined;
     const activeItems = Array.isArray(rows?.draft_items) ? rows.draft_items : rows?.items;
-    return (Array.isArray(activeItems) ? activeItems : []).map((i, idx) => ({
+    const items = (Array.isArray(activeItems) ? activeItems : []).map((i, idx) => ({
       ...i,
       id: i.id || `row-${idx}`,
       qty: Number(i.qty) || 0,
       prints: Array.isArray(i.prints) ? i.prints : [],
     })) as WorksheetItem[];
+    return { items, revision: rows?.revision ?? 0 };
   };
 
-  const persist = async (next: WorksheetItem[]) => {
+  const persist = async (next: WorksheetItem[], baseRevision: number) => {
     const { data, error } = await supabase.rpc("save_quote_worksheet" as never, {
       _token: pick.token,
       _items: next,
       _by: null,
+      _base_revision: baseRevision,
     } as never);
     if (error || data === false) throw new Error("save failed");
   };
@@ -77,7 +79,7 @@ const WorksheetPickBar = () => {
           prints: [],
         });
       }
-      await persist([...current, ...rows]);
+      await persist([...current.items, ...rows], current.revision);
 
       clear();
       toast.success(`Pievienots sarakstam: ${rows.length}`);
@@ -97,7 +99,7 @@ const WorksheetPickBar = () => {
       const current = await loadSheet();
       const prices = await fetchVariantPrices(c.source, c.productId);
       let missing = false;
-      const next = current.map((i) => {
+      const next = current.items.map((i) => {
         if (i.id !== pick.rowId) return i;
         const hit = priceForVariant(c.source, prices, c.colorCode, i.size);
         if (!hit.price) missing = true;
@@ -116,7 +118,7 @@ const WorksheetPickBar = () => {
         };
       });
 
-      await persist(next);
+      await persist(next, current.revision);
       clear();
       toast[missing ? "warning" : "success"](
         missing ? "Modelis nomainīts — šim izmēram nav cenas" : "Modelis nomainīts",

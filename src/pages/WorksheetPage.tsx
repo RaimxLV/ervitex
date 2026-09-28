@@ -122,6 +122,7 @@ const WorksheetPage = () => {
       _token: token,
       _items: items as any,
       _by: editor || null,
+      _base_revision: sheet?.revision ?? 0,
     });
     setSaving(false);
     if (error || data === false) {
