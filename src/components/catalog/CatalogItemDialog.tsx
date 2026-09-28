@@ -1585,10 +1585,22 @@ const CatalogItemDialog = ({
                   </div>
                 )}
 
-                {careText && (
+                {careText && careList.length > 0 && (
                   <div>
                     <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.care}</h4>
-                    <p className="whitespace-pre-line text-sm text-foreground/90">{careText}</p>
+                    <ul className="space-y-2.5 rounded-md border border-border bg-muted/30 p-4">
+                      {careList.map((c, i) => {
+                        const Icon = careIcon(c);
+                        return (
+                          <li key={`${c}-${i}`} className="flex items-start gap-3">
+                            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground">
+                              <Icon className="h-4 w-4" strokeWidth={1.75} />
+                            </span>
+                            <span className="text-sm leading-snug text-foreground/90">{c}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
                 )}
               </div>
