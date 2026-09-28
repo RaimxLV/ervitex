@@ -216,8 +216,16 @@ async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise
 
         // NWG rotates refresh tokens. If a previous process consumed one but
         // failed before saving the replacement, recover automatically with the
-        // unchanged account credentials already held in the secret store.
-        json = await passwordToken();
+        // unchanged account credentials already held in the secret store. Some
+        // NWG tenants disable password grant for ReactJs; in that case the
+        // separately issued partner API token remains the safe fallback.
+        try {
+          json = await passwordToken();
+        } catch (passwordError) {
+          const partnerToken = Deno.env.get("NWG_ACCESS_TOKEN");
+          if (!partnerToken) throw passwordError;
+          json = { access_token: partnerToken, expires_in: 300 };
+        }
       }
       const expiresIn = Math.max(Number(json.expires_in ?? 300), 60);
       const { data: saved, error: saveError } = await sb.from("nwg_auth").update({
