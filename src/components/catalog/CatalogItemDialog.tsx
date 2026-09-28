@@ -1566,7 +1566,7 @@ const CatalogItemDialog = ({
                         <ul className="space-y-1.5 text-sm">
                           {descriptionLines.map((b, i) => (
                             <li key={`${b}-${i}`} className="flex gap-2">
-                              <span className="mt-0.5 text-accent">✓</span>
+                              <span className="flex h-5 shrink-0 items-center text-accent">✓</span>
                               <span className="text-foreground/90">{b}</span>
                             </li>
                           ))}

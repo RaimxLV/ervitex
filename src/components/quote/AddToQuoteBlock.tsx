@@ -165,14 +165,12 @@ const AddToQuoteBlock = ({
           const Icon = s.icon;
           const isLast = i === STEPS.length - 1;
           return (
-            <li key={s.lv} className="flex items-stretch gap-3">
-              <div className="flex flex-col items-center">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent font-heading text-xs font-black text-accent-foreground">
-                  {i + 1}
-                </span>
-                {!isLast && <span className="my-1 w-px flex-1 bg-accent/30" aria-hidden />}
-              </div>
-              <div className={`flex min-w-0 items-center gap-2.5 pt-1 ${isLast ? "" : "pb-3"}`}>
+            <li key={s.lv} className={`relative flex items-start gap-3 ${isLast ? "" : "pb-4"}`}>
+              {!isLast && <span className="absolute bottom-[-2px] left-[13px] top-7 w-px bg-accent/40" aria-hidden />}
+              <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent font-heading text-xs font-black text-accent-foreground">
+                {i + 1}
+              </span>
+              <div className="flex min-w-0 flex-1 items-center gap-2.5 pt-1">
                 <Icon className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.75} />
                 <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
                   {t(s.lv, s.en)}
