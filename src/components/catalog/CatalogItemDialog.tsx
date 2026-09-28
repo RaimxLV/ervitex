@@ -1276,7 +1276,8 @@ const CatalogItemDialog = ({
   const specsBesideDescription = filteredSpecs.length > 0 && descriptionLines.length > 0;
 
   const body = (
-        <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
+    <div className="space-y-8 p-6 md:p-8">
+      <div className="grid gap-8 md:grid-cols-2">
           <div className="space-y-3">
             <div className="relative aspect-square md:aspect-[4/5] max-h-[70vh] w-full overflow-hidden bg-white flex items-center justify-center">
               {mainImg ? (
@@ -1521,8 +1522,10 @@ const CatalogItemDialog = ({
                   onClose={() => onOpenChange(false)}
                 />
               )}
+              </div>
+            </div>
 
-              <div className="space-y-6 border-t border-border pt-6">
+            <div className="space-y-6 border-t border-border pt-6">
                 <h4 className="font-heading text-lg font-bold uppercase tracking-wider">
                   {lang === "lv" ? "Par preci" : "About this item"}
                 </h4>
@@ -1534,7 +1537,7 @@ const CatalogItemDialog = ({
                         <h4 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider">
                           {label.specifications}
                         </h4>
-                        <dl className={`grid gap-x-6 gap-y-3 rounded-md border border-border bg-muted/30 p-4 ${specsBesideDescription ? "grid-cols-1" : "sm:grid-cols-2"}`}>
+                        <dl className="grid gap-x-6 gap-y-3 rounded-md border border-border bg-muted/30 p-4 sm:grid-cols-2">
                           {filteredSpecs.map((s) => (
                             <div key={`${s.label}-${s.value}`} className="flex flex-col">
                               <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -1601,7 +1604,6 @@ const CatalogItemDialog = ({
                 <p className="border-t border-border pt-4 text-sm text-muted-foreground">{displayDetail.notice}</p>
               )}
             </div>
-        </div>
   );
 
   if (inline) return body;
