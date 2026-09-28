@@ -18,6 +18,7 @@ import {
   Mail,
   Paperclip,
   RefreshCw,
+  History,
   Trash2,
 } from "lucide-react";
 
@@ -57,6 +58,23 @@ interface QuoteRow {
   worksheet_locked?: boolean;
 }
 
+interface QuoteEvent {
+  id: string;
+  quote_id: string;
+  event_type: string;
+  actor_name: string | null;
+  details: Record<string, unknown>;
+  created_at: string;
+}
+
+const EVENT_LABELS: Record<string, string> = {
+  submitted: "Pieprasījums iesniegts",
+  assigned: "Nodots",
+  worksheet_confirmed: "Preču saraksts apstiprināts",
+  completed: "Pabeigts",
+  reopened: "Atvērts atkārtoti",
+};
+
 const daysSince = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
 const isDone = (q: QuoteRow) => q.status === "closed";
 
@@ -88,18 +106,19 @@ const AdminQuotes = () => {
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<SortKey>("newest");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [events, setEvents] = useState<QuoteEvent[]>([]);
   const { toast } = useToast();
   const { user } = useAuth();
 
   const fetchQuotes = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("quote_requests")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(500);
+    const [{ data, error }, eventResult] = await Promise.all([
+      supabase.from("quote_requests").select("*").order("created_at", { ascending: false }).limit(500),
+      supabase.from("quote_events").select("*").order("created_at", { ascending: false }).limit(2000),
+    ]);
     if (error) toast({ title: "Kļūda", description: error.message, variant: "destructive" });
     else setQuotes((data as unknown as QuoteRow[]) || []);
+    if (!eventResult.error) setEvents((eventResult.data as QuoteEvent[]) || []);
     setLoading(false);
   };
 
@@ -583,6 +602,27 @@ const AdminQuotes = () => {
                   <p className="whitespace-pre-wrap border-t border-border pt-3 text-sm text-muted-foreground">
                     {row.message}
                   </p>
+                )}
+                {events.some((event) => event.quote_id === row.id) && (
+                  <div className="border-t border-border pt-3">
+                    <p className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      <History className="h-3.5 w-3.5" /> Darbību vēsture
+                    </p>
+                    <ol className="space-y-2">
+                      {events.filter((event) => event.quote_id === row.id).map((event) => {
+                        const target = typeof event.details?.to === "string" ? event.details.to : null;
+                        const revision = typeof event.details?.revision === "number" ? ` · versija ${event.details.revision}` : "";
+                        return (
+                          <li key={event.id} className="flex flex-wrap items-baseline gap-x-2 text-xs">
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                            <span className="font-medium text-foreground">{EVENT_LABELS[event.event_type] || event.event_type}</span>
+                            {(target || event.actor_name) && <span className="text-muted-foreground">{target || event.actor_name}</span>}
+                            <span className="text-muted-foreground">{revision} · {new Date(event.created_at).toLocaleString("lv-LV")}</span>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </div>
                 )}
                   </div>
                 )}
