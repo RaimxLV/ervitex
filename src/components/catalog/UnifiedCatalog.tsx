@@ -11,6 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
+import { prepareQuery, searchScore } from "@/lib/catalogSearch";
+
+const SCROLL_KEY = "catalog-scroll";
 
 import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
@@ -363,6 +366,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   // coming from outside (mega menu links while already on /catalog) can be
   // detected and applied instead of being overwritten by the local state.
   const lastWrittenSearch = useRef<string | null>(null);
+  const urlSyncing = useRef(false);
 
   useEffect(() => {
     const p = new URLSearchParams();
@@ -385,6 +389,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     const incoming = searchParams.toString();
     if (lastWrittenSearch.current === incoming) return;
     lastWrittenSearch.current = incoming;
+    urlSyncing.current = true;
+    window.setTimeout(() => { urlSyncing.current = false; }, 0);
     setQ(searchParams.get("q") || "");
     setSources(lockedSource ? new Set() : parseManufacturerFilter(searchParams.get("source")));
     setBrands(new Set((searchParams.get("brand") || "").split(",").filter(Boolean)));
@@ -591,9 +597,23 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
 
 
+  // Atiestata uz 1. lapu tikai tad, ja lietotājs tiešām maina filtrus —
+  // nevis ielādējot vai atgriežoties no preces lapas ar ?page=8.
+  const filterSig = [q, [...sources], [...brands], [...categories], [...groups], [...genders], [...colors], sort]
+    .map((v) => (Array.isArray(v) ? [...v].sort().join(",") : v))
+    .join("|");
+  const prevFilterSig = useRef(filterSig);
   useEffect(() => {
+    if (prevFilterSig.current === filterSig) return;
+    prevFilterSig.current = filterSig;
+    if (urlSyncing.current) {
+      urlSyncing.current = false;
+      return;
+    }
     setPage(1);
-  }, [q, sources, brands, categories, groups, genders, colors, sort]);
+  }, [filterSig]);
+
+  const pq = useMemo(() => prepareQuery(q), [q]);
 
   const toggle = (set: Set<string>, setter: (s: Set<string>) => void) => (v: string) => {
     const next = new Set(set);
@@ -628,12 +648,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     [lang, title, subtitle]
   );
 
-  const passesExcept = (it: EnrichedItem, except: string, extraQ = q) => {
-    if (extraQ) {
-      const needle = extraQ.toLowerCase();
-      const hay = `${it.name || ""} ${it.id} ${it.brand || ""}`.toLowerCase();
-      if (!hay.includes(needle)) return false;
-    }
+  const passesExcept = (it: EnrichedItem, except: string) => {
+    if (pq && searchScore(it, pq) === 0) return false;
     if (except !== "source" && sources.size && !sources.has(it.manufacturer)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
     if (except !== "category" && categories.size && (!it.category || !categories.has(it.category))) return false;
@@ -849,29 +865,33 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     );
     const cmpName = (a: EnrichedItem, b: EnrichedItem) =>
       (a.name || a.id).localeCompare(b.name || b.id, lang === "lv" ? "lv" : "en", { sensitivity: "base" });
-    if (sort === "az") return [...base].sort(cmpName);
-    if (sort === "za") return [...base].sort((a, b) => cmpName(b, a));
-    if (sort === "newest" || sort === "featured") {
-      return [...base].sort((a, b) =>
+    let cmp: ((a: EnrichedItem, b: EnrichedItem) => number) | null = null;
+    if (sort === "az") cmp = cmpName;
+    else if (sort === "za") cmp = (a, b) => cmpName(b, a);
+    else if (sort === "newest" || sort === "featured") {
+      cmp = (a, b) =>
         Number(b.source === "ss") - Number(a.source === "ss") ||
-        (b.id || "").localeCompare(a.id || "", "en", { numeric: true, sensitivity: "base" })
-      );
-    }
-    if (sort === "price_asc" || sort === "price_desc") {
+        (b.id || "").localeCompare(a.id || "", "en", { numeric: true, sensitivity: "base" });
+    } else if (sort === "price_asc" || sort === "price_desc") {
       const dir = sort === "price_asc" ? 1 : -1;
-      return [...base].sort((a, b) => {
+      cmp = (a, b) => {
         const pa = priceOf(a);
         const pb = priceOf(b);
-        // items without price go to the end regardless of direction
         if (pa == null && pb == null) return cmpName(a, b);
         if (pa == null) return 1;
         if (pb == null) return -1;
         return (pa - pb) * dir || cmpName(a, b);
-      });
+      };
     }
-    return base;
+    if (pq) {
+      // Meklējot — atbilstošākās preces vienmēr pirmās.
+      const scores = new Map<EnrichedItem, number>();
+      for (const it of base) scores.set(it, searchScore(it, pq));
+      return [...base].sort((a, b) => (scores.get(b)! - scores.get(a)!) || (cmp ? cmp(a, b) : 0));
+    }
+    return cmp ? [...base].sort(cmp) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, q, sources, brands, categories, groups, genders, colors, sort, priceOf, priceRanges, lang]);
+  }, [items, pq, sources, brands, categories, groups, genders, colors, sort, priceOf, priceRanges, lang]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Number.isFinite(page) ? Math.min(Math.max(page, 1), totalPages) : 1;
@@ -896,6 +916,22 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     () => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
     [filtered, safePage]
   );
+
+  // Atgriežoties no preces lapas — atjauno ritināšanas vietu tajā pašā lapā.
+  const scrollRestored = useRef(false);
+  useEffect(() => {
+    if (scrollRestored.current || !loaded || !paginated.length) return;
+    if (page > 1 && safePage !== page) return; // vēl ielādējas pārējās lapas
+    scrollRestored.current = true;
+    try {
+      const raw = sessionStorage.getItem(SCROLL_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as { path: string; y: number };
+      if (saved.path !== window.location.pathname + window.location.search) return;
+      sessionStorage.removeItem(SCROLL_KEY);
+      requestAnimationFrame(() => window.scrollTo(0, saved.y));
+    } catch { /* ignore */ }
+  }, [loaded, paginated, page, safePage]);
 
   const clearAll = () => {
     setQ("");
@@ -1100,7 +1136,15 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       priceInfo={priceRanges.get(`${it.source}:${it.id}`)}
 
                       fromLabel={lang === "lv" ? "no" : "from"}
-                      onNavigate={() => navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}`)}
+                      onNavigate={() => {
+                        try {
+                          sessionStorage.setItem(
+                            SCROLL_KEY,
+                            JSON.stringify({ path: window.location.pathname + window.location.search, y: window.scrollY }),
+                          );
+                        } catch { /* ignore */ }
+                        navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}`);
+                      }}
                     />
                   ))}
                 </div>

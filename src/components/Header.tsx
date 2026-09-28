@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { toast } from "sonner";
 import CatalogMegaMenu, { MobileCatalogMenu } from "@/components/CatalogMegaMenu";
+import HeaderSearch from "@/components/HeaderSearch";
 
 const navItems = [
   { key: "nav.home" as const, path: "/" },
@@ -164,16 +165,13 @@ const Header = () => {
         <div className="hidden items-center gap-3 xl:flex">
           {/* Search */}
           {searchOpen ? (
-            <form onSubmit={handleSearch} className="flex items-center gap-2">
-              <Input
-                placeholder={t("header.search")}
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="h-9 w-48 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/40"
-                autoFocus
-                onBlur={() => { if (!searchValue) setSearchOpen(false); }}
-              />
-            </form>
+            <HeaderSearch
+              autoFocus
+              className="w-64"
+              inputClassName="h-9"
+              onDone={() => setSearchOpen(false)}
+              onEmptyBlur={() => setSearchOpen(false)}
+            />
           ) : (
             <button onClick={() => setSearchOpen(true)} className="p-2 text-primary-foreground/70 hover:text-primary-foreground transition-colors">
               <Search className="h-4 w-4" strokeWidth={1.5} />
@@ -300,17 +298,7 @@ const Header = () => {
       {/* Mobile nav */}
       {isOpen && (
         <div className="max-h-[calc(100svh-4rem)] overflow-y-auto overscroll-contain border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 xl:hidden md:max-h-[calc(100svh-5rem)]">
-          <form onSubmit={handleSearch} className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-foreground/40" strokeWidth={1.5} />
-              <Input
-                placeholder={lang === "lv" ? "Meklēt produktus..." : "Search products..."}
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                className="h-10 border-primary-foreground/20 bg-primary-foreground/10 pl-9 text-primary-foreground placeholder:text-primary-foreground/40"
-              />
-            </div>
-          </form>
+          <HeaderSearch className="mb-4" inputClassName="h-10" onDone={() => setIsOpen(false)} />
           <nav>
             <div className="grid grid-cols-2 border-y border-primary-foreground/10 sm:grid-cols-4">
               {navItems.filter((item) => item.path !== "/catalog").map((item) => (
