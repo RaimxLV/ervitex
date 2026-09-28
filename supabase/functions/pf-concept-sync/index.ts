@@ -343,7 +343,9 @@ async function probe(lang = "en") {
 // parse it within the CPU limit. We therefore read it in byte slices with HTTP
 // Range requests, extract item prices with a cheap text scan, and chain the
 // next slice in the background until the whole feed is processed.
-const PRICE_SLICE = 12_000_000; // ~12 MB per invocation
+// Keep each invocation comfortably below the edge CPU limit. The previous
+// 12 MB slice repeatedly exhausted the worker while splitting/scanning JSON.
+const PRICE_SLICE = 1_500_000;
 
 async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: boolean }) {
   const token = Deno.env.get("PF_FEED_TOKEN");
@@ -351,9 +353,20 @@ async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: bool
   const feedUrl = `http://www.pfconcept.com/portal/datafeed/pricefeed_${token}_v3.json`;
 
   const start = Math.max(0, opts.start);
-  const res = await fetch(feedUrl, { headers: { Range: `bytes=${start}-${start + PRICE_SLICE - 1}` } });
+  const res = await fetch(feedUrl, {
+    headers: {
+      Range: `bytes=${start}-${start + PRICE_SLICE - 1}`,
+      "Accept-Encoding": "identity",
+    },
+  });
   if (!res.ok && res.status !== 206) throw new Error(`pricefeed fetch ${res.status}`);
   const text = await res.text();
+
+  // A server/proxy that ignores Range would hand the whole ~190 MB file to a
+  // single worker. Fail safely instead of hitting the CPU limit mid-write.
+  if (res.status !== 206 && text.length > PRICE_SLICE * 2) {
+    throw new Error("PF price feed ignored byte range");
+  }
 
   const cr = res.headers.get("content-range") || "";
   const total = Number(cr.split("/")[1]) || 0;
@@ -407,14 +420,9 @@ async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: bool
   const done = bytesRead === 0 || (total > 0 && nextStart >= total) || bytesRead < PRICE_SLICE - 1024;
 
   if (!done && opts.chain) {
-    // Continue with the next slice in the background; the caller returns now.
-    const nextUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/pf-concept-sync?mode=prices&start=${nextStart}`;
-    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    fetch(nextUrl, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, apikey: key, "Content-Type": "application/json" },
-      body: "{}",
-    }).catch(() => { /* the nightly job retries */ });
+    // Dispatch through pg_net. A plain fire-and-forget fetch is cancelled when
+    // this worker returns and used to leave the feed only partly processed.
+    await chainSelf(sb, { mode: "prices", start: String(nextStart), chain: "1" });
   }
 
   return { start, next_start: nextStart, total_bytes: total, items: rows.length, upserted, done };
