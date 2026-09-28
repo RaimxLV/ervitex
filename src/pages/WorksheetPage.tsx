@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import {
   PRINT_METHODS, lineNet, printNet, worksheetTotals,
   type PrintLine, type Worksheet, type WorksheetItem, type WorksheetVersion,
 } from "@/lib/worksheet";
-import { CheckCircle2, ChevronDown, Clock3, History, Loader2, Mail, Plus, Printer, Repeat, RotateCcw, ShieldCheck, Store, Trash2, Undo2, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock3, Copy, History, Loader2, Mail, Plus, Printer, Repeat, RotateCcw, Send, ShieldCheck, Store, Trash2, Undo2, X } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { useAuth } from "@/hooks/useAuth";
@@ -39,6 +39,51 @@ const WorksheetPage = () => {
   const saveSequence = useRef(0);
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isStaff = isAdmin || searchParams.get("v") === "pm";
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [replyText, setReplyText] = useState("");
+  const [replySending, setReplySending] = useState(false);
+  const publicUrl = `https://raimxlv.github.io/ervitex/saraksts/${token}`;
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+      toast.success("Saite nokopēta");
+    } catch {
+      window.prompt("Saite", publicUrl);
+    }
+  };
+
+  const sendToClient = async () => {
+    if (!sheet?.email || !token) return;
+    setReplySending(true);
+    const pmMail = sheet.assigned_pm_email || "laura@ervitex.lv";
+    const pmName = sheet.assigned_pm_name || "Laura";
+    const { data, error } = await supabase.functions.invoke("send-transactional-email", {
+      body: {
+        templateName: "worksheet-update",
+        recipientEmail: sheet.email,
+        replyTo: pmMail,
+        fromEmail: pmMail,
+        fromName: pmName,
+        idempotencyKey: `ws-${token}-r${sheet.revision}-${Date.now()}`,
+        templateData: {
+          message: replyText.trim(),
+          pmName,
+          pmEmail: pmMail,
+          company: sheet.company || "",
+          clientName: sheet.name || "",
+          worksheetUrl: publicUrl,
+        },
+      },
+    });
+    setReplySending(false);
+    if (error || (data as { error?: unknown } | null)?.error) return toast.error("Neizdevās nosūtīt");
+    toast.success("Nosūtīts klientam");
+    setReplyText("");
+    setReplyOpen(false);
+  };
 
   /** Reads the live sheet. `withItems` is false after status actions so local edits survive. */
   const reload = async (withItems: boolean) => {
@@ -175,6 +220,10 @@ const WorksheetPage = () => {
   };
 
   const closeView = () => {
+    if (isStaff) {
+      setReplyOpen(true);
+      return;
+    }
     window.setTimeout(() => {
       window.close();
       if (!window.closed) navigate(isAdmin ? "/admin/quotes" : "/");
@@ -524,13 +573,48 @@ const WorksheetPage = () => {
                     <Undo2 className="mr-2 h-4 w-4" /> Atcelt izmaiņas
                   </Button>
                 )}
-                {!dirty && !sheet.draft_items && (
+                {isStaff && (
+                  <Button variant="outline" onClick={copyLink}>
+                    <Copy className="mr-2 h-4 w-4" /> Kopēt saiti
+                  </Button>
+                )}
+                {isStaff && !replyOpen && sheet.email && (
+                  <Button variant="outline" onClick={() => setReplyOpen(true)}>
+                    <Send className="mr-2 h-4 w-4" /> Ziņa klientam
+                  </Button>
+                )}
+                {!isStaff && !dirty && !sheet.draft_items && (
                   <Button variant="outline" asChild>
                     <a href={mailtoNext}>
                       <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}
                     </a>
                   </Button>
                 )}
+              </div>
+            </div>
+          )}
+
+          {isStaff && replyOpen && sheet.email && (
+            <div className="mt-4 space-y-3 rounded-md border border-border p-4 print:hidden">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-heading text-sm font-black uppercase tracking-wide">Ziņa klientam</h2>
+                <span className="text-sm text-muted-foreground">{sheet.email}</span>
+              </div>
+              <textarea
+                value={replyText}
+                onChange={(e) => setReplyText(e.target.value)}
+                rows={5}
+                className="w-full rounded-sm border border-input bg-background p-3 text-sm"
+                placeholder="Labdien! ..."
+              />
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={sendToClient} disabled={replySending || !replyText.trim()}>
+                  {replySending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+                  Nosūtīt
+                </Button>
+                <Button variant="ghost" onClick={() => setReplyOpen(false)}>
+                  <X className="mr-2 h-4 w-4" /> Aizvērt
+                </Button>
               </div>
             </div>
           )}
