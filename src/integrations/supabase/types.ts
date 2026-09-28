@@ -2818,7 +2818,12 @@ export type Database = {
         Returns: boolean
       }
       save_quote_worksheet: {
-        Args: { _by?: string; _items: Json; _token: string }
+        Args: {
+          _base_revision?: number
+          _by?: string
+          _items: Json
+          _token: string
+        }
         Returns: boolean
       }
       ss_fill_missing_variant_prices: { Args: never; Returns: number }
