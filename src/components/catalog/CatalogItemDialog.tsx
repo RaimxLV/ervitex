@@ -1604,7 +1604,6 @@ const CatalogItemDialog = ({
                 <p className="border-t border-border pt-4 text-sm text-muted-foreground">{displayDetail.notice}</p>
               )}
             </div>
-        </div>
   );
 
   if (inline) return body;
