@@ -10,7 +10,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
-import { Ban, Droplets, Flame, Shirt, Sparkles, Sun, WashingMachine, Wind } from "lucide-react";
+import { assignCareIcons } from "./CareIcons";
 
 
 interface Props {
@@ -124,19 +124,6 @@ const careClauses = (text: string): string[] => {
     else out.push(p);
   }
   return out.slice(0, 8);
-};
-
-const careIcon = (text: string) => {
-  const t = text.toLowerCase();
-  if (/(nedrīkst|aizlieg|nepieļauj|don'?t|do not|never)/.test(t)) return Ban;
-  if (/^\s*no\s+(iron|bleach|dry|tumble|wash)|balin|bleach|hlora/.test(t)) return Ban;
-  if (/ķīmisk|dry clean|saus[āa] tīrīš|tīrīšan/.test(t)) return Sparkles;
-  if (/mazg|wash|skalo/.test(t)) return WashingMachine;
-  if (/glud|iron|presē|temperatūr|dzelzs/.test(t)) return Flame;
-  if (/žāvē|tumble|dry/.test(t)) return Wind;
-  if (/saules|tiešaj|sun exposure/.test(t)) return Sun;
-  if (/mitr|humid|ūden|water/.test(t)) return Droplets;
-  return Shirt;
 };
 
 const addSpec = (arr: { label: string; value: string }[], label: string, value?: unknown, suffix = "") => {
@@ -1219,6 +1206,7 @@ const CatalogItemDialog = ({
   const materialText = translated?.material || rawMaterial;
   const careText = translated?.care || rawCare;
   const careList = useMemo(() => (careText ? careClauses(careText) : []), [careText]);
+  const careItems = useMemo(() => assignCareIcons(careList), [careList]);
   const label = {
     lv: {
       description: "Apraksts",
@@ -1539,7 +1527,7 @@ const CatalogItemDialog = ({
                 </h4>
 
                 {(filteredSpecs.length > 0 || descriptionLines.length > 0) && (
-                  <div className={`grid gap-6 ${specsBesideDescription ? "lg:grid-cols-2" : ""}`}>
+                  <div className={`grid gap-6 ${specsBesideDescription ? "lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-x-10" : ""}`}>
                     {filteredSpecs.length > 0 && (
                       <div>
                         <h4 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider">
@@ -1585,21 +1573,24 @@ const CatalogItemDialog = ({
                   </div>
                 )}
 
-                {careText && careList.length > 0 && (
+                {careText && careItems.length > 0 && (
                   <div>
                     <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.care}</h4>
-                    <ul className="space-y-2.5 rounded-md border border-border bg-muted/30 p-4">
-                      {careList.map((c, i) => {
-                        const Icon = careIcon(c);
-                        return (
-                          <li key={`${c}-${i}`} className="flex items-start gap-3">
-                            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground">
-                              <Icon className="h-4 w-4" strokeWidth={1.75} />
-                            </span>
-                            <span className="text-sm leading-snug text-foreground/90">{c}</span>
-                          </li>
-                        );
-                      })}
+                    <ul className="grid gap-2.5 rounded-md border border-border bg-muted/30 p-4 sm:grid-cols-2">
+                      {careItems.map((c, i) => (
+                        <li key={`${c.text}-${i}`} className="flex items-center gap-3">
+                          <span
+                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border ${
+                              c.ban
+                                ? "border-accent/40 bg-accent/10 text-accent"
+                                : "border-border bg-background text-foreground"
+                            }`}
+                          >
+                            <c.Icon className="h-5 w-5" strokeWidth={1.9} />
+                          </span>
+                          <span className="text-sm leading-snug text-foreground/90">{c.text}</span>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 )}
