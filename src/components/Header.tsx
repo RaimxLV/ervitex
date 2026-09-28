@@ -78,6 +78,7 @@ const Header = () => {
 
   useEffect(() => {
     setMegaOpen(false);
+    setSearchOpen(false);
   }, [location.pathname, location.search]);
 
   useEffect(() => () => cancelMegaClose(), []);
