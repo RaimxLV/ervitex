@@ -29,6 +29,7 @@ interface Props {
   print_colors?: string
   deadline?: string
   submittedAt?: string
+  assignUrls?: { name: string; url: string }[]
 }
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
@@ -49,6 +50,7 @@ const cta = {
   borderRadius: '3px',
   textDecoration: 'none',
 }
+const assignBtn = { display: 'inline-block', border: '1px solid #111', color: '#111', fontSize: '13px', fontWeight: 'bold' as const, padding: '9px 14px', borderRadius: '3px', textDecoration: 'none', margin: '0 6px 6px 0' }
 const noteBox = { whiteSpace: 'pre-line' as const, fontSize: '13px', background: '#f6f6f6', padding: '10px', borderRadius: '3px' }
 
 const QuoteRequestEmail = ({
@@ -65,6 +67,7 @@ const QuoteRequestEmail = ({
   print_colors = '',
   deadline = '',
   submittedAt = '',
+  assignUrls = [],
 }: Props) => {
   const hasPrint = !!(print_method || print_placement || print_colors || deadline)
 
@@ -83,6 +86,17 @@ const QuoteRequestEmail = ({
             <Section>
               <Button href={worksheetUrl} style={cta}>ATVĒRT PREČU SARAKSTU</Button>
             </Section>
+          ) : null}
+
+          {assignUrls.length > 0 ? (
+            <>
+              <Heading as="h3" style={h3}>Nodot</Heading>
+              <Section>
+                {assignUrls.map((a, i) => (
+                  <Button key={i} href={a.url} style={assignBtn}>{a.name}</Button>
+                ))}
+              </Section>
+            </>
           ) : null}
 
           <Heading as="h3" style={h3}>Klients</Heading>
