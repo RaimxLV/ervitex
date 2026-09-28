@@ -155,6 +155,12 @@ const WorksheetPage = () => {
       setActionBusy(false);
       return;
     }
+    if (!dirty && !sheet?.draft_items) {
+      setActionBusy(false);
+      toast.success("Saglabāts");
+      closeView();
+      return;
+    }
     const { data, error } = await supabase.rpc("confirm_quote_worksheet" as any, { _token: token, _by: editor || null });
     setActionBusy(false);
     if (error) {
@@ -164,7 +170,15 @@ const WorksheetPage = () => {
     await Promise.all([reload(true), loadVersions()]);
     setSavedOnce(true);
     setSaveState("saved");
-    toast.success(`Izmaiņas apstiprinātas${typeof data === "number" ? ` · versija ${data}` : ""}`);
+    toast.success(`Saglabāts${typeof data === "number" ? ` · versija ${data}` : ""}`);
+    closeView();
+  };
+
+  const closeView = () => {
+    window.setTimeout(() => {
+      window.close();
+      if (!window.closed) navigate(isAdmin ? "/admin/quotes" : "/");
+    }, 600);
   };
 
   const discardDraft = async () => {
@@ -275,47 +289,17 @@ const WorksheetPage = () => {
                   {[sheet.company, sheet.name, sheet.email, sheet.phone].filter(Boolean).join(" · ")}
                 </p>
               </div>
-              <Badge variant={sheet.status === "closed" ? "secondary" : sheet.assigned_pm_email ? "default" : "outline"} className="w-fit shrink-0">
-                {statusLabel}
-              </Badge>
             </div>
-            {isAdmin && (
-              <div className="mt-4 grid gap-2 border-t border-border pt-4 sm:grid-cols-[minmax(180px,240px)_auto] sm:items-center">
-                <Select value={assignedSlug} onValueChange={assign} disabled={actionBusy}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Atbildīgais" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ASSIGNEES.map((a) => (
-                      <SelectItem key={a.slug} value={a.slug}>{a.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {sheet.status !== "closed" && (
-                  <Button variant="outline" size="sm" onClick={complete} disabled={actionBusy}>
-                    {actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-                    Pabeigts
-                  </Button>
-                )}
-              </div>
-            )}
-            {sheet.worksheet_updated_at && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Pēdējās izmaiņas: {new Date(sheet.worksheet_updated_at).toLocaleString("lv-LV")}
-                {sheet.worksheet_updated_by ? ` · ${sheet.worksheet_updated_by}` : ""}
+            {sheet.assigned_pm_name && (
+              <p className="mt-3 text-sm">
+                <span className="text-muted-foreground">Projekta vadītāja: </span>
+                <a href={`mailto:${pmEmail}`} className="font-medium hover:underline">{sheet.assigned_pm_name}</a>
               </p>
             )}
-            {!readOnly && (
-              <div className="mt-4 flex flex-wrap items-center gap-2 rounded-sm border border-border bg-muted/40 px-3 py-2 text-xs">
-                {saveState === "saving" ? <Loader2 className="h-4 w-4 animate-spin text-accent" /> : <ShieldCheck className="h-4 w-4 text-accent" />}
-                <span className="font-medium text-foreground">
-                  {saveState === "saving" ? "Saglabā melnrakstu…" : saveState === "error" ? "Melnrakstu neizdevās saglabāt" : sheet.draft_items ? "Ir neapstiprinātas izmaiņas" : "Izmaiņas apstiprinātas"}
-                </span>
-                {(sheet.draft_updated_at || sheet.worksheet_updated_at) && (
-                  <span className="text-muted-foreground">
-                    · {new Date(sheet.draft_updated_at || sheet.worksheet_updated_at || "").toLocaleString("lv-LV")}
-                  </span>
-                )}
+            {!readOnly && (saveState === "saving" || saveState === "error" || !!sheet.draft_items) && (
+              <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground print:hidden">
+                {saveState === "saving" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                <span>{saveState === "saving" ? "Saglabā…" : saveState === "error" ? "Neizdevās saglabāt" : "Nesaglabātas izmaiņas"}</span>
               </div>
             )}
             {readOnly && (
@@ -349,45 +333,45 @@ const WorksheetPage = () => {
               const open = openId === i.id;
               return (
               <div key={i.id} className="overflow-hidden rounded-md border border-border bg-background">
-                <button
-                  type="button"
-                  onClick={() => setOpenId(open ? null : i.id)}
-                  className="flex w-full items-center gap-3 p-2.5 text-left hover:bg-muted/50 sm:p-3"
-                >
-                  {i.image ? (
-                    <img src={i.image} alt={i.name} loading="lazy" className="h-11 w-11 shrink-0 rounded-sm border border-border object-contain p-0.5" />
-                  ) : (
-                    <span className="h-11 w-11 shrink-0 rounded-sm border border-dashed border-border" />
-                  )}
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium">{i.name}</span>
-                    <span className="block truncate text-[11px] text-muted-foreground">
-                      {[i.colorName, i.size, `${i.qty} gab.`, (i.prints || []).map((p) => p.method).join(" + ")].filter(Boolean).join(" · ")}
+                <div className="flex flex-wrap items-center gap-3 p-2.5 sm:flex-nowrap sm:p-3">
+                  <button type="button" onClick={() => setOpenId(open ? null : i.id)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
+                    {i.image ? (
+                      <img src={i.image} alt={i.name} loading="lazy" className="h-14 w-14 shrink-0 rounded-sm border border-border object-contain p-0.5" />
+                    ) : (
+                      <span className="h-14 w-14 shrink-0 rounded-sm border border-dashed border-border" />
+                    )}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold">{i.name}</span>
+                      {(i.code || i.brand) && <span className="block truncate text-xs text-muted-foreground">{[i.code, i.brand].filter(Boolean).join(" · ")}</span>}
+                      <span className="mt-1.5 flex flex-wrap gap-1.5 text-xs">
+                        <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Krāsa </span><b className="font-medium">{i.colorName || "—"}</b></span>
+                        <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Izmērs </span><b className="font-medium">{i.size || "—"}</b></span>
+                        <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Daudzums </span><b className="font-medium">{i.qty} gab.</b></span>
+                        {(i.prints || []).length > 0 && (
+                          <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Apdruka </span><b className="font-medium">{(i.prints || []).map((p) => p.method).join(" + ")}</b></span>
+                        )}
+                      </span>
                     </span>
-                  </span>
-                  <span className="shrink-0 text-right">
-                    <span className="block font-heading text-sm font-black tabular-nums">{money(lineNet(i))}</span>
-                    <span className="block text-[11px] text-muted-foreground tabular-nums">
-                      ar PVN {money(lineNet(i) * (1 + (sheet.vat_rate || 21) / 100))}
+                  </button>
+                  <span className="ml-auto flex shrink-0 items-center gap-2">
+                    <span className="text-right">
+                      <span className="block font-heading text-sm font-black tabular-nums">{money(lineNet(i))}</span>
+                      <span className="block text-xs text-muted-foreground tabular-nums">ar PVN {money(lineNet(i) * (1 + (sheet.vat_rate || 21) / 100))}</span>
                     </span>
+                    {!readOnly && (
+                      <Button size="sm" variant="outline" className="print:hidden" onClick={() => goCatalog("swap", i)}>
+                        <Repeat className="mr-1.5 h-3.5 w-3.5" /> Nomainīt preci
+                      </Button>
+                    )}
+                    <button type="button" onClick={() => setOpenId(open ? null : i.id)} aria-label="Atvērt" className="p-1 print:hidden">
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+                    </button>
                   </span>
-                  <ChevronDown className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
-                </button>
+                </div>
 
                 {open && (
                   <div className="border-t border-border p-3 sm:p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-[11px] text-muted-foreground">
-                        {[i.code, i.brand].filter(Boolean).join(" · ")}
-                      </p>
-                      {!readOnly && (
-                        <Button size="sm" variant="outline" onClick={() => goCatalog("swap", i)}>
-                          <Repeat className="mr-1.5 h-3.5 w-3.5" /> Mainīt modeli
-                        </Button>
-                      )}
-                    </div>
-
-                    <div className="mt-3">
+                    <div>
                       <RowVariantControls item={i} disabled={readOnly} onChange={(changes) => patch(i.id, changes)} />
                     </div>
 
@@ -529,22 +513,18 @@ const WorksheetPage = () => {
           )}
 
           {!readOnly && (
-            <div className="mt-6 flex flex-col gap-3 rounded-md border border-border bg-muted/40 p-4 sm:flex-row sm:items-end sm:justify-between print:hidden">
-              <label className="block sm:max-w-xs sm:flex-1">
-                <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Kas labo? (vārds)</span>
-                <Input value={editor} placeholder="Piem. Jānis" onChange={(e) => setEditor(e.target.value)} />
-              </label>
+            <div className="mt-6 flex flex-col gap-3 rounded-md border border-border bg-muted/40 p-4 sm:flex-row sm:items-center sm:justify-end print:hidden">
               <div className="flex flex-wrap gap-2">
-                <Button onClick={confirmChanges} disabled={saving || actionBusy || (!dirty && !sheet.draft_items)}>
+                <Button onClick={confirmChanges} disabled={saving || actionBusy}>
                   {saving || actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-                  Apstiprināt izmaiņas
+                  Saglabāt un aizvērt
                 </Button>
                 {(dirty || sheet.draft_items) && (
                   <Button variant="outline" onClick={discardDraft} disabled={saving || actionBusy}>
-                    <Undo2 className="mr-2 h-4 w-4" /> Atmest melnrakstu
+                    <Undo2 className="mr-2 h-4 w-4" /> Atcelt izmaiņas
                   </Button>
                 )}
-                {savedOnce && !dirty && !sheet.draft_items && (
+                {!dirty && !sheet.draft_items && (
                   <Button variant="outline" asChild>
                     <a href={mailtoNext}>
                       <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}

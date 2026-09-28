@@ -98,6 +98,7 @@ Deno.serve(async (req) => {
       templateName: 'quote-assigned',
       recipientEmail: person.email,
       replyTo: quote.email,
+      fromName: quote.name,
       idempotencyKey: `quote-${quote.id}-assign-${person.slug}`,
       templateData: {
         ref: quote.ref,

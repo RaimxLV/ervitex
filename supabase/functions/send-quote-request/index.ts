@@ -80,6 +80,7 @@ Deno.serve(async (req) => {
         templateName: "quote-request",
         recipientEmail: OFFICE_EMAIL,
         replyTo: quote.email,
+        fromName: quote.name,
         idempotencyKey: `quote-${quote.id}-office`,
         templateData: { ...baseData, files: signedUrls },
       },
