@@ -547,8 +547,7 @@ Deno.serve(async (req) => {
     if (mode === "probe") {
       result = await probe(lang);
     } else if (mode === "cache") {
-      const chunkSize = Number(url.searchParams.get("chunkSize") || "150");
-      result = await cacheAndSplit(sb, { lang, chunkSize });
+      result = await resumableProductCache(sb, lang, 0);
     } else if (mode === "refresh") {
       const chunkSize = Number(url.searchParams.get("chunkSize") || "150");
       result = await refreshProducts(sb, lang, chunkSize);
