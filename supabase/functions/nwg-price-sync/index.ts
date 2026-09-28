@@ -163,13 +163,19 @@ async function requestToken(body: URLSearchParams): Promise<TokenResponse> {
   return json;
 }
 
-async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise<string> {
-  // The same partner token powers the healthy NWG catalog integration and is
-  // accepted by the customer-price endpoint. Prefer it over the fragile,
-  // rotating browser refresh token whenever it is configured.
-  const partnerToken = Deno.env.get("NWG_ACCESS_TOKEN");
-  if (partnerToken) return partnerToken;
+async function passwordToken(): Promise<TokenResponse> {
+  const username = Deno.env.get("NWG_USERNAME");
+  const password = Deno.env.get("NWG_PASSWORD");
+  if (!username || !password) throw new Error("NWG_USERNAME or NWG_PASSWORD missing");
+  return await requestToken(new URLSearchParams({
+    grant_type: "password",
+    client_id: CLIENT_ID,
+    username,
+    password,
+  }));
+}
 
+async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise<string> {
   for (let attempt = 0; attempt < 50; attempt++) {
     const auth = await readAuth(sb);
     if (!forceRefresh && auth.access_token && isFuture(auth.access_token_expires_at, ACCESS_TOKEN_SKEW_MS)) {
@@ -197,11 +203,21 @@ async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise
     }
 
     try {
-      const json = await requestToken(new URLSearchParams({
-        grant_type: "refresh_token",
-        client_id: CLIENT_ID,
-        refresh_token: auth.refresh_token!,
-      }));
+      let json: TokenResponse;
+      try {
+        json = await requestToken(new URLSearchParams({
+          grant_type: "refresh_token",
+          client_id: CLIENT_ID,
+          refresh_token: auth.refresh_token ?? "",
+        }));
+      } catch (refreshError) {
+        const message = (refreshError as Error).message;
+        if (!message.includes("invalid_grant")) throw refreshError;
+        // A rotating browser refresh token can expire even though the NWG
+        // account credentials are unchanged. Re-authenticate as the customer;
+        // the catalog partner token must never be used for customer prices.
+        json = await passwordToken();
+      }
       const expiresIn = Math.max(Number(json.expires_in ?? 300), 60);
       const { data: saved, error: saveError } = await sb.from("nwg_auth").update({
         refresh_token: json.refresh_token || auth.refresh_token,
@@ -294,13 +310,15 @@ Deno.serve(async (req) => {
         .maybeSingle();
       if (sampleError) throw new Error(`NWG sample SKU: ${sampleError.message}`);
       if (!sample?.sku) throw new Error("NWG has no active SKU for authorization test");
-      await fetchPrices(token, [sample.sku]);
+      const rows = await fetchPrices(token, [sample.sku]);
+      const priced = rows.find((row) => row.sku === sample.sku && row.valid && typeof row.num === "number" && row.num > 0);
+      if (!priced) throw new Error("NWG customer login succeeded, but the customer-price endpoint returned no contract price");
       await finishLog(sb, logId, {
         status: "success",
         message: "NWG līgumcenu pieeja pārbaudīta",
-        details: { authorization: "verified" },
+        details: { authorization: "verified", contract_price: "verified" },
       });
-      return new Response(JSON.stringify({ ok: true, authorization: "verified" }), {
+      return new Response(JSON.stringify({ ok: true, authorization: "verified", contract_price: "verified" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -461,10 +479,9 @@ Deno.serve(async (req) => {
             await writeChunk(updates.slice(j, j + 500));
           }
 
-          // `valid: false` is the customer commerce API's authoritative answer
-          // that this account cannot currently buy the SKU. Never leave an old
-          // contract price behind, because that would keep a withdrawn model in
-          // the public catalog even though it only exists in NWG's global feed.
+          // A missing row or `valid:false` can also mean a temporary customer
+          // context/API problem. Never destroy an already verified contract
+          // price from that response; only mark the SKU as attempted.
           const offeredSkus = new Set(
             rows
               .filter((r) => r.valid && typeof r.num === "number" && r.num > 0)
@@ -476,8 +493,6 @@ Deno.serve(async (req) => {
             const { error } = await sb
               .from("nwg_skus")
               .update({
-                purchase_price: null,
-                purchase_currency: null,
                 purchase_updated_at: now,
               })
               .in("sku", chunk);
