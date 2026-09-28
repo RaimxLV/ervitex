@@ -272,6 +272,21 @@ const Header = () => {
         </div>
       </div>
 
+      {/* Desktop search bar — zem pašas galvenes, satura ritināšanas plūsmā */}
+      {searchOpen && (
+        <div className="hidden border-t border-primary-foreground/10 bg-primary px-4 py-2.5 sm:px-6 xl:block">
+          <div className="mx-auto max-w-3xl">
+            <HeaderSearch
+              autoFocus
+              inline
+              className="w-full"
+              inputClassName="h-10"
+              onDone={() => setSearchOpen(false)}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Desktop Mega Menu */}
       <div
         ref={megaPanelRef}
