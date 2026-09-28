@@ -307,6 +307,23 @@ Deno.serve(async (req) => {
   const mode = (url.searchParams.get("mode") || "sync").toLowerCase();
 
   try {
+    if (mode === "auth") {
+      const token = await getAccessToken(sb);
+      const { data: sample, error: sampleError } = await sb
+        .from("nwg_skus")
+        .select("sku")
+        .eq("active", true)
+        .eq("discontinued", false)
+        .limit(1)
+        .maybeSingle();
+      if (sampleError) throw new Error(`NWG sample SKU: ${sampleError.message}`);
+      if (!sample?.sku) throw new Error("NWG has no active SKU for authorization test");
+      await fetchPrices(token, [sample.sku]);
+      return new Response(JSON.stringify({ ok: true, authorization: "verified" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (mode === "seed") {
       // Only signed-in admins may replace the stored NWG credential.
       const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
