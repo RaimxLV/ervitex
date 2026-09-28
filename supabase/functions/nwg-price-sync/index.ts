@@ -163,18 +163,6 @@ async function requestToken(body: URLSearchParams): Promise<TokenResponse> {
   return json;
 }
 
-async function passwordToken(): Promise<TokenResponse> {
-  const username = Deno.env.get("NWG_USERNAME");
-  const password = Deno.env.get("NWG_PASSWORD");
-  if (!username || !password) throw new Error("NWG_USERNAME or NWG_PASSWORD missing");
-  return await requestToken(new URLSearchParams({
-    grant_type: "password",
-    client_id: CLIENT_ID,
-    username,
-    password,
-  }));
-}
-
 async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise<string> {
   // The same partner token powers the healthy NWG catalog integration and is
   // accepted by the customer-price endpoint. Prefer it over the fragile,
@@ -209,30 +197,11 @@ async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise
     }
 
     try {
-      let json: TokenResponse;
-      try {
-        json = await requestToken(new URLSearchParams({
-          grant_type: "refresh_token",
-          client_id: CLIENT_ID,
-          refresh_token: auth.refresh_token,
-        }));
-      } catch (refreshError) {
-        const message = (refreshError as Error).message;
-        if (!message.includes("invalid_grant")) throw refreshError;
-
-        // NWG rotates refresh tokens. If a previous process consumed one but
-        // failed before saving the replacement, recover automatically with the
-        // unchanged account credentials already held in the secret store. Some
-        // NWG tenants disable password grant for ReactJs; in that case the
-        // separately issued partner API token remains the safe fallback.
-        try {
-          json = await passwordToken();
-        } catch (passwordError) {
-          const partnerToken = Deno.env.get("NWG_ACCESS_TOKEN");
-          if (!partnerToken) throw passwordError;
-          json = { access_token: partnerToken, expires_in: 300 };
-        }
-      }
+      const json = await requestToken(new URLSearchParams({
+        grant_type: "refresh_token",
+        client_id: CLIENT_ID,
+        refresh_token: auth.refresh_token!,
+      }));
       const expiresIn = Math.max(Number(json.expires_in ?? 300), 60);
       const { data: saved, error: saveError } = await sb.from("nwg_auth").update({
         refresh_token: json.refresh_token || auth.refresh_token,
