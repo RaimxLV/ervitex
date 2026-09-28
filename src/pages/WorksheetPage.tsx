@@ -3,17 +3,14 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { money } from "@/lib/offer";
 import {
   PRINT_METHODS, lineNet, printNet, worksheetTotals,
   type PrintLine, type Worksheet, type WorksheetItem, type WorksheetVersion,
 } from "@/lib/worksheet";
-import { CheckCircle2, ChevronDown, Clock3, Copy, History, Loader2, Mail, Plus, Printer, Repeat, RotateCcw, Send, ShieldCheck, Store, Trash2, Undo2, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock3, Copy, DoorOpen, History, Loader2, Mail, Plus, Printer, Repeat, RotateCcw, Store, Trash2, Undo2, X } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
-import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { useAuth } from "@/hooks/useAuth";
 import { startWorksheetPick } from "@/lib/worksheetPick";
 import RowVariantControls from "@/components/worksheet/RowVariantControls";
@@ -33,7 +30,6 @@ const WorksheetPage = () => {
   const [dirty, setDirty] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState(false);
-  const [savedOnce, setSavedOnce] = useState(false);
   const [versions, setVersions] = useState<WorksheetVersion[]>([]);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const saveSequence = useRef(0);
@@ -41,48 +37,28 @@ const WorksheetPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isStaff = isAdmin || searchParams.get("v") === "pm";
-  const [replyOpen, setReplyOpen] = useState(false);
-  const [replyText, setReplyText] = useState("");
-  const [replySending, setReplySending] = useState(false);
   const publicUrl = `https://raimxlv.github.io/ervitex/saraksts/${token}`;
 
-  const copyLink = async () => {
+  const copyEmailButton = async () => {
+    const label = "ATVĒRT PREČU SARAKSTU";
+    const html = `<table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td style="background:#111111;border-radius:3px"><a href="${publicUrl}" style="display:inline-block;padding:13px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:13px;font-weight:700;text-decoration:none">${label}</a></td></tr></table>`;
+    const text = `${label}\n${publicUrl}`;
     try {
-      await navigator.clipboard.writeText(publicUrl);
-      toast.success("Saite nokopēta");
+      if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            "text/html": new Blob([html], { type: "text/html" }),
+            "text/plain": new Blob([text], { type: "text/plain" }),
+          }),
+        ]);
+        toast.success("E-pasta poga nokopēta");
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      toast.success("Poga nokopēta kā saite");
     } catch {
-      window.prompt("Saite", publicUrl);
+      window.prompt("Nokopē un ielīmē e-pastā", text);
     }
-  };
-
-  const sendToClient = async () => {
-    if (!sheet?.email || !token) return;
-    setReplySending(true);
-    const pmMail = sheet.assigned_pm_email || "laura@ervitex.lv";
-    const pmName = sheet.assigned_pm_name || "Laura";
-    const { data, error } = await supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "worksheet-update",
-        recipientEmail: sheet.email,
-        replyTo: pmMail,
-        fromEmail: pmMail,
-        fromName: pmName,
-        idempotencyKey: `ws-${token}-r${sheet.revision}-${Date.now()}`,
-        templateData: {
-          message: replyText.trim(),
-          pmName,
-          pmEmail: pmMail,
-          company: sheet.company || "",
-          clientName: sheet.name || "",
-          worksheetUrl: publicUrl,
-        },
-      },
-    });
-    setReplySending(false);
-    if (error || (data as { error?: unknown } | null)?.error) return toast.error("Neizdevās nosūtīt");
-    toast.success("Nosūtīts klientam");
-    setReplyText("");
-    setReplyOpen(false);
   };
 
   /** Reads the live sheet. `withItems` is false after status actions so local edits survive. */
@@ -121,12 +97,6 @@ const WorksheetPage = () => {
 
   const totals = useMemo(() => worksheetTotals(items, sheet?.vat_rate ?? 21), [items, sheet?.vat_rate]);
   const readOnly = !!sheet?.locked;
-  const assignedSlug = useMemo(() => {
-    const byEmail = ASSIGNEES.find((a) => a.email.toLowerCase() === (sheet?.assigned_pm_email || "").toLowerCase());
-    return byEmail?.slug || "";
-  }, [sheet?.assigned_pm_email]);
-  const statusLabel = sheet?.status === "closed" ? "Pabeigts" : sheet?.assigned_pm_email ? "Darbā" : "Jauns";
-
   const patch = (id: string, changes: Partial<WorksheetItem>) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...changes } : i)));
     setDirty(true);
@@ -213,21 +183,19 @@ const WorksheetPage = () => {
       return;
     }
     await Promise.all([reload(true), loadVersions()]);
-    setSavedOnce(true);
     setSaveState("saved");
     toast.success(`Saglabāts${typeof data === "number" ? ` · versija ${data}` : ""}`);
-    closeView();
   };
 
   const closeView = () => {
-    if (isStaff) {
-      setReplyOpen(true);
-      return;
+    if (dirty || sheet?.draft_items) {
+      const leave = window.confirm("Ir neapstiprinātas izmaiņas. Aizvērt, tās neapstiprinot?");
+      if (!leave) return;
     }
+    window.close();
     window.setTimeout(() => {
-      window.close();
       if (!window.closed) navigate(isAdmin ? "/admin/quotes" : "/");
-    }, 600);
+    }, 250);
   };
 
   const discardDraft = async () => {
@@ -256,47 +224,6 @@ const WorksheetPage = () => {
     setSaveState("saved");
     toast.success(`Versija ${version.revision} atjaunota kā melnraksts`);
   };
-  const assign = async (slug: string) => {
-    if (!token || !sheet) return;
-    const person = assigneeBySlug(slug);
-    if (!person) return;
-    setActionBusy(true);
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quote-action?token=${token}&action=assign:${person.slug}&format=json`,
-      );
-      const out = (await res.json().catch(() => null)) as { ok?: boolean; emailed?: boolean } | null;
-      if (!res.ok || !out?.ok) throw new Error("Neizdevās nodot");
-      await reload(false);
-      if (out.emailed === false) toast.warning(`Nodots ${person.name} — vēstule uz ${person.email} neaizgāja`);
-      else toast.success(`Nodots ${person.name}`);
-    } catch {
-      toast.error("Neizdevās nodot");
-    } finally {
-      setActionBusy(false);
-    }
-  };
-
-  const complete = async () => {
-    if (!sheet) return;
-    setActionBusy(true);
-    if (dirty && !(await save())) {
-      setActionBusy(false);
-      return;
-    }
-    const { error } = await supabase
-      .from("quote_requests")
-      .update({ status: "closed", completed_at: new Date().toISOString(), worksheet_locked: true } as never)
-      .eq("id", sheet.id);
-    setActionBusy(false);
-    if (error) {
-      toast.error("Neizdevās pabeigt");
-      return;
-    }
-    await reload(true);
-    toast.success("Pabeigts");
-  };
-
   if (loading) {
     return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Ielādē…</div>;
   }
@@ -562,61 +489,62 @@ const WorksheetPage = () => {
           )}
 
           {!readOnly && (
-            <div className="mt-6 flex flex-col gap-3 rounded-md border border-border bg-muted/40 p-4 sm:flex-row sm:items-center sm:justify-end print:hidden">
-              <div className="flex flex-wrap gap-2">
-                <Button onClick={confirmChanges} disabled={saving || actionBusy}>
-                  {saving || actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-                  Saglabāt un aizvērt
-                </Button>
-                {(dirty || sheet.draft_items) && (
-                  <Button variant="outline" onClick={discardDraft} disabled={saving || actionBusy}>
-                    <Undo2 className="mr-2 h-4 w-4" /> Atcelt izmaiņas
+            <section className="mt-6 space-y-4 border-t border-border pt-5 print:hidden">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-heading text-sm font-black uppercase tracking-wide">1. Saglabā sarakstu</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Apstiprina pašreizējās preces, daudzumus un cenas.</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(dirty || sheet.draft_items) && (
+                    <Button variant="outline" onClick={discardDraft} disabled={saving || actionBusy}>
+                      <Undo2 className="mr-2 h-4 w-4" /> Atcelt izmaiņas
+                    </Button>
+                  )}
+                  <Button onClick={confirmChanges} disabled={saving || actionBusy}>
+                    {saving || actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+                    Saglabāt izmaiņas
                   </Button>
-                )}
-                {isStaff && (
-                  <Button variant="outline" onClick={copyLink}>
-                    <Copy className="mr-2 h-4 w-4" /> Kopēt saiti
-                  </Button>
-                )}
-                {isStaff && !replyOpen && sheet.email && (
-                  <Button variant="outline" onClick={() => setReplyOpen(true)}>
-                    <Send className="mr-2 h-4 w-4" /> Ziņa klientam
-                  </Button>
-                )}
-                {!isStaff && !dirty && !sheet.draft_items && (
-                  <Button variant="outline" asChild>
-                    <a href={mailtoNext}>
-                      <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}
-                    </a>
-                  </Button>
-                )}
+                </div>
               </div>
-            </div>
-          )}
 
-          {isStaff && replyOpen && sheet.email && (
-            <div className="mt-4 space-y-3 rounded-md border border-border p-4 print:hidden">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="font-heading text-sm font-black uppercase tracking-wide">Ziņa klientam</h2>
-                <span className="text-sm text-muted-foreground">{sheet.email}</span>
-              </div>
-              <textarea
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                rows={5}
-                className="w-full rounded-sm border border-input bg-background p-3 text-sm"
-                placeholder="Labdien! ..."
-              />
-              <div className="flex flex-wrap gap-2">
-                <Button onClick={sendToClient} disabled={replySending || !replyText.trim()}>
-                  {replySending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
-                  Nosūtīt
+              {isStaff && (
+                <div className="border-t border-border pt-4">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="font-heading text-sm font-black uppercase tracking-wide">2. Ielīmē pogu parastajā e-pastā</p>
+                      <p className="mt-1 text-sm text-muted-foreground">Nokopē un ielīmē zem savas atbildes klientam.</p>
+                    </div>
+                    <Button variant="outline" onClick={copyEmailButton} disabled={dirty || !!sheet.draft_items || saving || actionBusy}>
+                      <Copy className="mr-2 h-4 w-4" /> Kopēt e-pastam
+                    </Button>
+                  </div>
+                  <div className="mt-3 rounded-sm border border-dashed border-border bg-background p-4">
+                    <span className="inline-flex rounded-sm bg-foreground px-5 py-3 font-heading text-xs font-black uppercase text-background">
+                      Atvērt preču sarakstu
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {!isStaff && !dirty && !sheet.draft_items && (
+                <Button variant="outline" asChild>
+                  <a href={mailtoNext}>
+                    <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}
+                  </a>
                 </Button>
-                <Button variant="ghost" onClick={() => setReplyOpen(false)}>
-                  <X className="mr-2 h-4 w-4" /> Aizvērt
+              )}
+
+              <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-heading text-sm font-black uppercase tracking-wide">{isStaff ? "3. Aizver, kad darbs pabeigts" : "2. Aizver, kad darbs pabeigts"}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Sarakstu var atvērt vēlreiz no tās pašas saites.</p>
+                </div>
+                <Button variant="ghost" onClick={closeView}>
+                  <DoorOpen className="mr-2 h-4 w-4" /> Aizvērt
                 </Button>
               </div>
-            </div>
+            </section>
           )}
         </article>
 
