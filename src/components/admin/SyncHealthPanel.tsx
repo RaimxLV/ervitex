@@ -119,7 +119,8 @@ const SyncHealthPanel = () => {
   );
 
   const nwgPriceLog = useMemo(() => logs.find((l) => l.source === "nwg:prices"), [logs]);
-  const tokenExpired = !!nwgPriceLog?.message?.includes("invalid_grant");
+  const tokenExpired =
+    nwgPriceLog?.status === "error" && !!nwgPriceLog.message?.includes("invalid_grant");
 
   const callFn = async (fn: string, query = "", body?: unknown) => {
     const session = (await supabase.auth.getSession()).data.session;
@@ -259,8 +260,7 @@ const SyncHealthPanel = () => {
               <p className="text-sm font-medium text-destructive">NWG līgumcenu atjaunošana jāpārbauda</p>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Preču katalogs turpina darboties. Sistēma pati atjauno cenu pieeju ar saglabāto NWG kontu;
-              palaid cenu sinhronizāciju vēlreiz.
+              Preču katalogs turpina darboties. Cenu pieeju pārbaudi, palaižot cenu sinhronizāciju vēlreiz.
             </p>
             <Button
               variant="outline"
