@@ -1522,6 +1522,41 @@ export type Database = {
           },
         ]
       }
+      quote_events: {
+        Row: {
+          actor_name: string | null
+          created_at: string
+          details: Json
+          event_type: string
+          id: string
+          quote_id: string
+        }
+        Insert: {
+          actor_name?: string | null
+          created_at?: string
+          details?: Json
+          event_type: string
+          id?: string
+          quote_id: string
+        }
+        Update: {
+          actor_name?: string | null
+          created_at?: string
+          details?: Json
+          event_type?: string
+          id?: string
+          quote_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_events_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_requests: {
         Row: {
           action_token: string | null
@@ -1547,8 +1582,17 @@ export type Database = {
           ref: string | null
           status: string
           updated_at: string
+          worksheet_client_draft: Json | null
+          worksheet_client_draft_at: string | null
+          worksheet_client_draft_by: string | null
+          worksheet_client_draft_revision: number | null
           worksheet_items: Json
           worksheet_locked: boolean
+          worksheet_revision: number
+          worksheet_staff_draft: Json | null
+          worksheet_staff_draft_at: string | null
+          worksheet_staff_draft_by: string | null
+          worksheet_staff_draft_revision: number | null
           worksheet_updated_at: string | null
           worksheet_updated_by: string | null
           worksheet_vat_rate: number
@@ -1577,8 +1621,17 @@ export type Database = {
           ref?: string | null
           status?: string
           updated_at?: string
+          worksheet_client_draft?: Json | null
+          worksheet_client_draft_at?: string | null
+          worksheet_client_draft_by?: string | null
+          worksheet_client_draft_revision?: number | null
           worksheet_items?: Json
           worksheet_locked?: boolean
+          worksheet_revision?: number
+          worksheet_staff_draft?: Json | null
+          worksheet_staff_draft_at?: string | null
+          worksheet_staff_draft_by?: string | null
+          worksheet_staff_draft_revision?: number | null
           worksheet_updated_at?: string | null
           worksheet_updated_by?: string | null
           worksheet_vat_rate?: number
@@ -1607,8 +1660,17 @@ export type Database = {
           ref?: string | null
           status?: string
           updated_at?: string
+          worksheet_client_draft?: Json | null
+          worksheet_client_draft_at?: string | null
+          worksheet_client_draft_by?: string | null
+          worksheet_client_draft_revision?: number | null
           worksheet_items?: Json
           worksheet_locked?: boolean
+          worksheet_revision?: number
+          worksheet_staff_draft?: Json | null
+          worksheet_staff_draft_at?: string | null
+          worksheet_staff_draft_by?: string | null
+          worksheet_staff_draft_revision?: number | null
           worksheet_updated_at?: string | null
           worksheet_updated_by?: string | null
           worksheet_vat_rate?: number
@@ -1619,6 +1681,47 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_worksheet_versions: {
+        Row: {
+          actor_name: string | null
+          actor_side: string
+          created_at: string
+          id: string
+          items: Json
+          quote_id: string
+          revision: number
+          summary: string
+        }
+        Insert: {
+          actor_name?: string | null
+          actor_side: string
+          created_at?: string
+          id?: string
+          items?: Json
+          quote_id: string
+          revision: number
+          summary?: string
+        }
+        Update: {
+          actor_name?: string | null
+          actor_side?: string
+          created_at?: string
+          id?: string
+          items?: Json
+          quote_id?: string
+          revision?: number
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_worksheet_versions_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -2550,8 +2653,16 @@ export type Database = {
       }
     }
     Functions: {
+      confirm_quote_worksheet: {
+        Args: { _by?: string; _token: string }
+        Returns: number
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
+        Returns: boolean
+      }
+      discard_quote_worksheet_draft: {
+        Args: { _token: string }
         Returns: boolean
       }
       email_queue_dispatch: { Args: never; Returns: undefined }
@@ -2587,10 +2698,14 @@ export type Database = {
       get_quote_worksheet: {
         Args: { _token: string }
         Returns: {
+          actor_side: string
           assigned_pm_email: string
           assigned_pm_name: string
           company: string
           created_at: string
+          draft_items: Json
+          draft_updated_at: string
+          draft_updated_by: string
           email: string
           id: string
           items: Json
@@ -2598,10 +2713,23 @@ export type Database = {
           message: string
           name: string
           phone: string
+          revision: number
           status: string
           vat_rate: number
           worksheet_updated_at: string
           worksheet_updated_by: string
+        }[]
+      }
+      get_quote_worksheet_versions: {
+        Args: { _token: string }
+        Returns: {
+          actor_name: string
+          actor_side: string
+          created_at: string
+          id: string
+          items: Json
+          revision: number
+          summary: string
         }[]
       }
       has_role: {
@@ -2685,8 +2813,17 @@ export type Database = {
       refresh_mf_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
+      restore_quote_worksheet_version: {
+        Args: { _by?: string; _token: string; _version_id: string }
+        Returns: boolean
+      }
       save_quote_worksheet: {
-        Args: { _by?: string; _items: Json; _token: string }
+        Args: {
+          _base_revision?: number
+          _by?: string
+          _items: Json
+          _token: string
+        }
         Returns: boolean
       }
       ss_fill_missing_variant_prices: { Args: never; Returns: number }
@@ -2700,6 +2837,7 @@ export type Database = {
           style_code: string
         }[]
       }
+      validate_worksheet_items: { Args: { _items: Json }; Returns: undefined }
     }
     Enums: {
       app_role: "admin"

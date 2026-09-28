@@ -44,6 +44,21 @@ export interface Worksheet {
   assigned_pm_name: string | null;
   assigned_pm_email: string | null;
   created_at: string;
+  revision: number;
+  draft_items: WorksheetItem[] | null;
+  draft_updated_at: string | null;
+  draft_updated_by: string | null;
+  actor_side: "client" | "staff";
+}
+
+export interface WorksheetVersion {
+  id: string;
+  revision: number;
+  items: WorksheetItem[];
+  actor_side: string;
+  actor_name: string | null;
+  summary: string;
+  created_at: string;
 }
 
 /** Apdrukas cena par gabalu (tikai rindas ar mode "unit"). */

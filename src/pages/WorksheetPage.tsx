@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,9 @@ import { toast } from "sonner";
 import { money } from "@/lib/offer";
 import {
   PRINT_METHODS, lineNet, printNet, worksheetTotals,
-  type PrintLine, type Worksheet, type WorksheetItem,
+  type PrintLine, type Worksheet, type WorksheetItem, type WorksheetVersion,
 } from "@/lib/worksheet";
-import { CheckCircle2, ChevronDown, Loader2, Mail, Plus, Printer, Repeat, Save, Store, Trash2, X } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock3, History, Loader2, Mail, Plus, Printer, Repeat, RotateCcw, ShieldCheck, Store, Trash2, Undo2, X } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,6 +34,9 @@ const WorksheetPage = () => {
   const [openId, setOpenId] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState(false);
   const [savedOnce, setSavedOnce] = useState(false);
+  const [versions, setVersions] = useState<WorksheetVersion[]>([]);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const saveSequence = useRef(0);
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
@@ -44,8 +47,9 @@ const WorksheetPage = () => {
     if (!row) return null;
     setSheet(row);
     if (withItems) {
+      const activeItems = Array.isArray(row.draft_items) ? row.draft_items : row.items;
       setItems(
-        (Array.isArray(row.items) ? row.items : []).map((i, idx) => ({
+        (Array.isArray(activeItems) ? activeItems : []).map((i, idx) => ({
           ...i,
           id: i.id || `row-${idx}`,
           qty: Number(i.qty) || 0,
@@ -56,9 +60,15 @@ const WorksheetPage = () => {
     return row;
   };
 
+  const loadVersions = async () => {
+    const { data } = await supabase.rpc("get_quote_worksheet_versions" as any, { _token: token });
+    setVersions((Array.isArray(data) ? data : []) as WorksheetVersion[]);
+  };
+
   useEffect(() => {
     (async () => {
       await reload(true);
+      await loadVersions();
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,6 +85,7 @@ const WorksheetPage = () => {
   const patch = (id: string, changes: Partial<WorksheetItem>) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...changes } : i)));
     setDirty(true);
+    setSaveState("idle");
   };
   const patchPrint = (id: string, idx: number, changes: Partial<PrintLine>) =>
     patch(id, {
@@ -87,6 +98,7 @@ const WorksheetPage = () => {
   const removeRow = (id: string) => {
     setItems((prev) => prev.filter((i) => i.id !== id));
     setDirty(true);
+    setSaveState("idle");
   };
 
   /** Aizved uz parasto katalogu ar visiem filtriem; izvēlētās preces atgriežas sarakstā. */
@@ -102,23 +114,84 @@ const WorksheetPage = () => {
     navigate("/catalog");
   };
 
-  const save = async () => {
+  const save = async (quiet = false) => {
+    const sequence = ++saveSequence.current;
     setSaving(true);
+    setSaveState("saving");
     const { data, error } = await supabase.rpc("save_quote_worksheet" as any, {
       _token: token,
       _items: items as any,
       _by: editor || null,
+      _base_revision: sheet?.revision ?? 0,
     });
     setSaving(false);
     if (error || data === false) {
-      toast.error(error?.message ? `Neizdevās saglabāt: ${error.message}` : "Neizdevās saglabāt — saraksts ir slēgts");
+      setSaveState("error");
+      if (!quiet) toast.error(error?.message ? `Neizdevās saglabāt: ${error.message}` : "Neizdevās saglabāt — saraksts ir slēgts");
       return false;
     }
-    setDirty(false);
-    setSavedOnce(true);
-    setSheet((s) => (s ? { ...s, worksheet_updated_at: new Date().toISOString(), worksheet_updated_by: editor || null } : s));
-    toast.success("Saglabāts");
+    if (sequence === saveSequence.current) {
+      const savedAt = new Date().toISOString();
+      setDirty(false);
+      setSaveState("saved");
+      setSheet((s) => (s ? { ...s, draft_items: items, draft_updated_at: savedAt, draft_updated_by: editor || null } : s));
+    }
+    if (!quiet) toast.success("Melnraksts saglabāts");
     return true;
+  };
+
+  useEffect(() => {
+    if (!dirty || readOnly) return;
+    const timer = window.setTimeout(() => void save(true), 900);
+    return () => window.clearTimeout(timer);
+    // `items` is the autosave payload; editor is intentionally captured with it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, editor, dirty, readOnly]);
+
+  const confirmChanges = async () => {
+    if (!token) return;
+    setActionBusy(true);
+    if (dirty && !(await save())) {
+      setActionBusy(false);
+      return;
+    }
+    const { data, error } = await supabase.rpc("confirm_quote_worksheet" as any, { _token: token, _by: editor || null });
+    setActionBusy(false);
+    if (error) {
+      toast.error("Neizdevās apstiprināt izmaiņas");
+      return;
+    }
+    await Promise.all([reload(true), loadVersions()]);
+    setSavedOnce(true);
+    setSaveState("saved");
+    toast.success(`Izmaiņas apstiprinātas${typeof data === "number" ? ` · versija ${data}` : ""}`);
+  };
+
+  const discardDraft = async () => {
+    if (!token || !window.confirm("Atmest visas neapstiprinātās izmaiņas?")) return;
+    setActionBusy(true);
+    const { data, error } = await supabase.rpc("discard_quote_worksheet_draft" as any, { _token: token });
+    setActionBusy(false);
+    if (error || data === false) return toast.error("Neizdevās atmest melnrakstu");
+    setDirty(false);
+    setSaveState("idle");
+    await reload(true);
+    toast.success("Melnraksts atmests");
+  };
+
+  const restoreVersion = async (version: WorksheetVersion) => {
+    if (!token || !window.confirm(`Atjaunot versiju ${version.revision} kā jaunu melnrakstu?`)) return;
+    setActionBusy(true);
+    const { data, error } = await supabase.rpc("restore_quote_worksheet_version" as any, {
+      _token: token,
+      _version_id: version.id,
+      _by: editor || null,
+    });
+    setActionBusy(false);
+    if (error || data === false) return toast.error("Neizdevās atjaunot versiju");
+    await reload(true);
+    setSaveState("saved");
+    toast.success(`Versija ${version.revision} atjaunota kā melnraksts`);
   };
   const assign = async (slug: string) => {
     if (!token || !sheet) return;
@@ -231,6 +304,19 @@ const WorksheetPage = () => {
                 Pēdējās izmaiņas: {new Date(sheet.worksheet_updated_at).toLocaleString("lv-LV")}
                 {sheet.worksheet_updated_by ? ` · ${sheet.worksheet_updated_by}` : ""}
               </p>
+            )}
+            {!readOnly && (
+              <div className="mt-4 flex flex-wrap items-center gap-2 rounded-sm border border-border bg-muted/40 px-3 py-2 text-xs">
+                {saveState === "saving" ? <Loader2 className="h-4 w-4 animate-spin text-accent" /> : <ShieldCheck className="h-4 w-4 text-accent" />}
+                <span className="font-medium text-foreground">
+                  {saveState === "saving" ? "Saglabā melnrakstu…" : saveState === "error" ? "Melnrakstu neizdevās saglabāt" : sheet.draft_items ? "Ir neapstiprinātas izmaiņas" : "Izmaiņas apstiprinātas"}
+                </span>
+                {(sheet.draft_updated_at || sheet.worksheet_updated_at) && (
+                  <span className="text-muted-foreground">
+                    · {new Date(sheet.draft_updated_at || sheet.worksheet_updated_at || "").toLocaleString("lv-LV")}
+                  </span>
+                )}
+              </div>
             )}
             {readOnly && (
               <p className="mt-3 rounded-sm border border-dashed border-border p-3 text-xs text-muted-foreground">
@@ -417,6 +503,31 @@ const WorksheetPage = () => {
             </dl>
           </div>
 
+          {versions.length > 0 && (
+            <section className="mt-6 border-t border-border pt-5 print:hidden">
+              <h2 className="flex items-center gap-2 font-heading text-sm font-black uppercase tracking-wide">
+                <History className="h-4 w-4 text-accent" /> Versiju vēsture
+              </h2>
+              <div className="mt-3 divide-y divide-border rounded-sm border border-border">
+                {versions.map((version) => (
+                  <div key={version.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5 text-sm">
+                    <span className="font-semibold">Versija {version.revision}</span>
+                    <span className="text-muted-foreground">{version.actor_name || (version.actor_side === "staff" ? "Ervitex" : "Klients")}</span>
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock3 className="h-3.5 w-3.5" /> {new Date(version.created_at).toLocaleString("lv-LV")}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{version.items.length} preces</span>
+                    {!readOnly && version.revision !== sheet.revision && (
+                      <Button className="ml-auto" size="sm" variant="ghost" onClick={() => restoreVersion(version)} disabled={actionBusy}>
+                        <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Atjaunot
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {!readOnly && (
             <div className="mt-6 flex flex-col gap-3 rounded-md border border-border bg-muted/40 p-4 sm:flex-row sm:items-end sm:justify-between print:hidden">
               <label className="block sm:max-w-xs sm:flex-1">
@@ -424,11 +535,16 @@ const WorksheetPage = () => {
                 <Input value={editor} placeholder="Piem. Jānis" onChange={(e) => setEditor(e.target.value)} />
               </label>
               <div className="flex flex-wrap gap-2">
-                <Button onClick={save} disabled={saving || !dirty}>
-                  {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                  {dirty ? "Saglabāt" : "Saglabāts"}
+                <Button onClick={confirmChanges} disabled={saving || actionBusy || (!dirty && !sheet.draft_items)}>
+                  {saving || actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+                  Apstiprināt izmaiņas
                 </Button>
-                {savedOnce && !dirty && (
+                {(dirty || sheet.draft_items) && (
+                  <Button variant="outline" onClick={discardDraft} disabled={saving || actionBusy}>
+                    <Undo2 className="mr-2 h-4 w-4" /> Atmest melnrakstu
+                  </Button>
+                )}
+                {savedOnce && !dirty && !sheet.draft_items && (
                   <Button variant="outline" asChild>
                     <a href={mailtoNext}>
                       <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}

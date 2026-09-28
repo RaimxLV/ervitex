@@ -12,7 +12,6 @@ import { useAuth } from "@/hooks/useAuth";
 
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { OFFICE_EMAIL } from "@/data/projectManagers";
 import { Trash2, Upload, Send, X, ArrowLeft } from "lucide-react";
 
 const MAX_FILES = 10;
@@ -93,9 +92,6 @@ const RequestPage = () => {
 
     setSending(true);
     try {
-      const assignedEmail = OFFICE_EMAIL;
-      const assignedName = lang === "lv" ? "Ervitex birojs" : "Ervitex office";
-
       const messageParts: string[] = [];
       if (print.notes) messageParts.push(print.notes);
       const message = messageParts.join("\n\n").slice(0, 9800);
@@ -121,8 +117,6 @@ const RequestPage = () => {
           print_colors: print.colors || null,
           deadline: print.deadline || null,
           file_urls: [],
-          assigned_pm_email: assignedEmail,
-          assigned_pm_name: assignedName,
         });
       if (insErr) throw insErr;
 
@@ -154,7 +148,7 @@ const RequestPage = () => {
       toast({
         title: t("Pieprasījums nosūtīts!", "Request sent!"),
         description: delivered
-          ? t(`${assignedName} sazināsies ar Tevi tuvākajā laikā.`, `${assignedName} will contact you shortly.`)
+          ? t("Mēs sazināsimies ar Tevi tuvākajā laikā.", "We will contact you shortly.")
           : t(
               `Pieprasījums saglabāts. Ja neredzi apstiprinājumu e-pastā, zvani mums.`,
               `Request saved. If you don't see a confirmation e-mail, please call us.`,

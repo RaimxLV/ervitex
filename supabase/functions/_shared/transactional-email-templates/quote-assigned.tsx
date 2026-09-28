@@ -49,6 +49,7 @@ const cta = {
   textDecoration: 'none',
 }
 const noteBox = { whiteSpace: 'pre-line' as const, fontSize: '13px', background: '#f6f6f6', padding: '10px', borderRadius: '3px' }
+const replyBox = { fontSize: '14px', lineHeight: '21px', background: '#f6f6f6', borderLeft: '3px solid #111', padding: '10px 12px', margin: '14px 0' }
 
 const QuoteAssignedEmail = ({
   assigneeName = '',
@@ -75,6 +76,10 @@ const QuoteAssignedEmail = ({
           <Section style={header}>
             <Heading style={h1}>PIEPRASĪJUMS TEV</Heading>
           </Section>
+
+          <Text style={replyBox}>
+            Ja pieprasījums ir saprotams, spied e-pastā “Atbildēt” — atbilde aizies tieši klientam. Preces un cenas labo kopīgajā sarakstā un pēc tam apstiprini izmaiņas.
+          </Text>
 
           {worksheetUrl ? (
             <Section>
