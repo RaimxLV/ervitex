@@ -1585,12 +1585,14 @@ export type Database = {
           worksheet_client_draft: Json | null
           worksheet_client_draft_at: string | null
           worksheet_client_draft_by: string | null
+          worksheet_client_draft_revision: number | null
           worksheet_items: Json
           worksheet_locked: boolean
           worksheet_revision: number
           worksheet_staff_draft: Json | null
           worksheet_staff_draft_at: string | null
           worksheet_staff_draft_by: string | null
+          worksheet_staff_draft_revision: number | null
           worksheet_updated_at: string | null
           worksheet_updated_by: string | null
           worksheet_vat_rate: number
@@ -1622,12 +1624,14 @@ export type Database = {
           worksheet_client_draft?: Json | null
           worksheet_client_draft_at?: string | null
           worksheet_client_draft_by?: string | null
+          worksheet_client_draft_revision?: number | null
           worksheet_items?: Json
           worksheet_locked?: boolean
           worksheet_revision?: number
           worksheet_staff_draft?: Json | null
           worksheet_staff_draft_at?: string | null
           worksheet_staff_draft_by?: string | null
+          worksheet_staff_draft_revision?: number | null
           worksheet_updated_at?: string | null
           worksheet_updated_by?: string | null
           worksheet_vat_rate?: number
@@ -1659,12 +1663,14 @@ export type Database = {
           worksheet_client_draft?: Json | null
           worksheet_client_draft_at?: string | null
           worksheet_client_draft_by?: string | null
+          worksheet_client_draft_revision?: number | null
           worksheet_items?: Json
           worksheet_locked?: boolean
           worksheet_revision?: number
           worksheet_staff_draft?: Json | null
           worksheet_staff_draft_at?: string | null
           worksheet_staff_draft_by?: string | null
+          worksheet_staff_draft_revision?: number | null
           worksheet_updated_at?: string | null
           worksheet_updated_by?: string | null
           worksheet_vat_rate?: number
