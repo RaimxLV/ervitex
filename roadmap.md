@@ -32,13 +32,14 @@
 - [x] Salabot kataloga tiešo atvēršanu un paātrināt mega izvēlni ar plūstošu animāciju.
 
 ### P0
-- [x] Salabot PF Concept cenu sinhronizāciju un NWG automātisko pieejas atjaunošanu.
+- [x] Salabot PF Concept cenu sinhronizāciju.
+- [ ] Pilnībā atjaunot NWG līgumcenas ar klienta lietotājvārdu/paroli un pārbaudīt katru aktīvo SKU.
 - [x] Rādīt katra piegādātāja cenu pārklājumu un novērst NWG noraidīto SKU bezgalīgu atkārtošanu.
 - [x] NWG katalogā parādīt visus produktus ar visām pieejamajām cenām.
   - [x] Deterministiska modeļu un SKU lapošana bez izlaistām rindām.
   - [x] Rotējošā tokena un paralēlo procesu lease aizsardzība kodā.
-  - [x] Visiem 64 409 NWG izmēriem ir cena (iepriekš 659 bija tukši).
-  - [x] Visi 2 833 pārdošanā esošie NWG modeļi katalogā ar cenu.
+  - [ ] Visām aktīvajām NWG variācijām ir pārbaudīta līgumcena; pašlaik 4 655 aktīvajām četru publisko zīmolu variācijām tās trūkst.
+  - [ ] Visiem pārdošanā esošajiem NWG modeļiem katalogā cena balstās uz pārbaudītu līgumcenu.
 - [x] Automātiski aizvērt karājošos “procesā” sinhronizāciju ierakstus.
 - [ ] Izlemt par SEO: noņemt `noindex` un `robots.txt Disallow: /`, pievienot og/twitter/canonical/sitemap.
 
