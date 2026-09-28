@@ -1283,6 +1283,9 @@ const CatalogItemDialog = ({
     return l !== "brand"; // brand is shown as a pill
   });
 
+  // Specifikācija un apraksts blakus kolonnās, kad abu ir pietiekami
+  const specsBesideDescription = filteredSpecs.length > 0 && descriptionLines.length > 0;
+
   const body = (
         <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
           <div className="space-y-3">
@@ -1500,55 +1503,13 @@ const CatalogItemDialog = ({
 
 
               {visibleSizes.length > 0 && (
-                <div>
-                  <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.sizes}</h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {visibleSizes.map((s) => {
-                      const p = sizePriceMap[s];
-                      return (
-                        <button
-                          key={s}
-                          type="button"
-                          onClick={() => setSelectedSize(selectedSize === s ? null : s)}
-                          className={`min-w-[3.25rem] rounded-sm border px-2 py-1 text-center text-xs font-medium transition-colors ${
-                            selectedSize === s
-                              ? "border-accent bg-accent text-accent-foreground"
-                              : "border-border text-foreground hover:border-accent"
-                          }`}
-                        >
-                          <span className="block leading-tight">{s}</span>
-                          {p !== undefined && (
-                            <span className={`block text-[10px] font-semibold leading-tight ${selectedSize === s ? "text-accent-foreground/90" : "text-muted-foreground"}`}>
-                              €{p.toFixed(2)}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {(() => {
-                    const groups: { sizes: string[]; price: number }[] = [];
-                    for (const s of visibleSizes) {
-                      const p = sizePriceMap[s];
-                      if (p === undefined) continue;
-                      const last = groups[groups.length - 1];
-                      if (last && Math.abs(last.price - p) < 0.005) last.sizes.push(s);
-                      else groups.push({ sizes: [s], price: p });
-                    }
-                    if (groups.length < 2) return null;
-                    return (
-                      <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-                        <span className="font-semibold text-foreground">
-                          {lang === "lv" ? "Cenas pa izmēriem (bez PVN): " : "Prices by size (excl. VAT): "}
-                        </span>
-                        {groups
-                          .map((g) =>
-                            `${g.sizes.length > 2 ? `${g.sizes[0]}–${g.sizes[g.sizes.length - 1]}` : g.sizes.join(", ")} €${g.price.toFixed(2)}`,
-                          )
-                          .join(" · ")}
-                      </p>
-                    );
-                  })()}
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 border-y border-border py-2.5">
+                  <h4 className="font-heading text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                    {label.sizes}
+                  </h4>
+                  <p className="font-heading text-lg font-black uppercase tracking-wide text-foreground">
+                    {sizeRangeLabel}
+                  </p>
                 </div>
               )}
 
