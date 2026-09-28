@@ -104,6 +104,7 @@ Deno.serve(async (req) => {
       templateName: 'quote-assigned',
       recipientEmail: person.email,
       replyTo: quote.email,
+      fromEmail: person.email.endsWith('@ervitex.lv') ? person.email : 'birojs@ervitex.lv',
       fromName: quote.name,
       idempotencyKey: `quote-${quote.id}-assign-${person.slug}`,
       templateData: {
