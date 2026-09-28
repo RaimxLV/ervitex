@@ -167,7 +167,7 @@ const WorksheetPage = () => {
   };
 
   const discardDraft = async () => {
-    if (!token || !confirm("Atmest visas neapstiprinātās izmaiņas?")) return;
+    if (!token || !window.confirm("Atmest visas neapstiprinātās izmaiņas?")) return;
     setActionBusy(true);
     const { data, error } = await supabase.rpc("discard_quote_worksheet_draft" as any, { _token: token });
     setActionBusy(false);
@@ -179,7 +179,7 @@ const WorksheetPage = () => {
   };
 
   const restoreVersion = async (version: WorksheetVersion) => {
-    if (!token || !confirm(`Atjaunot versiju ${version.revision} kā jaunu melnrakstu?`)) return;
+    if (!token || !window.confirm(`Atjaunot versiju ${version.revision} kā jaunu melnrakstu?`)) return;
     setActionBusy(true);
     const { data, error } = await supabase.rpc("restore_quote_worksheet_version" as any, {
       _token: token,
