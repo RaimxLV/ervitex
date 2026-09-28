@@ -7,6 +7,12 @@ import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
 
+const STEPS = [
+  { icon: Palette, lv: "Izvēlies krāsu un izmērus", en: "Pick colour and sizes" },
+  { icon: ListPlus, lv: "Ievadi daudzumu", en: "Enter quantity" },
+  { icon: Send, lv: "Nosūti pieprasījumu", en: "Send the request" },
+];
+
 interface Props {
   source: string;
   productId: string;

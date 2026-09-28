@@ -113,6 +113,32 @@ const cleanText = (v?: unknown): string | null => {
   return s || null;
 };
 
+// Kopšanas nosacījumi: teksts sadalīsīsīsīs īsos punktos un katram tiek ikona.
+const CARE_CLAUSE_SPLIT = /[\n•·;]+|\.\s+|,\s+/;
+const careClauses = (text: string): string[] => {
+  const out: string[] = [];
+  for (const piece of text.split(CARE_CLAUSE_SPLIT)) {
+    const p = piece.replace(/\s+/g, " ").replace(/[.\s]+$/, "").trim();
+    if (!p) continue;
+    if (out.length && p.length < 10) out[out.length - 1] = `${out[out.length - 1]}, ${p}`;
+    else out.push(p);
+  }
+  return out.slice(0, 8);
+};
+
+const careIcon = (text: string) => {
+  const t = text.toLowerCase();
+  if (/(nedrīkst|aizlieg|nepieļauj|don'?t|do not|never)/.test(t)) return Ban;
+  if (/^\s*no\s+(iron|bleach|dry|tumble|wash)|balin|bleach|hlora/.test(t)) return Ban;
+  if (/ķīmisk|dry clean|saus[āa] tīrīš|tīrīšan/.test(t)) return Sparkles;
+  if (/mazg|wash|skalo/.test(t)) return WashingMachine;
+  if (/glud|iron|presē|temperatūr|dzelzs/.test(t)) return Flame;
+  if (/žāvē|tumble|dry/.test(t)) return Wind;
+  if (/saules|tiešaj|sun exposure/.test(t)) return Sun;
+  if (/mitr|humid|ūden|water/.test(t)) return Droplets;
+  return Shirt;
+};
+
 const addSpec = (arr: { label: string; value: string }[], label: string, value?: unknown, suffix = "") => {
   const v = cleanText(value);
   if (v) arr.push({ label, value: `${v}${suffix}` });
