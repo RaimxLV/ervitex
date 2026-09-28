@@ -2,12 +2,12 @@
 import * as React from 'npm:react@18.3.1'
 import {
   Body,
-  Button,
   Container,
   Head,
   Heading,
   Hr,
   Html,
+  Link,
   Preview,
   Section,
   Text,
@@ -25,15 +25,15 @@ const container = { maxWidth: '560px', margin: '0 auto', padding: '22px' }
 const header = { borderBottom: '1px solid #111', paddingBottom: '12px', marginBottom: '18px' }
 const h1 = { fontSize: '20px', margin: '0', letterSpacing: '0.4px', color: '#111' }
 const subtle = { color: '#666', fontSize: '12px', margin: '4px 0 0' }
-const cta = {
+const worksheetLink = {
   display: 'inline-block',
-  background: '#111',
-  color: '#fff',
-  fontSize: '13px',
+  color: '#991b2f',
+  fontSize: '15px',
   fontWeight: 'bold' as const,
-  padding: '12px 18px',
-  borderRadius: '3px',
-  textDecoration: 'none',
+  lineHeight: '22px',
+  textDecoration: 'underline',
+  textDecorationThickness: '2px',
+  textUnderlineOffset: '4px',
 }
 
 const QuoteConfirmationEmail = ({ name = '', worksheetUrl = '', submittedAt = '' }: Props) => (
@@ -51,7 +51,7 @@ const QuoteConfirmationEmail = ({ name = '', worksheetUrl = '', submittedAt = ''
 
         {worksheetUrl ? (
           <Section>
-            <Button href={worksheetUrl} style={cta}>ATVĒRT PREČU SARAKSTU</Button>
+            <Link href={worksheetUrl} style={worksheetLink}>ATVĒRT PREČU SARAKSTU →</Link>
           </Section>
         ) : null}
 

@@ -39,10 +39,10 @@ const WorksheetPage = () => {
   const isStaff = isAdmin || searchParams.get("v") === "pm";
   const publicUrl = `https://raimxlv.github.io/ervitex/saraksts/${token}`;
 
-  const copyEmailButton = async () => {
+  const copyEmailLink = async () => {
     const label = "ATVĒRT PREČU SARAKSTU";
-    const html = `<table role="presentation" cellspacing="0" cellpadding="0" border="0"><tr><td style="background:#111111;border-radius:3px"><a href="${publicUrl}" style="display:inline-block;padding:13px 20px;color:#ffffff;font-family:Arial,sans-serif;font-size:13px;font-weight:700;text-decoration:none">${label}</a></td></tr></table>`;
-    const text = `${label}\n${publicUrl}`;
+    const html = `<a href="${publicUrl}" style="display:inline-block;color:#991b2f;font-family:Arial,sans-serif;font-size:15px;line-height:22px;font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px">${label} →</a>`;
+    const text = `${label} →\n${publicUrl}`;
     try {
       if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
         await navigator.clipboard.write([
@@ -51,11 +51,11 @@ const WorksheetPage = () => {
             "text/plain": new Blob([text], { type: "text/plain" }),
           }),
         ]);
-        toast.success("E-pasta poga nokopēta");
+        toast.success("E-pasta saite nokopēta");
         return;
       }
       await navigator.clipboard.writeText(text);
-      toast.success("Poga nokopēta kā saite");
+      toast.success("Saite nokopēta");
     } catch {
       window.prompt("Nokopē un ielīmē e-pastā", text);
     }
@@ -511,16 +511,16 @@ const WorksheetPage = () => {
                 <div className="border-t border-border pt-4">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="font-heading text-sm font-black uppercase tracking-wide">2. Ielīmē pogu parastajā e-pastā</p>
+                      <p className="font-heading text-sm font-black uppercase tracking-wide">2. Ielīmē saiti parastajā e-pastā</p>
                       <p className="mt-1 text-sm text-muted-foreground">Nokopē un ielīmē zem savas atbildes klientam.</p>
                     </div>
-                    <Button variant="outline" onClick={copyEmailButton} disabled={dirty || !!sheet.draft_items || saving || actionBusy}>
+                    <Button variant="outline" onClick={copyEmailLink} disabled={dirty || !!sheet.draft_items || saving || actionBusy}>
                       <Copy className="mr-2 h-4 w-4" /> Kopēt e-pastam
                     </Button>
                   </div>
                   <div className="mt-3 rounded-sm border border-dashed border-border bg-background p-4">
-                    <span className="inline-flex rounded-sm bg-foreground px-5 py-3 font-heading text-xs font-black uppercase text-background">
-                      Atvērt preču sarakstu
+                    <span className="inline-flex font-heading text-sm font-black uppercase text-destructive underline decoration-2 underline-offset-4">
+                      Atvērt preču sarakstu →
                     </span>
                   </div>
                 </div>

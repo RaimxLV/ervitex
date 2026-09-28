@@ -65,7 +65,7 @@
 - [x] Rediģēšana tiešsaistē: izmērs, skaits, preces cena, piezīme, rindas dzēšana.
 - [x] Apdruka: Sietspiede / DTF / Izšūšana / Sublimācija / Cita, vairākas vienā precē, cena ar roku.
 - [x] Summas bez PVN un ar PVN pārrēķinās uzreiz.
-- [x] E-pastos paliek viena poga uz individuālo preču sarakstu.
+- [x] E-pastos paliek viena treknraksta bordo saite uz individuālo preču sarakstu.
 - [x] Adminā: "Preču saraksts" un "Kopēt saraksta saiti".
 
 ## Vienotā klienta–preču saraksta plūsma
@@ -73,7 +73,7 @@
 - [x] Konkurentu un B2B piedāvājumu rīku UI/UX salīdzinājums.
 - [x] Apstiprināts vienotas plūsmas pārbūves plāns: viena saraksta datu vieta un viena galvenā e-pasta poga.
 - [x] Pārbūvēt plūsmu līdz galam: modeļa maiņa, krāsas/izmēra maiņa un jaunu preču pievienošana pašā preču sarakstā.
-- [x] E-pasti: noņemt preču tabulas/nosaukumus un visas dublētās pogas; atstāt vienu pogu uz individuālo preču sarakstu, saraksti neveidojot mājaslapā.
+- [x] E-pasti: noņemt preču tabulas/nosaukumus un visas dublētās pogas; atstāt vienu pamanāmu saiti uz individuālo preču sarakstu, saraksti neveidojot mājaslapā.
 - [x] Mega izvēlnes sarkanās pogas krāsojums: 24 s plūstošs cikls (duration-* klase to paātrināja līdz 0,7 s)
 - [x] Vienādot visas publisko lapu melnās ievadjoslas ar kompakto kataloga galveni.
 
@@ -85,3 +85,4 @@
 - [x] Nodalīt “Saglabāt izmaiņas”, gatavās e-pasta pogas kopēšanu un aizvēršanu.
 - [x] Noņemt iekšējo ziņas klientam formu; saraksti atstāt tikai parastajā e-pastā.
 - [x] Pilnībā pārbaudīt saraksta saglabāšanu, kopēšanu, aizvēršanu un nodošanu no e-pasta.
+- [x] Noņemt projektu vadītāju izvēles pogas no e-pasta un aizstāt saraksta pogu ar universālu bordo teksta saiti.
