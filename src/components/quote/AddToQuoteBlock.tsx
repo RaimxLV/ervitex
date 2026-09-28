@@ -70,6 +70,19 @@ const AddToQuoteBlock = ({
 
   const [qtyBySize, setQtyBySize] = useState<Record<string, number>>(readCartQtys);
   const [flash, setFlash] = useState(false);
+  const [added, setAdded] = useState(false);
+  const addedTimer = useRef<number | null>(null);
+  useEffect(() => () => { if (addedTimer.current) window.clearTimeout(addedTimer.current); }, []);
+
+  const confirmAdd = () => {
+    if (totalForProduct === 0 || added) return;
+    setAdded(true);
+    if (addedTimer.current) window.clearTimeout(addedTimer.current);
+    addedTimer.current = window.setTimeout(() => {
+      setAdded(false);
+      onClose?.();
+    }, 950);
+  };
 
   // Re-sync inputs when color or product changes (preserving what user already saved for that color)
   const syncKey = `${productId}|${colorCode}|${sizes.join(",")}`;
