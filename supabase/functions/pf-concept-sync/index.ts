@@ -33,6 +33,7 @@ const corsHeaders: Record<string, string> = {
 const BUCKET = "pf-feeds";
 const IMG_BASE_500 = "https://images.pfconcept.com/ProductImages_All/JPG/500x500/";
 const IMG_BASE_1600 = "https://images.pfconcept.com/ProductImages_All/JPG/1600x1600/";
+const PRODUCT_SLICE = 2_000_000;
 
 // ---------------------------------------------------------------- utils
 const toStr = (v: unknown): string | null => {
@@ -288,6 +289,160 @@ async function cacheAndSplit(
   return manifest;
 }
 
+type ProductCacheState = {
+  next_start: number;
+  next_chunk: number;
+  total_models: number;
+  carry_b64: string;
+};
+
+const bytesToBase64 = (bytes: Uint8Array) => {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+};
+
+const base64ToBytes = (value: string) => {
+  if (!value) return new Uint8Array();
+  const binary = atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+};
+
+const findAscii = (bytes: Uint8Array, needle: string) => {
+  const pattern = new TextEncoder().encode(needle);
+  outer: for (let i = 0; i <= bytes.length - pattern.length; i++) {
+    for (let j = 0; j < pattern.length; j++) if (bytes[i + j] !== pattern[j]) continue outer;
+    return i;
+  }
+  return -1;
+};
+
+function extractModels(bytes: Uint8Array, firstSlice: boolean) {
+  let cursor = 0;
+  if (firstSlice) {
+    const modelsAt = findAscii(bytes, '"models"');
+    if (modelsAt < 0) throw new Error("PF models array not found in first slice");
+    cursor = modelsAt + 8;
+    while (cursor < bytes.length && bytes[cursor] !== 91) cursor++;
+    if (cursor >= bytes.length) throw new Error("PF models array opening bracket not found");
+    cursor++;
+  }
+
+  const models: any[] = [];
+  let consumed = cursor;
+  while (cursor < bytes.length) {
+    while (cursor < bytes.length && (bytes[cursor] === 9 || bytes[cursor] === 10 || bytes[cursor] === 13 || bytes[cursor] === 32 || bytes[cursor] === 44)) cursor++;
+    if (cursor >= bytes.length || bytes[cursor] === 93) { consumed = cursor; break; }
+    if (bytes[cursor] !== 123) { cursor++; consumed = cursor; continue; }
+
+    const objectStart = cursor;
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    let complete = false;
+    for (; cursor < bytes.length; cursor++) {
+      const value = bytes[cursor];
+      if (inString) {
+        if (escaped) escaped = false;
+        else if (value === 92) escaped = true;
+        else if (value === 34) inString = false;
+        continue;
+      }
+      if (value === 34) inString = true;
+      else if (value === 123) depth++;
+      else if (value === 125) {
+        depth--;
+        if (depth === 0) {
+          cursor++;
+          const wrapper = JSON.parse(new TextDecoder().decode(bytes.slice(objectStart, cursor)));
+          models.push(wrapper?.model ?? wrapper);
+          consumed = cursor;
+          complete = true;
+          break;
+        }
+      }
+    }
+    if (!complete) return { models, carry: bytes.slice(objectStart) };
+  }
+  return { models, carry: bytes.slice(consumed) };
+}
+
+async function resumableProductCache(sb: SupabaseClient, lang: string, start: number) {
+  const statePath = `chunks/${lang}/cache-state.json`;
+  let state: ProductCacheState = { next_start: 0, next_chunk: 0, total_models: 0, carry_b64: "" };
+  if (start > 0) {
+    const { data, error } = await sb.storage.from(BUCKET).download(statePath);
+    if (error) throw new Error(`PF cache state: ${error.message}`);
+    state = JSON.parse(await data.text()) as ProductCacheState;
+    if (state.next_start !== start) throw new Error(`PF cache resume mismatch: expected ${state.next_start}, received ${start}`);
+  }
+
+  const url = `https://www.pfconcept.com/portal/datafeed/productfeed_${lang}_v3.json`;
+  const res = await fetch(url, {
+    headers: { Range: `bytes=${start}-${start + PRODUCT_SLICE - 1}`, "Accept-Encoding": "identity" },
+  });
+  if (!res.ok && res.status !== 206) throw new Error(`PF product feed HTTP ${res.status}`);
+  const fresh = new Uint8Array(await res.arrayBuffer());
+  const previous = base64ToBytes(state.carry_b64);
+  const combined = new Uint8Array(previous.length + fresh.length);
+  combined.set(previous);
+  combined.set(fresh, previous.length);
+  const extracted = extractModels(combined, start === 0);
+
+  if (extracted.models.length) {
+    const path = `chunks/${lang}/chunk_${String(state.next_chunk).padStart(4, "0")}.json`;
+    const { error } = await sb.storage.from(BUCKET).upload(
+      path,
+      new Blob([JSON.stringify(extracted.models)], { type: "application/json" }),
+      { upsert: true, contentType: "application/json" },
+    );
+    if (error) throw new Error(`upload ${path}: ${error.message}`);
+    state.next_chunk++;
+    state.total_models += extracted.models.length;
+  }
+
+  const range = res.headers.get("content-range") || "";
+  const totalBytes = Number(range.split("/")[1]) || fresh.length;
+  state.next_start = start + fresh.length;
+  state.carry_b64 = bytesToBase64(extracted.carry);
+  const done = fresh.length === 0 || state.next_start >= totalBytes;
+
+  if (done) {
+    const manifest = {
+      lang,
+      chunk_size: null,
+      total_chunks: state.next_chunk,
+      total_models: state.total_models,
+      created_at: new Date().toISOString(),
+      source_url: url,
+    };
+    const { error } = await sb.storage.from(BUCKET).upload(
+      `chunks/${lang}/manifest.json`,
+      new Blob([JSON.stringify(manifest, null, 2)], { type: "application/json" }),
+      { upsert: true, contentType: "application/json" },
+    );
+    if (error) throw new Error(`manifest upload: ${error.message}`);
+    await sb.storage.from(BUCKET).remove([statePath]);
+    if (state.next_chunk > 0) {
+      await chainSelf(sb, { mode: "process", lang, from: "0", chain: "1", span: String(CHUNK_SPAN) });
+    }
+    return { done: true, total_bytes: totalBytes, total_chunks: state.next_chunk, total_models: state.total_models };
+  }
+
+  const { error: stateError } = await sb.storage.from(BUCKET).upload(
+    statePath,
+    new Blob([JSON.stringify(state)], { type: "application/json" }),
+    { upsert: true, contentType: "application/json" },
+  );
+  if (stateError) throw new Error(`PF cache state upload: ${stateError.message}`);
+  await chainSelf(sb, { mode: "cache_slice", lang, start: String(state.next_start) });
+  return { done: false, next_start: state.next_start, total_bytes: totalBytes, chunks: state.next_chunk, models: state.total_models };
+}
+
 // ------------------------------------------------------- Phase 2: PROCESS chunk
 
 async function readManifest(sb: SupabaseClient, lang: string) {
@@ -463,11 +618,8 @@ async function chainSelf(sb: SupabaseClient, params: Record<string, string>) {
 const CHUNK_SPAN = 15;
 
 async function refreshProducts(sb: SupabaseClient, lang: string, chunkSize: number) {
-  const manifest = await cacheAndSplit(sb, { lang, chunkSize });
-  if ((manifest.total_chunks ?? 0) > 0) {
-    await chainSelf(sb, { mode: "process", lang, from: "0", chain: "1", span: String(CHUNK_SPAN) });
-  }
-  return { ...manifest, processing_started: (manifest.total_chunks ?? 0) > 0 };
+  void chunkSize;
+  return await resumableProductCache(sb, lang, 0);
 }
 
 Deno.serve(async (req) => {
@@ -488,6 +640,8 @@ Deno.serve(async (req) => {
     } else if (mode === "refresh") {
       const chunkSize = Number(url.searchParams.get("chunkSize") || "150");
       result = await refreshProducts(sb, lang, chunkSize);
+    } else if (mode === "cache_slice") {
+      result = await resumableProductCache(sb, lang, Number(url.searchParams.get("start") || "0"));
     } else if (mode === "manifest") {
       result = await readManifest(sb, lang);
     } else if (mode === "process") {

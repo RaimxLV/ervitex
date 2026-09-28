@@ -32,7 +32,7 @@
 - [x] Salabot kataloga tiešo atvēršanu un paātrināt mega izvēlni ar plūstošu animāciju.
 
 ### P0
-- [ ] Salabot PF Concept cenu sinhronizāciju un NWG automātisko pieejas atjaunošanu.
+- [x] Salabot PF Concept cenu sinhronizāciju un NWG automātisko pieejas atjaunošanu.
 - [x] NWG katalogā parādīt visus produktus ar visām pieejamajām cenām.
   - [x] Deterministiska modeļu un SKU lapošana bez izlaistām rindām.
   - [x] Rotējošā tokena un paralēlo procesu lease aizsardzība kodā.
