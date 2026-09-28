@@ -163,20 +163,15 @@ const Header = () => {
         </nav>
 
         <div className="hidden items-center gap-3 xl:flex">
-          {/* Search */}
-          {searchOpen ? (
-            <HeaderSearch
-              autoFocus
-              className="w-64"
-              inputClassName="h-9"
-              onDone={() => setSearchOpen(false)}
-              onEmptyBlur={() => setSearchOpen(false)}
-            />
-          ) : (
-            <button onClick={() => setSearchOpen(true)} className="p-2 text-primary-foreground/70 hover:text-primary-foreground transition-colors">
-              <Search className="h-4 w-4" strokeWidth={1.5} />
-            </button>
-          )}
+          {/* Search — atveras kā atsevišķa josla zem galvenes, pogas nesedzas */}
+          <button
+            onClick={() => setSearchOpen((v) => !v)}
+            aria-expanded={searchOpen}
+            aria-label={lang === "lv" ? "Meklēt" : "Search"}
+            className={`p-2 transition-colors ${searchOpen ? "text-accent" : "text-primary-foreground/70 hover:text-primary-foreground"}`}
+          >
+            <Search className="h-4 w-4" strokeWidth={1.5} />
+          </button>
 
           {/* Share dropdown */}
           <div className="relative" ref={shareRef}>
