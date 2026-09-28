@@ -66,6 +66,12 @@ Deno.serve(async (req) => {
     return page('Nezināma persona', 'Šo saiti vairs neizmanto.', false)
   }
 
+  if (quote.assigned_pm_email) {
+    const assignee = { name: quote.assigned_pm_name || 'projektu vadītāja', email: quote.assigned_pm_email }
+    if (wantsJson) return json(200, { ok: true, alreadyAssigned: true, emailed: null, assignee })
+    return page('Pieprasījums jau nodots', `Pieprasījums jau ir nodots ${assignee.name}.`)
+  }
+
   const { error: assignErr } = await supabase
     .from('quote_requests')
     .update({

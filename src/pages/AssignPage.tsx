@@ -11,6 +11,7 @@ const AssignPage = () => {
   const [slug, setSlug] = useState(params.get("kam") || "");
   const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
   const [emailed, setEmailed] = useState(true);
+  const [assignedName, setAssignedName] = useState("");
   const person = assigneeBySlug(slug);
 
   const assign = async () => {
@@ -20,9 +21,15 @@ const AssignPage = () => {
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quote-action?token=${token}&action=assign:${person.slug}&format=json`,
       );
-      const out = (await res.json().catch(() => null)) as { ok?: boolean; emailed?: boolean } | null;
+      const out = (await res.json().catch(() => null)) as { ok?: boolean; emailed?: boolean; alreadyAssigned?: boolean; assignee?: { name?: string } } | null;
+      if (out?.alreadyAssigned) {
+        setAssignedName(out.assignee?.name || "projektu vadītājai");
+        setState("done");
+        return;
+      }
       if (!res.ok || !out?.ok) throw new Error();
       setEmailed(out.emailed !== false);
+      setAssignedName(person.name);
       setState("done");
     } catch {
       setState("error");
@@ -36,7 +43,7 @@ const AssignPage = () => {
         {state === "done" ? (
           <div className="space-y-2">
             <h1 className="flex items-center gap-2 font-heading text-xl font-black uppercase">
-              <CheckCircle2 className="h-5 w-5 text-accent" /> Nodots: {person?.name}
+              <CheckCircle2 className="h-5 w-5 text-accent" /> Nodots: {assignedName || person?.name}
             </h1>
             {!emailed && <p className="text-sm text-destructive">E-pasts neaizgāja uz {person?.email}</p>}
           </div>
