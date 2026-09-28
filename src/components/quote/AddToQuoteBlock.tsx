@@ -147,8 +147,8 @@ const AddToQuoteBlock = ({
           </p>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             {t(
-              "Šī tabula veido jūsu pieprasījumu — pēc nosūtīšanas ar jums sazināsies mūsu projekta vadītāja.",
-              "This table builds your request — once you send it, our project manager will get in touch.",
+              "Izveido pieprasījumu — pēc nosūtīšanas ar jums sazināsies mūsu projekta vadītāja.",
+              "Create a request — once you send it, our project manager will get in touch.",
             )}
           </p>
         </div>
