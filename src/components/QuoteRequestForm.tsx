@@ -40,7 +40,9 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
       return;
     }
     setSending(true);
+    const requestId = crypto.randomUUID();
     const { error } = await supabase.from("quote_requests").insert({
+      id: requestId,
       name,
       email,
       phone,
@@ -52,6 +54,11 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
+      try {
+        await supabase.functions.invoke("send-quote-request", { body: { request_id: requestId, file_urls: [] } });
+      } catch (mailError) {
+        console.warn("Email send failed, but request stored", mailError);
+      }
       toast({ title: lang === "lv" ? "Pieprasījums nosūtīts!" : "Quote request sent!" });
       setForm({ name: "", email: "", phone: "", company: "", message: "" });
     }

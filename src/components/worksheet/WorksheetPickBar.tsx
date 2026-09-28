@@ -27,8 +27,9 @@ const WorksheetPickBar = () => {
   const loadSheet = async () => {
     const { data } = await supabase.rpc("get_quote_worksheet" as never, { _token: pick.token } as never);
     const raw = data as unknown;
-    const rows = (Array.isArray(raw) ? raw[0] : raw) as { items?: WorksheetItem[] } | null | undefined;
-    return (Array.isArray(rows?.items) ? rows!.items : []).map((i, idx) => ({
+    const rows = (Array.isArray(raw) ? raw[0] : raw) as { items?: WorksheetItem[]; draft_items?: WorksheetItem[] | null } | null | undefined;
+    const activeItems = Array.isArray(rows?.draft_items) ? rows.draft_items : rows?.items;
+    return (Array.isArray(activeItems) ? activeItems : []).map((i, idx) => ({
       ...i,
       id: i.id || `row-${idx}`,
       qty: Number(i.qty) || 0,
