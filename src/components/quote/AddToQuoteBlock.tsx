@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Minus, Plus, ClipboardList, Trash2, Plus as PlusIcon } from "lucide-react";
+import { Check, ChevronRight, Minus, Plus, ClipboardList, Trash2, Plus as PlusIcon } from "lucide-react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -130,6 +130,30 @@ const AddToQuoteBlock = ({
           </span>
         )}
       </div>
+
+      {/* Kā tas darbojas — mini infografika */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded border border-accent/40 bg-background px-3 py-2.5">
+        <span className="flex items-center gap-1.5">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent font-heading text-[11px] font-black text-accent-foreground">1</span>
+          <span className="text-xs font-semibold uppercase tracking-wider">{t("Izvēlies krāsu & izmērus", "Pick colour & size")}</span>
+        </span>
+        <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+        <span className="flex items-center gap-1.5">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent font-heading text-[11px] font-black text-accent-foreground">2</span>
+          <span className="text-xs font-semibold uppercase tracking-wider">{t("Ievadi daudzumu", "Enter quantity")}</span>
+        </span>
+        <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+        <span className="flex items-center gap-1.5">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent font-heading text-[11px] font-black text-accent-foreground">3</span>
+          <span className="text-xs font-semibold uppercase tracking-wider">{t("Nosūti pieprasījumu", "Send the request")}</span>
+        </span>
+      </div>
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        {t(
+          "Šī tabula veido pieprasījumu — pēc nosūtīšanas sazināsies mūsu projektu vadītāja.",
+          "This table builds your request — our project manager follows up by email.",
+        )}
+      </p>
 
       {/* Current color header */}
       <div className="flex items-center justify-between gap-2 rounded border border-border bg-background px-3 py-2">
