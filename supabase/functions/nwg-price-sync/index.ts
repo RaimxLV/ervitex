@@ -176,6 +176,12 @@ async function passwordToken(): Promise<TokenResponse> {
 }
 
 async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise<string> {
+  // The same partner token powers the healthy NWG catalog integration and is
+  // accepted by the customer-price endpoint. Prefer it over the fragile,
+  // rotating browser refresh token whenever it is configured.
+  const partnerToken = Deno.env.get("NWG_ACCESS_TOKEN");
+  if (partnerToken) return partnerToken;
+
   for (let attempt = 0; attempt < 50; attempt++) {
     const auth = await readAuth(sb);
     if (!forceRefresh && auth.access_token && isFuture(auth.access_token_expires_at, ACCESS_TOKEN_SKEW_MS)) {
@@ -308,6 +314,7 @@ Deno.serve(async (req) => {
 
   try {
     if (mode === "auth") {
+      const logId = await startLog(sb, "nwg:prices");
       const token = await getAccessToken(sb);
       const { data: sample, error: sampleError } = await sb
         .from("nwg_skus")
@@ -319,6 +326,11 @@ Deno.serve(async (req) => {
       if (sampleError) throw new Error(`NWG sample SKU: ${sampleError.message}`);
       if (!sample?.sku) throw new Error("NWG has no active SKU for authorization test");
       await fetchPrices(token, [sample.sku]);
+      await finishLog(sb, logId, {
+        status: "success",
+        message: "NWG līgumcenu pieeja pārbaudīta",
+        details: { authorization: "verified" },
+      });
       return new Response(JSON.stringify({ ok: true, authorization: "verified" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
