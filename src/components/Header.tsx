@@ -298,7 +298,7 @@ const Header = () => {
       {/* Mobile nav */}
       {isOpen && (
         <div className="max-h-[calc(100svh-4rem)] overflow-y-auto overscroll-contain border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 xl:hidden md:max-h-[calc(100svh-5rem)]">
-          <HeaderSearch className="mb-4" inputClassName="h-10" onDone={() => setIsOpen(false)} />
+          <HeaderSearch inline className="mb-4" inputClassName="h-10" onDone={() => setIsOpen(false)} />
           <nav>
             <div className="grid grid-cols-2 border-y border-primary-foreground/10 sm:grid-cols-4">
               {navItems.filter((item) => item.path !== "/catalog").map((item) => (

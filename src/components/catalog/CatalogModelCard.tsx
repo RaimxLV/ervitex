@@ -92,9 +92,9 @@ export interface CatalogModelCardProps {
  * and the mega catalog). Matches the PF Concept design language: white background,
  * portrait 3:4 image, model code chip, brand chip, uniform swatches and price line.
  */
-const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
+const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
   (
-    { onClick, image, fallbackImage, hoverImage, imageAlt, priority, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, footer, noImageLabel },
+    { onClick, as, href, image, fallbackImage, hoverImage, imageAlt, priority, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, footer, noImageLabel },
     ref
   ) => {
     const [copied, setCopied] = useState(false);
@@ -104,13 +104,21 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
     const triedFallback = useRef(false);
     const triedHoverFallback = useRef(false);
     const showHover = !!hoverImage && !hoverFailed;
+    // Kā saite: parastais klikšķis atver šeit, Ctrl/Cmd/vidējais klikšķis atver jaunā cilnē.
+    const asLink = as === "a" && !!href;
+    const Tag = asLink ? "a" : "button";
+    const handleClick = (e: React.MouseEvent) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      e.preventDefault();
+      onClick?.();
+    };
     return (
       <div className="relative h-full">
       {topRight && <div className="absolute right-2 top-2 z-10">{topRight}</div>}
-      <button
-        ref={ref}
-        type="button"
-        onClick={onClick}
+      <Tag
+        ref={ref as React.Ref<any>}
+        {...(asLink ? { href } : { type: "button" as const })}
+        onClick={asLink ? handleClick : onClick}
         onMouseEnter={() => setHovered(true)}
         className="group flex h-full w-full flex-col overflow-hidden border border-border bg-white text-left transition-colors hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent"
       >
@@ -267,7 +275,7 @@ const CatalogModelCard = forwardRef<HTMLButtonElement, CatalogModelCardProps>(
           <div className="mt-auto pt-1">{price}</div>
           {footer}
         </div>
-      </button>
+      </Tag>
       </div>
     );
   }

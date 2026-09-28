@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -70,9 +70,11 @@ interface Props {
   className?: string;
   inputClassName?: string;
   onEmptyBlur?: () => void;
+  /** Mobiļajā izvēlnē: rezultāti atveras plūsmā zem ievades, nevis pāri izvēlnei. */
+  inline?: boolean;
 }
 
-export default function HeaderSearch({ onDone, autoFocus, className, inputClassName, onEmptyBlur }: Props) {
+export default function HeaderSearch({ onDone, autoFocus, className, inputClassName, onEmptyBlur, inline }: Props) {
   const { lang } = useLanguage();
   const navigate = useNavigate();
   const [value, setValue] = useState("");
@@ -169,17 +171,24 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
       </form>
 
       {open && value.trim() && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 min-w-[20rem] overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-xl">
+        <div
+          className={`overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-xl ${
+            inline ? "mt-2" : "absolute left-0 right-0 top-full z-50 mt-1 min-w-[20rem]"
+          }`}
+        >
           {!rows.length ? (
             <p className="px-4 py-3 text-sm text-muted-foreground">{lang === "lv" ? "Ielādē…" : "Loading…"}</p>
           ) : results.length ? (
             <ul role="listbox">
               {results.map((r, i) => (
                 <li key={`${r.source}:${r.id}`}>
-                  <button
-                    type="button"
+                  <Link
+                    to={`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`}
                     onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => goItem(r)}
+                    onClick={(e) => {
+                      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                      finish();
+                    }}
                     onMouseEnter={() => setActive(i)}
                     className={`flex w-full items-baseline justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
                       i === active ? "bg-muted" : "hover:bg-muted"
@@ -189,22 +198,25 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
                     <span className="shrink-0 text-xs text-muted-foreground">
                       {r.brand ? `${r.brand} · ` : ""}{r.id}
                     </span>
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>
           ) : (
             <p className="px-4 py-3 text-sm text-muted-foreground">{lang === "lv" ? "Nekas nav atrasts" : "Nothing found"}</p>
           )}
-          <button
-            type="button"
+          <Link
+            to={`/catalog?q=${encodeURIComponent(value.trim())}`}
             onMouseDown={(e) => e.preventDefault()}
-            onClick={goAll}
+            onClick={(e) => {
+              if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+              finish();
+            }}
             className="flex w-full items-center justify-between border-t border-border px-4 py-2.5 text-sm font-bold text-accent hover:bg-muted"
           >
             {lang === "lv" ? "Visi rezultāti katalogā" : "All results in catalog"}
             <ArrowRight className="h-4 w-4" />
-          </button>
+          </Link>
         </div>
       )}
     </div>
