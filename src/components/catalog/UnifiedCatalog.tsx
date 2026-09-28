@@ -1276,6 +1276,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
 
   return (
     <CatalogModelCard
+      as="a"
+      href={`/catalog/item/${it.source}/${encodeURIComponent(it.id)}`}
       onClick={onNavigate}
       image={img}
       fallbackImage={rawImg}
