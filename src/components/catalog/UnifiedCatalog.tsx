@@ -390,6 +390,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (lastWrittenSearch.current === incoming) return;
     lastWrittenSearch.current = incoming;
     urlSyncing.current = true;
+    window.setTimeout(() => { urlSyncing.current = false; }, 0);
     setQ(searchParams.get("q") || "");
     setSources(lockedSource ? new Set() : parseManufacturerFilter(searchParams.get("source")));
     setBrands(new Set((searchParams.get("brand") || "").split(",").filter(Boolean)));
