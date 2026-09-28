@@ -2,7 +2,6 @@
 import * as React from 'npm:react@18.3.1'
 import {
   Body,
-  Button,
   Container,
   Head,
   Heading,
@@ -38,15 +37,15 @@ const h1 = { fontSize: '20px', margin: '0', letterSpacing: '0.4px', color: '#111
 const h3 = { fontSize: '13px', margin: '18px 0 8px', color: '#111' }
 const label = { color: '#666', paddingRight: '12px' as const, paddingBottom: '5px' }
 const value = { paddingBottom: '5px' }
-const cta = {
+const worksheetLink = {
   display: 'inline-block',
-  background: '#111',
-  color: '#fff',
-  fontSize: '13px',
+  color: '#991b2f',
+  fontSize: '15px',
   fontWeight: 'bold' as const,
-  padding: '12px 18px',
-  borderRadius: '3px',
-  textDecoration: 'none',
+  lineHeight: '22px',
+  textDecoration: 'underline',
+  textDecorationThickness: '2px',
+  textUnderlineOffset: '4px',
 }
 const noteBox = { whiteSpace: 'pre-line' as const, fontSize: '13px', background: '#f6f6f6', padding: '10px', borderRadius: '3px' }
 const replyBox = { fontSize: '14px', lineHeight: '21px', background: '#f6f6f6', borderLeft: '3px solid #111', padding: '10px 12px', margin: '14px 0' }
@@ -83,7 +82,7 @@ const QuoteAssignedEmail = ({
 
           {worksheetUrl ? (
             <Section>
-              <Button href={worksheetUrl} style={cta}>ATVĒRT PREČU SARAKSTU</Button>
+              <Link href={worksheetUrl} style={worksheetLink}>ATVĒRT PREČU SARAKSTU →</Link>
             </Section>
           ) : null}
 

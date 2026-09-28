@@ -1,6 +1,5 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { ASSIGNEES } from "../_shared/assignees.ts";
 
 const OFFICE_EMAIL = "birojs@ervitex.lv";
 
@@ -93,9 +92,6 @@ Deno.serve(async (req) => {
           ...baseData,
           worksheetUrl: worksheetUrl ? `${worksheetUrl}?v=pm` : "",
           files: signedUrls,
-          assignUrls: quote.action_token && !quote.assigned_pm_email
-            ? ASSIGNEES.map((a) => ({ name: a.name, url: `https://raimxlv.github.io/ervitex/nodot/${quote.action_token}?kam=${a.slug}` }))
-            : [],
         },
       },
     });
