@@ -318,7 +318,7 @@ Deno.serve(async (req) => {
     payload: {
       message_id: messageId,
       to: effectiveRecipient,
-      from: `${fromName ? `${fromName} (via ${SITE_NAME})` : SITE_NAME} <${fromEmail || `noreply@${FROM_DOMAIN}`}>`,
+      from: `${fromName ? (fromEmail ? `${fromName} | ${SITE_NAME}` : `${fromName} (via ${SITE_NAME})`) : SITE_NAME} <${fromEmail || `noreply@${FROM_DOMAIN}`}>`,
       sender_domain: SENDER_DOMAIN,
       subject: resolvedSubject,
       html,

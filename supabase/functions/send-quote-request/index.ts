@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
           recipientEmail: quote.email,
           replyTo: pm.email,
           fromEmail: pm.email,
-          fromName: `${pm.name} | Ervitex`,
+          fromName: pm.name,
           idempotencyKey: `quote-${quote.id}-customer`,
           templateData: baseData,
         },
