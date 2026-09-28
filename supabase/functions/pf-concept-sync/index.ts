@@ -22,8 +22,6 @@
 // reads/writes it. No public exposure.
 
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { JSONParser } from "https://esm.sh/@streamparser/json@0.0.21";
-
 const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -33,6 +31,7 @@ const corsHeaders: Record<string, string> = {
 const BUCKET = "pf-feeds";
 const IMG_BASE_500 = "https://images.pfconcept.com/ProductImages_All/JPG/500x500/";
 const IMG_BASE_1600 = "https://images.pfconcept.com/ProductImages_All/JPG/1600x1600/";
+const PRODUCT_SLICE = 2_000_000;
 
 // ---------------------------------------------------------------- utils
 const toStr = (v: unknown): string | null => {
@@ -202,90 +201,158 @@ async function flushBatches(sb: SupabaseClient, b: Batches) {
 
 // ------------------------------------------------------- Phase 1: CACHE + SPLIT
 
-async function cacheAndSplit(
-  sb: SupabaseClient,
-  opts: { lang?: string; chunkSize?: number } = {},
-) {
-  const lang = (opts.lang || "en").toLowerCase();
-  const chunkSize = Math.max(50, Math.min(opts.chunkSize ?? 150, 500));
-  const url = `https://www.pfconcept.com/portal/datafeed/productfeed_${lang}_v3.json`;
+type ProductCacheState = {
+  next_start: number;
+  next_chunk: number;
+  total_models: number;
+  carry_b64: string;
+};
 
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Feed HTTP ${res.status}`);
-  if (!res.body) throw new Error("Feed no body");
+const bytesToBase64 = (bytes: Uint8Array) => {
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+};
 
-  const parser = new JSONParser({
-    paths: ["$.pfcProductfeed.productfeed.models.*.model"],
-    keepStack: false,
-  });
+const base64ToBytes = (value: string) => {
+  if (!value) return new Uint8Array();
+  const binary = atob(value);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+};
 
-  let modelCount = 0;
-  let chunkIdx = 0;
-  let currentBatch: any[] = [];
-  const uploads: Promise<any>[] = [];
+const findAscii = (bytes: Uint8Array, needle: string) => {
+  const pattern = new TextEncoder().encode(needle);
+  outer: for (let i = 0; i <= bytes.length - pattern.length; i++) {
+    for (let j = 0; j < pattern.length; j++) if (bytes[i + j] !== pattern[j]) continue outer;
+    return i;
+  }
+  return -1;
+};
 
-  const flushChunk = async () => {
-    if (!currentBatch.length) return;
-    const idx = chunkIdx++;
-    const path = `chunks/${lang}/chunk_${String(idx).padStart(4, "0")}.json`;
-    const body = new Blob([JSON.stringify(currentBatch)], { type: "application/json" });
-    currentBatch = [];
-    // Serialize uploads to avoid concurrent-memory spikes
-    const { error } = await sb.storage.from(BUCKET).upload(path, body, {
-      upsert: true, contentType: "application/json",
-    });
-    if (error) throw new Error(`upload ${path}: ${error.message}`);
-  };
+function extractModels(bytes: Uint8Array, firstSlice: boolean) {
+  let cursor = 0;
+  if (firstSlice) {
+    const modelsAt = findAscii(bytes, '"models"');
+    if (modelsAt < 0) throw new Error("PF models array not found in first slice");
+    cursor = modelsAt + 8;
+    while (cursor < bytes.length && bytes[cursor] !== 91) cursor++;
+    if (cursor >= bytes.length) throw new Error("PF models array opening bracket not found");
+    cursor++;
+  }
 
-  const done = new Promise<void>((resolve, reject) => {
-    parser.onValue = (v: any) => {
-      currentBatch.push(v.value);
-      modelCount++;
-      if (currentBatch.length >= chunkSize) {
-        // Fire-and-hold: push a promise, awaited between reads below
-        uploads.push(flushChunk());
+  const models: any[] = [];
+  let consumed = cursor;
+  while (cursor < bytes.length) {
+    while (cursor < bytes.length && (bytes[cursor] === 9 || bytes[cursor] === 10 || bytes[cursor] === 13 || bytes[cursor] === 32 || bytes[cursor] === 44)) cursor++;
+    if (cursor >= bytes.length || bytes[cursor] === 93) { consumed = cursor; break; }
+    if (bytes[cursor] !== 123) { cursor++; consumed = cursor; continue; }
+
+    const objectStart = cursor;
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    let complete = false;
+    for (; cursor < bytes.length; cursor++) {
+      const value = bytes[cursor];
+      if (inString) {
+        if (escaped) escaped = false;
+        else if (value === 92) escaped = true;
+        else if (value === 34) inString = false;
+        continue;
       }
-    };
-    parser.onEnd = () => resolve();
-    parser.onError = (e: any) => reject(e);
-  });
-
-  const reader = res.body.getReader();
-  try {
-    while (true) {
-      const { value, done: rd } = await reader.read();
-      if (rd) break;
-      parser.write(value);
-      // Backpressure: await any pending uploads before continuing to read
-      if (uploads.length) {
-        await Promise.all(uploads.splice(0));
+      if (value === 34) inString = true;
+      else if (value === 123) depth++;
+      else if (value === 125) {
+        depth--;
+        if (depth === 0) {
+          cursor++;
+          const wrapper = JSON.parse(new TextDecoder().decode(bytes.slice(objectStart, cursor)));
+          models.push(wrapper?.model ?? wrapper);
+          consumed = cursor;
+          complete = true;
+          break;
+        }
       }
     }
-  } finally {
-    try { reader.cancel(); } catch {}
+    if (!complete) return { models, carry: bytes.slice(objectStart) };
   }
-  parser.end();
-  await done;
-  await flushChunk();
-  if (uploads.length) await Promise.all(uploads);
+  return { models, carry: bytes.slice(consumed) };
+}
 
-  // Write manifest
-  const manifest = {
-    lang,
-    chunk_size: chunkSize,
-    total_chunks: chunkIdx,
-    total_models: modelCount,
-    created_at: new Date().toISOString(),
-    source_url: url,
-  };
-  const { error: mErr } = await sb.storage.from(BUCKET).upload(
-    `chunks/${lang}/manifest.json`,
-    new Blob([JSON.stringify(manifest, null, 2)], { type: "application/json" }),
+async function resumableProductCache(sb: SupabaseClient, lang: string, start: number) {
+  const statePath = `chunks/${lang}/cache-state.json`;
+  let state: ProductCacheState = { next_start: 0, next_chunk: 0, total_models: 0, carry_b64: "" };
+  if (start > 0) {
+    const { data, error } = await sb.storage.from(BUCKET).download(statePath);
+    if (error) throw new Error(`PF cache state: ${error.message}`);
+    state = JSON.parse(await data.text()) as ProductCacheState;
+    if (state.next_start !== start) throw new Error(`PF cache resume mismatch: expected ${state.next_start}, received ${start}`);
+  }
+
+  const url = `https://www.pfconcept.com/portal/datafeed/productfeed_${lang}_v3.json`;
+  const res = await fetch(url, {
+    headers: { Range: `bytes=${start}-${start + PRODUCT_SLICE - 1}`, "Accept-Encoding": "identity" },
+  });
+  if (!res.ok && res.status !== 206) throw new Error(`PF product feed HTTP ${res.status}`);
+  const fresh = new Uint8Array(await res.arrayBuffer());
+  const previous = base64ToBytes(state.carry_b64);
+  const combined = new Uint8Array(previous.length + fresh.length);
+  combined.set(previous);
+  combined.set(fresh, previous.length);
+  const extracted = extractModels(combined, start === 0);
+
+  if (extracted.models.length) {
+    const path = `chunks/${lang}/chunk_${String(state.next_chunk).padStart(4, "0")}.json`;
+    const { error } = await sb.storage.from(BUCKET).upload(
+      path,
+      new Blob([JSON.stringify(extracted.models)], { type: "application/json" }),
+      { upsert: true, contentType: "application/json" },
+    );
+    if (error) throw new Error(`upload ${path}: ${error.message}`);
+    state.next_chunk++;
+    state.total_models += extracted.models.length;
+  }
+
+  const range = res.headers.get("content-range") || "";
+  const totalBytes = Number(range.split("/")[1]) || fresh.length;
+  state.next_start = start + fresh.length;
+  state.carry_b64 = bytesToBase64(extracted.carry);
+  const done = fresh.length === 0 || state.next_start >= totalBytes;
+
+  if (done) {
+    const manifest = {
+      lang,
+      chunk_size: null,
+      total_chunks: state.next_chunk,
+      total_models: state.total_models,
+      created_at: new Date().toISOString(),
+      source_url: url,
+    };
+    const { error } = await sb.storage.from(BUCKET).upload(
+      `chunks/${lang}/manifest.json`,
+      new Blob([JSON.stringify(manifest, null, 2)], { type: "application/json" }),
+      { upsert: true, contentType: "application/json" },
+    );
+    if (error) throw new Error(`manifest upload: ${error.message}`);
+    await sb.storage.from(BUCKET).remove([statePath]);
+    if (state.next_chunk > 0) {
+      await chainSelf(sb, { mode: "process", lang, from: "0", chain: "1", span: String(CHUNK_SPAN) });
+    }
+    return { done: true, total_bytes: totalBytes, total_chunks: state.next_chunk, total_models: state.total_models };
+  }
+
+  const { error: stateError } = await sb.storage.from(BUCKET).upload(
+    statePath,
+    new Blob([JSON.stringify(state)], { type: "application/json" }),
     { upsert: true, contentType: "application/json" },
   );
-  if (mErr) throw new Error(`manifest upload: ${mErr.message}`);
-
-  return manifest;
+  if (stateError) throw new Error(`PF cache state upload: ${stateError.message}`);
+  await chainSelf(sb, { mode: "cache_slice", lang, start: String(state.next_start) });
+  return { done: false, next_start: state.next_start, total_bytes: totalBytes, chunks: state.next_chunk, models: state.total_models };
 }
 
 // ------------------------------------------------------- Phase 2: PROCESS chunk
@@ -343,7 +410,9 @@ async function probe(lang = "en") {
 // parse it within the CPU limit. We therefore read it in byte slices with HTTP
 // Range requests, extract item prices with a cheap text scan, and chain the
 // next slice in the background until the whole feed is processed.
-const PRICE_SLICE = 12_000_000; // ~12 MB per invocation
+// Keep each invocation comfortably below the edge CPU limit. The previous
+// 12 MB slice repeatedly exhausted the worker while splitting/scanning JSON.
+const PRICE_SLICE = 1_500_000;
 
 async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: boolean }) {
   const token = Deno.env.get("PF_FEED_TOKEN");
@@ -351,9 +420,20 @@ async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: bool
   const feedUrl = `http://www.pfconcept.com/portal/datafeed/pricefeed_${token}_v3.json`;
 
   const start = Math.max(0, opts.start);
-  const res = await fetch(feedUrl, { headers: { Range: `bytes=${start}-${start + PRICE_SLICE - 1}` } });
+  const res = await fetch(feedUrl, {
+    headers: {
+      Range: `bytes=${start}-${start + PRICE_SLICE - 1}`,
+      "Accept-Encoding": "identity",
+    },
+  });
   if (!res.ok && res.status !== 206) throw new Error(`pricefeed fetch ${res.status}`);
   const text = await res.text();
+
+  // A server/proxy that ignores Range would hand the whole ~190 MB file to a
+  // single worker. Fail safely instead of hitting the CPU limit mid-write.
+  if (res.status !== 206 && text.length > PRICE_SLICE * 2) {
+    throw new Error("PF price feed ignored byte range");
+  }
 
   const cr = res.headers.get("content-range") || "";
   const total = Number(cr.split("/")[1]) || 0;
@@ -407,14 +487,9 @@ async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: bool
   const done = bytesRead === 0 || (total > 0 && nextStart >= total) || bytesRead < PRICE_SLICE - 1024;
 
   if (!done && opts.chain) {
-    // Continue with the next slice in the background; the caller returns now.
-    const nextUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/pf-concept-sync?mode=prices&start=${nextStart}`;
-    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    fetch(nextUrl, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${key}`, apikey: key, "Content-Type": "application/json" },
-      body: "{}",
-    }).catch(() => { /* the nightly job retries */ });
+    // Dispatch through pg_net. A plain fire-and-forget fetch is cancelled when
+    // this worker returns and used to leave the feed only partly processed.
+    await chainSelf(sb, { mode: "prices", start: String(nextStart), chain: "1" });
   }
 
   return { start, next_start: nextStart, total_bytes: total, items: rows.length, upserted, done };
@@ -455,11 +530,8 @@ async function chainSelf(sb: SupabaseClient, params: Record<string, string>) {
 const CHUNK_SPAN = 15;
 
 async function refreshProducts(sb: SupabaseClient, lang: string, chunkSize: number) {
-  const manifest = await cacheAndSplit(sb, { lang, chunkSize });
-  if ((manifest.total_chunks ?? 0) > 0) {
-    await chainSelf(sb, { mode: "process", lang, from: "0", chain: "1", span: String(CHUNK_SPAN) });
-  }
-  return { ...manifest, processing_started: (manifest.total_chunks ?? 0) > 0 };
+  void chunkSize;
+  return await resumableProductCache(sb, lang, 0);
 }
 
 Deno.serve(async (req) => {
@@ -475,11 +547,12 @@ Deno.serve(async (req) => {
     if (mode === "probe") {
       result = await probe(lang);
     } else if (mode === "cache") {
-      const chunkSize = Number(url.searchParams.get("chunkSize") || "150");
-      result = await cacheAndSplit(sb, { lang, chunkSize });
+      result = await resumableProductCache(sb, lang, 0);
     } else if (mode === "refresh") {
       const chunkSize = Number(url.searchParams.get("chunkSize") || "150");
       result = await refreshProducts(sb, lang, chunkSize);
+    } else if (mode === "cache_slice") {
+      result = await resumableProductCache(sb, lang, Number(url.searchParams.get("start") || "0"));
     } else if (mode === "manifest") {
       result = await readManifest(sb, lang);
     } else if (mode === "process") {

@@ -144,7 +144,32 @@ async function readAuth(sb: SupabaseClient): Promise<AuthRow> {
   return data as AuthRow;
 }
 
+type TokenResponse = {
+  access_token?: string;
+  refresh_token?: string;
+  expires_in?: number;
+};
+
+async function requestToken(body: URLSearchParams): Promise<TokenResponse> {
+  const res = await fetch(TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body,
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`NWG token request failed [${res.status}]: ${text.slice(0, 200)}`);
+  const json = JSON.parse(text) as TokenResponse;
+  if (!json.access_token) throw new Error("NWG token request returned no access_token");
+  return json;
+}
+
 async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise<string> {
+  // The same partner token powers the healthy NWG catalog integration and is
+  // accepted by the customer-price endpoint. Prefer it over the fragile,
+  // rotating browser refresh token whenever it is configured.
+  const partnerToken = Deno.env.get("NWG_ACCESS_TOKEN");
+  if (partnerToken) return partnerToken;
+
   for (let attempt = 0; attempt < 50; attempt++) {
     const auth = await readAuth(sb);
     if (!forceRefresh && auth.access_token && isFuture(auth.access_token_expires_at, ACCESS_TOKEN_SKEW_MS)) {
@@ -172,37 +197,22 @@ async function getAccessToken(sb: SupabaseClient, forceRefresh = false): Promise
     }
 
     try {
-      const res = await fetch(TOKEN_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          grant_type: "refresh_token",
-          client_id: CLIENT_ID,
-          refresh_token: auth.refresh_token,
-        }),
-      });
-      const text = await res.text();
-      if (!res.ok) {
-        if (res.status === 400 && text.includes("invalid_grant")) {
-          const latest = await readAuth(sb);
-          if (latest.access_token && isFuture(latest.access_token_expires_at, ACCESS_TOKEN_SKEW_MS)) {
-            return latest.access_token;
-          }
-        }
-        throw new Error(`NWG token refresh failed [${res.status}]: ${text.slice(0, 200)}`);
-      }
-      const json = JSON.parse(text);
-      if (!json.access_token) throw new Error("NWG token refresh returned no access_token");
+      const json = await requestToken(new URLSearchParams({
+        grant_type: "refresh_token",
+        client_id: CLIENT_ID,
+        refresh_token: auth.refresh_token!,
+      }));
       const expiresIn = Math.max(Number(json.expires_in ?? 300), 60);
-      const { error: saveError } = await sb.from("nwg_auth").update({
+      const { data: saved, error: saveError } = await sb.from("nwg_auth").update({
         refresh_token: json.refresh_token || auth.refresh_token,
         access_token: json.access_token,
         access_token_expires_at: new Date(Date.now() + expiresIn * 1000).toISOString(),
         refresh_in_progress: false,
         refresh_started_at: null,
         updated_at: new Date().toISOString(),
-      }).eq("id", 1).eq("refresh_started_at", leaseAt);
+      }).eq("id", 1).eq("refresh_started_at", leaseAt).select("id").maybeSingle();
       if (saveError) throw new Error(`NWG token save: ${saveError.message}`);
+      if (!saved) throw new Error("NWG authorization lease changed before credentials were saved");
       return json.access_token as string;
     } catch (error) {
       await sb.from("nwg_auth").update({ refresh_in_progress: false, refresh_started_at: null })
@@ -272,6 +282,29 @@ Deno.serve(async (req) => {
   const mode = (url.searchParams.get("mode") || "sync").toLowerCase();
 
   try {
+    if (mode === "auth") {
+      const logId = await startLog(sb, "nwg:prices");
+      const token = await getAccessToken(sb);
+      const { data: sample, error: sampleError } = await sb
+        .from("nwg_skus")
+        .select("sku")
+        .eq("active", true)
+        .eq("discontinued", false)
+        .limit(1)
+        .maybeSingle();
+      if (sampleError) throw new Error(`NWG sample SKU: ${sampleError.message}`);
+      if (!sample?.sku) throw new Error("NWG has no active SKU for authorization test");
+      await fetchPrices(token, [sample.sku]);
+      await finishLog(sb, logId, {
+        status: "success",
+        message: "NWG līgumcenu pieeja pārbaudīta",
+        details: { authorization: "verified" },
+      });
+      return new Response(JSON.stringify({ ok: true, authorization: "verified" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (mode === "seed") {
       // Only signed-in admins may replace the stored NWG credential.
       const jwt = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");

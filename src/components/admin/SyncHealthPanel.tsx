@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { AlertTriangle, CheckCircle2, Clock, KeyRound, Loader2, RefreshCw } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock, Loader2, RefreshCw } from "lucide-react";
 
 interface SyncRow {
   source: string;
@@ -49,8 +48,6 @@ const SyncHealthPanel = () => {
   const [nwg, setNwg] = useState({ total: 0, priced: 0, lastUpdate: null as string | null });
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState<string | null>(null);
-  const [token, setToken] = useState("");
-  const [seeding, setSeeding] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -122,7 +119,8 @@ const SyncHealthPanel = () => {
   );
 
   const nwgPriceLog = useMemo(() => logs.find((l) => l.source === "nwg:prices"), [logs]);
-  const tokenExpired = !!nwgPriceLog?.message?.includes("invalid_grant");
+  const tokenExpired =
+    nwgPriceLog?.status === "error" && !!nwgPriceLog.message?.includes("invalid_grant");
 
   const callFn = async (fn: string, query = "", body?: unknown) => {
     const session = (await supabase.auth.getSession()).data.session;
@@ -149,21 +147,6 @@ const SyncHealthPanel = () => {
       toast({ title: `${s.label}: neizdevās`, description: (e as Error).message, variant: "destructive" });
     } finally {
       setRunning(null);
-      setTimeout(load, 3000);
-    }
-  };
-
-  const seedToken = async () => {
-    setSeeding(true);
-    try {
-      await callFn("nwg-price-sync", "?mode=seed", { refresh_token: token.trim() });
-      setToken("");
-      toast({ title: "NWG pieeja atjaunota", description: "Cenu sinhronizācija atkal var strādāt." });
-      await callFn("nwg-price-sync", "?limit=100000&batch=400");
-    } catch (e) {
-      toast({ title: "NWG pieeju neizdevās atjaunot", description: (e as Error).message, variant: "destructive" });
-    } finally {
-      setSeeding(false);
       setTimeout(load, 3000);
     }
   };
@@ -273,30 +256,22 @@ const SyncHealthPanel = () => {
         {tokenExpired ? (
           <div className="mt-4 rounded-sm border border-destructive/40 bg-destructive/5 p-3 sm:p-4">
             <div className="flex items-center gap-2">
-              <KeyRound className="h-4 w-4 shrink-0 text-destructive" />
-              <p className="text-sm font-medium text-destructive">NWG pieejas atļauja beigusies</p>
+              <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+              <p className="text-sm font-medium text-destructive">NWG līgumcenu atjaunošana jāpārbauda</p>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              NWG portāla sesija jāatjauno vienu reizi. Pēc tam sistēma glabās īslaicīgo piekļuvi un neļaus
-              vienlaicīgiem atjauninājumiem to savstarpēji sabojāt.
+              Preču katalogs turpina darboties. Cenu pieeju pārbaudi, palaižot cenu sinhronizāciju vēlreiz.
             </p>
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-              <Input
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
-                placeholder="NWG refresh token"
-                className="rounded-sm"
-                autoComplete="off"
-              />
-              <Button
-                onClick={seedToken}
-                disabled={seeding || token.trim().length < 20}
-                className="shrink-0 bg-accent text-accent-foreground hover:bg-accent/90"
-              >
-                {seeding ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <KeyRound className="mr-2 h-4 w-4" />}
-                Saglabāt un palaist
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => run({ key: "nwg-prices", label: "NWG līgumcenas", fn: "nwg-price-sync" })}
+              disabled={running === "nwg-prices"}
+              className="mt-3"
+            >
+              <RefreshCw className={`mr-2 h-3.5 w-3.5 ${running === "nwg-prices" ? "animate-spin" : ""}`} />
+              Atjaunot līgumcenas
+            </Button>
           </div>
         ) : (
           <div className="mt-4 flex flex-wrap gap-2">
