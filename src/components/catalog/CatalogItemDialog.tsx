@@ -10,6 +10,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
+import { Ban, Droplets, Flame, Shirt, Sparkles, Sun, WashingMachine, Wind } from "lucide-react";
 
 
 interface Props {

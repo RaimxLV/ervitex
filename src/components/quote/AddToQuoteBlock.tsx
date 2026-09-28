@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, ChevronRight, Minus, Plus, ClipboardList, Trash2, Plus as PlusIcon } from "lucide-react";
+import { Check, ListPlus, Minus, Palette, Plus, ClipboardList, Send, Trash2, Plus as PlusIcon } from "lucide-react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -135,39 +135,47 @@ const AddToQuoteBlock = ({
   return (
     <div className="rounded-md border-2 border-accent/60 bg-accent/5 p-4 space-y-4">
       <div className="flex items-start justify-between gap-2">
-        <p className="font-heading text-sm font-black uppercase tracking-wider text-foreground">
-          {t("Pievieno pieprasījumam", "Add to request")}
-        </p>
+        <div className="min-w-0">
+          <p className="font-heading text-base font-black uppercase tracking-wider text-foreground">
+            {t("Izveido pieprasījumu", "Create a request")}
+          </p>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+            {t(
+              "Šī tabula veido jūsu pieprasījumu — pēc nosūtīšanas ar jums sazināsies mūsu projekta vadītāja.",
+              "This table builds your request — once you send it, our project manager will get in touch.",
+            )}
+          </p>
+        </div>
         {flash && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
             <Check className="h-3 w-3" /> {t("Saglabāts", "Saved")}
           </span>
         )}
       </div>
 
-      {/* Kā tas darbojas — mini infografika */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 rounded border border-accent/40 bg-background px-3 py-2.5">
-        <span className="flex items-center gap-1.5">
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent font-heading text-[11px] font-black text-accent-foreground">1</span>
-          <span className="text-xs font-semibold uppercase tracking-wider">{t("Izvēlies krāsu & izmērus", "Pick colour & size")}</span>
-        </span>
-        <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
-        <span className="flex items-center gap-1.5">
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent font-heading text-[11px] font-black text-accent-foreground">2</span>
-          <span className="text-xs font-semibold uppercase tracking-wider">{t("Ievadi daudzumu", "Enter quantity")}</span>
-        </span>
-        <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
-        <span className="flex items-center gap-1.5">
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent font-heading text-[11px] font-black text-accent-foreground">3</span>
-          <span className="text-xs font-semibold uppercase tracking-wider">{t("Nosūti pieprasījumu", "Send the request")}</span>
-        </span>
-      </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">
-        {t(
-          "Šī tabula veido pieprasījumu — pēc nosūtīšanas sazināsies mūsu projektu vadītāja.",
-          "This table builds your request — our project manager follows up by email.",
-        )}
-      </p>
+      {/* Kā tas darbojas — soļi viens zem otra */}
+      <ol className="rounded border border-accent/40 bg-background px-3 py-3">
+        {STEPS.map((s, i) => {
+          const Icon = s.icon;
+          const isLast = i === STEPS.length - 1;
+          return (
+            <li key={s.lv} className="flex items-stretch gap-3">
+              <div className="flex flex-col items-center">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent font-heading text-xs font-black text-accent-foreground">
+                  {i + 1}
+                </span>
+                {!isLast && <span className="my-1 w-px flex-1 bg-accent/30" aria-hidden />}
+              </div>
+              <div className={`flex min-w-0 items-center gap-2.5 pt-1 ${isLast ? "" : "pb-3"}`}>
+                <Icon className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.75} />
+                <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
+                  {t(s.lv, s.en)}
+                </span>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
 
       {/* Current color header */}
       <div className="flex items-center justify-between gap-2 rounded border border-border bg-background px-3 py-2">
