@@ -104,16 +104,16 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
       </div>
 
       {images.length > visibleCount && (
-        <div className="mt-6 flex items-center justify-between border-t border-border pt-5">
-          <div className="flex items-center gap-1.5" aria-hidden="true">
+        <div className="mt-6 flex items-center justify-between gap-4 border-t border-border pt-5">
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden" aria-hidden="true">
             {images.map((_, index) => (
               <span
                 key={index}
-                className={`h-1 transition-all duration-500 ${index === start ? "w-10 bg-foreground" : "w-5 bg-border"}`}
+                className={`h-1 min-w-0 transition-all duration-500 ${index === start ? "w-10 shrink-0 bg-foreground" : "w-5 shrink bg-border"}`}
               />
             ))}
           </div>
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-2">
             <Button type="button" variant="outline" size="icon" className="rounded-none" onClick={() => move(-1)} aria-label="Iepriekšējais attēls">
               <ChevronLeft />
             </Button>

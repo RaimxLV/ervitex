@@ -183,14 +183,19 @@ export default function AdminMegaMenu() {
   };
 
   const loadDbCategories = async () => {
-    const { data } = await supabase
-      .schema("private" as any)
-      .from("catalog_items_mv" as any)
-      .select("category")
-      .not("category", "is", null)
-      .limit(5000);
+    const rows: any[] = [];
+    for (let from = 0; from < 20000; from += 1000) {
+      const { data, error } = await supabase
+        .from("catalog_items" as any)
+        .select("category")
+        .not("category", "is", null)
+        .range(from, from + 999);
+      if (error || !data?.length) break;
+      rows.push(...data);
+      if (data.length < 1000) break;
+    }
     const counts: Record<string, number> = {};
-    ((data as any[]) || []).forEach((r) => {
+    rows.forEach((r) => {
       const c = (r.category || "").trim();
       if (c) counts[c] = (counts[c] || 0) + 1;
     });
