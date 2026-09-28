@@ -173,7 +173,6 @@ const WorksheetPage = () => {
     if (!dirty && !sheet?.draft_items) {
       setActionBusy(false);
       toast.success("Saglabāts");
-      closeView();
       return;
     }
     const { data, error } = await supabase.rpc("confirm_quote_worksheet" as any, { _token: token, _by: editor || null });

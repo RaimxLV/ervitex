@@ -82,3 +82,6 @@
 - [x] Padarīt Lauras nodošanu kolēģēm un e-pasta atbildes darbību nepārprotamu.
 - [x] Saglabāt preču maiņas un atbildīgā maiņas vēsturi, lai nekas nepazūd.
 - [x] Pārbaudīt pilno plūsmu no klienta pieprasījuma līdz kolēģes atbildei.
+- [ ] Nodalīt “Saglabāt izmaiņas”, gatavās e-pasta pogas kopēšanu un aizvēršanu.
+- [ ] Noņemt iekšējo ziņas klientam formu; saraksti atstāt tikai parastajā e-pastā.
+- [ ] Pilnībā pārbaudīt saraksta saglabāšanu, kopēšanu, aizvēršanu un nodošanu no e-pasta.
