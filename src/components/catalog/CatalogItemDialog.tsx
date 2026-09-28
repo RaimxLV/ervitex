@@ -1522,8 +1522,10 @@ const CatalogItemDialog = ({
                   onClose={() => onOpenChange(false)}
                 />
               )}
+              </div>
+            </div>
 
-              <div className="space-y-6 border-t border-border pt-6">
+            <div className="space-y-6 border-t border-border pt-6">
                 <h4 className="font-heading text-lg font-bold uppercase tracking-wider">
                   {lang === "lv" ? "Par preci" : "About this item"}
                 </h4>
