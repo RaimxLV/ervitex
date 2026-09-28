@@ -27,14 +27,89 @@ import sub8Asset from "@/assets/services/sublimation-gallery-8.webp";
 import heatTransfer from "@/assets/services/termodruka-hero.webp";
 import heatTransfer2 from "@/assets/services/termodruka-2.webp";
 
+import {
+  Award,
+  Blend,
+  Box,
+  Clock,
+  Droplets,
+  Feather,
+  FileType2,
+  FileDigit,
+  Frame,
+  Hand,
+  Layers,
+  Package,
+  PackageCheck,
+  Palette,
+  Pipette,
+  Printer,
+  Ruler,
+  Scissors,
+  Send,
+  Shapes,
+  ShieldCheck,
+  Shirt,
+  Sparkles,
+  Sun,
+  TrendingDown,
+  UserRound,
+  Wind,
+  ZoomIn,
+  type LucideIcon,
+} from "lucide-react";
+
+export type TechSpec = {
+  icon: LucideIcon;
+  label: { lv: string; en: string };
+  value: { lv: string; en: string };
+};
+
+export type TechBenefit = {
+  icon: LucideIcon;
+  title: { lv: string; en: string };
+  desc?: { lv: string; en: string };
+};
+
+export type TechStep = {
+  icon: LucideIcon;
+  text: { lv: string; en: string };
+};
+
+export type TechExtra = {
+  title: { lv: string; en: string };
+  tagline?: { lv: string; en: string };
+  paragraphs: { lv: string; en: string }[];
+  stepsTitle?: { lv: string; en: string };
+  steps?: TechStep[];
+  highlights?: TechSpec[];
+  note?: { lv: string; en: string };
+};
+
+export type TechFilm = {
+  icon: LucideIcon;
+  name: { lv: string; en: string };
+  desc: { lv: string; en: string };
+};
+
 export type Tech = {
   id: string;
   name: { lv: string; en: string };
   tagline: { lv: string; en: string };
   short: { lv: string; en: string };
-  desc: { lv: string; en: string };
-  features: { lv: string; en: string }[];
-  specs: { label: { lv: string; en: string }; value: { lv: string; en: string } }[];
+  intro: { lv: string; en: string }[];
+  benefitsTitle: { lv: string; en: string };
+  benefits: TechBenefit[];
+  useCasesTitle: { lv: string; en: string };
+  useCases: { lv: string; en: string }[];
+  processTitle?: { lv: string; en: string };
+  processSteps?: TechStep[];
+  filmsTitle?: { lv: string; en: string };
+  films?: TechFilm[];
+  filmsNote?: { lv: string; en: string };
+  note?: { lv: string; en: string };
+  extras?: TechExtra[];
+  specs: TechSpec[];
   images: string[];
 };
 
@@ -42,100 +117,346 @@ export const techs: Tech[] = [
   {
     id: "sietspiede",
     name: { lv: "Sietspiede", en: "Screen printing" },
-    tagline: { lv: "Lielām tirāžām", en: "For large runs" },
+    tagline: {
+      lv: "Klasiska, izturīga un ekonomiska apdrukas tehnoloģija lielām tirāžām.",
+      en: "Classic, durable and cost-effective printing for large runs.",
+    },
     short: {
-      lv: "Ekonomiskākā izvēle lielām tirāžām — spilgta, mīksta un ļoti izturīga apdruka.",
-      en: "The most economical choice for large runs — vivid, soft and highly durable prints.",
+      lv: "Klasiska, izturīga un ekonomiska apdrukas tehnoloģija lielām tirāžām.",
+      en: "Classic, durable and cost-effective printing for large runs.",
     },
-    desc: {
-      lv: "Klasiskā un ekonomiskākā tehnoloģija lielām tirāžām. Katrai krāsai tiek sagatavots atsevišķs siets, tāpēc rezultāts ir spilgts, mīksts uz taustes un ļoti izturīgs pret mazgāšanu. Ideāla izvēle T-krekliem, hūdijiem un pasākumu apģērbam.",
-      en: "The classic and most cost-effective technology for large runs. A separate screen is prepared for every colour, so the result is vivid, soft to the touch and extremely wash-resistant. Ideal for tees, hoodies and event apparel.",
-    },
-    features: [
-      { lv: "Izdevīgi no 30 gab.", en: "Cost-effective from 30 pcs" },
-      { lv: "Līdz 6 krāsām vienā apdrukā", en: "Up to 6 colours per print" },
-      { lv: "Mīksta, elastīga apdruka", en: "Soft, flexible print" },
-      { lv: "Pantone krāsu saskaņošana", en: "Pantone colour matching" },
+    intro: [
+      {
+        lv: "Sietspiede ir viena no populārākajām tekstila apdrukas metodēm, īpaši tad, ja nepieciešams apdrukāt lielāku skaitu T-kreklu, hūdiju vai cita tekstila izstrādājumu.",
+        en: "Screen printing is one of the most popular textile decoration methods, especially when a larger number of T-shirts, hoodies or other textile products needs to be printed.",
+      },
+      {
+        lv: "Apdrukas procesā katrai krāsai tiek sagatavots atsevišķs siets, caur kuru krāsa tiek uzklāta uz auduma. Tas nodrošina spilgtas, piesātinātas krāsas, patīkamu sajūtu uz taustes un augstu apdrukas izturību.",
+        en: "In the process, a separate screen is prepared for each colour, through which the ink is applied to the fabric. This ensures vivid, saturated colours, a pleasant feel and high print durability.",
+      },
+      {
+        lv: "Sietspiede ir īpaši izdevīga, sākot no 25 gabaliem, tāpēc tā ir lieliska izvēle uzņēmumu apģērbam, komandām, pasākumiem, festivāliem, darba apģērbam un citiem lielākiem pasūtījumiem.",
+        en: "Screen printing is especially cost-effective from 25 pieces onwards, making it an excellent choice for company apparel, teams, events, festivals, workwear and other larger orders.",
+      },
+    ],
+    benefitsTitle: { lv: "Kāpēc izvēlēties sietspiedi?", en: "Why choose screen printing?" },
+    benefits: [
+      {
+        icon: TrendingDown,
+        title: { lv: "Izdevīga lielām tirāžām", en: "Cost-effective for large runs" },
+        desc: { lv: "Jo lielāks pasūtījuma daudzums, jo izdevīgāka cena par vienību.", en: "The larger the order quantity, the lower the price per unit." },
+      },
+      {
+        icon: Palette,
+        title: { lv: "Spilgta un kvalitatīva apdruka", en: "Vivid, high-quality prints" },
+        desc: { lv: "Krāsas ir piesātinātas un vizuāli izteiksmīgas.", en: "Colours are saturated and visually expressive." },
+      },
+      {
+        icon: Droplets,
+        title: { lv: "Izturīga pret mazgāšanu", en: "Wash-resistant" },
+        desc: { lv: "Piemērota apģērbam, ko paredzēts valkāt un mazgāt regulāri.", en: "Suited to garments that are worn and washed regularly." },
+      },
+      {
+        icon: Hand,
+        title: { lv: "Patīkama uz tausti", en: "Pleasant to the touch" },
+        desc: { lv: "Kvalitatīva apdruka, kas saglabā komfortu.", en: "A high-quality print that preserves comfort." },
+      },
+      {
+        icon: Layers,
+        title: { lv: "Līdz 6 krāsām vienā apdrukā", en: "Up to 6 colours per print" },
+        desc: { lv: "Iespējams realizēt arī sarežģītākus dizainus.", en: "More complex designs can also be realised." },
+      },
+      {
+        icon: Pipette,
+        title: { lv: "Pantone krāsu saskaņošana", en: "Pantone colour matching" },
+        desc: { lv: "Ja nepieciešams precīzi ievērot konkrētas zīmola krāsas.", en: "When specific brand colours must be matched precisely." },
+      },
+    ],
+    useCasesTitle: { lv: "Piemērota izvēle", en: "Great for" },
+    useCases: [
+      { lv: "T-krekliem", en: "T-shirts" },
+      { lv: "Hūdijiem un džemperiem", en: "Hoodies and sweatshirts" },
+      { lv: "Darba apģērbam", en: "Workwear" },
+      { lv: "Komandu un pasākumu apģērbam", en: "Team and event apparel" },
+      { lv: "Uzņēmumu merch un zīmola apģērbam", en: "Company merch and branded apparel" },
+      { lv: "Lielām apdrukas tirāžām", en: "Large print runs" },
     ],
     specs: [
-      { label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "30 gab.", en: "30 pcs" } },
-      { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "5–8 darba dienas", en: "5–8 business days" } },
-      { label: { lv: "Faili", en: "Files" }, value: { lv: "AI, EPS, PDF (vektors)", en: "AI, EPS, PDF (vector)" } },
+      { icon: Package, label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "30 gab.", en: "30 pcs" } },
+      { icon: Clock, label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "5–8 darba dienas", en: "5–8 business days" } },
+      { icon: FileType2, label: { lv: "Pieņemamie faili", en: "Accepted files" }, value: { lv: "AI, EPS, PDF (vektora formātā)", en: "AI, EPS, PDF (vector)" } },
+      { icon: Layers, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "līdz 6 krāsām vienā apdrukā", en: "up to 6 colours per print" } },
     ],
     images: [screen1, screen2, screen3, screen4, screen5, screen6],
   },
   {
     id: "dtf",
     name: { lv: "DTF druka", en: "DTF printing" },
-    tagline: { lv: "Fotogrāfiskai detaļai", en: "For photographic detail" },
+    tagline: {
+      lv: "Fotogrāfijām, detaļām un personalizācijai.",
+      en: "For photographs, detail and personalisation.",
+    },
     short: {
-      lv: "Digitāla druka bez krāsu ierobežojuma — arī no viena gabala un uz tumša auduma.",
-      en: "Digital printing with no colour limit — even one-offs and on dark fabric.",
+      lv: "Fotogrāfijām, detaļām un personalizācijai.",
+      en: "For photographs, detail and personalisation.",
     },
-    desc: {
-      lv: "Digitālā druka uz plēves, kas tiek pārnesta ar presi. Bez krāsu skaita ierobežojuma — gradienti, fotogrāfijas un smalkas detaļas izskatās perfekti pat uz tumša auduma. Piemērota mazām tirāžām un personalizācijai pa vienam gabalam.",
-      en: "Digital film printing transferred with a heat press. No colour limit — gradients, photos and fine detail look perfect even on dark fabric. Perfect for small runs and one-off personalisation.",
-    },
-    features: [
-      { lv: "No 1 gabala", en: "From a single piece" },
-      { lv: "Neierobežots krāsu skaits", en: "Unlimited colours" },
-      { lv: "Der arī sintētikai un jakām", en: "Works on synthetics and jackets" },
-      { lv: "Vārdi un numuri komandām", en: "Names and numbers for teams" },
+    intro: [
+      {
+        lv: "DTF druka ir digitālās apdrukas tehnoloģija, kur dizains vispirms tiek izdrukāts uz speciālas plēves un pēc tam ar termopresi pārnests uz tekstila izstrādājumu.",
+        en: "DTF printing is a digital decoration technology where the design is first printed onto a special film and then transferred to the textile product with a heat press.",
+      },
+      {
+        lv: "Šī metode ļauj drukāt jebkādu krāsu skaitu, gradientus, fotogrāfijas un ļoti smalkas detaļas — bez nepieciešamības veidot atsevišķus sietus katrai krāsai.",
+        en: "This method allows printing any number of colours, gradients, photographs and very fine details — without the need to prepare separate screens for each colour.",
+      },
+      {
+        lv: "DTF druka ir lieliska izvēle, ja nepieciešama neliela tirāža, individuāla apdruka vai personalizēts dizains pat vienā eksemplārā.",
+        en: "DTF printing is a great choice when a small run, individual decoration or personalised design is needed — even for a single piece.",
+      },
+    ],
+    benefitsTitle: { lv: "DTF drukas priekšrocības", en: "Advantages of DTF printing" },
+    benefits: [
+      {
+        icon: Package,
+        title: { lv: "No 10 gabaliem", en: "From 10 pieces" },
+        desc: { lv: "Nav nepieciešama liela tirāža.", en: "No large run is required." },
+      },
+      {
+        icon: Palette,
+        title: { lv: "Neierobežots krāsu skaits", en: "Unlimited colours" },
+        desc: { lv: "Dizainā vari izmantot pilnu krāsu gammu, gradientus un fotogrāfijas.", en: "Use the full colour gamut, gradients and photographs in your design." },
+      },
+      {
+        icon: ZoomIn,
+        title: { lv: "Smalkas detaļas", en: "Fine detail" },
+        desc: { lv: "Lieliski piemērota sarežģītiem dizainiem, tekstiem, ilustrācijām un fotogrāfijām.", en: "Excellent for complex designs, lettering, illustrations and photographs." },
+      },
+      {
+        icon: UserRound,
+        title: { lv: "Personalizācija", en: "Personalisation" },
+        desc: { lv: "Katram apģērbam var pievienot savu vārdu, numuru vai citu individuālu informāciju.", en: "Each garment can have its own name, number or other individual detail." },
+      },
+      {
+        icon: Shirt,
+        title: { lv: "Materiālu klāsts", en: "Wide range of materials" },
+        desc: { lv: "Piemērota kokvilnai, poliesteram, sintētikai un dažādiem virsdrēbju materiāliem.", en: "Suited to cotton, polyester, synthetics and various outerwear fabrics." },
+      },
+    ],
+    useCasesTitle: { lv: "Kad izvēlēties DTF?", en: "When to choose DTF?" },
+    useCases: [
+      { lv: "Nepieciešams apdrukāt dažus izstrādājumus", en: "A few products need to be printed" },
+      { lv: "Dizainā ir daudz krāsu vai gradienti", en: "The design has many colours or gradients" },
+      { lv: "Vēlies drukāt fotogrāfijas un smalkas detaļas", en: "You want to print photos and fine details" },
+      { lv: "Katram izstrādājumam nepieciešams atšķirīgs vārds, numurs vai dizains", en: "Each product needs a different name, number or design" },
+      { lv: "Nepieciešams apdrukāt dažādus materiālus, tostarp sintētiku un jakas", en: "Various materials need to be printed, including synthetics and jackets" },
+    ],
+    extras: [
+      {
+        title: { lv: "DTF transfēri", en: "DTF transfers" },
+        tagline: { lv: "Tavs dizains — mūsu druka.", en: "Your design — printed by us." },
+        paragraphs: [
+          {
+            lv: "Nepieciešami DTF transfēri, bet apdruku uz apģērba vēlies veikt pats? Mēs izdrukāsim tavu dizainu uz DTF plēves, un tu saņemsi gatavu transfēru, ko vari uzklāt uz tekstila ar termopresi.",
+            en: "Need DTF transfers but want to apply the print yourself? We will print your design onto DTF film and deliver a ready-made transfer that you can apply to textiles with a heat press.",
+          },
+          {
+            lv: "Tu atsūti savu sagatavoto failu, mēs parūpējamies par kvalitatīvu DTF drukas sagatavošanu un izdruku. Ērts risinājums uzņēmumiem, apdrukas veicējiem un ikvienam, kam nepieciešami gatavi transfēri turpmākai izmantošanai.",
+            en: "You send us your prepared file and we take care of high-quality DTF print preparation and output. A convenient solution for businesses, decorators and anyone who needs ready-made transfers for later use.",
+          },
+        ],
+        stepsTitle: { lv: "Kā tas notiek?", en: "How it works" },
+        steps: [
+          { icon: Send, text: { lv: "Atsūti savu dizainu atbilstošā drukas kvalitātē.", en: "Send us your design at print-appropriate quality." } },
+          { icon: Printer, text: { lv: "Mēs to izdrukājam uz DTF plēves.", en: "We print it onto DTF film." } },
+          { icon: PackageCheck, text: { lv: "Saņem gatavu DTF transfēru metrāžā un vari to uzklāt uz sava tekstila.", en: "You receive a ready DTF transfer by the metre and apply it to your own textiles." } },
+        ],
+        highlights: [
+          { icon: Ruler, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "1 tekošais metrs (materiāla platums: 57 cm)", en: "1 running metre (film width: 57 cm)" } },
+          { icon: Package, label: { lv: "Cena", en: "Price" }, value: { lv: "15 € + PVN / tekošais metrs", en: "€15 + VAT / running metre" } },
+          { icon: Palette, label: { lv: "Druka", en: "Print" }, value: { lv: "Pilnkrāsu DTF, bez krāsu skaita ierobežojuma", en: "Full-colour DTF, no colour limit" } },
+        ],
+        note: {
+          lv: "DTF transfēri ir piemēroti gan atsevišķiem dizainiem, gan vairāku apdruku izvietošanai uz viena metra, ļaujot efektīvi izmantot plēves laukumu.",
+          en: "DTF transfers work for individual designs as well as several placements on one metre, letting you use the film area efficiently.",
+        },
+      },
     ],
     specs: [
-      { label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "1 gab.", en: "1 pc" } },
-      { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "2–5 darba dienas", en: "2–5 business days" } },
-      { label: { lv: "Faili", en: "Files" }, value: { lv: "PNG 300 dpi, PDF, AI", en: "PNG 300 dpi, PDF, AI" } },
+      { icon: Package, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "10 gab.", en: "10 pcs" } },
+      { icon: Clock, label: { lv: "Izgatavošanas laiks", en: "Production time" }, value: { lv: "2–5 darba dienas", en: "2–5 business days" } },
+      { icon: Palette, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "Neierobežots", en: "Unlimited" } },
+      { icon: FileType2, label: { lv: "Faili", en: "Files" }, value: { lv: "PNG (300 DPI), PDF, AI", en: "PNG (300 DPI), PDF, AI" } },
     ],
     images: [dtf1, dtf2, dtf3, dtf4],
   },
   {
     id: "izsusana",
     name: { lv: "Izšūšana", en: "Embroidery" },
-    tagline: { lv: "Premium izskatam", en: "For a premium look" },
+    tagline: {
+      lv: "Premium izskats un izturīgs rezultāts.",
+      en: "A premium look and a durable result.",
+    },
     short: {
-      lv: "Reljefs diegu dizains, kas korporatīvajam apģērbam piešķir premium izskatu.",
-      en: "Textured thread design that gives corporate apparel a premium look.",
+      lv: "Premium izskats un izturīgs rezultāts.",
+      en: "A premium look and a durable result.",
     },
-    desc: {
-      lv: "Vissolīdākais risinājums korporatīvajam apģērbam. Dizains tiek digitalizēts un izšūts ar diegu — reljefs, taustāms un praktiski nenodilstošs. Lieliski strādā uz cepurēm, polo krekliem, jakām un darba apģērba.",
-      en: "The most solid solution for corporate apparel. The design is digitised and stitched with thread — textured, tangible and virtually indestructible. Works great on caps, polos, jackets and workwear.",
-    },
-    features: [
-      { lv: "No 10 gab.", en: "From 10 pcs" },
-      { lv: "Līdz 12 diegu krāsām", en: "Up to 12 thread colours" },
-      { lv: "3D / puff izšūšana un uzšuves", en: "3D / puff embroidery and patches" },
-      { lv: "Bezmaksas digitalizācijas pārbaude", en: "Free digitising check" },
+    intro: [
+      {
+        lv: "Izšūšana ir lieliska izvēle, ja vēlies apģērbam piešķirt kvalitatīvu, profesionālu un premium izskatu.",
+        en: "Embroidery is an excellent choice when you want to give apparel a high-quality, professional and premium look.",
+      },
+      {
+        lv: "Atšķirībā no apdrukas, izšuvumam ir taustāms reljefs, kas piešķir dizainam izteiksmīgu un kvalitatīvu izskatu. Tas ir īpaši piemērots uzņēmumu logotipiem, darba apģērbam un zīmola apģērbam, ko paredzēts izmantot ilgstoši.",
+        en: "Unlike printing, embroidery has a tangible texture that gives the design an expressive, quality appearance. It is especially suited to company logos, workwear and branded apparel intended for long-term use.",
+      },
+    ],
+    benefitsTitle: { lv: "Izšūšanas priekšrocības", en: "Advantages of embroidery" },
+    benefits: [
+      {
+        icon: Award,
+        title: { lv: "Premium izskats", en: "Premium look" },
+        desc: { lv: "Reljefs un kvalitatīvs izšuvums piešķir apģērbam profesionālu izskatu.", en: "A textured, high-quality embroidery gives apparel a professional appearance." },
+      },
+      {
+        icon: ShieldCheck,
+        title: { lv: "Izturīgs rezultāts", en: "Durable result" },
+        desc: { lv: "Izšuvums ir piemērots regulārai valkāšanai un mazgāšanai.", en: "Embroidery withstands regular wear and washing." },
+      },
+      {
+        icon: Palette,
+        title: { lv: "Līdz 12 diegu krāsām", en: "Up to 12 thread colours" },
+        desc: { lv: "Dizainā iespējams izmantot līdz 12 dažādām diegu krāsām.", en: "Designs can use up to 12 different thread colours." },
+      },
+      {
+        icon: Box,
+        title: { lv: "3D / Puff izšūšana", en: "3D / Puff embroidery" },
+        desc: { lv: "Lai dizainam piešķirtu papildu apjomu un izteiksmīgumu, piedāvājam arī 3D jeb Puff izšūšanu.", en: "We also offer 3D (puff) embroidery to add volume and expressiveness to the design." },
+      },
+      {
+        icon: Scissors,
+        title: { lv: "Uzšuves", en: "Patches" },
+        desc: { lv: "Izšuvumu iespējams izgatavot arī kā atsevišķu uzšuvi, ko pēc tam var piešūt vai pielīmēt pie apģērba vai cita tekstila.", en: "Embroidery can also be made as a separate patch that is later sewn or attached to apparel or other textiles." },
+      },
+    ],
+    useCasesTitle: { lv: "Kad izvēlēties izšūšanu?", en: "When to choose embroidery?" },
+    useCases: [
+      { lv: "Uzņēmumu un korporatīvajam apģērbam", en: "Company and corporate apparel" },
+      { lv: "Polo krekliem", en: "Polo shirts" },
+      { lv: "Cepurēm un beanie cepurēm", en: "Caps and beanies" },
+      { lv: "Jakām un vestēm", en: "Jackets and vests" },
+      { lv: "Darba apģērbam", en: "Workwear" },
+      { lv: "Hūdijiem un džemperiem", en: "Hoodies and sweatshirts" },
+      { lv: "Zīmola apģērbam un merch", en: "Branded apparel and merch" },
+    ],
+    processTitle: { lv: "Kā notiek izšūšana?", en: "How embroidery is done" },
+    processSteps: [
+      {
+        icon: FileDigit,
+        text: {
+          lv: "Lai dizainu varētu izšūt, tas vispirms tiek digitalizēts — pārveidots īpašā izšūšanas failā, kas nosaka dūrienu veidu, virzienu, blīvumu un krāsu.",
+          en: "To embroider a design, it is first digitised — converted into a special embroidery file that defines stitch type, direction, density and colour.",
+        },
+      },
+      {
+        icon: ShieldCheck,
+        text: {
+          lv: "Pirms ražošanas pārbaudām, vai dizains ir piemērots izšūšanai un vai nepieciešamas kādas korekcijas, lai gala rezultāts būtu kvalitatīvs.",
+          en: "Before production we check whether the design is suitable for embroidery and whether any adjustments are needed to achieve a high-quality result.",
+        },
+      },
     ],
     specs: [
-      { label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "10 gab.", en: "10 pcs" } },
-      { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "5–10 darba dienas", en: "5–10 business days" } },
-      { label: { lv: "Ieteicamais izmērs", en: "Recommended size" }, value: { lv: "līdz 25 × 25 cm", en: "up to 25 × 25 cm" } },
+      { icon: Package, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "No 10 gab.", en: "From 10 pcs" } },
+      { icon: Clock, label: { lv: "Izgatavošanas laiks", en: "Production time" }, value: { lv: "5–10 darba dienas", en: "5–10 business days" } },
+      { icon: Palette, label: { lv: "Diegu krāsas", en: "Thread colours" }, value: { lv: "Plaša krāsu palete", en: "A wide colour palette" } },
+      { icon: Ruler, label: { lv: "Izšuvuma izmērs", en: "Embroidery size" }, value: { lv: "No ļoti smalkiem līdz lieliem (min. burta augstums 4 mm)", en: "From delicate to large (minimum letter height 4 mm)" } },
     ],
     images: [emb1, emb2, emb3, emb4, emb5, emb6, emb7],
   },
   {
     id: "sublimacija",
     name: { lv: "Sublimācija", en: "Sublimation" },
-    tagline: { lv: "Sporta un pilnkrāsu risinājums", en: "Sport & all-over solution" },
+    tagline: {
+      lv: "Pilnkrāsu apdruka sportam un gaišam poliesteram.",
+      en: "Full-colour printing for sports and light polyester.",
+    },
     short: {
-      lv: "Krāsa iekļūst šķiedrā — pilnkrāsu risinājums sporta formām un suvenīriem.",
-      en: "Ink bonds inside the fibre — full-colour solution for sports kits and gifts.",
+      lv: "Pilnkrāsu apdruka sportam un gaišam poliesteram.",
+      en: "Full-colour printing for sports and light polyester.",
     },
-    desc: {
-      lv: "Krāsa iekļūst pašā šķiedrā, tāpēc apdruka nav ne saredzama, ne sajūtama — tā nekad neplaisā un neatlīmējas. Piemērota gaišam poliestera audumam: sporta formām, pilnkrāsu dizainiem, krūzēm un suvenīriem.",
-      en: "The ink bonds inside the fibre, so the print cannot be seen or felt — it never cracks or peels. Suited to light polyester fabrics: sports kits, all-over designs, mugs and gifts.",
+    intro: [
+      {
+        lv: "Sublimācija ir apdrukas tehnoloģija, kurā krāsa ar karstuma palīdzību iekļūst tieši materiāla šķiedrās. Rezultātā apdruka kļūst par auduma daļu — tā nav jūtama uz tausti, neplaisā un nelobās.",
+        en: "Sublimation is a decoration technology in which the ink penetrates directly into the material's fibres with the help of heat. As a result, the print becomes part of the fabric — it cannot be felt, crack or peel.",
+      },
+      {
+        lv: "Sublimācija ļauj izveidot pilnkrāsu dizainus ar fotogrāfijām, gradientiem un smalkām detaļām. Šī tehnoloģija ir īpaši piemērota sporta apģērbam un citiem gaišiem poliestera izstrādājumiem.",
+        en: "Sublimation allows full-colour designs with photographs, gradients and fine details. This technology is especially suited to sportswear and other light polyester products.",
+      },
+    ],
+    benefitsTitle: { lv: "Sublimācijas priekšrocības", en: "Advantages of sublimation" },
+    benefits: [
+      {
+        icon: Blend,
+        title: { lv: "Apdruka kļūst par auduma daļu", en: "The print becomes part of the fabric" },
+        desc: { lv: "Krāsa iesūcas šķiedrās, tāpēc uz auduma neveidojas atsevišķs apdrukas slānis.", en: "The ink soaks into the fibres, so no separate print layer forms on the fabric." },
+      },
+      {
+        icon: ShieldCheck,
+        title: { lv: "Neplaisā un nelobās", en: "Never cracks or peels" },
+        desc: { lv: "Tā kā krāsa atrodas pašā materiālā, apdrukai nav atsevišķas plēves vai krāsas slāņa, kas varētu lobīties.", en: "Since the ink is inside the material, there is no separate film or ink layer that could peel off." },
+      },
+      {
+        icon: Palette,
+        title: { lv: "Pilnkrāsu iespējas", en: "Full-colour options" },
+        desc: { lv: "Var izmantot neierobežotu krāsu gammu, fotogrāfijas, gradientus un ļoti smalkas detaļas.", en: "An unlimited colour gamut, photographs, gradients and very fine details." },
+      },
+      {
+        icon: Frame,
+        title: { lv: "Apdruka pa visu virsmu", en: "All-over printing" },
+        desc: { lv: "Iespējams veidot dizainu, kas noklāj visu izstrādājuma virsmu — īpaši piemērots sporta formām un individuāliem dizainiem.", en: "Designs can cover the entire product surface — especially suited to sports kits and individual designs." },
+      },
+      {
+        icon: Wind,
+        title: { lv: "Saglabā auduma īpašības", en: "Preserves fabric properties" },
+        desc: { lv: "Apdruka ir viegla un elpojoša, tāpēc audums saglabā savas sākotnējās īpašības un sajūtu.", en: "The print is light and breathable, so the fabric keeps its original properties and feel." },
+      },
+    ],
+    useCasesTitle: { lv: "Kad izvēlēties sublimāciju?", en: "When to choose sublimation?" },
+    useCases: [
+      { lv: "Pilnkrāsu un sarežģīts dizains", en: "Full-colour and complex designs" },
+      { lv: "Apdruka pa visu izstrādājuma virsmu", en: "All-over printing" },
+      { lv: "Sporta formas un komandu apģērbs", en: "Sports kits and team apparel" },
+      { lv: "Fotogrāfijas, gradienti un smalkas detaļas", en: "Photographs, gradients and fine details" },
+      { lv: "Viegla un elpojoša apdruka, kas nemaina auduma sajūtu", en: "A light, breathable print that does not change the fabric's feel" },
+    ],
+    note: {
+      lv: "Sublimācija vislabāk darbojas uz gaišiem poliestera materiāliem. Uz kokvilnas un tumšiem audumiem šī tehnoloģija nav piemērota.",
+      en: "Sublimation works best on light polyester materials. It is not suitable for cotton and dark fabrics.",
     },
-    features: [
-      { lv: "Apdruka pa visu virsmu", en: "All-over printing" },
-      { lv: "Neizbalo un neplaisā", en: "Never fades or cracks" },
-      { lv: "Elpojošs — nemaina auduma īpašības", en: "Breathable — fabric stays as it is" },
-      { lv: "Arī krūzes un suvenīri", en: "Also mugs and gifts" },
+    extras: [
+      {
+        title: { lv: "Sublimācija uz termokrūzēm", en: "Sublimation on thermo mugs" },
+        paragraphs: [
+          {
+            lv: "Sublimāciju iespējams izmantot arī speciālām termokrūzēm ar sublimācijai paredzētu pārklājumu. Dizains tiek iestrādāts krūzes virsmā, nodrošinot spilgtu un detalizētu rezultātu.",
+            en: "Sublimation can also be used on special thermo mugs with a sublimation coating. The design is baked into the mug's surface, ensuring a vivid and detailed result.",
+          },
+          {
+            lv: "Ideāli piemērota personalizētām dāvanām, uzņēmumu merch, logo un individuāliem dizainiem.",
+            en: "Ideal for personalised gifts, company merch, logos and individual designs.",
+          },
+        ],
+        highlights: [
+          { icon: Package, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "No 10 vienībām", en: "From 10 units" } },
+        ],
+      },
     ],
     specs: [
-      { label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "1 gab.", en: "1 pc" } },
-      { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "3–7 darba dienas", en: "3–7 business days" } },
-      { label: { lv: "Materiāls", en: "Material" }, value: { lv: "Poliesters, gaišas krāsas", en: "Polyester, light colours" } },
+      { icon: Package, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "10 gab.", en: "10 pcs" } },
+      { icon: Clock, label: { lv: "Izgatavošanas laiks", en: "Production time" }, value: { lv: "7–14 darba dienas", en: "7–14 business days" } },
+      { icon: Layers, label: { lv: "Materiāls", en: "Material" }, value: { lv: "Gaišs poliesteris", en: "Light polyester" } },
+      { icon: Palette, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "Pilnkrāsu apdruka", en: "Full-colour print" } },
     ],
     images: [
       subHeroAsset,
@@ -152,25 +473,68 @@ export const techs: Tech[] = [
   {
     id: "termodruka",
     name: { lv: "Termodruka", en: "Heat transfer" },
-    tagline: { lv: "Precīziem uzrakstiem un simboliem", en: "For precise lettering and symbols" },
+    tagline: {
+      lv: "Precīziem uzrakstiem, numuriem un īpašiem efektiem.",
+      en: "For precise lettering, numbers and special effects.",
+    },
     short: {
-      lv: "No speciālas plēves izgriezts dizains, ko ar karstumu un spiedienu nostiprina uz tekstila.",
-      en: "A design cut from specialist film and bonded to the textile using heat and pressure.",
+      lv: "Precīziem uzrakstiem, numuriem un īpašiem efektiem.",
+      en: "For precise lettering, numbers and special effects.",
     },
-    desc: {
-      lv: "Termodruka ir apdrukas veids, kurā dizainu izgriež no speciālas termoplēves un ar termopresi augstā temperatūrā nostiprina uz auduma. Tā ir īpaši piemērota vienkrāsainiem logotipiem, uzrakstiem, vārdiem un numuriem. Pieejamas gludas, elastīgas, atstarojošas, metāliskas un samtainas flokplēves. Šo risinājumu var izmantot arī nelieliem pasūtījumiem un individuāli personalizētam apģērbam.",
-      en: "Heat transfer is a decoration method where a design is cut from specialist film and bonded to fabric with a heat press at high temperature. It is especially suitable for single-colour logos, lettering, names and numbers. Smooth, stretch, reflective, metallic and velvet flock finishes are available. It also works well for small orders and individually personalised garments.",
-    },
-    features: [
-      { lv: "No 1 gabala", en: "From a single piece" },
-      { lv: "Vārdi, numuri un vienkrāsaini logotipi", en: "Names, numbers and single-colour logos" },
-      { lv: "Atstarojošas, metāliskas un flokplēves", en: "Reflective, metallic and flock films" },
-      { lv: "Piemērota kokvilnai, poliesteram un jauktiem audumiem", en: "Suitable for cotton, polyester and blended fabrics" },
+    intro: [
+      {
+        lv: "Termodruka ir apdrukas tehnoloģija, kurā dizains tiek izgriezts no speciālas termoplēves un ar termopresi, izmantojot augstu temperatūru un spiedienu, tiek pārnests uz tekstila.",
+        en: "Heat transfer is a decoration technology in which the design is cut from a special film and transferred to the textile with a heat press, using high temperature and pressure.",
+      },
+      {
+        lv: "Tā ir lieliska izvēle vārdiem, numuriem, vienkrāsainiem logotipiem un vienkāršiem grafiskiem elementiem. Ir pieejamas dažādu krāsu, faktūru un biezumu termoplēves, tāpēc apdrukai iespējams piešķirt arī īpašu vizuālo efektu — piemēram, metālisku, atstarojošu vai samtainu.",
+        en: "It is a great choice for names, numbers, single-colour logos and simple graphic elements. Films are available in different colours, textures and thicknesses, so the decoration can also get a special visual effect — for example metallic, reflective or velvet.",
+      },
+      {
+        lv: "Termodruka ir īpaši piemērota maziem pasūtījumiem un individuālai personalizācijai, sākot no 10 vienībām.",
+        en: "Heat transfer is especially suited to small orders and individual personalisation, starting from 10 pieces.",
+      },
     ],
+    benefitsTitle: { lv: "Pieejamās termoplēves", en: "Available films" },
+    benefits: [
+      {
+        icon: Shapes,
+        title: { lv: "Standarta", en: "Standard" },
+        desc: { lv: "Gluda un elastīga plēve ikdienas apdrukām.", en: "A smooth and stretchy film for everyday prints." },
+      },
+      {
+        icon: Feather,
+        title: { lv: "Flok", en: "Flock" },
+        desc: { lv: "Samtaina, mīksta un izteiksmīga virsma ar tekstila sajūtu.", en: "A velvet-like, soft and expressive surface with a textile feel." },
+      },
+      {
+        icon: Sparkles,
+        title: { lv: "Metāliska", en: "Metallic" },
+        desc: { lv: "Spīdīgs metālisks efekts, kas īpaši izceļas uz apģērba.", en: "A shiny metallic effect that really stands out on apparel." },
+      },
+      {
+        icon: Sun,
+        title: { lv: "Atstarojoša", en: "Reflective" },
+        desc: { lv: "Gaismu atstarojoša plēve, piemērota sporta un darba apģērbam, kā arī dizainiem, kuriem nepieciešama papildu redzamība.", en: "A light-reflective film suited to sports and workwear, as well as designs that need extra visibility." },
+      },
+    ],
+    useCasesTitle: { lv: "Kad izvēlēties termodruku?", en: "When to choose heat transfer?" },
+    useCases: [
+      { lv: "Uzdrukāt vārdu vai uzvārdu", en: "Print a first or last name" },
+      { lv: "Uzdrukāt numuru sporta apģērbam", en: "Print numbers for sports apparel" },
+      { lv: "Apdrukāt vienkrāsainu logo", en: "Decorate a single-colour logo" },
+      { lv: "Izveidot precīzu uzrakstu vai simbolu", en: "Create precise lettering or a symbol" },
+      { lv: "Izmantot īpašu apdrukas efektu", en: "Use a special print effect" },
+    ],
+    filmsNote: {
+      lv: "Piemērota kokvilnai, poliesteram un jauktiem audumiem.",
+      en: "Suited to cotton, polyester and blended fabrics.",
+    },
     specs: [
-      { label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "1 gab.", en: "1 pc" } },
-      { label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "2–5 darba dienas", en: "2–5 business days" } },
-      { label: { lv: "Faili", en: "Files" }, value: { lv: "AI, EPS, PDF (vektors)", en: "AI, EPS, PDF (vector)" } },
+      { icon: Package, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "10 gab.", en: "10 pcs" } },
+      { icon: Clock, label: { lv: "Izgatavošanas laiks", en: "Production time" }, value: { lv: "3–7 darba dienas", en: "3–7 business days" } },
+      { icon: Layers, label: { lv: "Pieejamie materiāli", en: "Available materials" }, value: { lv: "Standarta, flok, metāliskas un atstarojošas termoplēves", en: "Standard, flock, metallic and reflective films" } },
+      { icon: FileType2, label: { lv: "Faili", en: "Files" }, value: { lv: "AI, EPS, PDF — vektora formātā", en: "AI, EPS, PDF — vector format" } },
     ],
     images: [heatTransfer, heatTransfer2],
   },
