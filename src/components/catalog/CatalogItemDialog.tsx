@@ -10,6 +10,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
+import { Ban, Droplets, Flame, Shirt, Sparkles, Sun, WashingMachine, Wind } from "lucide-react";
 
 
 interface Props {
@@ -110,6 +111,32 @@ const cleanText = (v?: unknown): string | null => {
   const digits = (s.match(/\d/g) || []).length;
   if (s.length > 80 && digits / s.length > 0.25) return null;
   return s || null;
+};
+
+// Kopšanas nosacījumi: teksts sadalīts īsos punktos, katram tiek atbilstoša ikona.
+const CARE_CLAUSE_SPLIT = /[\n•·;]+|\.\s+|,\s+/;
+const careClauses = (text: string): string[] => {
+  const out: string[] = [];
+  for (const piece of text.split(CARE_CLAUSE_SPLIT)) {
+    const p = piece.replace(/\s+/g, " ").replace(/[.\s]+$/, "").trim();
+    if (!p) continue;
+    if (out.length && p.length < 10) out[out.length - 1] = `${out[out.length - 1]}, ${p}`;
+    else out.push(p);
+  }
+  return out.slice(0, 8);
+};
+
+const careIcon = (text: string) => {
+  const t = text.toLowerCase();
+  if (/(nedrīkst|aizlieg|nepieļauj|don'?t|do not|never)/.test(t)) return Ban;
+  if (/^\s*no\s+(iron|bleach|dry|tumble|wash)|balin|bleach|hlora/.test(t)) return Ban;
+  if (/ķīmisk|dry clean|saus[āa] tīrīš|tīrīšan/.test(t)) return Sparkles;
+  if (/mazg|wash|skalo/.test(t)) return WashingMachine;
+  if (/glud|iron|presē|temperatūr|dzelzs/.test(t)) return Flame;
+  if (/žāvē|tumble|dry/.test(t)) return Wind;
+  if (/saules|tiešaj|sun exposure/.test(t)) return Sun;
+  if (/mitr|humid|ūden|water/.test(t)) return Droplets;
+  return Shirt;
 };
 
 const addSpec = (arr: { label: string; value: string }[], label: string, value?: unknown, suffix = "") => {
@@ -1046,6 +1073,19 @@ const CatalogItemDialog = ({
   const mainImg = gallery[imgIndex] || gallery[0] || image;
   const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : displayDetail.sizes || [];
 
+  // "Pieejamie izmēri: XS – XXXL" — cenās pa izmēriem skatīt pieprasījuma tabulā
+  const sizeRangeLabel = useMemo(() => {
+    const list = (visibleSizes || []).filter(Boolean).map(String);
+    if (!list.length) return "";
+    if (list.length === 1) return list[0];
+    const coded = list.every((s) => SIZE_ORDER.includes(s.toUpperCase()));
+    if (!coded) return list.join(", ");
+    const sorted = [...list].sort((a, b) => sizeIndex(a) - sizeIndex(b));
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+    return first === last ? first : `${first} – ${last}`;
+  }, [visibleSizes]);
+
   // Map raw supplier size code -> display label (e.g. NWG "4" -> "S")
   const rawToLabel = useMemo(() => {
     const out: Record<string, string> = {};
@@ -1178,6 +1218,7 @@ const CatalogItemDialog = ({
 
   const materialText = translated?.material || rawMaterial;
   const careText = translated?.care || rawCare;
+  const careList = useMemo(() => (careText ? careClauses(careText) : []), [careText]);
   const label = {
     lv: {
       description: "Apraksts",
@@ -1185,7 +1226,7 @@ const CatalogItemDialog = ({
       care: "Kopšanas instrukcijas",
       specifications: "Specifikācija",
       colors: "Krāsas",
-      sizes: "Izmēri",
+      sizes: "Pieejamie izmēri",
       request: "Pieprasīt cenu šim modelim",
       noImage: "Bez attēla",
       allColors: "Visas krāsas",
@@ -1198,7 +1239,7 @@ const CatalogItemDialog = ({
       care: "Care instructions",
       specifications: "Specifications",
       colors: "Colors",
-      sizes: "Sizes",
+      sizes: "Available sizes",
       request: "Request a quote for this model",
       noImage: "No image",
       allColors: "All colours",
@@ -1241,6 +1282,9 @@ const CatalogItemDialog = ({
     const l = s.label.toLowerCase();
     return l !== "brand"; // brand is shown as a pill
   });
+
+  // Specifikācija un apraksts blakus kolonnās, kad abu ir pietiekami
+  const specsBesideDescription = filteredSpecs.length > 0 && descriptionLines.length > 0;
 
   const body = (
         <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
@@ -1459,55 +1503,13 @@ const CatalogItemDialog = ({
 
 
               {visibleSizes.length > 0 && (
-                <div>
-                  <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.sizes}</h4>
-                  <div className="flex flex-wrap gap-1.5">
-                    {visibleSizes.map((s) => {
-                      const p = sizePriceMap[s];
-                      return (
-                        <button
-                          key={s}
-                          type="button"
-                          onClick={() => setSelectedSize(selectedSize === s ? null : s)}
-                          className={`min-w-[3.25rem] rounded-sm border px-2 py-1 text-center text-xs font-medium transition-colors ${
-                            selectedSize === s
-                              ? "border-accent bg-accent text-accent-foreground"
-                              : "border-border text-foreground hover:border-accent"
-                          }`}
-                        >
-                          <span className="block leading-tight">{s}</span>
-                          {p !== undefined && (
-                            <span className={`block text-[10px] font-semibold leading-tight ${selectedSize === s ? "text-accent-foreground/90" : "text-muted-foreground"}`}>
-                              €{p.toFixed(2)}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {(() => {
-                    const groups: { sizes: string[]; price: number }[] = [];
-                    for (const s of visibleSizes) {
-                      const p = sizePriceMap[s];
-                      if (p === undefined) continue;
-                      const last = groups[groups.length - 1];
-                      if (last && Math.abs(last.price - p) < 0.005) last.sizes.push(s);
-                      else groups.push({ sizes: [s], price: p });
-                    }
-                    if (groups.length < 2) return null;
-                    return (
-                      <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
-                        <span className="font-semibold text-foreground">
-                          {lang === "lv" ? "Cenas pa izmēriem (bez PVN): " : "Prices by size (excl. VAT): "}
-                        </span>
-                        {groups
-                          .map((g) =>
-                            `${g.sizes.length > 2 ? `${g.sizes[0]}–${g.sizes[g.sizes.length - 1]}` : g.sizes.join(", ")} €${g.price.toFixed(2)}`,
-                          )
-                          .join(" · ")}
-                      </p>
-                    );
-                  })()}
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 border-y border-border py-2.5">
+                  <h4 className="font-heading text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                    {label.sizes}
+                  </h4>
+                  <p className="font-heading text-lg font-black uppercase tracking-wide text-foreground">
+                    {sizeRangeLabel}
+                  </p>
                 </div>
               )}
 
@@ -1536,37 +1538,41 @@ const CatalogItemDialog = ({
                   {lang === "lv" ? "Par preci" : "About this item"}
                 </h4>
 
-                {filteredSpecs.length > 0 && (
-                  <div>
-                    <h4 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider">
-                      {label.specifications}
-                    </h4>
-                    <dl className="grid grid-cols-1 gap-x-6 gap-y-3 rounded-md border border-border bg-muted/30 p-4 sm:grid-cols-2">
-                      {filteredSpecs.map((s) => (
-                        <div key={`${s.label}-${s.value}`} className="flex flex-col">
-                          <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                            {translateLabel(s.label, lang)}
-                          </dt>
-                          <dd className="mt-0.5 text-sm text-foreground">
-                            {translateValue(s.value, lang)}
-                          </dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </div>
-                )}
+                {(filteredSpecs.length > 0 || descriptionLines.length > 0) && (
+                  <div className={`grid gap-6 ${specsBesideDescription ? "lg:grid-cols-2" : ""}`}>
+                    {filteredSpecs.length > 0 && (
+                      <div>
+                        <h4 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider">
+                          {label.specifications}
+                        </h4>
+                        <dl className={`grid gap-x-6 gap-y-3 rounded-md border border-border bg-muted/30 p-4 ${specsBesideDescription ? "grid-cols-1" : "sm:grid-cols-2"}`}>
+                          {filteredSpecs.map((s) => (
+                            <div key={`${s.label}-${s.value}`} className="flex flex-col">
+                              <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                                {translateLabel(s.label, lang)}
+                              </dt>
+                              <dd className="mt-0.5 text-sm text-foreground">
+                                {translateValue(s.value, lang)}
+                              </dd>
+                            </div>
+                          ))}
+                        </dl>
+                      </div>
+                    )}
 
-                {descriptionLines.length > 0 && (
-                  <div>
-                    <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.description}</h4>
-                    <ul className="space-y-1.5 text-sm">
-                      {descriptionLines.map((b, i) => (
-                        <li key={`${b}-${i}`} className="flex gap-2">
-                          <span className="mt-0.5 text-accent">✓</span>
-                          <span className="text-foreground/90">{b}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    {descriptionLines.length > 0 && (
+                      <div>
+                        <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.description}</h4>
+                        <ul className="space-y-1.5 text-sm">
+                          {descriptionLines.map((b, i) => (
+                            <li key={`${b}-${i}`} className="flex gap-2">
+                              <span className="flex h-5 shrink-0 items-center text-accent">✓</span>
+                              <span className="text-foreground/90">{b}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -1579,10 +1585,22 @@ const CatalogItemDialog = ({
                   </div>
                 )}
 
-                {careText && (
+                {careText && careList.length > 0 && (
                   <div>
                     <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.care}</h4>
-                    <p className="whitespace-pre-line text-sm text-foreground/90">{careText}</p>
+                    <ul className="space-y-2.5 rounded-md border border-border bg-muted/30 p-4">
+                      {careList.map((c, i) => {
+                        const Icon = careIcon(c);
+                        return (
+                          <li key={`${c}-${i}`} className="flex items-start gap-3">
+                            <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-background text-foreground">
+                              <Icon className="h-4 w-4" strokeWidth={1.75} />
+                            </span>
+                            <span className="text-sm leading-snug text-foreground/90">{c}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
                 )}
               </div>
