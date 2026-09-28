@@ -96,7 +96,7 @@ const WorksheetPage = () => {
   }, [token]);
 
   const totals = useMemo(() => worksheetTotals(items, sheet?.vat_rate ?? 21), [items, sheet?.vat_rate]);
-  const readOnly = !!sheet?.locked;
+  const readOnly = !!sheet?.locked || !isStaff;
   const patch = (id: string, changes: Partial<WorksheetItem>) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...changes } : i)));
     setDirty(true);
