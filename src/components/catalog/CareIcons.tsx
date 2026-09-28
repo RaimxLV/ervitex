@@ -18,7 +18,7 @@ import {
   Wind,
 } from "lucide-react";
 
-export type GlyphProps = { className?: string; strokeWidth?: number };
+export type GlyphProps = { className?: string; strokeWidth?: number | string };
 
 const Svg = ({
   children,
