@@ -81,4 +81,4 @@
 - [x] Padarīt klienta pirmo rediģēšanu pārskatāmu un droši saglabājamu.
 - [x] Padarīt Lauras nodošanu kolēģēm un e-pasta atbildes darbību nepārprotamu.
 - [x] Saglabāt preču maiņas un atbildīgā maiņas vēsturi, lai nekas nepazūd.
-- [ ] Pārbaudīt pilno plūsmu no klienta pieprasījuma līdz kolēģes atbildei.
+- [x] Pārbaudīt pilno plūsmu no klienta pieprasījuma līdz kolēģes atbildei.
