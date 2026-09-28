@@ -49,6 +49,7 @@ import {
   Send,
   Shapes,
   ShieldCheck,
+  Shirt,
   Sparkles,
   Sun,
   TrendingDown,
