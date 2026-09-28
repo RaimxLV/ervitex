@@ -2837,6 +2837,16 @@ export type Database = {
           style_code: string
         }[]
       }
+      supplier_price_health: {
+        Args: never
+        Returns: {
+          contract_priced: number
+          fallback_priced: number
+          priced_variants: number
+          source: string
+          total_variants: number
+        }[]
+      }
       validate_worksheet_items: { Args: { _items: Json }; Returns: undefined }
     }
     Enums: {
