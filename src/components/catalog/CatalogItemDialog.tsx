@@ -1276,7 +1276,8 @@ const CatalogItemDialog = ({
   const specsBesideDescription = filteredSpecs.length > 0 && descriptionLines.length > 0;
 
   const body = (
-        <div className="grid gap-8 p-6 md:grid-cols-2 md:p-8">
+    <div className="space-y-8 p-6 md:p-8">
+      <div className="grid gap-8 md:grid-cols-2">
           <div className="space-y-3">
             <div className="relative aspect-square md:aspect-[4/5] max-h-[70vh] w-full overflow-hidden bg-white flex items-center justify-center">
               {mainImg ? (
