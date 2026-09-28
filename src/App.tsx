@@ -1,3 +1,4 @@
+import AssignPage from "./pages/AssignPage";
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -85,6 +86,7 @@ const App = () => (
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/piedavajums/:token" element={<OfferPage />} />
               <Route path="/saraksts/:token" element={<WorksheetPage />} />
+              <Route path="/nodot/:token" element={<AssignPage />} />
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/admin/offers" element={<ProtectedRoute><AdminOffers /></ProtectedRoute>} />
               <Route path="/admin/offers/:id" element={<ProtectedRoute><AdminOfferEdit /></ProtectedRoute>} />
