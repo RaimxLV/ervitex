@@ -96,7 +96,7 @@ const WorksheetPage = () => {
   }, [token]);
 
   const totals = useMemo(() => worksheetTotals(items, sheet?.vat_rate ?? 21), [items, sheet?.vat_rate]);
-  const readOnly = !!sheet?.locked;
+  const readOnly = !!sheet?.locked || !isStaff;
   const patch = (id: string, changes: Partial<WorksheetItem>) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...changes } : i)));
     setDirty(true);
@@ -278,9 +278,14 @@ const WorksheetPage = () => {
               </div>
             )}
             {readOnly && (
-              <p className="mt-3 rounded-sm border border-dashed border-border p-3 text-xs text-muted-foreground">
-                Labošana slēgta. Raksti uz {pmEmail}.
-              </p>
+              <div className="mt-3 rounded-sm border border-dashed border-border p-3 print:hidden">
+                <p className="text-sm text-muted-foreground">Izmaiņas sarakstā veic projekta vadītāja.</p>
+                <Button className="mt-2" size="sm" variant="outline" asChild>
+                  <a href={mailtoNext}>
+                    <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}
+                  </a>
+                </Button>
+              </div>
             )}
 
           </header>
@@ -526,13 +531,6 @@ const WorksheetPage = () => {
                 </div>
               )}
 
-              {!isStaff && !dirty && !sheet.draft_items && (
-                <Button variant="outline" asChild>
-                  <a href={mailtoNext}>
-                    <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}
-                  </a>
-                </Button>
-              )}
 
               <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
