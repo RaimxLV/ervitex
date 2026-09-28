@@ -113,7 +113,7 @@ const cleanText = (v?: unknown): string | null => {
   return s || null;
 };
 
-// Kopšanas nosacījumi: teksts sadalīsīsīsīs īsos punktos un katram tiek ikona.
+// Kopšanas nosacījumi: teksts sadalīts īsos punktos, katram tiek atbilstoša ikona.
 const CARE_CLAUSE_SPLIT = /[\n•·;]+|\.\s+|,\s+/;
 const careClauses = (text: string): string[] => {
   const out: string[] = [];
@@ -1073,6 +1073,19 @@ const CatalogItemDialog = ({
   const mainImg = gallery[imgIndex] || gallery[0] || image;
   const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : displayDetail.sizes || [];
 
+  // "Pieejamie izmēri: XS – XXXL" — cenās pa izmēriem skatīt pieprasījuma tabulā
+  const sizeRangeLabel = useMemo(() => {
+    const list = (visibleSizes || []).filter(Boolean).map(String);
+    if (!list.length) return "";
+    if (list.length === 1) return list[0];
+    const coded = list.every((s) => SIZE_ORDER.includes(s.toUpperCase()));
+    if (!coded) return list.join(", ");
+    const sorted = [...list].sort((a, b) => sizeIndex(a) - sizeIndex(b));
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+    return first === last ? first : `${first} – ${last}`;
+  }, [visibleSizes]);
+
   // Map raw supplier size code -> display label (e.g. NWG "4" -> "S")
   const rawToLabel = useMemo(() => {
     const out: Record<string, string> = {};
@@ -1205,6 +1218,7 @@ const CatalogItemDialog = ({
 
   const materialText = translated?.material || rawMaterial;
   const careText = translated?.care || rawCare;
+  const careList = useMemo(() => (careText ? careClauses(careText) : []), [careText]);
   const label = {
     lv: {
       description: "Apraksts",
@@ -1212,7 +1226,7 @@ const CatalogItemDialog = ({
       care: "Kopšanas instrukcijas",
       specifications: "Specifikācija",
       colors: "Krāsas",
-      sizes: "Izmēri",
+      sizes: "Pieejamie izmēri",
       request: "Pieprasīt cenu šim modelim",
       noImage: "Bez attēla",
       allColors: "Visas krāsas",
@@ -1225,7 +1239,7 @@ const CatalogItemDialog = ({
       care: "Care instructions",
       specifications: "Specifications",
       colors: "Colors",
-      sizes: "Sizes",
+      sizes: "Available sizes",
       request: "Request a quote for this model",
       noImage: "No image",
       allColors: "All colours",
