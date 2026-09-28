@@ -1,4 +1,4 @@
-import AssignPage from "./pages/AssignPage";
+import AssignPage from "@/pages/AssignPage";
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
