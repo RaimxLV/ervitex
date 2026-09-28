@@ -120,8 +120,9 @@ const careClauses = (text: string): string[] => {
   for (const piece of text.split(CARE_CLAUSE_SPLIT)) {
     const p = piece.replace(/\s+/g, " ").replace(/[.\s]+$/, "").trim();
     if (!p) continue;
+    const withCap = p.charAt(0).toUpperCase() + p.slice(1);
     if (out.length && p.length < 10) out[out.length - 1] = `${out[out.length - 1]}, ${p}`;
-    else out.push(p);
+    else out.push(withCap);
   }
   return out.slice(0, 8);
 };
@@ -1586,7 +1587,7 @@ const CatalogItemDialog = ({
                                 : "border-border bg-background text-foreground"
                             }`}
                           >
-                            <c.Icon className="h-5 w-5" strokeWidth={1.9} />
+                            <c.Icon className="h-6 w-6" strokeWidth={1.8} />
                           </span>
                           <span className="text-sm leading-snug text-foreground/90">{c.text}</span>
                         </li>

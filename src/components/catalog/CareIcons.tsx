@@ -98,13 +98,14 @@ export const Hanger = (p: GlyphProps) => (
 );
 
 const RULES: { test: RegExp; icons: ComponentType<GlyphProps>[]; ban?: boolean }[] = [
-  { test: /druk|appli|transfer|sublim|flex|print/, icons: [Brush, IronBan], ban: true },
+  { test: /((glud|iron|pres[ēe]).{0,25}(druk|print|appli|transfer|sublim|flex))|((druk|print|appli|transfer|sublim|flex).{0,25}(glud|iron|pres[ēe]))/, icons: [IronBan, Brush], ban: true },
   { test: /negludin|nedr[īi]kst gludin|no iron|do not iron|nespied|gludin[āa]t aiz|nedr[īi]kst glab|glab[āa]t glude|gludek|aizlieg.*gludin/, icons: [IronBan, Iron, TriangleAlert], ban: true },
   { test: /apgriezt|uzgriezt| otrādi|inside out|ārd|ārā puse/, icons: [Shirt, Layers] },
   { test: /nebalin|balin|bleach|hlora|peroksid|no bleach/, icons: [BleachBan, Ban, TriangleAlert], ban: true },
   { test: /nevar žāvēt veļas|veļas žāvētav|nedr[īi]kst žāvēt|mazgāšanas žāvē|tumble|dryer|nerotary|nerot/, icons: [TumbleDry, Wind, Ban], ban: true },
   { test: /neķīmisk|nedr[īi]kst ķīmisk|no dry clean|aizlieg.*ķīmisk|saus[āa] tīr[īi]\s*nav/, icons: [DryCleanBan, DryClean, Ban], ban: true },
   { test: /ķīmisk|saus[āa] tīr[īi]|dry clean|tetrahlor|perhlor/, icons: [DryClean, Sparkles] },
+  { test: /druk|appli|transfer|sublim|flex|print/, icons: [Brush, Sparkles] },
   { test: /aiztais|ra[ēe]vējslēdz|r[āa]vējslēdz|knied|poga|kāvel|velcro|liplent|aizdari|nosedz|atsegs|noseg/, icons: [Lock, Layers] },
   { test: /līdzīg[āa]s krās|atsevišķ|cit[āa]s krās|pretkrās|nokrāso|krāsas atdal|dye|color run|tumš|gaiš|sviest|sveiciņ|spot|traipu/, icons: [Palette, Droplets, Snowflake] },
   { test: /snag|velk|cirkul|maig|delic|smalk|puff|burbul|triilot|velcro pirms|izš|apdrukas lauk|nepiecieš|p[āa]rbaud|nodil|berz|assort/, icons: [Scissors, Snowflake, Layers] },
