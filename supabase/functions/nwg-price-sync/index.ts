@@ -300,27 +300,35 @@ Deno.serve(async (req) => {
   try {
     if (mode === "auth") {
       const logId = await startLog(sb, "nwg:prices");
-      const token = await getAccessToken(sb);
-      const { data: sample, error: sampleError } = await sb
-        .from("nwg_skus")
-        .select("sku")
-        .eq("active", true)
-        .eq("discontinued", false)
-        .limit(1)
-        .maybeSingle();
-      if (sampleError) throw new Error(`NWG sample SKU: ${sampleError.message}`);
-      if (!sample?.sku) throw new Error("NWG has no active SKU for authorization test");
-      const rows = await fetchPrices(token, [sample.sku]);
-      const priced = rows.find((row) => row.sku === sample.sku && row.valid && typeof row.num === "number" && row.num > 0);
-      if (!priced) throw new Error("NWG customer login succeeded, but the customer-price endpoint returned no contract price");
-      await finishLog(sb, logId, {
-        status: "success",
-        message: "NWG līgumcenu pieeja pārbaudīta",
-        details: { authorization: "verified", contract_price: "verified" },
-      });
-      return new Response(JSON.stringify({ ok: true, authorization: "verified", contract_price: "verified" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      try {
+        const token = await getAccessToken(sb);
+        const { data: sample, error: sampleError } = await sb
+          .from("nwg_skus")
+          .select("sku")
+          .eq("active", true)
+          .eq("discontinued", false)
+          .gt("purchase_price", 0)
+          .order("purchase_updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (sampleError) throw new Error(`NWG sample SKU: ${sampleError.message}`);
+        if (!sample?.sku) throw new Error("NWG has no previously verified contract-price SKU");
+        const rows = await fetchPrices(token, [sample.sku]);
+        const priced = rows.find((row) => row.sku === sample.sku && row.valid && typeof row.num === "number" && row.num > 0);
+        if (!priced) throw new Error("NWG customer login succeeded, but the customer-price endpoint returned no contract price");
+        await finishLog(sb, logId, {
+          status: "success",
+          message: "NWG līgumcenu pieeja pārbaudīta",
+          details: { authorization: "verified", contract_price: "verified" },
+        });
+        return new Response(JSON.stringify({ ok: true, authorization: "verified", contract_price: "verified" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch (error) {
+        const message = (error as Error).message;
+        await finishLog(sb, logId, { status: "error", message });
+        throw error;
+      }
     }
 
     if (mode === "seed") {
