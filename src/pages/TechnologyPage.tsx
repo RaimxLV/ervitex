@@ -212,7 +212,7 @@ const TechnologyPage = () => {
             </h2>
           </motion.div>
 
-          <div className="mt-10 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {tech.benefits.map((b, i) => {
               const Icon = b.icon;
               return (
@@ -220,7 +220,7 @@ const TechnologyPage = () => {
                   key={b.title.en}
                   {...fadeUp}
                   transition={{ duration: 0.4, delay: (i % 3) * 0.08 }}
-                  className="bg-card p-6 md:p-8"
+                  className="border border-border bg-card p-6 md:p-8"
                 >
                   <div className="flex h-11 w-11 items-center justify-center border border-border bg-background">
                     <Icon className="h-5 w-5 text-accent" strokeWidth={1.8} />
