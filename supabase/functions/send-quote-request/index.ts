@@ -71,6 +71,12 @@ Deno.serve(async (req) => {
       worksheetUrl,
     };
 
+    // Klients saņem vēstuli no konkrētās projektu vadītājas (līdz nodošanai — Laura).
+    const pm = {
+      email: quote.assigned_pm_email || "laura@ervitex.lv",
+      name: quote.assigned_pm_name || "Laura",
+    };
+
     const results: Array<{ to: string; template: string; ok: boolean; error?: string }> = [];
 
     // 1) Internal notification to office — with Reply-To set to the customer so
@@ -93,7 +99,9 @@ Deno.serve(async (req) => {
         body: {
           templateName: "quote-confirmation",
           recipientEmail: quote.email,
-          replyTo: OFFICE_EMAIL,
+          replyTo: pm.email,
+          fromEmail: pm.email,
+          fromName: `${pm.name} | Ervitex`,
           idempotencyKey: `quote-${quote.id}-customer`,
           templateData: baseData,
         },
