@@ -1424,25 +1424,6 @@ const CatalogItemDialog = ({
               )}
 
 
-              {filteredSpecs.length > 0 && (
-                <div>
-                  <h4 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider">
-                    {label.specifications}
-                  </h4>
-                  <dl className="grid grid-cols-1 gap-x-6 gap-y-3 rounded-md border border-border bg-muted/30 p-4 sm:grid-cols-2">
-                    {filteredSpecs.map((s) => (
-                      <div key={`${s.label}-${s.value}`} className="flex flex-col">
-                        <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                          {translateLabel(s.label, lang)}
-                        </dt>
-                        <dd className="mt-0.5 text-sm text-foreground">
-                          {translateValue(s.value, lang)}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              )}
 
               {displayDetail.colors.length > 0 && (
                 <div>
@@ -1476,35 +1457,6 @@ const CatalogItemDialog = ({
               )}
 
 
-              {descriptionLines.length > 0 && (
-                <div>
-                  <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.description}</h4>
-                  <ul className="space-y-1.5 text-sm">
-                    {descriptionLines.map((b, i) => (
-                      <li key={`${b}-${i}`} className="flex gap-2">
-                        <span className="mt-0.5 text-accent">✓</span>
-                        <span className="text-foreground/90">{b}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {materialText && (
-                <div>
-                  <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">
-                    {label.composition}
-                  </h4>
-                  <p className="text-sm text-foreground/85">{materialText}</p>
-                </div>
-              )}
-
-              {careText && (
-                <div>
-                  <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.care}</h4>
-                  <p className="whitespace-pre-line text-sm text-foreground/90">{careText}</p>
-                </div>
-              )}
 
               {visibleSizes.length > 0 && (
                 <div>
@@ -1578,6 +1530,62 @@ const CatalogItemDialog = ({
                   onClose={() => onOpenChange(false)}
                 />
               )}
+
+              <div className="space-y-6 border-t border-border pt-6">
+                <h4 className="font-heading text-lg font-bold uppercase tracking-wider">
+                  {lang === "lv" ? "Par preci" : "About this item"}
+                </h4>
+
+                {filteredSpecs.length > 0 && (
+                  <div>
+                    <h4 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider">
+                      {label.specifications}
+                    </h4>
+                    <dl className="grid grid-cols-1 gap-x-6 gap-y-3 rounded-md border border-border bg-muted/30 p-4 sm:grid-cols-2">
+                      {filteredSpecs.map((s) => (
+                        <div key={`${s.label}-${s.value}`} className="flex flex-col">
+                          <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            {translateLabel(s.label, lang)}
+                          </dt>
+                          <dd className="mt-0.5 text-sm text-foreground">
+                            {translateValue(s.value, lang)}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                )}
+
+                {descriptionLines.length > 0 && (
+                  <div>
+                    <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.description}</h4>
+                    <ul className="space-y-1.5 text-sm">
+                      {descriptionLines.map((b, i) => (
+                        <li key={`${b}-${i}`} className="flex gap-2">
+                          <span className="mt-0.5 text-accent">✓</span>
+                          <span className="text-foreground/90">{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {materialText && (
+                  <div>
+                    <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">
+                      {label.composition}
+                    </h4>
+                    <p className="text-sm text-foreground/85">{materialText}</p>
+                  </div>
+                )}
+
+                {careText && (
+                  <div>
+                    <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.care}</h4>
+                    <p className="whitespace-pre-line text-sm text-foreground/90">{careText}</p>
+                  </div>
+                )}
+              </div>
 
               {displayDetail.notice && (
                 <p className="border-t border-border pt-4 text-sm text-muted-foreground">{displayDetail.notice}</p>
