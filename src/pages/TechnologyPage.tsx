@@ -90,11 +90,11 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
       )}
 
       {(!extra.steps || extra.steps.length === 0) && extra.highlights && extra.highlights.length > 0 && (
-        <div className="mt-10 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {extra.highlights.map((h) => {
             const Icon = h.icon;
             return (
-              <div key={h.label.en} className="bg-card p-6">
+              <div key={h.label.en} className="border border-border bg-card p-6">
                 <Icon className="h-5 w-5 text-accent" strokeWidth={1.8} />
                 <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   {h.label[isLv ? "lv" : "en"]}
