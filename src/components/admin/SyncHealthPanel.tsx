@@ -65,7 +65,7 @@ const SyncHealthPanel = () => {
         .select("source,status,message,started_at,finished_at,products_updated")
         .order("started_at", { ascending: false })
         .limit(300),
-      supabase.rpc("supplier_price_health"),
+      supabase.rpc("supplier_price_health" as never),
     ]);
     setLogs((logRes.data as unknown as SyncRow[]) ?? []);
     setCoverage((coverageRes.data as unknown as PriceHealth[]) ?? []);
@@ -94,10 +94,6 @@ const SyncHealthPanel = () => {
       }),
     [coverage, logs],
   );
-
-  const nwgPriceLog = useMemo(() => logs.find((l) => l.source === "nwg:prices"), [logs]);
-  const tokenExpired =
-    nwgPriceLog?.status === "error" && !!nwgPriceLog.message?.includes("invalid_grant");
 
   const callFn = async (fn: string, query = "", body?: unknown) => {
     const session = (await supabase.auth.getSession()).data.session;
