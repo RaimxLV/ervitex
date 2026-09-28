@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Check, ChevronRight, Minus, Plus, ClipboardList, Trash2, Plus as PlusIcon } from "lucide-react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { cn } from "@/lib/utils";
 
 interface Props {
   source: string;
@@ -69,6 +70,19 @@ const AddToQuoteBlock = ({
 
   const [qtyBySize, setQtyBySize] = useState<Record<string, number>>(readCartQtys);
   const [flash, setFlash] = useState(false);
+  const [added, setAdded] = useState(false);
+  const addedTimer = useRef<number | null>(null);
+  useEffect(() => () => { if (addedTimer.current) window.clearTimeout(addedTimer.current); }, []);
+
+  const confirmAdd = () => {
+    if (totalForProduct === 0 || added) return;
+    setAdded(true);
+    if (addedTimer.current) window.clearTimeout(addedTimer.current);
+    addedTimer.current = window.setTimeout(() => {
+      setAdded(false);
+      onClose?.();
+    }, 950);
+  };
 
   // Re-sync inputs when color or product changes (preserving what user already saved for that color)
   const syncKey = `${productId}|${colorCode}|${sizes.join(",")}`;
@@ -309,11 +323,23 @@ const AddToQuoteBlock = ({
             type="button"
             size="sm"
             disabled={totalForProduct === 0}
-            onClick={() => onClose?.()}
-            className="h-auto min-h-9 w-full min-w-0 flex-1 whitespace-normal break-words px-3 py-2 text-center leading-tight bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest"
+            onClick={confirmAdd}
+            className={cn(
+              "h-auto min-h-9 w-full min-w-0 flex-1 whitespace-normal break-words px-3 py-2 text-center leading-tight bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest transition-transform",
+              added && "ring-2 ring-accent ring-offset-2 ring-offset-background scale-[1.02] bg-foreground hover:bg-foreground",
+            )}
           >
-            <PlusIcon className="mr-2 h-4 w-4 shrink-0" />
-            {t("Pievienot pieprasījuma sarakstam", "Add to request list")}
+            {added ? (
+              <>
+                <Check className="mr-2 h-4 w-4 shrink-0" />
+                {t("Pievienots pieprasījumam", "Added to request")}
+              </>
+            ) : (
+              <>
+                <PlusIcon className="mr-2 h-4 w-4 shrink-0" />
+                {t("Pievienot pieprasījuma sarakstam", "Add to request list")}
+              </>
+            )}
           </Button>
           <Button
             asChild
