@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Check, ChevronRight, Minus, Plus, ClipboardList, Trash2, Plus as PlusIcon } from "lucide-react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { cn } from "@/lib/utils";
 
 interface Props {
   source: string;
