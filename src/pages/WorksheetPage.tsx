@@ -531,13 +531,6 @@ const WorksheetPage = () => {
                 </div>
               )}
 
-              {!isStaff && !dirty && !sheet.draft_items && (
-                <Button variant="outline" asChild>
-                  <a href={mailtoNext}>
-                    <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}
-                  </a>
-                </Button>
-              )}
 
               <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
