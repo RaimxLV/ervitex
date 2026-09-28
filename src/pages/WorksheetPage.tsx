@@ -274,7 +274,7 @@ const WorksheetPage = () => {
             {!readOnly && (saveState === "saving" || saveState === "error" || !!sheet.draft_items) && (
               <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground print:hidden">
                 {saveState === "saving" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                <span>{saveState === "saving" ? "Saglabā…" : saveState === "error" ? "Neizdevās saglabāt" : "Nesaglabātas izmaiņas"}</span>
+                <span>{saveState === "saving" ? "Saglabā melnrakstu…" : saveState === "error" ? "Neizdevās saglabāt" : "Izmaiņas vēl nav apstiprinātas"}</span>
               </div>
             )}
             {readOnly && (
@@ -462,7 +462,7 @@ const WorksheetPage = () => {
             </dl>
           </div>
 
-          {versions.length > 0 && (
+          {isStaff && versions.length > 0 && (
             <section className="mt-6 border-t border-border pt-5 print:hidden">
               <h2 className="flex items-center gap-2 font-heading text-sm font-black uppercase tracking-wide">
                 <History className="h-4 w-4 text-accent" /> Versiju vēsture
