@@ -55,6 +55,7 @@ Deno.serve(async (req) => {
   let idempotencyKey: string
   let messageId: string
   let replyTo: string | undefined
+  let fromName: string | undefined
   let templateData: Record<string, any> = {}
   try {
     const body = await req.json()
@@ -63,6 +64,9 @@ Deno.serve(async (req) => {
     messageId = crypto.randomUUID()
     idempotencyKey = body.idempotencyKey || body.idempotency_key || messageId
     replyTo = body.replyTo || body.reply_to
+    if (typeof body.fromName === 'string') {
+      fromName = body.fromName.replace(/[<>"\r\n,;@]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60) || undefined
+    }
     if (body.templateData && typeof body.templateData === 'object') {
       templateData = body.templateData
     }
@@ -310,7 +314,7 @@ Deno.serve(async (req) => {
     payload: {
       message_id: messageId,
       to: effectiveRecipient,
-      from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+      from: `${fromName ? `${fromName} (via ${SITE_NAME})` : SITE_NAME} <noreply@${FROM_DOMAIN}>`,
       sender_domain: SENDER_DOMAIN,
       subject: resolvedSubject,
       html,
