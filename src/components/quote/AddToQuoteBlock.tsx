@@ -289,9 +289,19 @@ const AddToQuoteBlock = ({
       {/* Summary of other colors already in cart for this product */}
       {otherGrouped.length > 0 && (
         <div className="rounded border border-border bg-background p-3">
-          <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-            {t("Šai precei jau pievienots citās krāsās", "Already added in other colors")}
-          </p>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              {t("Šai precei jau pievienots citās krāsās", "Already added in other colors")}
+            </p>
+            <button
+              type="button"
+              onClick={() => { for (const l of otherColorLines) remove(l.id); clearThisColor(); }}
+              className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-accent hover:underline"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              {t("Notīrīt visu", "Clear all")}
+            </button>
+          </div>
           <ul className="space-y-1.5">
             {otherGrouped.map((g) => (
               <li key={g.code} className="flex items-center gap-2 text-xs">
@@ -303,6 +313,14 @@ const AddToQuoteBlock = ({
                   {g.lines.map((l) => `${l.size || "—"}×${l.qty}`).join(", ")}
                 </span>
                 <span className="text-muted-foreground">= {g.qty} {t("gab.", "pcs")}</span>
+                <button
+                  type="button"
+                  aria-label={t(`Dzēst ${g.name}`, `Remove ${g.name}`)}
+                  onClick={() => { for (const l of g.lines) remove(l.id); }}
+                  className="rounded p-1 text-muted-foreground hover:bg-accent/10 hover:text-accent"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
               </li>
             ))}
           </ul>
