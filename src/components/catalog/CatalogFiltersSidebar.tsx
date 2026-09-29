@@ -354,17 +354,27 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                           const isLight = !!sw && !isGradient && /^#([efEF][0-9a-fA-F]{5}|[fF]{3})$/.test(sw);
                           return (
                             <li key={val}>
-                              <label
+                              <div
+                                role="checkbox"
+                                aria-checked={isSelected}
+                                tabIndex={0}
+                                onClick={() => section.onToggle(val)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    section.onToggle(val);
+                                  }
+                                }}
                                 className={cn(
-                                  "flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm transition",
+                                  "flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-2 text-sm transition",
                                   isSelected ? "bg-accent/5" : "hover:bg-muted/60"
                                 )}
                               >
                                 <Checkbox
                                   checked={isSelected}
-                                  onCheckedChange={() => section.onToggle(val)}
                                   aria-label={it.label}
-                                  className="h-4 w-4"
+                                  className="pointer-events-none h-4 w-4"
+                                  tabIndex={-1}
                                 />
                                 {sw && (
                                   <span
@@ -390,7 +400,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                                     {it.count}
                                   </span>
                                 )}
-                              </label>
+                              </div>
                             </li>
                           );
                         })}
