@@ -18,37 +18,10 @@ const navItems = [
   { key: "nav.contact" as const, path: "/contact" },
 ];
 
-const LatviaFlag = () => (
-  <svg viewBox="0 0 30 30" aria-hidden="true" className="h-full w-full">
-    <defs>
-      <clipPath id="lv-flag-circle"><circle cx="15" cy="15" r="15" /></clipPath>
-    </defs>
-    <g clipPath="url(#lv-flag-circle)">
-      <rect width="30" height="30" fill="#9E3039" />
-      <rect y="12" width="30" height="6" fill="#FFFFFF" />
-    </g>
-  </svg>
-);
-
-const UnitedKingdomFlag = () => (
-  <svg viewBox="0 0 60 60" aria-hidden="true" className="h-full w-full">
-    <defs>
-      <clipPath id="uk-flag-circle"><circle cx="30" cy="30" r="30" /></clipPath>
-    </defs>
-    <g clipPath="url(#uk-flag-circle)">
-      <rect width="60" height="60" fill="#012169" />
-      <path d="M0 0 60 60M60 0 0 60" stroke="#FFFFFF" strokeWidth="13" />
-      <path d="M0 0 60 60M60 0 0 60" stroke="#C8102E" strokeWidth="7" />
-      <path d="M30 0v60M0 30h60" stroke="#FFFFFF" strokeWidth="20" />
-      <path d="M30 0v60M0 30h60" stroke="#C8102E" strokeWidth="11" />
-    </g>
-  </svg>
-);
-
 const LanguageFlag = ({ language }: { language: "lv" | "en" }) => (
-  <span className="relative block h-7 w-7 overflow-hidden rounded-full shadow-md ring-1 ring-primary-foreground/25">
-    {language === "lv" ? <LatviaFlag /> : <UnitedKingdomFlag />}
-    <span className="pointer-events-none absolute inset-x-1 top-0.5 h-2 rounded-full bg-primary-foreground/35 blur-[1px]" />
+  <span className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-primary-foreground/10 text-[25px] leading-none shadow-md ring-1 ring-primary-foreground/25">
+    <span aria-hidden="true" className="-translate-y-px scale-[1.3]">{language === "lv" ? "🇱🇻" : "🇬🇧"}</span>
+    <span className="pointer-events-none absolute inset-x-1 top-0.5 h-2 rounded-full bg-primary-foreground/30 blur-[1px]" />
   </span>
 );
 
