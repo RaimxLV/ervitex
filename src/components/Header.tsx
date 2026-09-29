@@ -62,7 +62,7 @@ const LanguageSwitcher = ({
   return (
     <div className="group relative z-50 h-10 w-10" aria-label={currentLabel}>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/5 ring-1 ring-primary-foreground/15 transition-all duration-300 group-hover:ring-accent/70 group-focus-within:ring-accent/70">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300">
           <LanguageFlag language={lang} />
         </span>
       </div>
