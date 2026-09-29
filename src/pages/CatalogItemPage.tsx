@@ -169,9 +169,13 @@ const CatalogItemPage = () => {
                 const initialColor = r.source === "pf"
                   ? cols[0]?.n || null
                   : cols[0]?.c || cols[0]?.n || null;
-                const p = initialColor
-                  ? prices.get(`${r.source}:${r.id}:${initialColor.trim().toLowerCase()}`)
-                  : undefined;
+                let p: PriceInfo | undefined;
+                if (initialColor) {
+                  for (const k of colorCodeCandidates(initialColor)) {
+                    const hit = prices.get(`${r.source}:${r.id}:${k}`);
+                    if (hit) { p = hit; break; }
+                  }
+                }
                 return (
                   <CatalogModelCard
                     key={`${r.source}-${r.id}`}
