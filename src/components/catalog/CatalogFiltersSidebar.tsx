@@ -266,38 +266,52 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                           return (
                             <li key={val}>
                               <div
+                                role="checkbox"
+                                aria-checked={isSelected}
+                                tabIndex={0}
+                                onClick={() => section.onToggle(val)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    section.onToggle(val);
+                                  }
+                                }}
                                 className={cn(
-                                  "flex items-center gap-2 rounded-md px-2 py-2 text-sm transition",
+                                  "flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-2 text-sm transition",
                                   isSelected ? "bg-accent/5" : "hover:bg-muted/60"
                                 )}
+                                title={it.label}
                               >
                                 <Checkbox
                                   checked={isSelected}
-                                  onCheckedChange={() => section.onToggle(val)}
                                   aria-label={it.label}
-                                  className="h-4 w-4"
+                                  className="pointer-events-none h-4 w-4"
+                                  tabIndex={-1}
                                 />
-                                <button
-                                  type="button"
-                                  onClick={() => nested.length && setExpandedNested((current) => ({
-                                    ...current,
-                                    [`${section.key}:${val}`]: !isExpanded,
-                                  }))}
-                                  className={cn(
-                                    "flex min-w-0 flex-1 items-center gap-1.5 text-left",
-                                    nested.length ? "cursor-pointer" : "cursor-default"
-                                  )}
-                                  aria-expanded={nested.length ? isExpanded : undefined}
-                                >
-                                  <span className={cn("flex-1 truncate text-sm", isSelected && "font-semibold")} title={it.label}>
-                                    {it.label}
-                                  </span>
-                                  {nested.length > 0 && (isExpanded ? (
-                                    <ChevronDown className="h-4 w-4 shrink-0 text-accent" />
-                                  ) : (
-                                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-                                  ))}
-                                </button>
+                                <span className={cn("min-w-0 flex-1 truncate text-left text-sm", isSelected && "font-semibold")}>
+                                  {it.label}
+                                </span>
+                                {nested.length > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setExpandedNested((current) => ({
+                                        ...current,
+                                        [`${section.key}:${val}`]: !isExpanded,
+                                      }));
+                                    }}
+                                    aria-expanded={isExpanded}
+                                    aria-label={isExpanded ? `${it.label} — aizvērt` : `${it.label} — atvērt`}
+                                    className="shrink-0 rounded p-0.5 text-muted-foreground transition hover:text-accent"
+                                  >
+                                    {isExpanded ? (
+                                      <ChevronDown className="h-4 w-4 text-accent" />
+                                    ) : (
+                                      <ChevronRight className="h-4 w-4" />
+                                    )}
+                                  </button>
+                                )}
                                 {!section.hideCounts && (
                                   <span className="text-xs tabular-nums text-muted-foreground">{it.count}</span>
                                 )}
@@ -308,24 +322,35 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                                     const childVal = child.value ?? child.label;
                                     const childSelected = section.childSelected?.has(childVal) ?? false;
                                     return (
-                                      <label
+                                      <div
                                         key={childVal}
+                                        role="checkbox"
+                                        aria-checked={childSelected}
+                                        tabIndex={0}
+                                        onClick={() => section.onChildToggle?.(childVal)}
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter" || e.key === " ") {
+                                            e.preventDefault();
+                                            section.onChildToggle?.(childVal);
+                                          }
+                                        }}
                                         className={cn(
-                                          "flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm transition",
+                                          "flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-2 text-sm transition",
                                           childSelected ? "bg-accent/5 font-semibold" : "hover:bg-muted/60"
                                         )}
+                                        title={child.label}
                                       >
                                         <Checkbox
                                           checked={childSelected}
-                                          onCheckedChange={() => section.onChildToggle?.(childVal)}
                                           aria-label={child.label}
-                                          className="h-3.5 w-3.5"
+                                          className="pointer-events-none h-3.5 w-3.5"
+                                          tabIndex={-1}
                                         />
-                                        <span className="min-w-0 flex-1 truncate" title={child.label}>{child.label}</span>
+                                        <span className="min-w-0 flex-1 truncate">{child.label}</span>
                                         {!section.hideCounts && (
                                           <span className="text-xs tabular-nums text-muted-foreground">{child.count}</span>
                                         )}
-                                      </label>
+                                      </div>
                                     );
                                   })}
                                 </div>
