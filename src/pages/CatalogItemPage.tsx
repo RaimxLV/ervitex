@@ -7,6 +7,7 @@ import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
+import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 
@@ -169,9 +170,13 @@ const CatalogItemPage = () => {
                 const initialColor = r.source === "pf"
                   ? cols[0]?.n || null
                   : cols[0]?.c || cols[0]?.n || null;
-                const p = initialColor
-                  ? prices.get(`${r.source}:${r.id}:${initialColor.trim().toLowerCase()}`)
-                  : undefined;
+                let p: PriceInfo | undefined;
+                if (initialColor) {
+                  for (const k of colorCodeCandidates(initialColor)) {
+                    const hit = prices.get(`${r.source}:${r.id}:${k}`);
+                    if (hit) { p = hit; break; }
+                  }
+                }
                 return (
                   <CatalogModelCard
                     key={`${r.source}-${r.id}`}

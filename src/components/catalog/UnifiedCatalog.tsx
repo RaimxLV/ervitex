@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
+import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { prepareQuery, searchScore } from "@/lib/catalogSearch";
@@ -1340,10 +1341,15 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   // PF's catalog colour `c` is an item/article number, while variant prices
   // and the detail loader use the supplier colour code/name (BLACK, NAVY...).
   const selectedColor = active ? (item.source === "pf" ? active.n : active.c || active.n) : null;
-  const colorKey = (selectedColor || "").trim().toLowerCase();
-  const effectivePrice = colorKey
-    ? variantPrices.get(`${item.source}:${item.id}:${colorKey}`) || priceInfo
-    : priceInfo;
+  // Cenu tabulas krāsu kodi ir īsāki nekā kataloga kodi (SS SKU, NWG prefikss,
+  // MF ietvertais kods) — meklējam visus iespējamos atslēgu variantus.
+  let effectivePrice = priceInfo;
+  if (selectedColor) {
+    for (const k of colorCodeCandidates(selectedColor)) {
+      const hit = variantPrices.get(`${item.source}:${item.id}:${k}`);
+      if (hit) { effectivePrice = hit; break; }
+    }
+  }
   const colorQuery = selectedColor ? `?color=${encodeURIComponent(selectedColor)}` : "";
 
   return (

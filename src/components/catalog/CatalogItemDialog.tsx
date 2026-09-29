@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
+import { colorCodeMatches } from "@/lib/colorCodeMatch";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
@@ -1008,6 +1009,7 @@ const CatalogItemDialog = ({
         const wn = canonName(wanted);
         const hit =
           d.colors.find((c) => (c.code || "").toLowerCase() === wc) ||
+          d.colors.find((c) => colorCodeMatches(c.code, wanted)) ||
           d.colors.find((c) => (c.name || "").toLowerCase() === wc) ||
           d.colors.find((c) => canonName(c.name) === wn) ||
           (wn ? d.colors.find((c) => canonName(c.name).includes(wn) || wn.includes(canonName(c.name))) : undefined);
@@ -1096,7 +1098,7 @@ const CatalogItemDialog = ({
     };
     let rows = variantPrices;
     if (currentColor) {
-      const byColor = rows.filter((r) => norm(r.color_code) === norm(currentColor.code));
+      const byColor = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code));
       if (byColor.length) rows = byColor;
     }
     if (selectedSize) {
@@ -1118,7 +1120,7 @@ const CatalogItemDialog = ({
     if (!variantPrices.length) return {} as Record<string, number>;
     let rows = variantPrices;
     if (currentColor) {
-      const byColor = rows.filter((r) => norm(r.color_code) === norm(currentColor.code));
+      const byColor = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code));
       if (byColor.length) rows = byColor;
     }
     const map: Record<string, number> = {};
