@@ -827,6 +827,24 @@ export type Database = {
           },
         ]
       }
+      nwg_pricelist: {
+        Row: {
+          product_number: string
+          rec_price: number
+          updated_at: string
+        }
+        Insert: {
+          product_number: string
+          rec_price: number
+          updated_at?: string
+        }
+        Update: {
+          product_number?: string
+          rec_price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nwg_skus: {
         Row: {
           active: boolean | null
