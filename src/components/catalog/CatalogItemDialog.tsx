@@ -322,13 +322,14 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     supabase.from("nwg_styles").select("product_number,name,brand,category,gender,fit,fabrics,commerce_text,catalog_text,usp,weight,country_of_origin,raw").eq("product_number", productNumber).maybeSingle(),
     supabase.from("nwg_variants").select("item_number,color_name,color_code,filter_color,shade_color,main_picture_url").eq("product_number", productNumber),
     supabase.from("nwg_images").select("item_number,image_url,high_res_url,large_thumbnail_url,standard_url,sort_order").eq("product_number", productNumber).order("sort_order", { ascending: true }),
-    supabase.from("nwg_skus").select("sku,item_number,size,size_name,size_sequence").eq("product_number", productNumber),
+    supabase.from("nwg_skus").select("sku,item_number,size,size_name,size_sequence").eq("product_number", productNumber).gt("purchase_price", 0),
   ]);
   const style = styleRes.data;
   if (!style) return null;
-  const variants = variantsRes.data || [];
-  const images = imagesRes.data || [];
   const skus = skusRes.data || [];
+  const pricedItems = new Set(skus.map((k) => k.item_number));
+  const variants = (variantsRes.data || []).filter((v) => pricedItems.has(v.item_number));
+  const images = imagesRes.data || [];
   const raw = ((style as any).raw || {}) as Record<string, any>;
 
   const NAMED_HEX: Record<string, string> = {
