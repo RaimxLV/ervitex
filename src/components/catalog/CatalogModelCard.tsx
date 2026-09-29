@@ -177,11 +177,11 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
         {(code || brandBadge) && (
           <div className="flex flex-row items-stretch border-t border-border bg-primary text-primary-foreground">
             {code && (
-              <span className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden px-2 py-1 sm:px-3 sm:py-1.5">
+              <span className="flex shrink-0 items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5">
                 <span
                   onClick={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
-                  className="codebar-code truncate font-mono font-bold uppercase select-all cursor-text"
+                  className="codebar-code whitespace-nowrap font-mono font-bold uppercase select-all cursor-text"
                 >
                   {code}
                 </span>
@@ -205,7 +205,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
               </span>
             )}
             {brandBadge && (
-              <span className="codebar-brand hidden max-w-[60%] shrink-0 items-center overflow-hidden border-l border-primary-foreground/20 px-2 py-1 text-right font-heading font-bold uppercase sm:px-3 sm:py-1.5 md:flex">
+              <span className="codebar-brand hidden min-w-0 items-center justify-end overflow-hidden border-l border-primary-foreground/20 px-2 py-1 text-right font-heading font-bold uppercase sm:px-3 sm:py-1.5 md:flex">
                 <span className="truncate">{brandBadge}</span>
               </span>
             )}

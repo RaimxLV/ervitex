@@ -1024,7 +1024,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="md:hidden h-9 gap-2 font-heading text-xs font-bold uppercase tracking-wider"
+                  className="lg:hidden h-9 gap-2 font-heading text-xs font-bold uppercase tracking-wider"
                 >
                   <SlidersHorizontal className="h-3.5 w-3.5 text-accent" />
                   {lang === "lv" ? "Filtri" : "Filters"}
@@ -1081,8 +1081,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-8 md:flex-row">
-          <div className="hidden md:block md:w-80 md:shrink-0">
+        <div className="flex flex-col gap-8 lg:flex-row">
+          <div className="hidden lg:block lg:w-80 lg:shrink-0">
             <CatalogFiltersSidebar
               sections={filterSections}
               onClearAll={clearAll}
@@ -1092,7 +1092,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
           <div className="min-w-0 flex-1">
             {!loaded ? (
-              <div className="grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                 {Array.from({ length: 12 }).map((_, i) => (
                   <div key={i} className="overflow-hidden border border-border bg-card">
                     <Skeleton className="aspect-[3/4] w-full" />
@@ -1123,7 +1123,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 gap-2.5 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+                <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                   {paginated.map((it, idx) => (
                     <CatalogCard
                       key={`${it.source}-${it.id}`}
