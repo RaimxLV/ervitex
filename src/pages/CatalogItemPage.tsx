@@ -10,7 +10,7 @@ import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 
-interface ColorEntry { h: string | null; n: string | null; u: string | null }
+interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
 
 interface RelatedItem {
   source: CatalogSource;
@@ -71,18 +71,32 @@ const CatalogItemPage = () => {
         setRelated(list);
 
         if (list.length) {
-          const { data: pr } = await supabase
-            .from("catalog_price_ranges" as any)
-            .select("source,style_code,min_price,max_price")
-            .eq("source", validSource)
-            .in("style_code", list.map((r) => r.id));
+          const priceRows: any[] = [];
+          let from = 0;
+          while (true) {
+            const { data: pr, error } = await supabase
+              .from("catalog_variant_prices" as any)
+              .select("source,style_code,color_code,retail_price")
+              .eq("source", validSource)
+              .in("style_code", list.map((r) => r.id))
+              .gt("retail_price", 0)
+              .range(from, from + 999);
+            if (error || !pr) break;
+            priceRows.push(...(pr as any[]));
+            if (pr.length < 1000) break;
+            from += 1000;
+          }
           if (cancelled) return;
           const map = new Map<string, PriceInfo>();
-          for (const row of (pr || []) as any[]) {
-            const min = Number(row.min_price);
-            const max = Number(row.max_price);
-            if (!Number.isFinite(min) || min <= 0) continue;
-            map.set(`${row.source}:${row.style_code}`, { price: min, max: Number.isFinite(max) ? max : min });
+          for (const row of priceRows) {
+            const value = Number(row.retail_price);
+            if (!Number.isFinite(value) || value <= 0) continue;
+            const key = `${row.source}:${row.style_code}:${(row.color_code || "").trim().toLowerCase()}`;
+            const current = map.get(key);
+            map.set(key, {
+              price: current ? Math.min(current.price, value) : value,
+              max: current ? Math.max(current.max, value) : value,
+            });
           }
           setPrices(map);
         }
@@ -152,11 +166,17 @@ const CatalogItemPage = () => {
                   hex: c.h ?? null,
                   name: c.n || "",
                 }));
-                const p = prices.get(`${r.source}:${r.id}`);
+                const initialColor = cols[0]?.c || cols[0]?.n || null;
+                const p = initialColor
+                  ? prices.get(`${r.source}:${r.id}:${initialColor.trim().toLowerCase()}`)
+                  : undefined;
                 return (
                   <CatalogModelCard
                     key={`${r.source}-${r.id}`}
-                    onClick={() => navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`)}
+                    onClick={() => {
+                      const colorQuery = initialColor ? `?color=${encodeURIComponent(initialColor)}` : "";
+                      navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}${colorQuery}`);
+                    }}
                     image={thumbUrl(r.image_url)}
                     fallbackImage={r.image_url}
                     hoverImage={thumbUrl(r.hover_image_url)}
