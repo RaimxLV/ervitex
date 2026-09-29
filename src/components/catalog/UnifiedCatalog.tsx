@@ -1337,17 +1337,20 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   };
   const displayCode = formatCode(active?.c || item.id);
 
-  const colorKey = (active?.c || active?.n || "").trim().toLowerCase();
+  // PF's catalog colour `c` is an item/article number, while variant prices
+  // and the detail loader use the supplier colour code/name (BLACK, NAVY...).
+  const selectedColor = active ? (item.source === "pf" ? active.n : active.c || active.n) : null;
+  const colorKey = (selectedColor || "").trim().toLowerCase();
   const effectivePrice = colorKey
     ? variantPrices.get(`${item.source}:${item.id}:${colorKey}`) || priceInfo
     : priceInfo;
-  const colorQuery = active ? `?color=${encodeURIComponent(active.c || active.n || "")}` : "";
+  const colorQuery = selectedColor ? `?color=${encodeURIComponent(selectedColor)}` : "";
 
   return (
     <CatalogModelCard
       as="a"
       href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/catalog/item/${item.source}/${encodeURIComponent(item.id)}${colorQuery}`}
-      onClick={() => onNavigate(active?.c || active?.n || null)}
+      onClick={() => onNavigate(selectedColor)}
       image={img}
       fallbackImage={rawImg}
       priority={priority}

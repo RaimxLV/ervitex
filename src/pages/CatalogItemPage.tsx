@@ -166,7 +166,9 @@ const CatalogItemPage = () => {
                   hex: c.h ?? null,
                   name: c.n || "",
                 }));
-                const initialColor = cols[0]?.c || cols[0]?.n || null;
+                const initialColor = r.source === "pf"
+                  ? cols[0]?.n || null
+                  : cols[0]?.c || cols[0]?.n || null;
                 const p = initialColor
                   ? prices.get(`${r.source}:${r.id}:${initialColor.trim().toLowerCase()}`)
                   : undefined;
