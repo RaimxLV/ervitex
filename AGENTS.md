@@ -4,3 +4,4 @@
 - Quote workflow history is append-only in `quote_events`; assignment and status changes must remain visible even when the current quote row changes.
 - Client communication stays in normal email; the worksheet only edits and confirms products, then copies a reusable HTML/plain-text burgundy list link for email replies, maximizing compatibility across mail clients and dark mode.
 - Supplier syncs use bounded resumable work and database-dispatched continuation; NWG contract prices authenticate only with stored customer credentials, never the catalog token, and empty API responses never erase verified prices.
+- Catalog cards use the displayed colour's variant-price range and carry that colour into the product view, so the price never changes merely by opening a product.
