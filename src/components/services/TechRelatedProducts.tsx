@@ -8,7 +8,7 @@ import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import { bucketOf, getBucket, type ColorBucketKey } from "@/lib/colorBuckets";
 
-interface ColorEntry { h: string | null; n: string | null; u: string | null }
+interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
 
 type Row = {
   source: CatalogSource;
@@ -97,7 +97,7 @@ const RelatedCard = ({
   row: Row;
   price?: PriceInfo;
   isLv: boolean;
-  onNavigate: () => void;
+  onNavigate: (color: string | null) => void;
 }) => {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
@@ -110,6 +110,7 @@ const RelatedCard = ({
   );
 
   const active = activeIdx !== null ? colors.find((c) => c.idx === activeIdx) ?? null : null;
+  const displayed = active || colors[0] || null;
   const rawImg = active?.u || row.image_url;
 
   const swatches = colors.slice(0, 8).map((c) => ({
@@ -121,7 +122,7 @@ const RelatedCard = ({
 
   return (
     <CatalogModelCard
-      onClick={onNavigate}
+      onClick={() => onNavigate(displayed ? (row.source === "pf" ? displayed.n : displayed.c || displayed.n) : null)}
       image={thumbUrl(rawImg)}
       fallbackImage={rawImg}
       hoverImage={active ? null : thumbUrl(row.hover_image_url)}
@@ -212,17 +213,37 @@ const TechRelatedProducts = ({ techId }: { techId: string }) => {
       setItems(picked);
 
       if (picked.length) {
-        const { data: pr } = await supabase
-          .from("catalog_price_ranges" as any)
-          .select("source,style_code,min_price,max_price")
-          .in("style_code", picked.map((r) => r.id));
+        const priceRows: any[] = [];
+        await Promise.all(
+          Array.from(new Set(picked.map((r) => r.source))).map(async (source) => {
+            const ids = picked.filter((r) => r.source === source).map((r) => r.id);
+            let from = 0;
+            while (true) {
+              const { data: pr, error } = await supabase
+                .from("catalog_variant_prices" as any)
+                .select("source,style_code,color_code,retail_price")
+                .eq("source", source)
+                .in("style_code", ids)
+                .gt("retail_price", 0)
+                .range(from, from + 999);
+              if (error || !pr) break;
+              priceRows.push(...(pr as any[]));
+              if (pr.length < 1000) break;
+              from += 1000;
+            }
+          }),
+        );
         if (cancelled) return;
         const map = new Map<string, PriceInfo>();
-        for (const row of (pr || []) as any[]) {
-          const min = Number(row.min_price);
-          const max = Number(row.max_price);
-          if (!Number.isFinite(min) || min <= 0) continue;
-          map.set(`${row.source}:${row.style_code}`, { price: min, max: Number.isFinite(max) ? max : min });
+        for (const row of priceRows) {
+          const value = Number(row.retail_price);
+          if (!Number.isFinite(value) || value <= 0) continue;
+          const key = `${row.source}:${row.style_code}:${(row.color_code || "").trim().toLowerCase()}`;
+          const current = map.get(key);
+          map.set(key, {
+            price: current ? Math.min(current.price, value) : value,
+            max: current ? Math.max(current.max, value) : value,
+          });
         }
         setPrices(map);
       }
@@ -252,15 +273,27 @@ const TechRelatedProducts = ({ techId }: { techId: string }) => {
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {items.map((r) => (
-          <RelatedCard
-            key={`${r.source}-${r.id}`}
-            row={r}
-            price={prices.get(`${r.source}:${r.id}`)}
-            isLv={isLv}
-            onNavigate={() => navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`)}
-          />
-        ))}
+        {items.map((r) => {
+          const firstColor = (r.colors || [])[0];
+          const initialColor = firstColor
+            ? (r.source === "pf" ? firstColor.n : firstColor.c || firstColor.n)
+            : null;
+          const price = initialColor
+            ? prices.get(`${r.source}:${r.id}:${initialColor.trim().toLowerCase()}`)
+            : undefined;
+          return (
+            <RelatedCard
+              key={`${r.source}-${r.id}`}
+              row={r}
+              price={price}
+              isLv={isLv}
+              onNavigate={(color) => {
+                const colorQuery = color ? `?color=${encodeURIComponent(color)}` : "";
+                navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}${colorQuery}`);
+              }}
+            />
+          );
+        })}
       </div>
     </div>
   );

@@ -326,6 +326,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [loadError, setLoadError] = useState(false);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [priceRanges, setPriceRanges] = useState<Map<string, { price: number; max: number; currency: string }>>(new Map());
+  const [visibleVariantPrices, setVisibleVariantPrices] = useState<
+    Map<string, { price: number; max: number; currency: string }>
+  >(new Map());
 
 
   const [q, setQ] = useState(searchParams.get("q") || "");
@@ -917,6 +920,65 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     [filtered, safePage]
   );
 
+  // A card represents its initially shown colour, not the cheapest colour in
+  // the whole model. Load only the current page's prices to keep this fast.
+  useEffect(() => {
+    if (!paginated.length) {
+      setVisibleVariantPrices(new Map());
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      type VariantPriceRow = {
+        source: string;
+        style_code: string;
+        color_code: string | null;
+        retail_price: number;
+        currency: string | null;
+      };
+      const rows: VariantPriceRow[] = [];
+      const bySource = new Map<CatalogSource, string[]>();
+      for (const item of paginated) {
+        const ids = bySource.get(item.source) || [];
+        ids.push(item.id);
+        bySource.set(item.source, ids);
+      }
+      await Promise.all(
+        Array.from(bySource.entries()).map(async ([source, ids]) => {
+          let from = 0;
+          while (true) {
+            const { data, error } = await supabase
+              .from("catalog_variant_prices" as any)
+              .select("source,style_code,color_code,retail_price,currency")
+              .eq("source", source)
+              .in("style_code", ids)
+              .gt("retail_price", 0)
+              .range(from, from + 999);
+            if (error || !data) break;
+            rows.push(...((data as unknown) as VariantPriceRow[]));
+            if (data.length < 1000) break;
+            from += 1000;
+          }
+        }),
+      );
+      if (cancelled) return;
+      const grouped = new Map<string, { price: number; max: number; currency: string }>();
+      for (const row of rows) {
+        const key = `${row.source}:${row.style_code}:${(row.color_code || "").trim().toLowerCase()}`;
+        const value = Number(row.retail_price);
+        if (!Number.isFinite(value) || value <= 0) continue;
+        const current = grouped.get(key);
+        grouped.set(key, {
+          price: current ? Math.min(current.price, value) : value,
+          max: current ? Math.max(current.max, value) : value,
+          currency: row.currency || current?.currency || "EUR",
+        });
+      }
+      setVisibleVariantPrices(grouped);
+    })();
+    return () => { cancelled = true; };
+  }, [paginated]);
+
   // Atgriežoties no preces lapas — atjauno ritināšanas vietu tajā pašā lapā.
   const scrollRestored = useRef(false);
   useEffect(() => {
@@ -1134,16 +1196,18 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       requestLabel={t.request}
                       noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
                       priceInfo={priceRanges.get(`${it.source}:${it.id}`)}
+                      variantPrices={visibleVariantPrices}
 
                       fromLabel={lang === "lv" ? "no" : "from"}
-                      onNavigate={() => {
+                      onNavigate={(color) => {
                         try {
                           sessionStorage.setItem(
                             SCROLL_KEY,
                             JSON.stringify({ path: window.location.pathname + window.location.search, y: window.scrollY }),
                           );
                         } catch { /* ignore */ }
-                        navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}`);
+                        const colorQuery = color ? `?color=${encodeURIComponent(color)}` : "";
+                        navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}${colorQuery}`);
                       }}
                     />
                   ))}
@@ -1229,13 +1293,14 @@ interface CardProps {
   selectedBuckets: Set<ColorBucketKey>;
   requestLabel: string;
   noImageLabel: string;
-  onNavigate: () => void;
+  onNavigate: (color: string | null) => void;
   priceInfo?: { price: number; max: number; currency: string };
+  variantPrices: Map<string, { price: number; max: number; currency: string }>;
   fromLabel?: string;
   priority?: boolean;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, fromLabel, priority }: CardProps) => {
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, fromLabel, priority }: CardProps) => {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   // Filter-driven initial match
@@ -1243,7 +1308,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   if (selectedBuckets.size > 0) {
     filterMatchIdx = item.colors.findIndex((c) => c.bucket && selectedBuckets.has(c.bucket));
   }
-  const effectiveIdx = activeIdx ?? (filterMatchIdx >= 0 ? filterMatchIdx : null);
+  const effectiveIdx = activeIdx ?? (filterMatchIdx >= 0 ? filterMatchIdx : (item.colors.length ? 0 : null));
   const active = effectiveIdx !== null ? item.colors[effectiveIdx] : null;
 
   const displayTitle = item.name || item.id;
@@ -1272,13 +1337,20 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   };
   const displayCode = formatCode(active?.c || item.id);
 
-  const effectivePrice = priceInfo;
+  // PF's catalog colour `c` is an item/article number, while variant prices
+  // and the detail loader use the supplier colour code/name (BLACK, NAVY...).
+  const selectedColor = active ? (item.source === "pf" ? active.n : active.c || active.n) : null;
+  const colorKey = (selectedColor || "").trim().toLowerCase();
+  const effectivePrice = colorKey
+    ? variantPrices.get(`${item.source}:${item.id}:${colorKey}`) || priceInfo
+    : priceInfo;
+  const colorQuery = selectedColor ? `?color=${encodeURIComponent(selectedColor)}` : "";
 
   return (
     <CatalogModelCard
       as="a"
-      href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/catalog/item/${item.source}/${encodeURIComponent(item.id)}`}
-      onClick={onNavigate}
+      href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/catalog/item/${item.source}/${encodeURIComponent(item.id)}${colorQuery}`}
+      onClick={() => onNavigate(selectedColor)}
       image={img}
       fallbackImage={rawImg}
       priority={priority}
