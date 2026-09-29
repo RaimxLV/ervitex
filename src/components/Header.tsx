@@ -21,7 +21,7 @@ const navItems = [
 ];
 
 const LanguageFlag = ({ language }: { language: "lv" | "en" }) => (
-  <span className="relative block h-7 w-7 overflow-hidden rounded-full shadow-md ring-1 ring-primary-foreground/25">
+  <span className="relative block h-7 w-7 overflow-hidden rounded-full">
     <img
       src={language === "lv" ? latviaFlag : unitedKingdomFlag}
       alt=""
