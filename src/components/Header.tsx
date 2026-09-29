@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import ervitexLogo from "@/assets/ervitex-logo-2.svg";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
+import latviaFlag from "@/assets/flags/lv-round.svg";
+import unitedKingdomFlag from "@/assets/flags/gb-round.svg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Phone, Search, Share2, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,9 +21,12 @@ const navItems = [
 ];
 
 const LanguageFlag = ({ language }: { language: "lv" | "en" }) => (
-  <span className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-primary-foreground/10 text-[25px] leading-none shadow-md ring-1 ring-primary-foreground/25">
-    <span aria-hidden="true" className="-translate-y-px scale-[1.3]">{language === "lv" ? "🇱🇻" : "🇬🇧"}</span>
-    <span className="pointer-events-none absolute inset-x-1 top-0.5 h-2 rounded-full bg-primary-foreground/30 blur-[1px]" />
+  <span className="relative block h-7 w-7 overflow-hidden rounded-full shadow-md ring-1 ring-primary-foreground/25">
+    <img
+      src={language === "lv" ? latviaFlag : unitedKingdomFlag}
+      alt=""
+      className="h-full w-full object-cover"
+    />
   </span>
 );
 

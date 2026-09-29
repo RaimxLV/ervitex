@@ -20,7 +20,7 @@
 ## No audita — jāsalabo
 
 ## Vizuālie uzlabojumi
-- [ ] Aizstāt LV/EN tekstu ar vienu glancētu apaļu karodziņu; datorā otru valodu rādīt vertikāli hover stāvoklī.
+- [x] Aizstāt LV/EN tekstu ar vienu glancētu apaļu karodziņu; datorā otru valodu rādīt vertikāli hover stāvoklī.
 - [x] Aizvietot DTF galerijas dubulto attēlu ar jauno optimizēto foto.
 - [x] Pārbūvēt tehnoloģiju galerijas modernākā, nepārtrauktā struktūrā bez tukšas pēdējās lapas.
 - [x] Pacelt publisko lapu mazos tekstus līdz vienotam, salasāmam izmēram.
