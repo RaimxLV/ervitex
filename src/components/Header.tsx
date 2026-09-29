@@ -73,7 +73,7 @@ const LanguageSwitcher = ({
         onClick={() => setLang(alternate)}
         aria-label={alternateLabel}
         title={alternateLabel}
-        className="absolute left-0 top-full mt-2 h-10 w-10 -translate-y-2 rounded-full bg-primary/95 p-1.5 opacity-0 shadow-xl ring-1 ring-primary-foreground/20 transition-all duration-300 hover:bg-primary focus:translate-y-0 focus:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
+        className="absolute left-0 top-full mt-2 h-10 w-10 -translate-y-2 rounded-full bg-primary/95 p-1.5 opacity-0 shadow-xl transition-all duration-300 hover:bg-primary focus:translate-y-0 focus:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
       >
         <LanguageFlag language={alternate} />
       </Button>
