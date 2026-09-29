@@ -1096,7 +1096,7 @@ const CatalogItemDialog = ({
     };
     let rows = variantPrices;
     if (currentColor) {
-      const byColor = rows.filter((r) => norm(r.color_code) === norm(currentColor.code));
+      const byColor = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code));
       if (byColor.length) rows = byColor;
     }
     if (selectedSize) {
