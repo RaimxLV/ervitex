@@ -303,17 +303,17 @@ const RequestPage = () => {
               </section>
 
               {/* Print details */}
-              <section className="space-y-5 rounded-md border border-border bg-card p-5 sm:p-6">
-                <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
+              <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
+                <h2 className="mb-6 font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
                   {t("Apdrukas informācija", "Print details")}
                 </h2>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
                     <select
                       value={print.method}
                       onChange={(e) => setPrint({ ...print, method: e.target.value })}
-                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                      className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm transition-colors focus:border-accent focus:outline-none"
                     >
                       <option value="">{t("Nezinu / konsultēties", "Not sure / consult")}</option>
                       <option value="silkscreen">{t("Sietspiede", "Silkscreen")}</option>
@@ -323,28 +323,30 @@ const RequestPage = () => {
                       <option value="none">{t("Bez apdrukas", "No print")}</option>
                     </select>
                   </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Vēlamais termiņš", "Deadline")}</Label>
-                    <Input className="h-10" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vēlamais termiņš", "Deadline")}</Label>
+                    <Input className="h-11 rounded-lg" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
-                  <Textarea rows={4} className="resize-none" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
+                <div className="mt-5 space-y-2">
+                  <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
+                  <Textarea rows={4} className="resize-none rounded-lg" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
                 </div>
               </section>
 
 
               {/* Files */}
-              <section className="space-y-4 rounded-md border border-border bg-card p-5 sm:p-6">
-                <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
+              <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
+                <h2 className="mb-6 font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
                   {t("Faili (logo, dizains)", "Files (logo, artwork)")}
                 </h2>
-                <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border bg-background px-4 py-7 text-center transition-colors hover:bg-muted/40">
-                  <Upload className="mb-2.5 h-6 w-6 text-muted-foreground" />
-                  <span className="text-sm font-medium leading-snug">{t("Ievelc failus šeit vai spied, lai izvēlētos", "Drop files here or click to choose")}</span>
-                  <span className="mt-1.5 text-[11px] text-muted-foreground">
+                <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 px-4 py-10 text-center transition-colors hover:border-accent/50 hover:bg-muted/50">
+                  <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
+                    <Upload className="h-5 w-5 text-accent" />
+                  </span>
+                  <span className="text-sm font-semibold leading-snug">{t("Ievelc failus šeit vai spied, lai izvēlētos", "Drop files here or click to choose")}</span>
+                  <span className="mt-1.5 text-xs text-muted-foreground">
                     {t(`Līdz ${MAX_FILES} failiem, katrs līdz ${MAX_FILE_MB}MB`, `Up to ${MAX_FILES} files, ${MAX_FILE_MB}MB each`)}
                   </span>
                   <input
@@ -356,14 +358,14 @@ const RequestPage = () => {
                   />
                 </label>
                 {files.length > 0 && (
-                  <ul className="space-y-1.5 text-sm">
+                  <ul className="mt-4 space-y-2 text-sm">
                     {files.map((f, i) => (
-                      <li key={i} className="flex min-w-0 items-center gap-2 rounded-md border border-border py-1.5 pl-3 pr-1.5">
-                        <span className="min-w-0 flex-1 truncate">
-                          {f.name} <span className="text-[11px] text-muted-foreground">({(f.size / 1024 / 1024).toFixed(2)}MB)</span>
+                      <li key={i} className="flex min-w-0 items-center gap-3 rounded-lg border border-border bg-background py-2 pl-4 pr-2">
+                        <span className="min-w-0 flex-1 truncate font-medium">
+                          {f.name} <span className="text-xs font-normal text-muted-foreground">({(f.size / 1024 / 1024).toFixed(2)}MB)</span>
                         </span>
-                        <Button type="button" size="icon" variant="ghost" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive" onClick={() => removeFile(i)}>
-                          <Trash2 className="h-3.5 w-3.5" />
+                        <Button type="button" size="icon" variant="ghost" className="h-8 w-8 shrink-0 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive" onClick={() => removeFile(i)}>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </li>
                     ))}
@@ -373,34 +375,65 @@ const RequestPage = () => {
             </div>
 
             {/* Right column */}
-            <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+            <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+              {/* Summary */}
+              {cartNet > 0 && (
+                <section className="rounded-2xl bg-foreground p-6 text-background shadow-lg sm:p-7">
+                  <h2 className="mb-5 font-heading text-lg font-black uppercase tracking-wide">
+                    {t("Kopsavilkums", "Summary")}
+                  </h2>
+                  <dl className="space-y-2.5 text-sm">
+                    <div className="flex justify-between">
+                      <dt className="text-background/60">{t("Kopā bez PVN", "Total excl. VAT")}</dt>
+                      <dd className="font-semibold">€{cartNet.toFixed(2)}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-background/60">{t("PVN 21%", "VAT 21%")}</dt>
+                      <dd className="font-semibold">€{(cartNet * 0.21).toFixed(2)}</dd>
+                    </div>
+                    <div className="mt-2 flex items-baseline justify-between border-t border-background/20 pt-4">
+                      <dt className="font-heading text-sm font-bold uppercase tracking-wide">{t("Kopā ar PVN", "Total incl. VAT")}</dt>
+                      <dd className="font-heading text-2xl font-black text-accent">€{(cartNet * 1.21).toFixed(2)}</dd>
+                    </div>
+                  </dl>
+                  <p className="mt-4 text-[11px] leading-snug text-background/50">
+                    {t(
+                      "Cenas ir informatīvas, par preci bez apdrukas. Apdrukas un izšuvumu izmaksas aprēķinām atsevišķi.",
+                      "Prices are indicative, for the product without decoration. Printing and embroidery are quoted separately.",
+                    )}
+                  </p>
+                </section>
+              )}
+
               {/* Contact */}
-              <section className="space-y-4 rounded-md border border-border bg-card p-5 sm:p-6">
-                <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
+              <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
+                <h2 className="mb-6 font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
                   {t("Tavi kontakti", "Your contacts")}
                 </h2>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Vārds", "Name")} *</Label>
-                  <Input className="h-10" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("E-pasts", "Email")} *</Label>
-                  <Input type="email" className="h-10" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Tālrunis", "Phone")}</Label>
-                  <Input className="h-10" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Uzņēmums", "Company")}</Label>
-                  <Input className="h-10" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vārds", "Name")} *</Label>
+                    <Input className="h-11 rounded-lg" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("E-pasts", "Email")} *</Label>
+                    <Input type="email" className="h-11 rounded-lg" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Tālrunis", "Phone")}</Label>
+                    <Input className="h-11 rounded-lg" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Uzņēmums", "Company")}</Label>
+                    <Input className="h-11 rounded-lg" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                  </div>
                 </div>
               </section>
 
               <Button
                 type="submit"
                 disabled={sending || items.length === 0}
-                className="h-12 w-full bg-accent font-heading text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90"
+                className="h-14 w-full rounded-xl bg-accent font-heading text-sm font-black uppercase tracking-widest text-accent-foreground shadow-lg transition-transform hover:bg-accent/90 active:scale-[0.99]"
               >
                 <Send className="mr-2 h-4 w-4" />
                 {sending ? t("Sūta...", "Sending...") : t("Nosūtīt pieprasījumu", "Send request")}
