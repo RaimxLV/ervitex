@@ -173,82 +173,101 @@ const RequestPage = () => {
         )}
         eyebrow={t("Pasūtījuma sagatavošana", "Preparing your order")}
       />
-      <div className="container mx-auto max-w-5xl px-4 py-10 sm:py-16">
-        <div className="mb-8 flex flex-wrap items-start justify-end gap-4">
-          <div className="flex flex-wrap gap-2">
-            {isAdmin && items.length > 0 && (
-              <Button
-                type="button"
-                size="sm"
-                variant="secondary"
-                className="font-heading text-xs uppercase tracking-widest"
-                onClick={createOffer}
-                disabled={creatingOffer}
-              >
-                {t("Izveidot piedāvājumu klientam", "Create client offer")}
-              </Button>
-            )}
-            <Button asChild variant="outline" size="sm" className="font-heading text-xs uppercase tracking-widest">
-              <Link to="/catalog">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                {t("Atgriezties katalogā", "Back to catalog")}
-              </Link>
+      <div className="container mx-auto max-w-6xl px-4 py-10 sm:py-14">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <Button asChild variant="ghost" size="sm" className="-ml-2 font-heading text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
+            <Link to="/catalog">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t("Atgriezties katalogā", "Back to catalog")}
+            </Link>
+          </Button>
+          {isAdmin && items.length > 0 && (
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              className="font-heading text-xs uppercase tracking-widest"
+              onClick={createOffer}
+              disabled={creatingOffer}
+            >
+              {t("Izveidot piedāvājumu klientam", "Create client offer")}
             </Button>
-          </div>
-
+          )}
         </div>
 
         {items.length === 0 ? (
-          <div className="rounded-md border border-dashed border-border p-10 text-center text-muted-foreground">
-            {t("Pieprasījums ir tukšs. Pārlūko katalogu un pievieno preces.", "Your request is empty. Browse the catalog and add items.")}
+          <div className="rounded-2xl border border-dashed border-border bg-card/50 p-14 text-center">
+            <p className="text-muted-foreground">
+              {t("Pieprasījums ir tukšs. Pārlūko katalogu un pievieno preces.", "Your request is empty. Browse the catalog and add items.")}
+            </p>
+            <Button asChild className="mt-6 bg-accent font-heading text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90">
+              <Link to="/catalog">{t("Atvērt katalogu", "Open catalog")}</Link>
+            </Button>
           </div>
         ) : (
-          <form onSubmit={submit} className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr),380px]">
-            <div className="min-w-0 space-y-4">
+          <form onSubmit={submit} className="grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr),400px]">
+            <div className="min-w-0 space-y-8">
 
               {/* Items */}
-              <section className="rounded-md border border-border bg-card p-4 sm:p-6">
-
-                <div className="mb-3 flex items-center justify-between gap-2">
-                  <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
-                    {t("Preces", "Items")} <span className="text-muted-foreground text-sm">({totalQty})</span>
+              <section>
+                <div className="mb-5 flex items-end justify-between gap-3 border-b-2 border-foreground pb-3">
+                  <h2 className="font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
+                    {t("Preces", "Items")}
+                    <span className="ml-2 align-middle font-heading text-sm font-bold text-muted-foreground">{totalQty} {t("gab.", "pcs")}</span>
                   </h2>
-                  <Button type="button" variant="ghost" size="sm" onClick={clear} className="h-8 px-2 text-[11px] text-muted-foreground">
+                  <button
+                    type="button"
+                    onClick={clear}
+                    className="font-heading text-[11px] font-bold uppercase tracking-widest text-muted-foreground underline-offset-4 transition-colors hover:text-destructive hover:underline"
+                  >
                     {t("Notīrīt visu", "Clear all")}
-                  </Button>
+                  </button>
                 </div>
-                <div className="divide-y divide-border border-y border-border">
+                <div className="space-y-4">
                   {grouped.map((group) => {
                     const head = group[0];
                     const groupNet = group.reduce((s, it) => s + (it.unitPrice || 0) * it.qty, 0);
                     const groupQty = group.reduce((s, it) => s + it.qty, 0);
                     return (
-                      <div key={head.productId + head.colorCode} className="flex gap-2.5 py-2.5 sm:gap-3">
-                        <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded bg-white sm:h-16 sm:w-16">
+                      <article
+                        key={head.productId + head.colorCode}
+                        className="group flex gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:gap-5 sm:p-5"
+                      >
+                        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border border-border/60 bg-white sm:h-24 sm:w-24">
                           {head.image ? (
-                            <img src={head.image} alt={head.name} className="h-full w-full object-contain" />
+                            <img src={head.image} alt={head.name} className="h-full w-full object-contain p-1.5" />
                           ) : (
                             <div className="h-full w-full bg-muted" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-[13px] font-semibold leading-tight">{head.name}</p>
-                          <p className="mt-0.5 flex items-center gap-1 truncate text-[11px] text-muted-foreground">
-                            <span className="font-mono">{head.code}</span>
-                            {head.colorName && (
-                              <>
-                                <span>·</span>
-                                {head.colorHex && (
-                                  <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full border border-black/20" style={{ backgroundColor: head.colorHex }} />
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <h3 className="line-clamp-2 text-[15px] font-bold leading-tight sm:text-base">{head.name}</h3>
+                              <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                                <span className="font-mono tracking-tight">{head.code}</span>
+                                {head.colorName && (
+                                  <>
+                                    <span aria-hidden>·</span>
+                                    {head.colorHex && (
+                                      <span className="inline-block h-3 w-3 shrink-0 rounded-full ring-1 ring-inset ring-black/15" style={{ backgroundColor: head.colorHex }} />
+                                    )}
+                                    <span className="truncate">{head.colorName}</span>
+                                  </>
                                 )}
-                                <span className="truncate">{head.colorName}</span>
-                              </>
+                              </p>
+                            </div>
+                            {groupNet > 0 && (
+                              <div className="shrink-0 text-right">
+                                <p className="font-heading text-base font-black leading-none sm:text-lg">€{groupNet.toFixed(2)}</p>
+                                <p className="mt-1 text-[11px] text-muted-foreground">€{(groupNet * 1.21).toFixed(2)} {t("ar PVN", "incl. VAT")}</p>
+                              </div>
                             )}
-                          </p>
-                          <div className="mt-1.5 space-y-1">
+                          </div>
+                          <div className="mt-3 space-y-2">
                             {group.map((it) => (
-                              <div key={it.id} className="flex items-center gap-1.5 text-[13px]">
-                                <span className="w-11 shrink-0 rounded border border-border px-1 py-0.5 text-center text-[11px] font-bold">
+                              <div key={it.id} className="flex flex-wrap items-center gap-2 rounded-lg bg-muted/40 px-2.5 py-1.5">
+                                <span className="min-w-9 shrink-0 rounded-md border border-border bg-background px-1.5 py-1 text-center font-heading text-xs font-bold">
                                   {it.size || "—"}
                                 </span>
                                 <Input
@@ -257,75 +276,46 @@ const RequestPage = () => {
                                   inputMode="numeric"
                                   value={it.qty}
                                   onChange={(e) => updateQty(it.id, parseInt(e.target.value) || 1)}
-                                  className="h-7 w-14 px-1 text-center text-[13px]"
+                                  className="h-8 w-14 border-border bg-background px-1 text-center text-sm font-semibold"
                                 />
                                 {it.unitPrice ? (
-                                  <span className="ml-1 truncate text-[11px] text-muted-foreground">
-                                    €{it.unitPrice.toFixed(2)} → <span className="font-semibold text-foreground">€{(it.unitPrice * it.qty).toFixed(2)}</span>
+                                  <span className="hidden min-w-0 truncate text-xs text-muted-foreground sm:inline">
+                                    €{it.unitPrice.toFixed(2)} / {t("gab.", "pc")}
                                   </span>
                                 ) : null}
-                                <button
-                                  type="button"
-                                  aria-label={t("Dzēst", "Remove")}
-                                  className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-destructive"
-                                  onClick={() => remove(it.id)}
-                                >
-                                  <X className="h-3.5 w-3.5" />
-                                </button>
+                                <span className="ml-auto flex shrink-0 items-center gap-1.5">
+                                  <span className="text-sm font-bold">€{((it.unitPrice || 0) * it.qty).toFixed(2)}</span>
+                                  <button
+                                    type="button"
+                                    aria-label={t("Dzēst", "Remove")}
+                                    className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                    onClick={() => remove(it.id)}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </button>
+                                </span>
                               </div>
                             ))}
                           </div>
-                          <p className="mt-1 text-[11px] text-muted-foreground">
-                            {groupQty} {t("gab.", "pcs")}
-                            {groupNet > 0 && (
-                              <>
-                                {" · "}
-                                <span className="font-semibold text-foreground">€{groupNet.toFixed(2)}</span> {t("bez PVN", "excl. VAT")}
-                                {" · "}€{(groupNet * 1.21).toFixed(2)} {t("ar PVN", "incl. VAT")}
-                              </>
-                            )}
-                          </p>
                         </div>
-                      </div>
+                      </article>
                     );
                   })}
                 </div>
-                {cartNet > 0 && (
-                  <dl className="mt-3 space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">{t("Kopā bez PVN", "Total excl. VAT")}</dt>
-                      <dd className="font-medium">€{cartNet.toFixed(2)}</dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">{t("PVN 21%", "VAT 21%")}</dt>
-                      <dd>€{(cartNet * 0.21).toFixed(2)}</dd>
-                    </div>
-                    <div className="flex justify-between border-t border-border pt-1 text-base">
-                      <dt className="font-semibold">{t("Kopā ar PVN", "Total incl. VAT")}</dt>
-                      <dd className="font-black text-accent">€{(cartNet * 1.21).toFixed(2)}</dd>
-                    </div>
-                    <p className="pt-1 text-[11px] leading-snug text-muted-foreground">
-                      {t(
-                        "Cenas ir informatīvas, par preci bez apdrukas. Apdrukas un izšuvumu izmaksas aprēķinām atsevišķi.",
-                        "Prices are indicative, for the product without decoration. Printing and embroidery are quoted separately.",
-                      )}
-                    </p>
-                  </dl>
-                )}
               </section>
 
               {/* Print details */}
-              <section className="space-y-5 rounded-md border border-border bg-card p-5 sm:p-6">
-                <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
+              <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
+                <h2 className="mb-6 font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
                   {t("Apdrukas informācija", "Print details")}
                 </h2>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-1.5">
-                    <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
                     <select
                       value={print.method}
                       onChange={(e) => setPrint({ ...print, method: e.target.value })}
-                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                      className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm transition-colors focus:border-accent focus:outline-none"
                     >
                       <option value="">{t("Nezinu / konsultēties", "Not sure / consult")}</option>
                       <option value="silkscreen">{t("Sietspiede", "Silkscreen")}</option>
@@ -335,28 +325,30 @@ const RequestPage = () => {
                       <option value="none">{t("Bez apdrukas", "No print")}</option>
                     </select>
                   </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Vēlamais termiņš", "Deadline")}</Label>
-                    <Input className="h-10" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vēlamais termiņš", "Deadline")}</Label>
+                    <Input className="h-11 rounded-lg" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
-                  <Textarea rows={4} className="resize-none" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
+                <div className="mt-5 space-y-2">
+                  <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
+                  <Textarea rows={4} className="resize-none rounded-lg" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
                 </div>
               </section>
 
 
               {/* Files */}
-              <section className="space-y-4 rounded-md border border-border bg-card p-5 sm:p-6">
-                <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
+              <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
+                <h2 className="mb-6 font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
                   {t("Faili (logo, dizains)", "Files (logo, artwork)")}
                 </h2>
-                <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border bg-background px-4 py-7 text-center transition-colors hover:bg-muted/40">
-                  <Upload className="mb-2.5 h-6 w-6 text-muted-foreground" />
-                  <span className="text-sm font-medium leading-snug">{t("Ievelc failus šeit vai spied, lai izvēlētos", "Drop files here or click to choose")}</span>
-                  <span className="mt-1.5 text-[11px] text-muted-foreground">
+                <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 px-4 py-10 text-center transition-colors hover:border-accent/50 hover:bg-muted/50">
+                  <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
+                    <Upload className="h-5 w-5 text-accent" />
+                  </span>
+                  <span className="text-sm font-semibold leading-snug">{t("Ievelc failus šeit vai spied, lai izvēlētos", "Drop files here or click to choose")}</span>
+                  <span className="mt-1.5 text-xs text-muted-foreground">
                     {t(`Līdz ${MAX_FILES} failiem, katrs līdz ${MAX_FILE_MB}MB`, `Up to ${MAX_FILES} files, ${MAX_FILE_MB}MB each`)}
                   </span>
                   <input
@@ -368,14 +360,14 @@ const RequestPage = () => {
                   />
                 </label>
                 {files.length > 0 && (
-                  <ul className="space-y-1.5 text-sm">
+                  <ul className="mt-4 space-y-2 text-sm">
                     {files.map((f, i) => (
-                      <li key={i} className="flex min-w-0 items-center gap-2 rounded-md border border-border py-1.5 pl-3 pr-1.5">
-                        <span className="min-w-0 flex-1 truncate">
-                          {f.name} <span className="text-[11px] text-muted-foreground">({(f.size / 1024 / 1024).toFixed(2)}MB)</span>
+                      <li key={i} className="flex min-w-0 items-center gap-3 rounded-lg border border-border bg-background py-2 pl-4 pr-2">
+                        <span className="min-w-0 flex-1 truncate font-medium">
+                          {f.name} <span className="text-xs font-normal text-muted-foreground">({(f.size / 1024 / 1024).toFixed(2)}MB)</span>
                         </span>
-                        <Button type="button" size="icon" variant="ghost" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive" onClick={() => removeFile(i)}>
-                          <Trash2 className="h-3.5 w-3.5" />
+                        <Button type="button" size="icon" variant="ghost" className="h-8 w-8 shrink-0 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive" onClick={() => removeFile(i)}>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </li>
                     ))}
@@ -385,34 +377,65 @@ const RequestPage = () => {
             </div>
 
             {/* Right column */}
-            <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+            <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+              {/* Summary */}
+              {cartNet > 0 && (
+                <section className="rounded-2xl bg-foreground p-6 text-background shadow-lg sm:p-7">
+                  <h2 className="mb-5 font-heading text-lg font-black uppercase tracking-wide">
+                    {t("Kopsavilkums", "Summary")}
+                  </h2>
+                  <dl className="space-y-2.5 text-sm">
+                    <div className="flex justify-between">
+                      <dt className="text-background/60">{t("Kopā bez PVN", "Total excl. VAT")}</dt>
+                      <dd className="font-semibold">€{cartNet.toFixed(2)}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-background/60">{t("PVN 21%", "VAT 21%")}</dt>
+                      <dd className="font-semibold">€{(cartNet * 0.21).toFixed(2)}</dd>
+                    </div>
+                    <div className="mt-2 flex items-baseline justify-between border-t border-background/20 pt-4">
+                      <dt className="font-heading text-sm font-bold uppercase tracking-wide">{t("Kopā ar PVN", "Total incl. VAT")}</dt>
+                      <dd className="font-heading text-2xl font-black text-accent">€{(cartNet * 1.21).toFixed(2)}</dd>
+                    </div>
+                  </dl>
+                  <p className="mt-4 text-[11px] leading-snug text-background/50">
+                    {t(
+                      "Cenas ir informatīvas, par preci bez apdrukas. Apdrukas un izšuvumu izmaksas aprēķinām atsevišķi.",
+                      "Prices are indicative, for the product without decoration. Printing and embroidery are quoted separately.",
+                    )}
+                  </p>
+                </section>
+              )}
+
               {/* Contact */}
-              <section className="space-y-4 rounded-md border border-border bg-card p-5 sm:p-6">
-                <h2 className="font-heading text-base font-black uppercase tracking-wide sm:text-lg">
+              <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
+                <h2 className="mb-6 font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
                   {t("Tavi kontakti", "Your contacts")}
                 </h2>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Vārds", "Name")} *</Label>
-                  <Input className="h-10" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("E-pasts", "Email")} *</Label>
-                  <Input type="email" className="h-10" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Tālrunis", "Phone")}</Label>
-                  <Input className="h-10" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground">{t("Uzņēmums", "Company")}</Label>
-                  <Input className="h-10" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vārds", "Name")} *</Label>
+                    <Input className="h-11 rounded-lg" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("E-pasts", "Email")} *</Label>
+                    <Input type="email" className="h-11 rounded-lg" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Tālrunis", "Phone")}</Label>
+                    <Input className="h-11 rounded-lg" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Uzņēmums", "Company")}</Label>
+                    <Input className="h-11 rounded-lg" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                  </div>
                 </div>
               </section>
 
               <Button
                 type="submit"
                 disabled={sending || items.length === 0}
-                className="h-12 w-full bg-accent font-heading text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90"
+                className="h-14 w-full rounded-xl bg-accent font-heading text-sm font-black uppercase tracking-widest text-accent-foreground shadow-lg transition-transform hover:bg-accent/90 active:scale-[0.99]"
               >
                 <Send className="mr-2 h-4 w-4" />
                 {sending ? t("Sūta...", "Sending...") : t("Nosūtīt pieprasījumu", "Send request")}
