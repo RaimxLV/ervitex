@@ -243,7 +243,7 @@ const RequestPage = () => {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                              <h3 className="truncate text-[15px] font-bold leading-tight sm:text-base">{head.name}</h3>
+                              <h3 className="line-clamp-2 text-[15px] font-bold leading-tight sm:text-base">{head.name}</h3>
                               <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                                 <span className="font-mono tracking-tight">{head.code}</span>
                                 {head.colorName && (
@@ -266,8 +266,8 @@ const RequestPage = () => {
                           </div>
                           <div className="mt-3 space-y-2">
                             {group.map((it) => (
-                              <div key={it.id} className="flex items-center gap-2.5 rounded-lg bg-muted/40 px-2.5 py-1.5">
-                                <span className="min-w-11 shrink-0 rounded-md border border-border bg-background px-2 py-1 text-center font-heading text-xs font-bold">
+                              <div key={it.id} className="flex flex-wrap items-center gap-2 rounded-lg bg-muted/40 px-2.5 py-1.5">
+                                <span className="min-w-9 shrink-0 rounded-md border border-border bg-background px-1.5 py-1 text-center font-heading text-xs font-bold">
                                   {it.size || "—"}
                                 </span>
                                 <Input
@@ -276,10 +276,10 @@ const RequestPage = () => {
                                   inputMode="numeric"
                                   value={it.qty}
                                   onChange={(e) => updateQty(it.id, parseInt(e.target.value) || 1)}
-                                  className="h-8 w-16 border-border bg-background px-1 text-center text-sm font-semibold"
+                                  className="h-8 w-14 border-border bg-background px-1 text-center text-sm font-semibold"
                                 />
                                 {it.unitPrice ? (
-                                  <span className="min-w-0 truncate text-xs text-muted-foreground">
+                                  <span className="hidden min-w-0 truncate text-xs text-muted-foreground sm:inline">
                                     €{it.unitPrice.toFixed(2)} / {t("gab.", "pc")}
                                   </span>
                                 ) : null}
