@@ -18,6 +18,91 @@ const navItems = [
   { key: "nav.contact" as const, path: "/contact" },
 ];
 
+const LatviaFlag = () => (
+  <svg viewBox="0 0 30 30" aria-hidden="true" className="h-full w-full">
+    <defs>
+      <clipPath id="lv-flag-circle"><circle cx="15" cy="15" r="15" /></clipPath>
+    </defs>
+    <g clipPath="url(#lv-flag-circle)">
+      <rect width="30" height="30" fill="#9E3039" />
+      <rect y="12" width="30" height="6" fill="#FFFFFF" />
+    </g>
+  </svg>
+);
+
+const UnitedKingdomFlag = () => (
+  <svg viewBox="0 0 60 60" aria-hidden="true" className="h-full w-full">
+    <defs>
+      <clipPath id="uk-flag-circle"><circle cx="30" cy="30" r="30" /></clipPath>
+    </defs>
+    <g clipPath="url(#uk-flag-circle)">
+      <rect width="60" height="60" fill="#012169" />
+      <path d="M0 0 60 60M60 0 0 60" stroke="#FFFFFF" strokeWidth="13" />
+      <path d="M0 0 60 60M60 0 0 60" stroke="#C8102E" strokeWidth="7" />
+      <path d="M30 0v60M0 30h60" stroke="#FFFFFF" strokeWidth="20" />
+      <path d="M30 0v60M0 30h60" stroke="#C8102E" strokeWidth="11" />
+    </g>
+  </svg>
+);
+
+const LanguageFlag = ({ language }: { language: "lv" | "en" }) => (
+  <span className="relative block h-7 w-7 overflow-hidden rounded-full shadow-md ring-1 ring-primary-foreground/25">
+    {language === "lv" ? <LatviaFlag /> : <UnitedKingdomFlag />}
+    <span className="pointer-events-none absolute inset-x-1 top-0.5 h-2 rounded-full bg-primary-foreground/35 blur-[1px]" />
+  </span>
+);
+
+const LanguageSwitcher = ({
+  lang,
+  setLang,
+  mobile = false,
+}: {
+  lang: "lv" | "en";
+  setLang: (language: "lv" | "en") => void;
+  mobile?: boolean;
+}) => {
+  const alternate = lang === "lv" ? "en" : "lv";
+  const currentLabel = lang === "lv" ? "Latviešu valoda" : "English";
+  const alternateLabel = alternate === "lv" ? "Pārslēgt uz latviešu valodu" : "Switch to English";
+
+  if (mobile) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => setLang(alternate)}
+        aria-label={alternateLabel}
+        title={alternateLabel}
+        className="h-10 w-10 rounded-full p-1.5 hover:bg-primary-foreground/10"
+      >
+        <LanguageFlag language={lang} />
+      </Button>
+    );
+  }
+
+  return (
+    <div className="group relative z-50 h-10 w-10" aria-label={currentLabel}>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/5 ring-1 ring-primary-foreground/15 transition-all duration-300 group-hover:ring-accent/70 group-focus-within:ring-accent/70">
+          <LanguageFlag language={lang} />
+        </span>
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => setLang(alternate)}
+        aria-label={alternateLabel}
+        title={alternateLabel}
+        className="absolute left-0 top-full mt-2 h-10 w-10 -translate-y-2 rounded-full bg-primary/95 p-1.5 opacity-0 shadow-xl ring-1 ring-primary-foreground/20 transition-all duration-300 hover:bg-primary focus:translate-y-0 focus:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
+      >
+        <LanguageFlag language={alternate} />
+      </Button>
+    </div>
+  );
+};
+
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -227,20 +312,7 @@ const Header = () => {
           </div>
 
           {/* Language switcher */}
-          <div className="flex items-center border border-primary-foreground/20 text-xs font-medium">
-            <button
-              onClick={() => setLang("lv")}
-              className={`px-2 py-1.5 transition-colors ${lang === "lv" ? "bg-accent text-accent-foreground" : "text-primary-foreground/70 hover:text-primary-foreground"}`}
-            >
-              LV
-            </button>
-            <button
-              onClick={() => setLang("en")}
-              className={`px-2 py-1.5 transition-colors ${lang === "en" ? "bg-accent text-accent-foreground" : "text-primary-foreground/70 hover:text-primary-foreground"}`}
-            >
-              EN
-            </button>
-          </div>
+          <LanguageSwitcher lang={lang} setLang={setLang} />
 
           <a href="tel:+37167818282" className="flex items-center gap-1.5 whitespace-nowrap text-sm text-primary-foreground/70 hover:text-primary-foreground">
             <Phone className="h-4 w-4" strokeWidth={1.5} />
@@ -250,20 +322,7 @@ const Header = () => {
 
         {/* Mobile controls */}
         <div className="flex shrink-0 items-center gap-1.5 xl:hidden">
-          <div className="flex items-center border border-primary-foreground/20 text-xs font-medium">
-            <button
-              onClick={() => setLang("lv")}
-              className={`px-1.5 py-1 transition-colors ${lang === "lv" ? "bg-accent text-accent-foreground" : "text-primary-foreground/70"}`}
-            >
-              LV
-            </button>
-            <button
-              onClick={() => setLang("en")}
-              className={`px-1.5 py-1 transition-colors ${lang === "en" ? "bg-accent text-accent-foreground" : "text-primary-foreground/70"}`}
-            >
-              EN
-            </button>
-          </div>
+          <LanguageSwitcher lang={lang} setLang={setLang} mobile />
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="inline-flex items-center justify-center p-2 text-primary-foreground"
