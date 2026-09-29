@@ -283,15 +283,17 @@ const RequestPage = () => {
                                     €{it.unitPrice.toFixed(2)} / {t("gab.", "pc")}
                                   </span>
                                 ) : null}
-                                <span className="ml-auto shrink-0 text-sm font-bold">€{((it.unitPrice || 0) * it.qty).toFixed(2)}</span>
-                                <button
-                                  type="button"
-                                  aria-label={t("Dzēst", "Remove")}
-                                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                                  onClick={() => remove(it.id)}
-                                >
-                                  <X className="h-4 w-4" />
-                                </button>
+                                <span className="ml-auto flex shrink-0 items-center gap-1.5">
+                                  <span className="text-sm font-bold">€{((it.unitPrice || 0) * it.qty).toFixed(2)}</span>
+                                  <button
+                                    type="button"
+                                    aria-label={t("Dzēst", "Remove")}
+                                    className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                    onClick={() => remove(it.id)}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </button>
+                                </span>
                               </div>
                             ))}
                           </div>
