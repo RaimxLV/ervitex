@@ -21,6 +21,8 @@ export interface PrintLine {
   price: number | null;
   /** "unit" = cena par gabalu, "total" = cena kopā par visu apdruku */
   mode?: "unit" | "total";
+  /** "order" = viena kopēja apdruka visam sarakstam */
+  scope?: "item" | "order";
 }
 
 export interface WorksheetItem extends OfferItem {
@@ -63,15 +65,28 @@ export interface WorksheetVersion {
 
 /** Apdrukas cena par gabalu (tikai rindas ar mode "unit"). */
 export const printTotalPerUnit = (i: WorksheetItem) =>
-  round2((i.prints || []).reduce((s, p) => s + (p.mode === "total" ? 0 : Number(p.price) || 0), 0));
+  round2((i.prints || []).reduce((s, p) => s + (p.scope === "order" || p.mode === "total" ? 0 : Number(p.price) || 0), 0));
 
 /** Apdrukas rindas, kur cena ierakstīta kopā par visu. */
 export const printFixedTotal = (i: WorksheetItem) =>
-  round2((i.prints || []).reduce((s, p) => s + (p.mode === "total" ? Number(p.price) || 0 : 0), 0));
+  round2((i.prints || []).reduce((s, p) => s + (p.scope !== "order" && p.mode === "total" ? Number(p.price) || 0 : 0), 0));
 
 /** Visas apdrukas kopā šai precei, bez PVN. */
 export const printNet = (i: WorksheetItem) =>
   round2(printTotalPerUnit(i) * (Number(i.qty) || 0) + printFixedTotal(i));
+
+/** Kopējās apdrukas izmaksas visam sarakstam, bez PVN. */
+export const orderPrintNet = (items: WorksheetItem[]) => {
+  const qty = items.reduce((s, i) => s + (Number(i.qty) || 0), 0);
+  return round2(items.reduce(
+    (sum, item) => sum + (item.prints || []).reduce((lineSum, print) => {
+      if (print.scope !== "order") return lineSum;
+      const price = Number(print.price) || 0;
+      return lineSum + (print.mode === "total" ? price : price * qty);
+    }, 0),
+    0,
+  ));
+};
 
 export const lineNet = (i: WorksheetItem) =>
   round2((Number(i.unitPrice) || 0) * (Number(i.qty) || 0) + printNet(i));
@@ -108,7 +123,7 @@ export const discountAmount = (net: number, d?: Discount | null) => {
 
 export const worksheetTotals = (items: WorksheetItem[], vatRate = 21, discount?: Discount | null) => {
   const goods = round2(items.reduce((s, i) => s + (Number(i.unitPrice) || 0) * (Number(i.qty) || 0), 0));
-  const print = round2(items.reduce((s, i) => s + printNet(i), 0));
+  const print = round2(items.reduce((s, i) => s + printNet(i), 0) + orderPrintNet(items));
   const subtotal = round2(goods + print);
   const disc = discountAmount(subtotal, discount);
   const net = round2(subtotal - disc);

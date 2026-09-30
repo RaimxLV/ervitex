@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { money } from "@/lib/offer";
 import {
-  PRINT_METHODS, lineNet, printNet, worksheetTotals, BILLING_FIELDS, hasBilling,
+  PRINT_METHODS, lineNet, orderPrintNet, worksheetTotals, BILLING_FIELDS, hasBilling,
   type Billing, type Discount, type PrintLine, type Worksheet, type WorksheetItem, type WorksheetVersion,
 } from "@/lib/worksheet";
 import { CheckCircle2, ChevronDown, Clock3, Copy, DoorOpen, History, Loader2, Mail, Plus, Printer, Repeat, RotateCcw, Store, Trash2, Undo2, X } from "lucide-react";
@@ -119,6 +119,10 @@ const WorksheetPage = () => {
   }, [token]);
 
   const totals = useMemo(() => worksheetTotals(items, sheet?.vat_rate ?? 21, discount), [items, sheet?.vat_rate, discount]);
+  const orderPrints = useMemo(
+    () => items.flatMap((item) => (item.prints || []).map((print, index) => ({ itemId: item.id, index, print })).filter((entry) => entry.print.scope === "order")),
+    [items],
+  );
   const readOnly = !!sheet?.locked || !isStaff;
   const patch = (id: string, changes: Partial<WorksheetItem>) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...changes } : i)));
@@ -133,8 +137,21 @@ const WorksheetPage = () => {
     patch(id, { prints: [...(items.find((i) => i.id === id)?.prints || []), { method: PRINT_METHODS[0], placement: "", price: null }] });
   const removePrint = (id: string, idx: number) =>
     patch(id, { prints: (items.find((i) => i.id === id)?.prints || []).filter((_, n) => n !== idx) });
+  const addOrderPrint = () => {
+    const owner = items[0];
+    if (!owner) return;
+    patch(owner.id, {
+      prints: [...(owner.prints || []), { method: PRINT_METHODS[0], placement: "", price: null, mode: "total", scope: "order" }],
+    });
+  };
   const removeRow = (id: string) => {
-    setItems((prev) => prev.filter((i) => i.id !== id));
+    setItems((prev) => {
+      const removed = prev.find((i) => i.id === id);
+      const remaining = prev.filter((i) => i.id !== id);
+      const sharedPrints = (removed?.prints || []).filter((print) => print.scope === "order");
+      if (!sharedPrints.length || !remaining[0]) return remaining;
+      return remaining.map((item, index) => index === 0 ? { ...item, prints: [...(item.prints || []), ...sharedPrints] } : item);
+    });
     setDirty(true);
     setSaveState("idle");
   };
@@ -350,8 +367,8 @@ const WorksheetPage = () => {
                         <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Krāsa </span><b className="font-medium">{i.colorName || "—"}</b></span>
                         <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Izmērs </span><b className="font-medium">{i.size || "—"}</b></span>
                         <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Daudzums </span><b className="font-medium">{i.qty} gab.</b></span>
-                        {(i.prints || []).length > 0 && (
-                          <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Apdruka </span><b className="font-medium">{(i.prints || []).map((p) => p.method).join(" + ")}</b></span>
+                        {(i.prints || []).some((print) => print.scope !== "order") && (
+                          <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Apdruka </span><b className="font-medium">{(i.prints || []).filter((print) => print.scope !== "order").map((p) => p.method).join(" + ")}</b></span>
                         )}
                       </span>
                     </span>
@@ -414,11 +431,11 @@ const WorksheetPage = () => {
                         )}
                       </div>
 
-                      {(i.prints || []).length === 0 ? (
+                      {(i.prints || []).filter((print) => print.scope !== "order").length === 0 ? (
                         <p className="mt-2 text-xs text-muted-foreground">Bez apdrukas</p>
                       ) : (
                         <div className="mt-2 space-y-2">
-                          {(i.prints || []).map((p, idx) => (
+                          {(i.prints || []).map((p, idx) => p.scope === "order" ? null : (
                             <div key={idx} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_130px_120px_auto]">
                               <select
                                 className="h-10 rounded-md border border-input bg-background px-3 text-sm"
@@ -475,9 +492,70 @@ const WorksheetPage = () => {
             })}
           </div>
 
+          <section className="mt-6 border-t border-border pt-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="flex items-center gap-2 font-heading text-sm font-black uppercase tracking-wide">
+                  <Printer className="h-4 w-4 text-accent" /> Kopējās apdrukas izmaksas
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">Apdruka, izšūšana vai cita personalizācija visam preču sarakstam.</p>
+              </div>
+              {!readOnly && (
+                <Button size="sm" variant="outline" onClick={addOrderPrint} disabled={items.length === 0}>
+                  <Plus className="mr-1.5 h-3.5 w-3.5" /> Pievienot apdrukas cenu
+                </Button>
+              )}
+            </div>
+
+            {orderPrints.length === 0 ? (
+              <div className="mt-3 border border-dashed border-border bg-muted/20 px-4 py-5 text-center text-sm text-muted-foreground">
+                Apdrukas izmaksas nav pievienotas.
+              </div>
+            ) : (
+              <div className="mt-3 divide-y divide-border border border-border bg-background">
+                {orderPrints.map(({ itemId, index, print }, rowIndex) => (
+                  <div key={`${itemId}-${index}`} className="grid grid-cols-1 gap-3 p-3 sm:grid-cols-[minmax(150px,1fr)_minmax(150px,1fr)_130px_130px_auto] sm:items-end">
+                    <label>
+                      <span className="mb-1 block text-xs font-medium text-muted-foreground">Veids</span>
+                      <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={print.method} disabled={readOnly} onChange={(e) => patchPrint(itemId, index, { method: e.target.value })}>
+                        {PRINT_METHODS.map((method) => <option key={method} value={method}>{method}</option>)}
+                      </select>
+                    </label>
+                    <label>
+                      <span className="mb-1 block text-xs font-medium text-muted-foreground">Apdrukas vieta</span>
+                      <Input placeholder="Piem., priekšpuse" value={print.placement || ""} disabled={readOnly} onChange={(e) => patchPrint(itemId, index, { placement: e.target.value })} />
+                    </label>
+                    <label>
+                      <span className="mb-1 block text-xs font-medium text-muted-foreground">Aprēķins</span>
+                      <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={print.mode === "unit" ? "unit" : "total"} disabled={readOnly} onChange={(e) => patchPrint(itemId, index, { mode: e.target.value === "unit" ? "unit" : "total" })}>
+                        <option value="total">€ kopā</option>
+                        <option value="unit">€ par gabalu</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span className="mb-1 block text-xs font-medium text-muted-foreground">Cena bez PVN</span>
+                      <Input inputMode="decimal" placeholder="0,00" value={print.price ?? ""} disabled={readOnly} onChange={(e) => patchPrint(itemId, index, { price: e.target.value === "" ? null : num(e.target.value) })} />
+                    </label>
+                    {!readOnly && (
+                      <Button size="icon" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={() => removePrint(itemId, index)} aria-label={`Noņemt apdrukas rindu ${rowIndex + 1}`}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <div className="flex justify-between gap-4 bg-muted/30 px-3 py-3 text-sm font-semibold">
+                  <span>Apdruka kopā bez PVN</span>
+                  <span className="tabular-nums">{money(orderPrintNet(items))}</span>
+                </div>
+              </div>
+            )}
+          </section>
+
           {/* Kopsummas */}
-          <div className="mt-6 flex justify-end border-t border-border pt-5">
-            <dl className="w-full space-y-1.5 text-sm sm:max-w-sm">
+          <section className="mt-6 border-t border-border pt-5">
+            <div className="ml-auto w-full border border-border bg-muted/20 p-4 sm:max-w-md">
+              <h2 className="mb-3 font-heading text-sm font-black uppercase tracking-wide">Kopsavilkums</h2>
+              <dl className="space-y-2 text-sm">
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Gabali kopā</dt><dd className="tabular-nums">{totals.qty}</dd></div>
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Preces bez PVN</dt><dd className="tabular-nums">{money(totals.goods)}</dd></div>
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Apdruka bez PVN</dt><dd className="tabular-nums">{money(totals.print)}</dd></div>
@@ -493,8 +571,9 @@ const WorksheetPage = () => {
                 <dt className="font-heading text-sm font-black uppercase tracking-wide">Kopā ar PVN</dt>
                 <dd className="font-heading font-black tabular-nums text-accent">{money(totals.gross)}</dd>
               </div>
-            </dl>
-          </div>
+              </dl>
+            </div>
+          </section>
 
           {isStaff && hasBilling(billing) && (
             <section className="mt-6 border-t border-border pt-5">

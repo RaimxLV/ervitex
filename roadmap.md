@@ -73,6 +73,7 @@
 - [x] Summas bez PVN un ar PVN pārrēķinās uzreiz.
 - [x] E-pastos paliek viena treknraksta bordo saite uz individuālo preču sarakstu.
 - [x] Adminā: "Preču saraksts" un "Kopēt saraksta saiti".
+- [x] Kopējās apdrukas izmaksas ir atsevišķā, vienmēr redzamā blokā zem precēm; prece nav jāatver.
 
 ## Vienotā klienta–preču saraksta plūsma
 - [x] Pilns esošās klienta, e-pasta, kopīgā saraksta un admina plūsmas audits.
