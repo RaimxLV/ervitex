@@ -1062,6 +1062,11 @@ const CatalogItemDialog = ({
     [displayDetail, activeColor]
   );
 
+  // Noliktavas atzīme attiecas uz konkrēto krāsu; vecās modeļa atzīmes arī skaitās.
+  const inStock =
+    (!!currentColor && stockFlags.has(stockKey(source, id, currentColor.code))) ||
+    stockFlags.has(stockKey(source, id));
+
   const gallery = useMemo(() => {
     if (!currentColor) return image ? [image] : [];
     if (currentColor.images.length) return currentColor.images;
