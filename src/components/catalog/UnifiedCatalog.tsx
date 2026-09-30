@@ -1321,11 +1321,9 @@ interface CardProps {
   variantPrices: Map<string, { price: number; max: number; currency: string }>;
   fromLabel?: string;
   priority?: boolean;
-  inStock?: boolean;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, fromLabel, priority, inStock }: CardProps) => {
-  const { isAdmin } = useAuth();
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, fromLabel, priority }: CardProps) => {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   // Filter-driven initial match
