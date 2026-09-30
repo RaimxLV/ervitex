@@ -40,7 +40,7 @@ const WorksheetPage = () => {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isStaff = isAdmin || searchParams.get("v") === "pm";
+  const isStaff = isAdmin;
   const publicUrl = `https://raimxlv.github.io/ervitex/saraksts/${token}`;
 
   const copyEmailLink = async () => {
@@ -123,7 +123,7 @@ const WorksheetPage = () => {
     () => items.flatMap((item) => (item.prints || []).map((print, index) => ({ itemId: item.id, index, print })).filter((entry) => entry.print.scope === "order")),
     [items],
   );
-  const readOnly = !!sheet?.locked || !isStaff;
+  const readOnly = !!sheet?.locked || !isAdmin;
   const patch = (id: string, changes: Partial<WorksheetItem>) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...changes } : i)));
     setDirty(true);
@@ -299,7 +299,7 @@ const WorksheetPage = () => {
             <img src={logo} alt="Ervitex" className="h-7 w-auto" />
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
-                <h1 className="font-heading text-xl font-black uppercase leading-tight sm:text-3xl">Preču saraksts</h1>
+                <h1 className="font-heading text-xl font-black uppercase leading-tight sm:text-3xl">{isStaff ? "Preču saraksts" : "Jūsu preces"}</h1>
                 <p className="mt-1.5 break-words text-sm text-muted-foreground">
                   {[sheet.company, sheet.name, sheet.email, sheet.phone].filter(Boolean).join(" · ")}
                 </p>
@@ -492,7 +492,7 @@ const WorksheetPage = () => {
             })}
           </div>
 
-          <section className="mt-6 border-t border-border pt-5">
+          {(!readOnly || orderPrints.length > 0) && (<section className="mt-6 border-t border-border pt-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="flex items-center gap-2 font-heading text-sm font-black uppercase tracking-wide">
@@ -549,7 +549,7 @@ const WorksheetPage = () => {
                 </div>
               </div>
             )}
-          </section>
+          </section>)}
 
           {/* Kopsummas */}
           <section className="mt-6 border-t border-border pt-5">
@@ -558,7 +558,7 @@ const WorksheetPage = () => {
               <dl className="space-y-2 text-sm">
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Gabali kopā</dt><dd className="tabular-nums">{totals.qty}</dd></div>
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Preces bez PVN</dt><dd className="tabular-nums">{money(totals.goods)}</dd></div>
-              <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Apdruka bez PVN</dt><dd className="tabular-nums">{money(totals.print)}</dd></div>
+              {totals.print > 0 && <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Apdruka bez PVN</dt><dd className="tabular-nums">{money(totals.print)}</dd></div>}
               {(isAdmin && !sheet.locked) ? (
                 <div className="flex items-center justify-between gap-4 pt-1 print:hidden"><dt className="text-muted-foreground">Atlaide</dt><dd><DiscountField value={discount} onChange={setDiscount} onCommit={commitDiscount} /></dd></div>
               ) : null}
@@ -586,7 +586,7 @@ const WorksheetPage = () => {
             </section>
           )}
 
-          {isStaff && versions.length > 0 && (
+          {false && isStaff && versions.length > 0 && (
             <section className="mt-6 border-t border-border pt-5 print:hidden">
               <h2 className="flex items-center gap-2 font-heading text-sm font-black uppercase tracking-wide">
                 <History className="h-4 w-4 text-accent" /> Versiju vēsture
