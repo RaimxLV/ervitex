@@ -188,13 +188,13 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-    reduceMotion.addEventListener("change", requestDraw);
+    reduceMotion.addEventListener("change", onScroll);
 
     return () => {
       disposed = true;
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
-      reduceMotion.removeEventListener("change", requestDraw);
+      reduceMotion.removeEventListener("change", onScroll);
       visibilityObserver.disconnect();
       if (frame !== null) cancelAnimationFrame(frame);
       gl.deleteProgram(program);
