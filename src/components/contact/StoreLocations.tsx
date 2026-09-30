@@ -131,7 +131,7 @@ const StoreLocations = () => {
             </p>
           </motion.div>
 
-          <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {stores.map((store, i) => (
               <motion.div
                 key={store.email}
@@ -139,9 +139,9 @@ const StoreLocations = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="group flex flex-col overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5"
+                className="group flex flex-row overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 sm:flex-col"
               >
-                <div className="aspect-[4/3] overflow-hidden bg-muted">
+                <div className="w-[40%] shrink-0 overflow-hidden bg-muted sm:aspect-[4/3] sm:w-full">
                   <img
                     src={store.image}
                     alt={`${store.name} T-Bode veikals`}
