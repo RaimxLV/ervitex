@@ -1268,12 +1268,14 @@ export type Database = {
       }
       pm_offers: {
         Row: {
+          client_billing: Json | null
           client_company: string | null
           client_email: string | null
           client_name: string
           client_phone: string | null
           created_at: string
           created_by: string | null
+          discount: Json | null
           id: string
           items: Json
           note: string | null
@@ -1287,12 +1289,14 @@ export type Database = {
           vat_rate: number
         }
         Insert: {
+          client_billing?: Json | null
           client_company?: string | null
           client_email?: string | null
           client_name?: string
           client_phone?: string | null
           created_at?: string
           created_by?: string | null
+          discount?: Json | null
           id?: string
           items?: Json
           note?: string | null
@@ -1306,12 +1310,14 @@ export type Database = {
           vat_rate?: number
         }
         Update: {
+          client_billing?: Json | null
           client_company?: string | null
           client_email?: string | null
           client_name?: string
           client_phone?: string | null
           created_at?: string
           created_by?: string | null
+          discount?: Json | null
           id?: string
           items?: Json
           note?: string | null
@@ -1582,6 +1588,7 @@ export type Database = {
           assigned_pm_email: string | null
           assigned_pm_name: string | null
           assigned_pm_slug: string | null
+          billing: Json | null
           company: string | null
           completed_at: string | null
           created_at: string
@@ -1604,6 +1611,7 @@ export type Database = {
           worksheet_client_draft_at: string | null
           worksheet_client_draft_by: string | null
           worksheet_client_draft_revision: number | null
+          worksheet_discount: Json | null
           worksheet_items: Json
           worksheet_locked: boolean
           worksheet_revision: number
@@ -1621,6 +1629,7 @@ export type Database = {
           assigned_pm_email?: string | null
           assigned_pm_name?: string | null
           assigned_pm_slug?: string | null
+          billing?: Json | null
           company?: string | null
           completed_at?: string | null
           created_at?: string
@@ -1643,6 +1652,7 @@ export type Database = {
           worksheet_client_draft_at?: string | null
           worksheet_client_draft_by?: string | null
           worksheet_client_draft_revision?: number | null
+          worksheet_discount?: Json | null
           worksheet_items?: Json
           worksheet_locked?: boolean
           worksheet_revision?: number
@@ -1660,6 +1670,7 @@ export type Database = {
           assigned_pm_email?: string | null
           assigned_pm_name?: string | null
           assigned_pm_slug?: string | null
+          billing?: Json | null
           company?: string | null
           completed_at?: string | null
           created_at?: string
@@ -1682,6 +1693,7 @@ export type Database = {
           worksheet_client_draft_at?: string | null
           worksheet_client_draft_by?: string | null
           worksheet_client_draft_revision?: number | null
+          worksheet_discount?: Json | null
           worksheet_items?: Json
           worksheet_locked?: boolean
           worksheet_revision?: number
@@ -2296,6 +2308,27 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_flags: {
+        Row: {
+          item_id: string
+          source: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          item_id: string
+          source: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          item_id?: string
+          source?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -2691,9 +2724,11 @@ export type Database = {
       get_pm_offer: {
         Args: { _token: string }
         Returns: {
+          client_billing: Json
           client_company: string
           client_name: string
           created_at: string
+          discount: Json
           id: string
           items: Json
           note: string
@@ -2736,6 +2771,13 @@ export type Database = {
           vat_rate: number
           worksheet_updated_at: string
           worksheet_updated_by: string
+        }[]
+      }
+      get_quote_worksheet_extras: {
+        Args: { _token: string }
+        Returns: {
+          billing: Json
+          discount: Json
         }[]
       }
       get_quote_worksheet_versions: {
@@ -2844,6 +2886,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      set_quote_worksheet_discount: {
+        Args: { _discount: Json; _token: string }
+        Returns: boolean
+      }
       ss_fill_missing_variant_prices: { Args: never; Returns: number }
       ss_sku_retail_prices: {
         Args: never
@@ -2865,6 +2911,7 @@ export type Database = {
           total_variants: number
         }[]
       }
+      validate_discount: { Args: { _d: Json }; Returns: undefined }
       validate_worksheet_items: { Args: { _items: Json }; Returns: undefined }
     }
     Enums: {
