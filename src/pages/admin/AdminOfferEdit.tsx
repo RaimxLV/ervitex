@@ -9,7 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { money, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
+import DiscountField from "@/components/quote/DiscountField";
+import { PRINT_METHODS } from "@/lib/worksheet";
+import { money, itemPrintNet, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
 import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
 import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Repeat, Save, Search, Send, Trash2, Plus } from "lucide-react";
 
@@ -249,7 +251,7 @@ const AdminOfferEdit = () => {
   const removeItem = (itemId: string) =>
     setOffer((o) => ({ ...o, items: o.items.filter((i) => i.id !== itemId) }));
 
-  const totals = offerTotals(offer.items, offer.vat_rate);
+  const totals = offerTotals(offer.items, offer.vat_rate, offer.discount);
 
   const save = async (status?: string) => {
     setSaving(true);
@@ -268,6 +270,7 @@ const AdminOfferEdit = () => {
         pm_name: next.pm_name || null,
         pm_email: next.pm_email || null,
         items: next.items as any,
+        discount: next.discount && next.discount.value > 0 ? next.discount : null,
       } as any)
       .eq("id", offer.id);
     setSaving(false);
@@ -329,7 +332,7 @@ const AdminOfferEdit = () => {
     if (mode === "client") await save("sent");
     else await save();
 
-    const t = offerTotals(offer.items, offer.vat_rate);
+    const t = offerTotals(offer.items, offer.vat_rate, offer.discount);
     const pmEmail = (offer.pm_email || user?.email || OFFICE_EMAIL).trim();
     const pmName = offer.pm_name || "";
     const { error } = await supabase.functions.invoke("send-transactional-email", {
@@ -352,8 +355,10 @@ const AdminOfferEdit = () => {
             size: i.size,
             qty: i.qty,
             unitPrice: i.unitPrice ? money(i.unitPrice) : null,
-            lineTotal: i.unitPrice ? money(i.unitPrice * i.qty) : "",
+            lineTotal: i.unitPrice || itemPrintNet(i) ? money((i.unitPrice || 0) * i.qty + itemPrintNet(i)) : "",
+            prints: (i.prints || []).filter((p) => Number(p.price) > 0).map((p) => `${p.method}${p.placement ? ` (${p.placement})` : ""}: ${money(Number(p.price))}${p.mode === "total" ? " kopā" : " / gab."}`),
           })),
+          discount: t.discount > 0 ? `−${money(t.discount)}${offer.discount?.type === "percent" ? ` (${offer.discount.value}%)` : ""}` : "",
           totalQty: t.qty,
           net: money(t.net),
           vat: money(t.vat),
@@ -613,9 +618,9 @@ const AdminOfferEdit = () => {
                       className="h-8 px-2 text-[13px]"
                     />
                     <div className="text-right leading-tight">
-                      <p className="text-[13px] font-medium text-foreground">{money((i.unitPrice || 0) * i.qty)}</p>
+                      <p className="text-[13px] font-medium text-foreground">{money((i.unitPrice || 0) * i.qty + itemPrintNet(i))}</p>
                       <p className="text-[10px] text-muted-foreground">
-                        {money((i.unitPrice || 0) * i.qty * (1 + offer.vat_rate / 100))} ar PVN
+                        {money(((i.unitPrice || 0) * i.qty + itemPrintNet(i)) * (1 + offer.vat_rate / 100))} ar PVN
                       </p>
                     </div>
                     <button
@@ -626,6 +631,35 @@ const AdminOfferEdit = () => {
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
+                    <div className="space-y-1.5 sm:col-span-5 sm:pl-11">
+                      {(i.prints || []).map((p, n) => {
+                        const setP = (c: Partial<NonNullable<OfferItem["prints"]>[number]>) =>
+                          patchItem(i.id, { prints: (i.prints || []).map((x, k) => (k === n ? { ...x, ...c } : x)) });
+                        return (
+                          <div key={n} className="flex flex-wrap items-center gap-1.5">
+                            <select value={p.method} onChange={(e) => setP({ method: e.target.value })} className="h-8 rounded-sm border border-input bg-background px-2 text-[13px]">
+                              {PRINT_METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
+                            </select>
+                            <Input value={p.placement || ""} placeholder="Vieta" onChange={(e) => setP({ placement: e.target.value })} className="h-8 w-32 px-2 text-[13px]" />
+                            <Input type="number" step="0.01" min={0} value={p.price ?? ""} placeholder="€ bez PVN" onChange={(e) => setP({ price: e.target.value === "" ? null : Number(e.target.value) })} className="h-8 w-24 px-2 text-[13px]" />
+                            <select value={p.mode || "unit"} onChange={(e) => setP({ mode: e.target.value as "unit" | "total" })} className="h-8 rounded-sm border border-input bg-background px-2 text-[13px]">
+                              <option value="unit">/ gab.</option>
+                              <option value="total">kopā</option>
+                            </select>
+                            <button type="button" aria-label="Dzēst apdruku" onClick={() => patchItem(i.id, { prints: (i.prints || []).filter((_, k) => k !== n) })} className="flex h-7 w-7 items-center justify-center text-muted-foreground hover:text-destructive">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        );
+                      })}
+                      <button
+                        type="button"
+                        onClick={() => patchItem(i.id, { prints: [...(i.prints || []), { method: PRINT_METHODS[0], placement: "", price: null, mode: "unit" }] })}
+                        className="inline-flex items-center gap-1 text-[12px] font-semibold text-accent hover:underline"
+                      >
+                        + Apdruka / izšūšana
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -672,6 +706,10 @@ const AdminOfferEdit = () => {
           <div className="rounded-sm border border-border p-4">
             <h3 className="font-heading text-sm font-black uppercase tracking-widest">Kopsavilkums</h3>
             <dl className="mt-3 space-y-1 text-sm">
+              <div className="flex justify-between"><dt className="text-muted-foreground">Preces</dt><dd>{money(totals.goods)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Apdruka</dt><dd>{money(totals.print)}</dd></div>
+              <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">Atlaide</dt><dd><DiscountField value={offer.discount ?? null} onChange={(d) => setOffer((o) => ({ ...o, discount: d }))} /></dd></div>
+              {totals.discount > 0 && <div className="flex justify-between"><dt className="text-muted-foreground">Atlaides summa</dt><dd className="text-accent">−{money(totals.discount)}</dd></div>}
               <div className="flex justify-between"><dt className="text-muted-foreground">Kopā bez PVN</dt><dd className="font-medium">{money(totals.net)}</dd></div>
               <div className="flex justify-between"><dt className="text-muted-foreground">PVN {offer.vat_rate}%</dt><dd>{money(totals.vat)}</dd></div>
               <div className="flex justify-between border-t border-border pt-1 text-base"><dt className="font-semibold">Kopā ar PVN</dt><dd className="font-black text-accent">{money(totals.gross)}</dd></div>
