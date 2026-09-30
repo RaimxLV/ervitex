@@ -24,6 +24,9 @@ import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
 import { StockToggle } from "./StockBadge";
 import { useAuth } from "@/hooks/useAuth";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
+import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
+import { StockToggle } from "./StockBadge";
+import { useAuth } from "@/hooks/useAuth";
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import {
@@ -391,7 +394,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (page > 1) p.set("page", String(page));
     lastWrittenSearch.current = p.toString();
     setSearchParams(p, { replace: true });
-  }, [q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags, sort, page, stockOnly, setSearchParams]);
+  }, [q, sources, brands, categories, groups, genders, colors, sort, page, stockOnly, setSearchParams]);
 
   // External URL changes (e.g. clicking another mega menu category while the
   // catalog is already mounted) must reset the filters to the incoming params.
@@ -1066,7 +1069,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   );
 
   const totalSelectedFilters =
-    sources.size + brands.size + categories.size + groups.size + genders.size + colors.size;
+    sources.size + brands.size + categories.size + groups.size + genders.size + colors.size + (stockOnly ? 1 : 0);
 
 
   return (
@@ -1161,6 +1164,21 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           </div>
 
           <div className="min-w-0 flex-1">
+            {stockFlags.size > 0 && (
+              <div className="mb-3 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => { setStockOnly((v) => !v); setPage(1); }}
+                  aria-pressed={stockOnly}
+                  className={`inline-flex h-9 items-center gap-2 border px-3 font-heading text-xs font-bold uppercase tracking-wider transition-colors ${
+                    stockOnly ? "border-success bg-success text-success-foreground" : "border-border bg-card text-foreground hover:border-success"
+                  }`}
+                >
+                  <span className={`h-2.5 w-2.5 rounded-full ${stockOnly ? "bg-success-foreground" : "bg-success"}`} />
+                  {lang === "lv" ? "Tikai noliktavā" : "In stock only"} ({stockFlags.size})
+                </button>
+              </div>
+            )}
             {!loaded ? (
               <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                 {Array.from({ length: 12 }).map((_, i) => (
@@ -1196,6 +1214,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                   {paginated.map((it, idx) => (
                     <CatalogCard
+                      inStock={stockFlags.has(stockKey(it.source, it.id))}
                       key={`${it.source}-${it.id}`}
                       item={it}
                       priority={idx < 8}
@@ -1306,9 +1325,11 @@ interface CardProps {
   variantPrices: Map<string, { price: number; max: number; currency: string }>;
   fromLabel?: string;
   priority?: boolean;
+  inStock?: boolean;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, fromLabel, priority }: CardProps) => {
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, fromLabel, priority, inStock }: CardProps) => {
+  const { isAdmin } = useAuth();
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   // Filter-driven initial match
@@ -1376,6 +1397,9 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       swatches={swatches}
       extraSwatches={extra}
       noImageLabel={noImageLabel}
+      inStock={inStock}
+      lang={lang}
+      topRight={isAdmin ? <StockToggle source={item.source} id={item.id} on={!!inStock} /> : undefined}
       price={
         effectivePrice ? (
           <div className="flex flex-col leading-tight">
