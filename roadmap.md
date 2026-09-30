@@ -36,6 +36,7 @@
 - [x] Salabot kataloga tiešo atvēršanu un paātrināt mega izvēlni ar plūstošu animāciju.
 
 ### P0
+- [x] Pārrēķināt NWG cenas pēc zīmola atlaides: Clique −63%, Craft −50%, ProJob −40%, Cutter & Buck −40%; pēc tam ×1,75.
 - [x] Salabot PF Concept cenu sinhronizāciju.
 - [ ] Pilnībā atjaunot NWG līgumcenas ar klienta lietotājvārdu/paroli un pārbaudīt katru aktīvo SKU.
 - [x] Rādīt katra piegādātāja cenu pārklājumu un novērst NWG noraidīto SKU bezgalīgu atkārtošanu.
