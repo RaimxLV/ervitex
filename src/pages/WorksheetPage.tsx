@@ -14,6 +14,7 @@ import logo from "@/assets/ervitex-logo-2.svg";
 import { useAuth } from "@/hooks/useAuth";
 import { startWorksheetPick } from "@/lib/worksheetPick";
 import RowVariantControls from "@/components/worksheet/RowVariantControls";
+import { DecimalInput } from "@/components/ui/decimal-input";
 import DiscountField from "@/components/quote/DiscountField";
 
 const num = (v: string) => {
@@ -402,7 +403,7 @@ const WorksheetPage = () => {
                       </label>
                       <label className="block">
                         <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Prece €/gab. bez PVN</span>
-                        <Input inputMode="decimal" value={i.unitPrice ?? ""} disabled={readOnly} onChange={(e) => patch(i.id, { unitPrice: e.target.value === "" ? null : num(e.target.value) })} />
+                        <DecimalInput value={i.unitPrice} disabled={readOnly} onValueChange={(v) => patch(i.id, { unitPrice: v })} />
                       </label>
                       <div className="flex items-end justify-between gap-2 sm:justify-end">
                         <div className="text-right">
@@ -460,12 +461,11 @@ const WorksheetPage = () => {
                                 <option value="unit">€ par gabalu</option>
                                 <option value="total">€ kopā</option>
                               </select>
-                              <Input
-                                inputMode="decimal"
+                              <DecimalInput
                                 placeholder={p.mode === "total" ? "€ kopā" : "€/gab."}
-                                value={p.price ?? ""}
+                                value={p.price}
                                 disabled={readOnly}
-                                onChange={(e) => patchPrint(i.id, idx, { price: e.target.value === "" ? null : num(e.target.value) })}
+                                onValueChange={(v) => patchPrint(i.id, idx, { price: v })}
                               />
                               {!readOnly && (
                                 <Button size="icon" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={() => removePrint(i.id, idx)} aria-label="Noņemt apdruku">
@@ -534,7 +534,7 @@ const WorksheetPage = () => {
                     </label>
                     <label>
                       <span className="mb-1 block text-xs font-medium text-muted-foreground">Cena bez PVN</span>
-                      <Input inputMode="decimal" placeholder="0,00" value={print.price ?? ""} disabled={readOnly} onChange={(e) => patchPrint(itemId, index, { price: e.target.value === "" ? null : num(e.target.value) })} />
+                      <DecimalInput placeholder="0,00" value={print.price} disabled={readOnly} onValueChange={(v) => patchPrint(itemId, index, { price: v })} />
                     </label>
                     {!readOnly && (
                       <Button size="icon" variant="ghost" className="text-muted-foreground hover:text-destructive" onClick={() => removePrint(itemId, index)} aria-label={`Noņemt apdrukas rindu ${rowIndex + 1}`}>

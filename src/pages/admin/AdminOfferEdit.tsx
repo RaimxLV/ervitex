@@ -1,3 +1,4 @@
+import { DecimalInput } from "@/components/ui/decimal-input";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -610,11 +611,10 @@ const AdminOfferEdit = () => {
                       </button>
                     </div>
                     <Input type="number" min={1} value={i.qty} onChange={(e) => patchItem(i.id, { qty: Math.max(1, Number(e.target.value) || 1) })} className="h-8 px-2 text-center text-[13px]" />
-                    <Input
-                      type="number" step="0.01" min={0}
-                      value={i.unitPrice ?? ""}
+                    <DecimalInput
+                      value={i.unitPrice}
                       placeholder="cena"
-                      onChange={(e) => patchItem(i.id, { unitPrice: e.target.value === "" ? null : Number(e.target.value) })}
+                      onValueChange={(v) => patchItem(i.id, { unitPrice: v })}
                       className="h-8 px-2 text-[13px]"
                     />
                     <div className="text-right leading-tight">
@@ -641,7 +641,7 @@ const AdminOfferEdit = () => {
                               {PRINT_METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
                             </select>
                             <Input value={p.placement || ""} placeholder="Vieta" onChange={(e) => setP({ placement: e.target.value })} className="h-8 w-32 px-2 text-[13px]" />
-                            <Input type="number" step="0.01" min={0} value={p.price ?? ""} placeholder="€ bez PVN" onChange={(e) => setP({ price: e.target.value === "" ? null : Number(e.target.value) })} className="h-8 w-24 px-2 text-[13px]" />
+                            <DecimalInput value={p.price} placeholder="€ bez PVN" onValueChange={(v) => setP({ price: v })} className="h-8 w-24 px-2 text-[13px]" />
                             <select value={p.mode || "unit"} onChange={(e) => setP({ mode: e.target.value as "unit" | "total" })} className="h-8 rounded-sm border border-input bg-background px-2 text-[13px]">
                               <option value="unit">/ gab.</option>
                               <option value="total">kopā</option>

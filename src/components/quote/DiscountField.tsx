@@ -1,3 +1,4 @@
+import { DecimalInput } from "@/components/ui/decimal-input";
 import { Input } from "@/components/ui/input";
 import type { Discount } from "@/lib/worksheet";
 
@@ -17,18 +18,9 @@ const DiscountField = ({ value, onChange, onCommit, disabled }: Props) => {
   };
   return (
     <div className="flex items-center gap-2">
-      <Input
-        type="number"
-        min={0}
-        step="0.01"
-        inputMode="decimal"
-        disabled={disabled}
-        value={value?.value ? String(value.value) : ""}
+      <DecimalInput disabled={disabled} value={value?.value || null}
         placeholder="0"
-        onChange={(e) => {
-          const n = Number(e.target.value.replace(",", "."));
-          set({ type, value: n > 0 ? n : 0 });
-        }}
+        onValueChange={(n) => set({ type, value: n && n > 0 ? n : 0 })}
         onBlur={() => onCommit?.(value)}
         className="h-9 w-24 text-right tabular-nums"
         aria-label="Atlaide"
