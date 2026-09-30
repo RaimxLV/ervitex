@@ -22,6 +22,7 @@
 - [x] Saskaņot visu kataloga kartīšu cenu ar uzreiz atvērtās krāsas cenu un saglabāt krāsas izvēli saitē.
 
 ## Vizuālie uzlabojumi
+- [x] Padarīt sākumlapas ritināšanu plūdenu un optimizēt hero dziļuma efektu tikai ritināšanai.
 - [x] Aizstāt LV/EN tekstu ar vienu glancētu apaļu karodziņu; datorā otru valodu rādīt vertikāli hover stāvoklī.
 - [x] Aizvietot DTF galerijas dubulto attēlu ar jauno optimizēto foto.
 - [x] Pārbūvēt tehnoloģiju galerijas modernākā, nepārtrauktā struktūrā bez tukšas pēdējās lapas.

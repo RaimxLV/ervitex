@@ -7,13 +7,13 @@ import Lenis from "lenis";
  * data lists (catalog, admin, worksheet) keep native scrolling so they stay
  * responsive, and touch devices always use native gestures.
  */
-const SMOOTH_ROUTES = ["/", "/about", "/tehnologijas"];
+const SMOOTH_ROUTES = ["/about", "/tehnologijas"];
 
 const SmoothScroll = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const enabled = SMOOTH_ROUTES.some((r) => (r === "/" ? pathname === "/" : pathname.startsWith(r)));
+    const enabled = SMOOTH_ROUTES.some((route) => pathname.startsWith(route));
     if (!enabled) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;

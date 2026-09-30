@@ -18,7 +18,7 @@ const fragmentShader = `
   uniform sampler2D u_depth;
   uniform vec2 u_resolution;
   uniform vec2 u_imageSize;
-  uniform vec2 u_shift;
+  uniform float u_shift;
 
   void main() {
     vec2 uv = v_uv;
@@ -33,11 +33,9 @@ const fragmentShader = `
       uv.x = uv.x * scale + (1.0 - scale) * 0.5;
     }
 
-    vec2 displaced = uv;
-    for (int i = 0; i < 8; i++) {
-      float d = texture2D(u_depth, displaced).r - 0.45;
-      displaced = clamp(uv + u_shift * d, 0.002, 0.998);
-    }
+    float depth = texture2D(u_depth, uv).r;
+    float depthOffset = (depth - 0.5) * u_shift;
+    vec2 displaced = clamp(uv + vec2(depthOffset * 0.18, depthOffset), 0.015, 0.985);
     vec3 color = texture2D(u_image, displaced).rgb;
     gl_FragColor = vec4(color, 1.0);
 
@@ -64,8 +62,8 @@ const loadImage = (src: string) =>
     image.src = src;
   });
 
-const EASING = 0.08;
-const SETTLED = 0.00006;
+const EASING = 0.14;
+const SETTLED = 0.00008;
 
 const HeroDepthScene = ({ className = "" }: { className?: string }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -104,11 +102,9 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
     let disposed = false;
     let frame: number | null = null;
     let ready = false;
-    let currentX = 0;
-    let currentY = 0;
-    let pointerX = 0;
-    let pointerY = 0;
-    let scrollY = 0;
+    let currentShift = 0;
+    let targetShift = 0;
+    let isVisible = true;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const addTexture = (image: HTMLImageElement, unit: number, uniform: string) => {
@@ -125,7 +121,7 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
     };
 
     const resize = () => {
-      const ratio = Math.min(window.devicePixelRatio, 1.75);
+      const ratio = Math.min(window.devicePixelRatio, 1.25);
       const width = Math.round(canvas.clientWidth * ratio);
       const height = Math.round(canvas.clientHeight * ratio);
       if (canvas.width !== width || canvas.height !== height) {
@@ -137,25 +133,17 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
 
     const draw = () => {
       frame = null;
-      if (!ready || disposed) return;
+      if (!ready || disposed || !isVisible) return;
       resize();
-      const targetX = reduceMotion.matches ? 0 : pointerX * 0.028;
-      const targetY = reduceMotion.matches ? 0 : pointerY * 0.022 + scrollY * 0.07;
-
-      currentX += (targetX - currentX) * EASING;
-      currentY += (targetY - currentY) * EASING;
+      currentShift += (targetShift - currentShift) * EASING;
       gl.uniform2f(uResolution, canvas.width, canvas.height);
-      gl.uniform2f(uShift, currentX, currentY);
+      gl.uniform1f(uShift, currentShift);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-      if (
-        Math.abs(targetX - currentX) > SETTLED ||
-        Math.abs(targetY - currentY) > SETTLED
-      ) {
+      if (Math.abs(targetShift - currentShift) > SETTLED) {
         frame = requestAnimationFrame(draw);
       } else {
-        currentX = targetX;
-        currentY = targetY;
+        currentShift = targetShift;
       }
     };
 
@@ -163,25 +151,23 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
       if (frame === null) frame = requestAnimationFrame(draw);
     };
 
-    const onPointer = (event: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      pointerX = ((event.clientX - rect.left) / Math.max(1, rect.width) - 0.5) * 2;
-      pointerY = ((event.clientY - rect.top) / Math.max(1, rect.height) - 0.5) * 2;
-      requestDraw();
-    };
-
-    const onLeave = () => {
-      pointerX = 0;
-      pointerY = 0;
-      requestDraw();
-    };
-
     const onScroll = () => {
       const rect = canvas.getBoundingClientRect();
-      const travel = Math.max(1, rect.height);
-      scrollY = Math.min(1, Math.max(0, -rect.top / travel));
+      const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height)));
+      targetShift = reduceMotion.matches ? 0 : progress * 0.055;
       requestDraw();
     };
+
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible) {
+        onScroll();
+      } else if (frame !== null) {
+        cancelAnimationFrame(frame);
+        frame = null;
+      }
+    }, { rootMargin: "120px 0px" });
+    visibilityObserver.observe(canvas);
 
     Promise.all([loadImage(heroImage), loadImage(heroDepth)])
       .then(([image, depth]) => {
@@ -195,25 +181,21 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
         );
         ready = true;
         onScroll();
-        draw();
         canvas.style.opacity = "1";
         requestDraw();
       })
       .catch(() => undefined);
 
-    window.addEventListener("pointermove", onPointer, { passive: true });
-    window.addEventListener("pointerleave", onLeave);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-    reduceMotion.addEventListener("change", requestDraw);
+    reduceMotion.addEventListener("change", onScroll);
 
     return () => {
       disposed = true;
-      window.removeEventListener("pointermove", onPointer);
-      window.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
-      reduceMotion.removeEventListener("change", requestDraw);
+      reduceMotion.removeEventListener("change", onScroll);
+      visibilityObserver.disconnect();
       if (frame !== null) cancelAnimationFrame(frame);
       gl.deleteProgram(program);
       gl.deleteShader(vertex);
