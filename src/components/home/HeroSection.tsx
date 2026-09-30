@@ -128,8 +128,8 @@ const HeroSection = () => {
           {/* Stats */}
           <div className="mt-10 grid max-w-[23rem] grid-cols-3 gap-4 border-t border-primary-foreground/10 pt-6 sm:mt-14 sm:flex sm:max-w-none sm:gap-10 sm:pt-7">
             {[
-              { value: "20+", label: lang === "lv" ? "Gadi pieredzē" : "Years Experience" },
-              { value: "3000+", label: lang === "lv" ? "Produkti" : "Products" },
+              { value: "28+", label: lang === "lv" ? "Gadi pieredzē" : "Years Experience" },
+              { value: "6000+", label: lang === "lv" ? "Produkti" : "Products" },
               { value: "5", label: lang === "lv" ? "Drukas tehnoloģijas" : "Print Technologies" },
             ].map((stat, i) => (
               <div key={i}>

@@ -63,7 +63,47 @@ const StoreLocations = () => {
           </p>
         </motion.div>
 
+        {/* T-Bode birojs */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-4 flex flex-col gap-4 border border-accent/30 bg-card p-5 transition-all duration-300 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/5 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+              <StoreIcon className="h-4 w-4" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h3 className="font-heading text-sm font-bold uppercase text-foreground">
+                T-Bode {lang === "lv" ? "birojs" : "Office"}
+              </h3>
+              <p className="mt-1 flex items-start gap-2 text-[11px] leading-relaxed text-muted-foreground">
+                <MapPin className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
+                Braslas iela 29, Rīga, LV-1084
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1.5 sm:items-end">
+            <a
+              href="mailto:info@t-bode.lv"
+              className="flex items-center gap-2 text-[11px] text-muted-foreground transition-colors hover:text-accent"
+            >
+              <Mail className="h-3 w-3 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
+              info@t-bode.lv
+            </a>
+            <a
+              href="tel:+37129475227"
+              className="flex items-center gap-2 text-[11px] text-muted-foreground transition-colors hover:text-accent"
+            >
+              <Phone className="h-3 w-3 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
+              {lang === "lv" ? "Tālr." : "Tel."}: +371 29475227
+            </a>
+          </div>
+        </motion.div>
+
         {/* Store cards grid */}
+
         <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
           {stores.map((store, i) => (
             <motion.div

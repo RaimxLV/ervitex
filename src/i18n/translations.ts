@@ -149,7 +149,7 @@ export const translations = {
   "contact.sentDesc": { lv: "Sazināsimies ar jums 24 stundu laikā.", en: "We'll get back to you within 24 hours." },
 
   // Why choose us items
-  "why.experience": { lv: "20+ gadu pieredze", en: "20+ Years of Expertise" },
+  "why.experience": { lv: "28+ gadu pieredze", en: "28+ Years of Expertise" },
   "why.experienceDesc": { lv: "Uzticams tekstila partneris kopš 2003. gada ar dziļu nozares izpratni.", en: "A trusted textile partner since 2003 with deep industry knowledge." },
   "why.turnaround": { lv: "Ātra izpilde", en: "Fast Turnaround" },
   "why.turnaroundDesc": { lv: "Efektīva ražošana un uzticama piegāde visā Eiropā.", en: "Efficient production and reliable delivery across Europe." },
@@ -183,8 +183,8 @@ export const translations = {
   "team.subtitle": { lv: "Iepazīstieties ar profesionāļiem, kas rūpējas par jūsu projektiem", en: "Meet the professionals behind your projects" },
 
   // Contact - Office
-  "contact.officeTitle": { lv: "Biroja informācija", en: "Office Information" },
-  "contact.specialistsTitle": { lv: "Mūsu speciālisti", en: "Our Specialists" },
+  "contact.officeTitle": { lv: "Vairumtirdzniecības birojs", en: "Wholesale Office" },
+  "contact.specialistsTitle": { lv: "Sazinieties ar kādu no mūsu speciālistiem", en: "Get in Touch With One of Our Specialists" },
   "contact.regNr": { lv: "Reģ. Nr.", en: "Reg. No." },
   "contact.accounting": { lv: "Grāmatvedība", en: "Accounting" },
   "contact.officeEmail": { lv: "Biroja e-pasts", en: "Office Email" },
