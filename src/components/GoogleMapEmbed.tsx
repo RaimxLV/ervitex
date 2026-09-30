@@ -24,10 +24,10 @@ const GoogleMapEmbed = ({ className = "h-[320px] sm:h-[420px]" }: { className?: 
       scrollWheelZoom: false,
     });
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", { maxZoom: 19 }).addTo(map);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
     L.control.zoom({ position: "bottomright" }).addTo(map);
     L.control.attribution({ position: "bottomleft", prefix: false })
-      .addAttribution("© OpenStreetMap, © CARTO")
+      .addAttribution("© OpenStreetMap")
       .addTo(map);
 
     const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "0 85% 50%";
