@@ -21,6 +21,7 @@ interface Props {
   email?: string
   phone?: string
   company?: string
+  billing?: string[]
   message?: string
   files?: string[]
   print_method?: string
@@ -57,6 +58,7 @@ const QuoteRequestEmail = ({
   email = '',
   phone = '',
   company = '',
+  billing = [],
   message = '',
   files = [],
   print_method = '',
@@ -91,6 +93,7 @@ const QuoteRequestEmail = ({
               <tr><td style={label}>E-pasts:</td><td style={value}><Link href={`mailto:${email}`}>{email}</Link></td></tr>
               {phone ? <tr><td style={label}>Tālrunis:</td><td style={value}>{phone}</td></tr> : null}
               {company ? <tr><td style={label}>Uzņēmums:</td><td style={value}>{company}</td></tr> : null}
+              {billing.length ? <tr><td style={label}>Rekvizīti:</td><td style={value}>{billing.map((b, i) => <span key={i} style={{ display: 'block' }}>{b}</span>)}</td></tr> : null}
             </tbody>
           </table>
 

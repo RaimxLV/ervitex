@@ -69,6 +69,11 @@ Deno.serve(async (req) => {
       deadline: quote.deadline || "",
       submittedAt: new Date().toLocaleString("lv-LV"),
       worksheetUrl,
+      billing: (() => {
+        const b = (quote.billing || {}) as Record<string, string>;
+        const L: Record<string, string> = { company: "Uzņēmums", regNo: "Reģ. Nr.", vatNo: "PVN Nr.", address: "Juridiskā adrese", delivery: "Piegādes adrese" };
+        return Object.keys(L).filter((k) => b[k]).map((k) => `${L[k]}: ${b[k]}`);
+      })(),
     };
 
     // Klients saņem vēstuli no konkrētās projektu vadītājas (līdz nodošanai — Laura).
