@@ -20,6 +20,9 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
   type FilterSection,
 } from "@/components/catalog/CatalogFiltersSidebar";
+import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
+import { StockToggle } from "./StockBadge";
+import { useAuth } from "@/hooks/useAuth";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
@@ -364,6 +367,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     new Set((searchParams.get("color") || "").split(",").filter(Boolean))
   );
   const [sort, setSort] = useState<string>(searchParams.get("sort") || "newest");
+  const [stockOnly, setStockOnly] = useState(searchParams.get("stock") === "1");
+  const stockFlags = useStockFlags();
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
   // Tracks the query string this component itself wrote, so that navigations
@@ -382,10 +387,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (genders.size) p.set("gender", [...genders].join(","));
     if (colors.size) p.set("color", [...colors].join(","));
     if (sort && sort !== "newest") p.set("sort", sort);
+    if (stockOnly) p.set("stock", "1");
     if (page > 1) p.set("page", String(page));
     lastWrittenSearch.current = p.toString();
     setSearchParams(p, { replace: true });
-  }, [q, sources, brands, categories, groups, genders, colors, sort, page, setSearchParams]);
+  }, [q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags, sort, page, stockOnly, setSearchParams]);
 
   // External URL changes (e.g. clicking another mega menu category while the
   // catalog is already mounted) must reset the filters to the incoming params.
@@ -654,6 +660,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const passesExcept = (it: EnrichedItem, except: string) => {
     if (pq && searchScore(it, pq) === 0) return false;
+    if (stockOnly && !stockFlags.has(stockKey(it.source, it.id))) return false;
     if (except !== "source" && sources.size && !sources.has(it.manufacturer)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
     if (except !== "category" && categories.size && (!it.category || !categories.has(it.category))) return false;
@@ -681,7 +688,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items, q, sources, brands, categories, groups, genders, colors]
+    [items, q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags]
   );
 
   // "Ražotājs" facet — virtual manufacturer taxonomy (see MANUFACTURERS above).
@@ -695,7 +702,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       }))
       .filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
+  }, [items, lang, q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags]);
 
   const sourceBrandItems = useMemo(() => {
     const nested: Record<string, { label: string; value: string; count: number }[]> = {};
@@ -849,7 +856,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       count: counts.get(b.key) || 0,
     })).filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
+  }, [items, lang, q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags]);
 
   const priceOf = useCallback(
     (it: EnrichedItem): number | null => {
@@ -895,7 +902,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     return cmp ? [...base].sort(cmp) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, pq, sources, brands, categories, groups, genders, colors, sort, priceOf, priceRanges, lang]);
+  }, [items, pq, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags, sort, priceOf, priceRanges, lang]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Number.isFinite(page) ? Math.min(Math.max(page, 1), totalPages) : 1;
