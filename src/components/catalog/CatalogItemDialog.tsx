@@ -1337,7 +1337,15 @@ const CatalogItemDialog = ({
                 </div>
               )}
               {canFlagStock && (
-                <div className="absolute right-2 top-2 z-[2]"><StockToggle source={source} id={id} on={inStock} /></div>
+                <div className="absolute right-2 top-2 z-[2]">
+                  <StockToggle
+                    source={source}
+                    id={id}
+                    color={currentColor?.code || null}
+                    colorName={currentColor?.name || null}
+                    on={!!currentColor && stockFlags.has(stockKey(source, id, currentColor.code))}
+                  />
+                </div>
               )}
               {inStock && <StockRibbon lang={lang} />}
             </div>
