@@ -1335,8 +1335,8 @@ const CatalogItemDialog = ({
               {canFlagStock && (
                 <div className="absolute right-2 top-2 z-[2]"><StockToggle source={source} id={id} on={inStock} /></div>
               )}
+              {inStock && <StockRibbon lang={lang} />}
             </div>
-            {inStock && <StockRibbon lang={lang} />}
             {gallery.length > 1 && (
               <div className="grid grid-cols-5 gap-2">
                 {gallery.slice(0, 15).map((u, i) => (
