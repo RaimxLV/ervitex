@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { money } from "@/lib/offer";
 import {
-  PRINT_METHODS, lineNet, orderPrintNet, worksheetTotals, BILLING_FIELDS, hasBilling,
+  PRINT_METHODS, lineNet, printNet, orderPrintNet, worksheetTotals, BILLING_FIELDS, hasBilling,
   type Billing, type Discount, type PrintLine, type Worksheet, type WorksheetItem, type WorksheetVersion,
 } from "@/lib/worksheet";
 import { CheckCircle2, ChevronDown, Clock3, Copy, DoorOpen, History, Loader2, Mail, Plus, Printer, Repeat, RotateCcw, Store, Trash2, Undo2, X } from "lucide-react";
