@@ -159,15 +159,14 @@ const StoreLocations = () => {
                   <div className="space-y-2">
                     <div className="flex items-start gap-2 text-sm leading-snug text-muted-foreground">
                       <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
-                      <span>
-                        {store.street}
-                        <br />
+                      <span className="min-w-0">
+                        <span className="block whitespace-nowrap">{store.street}</span>
                         {store.city} {store.zip}
                       </span>
                     </div>
                     <a
                       href={`mailto:${store.email}`}
-                      className="flex items-center gap-2 break-all text-sm text-muted-foreground transition-colors hover:text-accent"
+                      className="flex items-center gap-2 break-words text-sm text-muted-foreground transition-colors hover:text-accent"
                     >
                       <Mail className="h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
                       {store.email}
