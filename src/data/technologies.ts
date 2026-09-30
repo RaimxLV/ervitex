@@ -182,7 +182,7 @@ export const techs: Tech[] = [
       { lv: "Lielām apdrukas tirāžām", en: "Large print runs" },
     ],
     specs: [
-      { icon: Package, label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "30 gab.", en: "30 pcs" } },
+      { icon: Package, label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "25 gab.", en: "25 pcs" } },
       { icon: Clock, label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "5–8 darba dienas", en: "5–8 business days" } },
       { icon: FileType2, label: { lv: "Pieņemamie faili", en: "Accepted files" }, value: { lv: "AI, EPS, PDF (vektora formātā)", en: "AI, EPS, PDF (vector)" } },
       { icon: Layers, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "līdz 6 krāsām vienā apdrukā", en: "up to 6 colours per print" } },
