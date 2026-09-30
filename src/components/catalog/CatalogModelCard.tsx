@@ -175,10 +175,8 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
               {noImageLabel}
             </div>
           )}
+          {inStock && <StockRibbon lang={lang} />}
         </div>
-
-        {inStock && <StockRibbon lang={lang} />}
-
 
         {(code || brandBadge) && (
           <div className="flex flex-row items-stretch border-t border-border bg-primary text-primary-foreground">
