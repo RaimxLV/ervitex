@@ -7,3 +7,4 @@
 - Catalog cards use the displayed colour's variant-price range and carry that colour into the product view, so the price never changes merely by opening a product.
 - "Ir noliktavā" is a manual admin flag in `stock_flags` (source,item_id), separate from supplier data so syncs never erase it; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.
 - Shared worksheet printing costs use `PrintLine.scope = "order"` inside the existing side-specific item drafts, preserving autosave/version behavior without a second persistence path.
+- Stock mutation controls render only after the authenticated admin role resolves, and every mutation revalidates the live user and role before writing; public users only see the outlined availability label.
