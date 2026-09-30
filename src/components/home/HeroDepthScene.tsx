@@ -33,9 +33,12 @@ const fragmentShader = `
       uv.x = uv.x * scale + (1.0 - scale) * 0.5;
     }
 
+    // Keep an overscan reserve so stronger displacement never exposes or
+    // stretches the image edges.
+    uv = (uv - 0.5) * 0.88 + 0.5;
     float depth = texture2D(u_depth, uv).r;
     float depthOffset = (depth - 0.5) * u_shift;
-    vec2 displaced = clamp(uv + vec2(depthOffset * 0.18, depthOffset), 0.015, 0.985);
+    vec2 displaced = clamp(uv + vec2(depthOffset * 0.16, depthOffset), 0.002, 0.998);
     vec3 color = texture2D(u_image, displaced).rgb;
     gl_FragColor = vec4(color, 1.0);
 
@@ -62,7 +65,7 @@ const loadImage = (src: string) =>
     image.src = src;
   });
 
-const EASING = 0.14;
+const EASING = 0.18;
 const SETTLED = 0.00008;
 
 const HeroDepthScene = ({ className = "" }: { className?: string }) => {
@@ -154,7 +157,7 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
     const onScroll = () => {
       const rect = canvas.getBoundingClientRect();
       const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height)));
-      targetShift = reduceMotion.matches ? 0 : progress * 0.055;
+      targetShift = reduceMotion.matches ? 0 : progress * 0.12;
       requestDraw();
     };
 
