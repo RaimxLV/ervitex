@@ -84,7 +84,10 @@ const StoreLocations = () => {
                 </h3>
                 <p className="mt-1.5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
                   <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/60" strokeWidth={1.5} />
-                  Braslas iela 29, Rīga, LV-1084
+                  <span className="min-w-0">
+                    <span className="block whitespace-nowrap">Braslas iela 29</span>
+                    Rīga, LV-1084
+                  </span>
                 </p>
               </div>
             </div>
