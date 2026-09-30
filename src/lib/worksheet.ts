@@ -76,15 +76,49 @@ export const printNet = (i: WorksheetItem) =>
 export const lineNet = (i: WorksheetItem) =>
   round2((Number(i.unitPrice) || 0) * (Number(i.qty) || 0) + printNet(i));
 
-export const worksheetTotals = (items: WorksheetItem[], vatRate = 21) => {
+export interface Discount {
+  type: "percent" | "amount";
+  value: number;
+}
+
+export interface Billing {
+  company?: string;
+  regNo?: string;
+  vatNo?: string;
+  address?: string;
+  delivery?: string;
+}
+
+export const BILLING_FIELDS: { key: keyof Billing; label: string }[] = [
+  { key: "company", label: "Uzņēmuma nosaukums" },
+  { key: "regNo", label: "Reģ. Nr." },
+  { key: "vatNo", label: "PVN Nr." },
+  { key: "address", label: "Juridiskā adrese" },
+  { key: "delivery", label: "Piegādes adrese" },
+];
+
+export const hasBilling = (b?: Billing | null) => !!b && BILLING_FIELDS.some((f) => (b[f.key] || "").trim());
+
+/** Atlaides summa (bez PVN) no neto summas. */
+export const discountAmount = (net: number, d?: Discount | null) => {
+  if (!d || !(Number(d.value) > 0)) return 0;
+  const v = Number(d.value);
+  return round2(Math.min(net, d.type === "percent" ? (net * Math.min(v, 100)) / 100 : v));
+};
+
+export const worksheetTotals = (items: WorksheetItem[], vatRate = 21, discount?: Discount | null) => {
   const goods = round2(items.reduce((s, i) => s + (Number(i.unitPrice) || 0) * (Number(i.qty) || 0), 0));
   const print = round2(items.reduce((s, i) => s + printNet(i), 0));
-  const net = round2(goods + print);
+  const subtotal = round2(goods + print);
+  const disc = discountAmount(subtotal, discount);
+  const net = round2(subtotal - disc);
   const vat = round2((net * vatRate) / 100);
   return {
     qty: items.reduce((s, i) => s + (Number(i.qty) || 0), 0),
     goods,
     print,
+    subtotal,
+    discount: disc,
     net,
     vat,
     gross: round2(net + vat),
