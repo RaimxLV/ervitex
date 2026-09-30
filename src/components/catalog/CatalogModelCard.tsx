@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
 import { unproxyUrl } from "@/lib/imageProxy";
-import { StockRibbon } from "./StockBadge";
 
 
 const VALID_HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
@@ -86,8 +85,6 @@ export interface CatalogModelCardProps {
   price?: ReactNode;
   footer?: ReactNode;
   noImageLabel: string;
-  /** Mūsu noliktavā — josla bildes apakšā */
-  inStock?: boolean;
   lang?: string;
 }
 
@@ -98,7 +95,7 @@ export interface CatalogModelCardProps {
  */
 const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
   (
-    { onClick, as, href, image, fallbackImage, hoverImage, imageAlt, priority, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, footer, noImageLabel, inStock, lang = "lv" },
+    { onClick, as, href, image, fallbackImage, hoverImage, imageAlt, priority, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, footer, noImageLabel, lang = "lv" },
     ref
   ) => {
     const [copied, setCopied] = useState(false);
@@ -175,7 +172,6 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
               {noImageLabel}
             </div>
           )}
-          {inStock && <StockRibbon lang={lang} />}
         </div>
 
         {(code || brandBadge) && (

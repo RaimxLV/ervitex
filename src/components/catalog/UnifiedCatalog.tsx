@@ -21,7 +21,6 @@ import CatalogFiltersSidebar, {
   type FilterSection,
 } from "@/components/catalog/CatalogFiltersSidebar";
 import { useStockFlags, hasAnyStock } from "@/hooks/useStockFlags";
-import { useAuth } from "@/hooks/useAuth";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
