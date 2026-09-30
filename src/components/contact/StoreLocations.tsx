@@ -26,7 +26,7 @@ const StoreLocations = () => {
         <SectionHeading
           eyebrow="T-Bode"
           title={lang === "lv" ? "T-Bode birojs un veikali" : "T-Bode office and stores"}
-          subtitle={lang === "lv" ? "T-Shirt Store by T-Bode mazumtirdzniecība Rīgā" : "T-Shirt Store by T-Bode retail in Riga"}
+          subtitle={lang === "lv" ? "\n" : "T-Shirt Store by T-Bode retail in Riga"}
         />
 
         {/* Office */}
