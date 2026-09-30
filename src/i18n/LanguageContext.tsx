@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 import { translations, type Language, type TranslationKey } from "./translations";
 
 interface LanguageContextType {
@@ -7,7 +7,9 @@ interface LanguageContextType {
   t: (key: TranslationKey) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | null>(null);
+// Keep one context instance across hot reloads so providers/consumers never mismatch.
+const g = globalThis as unknown as { __ervitexLangCtx?: React.Context<LanguageContextType | null> };
+const LanguageContext = g.__ervitexLangCtx ?? (g.__ervitexLangCtx = createContext<LanguageContextType | null>(null));
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [lang, setLangState] = useState<Language>(() => {
