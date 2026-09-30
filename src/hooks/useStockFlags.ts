@@ -31,6 +31,21 @@ const load = () => {
 export const stockKey = (source: string, id: string) => `${source}:${id}`;
 
 export const toggleStockFlag = async (source: string, id: string) => {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
+    toast.error("Noliktavas atzīmes var mainīt tikai administrators");
+    return;
+  }
+  const { data: role, error: roleError } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id)
+    .eq("role", "admin")
+    .maybeSingle();
+  if (roleError || !role) {
+    toast.error("Noliktavas atzīmes var mainīt tikai administrators");
+    return;
+  }
   const key = stockKey(source, id);
   const on = !cache?.has(key);
   const next = new Set(cache || []);

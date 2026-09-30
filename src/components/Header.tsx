@@ -4,13 +4,14 @@ import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 import latviaFlag from "@/assets/flags/lv-round.svg";
 import unitedKingdomFlag from "@/assets/flags/gb-round.svg";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Phone, Search, Share2, ChevronDown } from "lucide-react";
+import { Menu, X, Phone, Search, Share2, ChevronDown, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { toast } from "sonner";
 import CatalogMegaMenu, { MobileCatalogMenu } from "@/components/CatalogMegaMenu";
 import HeaderSearch from "@/components/HeaderSearch";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { key: "nav.home" as const, path: "/" },
@@ -92,6 +93,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { lang, setLang, t } = useLanguage();
+  const { isAdmin } = useAuth();
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
   const megaRef = useRef<HTMLDivElement>(null);
@@ -227,6 +229,11 @@ const Header = () => {
         </nav>
 
         <div className="hidden items-center gap-3 xl:flex">
+          {isAdmin && (
+            <Button asChild variant="outline" size="sm" className="h-8 border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground">
+              <Link to="/admin"><ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> Admin</Link>
+            </Button>
+          )}
           {/* Search — atveras kā atsevišķa josla zem galvenes, pogas nesedzas */}
           <button
             onClick={() => setSearchOpen((v) => !v)}
@@ -348,6 +355,11 @@ const Header = () => {
         <div className="max-h-[calc(100svh-4rem)] overflow-y-auto overscroll-contain border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 xl:hidden md:max-h-[calc(100svh-5rem)]">
           <HeaderSearch inline className="mb-4" inputClassName="h-10" onDone={() => setIsOpen(false)} />
           <nav>
+            {isAdmin && (
+              <Button asChild variant="outline" className="mb-4 w-full border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground">
+                <Link to="/admin" onClick={() => setIsOpen(false)}><ShieldCheck className="mr-2 h-4 w-4" /> Admin režīms</Link>
+              </Button>
+            )}
             <div className="grid grid-cols-2 border-y border-primary-foreground/10 sm:grid-cols-4">
               {navItems.filter((item) => item.path !== "/catalog").map((item) => (
                 <Link
