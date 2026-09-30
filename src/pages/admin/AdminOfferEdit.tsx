@@ -612,7 +612,7 @@ const AdminOfferEdit = () => {
                     </div>
                     <Input type="number" min={1} value={i.qty} onChange={(e) => patchItem(i.id, { qty: Math.max(1, Number(e.target.value) || 1) })} className="h-8 px-2 text-center text-[13px]" />
                     <DecimalInput
-                      value={i.unitPrice ?? ""}
+                      value={i.unitPrice}
                       placeholder="cena"
                       onValueChange={(v) => patchItem(i.id, { unitPrice: v })}
                       className="h-8 px-2 text-[13px]"
