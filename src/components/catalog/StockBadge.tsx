@@ -10,17 +10,31 @@ export const StockRibbon = ({ lang }: { lang: string }) => (
   </div>
 );
 
-/** Admina slēdzis: viens klikšķis ieslēdz/izslēdz. */
-export const StockToggle = ({ source, id, on }: { source: string; id: string; on: boolean }) => {
+/** Admina slēdzis konkrētai krāsai: viens klikšķis ieslēdz/izslēdz. */
+export const StockToggle = ({
+  source,
+  id,
+  color,
+  colorName,
+  on,
+}: {
+  source: string;
+  id: string;
+  color?: string | null;
+  colorName?: string | null;
+  on: boolean;
+}) => {
   const { isAdmin, loading } = useAuth();
   if (loading || !isAdmin) return null;
+
+  const what = colorName ? `krāsa "${colorName}"` : "prece";
 
   return (
     <button
       type="button"
-      onClick={(e) => { e.preventDefault(); e.stopPropagation(); void toggleStockFlag(source, id); }}
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); void toggleStockFlag(source, id, color); }}
       onPointerDown={(e) => e.stopPropagation()}
-      title={on ? "Noņemt: ir noliktavā" : "Atzīmēt: ir noliktavā"}
+      title={on ? `Noņemt: ${what} ir noliktavā` : `Atzīmēt: ${what} ir noliktavā`}
       aria-label={on ? "Noņemt noliktavas atzīmi" : "Atzīmēt kā noliktavā"}
       aria-pressed={on}
       className={`flex h-7 items-center gap-1 border px-2 text-[10px] font-bold uppercase transition-colors ${
@@ -28,7 +42,7 @@ export const StockToggle = ({ source, id, on }: { source: string; id: string; on
       }`}
     >
       <PackageCheck className="h-3 w-3" />
-      {on ? "Noliktavā" : "Atzīmēt"}
+      {on ? "Noliktavā" : "Atzīmēt krāsu"}
     </button>
   );
 };
