@@ -6,14 +6,15 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { money } from "@/lib/offer";
 import {
-  PRINT_METHODS, lineNet, printNet, worksheetTotals,
-  type PrintLine, type Worksheet, type WorksheetItem, type WorksheetVersion,
+  PRINT_METHODS, lineNet, printNet, worksheetTotals, BILLING_FIELDS, hasBilling,
+  type Billing, type Discount, type PrintLine, type Worksheet, type WorksheetItem, type WorksheetVersion,
 } from "@/lib/worksheet";
 import { CheckCircle2, ChevronDown, Clock3, Copy, DoorOpen, History, Loader2, Mail, Plus, Printer, Repeat, RotateCcw, Store, Trash2, Undo2, X } from "lucide-react";
 import logo from "@/assets/ervitex-logo-2.svg";
 import { useAuth } from "@/hooks/useAuth";
 import { startWorksheetPick } from "@/lib/worksheetPick";
 import RowVariantControls from "@/components/worksheet/RowVariantControls";
+import DiscountField from "@/components/quote/DiscountField";
 
 const num = (v: string) => {
   const n = Number(String(v).replace(",", "."));
@@ -33,6 +34,9 @@ const WorksheetPage = () => {
   const [versions, setVersions] = useState<WorksheetVersion[]>([]);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const saveSequence = useRef(0);
+  const [discount, setDiscount] = useState<Discount | null>(null);
+  const [billing, setBilling] = useState<Billing | null>(null);
+  const savedDiscount = useRef<string>("null");
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -86,8 +90,27 @@ const WorksheetPage = () => {
     setVersions((Array.isArray(data) ? data : []) as WorksheetVersion[]);
   };
 
+  const loadExtras = async () => {
+    const { data } = await supabase.rpc("get_quote_worksheet_extras" as any, { _token: token });
+    const row = (Array.isArray(data) ? data[0] : data) as { discount: Discount | null; billing: Billing | null } | undefined;
+    setDiscount(row?.discount ?? null);
+    setBilling(row?.billing ?? null);
+    savedDiscount.current = JSON.stringify(row?.discount ?? null);
+  };
+
+  const commitDiscount = async (d: Discount | null) => {
+    const clean = d && d.value > 0 ? d : null;
+    const key = JSON.stringify(clean);
+    if (key === savedDiscount.current) return;
+    const { error } = await supabase.rpc("set_quote_worksheet_discount" as any, { _token: token, _discount: clean });
+    if (error) { toast.error("Atlaidi neizdevās saglabāt"); return; }
+    savedDiscount.current = key;
+    toast.success("Atlaide saglabāta");
+  };
+
   useEffect(() => {
     (async () => {
+      loadExtras();
       await reload(true);
       await loadVersions();
       setLoading(false);
@@ -95,7 +118,7 @@ const WorksheetPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  const totals = useMemo(() => worksheetTotals(items, sheet?.vat_rate ?? 21), [items, sheet?.vat_rate]);
+  const totals = useMemo(() => worksheetTotals(items, sheet?.vat_rate ?? 21, discount), [items, sheet?.vat_rate, discount]);
   const readOnly = !!sheet?.locked || !isStaff;
   const patch = (id: string, changes: Partial<WorksheetItem>) => {
     setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...changes } : i)));
@@ -458,6 +481,12 @@ const WorksheetPage = () => {
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Gabali kopā</dt><dd className="tabular-nums">{totals.qty}</dd></div>
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Preces bez PVN</dt><dd className="tabular-nums">{money(totals.goods)}</dd></div>
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Apdruka bez PVN</dt><dd className="tabular-nums">{money(totals.print)}</dd></div>
+              {(isAdmin && !sheet.locked) ? (
+                <div className="flex items-center justify-between gap-4 pt-1 print:hidden"><dt className="text-muted-foreground">Atlaide</dt><dd><DiscountField value={discount} onChange={setDiscount} onCommit={commitDiscount} /></dd></div>
+              ) : null}
+              {totals.discount > 0 && (
+                <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Atlaide{discount?.type === "percent" ? ` ${discount.value}%` : ""}</dt><dd className="tabular-nums text-accent">−{money(totals.discount)}</dd></div>
+              )}
               <div className="flex justify-between gap-4 border-t border-border pt-2"><dt className="font-medium">Kopā bez PVN</dt><dd className="font-medium tabular-nums">{money(totals.net)}</dd></div>
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">PVN {sheet.vat_rate}%</dt><dd className="tabular-nums">{money(totals.vat)}</dd></div>
               <div className="flex items-baseline justify-between gap-4 border-t border-border pt-2.5 text-base">
@@ -466,6 +495,17 @@ const WorksheetPage = () => {
               </div>
             </dl>
           </div>
+
+          {isStaff && hasBilling(billing) && (
+            <section className="mt-6 border-t border-border pt-5">
+              <h2 className="font-heading text-sm font-black uppercase tracking-wide">Rekvizīti</h2>
+              <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+                {BILLING_FIELDS.filter((f) => (billing?.[f.key] || "").trim()).map((f) => (
+                  <div key={f.key}><dt className="text-xs uppercase tracking-wider text-muted-foreground">{f.label}</dt><dd className="select-all">{billing?.[f.key]}</dd></div>
+                ))}
+              </dl>
+            </section>
+          )}
 
           {isStaff && versions.length > 0 && (
             <section className="mt-6 border-t border-border pt-5 print:hidden">

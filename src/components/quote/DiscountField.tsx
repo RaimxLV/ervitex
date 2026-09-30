@@ -27,7 +27,7 @@ const DiscountField = ({ value, onChange, onCommit, disabled }: Props) => {
         placeholder="0"
         onChange={(e) => {
           const n = Number(e.target.value.replace(",", "."));
-          set(n > 0 ? { type, value: n } : null);
+          set({ type, value: n > 0 ? n : 0 });
         }}
         onBlur={() => onCommit?.(value)}
         className="h-9 w-24 text-right tabular-nums"
@@ -39,7 +39,7 @@ const DiscountField = ({ value, onChange, onCommit, disabled }: Props) => {
             key={t}
             type="button"
             disabled={disabled}
-            onClick={() => set(value ? { ...value, type: t } : null, true)}
+            onClick={() => set({ type: t, value: value?.value || 0 }, true)}
             className={`h-9 w-9 text-sm font-bold transition-colors ${
               type === t ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground hover:text-foreground"
             }`}
