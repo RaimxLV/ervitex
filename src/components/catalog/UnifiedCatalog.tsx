@@ -20,8 +20,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
   type FilterSection,
 } from "@/components/catalog/CatalogFiltersSidebar";
-import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
-import { StockToggle } from "./StockBadge";
+import { useStockFlags, hasAnyStock } from "@/hooks/useStockFlags";
 import { useAuth } from "@/hooks/useAuth";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
@@ -660,7 +659,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const passesExcept = (it: EnrichedItem, except: string) => {
     if (pq && searchScore(it, pq) === 0) return false;
-    if (stockOnly && !stockFlags.has(stockKey(it.source, it.id))) return false;
+    if (stockOnly && !hasAnyStock(stockFlags, it.source, it.id)) return false;
     if (except !== "source" && sources.size && !sources.has(it.manufacturer)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
     if (except !== "category" && categories.size && (!it.category || !categories.has(it.category))) return false;
@@ -1212,7 +1211,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                   {paginated.map((it, idx) => (
                     <CatalogCard
-                      inStock={stockFlags.has(stockKey(it.source, it.id))}
                       key={`${it.source}-${it.id}`}
                       item={it}
                       priority={idx < 8}
@@ -1395,9 +1393,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       swatches={swatches}
       extraSwatches={extra}
       noImageLabel={noImageLabel}
-      inStock={inStock}
       lang={lang}
-      topRight={isAdmin ? <StockToggle source={item.source} id={item.id} on={!!inStock} /> : undefined}
       price={
         effectivePrice ? (
           <div className="flex flex-col leading-tight">
