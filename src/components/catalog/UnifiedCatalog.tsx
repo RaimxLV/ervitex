@@ -20,6 +20,9 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogFiltersSidebar, {
   type FilterSection,
 } from "@/components/catalog/CatalogFiltersSidebar";
+import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
+import { StockToggle } from "./StockBadge";
+import { useAuth } from "@/hooks/useAuth";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
@@ -364,6 +367,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     new Set((searchParams.get("color") || "").split(",").filter(Boolean))
   );
   const [sort, setSort] = useState<string>(searchParams.get("sort") || "newest");
+  const [stockOnly, setStockOnly] = useState(searchParams.get("stock") === "1");
+  const stockFlags = useStockFlags();
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
   // Tracks the query string this component itself wrote, so that navigations
@@ -382,10 +387,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (genders.size) p.set("gender", [...genders].join(","));
     if (colors.size) p.set("color", [...colors].join(","));
     if (sort && sort !== "newest") p.set("sort", sort);
+    if (stockOnly) p.set("stock", "1");
     if (page > 1) p.set("page", String(page));
     lastWrittenSearch.current = p.toString();
     setSearchParams(p, { replace: true });
-  }, [q, sources, brands, categories, groups, genders, colors, sort, page, setSearchParams]);
+  }, [q, sources, brands, categories, groups, genders, colors, sort, page, stockOnly, setSearchParams]);
 
   // External URL changes (e.g. clicking another mega menu category while the
   // catalog is already mounted) must reset the filters to the incoming params.
@@ -654,6 +660,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const passesExcept = (it: EnrichedItem, except: string) => {
     if (pq && searchScore(it, pq) === 0) return false;
+    if (stockOnly && !stockFlags.has(stockKey(it.source, it.id))) return false;
     if (except !== "source" && sources.size && !sources.has(it.manufacturer)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
     if (except !== "category" && categories.size && (!it.category || !categories.has(it.category))) return false;
@@ -681,7 +688,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items, q, sources, brands, categories, groups, genders, colors]
+    [items, q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags]
   );
 
   // "Ražotājs" facet — virtual manufacturer taxonomy (see MANUFACTURERS above).
@@ -695,7 +702,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       }))
       .filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
+  }, [items, lang, q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags]);
 
   const sourceBrandItems = useMemo(() => {
     const nested: Record<string, { label: string; value: string; count: number }[]> = {};
@@ -849,7 +856,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       count: counts.get(b.key) || 0,
     })).filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, lang, q, sources, brands, categories, groups, genders, colors]);
+  }, [items, lang, q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags]);
 
   const priceOf = useCallback(
     (it: EnrichedItem): number | null => {
@@ -895,7 +902,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     return cmp ? [...base].sort(cmp) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, pq, sources, brands, categories, groups, genders, colors, sort, priceOf, priceRanges, lang]);
+  }, [items, pq, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags, sort, priceOf, priceRanges, lang]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Number.isFinite(page) ? Math.min(Math.max(page, 1), totalPages) : 1;
@@ -1004,6 +1011,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     setGroups(new Set());
     setGenders(new Set());
     setColors(new Set());
+    setStockOnly(false);
   };
 
   const filterSections: FilterSection[] = [];
@@ -1059,7 +1067,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   );
 
   const totalSelectedFilters =
-    sources.size + brands.size + categories.size + groups.size + genders.size + colors.size;
+    sources.size + brands.size + categories.size + groups.size + genders.size + colors.size + (stockOnly ? 1 : 0);
 
 
   return (
@@ -1154,6 +1162,21 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           </div>
 
           <div className="min-w-0 flex-1">
+            {stockFlags.size > 0 && (
+              <div className="mb-3 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => { setStockOnly((v) => !v); setPage(1); }}
+                  aria-pressed={stockOnly}
+                  className={`inline-flex h-9 items-center gap-2 border px-3 font-heading text-xs font-bold uppercase tracking-wider transition-colors ${
+                    stockOnly ? "border-success bg-success text-success-foreground" : "border-border bg-card text-foreground hover:border-success"
+                  }`}
+                >
+                  <span className={`h-2.5 w-2.5 rounded-full ${stockOnly ? "bg-success-foreground" : "bg-success"}`} />
+                  {lang === "lv" ? "Tikai noliktavā" : "In stock only"} ({stockFlags.size})
+                </button>
+              </div>
+            )}
             {!loaded ? (
               <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                 {Array.from({ length: 12 }).map((_, i) => (
@@ -1189,6 +1212,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                   {paginated.map((it, idx) => (
                     <CatalogCard
+                      inStock={stockFlags.has(stockKey(it.source, it.id))}
                       key={`${it.source}-${it.id}`}
                       item={it}
                       priority={idx < 8}
@@ -1299,9 +1323,11 @@ interface CardProps {
   variantPrices: Map<string, { price: number; max: number; currency: string }>;
   fromLabel?: string;
   priority?: boolean;
+  inStock?: boolean;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, fromLabel, priority }: CardProps) => {
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, fromLabel, priority, inStock }: CardProps) => {
+  const { isAdmin } = useAuth();
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
 
   // Filter-driven initial match
@@ -1369,6 +1395,9 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       swatches={swatches}
       extraSwatches={extra}
       noImageLabel={noImageLabel}
+      inStock={inStock}
+      lang={lang}
+      topRight={isAdmin ? <StockToggle source={item.source} id={item.id} on={!!inStock} /> : undefined}
       price={
         effectivePrice ? (
           <div className="flex flex-col leading-tight">

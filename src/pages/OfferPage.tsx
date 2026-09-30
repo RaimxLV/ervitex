@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import {
-  money, offerTotals, offerPlainText, type Offer, type OfferItem,
+  money, itemPrintNet, offerTotals, offerPlainText, type Offer, type OfferItem,
   PRINT_DISCLAIMER_LV, PRINT_DISCLAIMER_EN,
 } from "@/lib/offer";
 import { Printer, MessageCircle, Mail, ClipboardList, ArrowUpRight, Store } from "lucide-react";
@@ -49,7 +49,7 @@ const OfferPage = () => {
     );
   }
 
-  const totals = offerTotals(offer.items, offer.vat_rate);
+  const totals = offerTotals(offer.items, offer.vat_rate, offer.discount);
   const text = offerPlainText(offer, lang === "lv" ? "lv" : "en");
   const pmEmail = offer.pm_email || "birojs@ervitex.lv";
   const itemLink = (i: OfferItem) => {
@@ -164,7 +164,12 @@ const OfferPage = () => {
                       {i.unitPrice ? money(i.unitPrice) : t("pēc pieprasījuma", "on request")}
                     </td>
                     <td className="py-3 text-right font-medium tabular-nums whitespace-nowrap">
-                      {i.unitPrice ? money(i.unitPrice * i.qty) : "—"}
+                      {i.unitPrice || itemPrintNet(i) ? money((i.unitPrice || 0) * i.qty + itemPrintNet(i)) : "—"}
+                      {(i.prints || []).filter((p) => Number(p.price) > 0).map((p, k) => (
+                        <span key={k} className="block text-[11px] font-normal text-muted-foreground">
+                          + {p.method}{p.placement ? ` (${p.placement})` : ""} {money(Number(p.price))}{p.mode === "total" ? "" : ` / ${t("gab.", "pc")}`}
+                        </span>
+                      ))}
                     </td>
                   </tr>
                 ))}
@@ -203,9 +208,12 @@ const OfferPage = () => {
                         <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">
                           {i.unitPrice ? `${money(i.unitPrice)} / ${t("gab.", "pc")}` : t("pēc pieprasījuma", "on request")}
                         </span>
-                        {i.unitPrice && (
-                          <span className="block font-heading text-sm font-black text-foreground">{money(i.unitPrice * i.qty)}</span>
-                        )}
+                        {(i.prints || []).filter((p) => Number(p.price) > 0).map((p, k) => (
+                          <span key={k} className="block text-[10px] text-muted-foreground">+ {p.method} {money(Number(p.price))}{p.mode === "total" ? "" : ` / ${t("gab.", "pc")}`}</span>
+                        ))}
+                        {(i.unitPrice || itemPrintNet(i)) ? (
+                          <span className="block font-heading text-sm font-black text-foreground">{money((i.unitPrice || 0) * i.qty + itemPrintNet(i))}</span>
+                        ) : null}
                       </span>
                     </div>
                   </div>
@@ -220,6 +228,18 @@ const OfferPage = () => {
                 <dt className="text-muted-foreground">{t("Vienības kopā", "Total units")}</dt>
                 <dd className="tabular-nums">{totals.qty}</dd>
               </div>
+              {totals.print > 0 && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted-foreground">{t("Apdruka", "Decoration")}</dt>
+                  <dd className="tabular-nums">{money(totals.print)}</dd>
+                </div>
+              )}
+              {totals.discount > 0 && (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted-foreground">{t("Atlaide", "Discount")}{offer.discount?.type === "percent" ? ` ${offer.discount.value}%` : ""}</dt>
+                  <dd className="tabular-nums text-accent">−{money(totals.discount)}</dd>
+                </div>
+              )}
               <div className="flex justify-between gap-4">
                 <dt className="text-muted-foreground">{t("Kopā bez PVN", "Total excl. VAT")}</dt>
                 <dd className="font-medium tabular-nums">{money(totals.net)}</dd>

@@ -22,6 +22,7 @@ interface OfferLine {
   qty?: number | string
   unitPrice?: number | string | null
   lineTotal?: string
+  prints?: string[]
 }
 
 interface Props {
@@ -31,6 +32,7 @@ interface Props {
   items?: OfferLine[]
   totalQty?: number | string
   net?: string
+  discount?: string
   vat?: string
   gross?: string
   vatRate?: number | string
@@ -67,6 +69,7 @@ const PmOfferEmail = ({
   items = [],
   totalQty = '',
   net = '',
+  discount = '',
   vat = '',
   gross = '',
   vatRate = 21,
@@ -113,6 +116,9 @@ const PmOfferEmail = ({
                     <span style={{ color: '#666', fontSize: '11px' }}>
                       {[it.code, it.colorName, it.size].filter(Boolean).join(' · ')}
                     </span>
+                    {(it.prints || []).map((p, k) => (
+                      <span key={k} style={{ display: 'block', color: '#991b2f', fontSize: '11px' }}>+ {p}</span>
+                    ))}
                   </td>
                   <td style={rowCell}>{it.qty ?? ''}</td>
                   <td style={rowCell}>{it.unitPrice ? String(it.unitPrice) : 'pēc pieprasījuma'}</td>
@@ -126,6 +132,7 @@ const PmOfferEmail = ({
         <Hr style={{ borderColor: '#eee', margin: '18px 0' }} />
 
         <Text style={{ fontSize: '13px', margin: '2px 0' }}>Daudzums: {totalQty} gab.</Text>
+        {discount ? <Text style={{ fontSize: '13px', margin: '2px 0' }}>Atlaide: {discount}</Text> : null}
         <Text style={{ fontSize: '13px', margin: '2px 0' }}>Kopā bez PVN: {net}</Text>
         <Text style={{ fontSize: '13px', margin: '2px 0' }}>PVN {vatRate}%: {vat}</Text>
         <Text style={{ fontSize: '15px', fontWeight: 'bold', margin: '6px 0 0' }}>Kopā ar PVN: {gross}</Text>

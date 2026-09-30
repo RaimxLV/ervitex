@@ -26,6 +26,7 @@ const RequestPage = () => {
 
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "" });
+  const [billing, setBilling] = useState({ company: "", regNo: "", vatNo: "", address: "", delivery: "" });
   const [print, setPrint] = useState({ method: "", placement: "", colors: "", deadline: "", notes: "" });
   const [files, setFiles] = useState<File[]>([]);
   const [sending, setSending] = useState(false);
@@ -117,7 +118,10 @@ const RequestPage = () => {
           print_colors: print.colors || null,
           deadline: print.deadline || null,
           file_urls: [],
-        });
+          billing: Object.values(billing).some((v) => v.trim())
+            ? Object.fromEntries(Object.entries(billing).map(([k, v]) => [k, v.trim().slice(0, 300)]).filter(([, v]) => v))
+            : null,
+        } as any);
       if (insErr) throw insErr;
 
       // Upload attachments under "<requestId>/<filename>" so RLS binds them to this request
@@ -429,6 +433,26 @@ const RequestPage = () => {
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Uzņēmums", "Company")}</Label>
                     <Input className="h-11 rounded-lg" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
                   </div>
+                  <details className="group rounded-lg border border-border">
+                    <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs font-semibold uppercase tracking-wider text-foreground">
+                      {t("Rekvizīti rēķinam", "Billing details")}
+                      <span className="text-accent transition-transform group-open:rotate-45">+</span>
+                    </summary>
+                    <div className="space-y-3 border-t border-border p-4">
+                      {([
+                        ["company", t("Uzņēmuma nosaukums", "Company name")],
+                        ["regNo", t("Reģ. Nr.", "Reg. No.")],
+                        ["vatNo", t("PVN Nr.", "VAT No.")],
+                        ["address", t("Juridiskā adrese", "Legal address")],
+                        ["delivery", t("Piegādes adrese", "Delivery address")],
+                      ] as const).map(([k, label]) => (
+                        <div key={k} className="space-y-1.5">
+                          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</Label>
+                          <Input className="h-11 rounded-lg" maxLength={300} value={billing[k]} onChange={(e) => setBilling({ ...billing, [k]: e.target.value })} />
+                        </div>
+                      ))}
+                    </div>
+                  </details>
                 </div>
               </section>
 

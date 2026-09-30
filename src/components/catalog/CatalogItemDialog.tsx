@@ -932,11 +932,18 @@ const translateLabel = (label: string, lang: "lv" | "en") => {
 
 /* ---------- Component ---------- */
 
+import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
+import { StockRibbon, StockToggle } from "./StockBadge";
+import { useAuth } from "@/hooks/useAuth";
+
 const CatalogItemDialog = ({
   open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback, inline,
   initialColor, initialSize,
 }: Props) => {
   const { lang } = useLanguage();
+  const stockFlags = useStockFlags();
+  const { isAdmin: canFlagStock } = useAuth();
+  const inStock = stockFlags.has(stockKey(source, id));
   const placeholderSrc = `${import.meta.env.BASE_URL}placeholder.svg`;
   const isOpen = inline ? true : open;
   const [detail, setDetail] = useState<ProductDetail | null>(null);
@@ -1324,6 +1331,10 @@ const CatalogItemDialog = ({
                 <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                   {label.noImage}
                 </div>
+              )}
+              {inStock && <StockRibbon lang={lang} />}
+              {canFlagStock && (
+                <div className="absolute right-2 top-2 z-[2]"><StockToggle source={source} id={id} on={inStock} /></div>
               )}
             </div>
             {gallery.length > 1 && (
