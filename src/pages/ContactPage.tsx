@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, Clock3, Mail, MapPin, Phone, Send, X, PhoneCall, Loader2, ReceiptText } from "lucide-react";
+import { Building2, Clock3, Mail, MapPin, Phone, Send, X, Loader2, ReceiptText, Navigation } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,9 +9,10 @@ import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import { useLanguage } from "@/i18n/LanguageContext";
-import GoogleMapEmbed from "@/components/GoogleMapEmbed";
+import GoogleMapEmbed, { GMAPS_URL, WAZE_URL } from "@/components/GoogleMapEmbed";
 import HausmanaKvartalsMap from "@/components/HausmanaKvartalsMap";
 import StoreLocations from "@/components/contact/StoreLocations";
+import SectionHeading from "@/components/contact/SectionHeading";
 import vilnisPhoto from "@/assets/team/vilnis-lacis.jpg";
 import eriksPhoto from "@/assets/team/eriks-lacis.jpg";
 import lauraPhoto from "@/assets/team/laura-daukste.jpg";
@@ -100,97 +101,67 @@ const ContactPage = () => {
         eyebrow={lang === "lv" ? "Sāksim sarunu" : "Start a conversation"}
       />
 
-      {/* Specialists Section */}
-      <section className="bg-muted py-16 md:py-20">
+      {/* Team */}
+      <section className="bg-background py-16 md:py-24">
         <div className="container">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="h-px w-12 bg-accent" />
-              <span className="font-heading text-[10px] font-bold uppercase text-accent">
-                {lang === "lv" ? "Komanda" : "Team"}
-              </span>
-              <div className="h-px w-12 bg-accent" />
-            </div>
-            <h2 className="font-heading text-2xl font-bold uppercase text-foreground">
-              {lang === "lv" ? "Sazinieties ar kādu no mūsu speciālistiem" : "Get in touch with one of our specialists"}
-            </h2>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="mt-12 flex flex-wrap justify-center gap-5"
-          >
-            {specialists.map((member, i) => (
-              <div
-                key={i}
-                className="group relative flex w-full shrink-0 grow-0 basis-full flex-col overflow-hidden border border-border bg-card transition-all duration-300 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5 sm:basis-[calc(50%-0.625rem)] lg:basis-[calc(33.333%-0.8333rem)] xl:basis-[calc(25%-0.9375rem)]"
-              >
-                <div className="absolute top-0 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full" />
-
-                <div
-                  className={`relative aspect-[4/5] w-full overflow-hidden bg-muted ${member.photo ? "cursor-pointer" : ""}`}
-                  onClick={() => member.photo && setLightboxImg(member.photo)}
-                >
-                  {member.photo ? (
+          <SectionHeading
+            eyebrow={lang === "lv" ? "Komanda" : "Team"}
+            title={lang === "lv" ? "Sazinieties ar kādu no mūsu speciālistiem" : "Get in touch with one of our specialists"}
+          />
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {specialists.map((member) => {
+              const ps = photoSettings[member.slug];
+              return (
+                <article key={member.slug} className="group flex flex-col border border-border bg-card transition-colors hover:border-accent/50">
+                  <button
+                    type="button"
+                    onClick={() => setLightboxImg(member.photo)}
+                    className="relative aspect-[4/5] w-full overflow-hidden bg-muted"
+                    aria-label={member.name}
+                  >
                     <img
                       src={member.photo}
                       alt={member.name}
-                      className="h-full w-full max-w-none object-cover transition-transform duration-700"
+                      loading="lazy"
+                      className="h-full w-full object-cover"
                       style={{
-                        transform: `translate(${((photoSettings[member.slug]?.position_x ?? 50) - 50) * 0.5}%, ${((photoSettings[member.slug]?.position_y ?? 50) - 50) * 0.5}%) scale(${photoSettings[member.slug]?.zoom ?? 1})`,
+                        transform: `translate(${((ps?.position_x ?? 50) - 50) * 0.5}%, ${((ps?.position_y ?? 50) - 50) * 0.5}%) scale(${ps?.zoom ?? 1})`,
                       }}
                     />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-accent/5 text-accent font-heading text-3xl font-bold">
-                      {member.name.split(" ").map((n) => n[0]).join("")}
+                  </button>
+                  <div className="flex grow flex-col p-5">
+                    <h3 className="font-heading text-base font-bold uppercase text-foreground">{member.name}</h3>
+                    <p className="mt-1 min-h-[2.5rem] text-sm font-medium text-accent">{member.title[lang]}</p>
+                    <div className="mt-4 space-y-2 border-t border-border pt-4">
+                      <a href={`mailto:${member.email}`} className="flex items-center gap-2.5 truncate text-sm text-foreground/80 transition-colors hover:text-accent">
+                        <Mail className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.5} />{member.email}
+                      </a>
+                      <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-2.5 text-sm text-foreground/80 transition-colors hover:text-accent">
+                        <Phone className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.5} />{member.phone}
+                      </a>
                     </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/20 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                </div>
-
-                <div className="relative -mt-4 mx-4 mb-4 flex grow flex-col bg-card/95 backdrop-blur-sm p-4 shadow-sm border border-border/50">
-                  <h3 className="min-h-[1.6rem] font-heading text-sm font-bold uppercase leading-[1.6rem] text-foreground">{member.name}</h3>
-                  <p className="mt-0.5 line-clamp-2 min-h-[2.4rem] text-xs text-accent font-medium">{member.title[lang]}</p>
-                  <div className="mt-3 space-y-1.5 border-t border-border pt-3">
-                    <a href={`mailto:${member.email}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors truncate">
-                      <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={1.2} /> {member.email}
-                    </a>
-                    <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-accent transition-colors">
-                      <Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={1.2} /> {member.phoneLabel[lang]}: {member.phone}
-                    </a>
                   </div>
-                </div>
-              </div>
-            ))}
-          </motion.div>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       {/* Wholesale Office + Contact Form */}
-      <section className="bg-background py-16 md:py-24">
+      <section className="border-t border-border bg-muted/50 py-16 md:py-24">
         <div className="container">
-          <div className="grid items-start gap-6 lg:grid-cols-12">
-            <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-lg border border-border bg-card p-6 shadow-sm lg:col-span-5 md:p-8">
-              <span className="font-heading text-[10px] font-bold uppercase text-accent">Ervitex</span>
-              <h2 className="mt-2 font-heading text-2xl font-bold uppercase text-foreground">
-                {lang === "lv" ? "Vairumtirdzniecības birojs" : "Wholesale Office"}
-              </h2>
-
-              <div className="mt-8 divide-y divide-border">
+          <SectionHeading eyebrow="Ervitex" title={lang === "lv" ? "Vairumtirdzniecības birojs" : "Wholesale office"} />
+          <div className="grid items-stretch gap-6 lg:grid-cols-12">
+            <div className="flex flex-col border border-border bg-card p-6 lg:col-span-5 md:p-8">
+              <dl className="divide-y divide-border">
                 {[
-                  {
-                    icon: MapPin,
-                    label: t("contact.address"),
-                    content: <>Hausmaņa biroji, ieeja “D”, 2. stāvs<br />Braslas iela 29, Vidzemes priekšpilsēta, Rīga, LV-1084</>,
-                  },
+                  { icon: MapPin, label: t("contact.address"), content: <>Hausmaņa biroji, „D” ieeja, 2. stāvs<br />Braslas iela 29, Vidzemes priekšpilsēta,<br />Rīga, LV-1084</> },
                   { icon: ReceiptText, label: t("contact.regNr"), content: <>LV40002074377</> },
                   { icon: Mail, label: t("contact.officeEmail"), content: <a href="mailto:birojs@ervitex.lv" className="transition-colors hover:text-accent">birojs@ervitex.lv</a> },
                   {
                     icon: Phone,
-                    label: lang === "lv" ? "Tālr." : "Phone",
+                    label: lang === "lv" ? "Tālrunis" : "Phone",
                     content: (
                       <>
                         <a href="tel:+37167543384" className="block transition-colors hover:text-accent">+371 67543384</a>
@@ -204,94 +175,73 @@ const ContactPage = () => {
                     label: t("contact.hours"),
                     content: (
                       <>
-                        {lang === "lv" ? "P.–C.: 9:00–17:30" : "Mon–Thu: 9:00–17:30"}
-                        <br />
-                        {lang === "lv" ? "Pk.: 9:00–16:00" : "Fri: 9:00–16:00"}
-                        <br />
-                        <span className="text-muted-foreground">{lang === "lv" ? "Sest., Sv.: Slēgts" : "Sat, Sun: Closed"}</span>
+                        {lang === "lv" ? "P.–C.: 9:00–17:30" : "Mon–Thu: 9:00–17:30"}<br />
+                        {lang === "lv" ? "Pk.: 9:00–16:00" : "Fri: 9:00–16:00"}<br />
+                        <span className="text-muted-foreground">{lang === "lv" ? "Sest., Sv.: slēgts" : "Sat, Sun: closed"}</span>
                       </>
                     ),
                   },
                 ].map((item) => (
-                  <div key={item.label} className="group flex gap-4 py-4 first:pt-0 last:pb-0">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors group-hover:bg-accent group-hover:text-accent-foreground">
-                      <item.icon className="h-4 w-4" strokeWidth={1.5} />
-                    </div>
+                  <div key={item.label} className="flex gap-4 py-4 first:pt-0 last:pb-0">
+                    <item.icon className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={1.5} />
                     <div className="min-w-0">
-                      <p className="font-heading text-[10px] font-bold uppercase text-muted-foreground">{item.label}</p>
-                      <div className="mt-1 text-sm leading-relaxed text-foreground">{item.content}</div>
+                      <dt className="font-heading text-xs font-bold uppercase tracking-wider text-muted-foreground">{item.label}</dt>
+                      <dd className="mt-1 text-base leading-relaxed text-foreground">{item.content}</dd>
                     </div>
                   </div>
                 ))}
-              </div>
+              </dl>
+            </div>
 
-              <Button size="lg" className="mt-8 w-full rounded-lg bg-accent font-heading text-xs uppercase text-accent-foreground hover:bg-accent/90" asChild>
-                <a href="tel:+37167543384"><PhoneCall className="h-4 w-4" />{lang === "lv" ? "Zvanīt tūlīt" : "Call Now"}</a>
-              </Button>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.08 }} className="rounded-lg border border-border bg-card p-6 shadow-sm lg:col-span-7 md:p-8 lg:p-10">
-              <div className="mb-8">
-                <span className="font-heading text-[10px] font-bold uppercase text-accent">{lang === "lv" ? "Sazinieties" : "Get in touch"}</span>
-                <h2 className="mt-2 font-heading text-2xl font-bold uppercase text-foreground">{lang === "lv" ? "Jautājiet mums" : "Ask us a question"}</h2>
-              </div>
+            <div className="border border-border bg-card p-6 lg:col-span-7 md:p-8">
+              <h3 className="mb-6 font-heading text-lg font-bold uppercase text-foreground">{lang === "lv" ? "Sazinieties ar mums" : "Contact us"}</h3>
               <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.name")}</label>
-                  <Input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-12 rounded-lg bg-muted/40 px-4 focus-visible:ring-accent" />
+                <div className="grid gap-5 sm:grid-cols-2">
+                  {([
+                    ["name", t("contact.name"), "text", true],
+                    ["email", t("contact.emailLabel"), "email", true],
+                    ["company", t("contact.company"), "text", false],
+                    ["phone", t("contact.phoneLabel"), "tel", false],
+                  ] as const).map(([key, label, type, req]) => (
+                    <div key={key} className="space-y-2">
+                      <label htmlFor={`c-${key}`} className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{label}</label>
+                      <Input id={`c-${key}`} required={req} type={type} value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} className="h-12 rounded-none bg-background px-4 focus-visible:ring-accent" />
+                    </div>
+                  ))}
                 </div>
-                <div className="space-y-1.5">
-                  <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.emailLabel")}</label>
-                  <Input required type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="h-12 rounded-lg bg-muted/40 px-4 focus-visible:ring-accent" />
+                <div className="space-y-2">
+                  <label htmlFor="c-message" className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{t("contact.message")}</label>
+                  <Textarea id="c-message" required rows={7} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={t("contact.messagePlaceholder")} className="resize-none rounded-none bg-background px-4 py-3 focus-visible:ring-accent" />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.company")}</label>
-                  <Input value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="h-12 rounded-lg bg-muted/40 px-4 focus-visible:ring-accent" />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.phoneLabel")}</label>
-                  <Input type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="h-12 rounded-lg bg-muted/40 px-4 focus-visible:ring-accent" />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <label className="font-heading text-xs font-bold uppercase text-foreground">{t("contact.message")}</label>
-                <Textarea required rows={6} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={t("contact.messagePlaceholder")} className="resize-none rounded-lg bg-muted/40 px-4 py-3 focus-visible:ring-accent" />
-              </div>
-              <Button type="submit" size="lg" disabled={sending} className="w-full rounded-lg bg-foreground px-7 font-heading text-xs uppercase text-background hover:bg-accent hover:text-accent-foreground sm:w-auto">
-                {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" strokeWidth={1.2} />} {sending ? (lang === "lv" ? "Sūta..." : "Sending...") : t("contact.send")}
-              </Button>
+                <Button type="submit" size="lg" disabled={sending} className="h-12 w-full rounded-none bg-accent px-8 font-heading text-sm uppercase text-accent-foreground hover:bg-accent/90 sm:w-auto">
+                  {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" strokeWidth={1.5} />}
+                  {sending ? (lang === "lv" ? "Sūta..." : "Sending...") : t("contact.send")}
+                </Button>
               </form>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Maps Section */}
-      <section className="bg-muted/50 py-16 md:py-24">
+      {/* Location */}
+      <section className="border-t border-border bg-background py-16 md:py-24">
         <div className="container">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="mb-10 text-center">
-            <h2 className="font-heading text-2xl font-bold uppercase text-foreground">
-              {lang === "lv" ? "Kā mūs atrast" : "How to find us"}
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              {lang === "lv" ? "Hausmaņa biroji, Braslas ielā 29, Rīga" : "Hausmana offices, Braslas street 29, Riga"}
-            </p>
-          </motion.div>
-
-          <div className="grid items-start gap-8 lg:grid-cols-2">
-            <div>
-              <p className="mb-3 font-heading text-xs font-bold uppercase text-muted-foreground">
-                {lang === "lv" ? "Atrašanās vieta kartē" : "Location on map"}
-              </p>
-              <GoogleMapEmbed />
-            </div>
-            <div>
-              <p className="mb-3 font-heading text-xs font-bold uppercase text-muted-foreground">
-                {lang === "lv" ? "Ieeja D · 2. stāvs" : "Entrance D · 2nd floor"}
-              </p>
-              <HausmanaKvartalsMap />
-            </div>
+          <SectionHeading
+            eyebrow={lang === "lv" ? "Atrašanās vieta" : "Location"}
+            title={lang === "lv" ? "Kā mūs atrast" : "How to find us"}
+            subtitle={lang === "lv" ? "Braslas iela 29, Hausmaņa biroji, „D” ieeja, 2. stāvs" : "Braslas iela 29, Hausmana offices, entrance D, 2nd floor"}
+          />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="overflow-hidden border border-border"><GoogleMapEmbed /></div>
+            <div className="overflow-hidden border border-border"><HausmanaKvartalsMap /></div>
+          </div>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:max-w-xl">
+            <a href={GMAPS_URL} target="_blank" rel="noopener noreferrer" className="flex h-12 items-center justify-center gap-2 border border-border bg-card font-heading text-sm font-bold uppercase text-foreground transition-colors hover:border-accent hover:text-accent">
+              <Navigation className="h-4 w-4 text-accent" strokeWidth={1.5} />Google Maps
+            </a>
+            <a href={WAZE_URL} target="_blank" rel="noopener noreferrer" className="flex h-12 items-center justify-center gap-2 border border-border bg-card font-heading text-sm font-bold uppercase text-foreground transition-colors hover:border-accent hover:text-accent">
+              <Navigation className="h-4 w-4 text-accent" strokeWidth={1.5} />Waze
+            </a>
           </div>
         </div>
       </section>
