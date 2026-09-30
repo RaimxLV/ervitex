@@ -943,7 +943,6 @@ const CatalogItemDialog = ({
   const { lang } = useLanguage();
   const stockFlags = useStockFlags();
   const { isAdmin: canFlagStock } = useAuth();
-  const inStock = stockFlags.has(stockKey(source, id));
   const placeholderSrc = `${import.meta.env.BASE_URL}placeholder.svg`;
   const isOpen = inline ? true : open;
   const [detail, setDetail] = useState<ProductDetail | null>(null);
@@ -1062,6 +1061,11 @@ const CatalogItemDialog = ({
     () => displayDetail.colors.find((c) => c.code === activeColor) || displayDetail.colors[0] || null,
     [displayDetail, activeColor]
   );
+
+  // Noliktavas atzīme attiecas uz konkrēto krāsu; vecās modeļa atzīmes arī skaitās.
+  const inStock =
+    (!!currentColor && stockFlags.has(stockKey(source, id, currentColor.code))) ||
+    stockFlags.has(stockKey(source, id));
 
   const gallery = useMemo(() => {
     if (!currentColor) return image ? [image] : [];
@@ -1333,7 +1337,15 @@ const CatalogItemDialog = ({
                 </div>
               )}
               {canFlagStock && (
-                <div className="absolute right-2 top-2 z-[2]"><StockToggle source={source} id={id} on={inStock} /></div>
+                <div className="absolute right-2 top-2 z-[2]">
+                  <StockToggle
+                    source={source}
+                    id={id}
+                    color={currentColor?.code || null}
+                    colorName={currentColor?.name || null}
+                    on={!!currentColor && stockFlags.has(stockKey(source, id, currentColor.code))}
+                  />
+                </div>
               )}
               {inStock && <StockRibbon lang={lang} />}
             </div>
@@ -1489,17 +1501,21 @@ const CatalogItemDialog = ({
                     {displayDetail.colors.map((c) => {
                       const isActive = c.code === activeColor;
                       const hex = resolveHex(c.hex, c.name);
+                      const colorInStock = stockFlags.has(stockKey(source, id, c.code));
                       return (
-                        <button
-                          key={c.code}
-                          type="button"
-                          onClick={() => { setActiveColor(c.code); setImgIndex(0); }}
-                          title={`${c.name} – ${c.code}`}
-                          aria-label={c.name}
-                          className={`h-7 w-7 rounded-full border-2 transition-transform ${isActive ? "border-foreground ring-2 ring-foreground/30 scale-110" : isLightHex(hex) ? "border-neutral-500 hover:scale-105" : "border-border hover:scale-105"}`}
-                          style={swatchBackground(c.hex, c.name)}
-
-                        />
+                        <span key={c.code} className="relative inline-flex">
+                          <button
+                            type="button"
+                            onClick={() => { setActiveColor(c.code); setImgIndex(0); }}
+                            title={`${c.name} – ${c.code}${colorInStock ? (lang === "lv" ? " – ir noliktavā" : " – in stock") : ""}`}
+                            aria-label={c.name}
+                            className={`h-7 w-7 rounded-full border-2 transition-transform ${isActive ? "border-foreground ring-2 ring-foreground/30 scale-110" : isLightHex(hex) ? "border-neutral-500 hover:scale-105" : "border-border hover:scale-105"}`}
+                            style={swatchBackground(c.hex, c.name)}
+                          />
+                          {colorInStock && (
+                            <span className="pointer-events-none absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border border-card bg-success" />
+                          )}
+                        </span>
                       );
                     })}
                   </div>
