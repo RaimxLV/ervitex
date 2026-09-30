@@ -24,9 +24,6 @@ import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
 import { StockToggle } from "./StockBadge";
 import { useAuth } from "@/hooks/useAuth";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
-import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
-import { StockToggle } from "./StockBadge";
-import { useAuth } from "@/hooks/useAuth";
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import {
