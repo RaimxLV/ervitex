@@ -1014,6 +1014,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     setGroups(new Set());
     setGenders(new Set());
     setColors(new Set());
+    setStockOnly(false);
   };
 
   const filterSections: FilterSection[] = [];
