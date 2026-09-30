@@ -943,7 +943,6 @@ const CatalogItemDialog = ({
   const { lang } = useLanguage();
   const stockFlags = useStockFlags();
   const { isAdmin: canFlagStock } = useAuth();
-  const inStock = stockFlags.has(stockKey(source, id));
   const placeholderSrc = `${import.meta.env.BASE_URL}placeholder.svg`;
   const isOpen = inline ? true : open;
   const [detail, setDetail] = useState<ProductDetail | null>(null);
