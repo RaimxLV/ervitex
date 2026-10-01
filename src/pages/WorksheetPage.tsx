@@ -543,6 +543,16 @@ const WorksheetPage = () => {
             ) : (
               <div className="mt-3 divide-y divide-border border border-border bg-background">
                 {orderPrints.map(({ itemId, index, print }, rowIndex) => (
+                  readOnly ? (
+                    <div key={`${itemId}-${index}`} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 p-3 text-sm">
+                      <span className="min-w-0">
+                        <span className="font-medium">{print.method}</span>
+                        {print.placement?.trim() && <span className="text-muted-foreground"> · {print.placement}</span>}
+                        {print.mode !== "total" && <span className="text-xs text-muted-foreground"> / gab.</span>}
+                      </span>
+                      <span className="tabular-nums">{money(print.price)}</span>
+                    </div>
+                  ) : (
                   <div key={`${itemId}-${index}`} className="grid grid-cols-1 gap-3 p-3 sm:grid-cols-[minmax(150px,1fr)_minmax(150px,1fr)_130px_130px_auto] sm:items-end">
                     <label>
                       <span className="mb-1 block text-xs font-medium text-muted-foreground">Veids</span>
@@ -571,6 +581,7 @@ const WorksheetPage = () => {
                       </Button>
                     )}
                   </div>
+                  )
                 ))}
                 <div className="flex justify-between gap-4 bg-muted/30 px-3 py-3 text-sm font-semibold">
                   <span>Apdruka kopā bez PVN</span>
