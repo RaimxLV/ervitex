@@ -37,7 +37,13 @@ const fragmentShader = `
     // Keep an overscan reserve so stronger displacement never exposes or
     // stretches the image edges.
     uv = (uv - 0.5) * 0.84 + 0.5;
-    float depth = texture2D(u_depth, uv).r;
+    // Soften depth edges so displacement bends instead of tearing.
+    vec2 px = 3.0 / u_resolution;
+    float depth = texture2D(u_depth, uv).r * 0.4
+      + texture2D(u_depth, uv + vec2(px.x, 0.0)).r * 0.15
+      + texture2D(u_depth, uv - vec2(px.x, 0.0)).r * 0.15
+      + texture2D(u_depth, uv + vec2(0.0, px.y)).r * 0.15
+      + texture2D(u_depth, uv - vec2(0.0, px.y)).r * 0.15;
     float d = depth - 0.5;
     float depthOffset = d * u_shift;
     vec2 pointerOffset = d * u_pointer;
@@ -75,7 +81,7 @@ const loadImage = (src: string) =>
 const EASING = 0.18;
 const SETTLED = 0.00008;
 const POINTER_EASING = 0.08;
-const POINTER_STRENGTH = 0.07;
+const POINTER_STRENGTH = 0.045;
 
 const HeroDepthScene = ({ className = "" }: { className?: string }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
