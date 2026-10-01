@@ -1076,14 +1076,14 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         eyebrow={lang === "lv" ? "Produktu atlase" : "Product selection"}
         compact
       />
-      <div className="container px-4 py-6 md:py-10">
-        <div className="mb-6 space-y-3">
+      <div className="container px-4 py-5 md:py-10">
+        <div className="mb-5 space-y-3 md:mb-6">
           <div className="relative w-full md:max-w-xl">
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder={t.search}
-              className="h-11"
+              className="h-10 text-sm md:h-11"
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -1093,7 +1093,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="lg:hidden h-9 gap-2 font-heading text-xs font-bold uppercase tracking-wider"
+                   className="h-10 gap-2 font-heading text-xs font-bold uppercase tracking-wider lg:hidden"
                 >
                   <SlidersHorizontal className="h-3.5 w-3.5 text-accent" />
                   {lang === "lv" ? "Filtri" : "Filters"}
@@ -1132,7 +1132,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="h-9 flex-1 min-w-0 rounded-md border border-border bg-background px-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent sm:flex-none"
+              className="h-10 min-w-0 flex-1 rounded-md border border-border bg-background px-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent sm:flex-none"
             >
               <option value="featured">{lang === "lv" ? "Ieteiktie" : "Featured"}</option>
               <option value="newest">{lang === "lv" ? "Pēc jaunākā" : "Newest"}</option>
@@ -1166,7 +1166,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                   type="button"
                   onClick={() => { setStockOnly((v) => !v); setPage(1); }}
                   aria-pressed={stockOnly}
-                  className={`inline-flex h-9 items-center gap-2 border px-3 font-heading text-xs font-bold uppercase tracking-wider transition-colors ${
+                   className={`inline-flex h-10 items-center gap-2 border px-3 font-heading text-[11px] font-bold uppercase tracking-wider transition-colors sm:text-xs ${
                     stockOnly ? "border-success bg-success text-success-foreground" : "border-border bg-card text-foreground hover:border-success"
                   }`}
                 >

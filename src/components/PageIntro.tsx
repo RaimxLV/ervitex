@@ -32,24 +32,24 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
       {/* Hairline highlight along the bottom edge */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent_0%,hsl(var(--primary-foreground)/0.18)_35%,hsl(var(--primary-foreground)/0.18)_65%,transparent_100%)]" />
 
-      <div className="container relative flex min-h-[160px] items-end py-7 md:min-h-[190px] md:py-8">
-        <div className="grid w-full gap-5 md:grid-cols-[minmax(0,0.9fr)_minmax(280px,1.1fr)] md:items-end md:gap-12">
+      <div className="container relative flex min-h-[148px] items-end py-6 md:min-h-[190px] md:py-8">
+        <div className="grid w-full gap-4 md:grid-cols-[minmax(0,0.9fr)_minmax(280px,1.1fr)] md:items-end md:gap-12">
           <div className="min-w-0">
             {eyebrow && (
               <motion.div
                 initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45 }}
-                className="mb-6 flex items-center gap-2.5"
+                className="mb-4 flex items-center gap-2.5 md:mb-6"
               >
                 <span className="h-[3px] w-4 shrink-0 bg-accent" aria-hidden />
-                <span className="inline-flex border border-primary-foreground/20 px-3 py-1.5 font-heading text-[10px] font-bold uppercase text-primary-foreground/55">
+                <span className="inline-flex max-w-[calc(100vw-6rem)] border border-primary-foreground/20 px-3 py-1.5 font-heading text-[10px] font-bold uppercase leading-tight text-primary-foreground/55">
                   {eyebrow}
                 </span>
               </motion.div>
             )}
 
-            <h1 className="flex flex-wrap gap-x-[0.24em] overflow-hidden font-heading text-3xl font-bold uppercase leading-[0.94] md:text-5xl">
+            <h1 className="flex flex-wrap gap-x-[0.24em] overflow-hidden font-heading text-[1.75rem] font-bold uppercase leading-[0.98] md:text-5xl md:leading-[0.94]">
               {words.map((word, wordIndex) => (
                 <span key={`${word}-${wordIndex}`} className="overflow-hidden pb-1">
                   <motion.span
@@ -75,7 +75,7 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
               {/* Registration-mark corner accents frame the text block */}
               <span aria-hidden className="absolute -left-3 -top-2 h-3 w-3 border-l-2 border-t-2 border-primary-foreground/35" />
               <span aria-hidden className="absolute -right-3 bottom-0 h-3 w-3 border-b-2 border-r-2 border-primary-foreground/35" />
-              <p className="max-w-2xl text-base leading-relaxed text-primary-foreground/55 md:pb-1">
+              <p className="max-w-2xl text-[0.9rem] leading-[1.6] text-primary-foreground/55 md:pb-1 md:text-base md:leading-relaxed">
                 {subtitle}
               </p>
             </motion.div>

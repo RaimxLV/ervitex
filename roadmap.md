@@ -22,6 +22,7 @@
 - [x] Saskaņot visu kataloga kartīšu cenu ar uzreiz atvērtās krāsas cenu un saglabāt krāsas izvēli saitē.
 
 ## Vizuālie uzlabojumi
+- [x] Pilns publisko lapu telefona audits: sabalansēti fonti, lauki un atstarpes, desktopu nemainot.
 - [x] Atjaunot sākumlapai vieglu ritināšanas izlīdzinājumu un skaidri pamanāmu, optimizētu hero dziļuma efektu.
 - [x] Aizstāt LV/EN tekstu ar vienu glancētu apaļu karodziņu; datorā otru valodu rādīt vertikāli hover stāvoklī.
 - [x] Aizvietot DTF galerijas dubulto attēlu ar jauno optimizēto foto.

@@ -11,7 +11,7 @@ const TechnologiesShowcase = () => {
   const isLv = lang === "lv";
 
   return (
-    <section id="tehnologijas" className="bg-background py-20 md:py-28">
+    <section id="tehnologijas" className="bg-background py-12 md:py-28">
       <div className="container">
         {/* Intro */}
         <motion.div
@@ -24,10 +24,10 @@ const TechnologiesShowcase = () => {
           <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-accent">
             {isLv ? "Mūsu iespējas" : "Our capabilities"}
           </span>
-          <h2 className="mt-4 font-heading text-3xl font-bold uppercase tracking-tight text-foreground md:text-5xl">
+          <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-tight text-foreground md:mt-4 md:text-5xl">
             {isLv ? "APDRUKAS RISINĀJUMI" : "Decoration technologies"}
           </h2>
-          <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:mt-5 md:text-lg">
             {isLv
               ? "No smalkām detaļām līdz lielām tirāžām — palīdzēsim izvēlēties pareizo metodi, lai jūsu zīmols uz apģērba izskatītos nevainojami."
               : "Screen printing, DTF, embroidery and sublimation — all produced in our own facility in Latvia. We help you pick the technology that fits your design and quantity best."}
@@ -35,7 +35,7 @@ const TechnologiesShowcase = () => {
         </motion.div>
 
         {/* Overview cards */}
-        <div className="mt-12 flex flex-wrap justify-center gap-6 md:mt-16 md:gap-8">
+        <div className="mt-8 flex flex-wrap justify-center gap-7 md:mt-16 md:gap-8">
           {techs.map((t, i) => (
             <motion.div
               key={t.id}
@@ -58,7 +58,7 @@ const TechnologiesShowcase = () => {
                     className="h-full w-full bg-muted object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   />
                 </div>
-                <h3 className="mt-5 font-heading text-lg font-bold uppercase text-foreground">
+                <h3 className="mt-4 font-heading text-base font-bold uppercase text-foreground md:mt-5 md:text-lg">
                   {t.name[lang]}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.short[lang]}</p>
@@ -72,7 +72,7 @@ const TechnologiesShowcase = () => {
         </div>
 
         {/* Guarantee block */}
-        <div className="mt-20 grid gap-10 border-t border-border pt-16 lg:grid-cols-2 lg:items-center lg:gap-16 md:mt-28">
+        <div className="mt-12 grid gap-7 border-t border-border pt-10 md:mt-28 md:pt-16 lg:grid-cols-2 lg:items-center lg:gap-16">
           <img
             src={guaranteeImg}
             width={1200}
@@ -84,7 +84,7 @@ const TechnologiesShowcase = () => {
             className="aspect-[4/3] w-full rounded-sm bg-muted object-cover"
           />
           <div>
-            <h3 className="font-heading text-2xl font-bold uppercase leading-tight text-foreground md:text-4xl">
+            <h3 className="font-heading text-xl font-bold uppercase leading-tight text-foreground md:text-4xl">
               {isLv
                 ? "UZTICAMS PARTNERIS\nJŪSU UZŅĒMUMA\nAPĢĒRBU PROJEKTIEM"
                 : "We guarantee accuracy, quality and delivery on every order."}
