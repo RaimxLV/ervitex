@@ -299,11 +299,11 @@ const RetailSection = () => {
         <GlitchSparks />
       </div>
 
-      <div className="container relative flex flex-col justify-center pb-16 pt-[calc(56.7vw+1.5rem)] sm:min-h-[600px] sm:py-28 sm:pt-28 lg:min-h-[680px]">
+      <div className="container relative flex flex-col justify-center pb-12 pt-[calc(56.7vw+1.25rem)] sm:min-h-[600px] sm:py-28 sm:pt-28 lg:min-h-[680px]">
         <div className="max-w-2xl sm:max-w-[54%] lg:max-w-[46%]">
           <h2
             id="tbode-promo-title"
-            className="font-heading text-[clamp(2.2rem,5.4vw,4.4rem)] font-extrabold uppercase leading-[0.95] tracking-tight"
+            className="font-heading text-[2rem] font-extrabold uppercase leading-[0.98] tracking-tight sm:text-[clamp(2.2rem,5.4vw,4.4rem)] sm:leading-[0.95]"
           >
             {lang === "lv" ? (
               <>
@@ -318,7 +318,7 @@ const RetailSection = () => {
             )}
           </h2>
 
-          <p className="mt-8 max-w-2xl text-xl font-bold leading-snug tracking-tight sm:text-2xl lg:text-[1.75rem]">
+          <p className="mt-5 max-w-2xl text-base font-bold leading-snug tracking-tight sm:mt-8 sm:text-2xl lg:text-[1.75rem]">
             {lang === "lv" ? (
               <>
                 Izveido savu dizainu{" "}
@@ -338,12 +338,12 @@ const RetailSection = () => {
             )}
           </p>
 
-          <div className="mt-12">
+          <div className="mt-7 sm:mt-12">
             <a href={DESIGNER_URL} target="_blank" rel="noopener noreferrer" className="inline-block w-full sm:w-auto">
               <Button
                 size="lg"
                 style={{ transitionDuration: "300ms", animationDuration: "2.4s" }}
-                className="promo-cta group h-16 w-full justify-center gap-4 rounded-none border-0 px-12 font-heading text-base font-bold uppercase tracking-[0.15em] text-accent-foreground transition-transform motion-safe:animate-promo-pulse-cta hover:scale-[1.04] sm:h-[4.25rem] sm:w-auto sm:text-lg"
+                className="promo-cta group h-12 w-full justify-center gap-3 rounded-none border-0 px-6 font-heading text-sm font-bold uppercase tracking-[0.12em] text-accent-foreground transition-transform motion-safe:animate-promo-pulse-cta hover:scale-[1.04] sm:h-[4.25rem] sm:w-auto sm:px-12 sm:text-lg sm:tracking-[0.15em]"
               >
                 <span className="whitespace-nowrap">
                   {lang === "lv" ? "Izveidot dizainu" : "Create your design"}

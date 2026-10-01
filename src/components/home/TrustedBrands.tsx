@@ -11,14 +11,14 @@ const TrustedBrands = () => {
   const { lang } = useLanguage();
 
   return (
-    <section className="border-y border-border bg-background py-14 md:py-20">
+    <section className="border-y border-border bg-background py-10 md:py-20">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-10 text-center"
+          className="mb-7 text-center md:mb-10"
         >
           <div className="flex items-center justify-center gap-3 mb-3">
             <div className="h-px w-10 bg-accent" />

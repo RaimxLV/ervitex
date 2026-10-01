@@ -102,13 +102,13 @@ const ContactPage = () => {
       />
 
       {/* Team */}
-      <section className="bg-background py-16 md:py-24">
+      <section className="bg-background py-12 md:py-24">
         <div className="container">
           <SectionHeading
             eyebrow={lang === "lv" ? "Komanda" : "Team"}
             title={lang === "lv" ? "Sazinieties ar kādu no mūsu speciālistiem" : "Get in touch with one of our specialists"}
           />
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
             {specialists.map((member) => {
               const ps = photoSettings[member.slug];
               return (
@@ -129,7 +129,7 @@ const ContactPage = () => {
                       }}
                     />
                   </button>
-                  <div className="flex grow flex-col p-5">
+                   <div className="flex grow flex-col p-4 md:p-5">
                     <h3 className="font-heading text-base font-bold uppercase text-foreground">{member.name}</h3>
                     <p className="mt-1 min-h-[2.5rem] text-sm font-medium text-accent">{member.title[lang]}</p>
                     <div className="mt-4 space-y-2 border-t border-border pt-4">
@@ -149,11 +149,11 @@ const ContactPage = () => {
       </section>
 
       {/* Wholesale Office + Contact Form */}
-      <section className="border-t border-border bg-muted/50 py-16 md:py-24">
+      <section className="border-t border-border bg-muted/50 py-12 md:py-24">
         <div className="container">
           <SectionHeading eyebrow="Ervitex" title={lang === "lv" ? "Vairumtirdzniecības birojs" : "Wholesale office"} />
           <div className="grid items-stretch gap-6 lg:grid-cols-12">
-            <div className="flex flex-col border border-border bg-card p-6 lg:col-span-5 md:p-8">
+            <div className="flex flex-col border border-border bg-card p-5 lg:col-span-5 md:p-8">
               <dl className="divide-y divide-border">
                 {[
                   { icon: MapPin, label: t("contact.address"), content: <>Hausmaņa biroji, „D” ieeja, 2. stāvs<br />Braslas iela 29, Vidzemes priekšpilsēta,<br />Rīga, LV-1084</> },
@@ -182,20 +182,20 @@ const ContactPage = () => {
                     ),
                   },
                 ].map((item) => (
-                  <div key={item.label} className="flex gap-4 py-4 first:pt-0 last:pb-0">
+                  <div key={item.label} className="flex gap-3 py-3.5 first:pt-0 last:pb-0 md:gap-4 md:py-4">
                     <item.icon className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={1.5} />
                     <div className="min-w-0">
                       <dt className="font-heading text-xs font-bold uppercase tracking-wider text-muted-foreground">{item.label}</dt>
-                      <dd className="mt-1 text-base leading-relaxed text-foreground">{item.content}</dd>
+                      <dd className="mt-1 text-sm leading-relaxed text-foreground md:text-base">{item.content}</dd>
                     </div>
                   </div>
                 ))}
               </dl>
             </div>
 
-            <div className="border border-border bg-card p-6 lg:col-span-7 md:p-8">
+            <div className="border border-border bg-card p-5 lg:col-span-7 md:p-8">
               <h3 className="mb-6 font-heading text-lg font-bold uppercase text-foreground">{lang === "lv" ? "Sazinieties ar mums" : "Contact us"}</h3>
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
                 <div className="grid gap-5 sm:grid-cols-2">
                   {([
                     ["name", t("contact.name"), "text", true],
@@ -203,9 +203,9 @@ const ContactPage = () => {
                     ["company", t("contact.company"), "text", false],
                     ["phone", t("contact.phoneLabel"), "tel", false],
                   ] as const).map(([key, label, type, req]) => (
-                    <div key={key} className="space-y-2">
+                     <div key={key} className="space-y-1.5 md:space-y-2">
                       <label htmlFor={`c-${key}`} className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{label}</label>
-                      <Input id={`c-${key}`} required={req} type={type} value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} className="h-12 rounded-none bg-background px-4 focus-visible:ring-accent" />
+                       <Input id={`c-${key}`} required={req} type={type} value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} className="h-11 rounded-none bg-background px-3 focus-visible:ring-accent md:h-12 md:px-4" />
                     </div>
                   ))}
                 </div>
@@ -224,7 +224,7 @@ const ContactPage = () => {
       </section>
 
       {/* Location */}
-      <section className="border-t border-border bg-background py-16 md:py-24">
+      <section className="border-t border-border bg-background py-12 md:py-24">
         <div className="container">
           <SectionHeading
             eyebrow={lang === "lv" ? "Atrašanās vieta" : "Location"}

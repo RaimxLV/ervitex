@@ -177,11 +177,11 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
         {(code || brandBadge) && (
           <div className="flex flex-row items-stretch border-t border-border bg-primary text-primary-foreground">
             {code && (
-              <span className="flex shrink-0 items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5">
+                 <span className="flex min-w-0 shrink items-center gap-1.5 px-1.5 py-1 sm:shrink-0 sm:px-3 sm:py-1.5">
                 <span
                   onClick={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
-                  className="codebar-code whitespace-nowrap font-mono font-bold uppercase select-all cursor-text"
+                   className="codebar-code whitespace-nowrap font-mono font-bold uppercase select-all cursor-text"
                 >
                   {code}
                 </span>
@@ -205,7 +205,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
               </span>
             )}
             {brandBadge && (
-              <span className="codebar-brand flex min-w-0 flex-1 items-center justify-end overflow-hidden border-l border-primary-foreground/20 px-2 py-1 text-right font-heading font-bold uppercase sm:px-3 sm:py-1.5">
+               <span className="codebar-brand flex min-w-0 flex-1 items-center justify-end overflow-hidden border-l border-primary-foreground/20 px-1.5 py-1 text-right font-heading font-bold uppercase sm:px-3 sm:py-1.5">
                 <span className="truncate">{brandBadge}</span>
               </span>
             )}
@@ -214,12 +214,12 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
 
 
         <div className="flex flex-1 flex-col gap-1 p-2 sm:gap-1.5 sm:p-3">
-          <h3 className="line-clamp-2 min-h-[2.1em] font-heading text-[12px] font-bold uppercase leading-tight tracking-wide transition-colors group-hover:text-accent sm:text-sm">
+          <h3 className="line-clamp-2 min-h-[2.3em] font-heading text-[11px] font-bold uppercase leading-[1.15] tracking-normal transition-colors group-hover:text-accent sm:text-sm sm:leading-tight sm:tracking-wide">
             {title}
           </h3>
 
           {subtitle && (
-            <p className="line-clamp-1 text-[11px] text-muted-foreground sm:line-clamp-2 sm:text-xs">{subtitle}</p>
+             <p className="line-clamp-1 text-[10px] text-muted-foreground sm:line-clamp-2 sm:text-xs">{subtitle}</p>
           )}
 
           {swatches && swatches.length > 0 && (
@@ -254,7 +254,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
                         ? (e) => { e.stopPropagation(); e.preventDefault(); s.onSelect!(); }
                         : undefined
                     }
-                    className={`inline-block h-6 w-6 rounded-full transition-transform sm:h-4 sm:w-4 ${
+                     className={`inline-block h-5 w-5 rounded-full transition-transform sm:h-4 sm:w-4 ${
                       s.active
                         ? "ring-2 ring-foreground ring-offset-1 ring-offset-background scale-110"
                         : isLight

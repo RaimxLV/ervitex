@@ -177,7 +177,7 @@ const RequestPage = () => {
         )}
         eyebrow={t("Pasūtījuma sagatavošana", "Preparing your order")}
       />
-      <div className="container mx-auto max-w-6xl px-4 py-10 sm:py-14">
+      <div className="container mx-auto max-w-6xl px-4 py-7 sm:py-14">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <Button asChild variant="ghost" size="sm" className="-ml-2 font-heading text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
             <Link to="/catalog">
@@ -200,17 +200,17 @@ const RequestPage = () => {
         </div>
 
         {items.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border bg-card/50 p-14 text-center">
-            <p className="text-muted-foreground">
+          <div className="rounded-lg border border-dashed border-border bg-card/50 px-5 py-10 text-center sm:rounded-2xl sm:p-14">
+            <p className="mx-auto max-w-sm text-sm leading-relaxed text-muted-foreground sm:text-base">
               {t("Pieprasījums ir tukšs. Pārlūko katalogu un pievieno preces.", "Your request is empty. Browse the catalog and add items.")}
             </p>
-            <Button asChild className="mt-6 bg-accent font-heading text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90">
+            <Button asChild className="mt-5 h-11 bg-accent px-5 font-heading text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90 sm:mt-6">
               <Link to="/catalog">{t("Atvērt katalogu", "Open catalog")}</Link>
             </Button>
           </div>
         ) : (
-          <form onSubmit={submit} className="grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr),400px]">
-            <div className="min-w-0 space-y-8">
+          <form onSubmit={submit} className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr),400px] lg:gap-8">
+            <div className="min-w-0 space-y-6 sm:space-y-8">
 
               {/* Items */}
               <section>

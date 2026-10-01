@@ -77,7 +77,7 @@ const BentoCategories = () => {
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
 
   return (
-    <section className="bg-background py-16 md:py-24">
+    <section className="bg-background py-12 md:py-24">
       <div className="container px-4">
         {/* Header */}
         <motion.div
@@ -85,7 +85,7 @@ const BentoCategories = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-8 md:mb-10"
+           className="mb-6 md:mb-10"
         >
           <div className="mb-2 flex items-center gap-3">
             <div className="h-px w-8 bg-accent" />
@@ -93,7 +93,7 @@ const BentoCategories = () => {
               {t("Kategorijas", "Categories")}
             </span>
           </div>
-          <h2 className="font-heading text-3xl font-bold uppercase tracking-tight text-foreground md:text-5xl">
+          <h2 className="font-heading text-2xl font-bold uppercase tracking-tight text-foreground md:text-5xl">
             {t("Produktu katalogs", "Product catalog")}
           </h2>
         </motion.div>
@@ -106,15 +106,15 @@ const BentoCategories = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="group relative col-span-2 flex flex-col items-start justify-center overflow-hidden rounded-2xl bg-primary p-7 md:row-span-2 md:p-12"
+             className="group relative col-span-2 flex flex-col items-start justify-center overflow-hidden rounded-2xl bg-primary p-5 md:row-span-2 md:p-12"
           >
             <div className="relative z-10">
-              <h3 className="mb-4 font-heading text-2xl font-bold leading-tight text-primary-foreground md:mb-6 md:text-[2.75rem]">
+              <h3 className="mb-3 font-heading text-xl font-bold leading-tight text-primary-foreground md:mb-6 md:text-[2.75rem]">
                 {t("Padariet šos apģērbus", "Make these items")}
                 <br />
                 {t("par savējiem", "your own")}
               </h3>
-              <p className="mb-7 max-w-xs text-sm text-primary-foreground/60 md:mb-10 md:text-lg">
+              <p className="mb-5 max-w-xs text-sm text-primary-foreground/60 md:mb-10 md:text-lg">
                 {t(
                   "Izvēlieties no vairāk nekā 10 000 premium kvalitātes tekstila un prezentmateriālu vienībām.",
                   "Choose from 10,000+ premium textile and promo products.",
@@ -122,7 +122,7 @@ const BentoCategories = () => {
               </p>
               <Link
                 to="/catalog"
-                className="inline-flex items-center gap-3 rounded-full bg-accent px-7 py-3.5 font-heading text-xs font-bold uppercase tracking-wider text-accent-foreground transition-colors hover:bg-accent/90 md:px-8 md:py-4 md:text-sm"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 py-3 font-heading text-[11px] font-bold uppercase tracking-wider text-accent-foreground transition-colors hover:bg-accent/90 md:px-8 md:py-4 md:text-sm"
               >
                 {t("Izpētīt visu katalogu", "Explore all products")}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" strokeWidth={2.5} />

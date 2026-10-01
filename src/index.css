@@ -107,6 +107,12 @@
     font-size: 18px;
   }
 
+  @media (max-width: 767px) {
+    html {
+      font-size: 16px;
+    }
+  }
+
   * {
     @apply border-border;
   }
@@ -136,13 +142,23 @@
 
   /* Product-card code bar stays compact: code + brand must fit in one row */
   .public-readable .codebar-code {
-    font-size: 0.7rem !important;
+    font-size: 0.62rem !important;
     line-height: 1.4 !important;
   }
 
   .public-readable .codebar-brand {
-    font-size: 0.75rem !important;
+    font-size: 0.68rem !important;
     line-height: 1.4 !important;
+  }
+
+  @media (min-width: 640px) {
+    .public-readable .codebar-code {
+      font-size: 0.7rem !important;
+    }
+
+    .public-readable .codebar-brand {
+      font-size: 0.75rem !important;
+    }
   }
 
   .catalog-card-media {

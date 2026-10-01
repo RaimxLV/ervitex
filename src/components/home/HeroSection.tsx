@@ -21,7 +21,7 @@ const HeroSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[100svh] flex items-center overflow-hidden bg-black"
+      className="relative min-h-[calc(100svh-4rem)] flex items-center overflow-hidden bg-black md:min-h-[calc(100svh-5rem)]"
     >
       {/* ── LAYER 2: depth-map parallax scene ── */}
       <HeroDepthScene className="z-[1]" />
@@ -36,7 +36,7 @@ const HeroSection = () => {
 
 
       {/* ── LAYER 4: content ── */}
-      <div className="container relative z-10 py-20 sm:py-24 pointer-events-none">
+      <div className="container relative z-10 py-12 pointer-events-none sm:py-24">
 
         <div className="max-w-[min(37rem,86vw)] md:max-w-3xl">
           {/* Eyebrow */}
@@ -44,7 +44,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="mb-6 flex items-center gap-3"
+            className="mb-4 flex items-center gap-3 sm:mb-6"
           >
             <div className="h-px w-10 bg-accent" />
             <span className="font-heading text-[10px] font-bold uppercase text-accent tracking-wide">
@@ -57,7 +57,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="font-heading text-[2.55rem] font-bold leading-[0.98] text-primary-foreground sm:text-5xl md:text-7xl lg:text-[5.5rem]"
+            className="font-heading text-[2.15rem] font-bold leading-[1] text-primary-foreground min-[370px]:text-[2.3rem] sm:text-5xl md:text-7xl lg:text-[5.5rem]"
           >
             {lang === "lv" ? "Tekstila" : "Textile"}
             <br />
@@ -73,7 +73,7 @@ const HeroSection = () => {
           </motion.h1>
 
           {/* Subtitle */}
-          <p className="mt-6 max-w-[22rem] text-sm leading-relaxed text-primary-foreground/55 md:max-w-md md:text-base">
+          <p className="mt-5 max-w-[22rem] text-[0.8rem] leading-[1.65] text-primary-foreground/55 sm:mt-6 sm:text-sm md:max-w-md md:text-base">
             {lang === "lv" ? (
               <>
                 <span className="block font-heading font-bold uppercase tracking-wide text-primary-foreground">
@@ -100,11 +100,11 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.9 }}
-            className="mt-8 flex flex-col gap-3 pointer-events-auto sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4"
+            className="mt-6 flex flex-col gap-2.5 pointer-events-auto sm:mt-10 sm:flex-row sm:flex-wrap sm:gap-4"
           >
             <Button
               size="lg"
-              className="bg-transparent border border-accent text-accent hover:bg-accent/15 font-heading text-xs uppercase rounded-none px-8 py-4 h-14 w-full justify-center sm:w-auto sm:min-w-[220px] sm:px-14"
+              className="h-12 w-full justify-center rounded-none border border-accent bg-transparent px-6 py-3 font-heading text-xs uppercase text-accent hover:bg-accent/15 sm:h-14 sm:w-auto sm:min-w-[220px] sm:px-14 sm:py-4"
               asChild
             >
               <Link to="/catalog">
@@ -115,7 +115,7 @@ const HeroSection = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border border-primary-foreground/35 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:border-accent font-heading text-xs uppercase rounded-none px-8 py-4 h-14 w-full justify-center sm:w-auto sm:min-w-[220px] sm:px-14"
+              className="h-12 w-full justify-center rounded-none border border-primary-foreground/35 bg-transparent px-6 py-3 font-heading text-xs uppercase text-primary-foreground hover:border-accent hover:bg-primary-foreground/10 sm:h-14 sm:w-auto sm:min-w-[220px] sm:px-14 sm:py-4"
               asChild
             >
               <Link to="/services">
@@ -126,14 +126,14 @@ const HeroSection = () => {
           </motion.div>
 
           {/* Stats */}
-          <div className="mt-10 grid max-w-[23rem] grid-cols-3 gap-4 border-t border-primary-foreground/10 pt-6 sm:mt-14 sm:flex sm:max-w-none sm:gap-10 sm:pt-7">
+          <div className="mt-7 grid max-w-[23rem] grid-cols-3 gap-3 border-t border-primary-foreground/10 pt-4 sm:mt-14 sm:flex sm:max-w-none sm:gap-10 sm:pt-7">
             {[
               { value: "28+", label: lang === "lv" ? "Gadi pieredzē" : "Years Experience" },
               { value: "6000+", label: lang === "lv" ? "Produkti" : "Products" },
               { value: "5", label: lang === "lv" ? "Drukas tehnoloģijas" : "Print Technologies" },
             ].map((stat, i) => (
               <div key={i}>
-                <div className="font-heading text-2xl font-bold text-accent md:text-3xl">
+                <div className="font-heading text-xl font-bold text-accent sm:text-2xl md:text-3xl">
                   {stat.value}
                 </div>
                 <div className="mt-1 text-[10px] font-medium uppercase text-primary-foreground/40">
