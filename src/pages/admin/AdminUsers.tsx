@@ -29,6 +29,11 @@ const AdminUsers = () => {
   const [creating, setCreating] = useState(false);
   const [changingPw, setChangingPw] = useState<string | null>(null);
   const [newPw, setNewPw] = useState("");
+  const [ownCurrent, setOwnCurrent] = useState("");
+  const [ownNew, setOwnNew] = useState("");
+  const [ownRepeat, setOwnRepeat] = useState("");
+  const [changingOwn, setChangingOwn] = useState(false);
+
 
   const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
 
