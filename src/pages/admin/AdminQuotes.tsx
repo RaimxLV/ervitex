@@ -1,17 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
 import { worksheetPath, worksheetUrl } from "@/lib/worksheet";
 import {
-  AlertTriangle,
-  CheckCircle2,
   ChevronDown,
   ClipboardList,
   Copy,
@@ -76,39 +70,15 @@ const EVENT_LABELS: Record<string, string> = {
 };
 
 const daysSince = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
-const isDone = (q: QuoteRow) => q.status === "closed";
-
-type TabKey = "unassigned" | "mine" | "active" | "done";
-
-type SortKey = "newest" | "oldest" | "name" | "company" | "assignee" | "qty";
-
-const SORTS: { key: SortKey; label: string }[] = [
-  { key: "newest", label: "Jaunākie pirmie" },
-  { key: "oldest", label: "Vecākie pirmie" },
-  { key: "name", label: "Klients (A–Z)" },
-  { key: "company", label: "Uzņēmums (A–Z)" },
-  { key: "assignee", label: "Atbildīgais" },
-  { key: "qty", label: "Lielākais daudzums" },
-];
-
-const TABS: { key: TabKey; label: string }[] = [
-  { key: "unassigned", label: "Nenodotie" },
-  { key: "mine", label: "Mani" },
-  { key: "active", label: "Visi aktīvie" },
-  { key: "done", label: "Pabeigtie" },
-];
 
 const AdminQuotes = () => {
   const [quotes, setQuotes] = useState<QuoteRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
-  const [tab, setTab] = useState<TabKey>("unassigned");
   const [q, setQ] = useState("");
-  const [sort, setSort] = useState<SortKey>("newest");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [events, setEvents] = useState<QuoteEvent[]>([]);
   const { toast } = useToast();
-  const { user } = useAuth();
 
   const fetchQuotes = async () => {
     setLoading(true);
@@ -125,81 +95,6 @@ const AdminQuotes = () => {
   useEffect(() => {
     fetchQuotes();
   }, []);
-
-  const patch = async (id: string, values: Partial<QuoteRow>) => {
-    const { error } = await supabase.from("quote_requests").update(values as never).eq("id", id);
-    if (error) toast({ title: "Kļūda", description: error.message, variant: "destructive" });
-    else setQuotes((prev) => prev.map((x) => (x.id === id ? { ...x, ...values } : x)));
-  };
-
-  /**
-   * Nodod pieprasījumu cilvēkam. Ja ir darbības žetons, izmantojam to pašu ceļu kā e-pasta pogas,
-   * lai izvēlētais cilvēks uzreiz saņem vēstuli ar visu informāciju.
-   */
-  const assign = async (row: QuoteRow, slug: string) => {
-    const p = assigneeBySlug(slug);
-    if (!p) return;
-    setBusy(row.id);
-    if (row.action_token) {
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quote-action?token=${row.action_token}&action=assign:${p.slug}&format=json`,
-        );
-        const out = (await res.json().catch(() => null)) as { ok?: boolean; emailed?: boolean } | null;
-        if (!res.ok || !out?.ok) throw new Error("Neizdevās nodot");
-        setQuotes((prev) =>
-          prev.map((x) =>
-            x.id === row.id
-              ? {
-                  ...x,
-                  assigned_pm_slug: p.slug,
-                  assigned_pm_name: p.name,
-                  assigned_pm_email: p.email,
-                  assigned_at: new Date().toISOString(),
-                  status: x.status === "new" ? "contacted" : x.status,
-                }
-              : x,
-          ),
-        );
-        if (out.emailed === false) {
-          toast({
-            title: `Nodots ${p.name}`,
-            description: `Vēstule uz ${p.email} neaizgāja.`,
-            variant: "destructive",
-          });
-        } else {
-          toast({ title: `Nodots ${p.name}`, description: `Vēstule aizgāja uz ${p.email}.` });
-        }
-      } catch (e) {
-        toast({ title: "Kļūda", description: (e as Error).message, variant: "destructive" });
-      }
-    } else {
-      await patch(row.id, {
-        assigned_pm_slug: p.slug,
-        assigned_pm_name: p.name,
-        assigned_pm_email: p.email,
-        assigned_at: new Date().toISOString(),
-        status: row.status === "new" ? "contacted" : row.status,
-      });
-      toast({ title: `Nodots ${p.name}`, description: "Vēstule netika sūtīta (nav darbības saites)." });
-    }
-    setBusy(null);
-  };
-
-  const takeMine = (row: QuoteRow) => {
-    const me = ASSIGNEES.find((a) => a.email.toLowerCase() === (user?.email || "").toLowerCase());
-    if (!me) {
-      toast({ title: "Tavs e-pasts nav sarakstā", variant: "destructive" });
-      return;
-    }
-    assign(row, me.slug);
-  };
-
-  const complete = (row: QuoteRow) =>
-    patch(row.id, { status: "closed", completed_at: new Date().toISOString(), worksheet_locked: true } as Partial<QuoteRow>);
-
-  const reopen = (row: QuoteRow) =>
-    patch(row.id, { status: "contacted", completed_at: null, worksheet_locked: false } as Partial<QuoteRow>);
 
   /** Dzēš pieprasījumu un tam pievienotos failus. */
   const remove = async (row: QuoteRow) => {
@@ -236,40 +131,13 @@ const AdminQuotes = () => {
     window.open(data.signedUrl, "_blank", "noopener");
   };
 
-  const myEmail = (user?.email || "").toLowerCase();
-
-  const inTab = (row: QuoteRow, key: TabKey) => {
-    if (key === "done") return isDone(row);
-    if (isDone(row)) return false;
-    if (key === "unassigned") return !row.assigned_pm_slug;
-    if (key === "mine") return (row.assigned_pm_email || "").toLowerCase() === myEmail;
-    return true;
-  };
-
-  const counts = useMemo(
-    () =>
-      TABS.reduce<Record<TabKey, number>>(
-        (acc, t) => ({ ...acc, [t.key]: quotes.filter((x) => inTab(x, t.key)).length }),
-        { unassigned: 0, mine: 0, active: 0, done: 0 },
-      ),
-    [quotes, myEmail],
-  );
-
   const search = q.trim().toLowerCase();
   const matches = (row: QuoteRow) => {
     if (!search) return true;
     const itemText = (Array.isArray(row.items) ? row.items : [])
       .map((i) => [i.name, i.code, i.brand, i.colorName, i.size].filter(Boolean).join(" "))
       .join(" ");
-    return [
-      row.name,
-      row.company,
-      row.email,
-      row.phone,
-      row.assigned_pm_name,
-      row.message,
-      itemText,
-    ]
+    return [row.name, row.company, row.email, row.phone, row.message, itemText]
       .filter(Boolean)
       .join(" ")
       .toLowerCase()
@@ -280,29 +148,18 @@ const AdminQuotes = () => {
     (Array.isArray(row.items) ? row.items : []).reduce((s, i) => s + (i.qty || 0), 0);
 
   const visible = quotes
-    .filter((row) => inTab(row, tab) && matches(row))
-    .sort((a, b) => {
-      if (sort === "oldest") return +new Date(a.created_at) - +new Date(b.created_at);
-      if (sort === "name") return a.name.localeCompare(b.name, "lv");
-      if (sort === "company")
-        return (a.company || a.name).localeCompare(b.company || b.name, "lv");
-      if (sort === "assignee")
-        return (a.assigned_pm_name || "Ω").localeCompare(b.assigned_pm_name || "Ω", "lv");
-      if (sort === "qty") return qtyOf(b) - qtyOf(a);
-      return +new Date(b.created_at) - +new Date(a.created_at);
-    });
-
-  const stale = quotes.filter((x) => !isDone(x) && !x.assigned_pm_slug && daysSince(x.created_at) >= 2).length;
+    .filter(matches)
+    .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
 
   return (
     <AdminLayout>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="font-heading text-xl font-black uppercase tracking-wide text-foreground sm:text-2xl">
-            Pieprasījumi
+            Visi pasūtījumi
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Sadale un pārskats. Sarakste ar klientu notiek tavā e-pastā.
+            {quotes.length} pieprasījumu vēsture
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={fetchQuotes} disabled={loading}>
@@ -311,114 +168,35 @@ const AdminQuotes = () => {
         </Button>
       </div>
 
-      {stale > 0 && (
-        <div className="mt-4 flex items-start gap-2 rounded-sm border border-destructive/40 bg-destructive/5 p-3 text-sm">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
-          <p className="text-foreground">
-            <span className="font-semibold text-destructive">{stale}</span> pieprasījumi stāv nenodoti ilgāk par 2
-            dienām.
-          </p>
-        </div>
-      )}
-
-      <div className="mt-5 flex flex-wrap gap-2">
-        {TABS.map((t) => (
-          <Button
-            key={t.key}
-            variant={tab === t.key ? "default" : "outline"}
-            size="sm"
-            onClick={() => setTab(t.key)}
-            className="text-xs font-bold uppercase tracking-wider"
-          >
-            {t.label} ({counts[t.key]})
-          </Button>
-        ))}
-      </div>
-
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+      <div className="mt-5">
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Meklēt: klients, uzņēmums, e-pasts, telefons, prece…"
           className="sm:max-w-sm"
         />
-        <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-          <SelectTrigger className="sm:w-56">
-            <SelectValue placeholder="Kārtot" />
-          </SelectTrigger>
-          <SelectContent>
-            {SORTS.map((s) => (
-              <SelectItem key={s.key} value={s.key}>
-                {s.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-green-500" /> Jauns
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-blue-500" /> Darbā
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-destructive" /> Kavējas (nenodots vairāk par 2 dienām)
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-muted-foreground/50" /> Pabeigts
-        </span>
       </div>
 
       <div className="mt-6 space-y-4">
         {loading ? (
           <p className="py-8 text-center text-muted-foreground">Ielādē...</p>
         ) : visible.length === 0 ? (
-          <p className="py-8 text-center text-muted-foreground">Šajā sadaļā nav pieprasījumu</p>
+          <p className="py-8 text-center text-muted-foreground">
+            {search ? "Nekas netika atrasts" : "Nav pieprasījumu"}
+          </p>
         ) : (
           visible.map((row) => {
             const items = Array.isArray(row.items) ? row.items : [];
-            const totalQty = items.reduce((s, i) => s + (i.qty || 0), 0);
-            const totalNet = items.reduce((s, i) => s + (i.unitPrice || 0) * (i.qty || 0), 0);
+            const totalQty = qtyOf(row);
             const age = daysSince(row.created_at);
-            const done = isDone(row);
-            const late = !done && age >= 2 && !row.assigned_pm_slug;
             const isOpen = expanded === row.id;
-            const dotClass = done
-              ? "bg-muted-foreground/50"
-              : late
-                ? "bg-destructive"
-                : row.assigned_pm_slug
-                  ? "bg-blue-500"
-                  : "bg-green-500";
-            const badgeClass = done
-              ? "bg-muted text-muted-foreground"
-              : late
-                ? "bg-destructive text-white"
-                : row.assigned_pm_slug
-                  ? "bg-blue-500 text-white"
-                  : "bg-green-600 text-white";
-            const statusLabel = done
-              ? "Pabeigts"
-              : late
-                ? "Kavējas"
-                : row.assigned_pm_slug
-                  ? "Darbā"
-                  : "Jauns";
             return (
-              <div
-                key={row.id}
-                className={`overflow-hidden rounded-sm border bg-card ${
-                  late && !done ? "border-destructive/50" : "border-border"
-                }`}
-              >
+              <div key={row.id} className="overflow-hidden rounded-sm border border-border bg-card">
                 <button
                   type="button"
                   onClick={() => setExpanded(isOpen ? null : row.id)}
                   className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
                 >
-                  <span className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${dotClass}`} />
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-baseline gap-x-2">
                       <span className="truncate text-sm font-semibold text-foreground">
@@ -436,194 +214,137 @@ const AdminQuotes = () => {
                           · {items.length} preces, {totalQty} gab.
                         </span>
                       )}
-                      <span>
-                        · {row.assigned_pm_name ? `Atbildīgais: ${row.assigned_pm_name}` : "Nav atbildīgā"}
-                      </span>
                     </span>
                   </span>
                   <span className="hidden shrink-0 text-right text-xs text-muted-foreground sm:block">
                     {new Date(row.created_at).toLocaleDateString("lv")}
                     <span className="block">{age === 0 ? "šodien" : `${age} d. atpakaļ`}</span>
                   </span>
-                  <Badge className={`shrink-0 ${badgeClass}`}>{statusLabel}</Badge>
                   <ChevronDown
-                    className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
+                    className={`mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
                       isOpen ? "rotate-180" : ""
                     }`}
                   />
                 </button>
                 {isOpen && (
-                <div className="space-y-3 p-4 sm:p-5">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-medium text-foreground">{row.name}</p>
-                      {done ? (
-                        <Badge className="bg-muted text-muted-foreground">Pabeigts</Badge>
-                      ) : row.assigned_pm_name ? (
-                        <Badge className="bg-blue-500 text-white">{row.assigned_pm_name}</Badge>
-                      ) : (
-                        <Badge className="bg-accent text-accent-foreground">Nenodots</Badge>
-                      )}
-                      {!done && (
-                        <Badge
-                          variant="outline"
-                          className={late ? "border-destructive/60 text-destructive" : "text-muted-foreground"}
-                        >
-                          {age === 0 ? "Šodien" : `${age} d.`}
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="break-words text-sm text-muted-foreground">
-                      {row.email}
-                      {row.phone && ` · ${row.phone}`}
-                    </p>
-                    {row.company && <p className="text-sm text-muted-foreground">Uzņēmums: {row.company}</p>}
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {new Date(row.created_at).toLocaleString("lv")}
-                    </p>
-                  </div>
-                  <div className="flex flex-col gap-2 sm:w-52">
-                    <Select
-                      value={row.assigned_pm_slug ?? ""}
-                      onValueChange={(v) => assign(row, v)}
-                      disabled={busy === row.id}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Nodot…" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ASSIGNEES.map((a) => (
-                          <SelectItem key={a.slug} value={a.slug}>
-                            {a.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {!row.assigned_pm_slug && (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="w-full"
-                        disabled={busy === row.id}
-                        onClick={() => takeMine(row)}
-                      >
-                        Ņemu es
-                      </Button>
-                    )}
-                    <Button asChild variant="outline" size="sm" className="w-full">
-                      <a
-                        href={`mailto:${row.email}?subject=${encodeURIComponent(
-                          "Cenu pieprasījums",
-                        )}`}
-                      >
-                        <Mail className="mr-2 h-4 w-4" /> Rakstīt klientam
-                      </a>
-                    </Button>
-                    {row.action_token && (
-                      <>
-                        <Button asChild size="sm" className="w-full">
-                          <a href={worksheetPath(row.action_token)} target="_blank" rel="noreferrer">
-                            <ClipboardList className="mr-2 h-4 w-4" /> Preču saraksts
+                  <div className="space-y-3 p-4 sm:p-5">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <p className="font-medium text-foreground">{row.name}</p>
+                        <p className="break-words text-sm text-muted-foreground">
+                          {row.email}
+                          {row.phone && ` · ${row.phone}`}
+                        </p>
+                        {row.company && <p className="text-sm text-muted-foreground">Uzņēmums: {row.company}</p>}
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {new Date(row.created_at).toLocaleString("lv")}
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-2 sm:w-52">
+                        <Button asChild variant="outline" size="sm" className="w-full">
+                          <a
+                            href={`mailto:${row.email}?subject=${encodeURIComponent(
+                              "Cenu pieprasījums",
+                            )}`}
+                          >
+                            <Mail className="mr-2 h-4 w-4" /> Rakstīt klientam
                           </a>
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="w-full text-xs"
-                          onClick={() => copyText(worksheetUrl(row.action_token!), "Saraksta saite nokopēta")}
-                        >
-                          <Copy className="mr-1.5 h-3.5 w-3.5" /> Kopēt saraksta saiti
-                        </Button>
-                      </>
-                    )}
-                    {done ? (
-                      <Button variant="ghost" size="sm" className="w-full" onClick={() => reopen(row)}>
-                        Atvērt atkal
-                      </Button>
-                    ) : (
-                      <Button variant="outline" size="sm" className="w-full" onClick={() => complete(row)}>
-                        <CheckCircle2 className="mr-2 h-4 w-4" /> Pabeigts
-                      </Button>
-                    )}
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="flex-1 text-xs"
-                        onClick={() =>
-                          copyText(
-                            [row.name, row.email, row.phone, row.company]
-                              .filter(Boolean)
-                              .join(" · "),
-                            "Klienta dati nokopēti",
-                          )
-                        }
-                      >
-                        <Copy className="mr-1.5 h-3.5 w-3.5" /> Kopēt
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="flex-1 text-xs text-destructive"
-                        disabled={busy === row.id}
-                        onClick={() => remove(row)}
-                      >
-                        <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Dzēst
-                      </Button>
+                        {row.action_token && (
+                          <>
+                            <Button asChild size="sm" className="w-full">
+                              <a href={worksheetPath(row.action_token)} target="_blank" rel="noreferrer">
+                                <ClipboardList className="mr-2 h-4 w-4" /> Preču saraksts
+                              </a>
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full text-xs"
+                              onClick={() => copyText(worksheetUrl(row.action_token!), "Saraksta saite nokopēta")}
+                            >
+                              <Copy className="mr-1.5 h-3.5 w-3.5" /> Kopēt saraksta saiti
+                            </Button>
+                          </>
+                        )}
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="flex-1 text-xs"
+                            onClick={() =>
+                              copyText(
+                                [row.name, row.email, row.phone, row.company]
+                                  .filter(Boolean)
+                                  .join(" · "),
+                                "Klienta dati nokopēti",
+                              )
+                            }
+                          >
+                            <Copy className="mr-1.5 h-3.5 w-3.5" /> Kopēt
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="flex-1 text-xs text-destructive"
+                            disabled={busy === row.id}
+                            onClick={() => remove(row)}
+                          >
+                            <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Dzēst
+                          </Button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
 
-                {(row.print_method || row.print_placement || row.print_colors || row.deadline) && (
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
-                    {row.print_method && <span>Tehnoloģija: <span className="text-foreground">{row.print_method}</span></span>}
-                    {row.print_placement && <span>Vieta: <span className="text-foreground">{row.print_placement}</span></span>}
-                    {row.print_colors && <span>Krāsas: <span className="text-foreground">{row.print_colors}</span></span>}
-                    {row.deadline && <span>Termiņš: <span className="text-foreground">{row.deadline}</span></span>}
-                  </div>
-                )}
+                    {(row.print_method || row.print_placement || row.print_colors || row.deadline) && (
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-border pt-3 text-xs text-muted-foreground">
+                        {row.print_method && <span>Tehnoloģija: <span className="text-foreground">{row.print_method}</span></span>}
+                        {row.print_placement && <span>Vieta: <span className="text-foreground">{row.print_placement}</span></span>}
+                        {row.print_colors && <span>Krāsas: <span className="text-foreground">{row.print_colors}</span></span>}
+                        {row.deadline && <span>Termiņš: <span className="text-foreground">{row.deadline}</span></span>}
+                      </div>
+                    )}
 
-                {row.file_urls && row.file_urls.length > 0 && (
-                  <div className="border-t border-border pt-3">
-                    <p className="mb-2 text-[11px] uppercase tracking-wider text-muted-foreground">Pielikumi</p>
-                    <div className="flex flex-wrap gap-2">
-                      {row.file_urls.map((u, i) => (
-                        <Button key={i} variant="outline" size="sm" className="text-xs" onClick={() => openAttachment(u)}>
-                          <Paperclip className="mr-1.5 h-3.5 w-3.5" />
-                          {decodeURIComponent(u.split("/").pop() || `Fails ${i + 1}`)}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                    {row.file_urls && row.file_urls.length > 0 && (
+                      <div className="border-t border-border pt-3">
+                        <p className="mb-2 text-[11px] uppercase tracking-wider text-muted-foreground">Pielikumi</p>
+                        <div className="flex flex-wrap gap-2">
+                          {row.file_urls.map((u, i) => (
+                            <Button key={i} variant="outline" size="sm" className="text-xs" onClick={() => openAttachment(u)}>
+                              <Paperclip className="mr-1.5 h-3.5 w-3.5" />
+                              {decodeURIComponent(u.split("/").pop() || `Fails ${i + 1}`)}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-                {row.message && (
-                  <p className="whitespace-pre-wrap border-t border-border pt-3 text-sm text-muted-foreground">
-                    {row.message}
-                  </p>
-                )}
-                {events.some((event) => event.quote_id === row.id) && (
-                  <div className="border-t border-border pt-3">
-                    <p className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                      <History className="h-3.5 w-3.5" /> Darbību vēsture
-                    </p>
-                    <ol className="space-y-2">
-                      {events.filter((event) => event.quote_id === row.id).map((event) => {
-                        const target = typeof event.details?.to === "string" ? event.details.to : null;
-                        const revision = typeof event.details?.revision === "number" ? ` · versija ${event.details.revision}` : "";
-                        return (
-                          <li key={event.id} className="flex flex-wrap items-baseline gap-x-2 text-xs">
-                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                            <span className="font-medium text-foreground">{EVENT_LABELS[event.event_type] || event.event_type}</span>
-                            {(target || event.actor_name) && <span className="text-muted-foreground">{target || event.actor_name}</span>}
-                            <span className="text-muted-foreground">{revision} · {new Date(event.created_at).toLocaleString("lv-LV")}</span>
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  </div>
-                )}
+                    {row.message && (
+                      <p className="whitespace-pre-wrap border-t border-border pt-3 text-sm text-muted-foreground">
+                        {row.message}
+                      </p>
+                    )}
+                    {events.some((event) => event.quote_id === row.id) && (
+                      <div className="border-t border-border pt-3">
+                        <p className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                          <History className="h-3.5 w-3.5" /> Darbību vēsture
+                        </p>
+                        <ol className="space-y-2">
+                          {events.filter((event) => event.quote_id === row.id).map((event) => {
+                            const target = typeof event.details?.to === "string" ? event.details.to : null;
+                            const revision = typeof event.details?.revision === "number" ? ` · versija ${event.details.revision}` : "";
+                            return (
+                              <li key={event.id} className="flex flex-wrap items-baseline gap-x-2 text-xs">
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                                <span className="font-medium text-foreground">{EVENT_LABELS[event.event_type] || event.event_type}</span>
+                                {(target || event.actor_name) && <span className="text-muted-foreground">{target || event.actor_name}</span>}
+                                <span className="text-muted-foreground">{revision} · {new Date(event.created_at).toLocaleString("lv-LV")}</span>
+                              </li>
+                            );
+                          })}
+                        </ol>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
