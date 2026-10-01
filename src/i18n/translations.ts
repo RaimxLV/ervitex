@@ -11,7 +11,7 @@ export const translations = {
   "nav.contact": { lv: "Kontakti", en: "Contact" },
 
   // Header
-  "header.phone": { lv: "+371 678 18282", en: "+371 678 18282" },
+  "header.phone": { lv: "+371 675 43384", en: "+371 675 43384" },
   "header.quote": { lv: "Pieprasīt cenu", en: "Get a Quote" },
   "header.search": { lv: "Meklēt produktus...", en: "Search products..." },
 
