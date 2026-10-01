@@ -95,12 +95,17 @@ const Footer = () => {
                 <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
                 <div>
                   <div className="font-semibold">
-                    {lang === "lv" ? "Braslas Biznesa Centrs" : "Braslas Business Center"}
+                    {lang === "lv" ? "Hausmaņa biroji" : "Hausman Offices"}
                   </div>
                   <div className="text-primary-foreground/70">
-                    {lang === "lv" ? "Ieeja “D”, 2. stāvs" : "Entrance “D”, 2nd floor"}
+                    {lang === "lv" ? "„D” ieeja, 2. stāvs" : "Entrance “D”, 2nd floor"}
                   </div>
-                  <div className="text-primary-foreground/70">Braslas iela 29, Rīga, LV-1084</div>
+                  <div className="text-primary-foreground/70">
+                    Braslas iela 29, Vidzemes priekšpilsēta
+                  </div>
+                  <div className="whitespace-nowrap text-primary-foreground/70">
+                    Rīga, LV-1084
+                  </div>
                   <div className="mt-1 text-primary-foreground/60 text-sm">
                     {lang === "lv" ? "Reģ. Nr." : "Reg. No."} LV40002074377
                   </div>
