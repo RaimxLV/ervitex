@@ -360,13 +360,13 @@ const Header = () => {
                 <Link to="/admin" onClick={() => setIsOpen(false)}><ShieldCheck className="mr-2 h-4 w-4" /> Admin režīms</Link>
               </Button>
             )}
-            <div className="grid grid-cols-2 border-y border-primary-foreground/10 sm:grid-cols-4">
+            <div className="border-y border-primary-foreground/15">
               {navItems.filter((item) => item.path !== "/catalog").map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsOpen(false)}
-                  className={`py-4 text-center text-base font-semibold uppercase transition-colors ${
+                  className={`flex min-h-12 items-center border-b border-primary-foreground/10 py-3 font-heading text-[15px] font-semibold uppercase transition-colors last:border-b-0 ${
                     location.pathname === item.path ? "text-accent" : "text-primary-foreground/75"
                   }`}
                 >
@@ -374,8 +374,8 @@ const Header = () => {
                 </Link>
               ))}
             </div>
-            <div className="pt-5">
-              <p className="mb-3 font-heading text-lg font-bold uppercase text-primary-foreground">
+            <div className="pt-6">
+              <p className="mb-3 font-heading text-base font-bold uppercase text-primary-foreground">
                 {t("nav.catalog")}
               </p>
               <MobileCatalogMenu onNavigate={() => setIsOpen(false)} />
