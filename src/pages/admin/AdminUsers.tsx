@@ -86,7 +86,34 @@ const AdminUsers = () => {
     }
   };
 
+  const handleChangeOwnPassword = async () => {
+    if (!ownCurrent.trim() || !ownNew.trim()) return;
+    if (ownNew !== ownRepeat) {
+      toast({ title: "Kļūda", description: "Jaunās paroles nesakrīt", variant: "destructive" });
+      return;
+    }
+    setChangingOwn(true);
+    try {
+      const { error: verifyErr } = await supabase.auth.signInWithPassword({
+        email: user!.email!,
+        password: ownCurrent,
+      });
+      if (verifyErr) throw new Error("Pašreizējā parole nepareiza");
+      const { error } = await supabase.auth.updateUser({ password: ownNew });
+      if (error) throw error;
+      toast({ title: "Parole nomainīta", description: "Nākamreiz ielogojies ar jauno paroli" });
+      setOwnCurrent("");
+      setOwnNew("");
+      setOwnRepeat("");
+    } catch (e: any) {
+      toast({ title: "Kļūda", description: e.message, variant: "destructive" });
+    } finally {
+      setChangingOwn(false);
+    }
+  };
+
   const handleToggleBan = async (userId: string, currentlyBanned: boolean) => {
+
     try {
       await callFn({ action: "toggle_ban", user_id: userId, ban: !currentlyBanned });
       toast({ title: currentlyBanned ? "Lietotājs atbloķēts" : "Lietotājs bloķēts" });
