@@ -19,6 +19,7 @@ const fragmentShader = `
   uniform vec2 u_resolution;
   uniform vec2 u_imageSize;
   uniform float u_shift;
+  uniform vec2 u_pointer;
 
   void main() {
     vec2 uv = v_uv;
@@ -35,10 +36,22 @@ const fragmentShader = `
 
     // Keep an overscan reserve so stronger displacement never exposes or
     // stretches the image edges.
-    uv = (uv - 0.5) * 0.88 + 0.5;
-    float depth = texture2D(u_depth, uv).r;
-    float depthOffset = (depth - 0.5) * u_shift;
-    vec2 displaced = clamp(uv + vec2(depthOffset * 0.16, depthOffset), 0.002, 0.998);
+    uv = (uv - 0.5) * 0.84 + 0.5;
+    // Soften depth edges so displacement bends instead of tearing.
+    vec2 px = 3.0 / u_resolution;
+    float depth = texture2D(u_depth, uv).r * 0.4
+      + texture2D(u_depth, uv + vec2(px.x, 0.0)).r * 0.15
+      + texture2D(u_depth, uv - vec2(px.x, 0.0)).r * 0.15
+      + texture2D(u_depth, uv + vec2(0.0, px.y)).r * 0.15
+      + texture2D(u_depth, uv - vec2(0.0, px.y)).r * 0.15;
+    float d = depth - 0.5;
+    float depthOffset = d * u_shift;
+    vec2 pointerOffset = d * u_pointer;
+    vec2 displaced = clamp(
+      uv + vec2(depthOffset * 0.16, depthOffset) + pointerOffset,
+      0.002,
+      0.998
+    );
     vec3 color = texture2D(u_image, displaced).rgb;
     gl_FragColor = vec4(color, 1.0);
 
@@ -67,6 +80,8 @@ const loadImage = (src: string) =>
 
 const EASING = 0.18;
 const SETTLED = 0.00008;
+const POINTER_EASING = 0.08;
+const POINTER_STRENGTH = 0.045;
 
 const HeroDepthScene = ({ className = "" }: { className?: string }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -101,12 +116,17 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
 
     const uResolution = gl.getUniformLocation(program, "u_resolution");
     const uShift = gl.getUniformLocation(program, "u_shift");
+    const uPointer = gl.getUniformLocation(program, "u_pointer");
 
     let disposed = false;
     let frame: number | null = null;
     let ready = false;
     let currentShift = 0;
     let targetShift = 0;
+    let curPX = 0;
+    let curPY = 0;
+    let tgtPX = 0;
+    let tgtPY = 0;
     let isVisible = true;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -139,14 +159,23 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
       if (!ready || disposed || !isVisible) return;
       resize();
       currentShift += (targetShift - currentShift) * EASING;
+      curPX += (tgtPX - curPX) * POINTER_EASING;
+      curPY += (tgtPY - curPY) * POINTER_EASING;
       gl.uniform2f(uResolution, canvas.width, canvas.height);
       gl.uniform1f(uShift, currentShift);
+      gl.uniform2f(uPointer, curPX, curPY);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-      if (Math.abs(targetShift - currentShift) > SETTLED) {
+      const moving =
+        Math.abs(targetShift - currentShift) > SETTLED ||
+        Math.abs(tgtPX - curPX) > SETTLED ||
+        Math.abs(tgtPY - curPY) > SETTLED;
+      if (moving) {
         frame = requestAnimationFrame(draw);
       } else {
         currentShift = targetShift;
+        curPX = tgtPX;
+        curPY = tgtPY;
       }
     };
 
@@ -157,7 +186,24 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
     const onScroll = () => {
       const rect = canvas.getBoundingClientRect();
       const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height)));
-      targetShift = reduceMotion.matches ? 0 : progress * 0.12;
+      targetShift = reduceMotion.matches ? 0 : progress * 0.16;
+      requestDraw();
+    };
+
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const onPointerMove = (event: PointerEvent) => {
+      if (!finePointer.matches || reduceMotion.matches || !isVisible) return;
+      const rect = canvas.getBoundingClientRect();
+      if (event.clientY > rect.bottom) return;
+      const nx = ((event.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1;
+      const ny = ((event.clientY - rect.top) / Math.max(1, rect.height)) * 2 - 1;
+      tgtPX = Math.max(-1, Math.min(1, nx)) * POINTER_STRENGTH;
+      tgtPY = -Math.max(-1, Math.min(1, ny)) * POINTER_STRENGTH * 0.6;
+      requestDraw();
+    };
+    const onPointerLeave = () => {
+      tgtPX = 0;
+      tgtPY = 0;
       requestDraw();
     };
 
@@ -191,12 +237,16 @@ const HeroDepthScene = ({ className = "" }: { className?: string }) => {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.documentElement.addEventListener("pointerleave", onPointerLeave);
     reduceMotion.addEventListener("change", onScroll);
 
     return () => {
       disposed = true;
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
+      window.removeEventListener("pointermove", onPointerMove);
+      document.documentElement.removeEventListener("pointerleave", onPointerLeave);
       reduceMotion.removeEventListener("change", onScroll);
       visibilityObserver.disconnect();
       if (frame !== null) cancelAnimationFrame(frame);
