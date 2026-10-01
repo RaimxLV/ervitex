@@ -29,6 +29,11 @@ const AdminUsers = () => {
   const [creating, setCreating] = useState(false);
   const [changingPw, setChangingPw] = useState<string | null>(null);
   const [newPw, setNewPw] = useState("");
+  const [ownCurrent, setOwnCurrent] = useState("");
+  const [ownNew, setOwnNew] = useState("");
+  const [ownRepeat, setOwnRepeat] = useState("");
+  const [changingOwn, setChangingOwn] = useState(false);
+
 
   const isSuperAdmin = user?.email === SUPER_ADMIN_EMAIL;
 
@@ -81,7 +86,34 @@ const AdminUsers = () => {
     }
   };
 
+  const handleChangeOwnPassword = async () => {
+    if (!ownCurrent.trim() || !ownNew.trim()) return;
+    if (ownNew !== ownRepeat) {
+      toast({ title: "Kļūda", description: "Jaunās paroles nesakrīt", variant: "destructive" });
+      return;
+    }
+    setChangingOwn(true);
+    try {
+      const { error: verifyErr } = await supabase.auth.signInWithPassword({
+        email: user!.email!,
+        password: ownCurrent,
+      });
+      if (verifyErr) throw new Error("Pašreizējā parole nepareiza");
+      const { error } = await supabase.auth.updateUser({ password: ownNew });
+      if (error) throw error;
+      toast({ title: "Parole nomainīta", description: "Nākamreiz ielogojies ar jauno paroli" });
+      setOwnCurrent("");
+      setOwnNew("");
+      setOwnRepeat("");
+    } catch (e: any) {
+      toast({ title: "Kļūda", description: e.message, variant: "destructive" });
+    } finally {
+      setChangingOwn(false);
+    }
+  };
+
   const handleToggleBan = async (userId: string, currentlyBanned: boolean) => {
+
     try {
       await callFn({ action: "toggle_ban", user_id: userId, ban: !currentlyBanned });
       toast({ title: currentlyBanned ? "Lietotājs atbloķēts" : "Lietotājs bloķēts" });
@@ -121,6 +153,31 @@ const AdminUsers = () => {
           <h1 className="font-heading text-xl sm:text-2xl font-black uppercase tracking-wide">Lietotāju pārvaldība</h1>
           <p className="mt-1 text-sm text-muted-foreground">Pievienot, bloķēt vai dzēst darbiniekus</p>
         </div>
+
+        {/* Sava paroles maiņa */}
+        <div className="rounded-sm border border-border bg-card p-4 sm:p-6 space-y-4">
+          <h2 className="font-heading text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+            <KeyRound className="h-4 w-4" /> Mainīt manu paroli
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Pašreizējā parole</Label>
+              <Input value={ownCurrent} onChange={(e) => setOwnCurrent(e.target.value)} type="password" placeholder="••••••••" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Jaunā parole</Label>
+              <Input value={ownNew} onChange={(e) => setOwnNew(e.target.value)} type="password" placeholder="Vismaz 8 simboli" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Jaunā parole vēlreiz</Label>
+              <Input value={ownRepeat} onChange={(e) => setOwnRepeat(e.target.value)} type="password" placeholder="••••••••" />
+            </div>
+          </div>
+          <Button onClick={handleChangeOwnPassword} disabled={changingOwn || !ownCurrent.trim() || !ownNew.trim()} className="bg-accent text-accent-foreground hover:bg-accent/90">
+            {changingOwn ? "Maina..." : "Nomainīt paroli"}
+          </Button>
+        </div>
+
 
         {/* Jauns lietotājs */}
         <div className="rounded-sm border border-border bg-card p-4 sm:p-6 space-y-4">
