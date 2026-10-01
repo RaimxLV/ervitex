@@ -481,10 +481,24 @@ const WorksheetPage = () => {
                       )}
                     </div>
 
-                    <label className="mt-3 block">
-                      <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Piezīme par šo preci</span>
-                      <Input value={i.note || ""} disabled={readOnly} onChange={(e) => patch(i.id, { note: e.target.value })} />
-                    </label>
+                    {readOnly ? (
+                      i.note?.trim() ? (
+                        <div className="mt-3 border-l-2 border-accent bg-muted/50 px-3 py-2">
+                          <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Projekta vadītājas komentārs</span>
+                          <p className="whitespace-pre-line text-sm">{i.note}</p>
+                        </div>
+                      ) : null
+                    ) : (
+                      <label className="mt-3 block">
+                        <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Komentārs par preci</span>
+                        <textarea
+                          rows={3}
+                          value={i.note || ""}
+                          onChange={(e) => patch(i.id, { note: e.target.value })}
+                          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        />
+                      </label>
+                    )}
                   </div>
                 )}
               </div>

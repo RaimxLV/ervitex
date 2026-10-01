@@ -125,7 +125,8 @@ export const worksheetTotals = (items: WorksheetItem[], vatRate = 21, discount?:
   const goods = round2(items.reduce((s, i) => s + (Number(i.unitPrice) || 0) * (Number(i.qty) || 0), 0));
   const print = round2(items.reduce((s, i) => s + printNet(i), 0) + orderPrintNet(items));
   const subtotal = round2(goods + print);
-  const disc = discountAmount(subtotal, discount);
+  // Atlaide tikai no precēm — nekad no apdrukas/izšūšanas.
+  const disc = discountAmount(goods, discount);
   const net = round2(subtotal - disc);
   const vat = round2((net * vatRate) / 100);
   return {

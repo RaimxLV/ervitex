@@ -57,7 +57,8 @@ export const offerTotals = (items: OfferItem[], vatRate = VAT_DEFAULT, discount?
   const print = round2(items.reduce((s, i) => s + itemPrintNet(i), 0));
   const subtotal = round2(goods + print);
   const dv = Number(discount?.value) || 0;
-  const disc = dv > 0 ? round2(Math.min(subtotal, discount!.type === "percent" ? (subtotal * Math.min(dv, 100)) / 100 : dv)) : 0;
+  // Atlaide tikai no precēm — nekad no apdrukas/izšūšanas.
+  const disc = dv > 0 ? round2(Math.min(goods, discount!.type === "percent" ? (goods * Math.min(dv, 100)) / 100 : dv)) : 0;
   const net = round2(subtotal - disc);
   const vat = round2((net * vatRate) / 100);
   return { goods, print, subtotal, discount: disc, net, vat, gross: round2(net + vat), qty: items.reduce((s, i) => s + i.qty, 0) };
