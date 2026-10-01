@@ -8,7 +8,6 @@ import {
   MEGA_MENU_COLUMNS,
   SECTION_META,
   buildCategoryHref,
-  buildSourceHref,
   type MegaMenuSection,
 } from "@/lib/megaMenuConfig";
 
@@ -131,14 +130,11 @@ export default function CatalogMegaMenu({ onNavigate, open = true }: MegaMenuPro
 export function MobileCatalogMenu({ onNavigate }: MegaMenuProps) {
   const { lang } = useLanguage();
   const { items } = useMegaMenuItems();
-  const [openSection, setOpenSection] = useState<MegaMenuSection | null>("tops");
+  const [openSection, setOpenSection] = useState<MegaMenuSection | null>(null);
   const sections = MEGA_MENU_COLUMNS.flat();
-  const manufacturers = items
-    .filter((item) => item.section === "manufacturers")
-    .sort((a, b) => a.sort_order - b.sort_order);
 
   return (
-    <div className="border-t border-primary-foreground/10">
+    <div className="border-t border-primary-foreground/15">
       {sections.map((section) => {
         const meta = SECTION_META[section];
         const sectionItems = items
@@ -149,25 +145,25 @@ export function MobileCatalogMenu({ onNavigate }: MegaMenuProps) {
         const allCategories = Array.from(new Set(sectionItems.flatMap((item) => item.categories)));
 
         return (
-          <div key={section} className="border-b border-primary-foreground/10">
+          <div key={section} className="border-b border-primary-foreground/15">
             <Button
               type="button"
               variant="ghost"
               onClick={() => setOpenSection(expanded ? null : section)}
               aria-expanded={expanded}
-              className="h-auto w-full justify-between rounded-none px-0 py-3.5 font-heading text-base font-bold uppercase text-primary-foreground hover:bg-transparent hover:text-accent"
+              className="h-14 w-full justify-between rounded-none px-0 font-heading text-[15px] font-semibold uppercase text-primary-foreground/85 hover:bg-transparent hover:text-accent"
             >
               {lang === "lv" ? meta.lv : meta.en}
               <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
             </Button>
             {expanded && (
-              <div className="grid grid-cols-1 gap-1 pb-4 min-[430px]:grid-cols-2">
+              <div className="grid grid-cols-1 gap-0 border-t border-primary-foreground/10 pb-2 min-[430px]:grid-cols-2">
                 {sectionItems.map((item) => (
                   <Link
                     key={item.id}
                     to={buildCategoryHref(item.categories)}
                     onClick={onNavigate}
-                    className="py-2 text-[15px] leading-snug text-primary-foreground/70"
+                    className="min-h-11 py-3 pr-3 text-[15px] leading-snug text-primary-foreground/70 transition-colors hover:text-accent"
                   >
                     {lang === "lv" ? item.label_lv : item.label_en}
                   </Link>
@@ -175,7 +171,7 @@ export function MobileCatalogMenu({ onNavigate }: MegaMenuProps) {
                 <Link
                   to={buildCategoryHref(allCategories)}
                   onClick={onNavigate}
-                  className="inline-flex items-center gap-1 py-2 text-[15px] font-bold text-accent"
+                  className="inline-flex min-h-11 items-center gap-1 py-3 pr-3 text-[15px] font-semibold text-accent"
                 >
                   {lang === "lv" ? meta.allLv : meta.allEn}
                   <ArrowRight className="h-4 w-4" />
@@ -186,30 +182,10 @@ export function MobileCatalogMenu({ onNavigate }: MegaMenuProps) {
         );
       })}
 
-      {manufacturers.length > 0 && (
-        <div className="py-4">
-          <p className="mb-3 font-heading text-sm font-bold uppercase text-primary-foreground">
-            {lang === "lv" ? "Ražotāji" : "Manufacturers"}
-          </p>
-          <div className="flex flex-wrap gap-x-5 gap-y-3">
-            {manufacturers.map((manufacturer) => (
-              <Link
-                key={manufacturer.id}
-                to={buildSourceHref(manufacturer.categories[0] || "")}
-                onClick={onNavigate}
-                className="text-[15px] font-semibold text-primary-foreground/70"
-              >
-                {lang === "lv" ? manufacturer.label_lv : manufacturer.label_en}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
       <Link
         to="/catalog"
         onClick={onNavigate}
-        className="mt-2 flex items-center justify-between bg-accent px-4 py-3.5 font-heading text-base font-bold uppercase text-accent-foreground"
+        className="mt-5 flex min-h-12 items-center justify-between bg-accent px-4 py-3 font-heading text-[15px] font-bold uppercase text-accent-foreground"
       >
         {lang === "lv" ? "Skatīt visus produktus" : "Browse all products"}
         <ArrowRight className="h-5 w-5" />
