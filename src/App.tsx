@@ -15,6 +15,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
 import ScrollToTop from "./components/ScrollToTop.tsx";
 import SmoothScroll from "./components/SmoothScroll.tsx";
+import RouteSeo from "./components/RouteSeo.tsx";
 
 // Everything except the landing page is code-split so the first visit only
 // downloads the home-page bundle instead of the whole app.
@@ -66,6 +67,7 @@ const App = () => (
           <BrowserRouter basename={routerBase}>
             <SmoothScroll />
             <ScrollToTop />
+            <RouteSeo />
             <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Index />} />

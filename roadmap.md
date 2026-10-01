@@ -46,7 +46,7 @@
   - [ ] Visām aktīvajām NWG variācijām ir pārbaudīta līgumcena; pašlaik 4 655 aktīvajām četru publisko zīmolu variācijām tās trūkst.
   - [ ] Visiem pārdošanā esošajiem NWG modeļiem katalogā cena balstās uz pārbaudītu līgumcenu.
 - [x] Automātiski aizvērt karājošos “procesā” sinhronizāciju ierakstus.
-- [ ] Izlemt par SEO: noņemt `noindex` un `robots.txt Disallow: /`, pievienot og/twitter/canonical/sitemap.
+- [ ] SEO sagatavots; gaida atļauju noņemt noindex un robots Disallow (Google ieslēgšana).
 
 
 ### P1
@@ -56,8 +56,8 @@
 - [ ] E-pasta paziņojumi par jauniem un neatbildētiem klientu pieteikumiem (18 no 20 karājas).
 
 ### P2
-- [ ] Sašaurināt publisko piekļuvi `catalog_overrides`, `mf_stock`, `ss_stock`.
-- [ ] Dzēst dublējošo service worker un 6 neizmantotās komponentes.
+- [x] Drošības audits 01.10: dzēsta create-super-admin, slēptas iepirkuma cenas, iekšējās funkcijas tikai serverim.
+- [x] Dzēsti vecie service worker faili.
 - [ ] Noņemt `no-store` meta tagus; sakārtot ESLint kļūdas edge funkcijās; sadalīt `CatalogItemDialog.tsx`.
 
 ## Pieprasījumu plūsma (pabeigts 22.09.2026)
