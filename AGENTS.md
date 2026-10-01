@@ -11,3 +11,4 @@
 - The homepage uses short-duration Lenis wheel smoothing on fine-pointer devices and native touch scrolling; its WebGL hero depth reacts to scroll and, on fine-pointer devices, to eased mouse movement, renders only while values change and pauses off-screen, balancing visible depth with smooth performance.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - Per-route title/description/canonical/robots are set client-side by `RouteSeo`; private token and admin routes are always noindex.
+- Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
