@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.restore_quote_worksheet_version(text, uuid, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.restore_quote_worksheet_version(text, uuid, text) TO service_role;
