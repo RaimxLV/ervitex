@@ -64,8 +64,8 @@
 - [x] Numurs `ERV-DDMM-NNN` katram pieteikumam, tēmā `[#ERV-...]`
 - [x] E-pastā vairs nav nodošanas un pabeigšanas pogu; nodošana notiek pie konkrētā pasūtījuma
 - [x] `quote-action` funkcija: nodod, sūta pieteikumu darbiniecei ar Reply-To uz klientu, atzīmē pabeigtu
-- [x] Admina cilnes: Nenodotie / Mani / Visi aktīvie / Pabeigtie + brīdinājums >2 dienām
-- [x] Katalogā/piedāvājumos poga „Kopēt piedāvājuma saiti”
+- [x] (01.10.2026) Admina "Pieprasījumi" kļuvis par vienkāršu vēsturi "Visi pasūtījumi": bez statusu cilnēm, kavēšanās brīdinājumiem, krāsām un piešķiršanas — paliek meklētājs, atvēršana, "Rakstīt klientam", saraksta saite, dzēšana. Darbinieki strādā pa Outlook.
+- [x] Katalogā/piedāvājumos poga „Kopēt piedāvājuma saiti"
 - [x] Evitas e-pasts: info@t-bode.lv; Raimonds: ofsetadruka@gmail.com
 
 ## Kopīgais preču saraksts (pie pieprasījuma)
