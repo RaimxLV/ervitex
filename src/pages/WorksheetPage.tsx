@@ -318,11 +318,11 @@ const WorksheetPage = () => {
                 <span>{saveState === "saving" ? "Saglabā melnrakstu…" : saveState === "error" ? "Neizdevās saglabāt" : "Izmaiņas vēl nav apstiprinātas"}</span>
               </div>
             )}
-            {readOnly && (
+            {readOnly && isAdmin && (
               <div className="mt-3 print:hidden">
                 <Button size="sm" variant="outline" asChild>
                   <a href={mailtoNext}>
-                    <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}
+                    <Mail className="mr-2 h-4 w-4" /> Rakstīt klientam
                   </a>
                 </Button>
               </div>
