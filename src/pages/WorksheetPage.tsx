@@ -364,8 +364,8 @@ const WorksheetPage = () => {
                       <span className="h-14 w-14 shrink-0 rounded-sm border border-dashed border-border" />
                     )}
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold">{i.name}</span>
-                      {(i.code || i.brand) && <span className="block truncate text-xs text-muted-foreground">{[i.code, i.brand].filter(Boolean).join(" · ")}</span>}
+                      <span className="block text-sm font-semibold">{i.name}</span>
+                      {(i.code || i.brand) && <span className="block text-xs text-muted-foreground">{[i.code, i.brand].filter(Boolean).join(" · ")}</span>}
                       <span className="mt-1.5 flex flex-wrap gap-1.5 text-xs">
                         <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5">
                           {i.colorHex && <span className="mr-1.5 inline-block h-2.5 w-2.5 -translate-y-px rounded-full border border-border align-middle" style={{ background: i.colorHex }} />}
