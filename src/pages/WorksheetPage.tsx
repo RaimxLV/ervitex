@@ -319,9 +319,8 @@ const WorksheetPage = () => {
               </div>
             )}
             {readOnly && (
-              <div className="mt-3 rounded-sm border border-dashed border-border p-3 print:hidden">
-                <p className="text-sm text-muted-foreground">Izmaiņas sarakstā veic projekta vadītāja.</p>
-                <Button className="mt-2" size="sm" variant="outline" asChild>
+              <div className="mt-3 print:hidden">
+                <Button size="sm" variant="outline" asChild>
                   <a href={mailtoNext}>
                     <Mail className="mr-2 h-4 w-4" /> {isAdmin ? "Rakstīt klientam" : `Rakstīt ${sheet.assigned_pm_name || "Ervitex"}`}
                   </a>
@@ -351,21 +350,27 @@ const WorksheetPage = () => {
 
 
             {items.map((i) => {
-              const open = openId === i.id;
+              const open = !readOnly && openId === i.id;
               return (
               <div key={i.id} className="overflow-hidden rounded-md border border-border bg-background">
                 <div className="flex flex-wrap items-center gap-3 p-2.5 sm:flex-nowrap sm:p-3">
-                  <button type="button" onClick={() => setOpenId(open ? null : i.id)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
+                  <div
+                    className={`flex min-w-0 flex-1 items-center gap-3 text-left ${readOnly ? "" : "cursor-pointer"}`}
+                    onClick={readOnly ? undefined : () => setOpenId(open ? null : i.id)}
+                  >
                     {i.image ? (
                       <img src={i.image} alt={i.name} loading="lazy" className="h-14 w-14 shrink-0 rounded-sm border border-border object-contain p-0.5" />
                     ) : (
                       <span className="h-14 w-14 shrink-0 rounded-sm border border-dashed border-border" />
                     )}
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold">{i.name}</span>
-                      {(i.code || i.brand) && <span className="block truncate text-xs text-muted-foreground">{[i.code, i.brand].filter(Boolean).join(" · ")}</span>}
+                      <span className="block text-sm font-semibold">{i.name}</span>
+                      {(i.code || i.brand) && <span className="block text-xs text-muted-foreground">{[i.code, i.brand].filter(Boolean).join(" · ")}</span>}
                       <span className="mt-1.5 flex flex-wrap gap-1.5 text-xs">
-                        <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Krāsa </span><b className="font-medium">{i.colorName || "—"}</b></span>
+                        <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5">
+                          {i.colorHex && <span className="mr-1.5 inline-block h-2.5 w-2.5 -translate-y-px rounded-full border border-border align-middle" style={{ background: i.colorHex }} />}
+                          <span className="text-muted-foreground">Krāsa </span><b className="font-medium">{i.colorName || "—"}</b>
+                        </span>
                         <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Izmērs </span><b className="font-medium">{i.size || "—"}</b></span>
                         <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Daudzums </span><b className="font-medium">{i.qty} gab.</b></span>
                         {(i.prints || []).some((print) => print.scope !== "order") && (
@@ -373,7 +378,7 @@ const WorksheetPage = () => {
                         )}
                       </span>
                     </span>
-                  </button>
+                  </div>
                   <span className="ml-auto flex shrink-0 items-center gap-2">
                     <span className="text-right">
                       <span className="block font-heading text-sm font-black tabular-nums">{money(lineNet(i))}</span>
@@ -384,11 +389,21 @@ const WorksheetPage = () => {
                         <Repeat className="mr-1.5 h-3.5 w-3.5" /> Nomainīt preci
                       </Button>
                     )}
-                    <button type="button" onClick={() => setOpenId(open ? null : i.id)} aria-label="Atvērt" className="p-1 print:hidden">
-                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
-                    </button>
+                    {!readOnly && (
+                      <button type="button" onClick={() => setOpenId(open ? null : i.id)} aria-label="Atvērt" className="p-1 print:hidden">
+                        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+                      </button>
+                    )}
                   </span>
                 </div>
+
+                {readOnly && i.note?.trim() ? (
+                  <div className="border-t border-border px-3 py-2.5 sm:px-4">
+                    <div className="border-l-2 border-accent bg-muted/50 px-3 py-2">
+                      <p className="whitespace-pre-line text-sm">{i.note}</p>
+                    </div>
+                  </div>
+                ) : null}
 
                 {open && (
                   <div className="border-t border-border p-3 sm:p-4">
@@ -528,6 +543,16 @@ const WorksheetPage = () => {
             ) : (
               <div className="mt-3 divide-y divide-border border border-border bg-background">
                 {orderPrints.map(({ itemId, index, print }, rowIndex) => (
+                  readOnly ? (
+                    <div key={`${itemId}-${index}`} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 p-3 text-sm">
+                      <span className="min-w-0">
+                        <span className="font-medium">{print.method}</span>
+                        {print.placement?.trim() && <span className="text-muted-foreground"> · {print.placement}</span>}
+                        {print.mode !== "total" && <span className="text-xs text-muted-foreground"> / gab.</span>}
+                      </span>
+                      <span className="tabular-nums">{money(print.price)}</span>
+                    </div>
+                  ) : (
                   <div key={`${itemId}-${index}`} className="grid grid-cols-1 gap-3 p-3 sm:grid-cols-[minmax(150px,1fr)_minmax(150px,1fr)_130px_130px_auto] sm:items-end">
                     <label>
                       <span className="mb-1 block text-xs font-medium text-muted-foreground">Veids</span>
@@ -556,6 +581,7 @@ const WorksheetPage = () => {
                       </Button>
                     )}
                   </div>
+                  )
                 ))}
                 <div className="flex justify-between gap-4 bg-muted/30 px-3 py-3 text-sm font-semibold">
                   <span>Apdruka kopā bez PVN</span>
