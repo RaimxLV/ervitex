@@ -101,7 +101,10 @@ const Footer = () => {
                     {lang === "lv" ? "„D” ieeja, 2. stāvs" : "Entrance “D”, 2nd floor"}
                   </div>
                   <div className="text-primary-foreground/70">
-                    Braslas iela 29, Vidzemes priekšpilsēta, Rīga, LV-1084
+                    Braslas iela 29, Vidzemes priekšpilsēta
+                  </div>
+                  <div className="whitespace-nowrap text-primary-foreground/70">
+                    Rīga, LV-1084
                   </div>
                   <div className="mt-1 text-primary-foreground/60 text-sm">
                     {lang === "lv" ? "Reģ. Nr." : "Reg. No."} LV40002074377
