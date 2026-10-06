@@ -13,8 +13,8 @@ import GoogleMapEmbed, { GMAPS_URL, WAZE_URL } from "@/components/GoogleMapEmbed
 import HausmanaKvartalsMap from "@/components/HausmanaKvartalsMap";
 import StoreLocations from "@/components/contact/StoreLocations";
 import SectionHeading from "@/components/contact/SectionHeading";
-import vilnisPhoto from "@/assets/team/vilnis-lacis.jpg";
-import eriksPhoto from "@/assets/team/eriks-lacis.jpg";
+import vilnisPhoto from "@/assets/team/vilnis-lacis.png.asset.json";
+import eriksPhoto from "@/assets/team/eriks-lacis.png.asset.json";
 import lauraPhoto from "@/assets/team/laura-daukste.jpg";
 import ilonaPhoto from "@/assets/team/ilona-romanovska.jpg";
 import santaPhoto from "@/assets/team/santa-zvaigzne.jpg";
@@ -27,8 +27,8 @@ const specialists = [
   { slug: "santa", name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "+371 67436899", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaPhoto },
   { slug: "justine", name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "+371 29725412", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justinePhoto },
   { slug: "evita", name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: evitaPhoto },
-  { slug: "vilnis", name: "Vilnis Lācis", title: { lv: "Valdes priekšsēdētājs", en: "Chairman of the Board" }, email: "vilnis@ervitex.lv", phone: "+371 67543384", phoneLabel: { lv: "Tel", en: "Tel" }, photo: vilnisPhoto },
-  { slug: "eriks", name: "Ēriks Lācis", title: { lv: "Tirdzniecības direktors", en: "Sales Director" }, email: "eriks@ervitex.lv", phone: "+371 29395600", phoneLabel: { lv: "Mob", en: "Mob" }, photo: eriksPhoto },
+  { slug: "vilnis", name: "Vilnis Lācis", title: { lv: "Valdes priekšsēdētājs", en: "Chairman of the Board" }, email: "vilnis@ervitex.lv", phone: "+371 67543384", phoneLabel: { lv: "Tel", en: "Tel" }, photo: vilnisPhoto.url },
+  { slug: "eriks", name: "Ēriks Lācis", title: { lv: "Tirdzniecības direktors", en: "Sales Director" }, email: "eriks@ervitex.lv", phone: "+371 29395600", phoneLabel: { lv: "Mob", en: "Mob" }, photo: eriksPhoto.url },
 ];
 
 type PhotoSettings = { zoom: number; position_x: number; position_y: number };
