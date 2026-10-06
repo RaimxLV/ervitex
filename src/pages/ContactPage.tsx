@@ -13,8 +13,8 @@ import GoogleMapEmbed, { GMAPS_URL, WAZE_URL } from "@/components/GoogleMapEmbed
 import HausmanaKvartalsMap from "@/components/HausmanaKvartalsMap";
 import StoreLocations from "@/components/contact/StoreLocations";
 import SectionHeading from "@/components/contact/SectionHeading";
-import vilnisPhoto from "@/assets/team/vilnis-lacis.jpg";
-import eriksPhoto from "@/assets/team/eriks-lacis.jpg";
+import vilnisPhoto from "@/assets/team/vilnis-lacis.png.asset.json";
+import eriksPhoto from "@/assets/team/eriks-lacis.png.asset.json";
 import lauraPhoto from "@/assets/team/laura-daukste.jpg";
 import ilonaPhoto from "@/assets/team/ilona-romanovska.jpg";
 import santaPhoto from "@/assets/team/santa-zvaigzne.jpg";
