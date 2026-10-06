@@ -81,6 +81,10 @@ import subHeroAsset from "@/assets/services/sublimation-hero.webp";
 import sub8Asset from "@/assets/services/sublimation-gallery-8.webp";
 import heatTransfer from "@/assets/services/termodruka-hero.webp";
 import heatTransfer2 from "@/assets/services/termodruka-2.webp";
+import heatTransfer3Asset from "@/assets/services/termodruka-3.webp.asset.json";
+import heatTransfer4Asset from "@/assets/services/termodruka-4.webp.asset.json";
+import heatTransfer5Asset from "@/assets/services/termodruka-5.webp.asset.json";
+import heatTransfer6Asset from "@/assets/services/termodruka-6.webp.asset.json";
 
 import {
   Award,
@@ -591,7 +595,7 @@ export const techs: Tech[] = [
       { icon: Layers, label: { lv: "Pieejamie materiāli", en: "Available materials" }, value: { lv: "Standarta, flok, metāliskas un atstarojošas termoplēves", en: "Standard, flock, metallic and reflective films" } },
       { icon: FileType2, label: { lv: "Faili", en: "Files" }, value: { lv: "AI, EPS, PDF — vektora formātā", en: "AI, EPS, PDF — vector format" } },
     ],
-    images: [heatTransfer, heatTransfer2],
+    images: [heatTransfer, heatTransfer2, heatTransfer3Asset.url, heatTransfer4Asset.url, heatTransfer5Asset.url, heatTransfer6Asset.url],
   },
 ];
 
