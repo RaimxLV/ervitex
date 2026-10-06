@@ -50,6 +50,16 @@ import emb5 from "@/assets/services/embroidery-5.webp";
 import emb6 from "@/assets/services/embroidery-6.webp";
 import emb7 from "@/assets/services/embroidery-7.webp";
 import emb8 from "@/assets/services/embroidery-8.webp";
+import emb9Asset from "@/assets/services/embroidery-9.webp.asset.json";
+import emb10Asset from "@/assets/services/embroidery-10.webp.asset.json";
+import emb11Asset from "@/assets/services/embroidery-11.webp.asset.json";
+import emb12Asset from "@/assets/services/embroidery-12.webp.asset.json";
+import emb13Asset from "@/assets/services/embroidery-13.webp.asset.json";
+import emb14Asset from "@/assets/services/embroidery-14.webp.asset.json";
+import emb15Asset from "@/assets/services/embroidery-15.webp.asset.json";
+import emb16Asset from "@/assets/services/embroidery-16.webp.asset.json";
+import emb17Asset from "@/assets/services/embroidery-17.webp.asset.json";
+import emb18Asset from "@/assets/services/embroidery-18.webp.asset.json";
 import sub1Asset from "@/assets/services/sublimation-gallery-1.webp";
 import sub2Asset from "@/assets/services/sublimation-gallery-2.webp";
 import sub3Asset from "@/assets/services/sublimation-gallery-3.webp";
@@ -406,7 +416,7 @@ export const techs: Tech[] = [
       { icon: Palette, label: { lv: "Diegu krāsas", en: "Thread colours" }, value: { lv: "Plaša krāsu palete", en: "A wide colour palette" } },
       { icon: Ruler, label: { lv: "Izšuvuma izmērs", en: "Embroidery size" }, value: { lv: "No ļoti smalkiem līdz lieliem (min. burta augstums 4 mm)", en: "From delicate to large (minimum letter height 4 mm)" } },
     ],
-    images: [emb1, emb2, emb3, emb4, emb5, emb6, emb7, emb8],
+    images: [emb1, emb2, emb3, emb4, emb5, emb6, emb7, emb8, emb9Asset.url, emb10Asset.url, emb11Asset.url, emb12Asset.url, emb13Asset.url, emb14Asset.url, emb15Asset.url, emb16Asset.url, emb17Asset.url, emb18Asset.url],
   },
   {
     id: "sublimacija",
