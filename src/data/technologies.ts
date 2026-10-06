@@ -14,6 +14,16 @@ import screen13 from "@/assets/services/screen-printing-13.webp";
 import screen14 from "@/assets/services/screen-printing-14.webp";
 import screen15 from "@/assets/services/screen-printing-15.webp";
 import screen16 from "@/assets/services/screen-printing-16.webp";
+import screen17 from "@/assets/services/screen-printing-17.webp";
+import screen18 from "@/assets/services/screen-printing-18.webp";
+import screen19 from "@/assets/services/screen-printing-19.webp";
+import screen20 from "@/assets/services/screen-printing-20.webp";
+import screen21 from "@/assets/services/screen-printing-21.webp";
+import screen22 from "@/assets/services/screen-printing-22.webp";
+import screen23 from "@/assets/services/screen-printing-23.webp";
+import screen24 from "@/assets/services/screen-printing-24.webp";
+import screen25 from "@/assets/services/screen-printing-25.webp";
+import screen26 from "@/assets/services/screen-printing-26.webp";
 import dtf1 from "@/assets/services/dtf-main.webp";
 import dtf2 from "@/assets/services/dtf-2.jpg";
 import dtf3 from "@/assets/services/dtf-3.jpg";
@@ -197,7 +207,7 @@ export const techs: Tech[] = [
       { icon: FileType2, label: { lv: "Pieņemamie faili", en: "Accepted files" }, value: { lv: "AI, EPS, PDF (vektora formātā)", en: "AI, EPS, PDF (vector)" } },
       { icon: Layers, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "līdz 6 krāsām vienā apdrukā", en: "up to 6 colours per print" } },
     ],
-    images: [screen1, screen2, screen3, screen4, screen5, screen6, screen7, screen8, screen9, screen10, screen11, screen12, screen13, screen14, screen15, screen16],
+    images: [screen1, screen2, screen3, screen4, screen5, screen6, screen7, screen8, screen9, screen10, screen11, screen12, screen13, screen14, screen15, screen16, screen17, screen18, screen19, screen20, screen21, screen22, screen23, screen24, screen25, screen26],
   },
   {
     id: "dtf",
