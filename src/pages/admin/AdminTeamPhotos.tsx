@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import vilnisPhoto from "@/assets/team/vilnis-lacis.png.asset.json";
-import eriksPhoto from "@/assets/team/eriks-lacis.png.asset.json";
-import lauraPhoto from "@/assets/team/laura-daukste.jpg";
-import ilonaPhoto from "@/assets/team/ilona-romanovska.jpg";
-import santaPhoto from "@/assets/team/santa-zvaigzne.jpg";
-import justinePhoto from "@/assets/team/justine-strunka.jpg";
-import evitaPhoto from "@/assets/team/evita-nesterova.jpg";
+import vilnisPhoto from "@/assets/team/vilnis-lacis.webp";
+import eriksPhoto from "@/assets/team/eriks-lacis.webp";
+import lauraPhoto from "@/assets/team/laura-daukste.webp";
+import ilonaPhoto from "@/assets/team/ilona-romanovska.webp";
+import santaPhoto from "@/assets/team/santa-zvaigzne.webp";
+import justinePhoto from "@/assets/team/justine-strunka.webp";
+import evitaPhoto from "@/assets/team/evita-nesterova.webp";
 
 type PhotoSettings = {
   slug: string;
@@ -21,8 +21,8 @@ type PhotoSettings = {
 };
 
 const people = [
-  { slug: "vilnis", name: "Vilnis Lācis", photo: vilnisPhoto.url },
-  { slug: "eriks", name: "Ēriks Lācis", photo: eriksPhoto.url },
+  { slug: "vilnis", name: "Vilnis Lācis", photo: vilnisPhoto },
+  { slug: "eriks", name: "Ēriks Lācis", photo: eriksPhoto },
   { slug: "laura", name: "Laura Daukšte", photo: lauraPhoto },
   { slug: "ilona", name: "Ilona Romanovska", photo: ilonaPhoto },
   { slug: "santa", name: "Santa Zvaigzne", photo: santaPhoto },

@@ -1,10 +1,10 @@
 import { MapPin, Mail, Phone, Building2 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import SectionHeading from "./SectionHeading";
-import origoPhoto from "@/assets/stores/Origo.jpg";
-import dominaPhoto from "@/assets/stores/Domina.jpg";
-import alfaPhoto from "@/assets/stores/Alfa.jpg";
-import acropolePhoto from "@/assets/stores/Acropole.jpg";
+import origoPhoto from "@/assets/stores/Origo.webp";
+import dominaPhoto from "@/assets/stores/Domina.webp";
+import alfaPhoto from "@/assets/stores/Alfa.webp";
+import acropolePhoto from "@/assets/stores/Acropole.webp";
 
 const stores = [
   { name: "Akropole Alfa", street: "Brīvības gatve 372", zip: "Rīga, LV-1006", email: "alfa@t-bode.lv", phone: "+371 25486124", image: alfaPhoto },

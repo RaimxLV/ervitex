@@ -1,7 +1,7 @@
-import lauraPhoto from "@/assets/team/laura-daukste.jpg";
-import ilonaPhoto from "@/assets/team/ilona-romanovska.jpg";
-import santaPhoto from "@/assets/team/santa-zvaigzne.jpg";
-import justinePhoto from "@/assets/team/justine-strunka.jpg";
+import lauraPhoto from "@/assets/team/laura-daukste.webp";
+import ilonaPhoto from "@/assets/team/ilona-romanovska.webp";
+import santaPhoto from "@/assets/team/santa-zvaigzne.webp";
+import justinePhoto from "@/assets/team/justine-strunka.webp";
 
 export interface ProjectManager {
   slug: string;
