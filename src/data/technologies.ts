@@ -430,7 +430,7 @@ export const techs: Tech[] = [
       { icon: Palette, label: { lv: "Diegu krāsas", en: "Thread colours" }, value: { lv: "Plaša krāsu palete", en: "A wide colour palette" } },
       { icon: Ruler, label: { lv: "Izšuvuma izmērs", en: "Embroidery size" }, value: { lv: "No ļoti smalkiem līdz lieliem (min. burta augstums 4 mm)", en: "From delicate to large (minimum letter height 4 mm)" } },
     ],
-    images: [emb1, emb2, emb3, emb4, emb5, emb6, emb7, emb8, emb9Asset.url, emb10Asset.url, emb11Asset.url, emb12Asset.url, emb13Asset.url, emb14Asset.url, emb15Asset.url, emb16Asset.url, emb17Asset.url, emb18Asset.url, emb19Asset.url, emb20Asset.url, emb21Asset.url, emb22Asset.url, emb23Asset.url, emb24Asset.url, emb25Asset.url, emb26Asset.url, emb27Asset.url, emb28Asset.url],
+    images: [emb12Asset.url, emb1, emb2, emb3, emb4, emb5, emb6, emb7, emb8, emb9Asset.url, emb10Asset.url, emb11Asset.url, emb13Asset.url, emb14Asset.url, emb15Asset.url, emb16Asset.url, emb17Asset.url, emb18Asset.url, emb19Asset.url, emb20Asset.url, emb21Asset.url, emb22Asset.url, emb23Asset.url, emb24Asset.url, emb25Asset.url, emb26Asset.url, emb27Asset.url, emb28Asset.url],
   },
   {
     id: "sublimacija",
@@ -595,7 +595,7 @@ export const techs: Tech[] = [
       { icon: Layers, label: { lv: "Pieejamie materiāli", en: "Available materials" }, value: { lv: "Standarta, flok, metāliskas un atstarojošas termoplēves", en: "Standard, flock, metallic and reflective films" } },
       { icon: FileType2, label: { lv: "Faili", en: "Files" }, value: { lv: "AI, EPS, PDF — vektora formātā", en: "AI, EPS, PDF — vector format" } },
     ],
-    images: [heatTransfer, heatTransfer2, heatTransfer3Asset.url, heatTransfer4Asset.url, heatTransfer5Asset.url, heatTransfer6Asset.url],
+    images: [heatTransfer6Asset.url, heatTransfer, heatTransfer2, heatTransfer3Asset.url, heatTransfer4Asset.url, heatTransfer5Asset.url],
   },
 ];
 
