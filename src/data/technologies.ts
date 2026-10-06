@@ -60,6 +60,16 @@ import emb15Asset from "@/assets/services/embroidery-15.webp.asset.json";
 import emb16Asset from "@/assets/services/embroidery-16.webp.asset.json";
 import emb17Asset from "@/assets/services/embroidery-17.webp.asset.json";
 import emb18Asset from "@/assets/services/embroidery-18.webp.asset.json";
+import emb19Asset from "@/assets/services/embroidery-19.webp.asset.json";
+import emb20Asset from "@/assets/services/embroidery-20.webp.asset.json";
+import emb21Asset from "@/assets/services/embroidery-21.webp.asset.json";
+import emb22Asset from "@/assets/services/embroidery-22.webp.asset.json";
+import emb23Asset from "@/assets/services/embroidery-23.webp.asset.json";
+import emb24Asset from "@/assets/services/embroidery-24.webp.asset.json";
+import emb25Asset from "@/assets/services/embroidery-25.webp.asset.json";
+import emb26Asset from "@/assets/services/embroidery-26.webp.asset.json";
+import emb27Asset from "@/assets/services/embroidery-27.webp.asset.json";
+import emb28Asset from "@/assets/services/embroidery-28.webp.asset.json";
 import sub1Asset from "@/assets/services/sublimation-gallery-1.webp";
 import sub2Asset from "@/assets/services/sublimation-gallery-2.webp";
 import sub3Asset from "@/assets/services/sublimation-gallery-3.webp";
@@ -416,7 +426,7 @@ export const techs: Tech[] = [
       { icon: Palette, label: { lv: "Diegu krāsas", en: "Thread colours" }, value: { lv: "Plaša krāsu palete", en: "A wide colour palette" } },
       { icon: Ruler, label: { lv: "Izšuvuma izmērs", en: "Embroidery size" }, value: { lv: "No ļoti smalkiem līdz lieliem (min. burta augstums 4 mm)", en: "From delicate to large (minimum letter height 4 mm)" } },
     ],
-    images: [emb1, emb2, emb3, emb4, emb5, emb6, emb7, emb8, emb9Asset.url, emb10Asset.url, emb11Asset.url, emb12Asset.url, emb13Asset.url, emb14Asset.url, emb15Asset.url, emb16Asset.url, emb17Asset.url, emb18Asset.url],
+    images: [emb1, emb2, emb3, emb4, emb5, emb6, emb7, emb8, emb9Asset.url, emb10Asset.url, emb11Asset.url, emb12Asset.url, emb13Asset.url, emb14Asset.url, emb15Asset.url, emb16Asset.url, emb17Asset.url, emb18Asset.url, emb19Asset.url, emb20Asset.url, emb21Asset.url, emb22Asset.url, emb23Asset.url, emb24Asset.url, emb25Asset.url, emb26Asset.url, emb27Asset.url, emb28Asset.url],
   },
   {
     id: "sublimacija",
