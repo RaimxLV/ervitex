@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { useGalleryNavigation } from "@/hooks/useGalleryNavigation";
 
 interface ServiceImageCarouselProps {
   images: string[];
@@ -8,55 +10,72 @@ interface ServiceImageCarouselProps {
 }
 
 const ServiceImageCarousel = ({ images, alt }: ServiceImageCarouselProps) => {
-  const [current, setCurrent] = useState(0);
+  const { index: current, busy, move, select } = useGalleryNavigation(images);
+  const reduced = useReducedMotion();
   const [lightbox, setLightbox] = useState(false);
+
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setLightbox(false);
+      if (event.key === "ArrowLeft") move(-1);
+      if (event.key === "ArrowRight") move(1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightbox, move]);
 
   if (!images.length) return null;
 
-  const prev = () => setCurrent((c) => (c === 0 ? images.length - 1 : c - 1));
-  const next = () => setCurrent((c) => (c === images.length - 1 ? 0 : c + 1));
+  const prev = () => move(-1);
+  const next = () => move(1);
 
   return (
     <>
       {/* Inline carousel */}
-      <div className="relative mt-6 aspect-[16/10] overflow-hidden rounded-sm bg-muted">
-        <div
-          className="h-full cursor-pointer"
+      <div className="relative mt-6 aspect-[16/10] overflow-hidden rounded-sm bg-muted" aria-busy={busy}>
+        <Button
+          type="button" variant="ghost" aria-label={`${alt} — atvērt attēlu`}
+          className="relative h-full w-full rounded-none p-0 hover:bg-muted"
           onClick={() => setLightbox(true)}
         >
-          <img
+          <AnimatePresence initial={false}>
+          <motion.img
+            key={images[current]}
             src={images[current]}
             alt={`${alt} ${current + 1}`}
-            loading={current === 0 ? "eager" : "lazy"}
+            loading="eager"
             decoding="async"
-            fetchPriority={current === 0 ? "high" : "low"}
-            className="h-full w-full bg-muted object-cover"
+            fetchPriority={current === 0 ? "high" : "auto"}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 1 }}
+            transition={{ duration: reduced ? 0 : 0.35 }}
+            className="absolute inset-0 h-full w-full bg-muted object-cover"
           />
-
-        </div>
+          </AnimatePresence>
+        </Button>
 
         {images.length > 1 && (
           <>
-            <button
+            <Button type="button" variant="ghost" size="icon" aria-label="Iepriekšējais titula attēls"
               onClick={(e) => { e.stopPropagation(); prev(); }}
               className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground backdrop-blur-sm transition hover:bg-background"
             >
               <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
+            </Button>
+            <Button type="button" variant="ghost" size="icon" aria-label="Nākamais titula attēls"
               onClick={(e) => { e.stopPropagation(); next(); }}
               className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground backdrop-blur-sm transition hover:bg-background"
             >
               <ChevronRight className="h-5 w-5" />
-            </button>
+            </Button>
 
             {/* Dots */}
-            <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+            <div className="absolute bottom-3 left-1/2 flex max-w-[80%] -translate-x-1/2 flex-wrap justify-center gap-1.5">
               {images.map((_, i) => (
-                <button
+                <Button type="button" variant="ghost" aria-label={`Titula attēls ${i + 1}`} aria-current={i === current ? "true" : undefined}
                   key={i}
-                  onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
-                  className={`h-2 w-2 rounded-full transition ${
+                  onClick={(e) => { e.stopPropagation(); void select(i); }}
+                  className={`h-2 w-2 shrink-0 rounded-full p-0 transition ${
                     i === current ? "bg-accent" : "bg-background/60"
                   }`}
                 />
@@ -73,30 +92,31 @@ const ServiceImageCarousel = ({ images, alt }: ServiceImageCarouselProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/90 backdrop-blur-sm"
             onClick={() => setLightbox(false)}
+            role="dialog" aria-modal="true" aria-label={alt}
           >
-            <button
-              className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+            <Button type="button" variant="secondary" size="icon" aria-label="Aizvērt"
+              className="absolute right-4 top-4 rounded-full"
               onClick={() => setLightbox(false)}
             >
               <X className="h-6 w-6" />
-            </button>
+            </Button>
 
             {images.length > 1 && (
               <>
-                <button
+                <Button type="button" variant="secondary" size="icon" aria-label="Iepriekšējā"
                   onClick={(e) => { e.stopPropagation(); prev(); }}
-                  className="absolute left-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+                  className="absolute left-4 rounded-full"
                 >
                   <ChevronLeft className="h-8 w-8" />
-                </button>
-                <button
+                </Button>
+                <Button type="button" variant="secondary" size="icon" aria-label="Nākamā"
                   onClick={(e) => { e.stopPropagation(); next(); }}
-                  className="absolute right-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
+                  className="absolute right-4 rounded-full"
                 >
                   <ChevronRight className="h-8 w-8" />
-                </button>
+                </Button>
               </>
             )}
 

@@ -1,5 +1,9 @@
 # Roadmap
 
+## Galerijas — 06.10.2026
+- [x] Pievienot 8 optimizētās Sublimācijas bildes arī kopīgajai galerijai; WA0021 kā titula attēlu (−48,5% svara).
+- [x] Auditēt galerijas: ielādēt un dekodēt pirms nomaiņas, saglabāt iepriekšējo kadru, iesildīt blakus attēlus, apturēt automātiku ārpus skata; labota arī GitHub tehnoloģiju attēlu adrese. Piecas tehnoloģijas un mozaīka pārbaudītas 1280/390 px ar aizkavētu īsto CDN attēlu piegādi; 3 automātiskie testi sekmīgi.
+
 - [x] Pārveidot jauno Ervitex veikala fotogrāfiju par 20 gadus pamestu nakts ainu.
 - [x] Aiz teksta ievietot jauno ainu ar jaudīgu peles lukturi.
 - [x] Pievienot bojātu lampu mirgošanu un retas elektriskās dzirksteles.

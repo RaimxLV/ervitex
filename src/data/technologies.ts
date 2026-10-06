@@ -79,6 +79,14 @@ import sub6Asset from "@/assets/services/sublimation-gallery-6.webp";
 import sub7Asset from "@/assets/services/sublimation-gallery-7.webp";
 import subHeroAsset from "@/assets/services/sublimation-hero.webp";
 import sub8Asset from "@/assets/services/sublimation-gallery-8.webp";
+import sub9Asset from "@/assets/services/sublimation-gallery-9.webp.asset.json";
+import sub10Asset from "@/assets/services/sublimation-gallery-10.webp.asset.json";
+import sub11Asset from "@/assets/services/sublimation-gallery-11.webp.asset.json";
+import sub12Asset from "@/assets/services/sublimation-gallery-12.webp.asset.json";
+import sub13Asset from "@/assets/services/sublimation-gallery-13.webp.asset.json";
+import sub14Asset from "@/assets/services/sublimation-gallery-14.webp.asset.json";
+import sub15Asset from "@/assets/services/sublimation-gallery-15.webp.asset.json";
+import sub16Asset from "@/assets/services/sublimation-gallery-16.webp.asset.json";
 import heatTransfer from "@/assets/services/termodruka-hero.webp";
 import heatTransfer2 from "@/assets/services/termodruka-2.webp";
 import heatTransfer3Asset from "@/assets/services/termodruka-3.webp.asset.json";
@@ -518,6 +526,7 @@ export const techs: Tech[] = [
       { icon: Palette, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "Pilnkrāsu apdruka", en: "Full-colour print" } },
     ],
     images: [
+      sub13Asset.url,
       subHeroAsset,
       sub1Asset,
       sub2Asset,
@@ -527,6 +536,13 @@ export const techs: Tech[] = [
       sub6Asset,
       sub7Asset,
       sub8Asset,
+      sub9Asset.url,
+      sub10Asset.url,
+      sub11Asset.url,
+      sub12Asset.url,
+      sub14Asset.url,
+      sub15Asset.url,
+      sub16Asset.url,
     ],
   },
   {
@@ -598,5 +614,12 @@ export const techs: Tech[] = [
     images: [heatTransfer6Asset.url, heatTransfer, heatTransfer2, heatTransfer3Asset.url, heatTransfer4Asset.url, heatTransfer5Asset.url],
   },
 ];
+
+// GitHub Pages cannot serve Lovable's asset route from its own origin.
+if (window.location.hostname.endsWith("github.io")) {
+  techs.forEach((tech) => {
+    tech.images = tech.images.map((src) => src.startsWith("/__l5e/assets-v1/") ? `https://ervitex.lovable.app${src}` : src);
+  });
+}
 
 export const getTech = (id?: string) => techs.find((t) => t.id === id);
