@@ -22,6 +22,7 @@
 - [x] Saskaņot visu kataloga kartīšu cenu ar uzreiz atvērtās krāsas cenu un saglabāt krāsas izvēli saitē.
 
 ## Vizuālie uzlabojumi
+- [ ] Biroja foto aizpilda kartes augstuma laukumu; caurspīdīgas norādes bez šķībajām kontūrām, pārbaudīt telefonā un datorā.
 - [x] Kontaktos aizstāt ēkas skici ar foto un interaktīvi izcelt D ieeju un biroja logus pēc zilajām atzīmēm; pārbaudīts klikšķis, tastatūra un telefona skats.
 - [x] Pilns publisko lapu telefona audits: sabalansēti fonti, lauki un atstarpes, desktopu nemainot.
 - [x] Atjaunot sākumlapai vieglu ritināšanas izlīdzinājumu un skaidri pamanāmu, optimizētu hero dziļuma efektu.

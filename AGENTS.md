@@ -1,6 +1,6 @@
 # Architecture rules
 
-- Office-photo hotspots share the uncropped image coordinate system; SVG outlines and accessible button hit areas scale together so entrance and window markers stay aligned on every screen.
+- Office-photo image, SVG highlights and accessible hotspots share one cover-sized scene with a left-biased crop; container units keep the annotations aligned while the photo fills the map-height frame on every screen.
 
 - Quote worksheet edits use side-specific autosaved drafts; only explicit confirmation updates the shared list and creates an immutable version, preventing incomplete client/staff edits from overwriting each other.
 - Quote workflow history is append-only in `quote_events`; assignment and status changes must remain visible even when the current quote row changes.
