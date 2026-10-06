@@ -1,9 +1,19 @@
 import screen1 from "@/assets/services/screen-printing-1.webp";
-import screen2 from "@/assets/services/screen-printing-2.jpg";
-import screen3 from "@/assets/services/screen-printing-3.jpg";
-import screen4 from "@/assets/services/screen-printing-4.jpg";
+import screen2 from "@/assets/services/screen-printing-2.webp";
+import screen3 from "@/assets/services/screen-printing-3.webp";
+import screen4 from "@/assets/services/screen-printing-4.webp";
 import screen5 from "@/assets/services/screen-printing-5.webp";
 import screen6 from "@/assets/services/screen-printing-6.webp";
+import screen7 from "@/assets/services/screen-printing-7.webp";
+import screen8 from "@/assets/services/screen-printing-8.webp";
+import screen9 from "@/assets/services/screen-printing-9.webp";
+import screen10 from "@/assets/services/screen-printing-10.webp";
+import screen11 from "@/assets/services/screen-printing-11.webp";
+import screen12 from "@/assets/services/screen-printing-12.webp";
+import screen13 from "@/assets/services/screen-printing-13.webp";
+import screen14 from "@/assets/services/screen-printing-14.webp";
+import screen15 from "@/assets/services/screen-printing-15.webp";
+import screen16 from "@/assets/services/screen-printing-16.webp";
 import dtf1 from "@/assets/services/dtf-main.webp";
 import dtf2 from "@/assets/services/dtf-2.jpg";
 import dtf3 from "@/assets/services/dtf-3.jpg";
@@ -187,7 +197,7 @@ export const techs: Tech[] = [
       { icon: FileType2, label: { lv: "Pieņemamie faili", en: "Accepted files" }, value: { lv: "AI, EPS, PDF (vektora formātā)", en: "AI, EPS, PDF (vector)" } },
       { icon: Layers, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "līdz 6 krāsām vienā apdrukā", en: "up to 6 colours per print" } },
     ],
-    images: [screen1, screen2, screen3, screen4, screen5, screen6],
+    images: [screen1, screen2, screen3, screen4, screen5, screen6, screen7, screen8, screen9, screen10, screen11, screen12, screen13, screen14, screen15, screen16],
   },
   {
     id: "dtf",
