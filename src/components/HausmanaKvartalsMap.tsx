@@ -12,20 +12,20 @@ const HausmanaKvartalsMap = ({ className = "h-[320px] sm:h-[420px]" }: { classNa
   const windows = lang === "lv" ? "Ervitex · 2. stāvs" : "Ervitex · 2nd floor";
 
   return (
-    <div className={`flex w-full items-center bg-card ${className}`}>
-      <div className="office-photo relative w-full" data-active={active ?? "none"}>
+    <div className={`office-photo relative w-full overflow-hidden bg-card ${className}`} data-active={active ?? "none"}>
+      <div className="office-photo-scene">
         <img
           src={officePhoto.url}
           alt={lang === "lv" ? "Hausmaņa biroji ar Ervitex D ieeju un otrā stāva logiem" : "Hausmana offices with the Ervitex entrance D and second-floor windows"}
           width={1200}
           height={560}
-          className="block h-auto w-full"
+          className="absolute inset-0 block h-full w-full"
           loading="lazy"
           decoding="async"
         />
         <svg viewBox="0 0 1200 560" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
-          <polygon className="office-outline office-windows-outline" points="154,347 665,267 660,369 428,377 287,400 154,405" />
-          <polygon className="office-outline office-entrance-outline" points="184,410 263,406 263,519 180,519" />
+          <polygon className="office-outline office-windows-outline" points="154,347 665,267 665,369 154,405" />
+          <path className="office-outline office-entrance-outline" d="M186 413 L259 409 L259 516 L183 516 Z" />
         </svg>
         <Button
           variant="ghost"
@@ -49,8 +49,8 @@ const HausmanaKvartalsMap = ({ className = "h-[320px] sm:h-[420px]" }: { classNa
           onBlur={() => setHovered(null)}
           onClick={() => setSelected(selected === "entrance" ? null : "entrance")}
         />
-        <span className="office-label office-windows-label" aria-hidden="true">{windows}</span>
-        <span className="office-label office-entrance-label" aria-hidden="true">{entrance}</span>
+        <span className="office-label office-windows-label" aria-hidden="true"><span className="office-marker-dot" />{windows}</span>
+        <span className="office-label office-entrance-label" aria-hidden="true"><span className="office-door-letter">D</span>{lang === "lv" ? "ieeja" : "entrance"}</span>
       </div>
     </div>
   );
