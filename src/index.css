@@ -143,24 +143,35 @@
     transform: translateY(-50%);
   }
   .office-outline {
-    fill: hsl(var(--office-glass) / 0.025);
+    fill: hsl(var(--office-glass) / 0.05);
     stroke: hsl(var(--office-glass));
-    stroke-width: 1.5;
+    stroke-width: 1.75;
     vector-effect: non-scaling-stroke;
-    filter: drop-shadow(0 0 2px hsl(var(--office-glass) / 0.5));
-    opacity: 0.55;
+    filter: drop-shadow(0 0 4px hsl(var(--office-glass) / 0.75))
+            drop-shadow(0 0 14px hsl(var(--office-glass) / 0.4));
+    opacity: 0.6;
     animation: office-contour-breathe 5.2s ease-in-out infinite;
-    transition: opacity 180ms ease;
+    transition: opacity 220ms ease, filter 220ms ease;
   }
-  .office-entrance-outline { stroke-width: 2; animation-delay: 3.84s; }
+  .office-entrance-outline { stroke-width: 2.25; animation-delay: 3.84s; }
   .office-outline[data-lit="true"] {
     animation: none;
     opacity: 1;
     stroke: hsl(var(--office-edge));
+    filter: drop-shadow(0 0 6px hsl(var(--office-glass) / 0.95))
+            drop-shadow(0 0 26px hsl(var(--office-glass) / 0.75));
   }
   @keyframes office-contour-breathe {
-    0%, 20%, 100% { opacity: 0.55; }
-    8% { opacity: 1; }
+    0%, 20%, 100% {
+      opacity: 0.5;
+      filter: drop-shadow(0 0 3px hsl(var(--office-glass) / 0.55))
+              drop-shadow(0 0 8px hsl(var(--office-glass) / 0.25));
+    }
+    8% {
+      opacity: 1;
+      filter: drop-shadow(0 0 8px hsl(var(--office-glass) / 1))
+              drop-shadow(0 0 30px hsl(var(--office-glass) / 0.85));
+    }
   }
   .office-photo .office-region {
     position: absolute;
@@ -206,7 +217,13 @@
     font-size: 18px; font-weight: 700; color: hsl(var(--office-glass));
   }
   @media (prefers-reduced-motion: reduce) {
-    .office-outline { transition: none; animation: none; opacity: 0.8; }
+    .office-outline {
+      transition: none;
+      animation: none;
+      opacity: 0.85;
+      filter: drop-shadow(0 0 5px hsl(var(--office-glass) / 0.85))
+              drop-shadow(0 0 18px hsl(var(--office-glass) / 0.5));
+    }
   }
 
   .public-readable :is(
