@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { prepareGalleryImage } from "@/lib/galleryImages";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 type Photo = { src: string; alt: string };
 type Content = { kind: "photo"; photo: Photo } | { kind: "color"; color: number };
@@ -16,7 +18,7 @@ const initialTiles: Tile[] = [
 ];
 const randomDelay = () => 5000 + Math.random() * 8500;
 
-function MosaicTile({ tile, photos, active, reduced }: { tile: Tile; photos: Photo[]; active: boolean; reduced: boolean }) {
+function MosaicTile({ tile, photos, active, reduced, onOpen }: { tile: Tile; photos: Photo[]; active: boolean; reduced: boolean; onOpen: (photo: Photo) => void }) {
   const [content, setContent] = useState<Content>(() => ({ kind: "color", color: tile.color ?? tile.id % colors.length }));
   const current = useRef(content);
 
@@ -61,14 +63,15 @@ function MosaicTile({ tile, photos, active, reduced }: { tile: Tile; photos: Pho
   const key = content.kind === "photo" ? content.photo.src : `color-${content.color}`;
   return (
     <motion.div layout={reduced ? false : "position"} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-      className={`mosaic-tile ${tile.wide ? "mosaic-tile-wide" : ""} ${tile.tall ? "mosaic-tile-tall" : ""}`} data-mosaic-tile={tile.id}>
+      className={`group mosaic-tile ${tile.wide ? "mosaic-tile-wide" : ""} ${tile.tall ? "mosaic-tile-tall" : ""}`} data-mosaic-tile={tile.id}>
       <AnimatePresence initial={false}>
         <motion.div key={key} className={`mosaic-content ${content.kind === "color" ? colors[content.color] : ""}`}
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 1 }}
           transition={{ duration: reduced ? 0 : 0.65, ease: "easeInOut" }}>
-          {content.kind === "photo" && <img src={content.photo.src} alt={content.photo.alt} loading="eager" decoding="async" className="h-full w-full object-cover" />}
+           {content.kind === "photo" && <img src={content.photo.src} alt={content.photo.alt} loading="eager" decoding="async" className="h-full w-full object-cover transition-[filter] duration-300 group-hover:grayscale group-focus-within:grayscale motion-reduce:transition-none" />}
         </motion.div>
       </AnimatePresence>
+      {content.kind === "photo" && <Button type="button" variant="ghost" className="absolute inset-0 z-10 h-full w-full cursor-zoom-in rounded-none p-0 hover:bg-transparent focus-visible:ring-inset" aria-label={`${content.photo.alt} — ${document.documentElement.lang === "en" ? "Open image" : "Atvērt attēlu"}`} onClick={() => onOpen(content.photo)} />}
     </motion.div>
   );
 }
@@ -82,6 +85,8 @@ export default function TechnologyMosaic() {
   const [foreground, setForeground] = useState(!document.hidden);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [tiles, setTiles] = useState(initialTiles);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [interacting, setInteracting] = useState(false);
 
   useEffect(() => {
     const node = section.current;
@@ -114,7 +119,7 @@ export default function TechnologyMosaic() {
     return () => { cancelled = true; };
   }, [near, lang]);
 
-  const active = visible && foreground;
+   const active = visible && foreground && !interacting && !selectedPhoto;
   useEffect(() => {
     if (!active || reduced || !photos.length) return;
     let timer: ReturnType<typeof setTimeout>;
@@ -137,11 +142,17 @@ export default function TechnologyMosaic() {
 
   return (
     <section ref={section} className="technology-mosaic" aria-label={lang === "lv" ? "Apdrukas un izšūšanas galerija" : "Printing and embroidery gallery"}>
-      <div className="mosaic-grid">
+      <div className="mosaic-grid" onMouseEnter={() => setInteracting(true)} onMouseLeave={() => setInteracting(false)} onFocusCapture={() => setInteracting(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setInteracting(false); }}>
         {tiles.map((tile) => photos.length
-          ? <MosaicTile key={`${lang}-${tile.id}`} tile={tile} photos={photos} active={active} reduced={reduced} />
+           ? <MosaicTile key={`${lang}-${tile.id}`} tile={tile} photos={photos} active={active} reduced={reduced} onOpen={setSelectedPhoto} />
           : <div key={tile.id} className={`mosaic-tile ${tile.wide ? "mosaic-tile-wide" : ""} ${tile.tall ? "mosaic-tile-tall" : ""} ${tile.color !== undefined ? colors[tile.color] : ""}`} aria-hidden="true" />)}
       </div>
+      <Dialog open={selectedPhoto !== null} onOpenChange={(open) => { if (!open) setSelectedPhoto(null); }}>
+        <DialogContent className="w-[calc(100%-2rem)] max-w-6xl border-0 bg-background p-2 pt-12" aria-describedby={undefined}>
+          <DialogTitle className="sr-only">{selectedPhoto?.alt}</DialogTitle>
+          {selectedPhoto && <img src={selectedPhoto.src} alt={selectedPhoto.alt} className="max-h-[80dvh] w-full object-contain" />}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
