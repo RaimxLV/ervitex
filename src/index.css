@@ -143,19 +143,19 @@
     transform: translateY(-50%);
   }
   .office-glow {
-    fill: hsl(var(--office-glass) / 0.55);
-    stroke: hsl(var(--office-glass) / 0.9);
-    stroke-width: 3;
+    fill: hsl(var(--office-glass) / 0.75);
+    stroke: hsl(var(--office-glass));
+    stroke-width: 3.5;
     vector-effect: non-scaling-stroke;
-    opacity: 0.14;
+    opacity: 0.28;
     animation: office-glow-breathe 5.2s ease-in-out infinite;
     transition: opacity 260ms ease;
   }
-  .office-entrance-glow { stroke-width: 4.5; animation-delay: 3.84s; }
-  .office-glow[data-lit="true"] { animation: none; opacity: 0.8; }
+  .office-entrance-glow { stroke-width: 5; animation-delay: 3.84s; }
+  .office-glow[data-lit="true"] { animation: none; opacity: 0.95; }
   @keyframes office-glow-breathe {
-    0%, 20%, 100% { opacity: 0.1; }
-    8% { opacity: 0.62; }
+    0%, 20%, 100% { opacity: 0.24; }
+    8% { opacity: 0.95; }
   }
   .office-outline {
     fill: none;

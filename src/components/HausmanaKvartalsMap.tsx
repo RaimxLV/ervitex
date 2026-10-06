@@ -48,11 +48,13 @@ const HausmanaKvartalsMap = ({ className = "h-[320px] sm:h-[420px]" }: { classNa
           <defs>
             {/* Tight bright core plus a wide soft spill, with a roomy region so the
                 blur is never clipped by the shape's own bounding box. */}
-            <filter id="office-glow" x="-600%" y="-250%" width="1300%" height="600%" colorInterpolationFilters="sRGB">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="wide" />
-              <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="tight" />
+            <filter id="office-glow" x="-700%" y="-300%" width="1500%" height="700%" colorInterpolationFilters="sRGB">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="16" result="wide" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="mid" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="tight" />
               <feMerge>
                 <feMergeNode in="wide" />
+                <feMergeNode in="mid" />
                 <feMergeNode in="tight" />
               </feMerge>
             </filter>
