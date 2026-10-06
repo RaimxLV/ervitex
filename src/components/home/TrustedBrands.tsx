@@ -1,6 +1,3 @@
-import { motion } from "framer-motion";
-import { useLanguage } from "@/i18n/LanguageContext";
-
 const brands = [
   "Stanley/Stella", "Craft", "Clique", "ProJob", "Cutter & Buck",
   "Elevate", "Roly", "Russell", "Beechfield Brands", "Malfini",
@@ -8,30 +5,9 @@ const brands = [
 ];
 
 const TrustedBrands = () => {
-  const { lang } = useLanguage();
-
   return (
-    <section className="border-y border-border bg-background py-10 md:py-20">
+    <section className="border-y border-border bg-background py-7 md:py-12">
       <div className="container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mb-7 text-center md:mb-10"
-        >
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <div className="h-px w-10 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase text-accent">
-              {lang === "lv" ? "Partneri" : "Partners"}
-            </span>
-            <div className="h-px w-10 bg-accent" />
-          </div>
-          <h2 className="font-heading text-xl font-black uppercase text-foreground md:text-2xl">
-            {lang === "lv" ? "Uzticami zīmoli" : "Trusted Brands"}
-          </h2>
-        </motion.div>
-
         {/* Scrolling brand logos (text-based, monochrome) */}
         <div className="overflow-hidden">
           <div className="flex animate-scroll-left whitespace-nowrap">
