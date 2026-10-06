@@ -1,5 +1,5 @@
 import { useState } from "react";
-import officePhoto from "@/assets/ervitex-birojs.png.asset.json";
+import officePhoto from "@/assets/ervitex-birojs.webp";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -36,7 +36,7 @@ const HausmanaKvartalsMap = ({ className = "h-[320px] sm:h-[420px]" }: { classNa
     <div className={`office-photo relative w-full overflow-hidden bg-card ${className}`} data-active={active ?? "none"}>
       <div className="office-photo-scene">
         <img
-          src={officePhoto.url}
+          src={officePhoto}
           alt={lang === "lv" ? "Hausmaņa biroji ar Ervitex D ieeju un otrā stāva logiem" : "Hausmana offices with the Ervitex entrance D and second-floor windows"}
           width={1200}
           height={560}
