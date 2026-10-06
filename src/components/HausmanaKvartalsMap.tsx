@@ -45,8 +45,39 @@ const HausmanaKvartalsMap = ({ className = "h-[320px] sm:h-[420px]" }: { classNa
           decoding="async"
         />
         <svg viewBox="0 0 1200 560" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
-          {windowContours.map((points, index) => <polygon key={points} className="office-outline office-window-outline" style={{ animationDelay: `${index * 0.32}s` }} data-lit={active === `window-${index}`} points={points} />)}
-          <polygon className="office-outline office-entrance-outline" data-lit={active === "entrance"} points={doorContour} />
+          <defs>
+            {/* Tight bright core plus a wide soft spill, with a roomy region so the
+                blur is never clipped by the shape's own bounding box. */}
+            <filter id="office-glow" x="-600%" y="-250%" width="1300%" height="600%" colorInterpolationFilters="sRGB">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="wide" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="tight" />
+              <feMerge>
+                <feMergeNode in="wide" />
+                <feMergeNode in="tight" />
+              </feMerge>
+            </filter>
+          </defs>
+          <g className="office-glow-layer">
+            {windowContours.map((points, index) => <polygon
+              key={points}
+              className="office-glow"
+              filter="url(#office-glow)"
+              style={{ animationDelay: `${index * 0.32}s` }}
+              data-lit={active === `window-${index}`}
+              points={points}
+            />)}
+            <polygon className="office-glow office-entrance-glow" filter="url(#office-glow)" data-lit={active === "entrance"} points={doorContour} />
+          </g>
+          <g className="office-core-layer">
+            {windowContours.map((points, index) => <polygon
+              key={points}
+              className="office-outline office-window-outline"
+              style={{ animationDelay: `${index * 0.32}s` }}
+              data-lit={active === `window-${index}`}
+              points={points}
+            />)}
+            <polygon className="office-outline office-entrance-outline" data-lit={active === "entrance"} points={doorContour} />
+          </g>
         </svg>
         {windowContours.map((points, index) => <Button
           key={points}
