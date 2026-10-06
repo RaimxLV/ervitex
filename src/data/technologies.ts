@@ -1,4 +1,4 @@
-import screen1 from "@/assets/services/screen-printing-1.jpg";
+import screen1 from "@/assets/services/screen-printing-1.webp";
 import screen2 from "@/assets/services/screen-printing-2.jpg";
 import screen3 from "@/assets/services/screen-printing-3.jpg";
 import screen4 from "@/assets/services/screen-printing-4.jpg";
