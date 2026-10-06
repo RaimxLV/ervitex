@@ -21,7 +21,7 @@ const StoreLocations = () => {
   const tel = lang === "lv" ? "Tālr." : "Tel.";
 
   return (
-    <section className="border-t border-border bg-background py-12 md:py-24">
+    <section className="section-dark border-t border-border bg-background py-12 md:py-24">
       <div className="container">
         <SectionHeading
           eyebrow="T-Bode"
