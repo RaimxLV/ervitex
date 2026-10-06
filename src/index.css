@@ -39,6 +39,12 @@
     --office-ink: 210 16% 15%;
     --office-edge: 201 25% 89%;
     --office-shadow: 220 20% 8%;
+    --mosaic-background: 0 0% 3.1372549%;
+    --mosaic-red: 0 85.03937% 50.980392%;
+    --mosaic-white: 0 0% 100%;
+    --mosaic-orange: 23.839286 100% 56.078431%;
+    --mosaic-lime: 72.513369 85.388128% 57.058824%;
+    --mosaic-turquoise: 186.181818 68.46473% 47.254902%;
 
     --value-blue: 215 72% 42%;
     --value-blue-soft: 214 70% 96%;
@@ -150,6 +156,37 @@
 }
 
 @layer components {
+  .technology-mosaic {
+    background: hsl(var(--mosaic-background));
+    padding: 32px;
+    overflow: hidden;
+  }
+  .mosaic-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-auto-flow: row dense;
+    grid-auto-rows: 200px;
+    gap: 16px;
+    max-width: 1280px;
+    margin-inline: auto;
+  }
+  .mosaic-tile { position: relative; min-width: 0; overflow: hidden; background: hsl(var(--mosaic-background)); }
+  .mosaic-tile-wide { grid-column: span 2; }
+  .mosaic-tile-tall { grid-row: span 2; }
+  .mosaic-content { position: absolute; inset: 0; }
+  .mosaic-red { background: hsl(var(--mosaic-red)); }
+  .mosaic-white { background: hsl(var(--mosaic-white)); }
+  .mosaic-orange { background: hsl(var(--mosaic-orange)); }
+  .mosaic-lime { background: hsl(var(--mosaic-lime)); }
+  .mosaic-turquoise { background: hsl(var(--mosaic-turquoise)); }
+  @media (max-width: 1023px) {
+    .mosaic-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 160px; }
+  }
+  @media (max-width: 767px) {
+    .technology-mosaic { padding: 16px; }
+    .mosaic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 150px; gap: 8px; }
+    .mosaic-tile-tall { grid-row: span 2; }
+  }
   .office-photo { container-type: size; }
   .office-photo-scene {
     position: absolute;
