@@ -15,10 +15,12 @@ const Index = () => {
     <Layout>
       <HeroSection />
       <BentoCategories />
+      <Suspense fallback={<div className="min-h-[16svh]" />}>
+        <TrustedBrands />
+      </Suspense>
       <TechnologiesShowcase />
       <Suspense fallback={<div className="min-h-[40svh]" />}>
         <TechnologyMosaic />
-        <TrustedBrands />
         <RetailSection />
       </Suspense>
     </Layout>
