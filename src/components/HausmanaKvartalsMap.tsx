@@ -3,12 +3,33 @@ import officePhoto from "@/assets/ervitex-birojs.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 
+// Coordinates trace the individual panes in the original 1200 × 560 photo.
+const windowContours = [
+  "164,357 175,355 175,405 164,407",
+  "188,351 200,349 200,396 188,398",
+  "220,345 232,343 232,392 220,394",
+  "261,341 273,339 273,385 261,387",
+  "295,334 307,332 307,383 295,385",
+  "329,328 341,326 341,381 329,383",
+  "365,324 376,322 376,380 365,382",
+  "431,312 447,310 447,365 431,367",
+  "477,305 494,302 494,362 477,364",
+  "525,298 543,295 543,359 525,361",
+  "575,290 595,287 595,354 575,357",
+  "628,284 651,281 651,349 628,352",
+];
+const doorContour = "201,434 233,432 233,492 201,491";
+const clipContour = (points: string) => `polygon(${points.split(" ").map((point) => {
+  const [x, y] = point.split(",").map(Number);
+  return `${x / 12}% ${y / 5.6}%`;
+}).join(", ")})`;
+
 const HausmanaKvartalsMap = ({ className = "h-[320px] sm:h-[420px]" }: { className?: string }) => {
   const { lang } = useLanguage();
-  const [selected, setSelected] = useState<"entrance" | "windows" | null>(null);
-  const [hovered, setHovered] = useState<"entrance" | "windows" | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
   const active = hovered ?? selected;
-  const entrance = lang === "lv" ? "D ieeja" : "Entrance D";
+  const entrance = lang === "lv" ? "Ieeja D" : "Entrance D";
   const windows = lang === "lv" ? "Ervitex · 2. stāvs" : "Ervitex · 2nd floor";
 
   return (
@@ -24,23 +45,26 @@ const HausmanaKvartalsMap = ({ className = "h-[320px] sm:h-[420px]" }: { classNa
           decoding="async"
         />
         <svg viewBox="0 0 1200 560" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
-          <polygon className="office-outline office-windows-outline" points="154,347 665,267 665,369 154,405" />
-          <path className="office-outline office-entrance-outline" d="M186 413 L259 409 L259 516 L183 516 Z" />
+          {windowContours.map((points, index) => <polygon key={points} className="office-outline office-window-outline" data-lit={active === `window-${index}`} points={points} />)}
+          <polygon className="office-outline office-entrance-outline" data-lit={active === "entrance"} points={doorContour} />
         </svg>
-        <Button
+        {windowContours.map((points, index) => <Button
+          key={points}
           variant="ghost"
-          className="office-region office-windows-region"
-          aria-label={windows}
-          aria-pressed={selected === "windows"}
-          onMouseEnter={() => setHovered("windows")}
+          className="office-region"
+          style={{ clipPath: clipContour(points) }}
+          aria-label={`${windows} · ${lang === "lv" ? "logs" : "window"} ${index + 1}`}
+          aria-pressed={selected === `window-${index}`}
+          onMouseEnter={() => setHovered(`window-${index}`)}
           onMouseLeave={() => setHovered(null)}
-          onFocus={() => setHovered("windows")}
+          onFocus={() => setHovered(`window-${index}`)}
           onBlur={() => setHovered(null)}
-          onClick={() => setSelected(selected === "windows" ? null : "windows")}
-        />
+          onClick={() => setSelected(selected === `window-${index}` ? null : `window-${index}`)}
+        />)}
         <Button
           variant="ghost"
-          className="office-region office-entrance-region"
+          className="office-region"
+          style={{ clipPath: clipContour(doorContour) }}
           aria-label={entrance}
           aria-pressed={selected === "entrance"}
           onMouseEnter={() => setHovered("entrance")}
@@ -49,8 +73,8 @@ const HausmanaKvartalsMap = ({ className = "h-[320px] sm:h-[420px]" }: { classNa
           onBlur={() => setHovered(null)}
           onClick={() => setSelected(selected === "entrance" ? null : "entrance")}
         />
-        <span className="office-label office-windows-label" aria-hidden="true"><span className="office-marker-dot" />{windows}</span>
-        <span className="office-label office-entrance-label" aria-hidden="true"><span className="office-door-letter">D</span>{lang === "lv" ? "ieeja" : "entrance"}</span>
+        <span className="office-label office-windows-label" aria-hidden="true">{windows}</span>
+        <span className="office-label office-entrance-label" aria-hidden="true"><span className="office-door-letter">D</span><span>{lang === "lv" ? "Ieeja birojam" : "Office entrance"}</span></span>
       </div>
     </div>
   );
