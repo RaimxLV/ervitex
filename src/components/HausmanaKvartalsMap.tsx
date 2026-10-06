@@ -18,7 +18,7 @@ const windowContours = [
   "575,290 595,287 595,354 575,357",
   "628,284 651,281 651,349 628,352",
 ];
-const doorContour = "201,434 233,432 233,492 201,491";
+const doorContour = "199,432 237,431 237,498 198,498";
 const clipContour = (points: string) => `polygon(${points.split(" ").map((point) => {
   const [x, y] = point.split(",").map(Number);
   return `${x / 12}% ${y / 5.6}%`;
@@ -45,7 +45,7 @@ const HausmanaKvartalsMap = ({ className = "h-[320px] sm:h-[420px]" }: { classNa
           decoding="async"
         />
         <svg viewBox="0 0 1200 560" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
-          {windowContours.map((points, index) => <polygon key={points} className="office-outline office-window-outline" data-lit={active === `window-${index}`} points={points} />)}
+          {windowContours.map((points, index) => <polygon key={points} className="office-outline office-window-outline" style={{ animationDelay: `${index * 0.32}s` }} data-lit={active === `window-${index}`} points={points} />)}
           <polygon className="office-outline office-entrance-outline" data-lit={active === "entrance"} points={doorContour} />
         </svg>
         {windowContours.map((points, index) => <Button
@@ -73,9 +73,8 @@ const HausmanaKvartalsMap = ({ className = "h-[320px] sm:h-[420px]" }: { classNa
           onBlur={() => setHovered(null)}
           onClick={() => setSelected(selected === "entrance" ? null : "entrance")}
         />
-        <span className="office-label office-windows-label" aria-hidden="true">{windows}</span>
-        <span className="office-label office-entrance-label" aria-hidden="true"><span className="office-door-letter">D</span><span>{lang === "lv" ? "Ieeja birojam" : "Office entrance"}</span></span>
       </div>
+      <span className="office-label office-entrance-label" aria-hidden="true"><span className="office-door-letter">D</span><span>{lang === "lv" ? "Ieeja birojam" : "Office entrance"}</span></span>
     </div>
   );
 };

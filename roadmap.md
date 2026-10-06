@@ -22,6 +22,7 @@
 - [x] Saskaņot visu kataloga kartīšu cenu ar uzreiz atvērtās krāsas cenu un saglabāt krāsas izvēli saitē.
 
 ## Vizuālie uzlabojumi
+- [x] Noņemt stāva etiķeti, ieejas norādi nostiprināt 16px no kreisās un apakšējās malas; precizēt durvis, pastiprināt kontūras un secīgi pulsēt; pārbaudīts datorā un telefonā.
 - [x] Aizstāt biroja logu kopējo kontūru ar 12 atsevišķām logu un precīzu durvju kontūru; viegls mirdzums, pulsēšana, bez peles pildījuma; pārbaudīts datorā un telefonā.
 - [x] Biroja foto aizpilda kartes augstuma laukumu; caurspīdīgas norādes bez šķībajām kontūrām, pārbaudīts telefonā un datorā.
 - [x] Kontaktos aizstāt ēkas skici ar foto un interaktīvi izcelt D ieeju un biroja logus pēc zilajām atzīmēm; pārbaudīts klikšķis, tastatūra un telefona skats.
