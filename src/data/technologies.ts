@@ -40,6 +40,8 @@ import dtf11 from "@/assets/services/dtf-11.webp";
 import dtf12 from "@/assets/services/dtf-12.webp";
 import dtf13 from "@/assets/services/dtf-13.webp";
 import dtf14 from "@/assets/services/dtf-14.webp";
+import dtf15 from "@/assets/services/dtf-15.webp";
+import dtf16 from "@/assets/services/dtf-16.webp";
 import emb1 from "@/assets/services/embroidery-1.jpg";
 import emb2 from "@/assets/services/embroidery-2.jpg";
 import emb3 from "@/assets/services/embroidery-3.jpg";
@@ -47,6 +49,7 @@ import emb4 from "@/assets/services/embroidery-4.jpg";
 import emb5 from "@/assets/services/embroidery-5.webp";
 import emb6 from "@/assets/services/embroidery-6.webp";
 import emb7 from "@/assets/services/embroidery-7.webp";
+import emb8 from "@/assets/services/embroidery-8.webp";
 import sub1Asset from "@/assets/services/sublimation-gallery-1.webp";
 import sub2Asset from "@/assets/services/sublimation-gallery-2.webp";
 import sub3Asset from "@/assets/services/sublimation-gallery-3.webp";
@@ -319,7 +322,7 @@ export const techs: Tech[] = [
       { icon: Palette, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "Neierobežots", en: "Unlimited" } },
       { icon: FileType2, label: { lv: "Faili", en: "Files" }, value: { lv: "PNG (300 DPI), PDF, AI", en: "PNG (300 DPI), PDF, AI" } },
     ],
-    images: [dtf1, dtf2, dtf3, dtf4, dtf5, dtf6, dtf7, dtf8, dtf9, dtf10, dtf11, dtf12, dtf13, dtf14],
+    images: [dtf1, dtf2, dtf3, dtf4, dtf5, dtf6, dtf7, dtf8, dtf9, dtf10, dtf11, dtf12, dtf13, dtf14, dtf15, dtf16],
   },
   {
     id: "izsusana",
@@ -403,7 +406,7 @@ export const techs: Tech[] = [
       { icon: Palette, label: { lv: "Diegu krāsas", en: "Thread colours" }, value: { lv: "Plaša krāsu palete", en: "A wide colour palette" } },
       { icon: Ruler, label: { lv: "Izšuvuma izmērs", en: "Embroidery size" }, value: { lv: "No ļoti smalkiem līdz lieliem (min. burta augstums 4 mm)", en: "From delicate to large (minimum letter height 4 mm)" } },
     ],
-    images: [emb1, emb2, emb3, emb4, emb5, emb6, emb7],
+    images: [emb1, emb2, emb3, emb4, emb5, emb6, emb7, emb8],
   },
   {
     id: "sublimacija",
