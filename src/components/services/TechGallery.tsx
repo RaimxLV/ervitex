@@ -1,7 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useGalleryNavigation } from "@/hooks/useGalleryNavigation";
+import { useGalleryVisibility } from "@/hooks/useGalleryVisibility";
+import { prepareGalleryImage, warmGalleryImages } from "@/lib/galleryImages";
 
 interface TechGalleryProps {
   images: string[];
@@ -35,33 +38,44 @@ const gridClasses: Record<number, string> = {
 };
 
 const TechGallery = ({ images, alt }: TechGalleryProps) => {
-  const [start, setStart] = useState(0);
+  const { ref, near } = useGalleryVisibility();
+  const { index: start, busy, move: navigate } = useGalleryNavigation(images, 4, near);
+  const reduced = useReducedMotion();
   const [direction, setDirection] = useState(1);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const lightboxRequest = useRef(0);
 
   const move = useCallback((step: number) => {
     if (images.length < 2) return;
     setDirection(step);
-    setStart((current) => (current + step + images.length) % images.length);
-  }, [images.length]);
+    navigate(step);
+  }, [images.length, navigate]);
 
   const moveLightbox = useCallback((step: number) => {
-    setLightbox((current) => {
-      if (current === null || images.length < 2) return current;
-      return (current + step + images.length) % images.length;
-    });
-  }, [images.length]);
+    if (lightbox === null || images.length < 2) return;
+    const next = (lightbox + step + images.length) % images.length;
+    const ticket = ++lightboxRequest.current;
+    void prepareGalleryImage(images[next]).then(() => {
+      if (ticket === lightboxRequest.current) setLightbox(next);
+    }).catch(() => undefined);
+  }, [images, lightbox]);
+
+  const closeLightbox = useCallback(() => { lightboxRequest.current++; setLightbox(null); }, []);
+  useEffect(() => {
+    if (lightbox === null) return;
+    warmGalleryImages([images[(lightbox + 1) % images.length], images[(lightbox - 1 + images.length) % images.length]]);
+  }, [lightbox, images]);
 
   useEffect(() => {
     if (lightbox === null) return;
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setLightbox(null);
+      if (event.key === "Escape") closeLightbox();
       if (event.key === "ArrowLeft") moveLightbox(-1);
       if (event.key === "ArrowRight") moveLightbox(1);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [lightbox, moveLightbox]);
+  }, [lightbox, moveLightbox, closeLightbox]);
 
   if (!images.length) return null;
 
@@ -73,7 +87,7 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
   const activeLightboxImage = lightbox === null ? undefined : images[lightbox];
 
   return (
-    <div>
+    <div ref={ref} aria-busy={busy}>
       <div className={gridClasses[visibleCount] ?? gridClasses[4]}>
         {visible.map(({ src, index, slot }) => (
           <Button
@@ -89,13 +103,13 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
                 key={`${slot}-${index}-${src}`}
                 src={src}
                 alt={`${alt} ${index + 1}`}
-                loading={slot < 2 ? "eager" : "lazy"}
+                loading={near ? "eager" : "lazy"}
                 decoding="async"
                 custom={direction}
-                initial={{ opacity: 0, x: direction > 0 ? 24 : -24, scale: 1.025 }}
+                initial={{ opacity: 0 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: direction > 0 ? -24 : 24, scale: 0.985 }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                exit={{ opacity: 1 }}
+                transition={{ duration: reduced ? 0 : 0.4, ease: "easeOut" }}
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
               />
             </AnimatePresence>
@@ -131,12 +145,12 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/90 p-4 backdrop-blur-sm"
-            onClick={() => setLightbox(null)}
+            onClick={closeLightbox}
             role="dialog"
             aria-modal="true"
             aria-label={`${alt} ${lightbox + 1}`}
           >
-            <Button type="button" variant="secondary" size="icon" className="absolute right-4 top-4 rounded-full" onClick={() => setLightbox(null)} aria-label="Aizvērt">
+            <Button type="button" variant="secondary" size="icon" className="absolute right-4 top-4 rounded-full" onClick={closeLightbox} aria-label="Aizvērt">
               <X />
             </Button>
             {images.length > 1 && (
@@ -153,7 +167,7 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
               key={activeLightboxImage}
               src={activeLightboxImage}
               alt={`${alt} ${lightbox + 1}`}
-              initial={{ opacity: 0, scale: 0.98 }}
+              initial={false}
               animate={{ opacity: 1, scale: 1 }}
               className="max-h-[86vh] max-w-[90vw] object-contain"
               onClick={(event) => event.stopPropagation()}

@@ -12,6 +12,8 @@ import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
 import { assignCareIcons } from "./CareIcons";
+import { GalleryImage } from "@/components/GalleryImage";
+import { warmGalleryImages } from "@/lib/galleryImages";
 
 
 interface Props {
@@ -1075,6 +1077,11 @@ const CatalogItemDialog = ({
   }, [currentColor, displayDetail, image]);
 
   const mainImg = gallery[imgIndex] || gallery[0] || image;
+  useEffect(() => {
+    if (!open || !gallery.length) return;
+    warmGalleryImages([gallery[(imgIndex + 1) % gallery.length], gallery[(imgIndex - 1 + gallery.length) % gallery.length]]
+      .map((src) => thumbUrl(src, 900) || src));
+  }, [open, gallery, imgIndex]);
   const visibleSizes = currentColor?.sizes.length ? currentColor.sizes : displayDetail.sizes || [];
 
   // "Pieejamie izmēri: XS – XXXL" — cenās pa izmēriem skatīt pieprasījuma tabulā
@@ -1306,27 +1313,11 @@ const CatalogItemDialog = ({
                     data-preview={mainImg}
                     className="absolute inset-0 h-full w-full object-contain blur-[8px] scale-105 transition-opacity duration-300"
                   />
-                  <img
-                    key={mainImg}
+                  <GalleryImage
                     src={thumbUrl(mainImg, 900) || mainImg}
+                    fallback={mainImg}
                     alt={currentColor?.name || displayDetail.title || id}
-                    loading="eager"
-                    fetchPriority="high"
-                    decoding="async"
-                    onLoad={(e) => {
-                      const el = e.currentTarget as HTMLImageElement;
-                      el.style.opacity = "1";
-                      const prev = el.parentElement?.querySelector<HTMLImageElement>("img[data-preview]");
-                      if (prev) prev.style.opacity = "0";
-                    }}
-                    style={{ opacity: 0 }}
                     className="relative h-full w-full object-contain transition-opacity duration-300"
-                    onError={(e) => {
-                      const el = e.currentTarget as HTMLImageElement;
-                      if (el.src !== mainImg) { el.src = mainImg; return; }
-                      el.src = placeholderSrc;
-                      el.style.opacity = "1";
-                    }}
                   />
                 </>
               ) : loading ? (

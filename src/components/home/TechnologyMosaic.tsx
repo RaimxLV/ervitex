@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { prepareGalleryImage } from "@/lib/galleryImages";
 
 type Photo = { src: string; alt: string };
 type Content = { kind: "photo"; photo: Photo } | { kind: "color"; color: number };
@@ -16,10 +17,21 @@ const initialTiles: Tile[] = [
 const randomDelay = () => 5000 + Math.random() * 8500;
 
 function MosaicTile({ tile, photos, active, reduced }: { tile: Tile; photos: Photo[]; active: boolean; reduced: boolean }) {
-  const [content, setContent] = useState<Content>(() => tile.color !== undefined
-    ? { kind: "color", color: tile.color }
-    : { kind: "photo", photo: photos[tile.id % photos.length] });
+  const [content, setContent] = useState<Content>(() => ({ kind: "color", color: tile.color ?? tile.id % colors.length }));
   const current = useRef(content);
+
+  useEffect(() => {
+    if (tile.color !== undefined || !photos.length) return;
+    let cancelled = false;
+    const photo = photos[tile.id % photos.length];
+    void prepareGalleryImage(photo.src).then(() => {
+      if (cancelled) return;
+      const next: Content = { kind: "photo", photo };
+      current.current = next;
+      setContent(next);
+    }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [photos, tile.id, tile.color]);
 
   useEffect(() => {
     if (!active || reduced || !photos.length) return;
@@ -34,9 +46,7 @@ function MosaicTile({ tile, photos, active, reduced }: { tile: Tile; photos: Pho
         const available = photos.filter((photo) => current.current.kind !== "photo" || photo.src !== current.current.photo.src);
         const photo = available[Math.floor(Math.random() * available.length)];
         if (!photo) { schedule(); return; }
-        const image = new Image();
-        image.src = photo.src;
-        try { await image.decode(); } catch { if (!cancelled) schedule(); return; }
+        try { await prepareGalleryImage(photo.src); } catch { if (!cancelled) schedule(); return; }
         next = { kind: "photo", photo };
       }
       if (cancelled) return;
@@ -52,11 +62,11 @@ function MosaicTile({ tile, photos, active, reduced }: { tile: Tile; photos: Pho
   return (
     <motion.div layout={reduced ? false : "position"} transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
       className={`mosaic-tile ${tile.wide ? "mosaic-tile-wide" : ""} ${tile.tall ? "mosaic-tile-tall" : ""}`} data-mosaic-tile={tile.id}>
-      <AnimatePresence initial={false} mode="wait">
+      <AnimatePresence initial={false}>
         <motion.div key={key} className={`mosaic-content ${content.kind === "color" ? colors[content.color] : ""}`}
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 1 }}
           transition={{ duration: reduced ? 0 : 0.65, ease: "easeInOut" }}>
-          {content.kind === "photo" && <img src={content.photo.src} alt={content.photo.alt} loading="lazy" decoding="async" className="h-full w-full object-cover" />}
+          {content.kind === "photo" && <img src={content.photo.src} alt={content.photo.alt} loading="eager" decoding="async" className="h-full w-full object-cover" />}
         </motion.div>
       </AnimatePresence>
     </motion.div>
@@ -76,7 +86,7 @@ export default function TechnologyMosaic() {
   useEffect(() => {
     const node = section.current;
     if (!node) return;
-    const preload = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setNear(true); }, { rootMargin: "400px" });
+    const preload = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setNear(true); }, { rootMargin: "1000px" });
     const viewport = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting));
     preload.observe(node);
     viewport.observe(node);

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useGalleryNavigation } from "@/hooks/useGalleryNavigation";
+import { useGalleryVisibility } from "@/hooks/useGalleryVisibility";
 
 export interface GallerySlide {
   src: string;
@@ -20,7 +22,9 @@ const ModernGallery = ({
   aspectRatio = "16/9",
   className = "",
 }: ModernGalleryProps) => {
-  const [current, setCurrent] = useState(0);
+  const { ref, near, active } = useGalleryVisibility();
+  const { index: current, move, select } = useGalleryNavigation(slides.map((slide) => slide.src), 1, near);
+  const reduced = useReducedMotion();
   const [direction, setDirection] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const dragX = useMotionValue(0);
@@ -31,25 +35,27 @@ const ModernGallery = ({
   const go = useCallback(
     (dir: number) => {
       setDirection(dir);
-      setCurrent((prev) => (prev + dir + total) % total);
+      move(dir);
     },
-    [total],
+    [move],
   );
 
   // Auto-play
   useEffect(() => {
+    if (!active || reduced || total < 2) return;
     timerRef.current = setInterval(() => go(1), autoPlayInterval);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [go, autoPlayInterval]);
+  }, [go, autoPlayInterval, active, reduced, total]);
 
   const resetTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => go(1), autoPlayInterval);
+    if (active && !reduced && total > 1) timerRef.current = setInterval(() => go(1), autoPlayInterval);
   };
 
   const handleDragEnd = (_: any, info: { offset: { x: number } }) => {
+    dragX.set(0);
     if (info.offset.x < -60) {
       go(1);
       resetTimer();
@@ -71,8 +77,11 @@ const ModernGallery = ({
     }),
   };
 
+  if (!total) return null;
+
   return (
     <div
+      ref={ref}
       className={`group relative w-full overflow-hidden rounded-xl shadow-lg ${className}`}
       style={{ aspectRatio }}
     >
@@ -86,7 +95,8 @@ const ModernGallery = ({
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: reduced ? 0 : 0.5, ease: [0.4, 0, 0.2, 1] }}
+          loading={near ? "eager" : "lazy"} decoding="async"
           className="absolute inset-0 h-full w-full object-cover"
           style={{ opacity: dragOpacity }}
           drag="x"
@@ -128,7 +138,7 @@ const ModernGallery = ({
         {slides.map((_, i) => (
           <button
             key={i}
-            onClick={() => { setDirection(i > current ? 1 : -1); setCurrent(i); resetTimer(); }}
+             onClick={() => { setDirection(i > current ? 1 : -1); void select(i); resetTimer(); }}
             className={`h-1.5 rounded-full transition-all ${
               i === current ? "w-6 bg-white" : "w-1.5 bg-white/50"
             }`}
