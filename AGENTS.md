@@ -14,3 +14,4 @@
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - Per-route title/description/canonical/robots are set client-side by `RouteSeo`; private token and admin routes are always noindex.
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
+- The homepage technology mosaic derives its photo pool from all `techs` galleries, loads images near the viewport, decodes replacements before fading, and pauses timers off-screen/in hidden tabs or for reduced motion; this keeps the gallery current without harming initial load or scrolling.

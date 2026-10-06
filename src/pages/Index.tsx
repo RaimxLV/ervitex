@@ -7,6 +7,7 @@ import TechnologiesShowcase from "@/components/home/TechnologiesShowcase";
 // Heavier lower-page sections stay code-split, while the first scrollable
 // content is loaded with the page so its images can start fetching immediately.
 const TrustedBrands = lazy(() => import("@/components/home/TrustedBrands"));
+const TechnologyMosaic = lazy(() => import("@/components/home/TechnologyMosaic"));
 const RetailSection = lazy(() => import("@/components/home/RetailSection"));
 
 const Index = () => {
@@ -16,6 +17,7 @@ const Index = () => {
       <BentoCategories />
       <TechnologiesShowcase />
       <Suspense fallback={<div className="min-h-[40svh]" />}>
+        <TechnologyMosaic />
         <TrustedBrands />
         <RetailSection />
       </Suspense>
