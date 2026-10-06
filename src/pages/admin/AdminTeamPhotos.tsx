@@ -21,8 +21,8 @@ type PhotoSettings = {
 };
 
 const people = [
-  { slug: "vilnis", name: "Vilnis Lācis", photo: vilnisPhoto },
-  { slug: "eriks", name: "Ēriks Lācis", photo: eriksPhoto },
+  { slug: "vilnis", name: "Vilnis Lācis", photo: vilnisPhoto.url },
+  { slug: "eriks", name: "Ēriks Lācis", photo: eriksPhoto.url },
   { slug: "laura", name: "Laura Daukšte", photo: lauraPhoto },
   { slug: "ilona", name: "Ilona Romanovska", photo: ilonaPhoto },
   { slug: "santa", name: "Santa Zvaigzne", photo: santaPhoto },
