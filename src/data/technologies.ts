@@ -30,6 +30,16 @@ import dtf1 from "@/assets/services/dtf-main.webp";
 import dtf2 from "@/assets/services/dtf-2.jpg";
 import dtf3 from "@/assets/services/dtf-3.jpg";
 import dtf4 from "@/assets/services/dtf-4.jpg";
+import dtf5 from "@/assets/services/dtf-5.webp";
+import dtf6 from "@/assets/services/dtf-6.webp";
+import dtf7 from "@/assets/services/dtf-7.webp";
+import dtf8 from "@/assets/services/dtf-8.webp";
+import dtf9 from "@/assets/services/dtf-9.webp";
+import dtf10 from "@/assets/services/dtf-10.webp";
+import dtf11 from "@/assets/services/dtf-11.webp";
+import dtf12 from "@/assets/services/dtf-12.webp";
+import dtf13 from "@/assets/services/dtf-13.webp";
+import dtf14 from "@/assets/services/dtf-14.webp";
 import emb1 from "@/assets/services/embroidery-1.jpg";
 import emb2 from "@/assets/services/embroidery-2.jpg";
 import emb3 from "@/assets/services/embroidery-3.jpg";
@@ -309,7 +319,7 @@ export const techs: Tech[] = [
       { icon: Palette, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "Neierobežots", en: "Unlimited" } },
       { icon: FileType2, label: { lv: "Faili", en: "Files" }, value: { lv: "PNG (300 DPI), PDF, AI", en: "PNG (300 DPI), PDF, AI" } },
     ],
-    images: [dtf1, dtf2, dtf3, dtf4],
+    images: [dtf1, dtf2, dtf3, dtf4, dtf5, dtf6, dtf7, dtf8, dtf9, dtf10, dtf11, dtf12, dtf13, dtf14],
   },
   {
     id: "izsusana",
