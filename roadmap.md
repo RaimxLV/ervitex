@@ -100,3 +100,4 @@
 - [x] Noņemt iekšējo ziņas klientam formu; saraksti atstāt tikai parastajā e-pastā.
 - [x] Pilnībā pārbaudīt saraksta saglabāšanu, kopēšanu, aizvēršanu un nodošanu no e-pasta.
 - [x] Noņemt projektu vadītāju izvēles pogas no e-pasta un aizstāt saraksta pogu ar universālu bordo teksta saiti.
+- [x] Sietspiedes galerijai pievienot vēl 2 bildes (BOLD reljefs, ceha kaudze uz oranža) un optimizēt uz WebP.
