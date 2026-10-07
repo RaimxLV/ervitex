@@ -872,6 +872,93 @@ async function loadRU(styleCode: string): Promise<ProductDetail | null> {
 
 
 
+async function loadUTT(styleCode: string): Promise<ProductDetail | null> {
+  const [styleRes, variantsRes, imagesRes] = await Promise.all([
+    supabase
+      .from("utt_styles")
+      .select("style_code,brand,name,description,category,gender,fabric,weight,cut,details,care")
+      .eq("style_code", styleCode)
+      .maybeSingle(),
+    supabase.from("utt_variants").select("sku,color_name,color_hex,size,size_order").eq("style_code", styleCode).eq("active", true).order("size_order", { ascending: true }),
+    supabase.from("utt_images").select("color_name,url,sort_order").eq("style_code", styleCode).not("url", "is", null).order("sort_order", { ascending: true }),
+  ]);
+  const style: any = styleRes.data;
+  if (!style) return null;
+  const variants: any[] = variantsRes.data || [];
+  const images: any[] = imagesRes.data || [];
+
+  const imgByColor = new Map<string, string[]>();
+  const shared: string[] = [];
+  for (const im of images) {
+    if (!im.url) continue;
+    const key = (im.color_name || "").toLowerCase();
+    if (key) {
+      if (!imgByColor.has(key)) imgByColor.set(key, []);
+      imgByColor.get(key)!.push(im.url);
+    } else shared.push(im.url);
+  }
+
+  const colorOrder: string[] = [];
+  const colorInfo = new Map<string, { name: string; hex: string | null }>();
+  const sizesByColor = new Map<string, Set<string>>();
+  const allSizes = new Set<string>();
+  const skuMap: Record<string, string> = {};
+  for (const v of variants) {
+    const name = v.color_name || "";
+    const key = name.toLowerCase();
+    if (name && !colorInfo.has(key)) {
+      colorInfo.set(key, { name, hex: cleanHex(v.color_hex) });
+      colorOrder.push(key);
+    }
+    if (v.size) {
+      allSizes.add(v.size);
+      if (key) {
+        if (!sizesByColor.has(key)) sizesByColor.set(key, new Set());
+        sizesByColor.get(key)!.add(v.size);
+      }
+    }
+    if (v.sku && name) skuMap[`${name}|${v.size ?? ""}`] = v.sku;
+  }
+  colorOrder.sort((a, b) => a.localeCompare(b));
+
+  const colors: ColorDetail[] = colorOrder.map((key) => {
+    const info = colorInfo.get(key)!;
+    const own = imgByColor.get(key) || [];
+    const merged = [...new Set([...own, ...shared])];
+    return { code: info.name, name: info.name, hex: info.hex, images: merged, sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes) };
+  });
+  if (colors.length === 0 && shared.length) {
+    colors.push({ code: "default", name: style.name || style.style_code, hex: null, images: shared, sizes: uniqueSortedSizes(allSizes) });
+  }
+
+  const specs: { label: string; value: string }[] = [];
+  addSpec(specs, "Brand", style.brand);
+  addSpec(specs, "Category", style.category);
+  addSpec(specs, "Gender", style.gender);
+  addSpec(specs, "Fit", style.cut);
+  addSpec(specs, "Material", style.fabric);
+  addSpec(specs, "Weight", style.weight);
+
+  return {
+    title: style.name || style.style_code,
+    code: style.style_code,
+    brand: style.brand,
+    category: style.category,
+    gender: style.gender,
+    shortDescription: cleanText(lines(style.description)[0]),
+    description: null,
+    features: [...lines(style.description), ...lines(style.details)],
+    material: style.fabric || null,
+    care: style.care || null,
+    specs,
+    notice: null,
+    sizes: uniqueSortedSizes(allSizes),
+    colors,
+    skus: skuMap,
+  };
+}
+
+
 /* ---------- i18n for spec labels & values ---------- */
 
 const SPEC_LABEL_I18N: Record<string, { lv: string; en: string }> = {
@@ -1007,6 +1094,7 @@ const CatalogItemDialog = ({
         : source === "bb" ? loadBB
         : source === "mf" ? loadMF
         : source === "ru" ? loadRU
+        : source === "utt" ? loadUTT
         : loadPF;
       const d = await loader(id).catch(() => null);
       if (cancelled) return;

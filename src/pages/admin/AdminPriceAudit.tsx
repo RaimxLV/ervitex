@@ -17,6 +17,7 @@ const SOURCES: { code: string; label: string; formula: string }[] = [
   { code: "pf", label: "PF Concept (prezentmateriāli)", formula: "piegādātāja cena × 1,65" },
   { code: "bb", label: "Beechfield / Bagbase", formula: "cenu lapas cena" },
   { code: "ru", label: "Russell Europe", formula: "piegādātāja cena × 1,65" },
+  { code: "utt", label: "UTT (Gildan / Kariban / Regatta)", formula: "UTT cena × 2 / 1,8 / 1,75" },
 ];
 
 interface Summary {

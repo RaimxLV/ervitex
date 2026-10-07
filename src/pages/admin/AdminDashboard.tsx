@@ -29,6 +29,7 @@ const SOURCE_LABELS: Record<string, string> = {
   bb: "Beechfield / Bagbase",
   mf: "Malfini",
   ru: "Russell Europe",
+  utt: "UTT (Gildan / Kariban / Regatta)",
 };
 const STUCK_MS = 30 * 60 * 1000;
 

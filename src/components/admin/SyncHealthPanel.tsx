@@ -36,6 +36,7 @@ const SUPPLIERS: { key: string; label: string; fn: string }[] = [
   { key: "pf", label: "PF Concept (prezentmateriāli)", fn: "pf-concept-sync" },
   { key: "bb", label: "Beechfield / Bagbase / Quadra", fn: "beechfield-sync" },
   { key: "malfini", label: "Malfini", fn: "malfini-sync" },
+  { key: "utt", label: "UTT (Gildan, Kariban, Regatta)", fn: "utt-sync" },
 ];
 
 const STUCK_MS = 30 * 60 * 1000;
