@@ -27,7 +27,7 @@ interface RelatedItem {
 interface PriceInfo { price: number; max: number }
 
 const isValidSource = (s: string | undefined): s is CatalogSource =>
-  !!s && ["ss", "nwg", "pf", "bb", "mf", "ru"].includes(s);
+  !!s && ["ss", "nwg", "pf", "bb", "mf", "ru", "utt"].includes(s);
 
 
 

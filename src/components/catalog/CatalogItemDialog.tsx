@@ -1007,6 +1007,7 @@ const CatalogItemDialog = ({
         : source === "bb" ? loadBB
         : source === "mf" ? loadMF
         : source === "ru" ? loadRU
+        : source === "utt" ? loadUTT
         : loadPF;
       const d = await loader(id).catch(() => null);
       if (cancelled) return;

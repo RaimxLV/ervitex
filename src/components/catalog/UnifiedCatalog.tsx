@@ -110,6 +110,9 @@ const MANUFACTURERS: { key: string; label: string }[] = [
   { key: "pf-elevate", label: "Elevate" },
   { key: "pf-roly", label: "Roly" },
   { key: "ru", label: "Russell" },
+  { key: "utt-gildan", label: "Gildan" },
+  { key: "utt-kariban", label: "Kariban" },
+  { key: "utt-regatta", label: "Regatta" },
   { key: "pf", label: "Prezentmateriāli" },
   { key: "bb", label: "Beechfield Brands" },
   { key: "mf", label: "Malfini" },
@@ -150,6 +153,12 @@ const manufacturerOf = (source: CatalogSource, brand: string | null): string | n
   if (source === "bb") return "bb";
   if (source === "mf") return "mf";
   if ((source as string) === "ru") return "ru";
+  if (source === "utt") {
+    if (b.includes("gildan")) return "utt-gildan";
+    if (b.includes("kariban")) return "utt-kariban";
+    if (b.includes("regatta")) return "utt-regatta";
+    return null;
+  }
   return source;
 };
 
