@@ -23,7 +23,7 @@ export type GlyphProps = { className?: string; strokeWidth?: number | string };
 const Svg = ({
   children,
   className,
-  strokeWidth = 1.9,
+  strokeWidth = 1.5,
 }: GlyphProps & { children: React.ReactNode }) => (
   <svg
     viewBox="0 0 24 24"
@@ -119,23 +119,14 @@ const RULES: { test: RegExp; icons: ComponentType<GlyphProps>[]; ban?: boolean }
   { test: /nedr[īi]kst|aizlieg|nepieļauj|don'?t|do not|never|^no\s|nedrīkst|nav atļauts/, icons: [Ban, TriangleAlert], ban: true },
 ];
 
-/** Ikona, kas der teksta jēgai un vēl nav aizņemta šajā sarakstā. */
+/** Match meaning, never substitute an unrelated icon merely to avoid repetition. */
 export const assignCareIcons = (
   clauses: string[],
 ): { text: string; Icon: ComponentType<GlyphProps>; ban: boolean }[] => {
-  const used = new Set<ComponentType<GlyphProps>>();
-  const pool: ComponentType<GlyphProps>[] = [
-    WashingMachine, Iron, IronBan, Hanger, TumbleDry, DryClean, DryCleanBan, BleachBan,
-    Palette, Lock, Scissors, Shirt, Thermometer, Sun, Wind, Droplets, Snowflake,
-    Recycle, Sparkles, Brush, Layers, TriangleAlert, Ban,
-  ];
-
   return clauses.map((text) => {
     const t = text.toLowerCase();
     const rule = RULES.find((r) => r.test.test(t));
-    const candidates = rule ? rule.icons : pool;
-    const Icon = candidates.find((c) => !used.has(c)) ?? candidates[0];
-    used.add(Icon);
+    const Icon = rule?.icons[0] ?? TriangleAlert;
     return { text, Icon, ban: !!rule?.ban };
   });
 };

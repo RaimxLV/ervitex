@@ -96,6 +96,7 @@ import heatTransfer6Asset from "@/assets/services/termodruka-6.webp.asset.json";
 
 import {
   Award,
+  BadgeEuro,
   Blend,
   Box,
   Clock,
@@ -229,7 +230,7 @@ export const techs: Tech[] = [
         desc: { lv: "Kvalitatīva apdruka, kas saglabā komfortu.", en: "A high-quality print that preserves comfort." },
       },
       {
-        icon: Layers,
+        icon: Palette,
         title: { lv: "Līdz 6 krāsām vienā apdrukā", en: "Up to 6 colours per print" },
         desc: { lv: "Iespējams realizēt arī sarežģītākus dizainus.", en: "More complex designs can also be realised." },
       },
@@ -252,7 +253,7 @@ export const techs: Tech[] = [
       { icon: Package, label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "25 gab.", en: "25 pcs" } },
       { icon: Clock, label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "5–8 darba dienas", en: "5–8 business days" } },
       { icon: FileType2, label: { lv: "Pieņemamie faili", en: "Accepted files" }, value: { lv: "AI, EPS, PDF (vektora formātā)", en: "AI, EPS, PDF (vector)" } },
-      { icon: Layers, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "līdz 6 krāsām vienā apdrukā", en: "up to 6 colours per print" } },
+      { icon: Palette, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "līdz 6 krāsām vienā apdrukā", en: "up to 6 colours per print" } },
     ],
     images: [screen1, screen2, screen3, screen4, screen5, screen6, screen7, screen8, screen9, screen10, screen11, screen12, screen13, screen14, screen15, screen16, screen17, screen18, screen19, screen20, screen21, screen22, screen23, screen24, screen25, screen26, screen27, screen28],
   },
@@ -339,7 +340,7 @@ export const techs: Tech[] = [
         ],
         highlights: [
           { icon: Ruler, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "1 tekošais metrs (materiāla platums: 57 cm)", en: "1 running metre (film width: 57 cm)" } },
-          { icon: Package, label: { lv: "Cena", en: "Price" }, value: { lv: "15 € + PVN / tekošais metrs", en: "€15 + VAT / running metre" } },
+          { icon: BadgeEuro, label: { lv: "Cena", en: "Price" }, value: { lv: "15 € + PVN / tekošais metrs", en: "€15 + VAT / running metre" } },
           { icon: Palette, label: { lv: "Druka", en: "Print" }, value: { lv: "Pilnkrāsu DTF, bez krāsu skaita ierobežojuma", en: "Full-colour DTF, no colour limit" } },
         ],
         note: {

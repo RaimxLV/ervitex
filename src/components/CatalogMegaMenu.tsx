@@ -55,7 +55,7 @@ function GroupBlock({
             className="inline-flex items-center gap-1 text-[14.5px] font-bold leading-snug text-primary-foreground transition-colors hover:text-accent"
           >
             {lang === "lv" ? meta.allLv : meta.allEn}
-            <ArrowRight className="h-3 w-3" strokeWidth={2.5} />
+            <ArrowRight className="h-3 w-3" strokeWidth={1.5} />
           </Link>
         </li>
       </ul>
@@ -120,7 +120,7 @@ export default function CatalogMegaMenu({ onNavigate, open = true }: MegaMenuPro
           <span className="font-heading text-[15px] font-bold uppercase tracking-[0.24em] text-accent-foreground">
             {t("Skatīt visus produktus", "Browse all products")}
           </span>
-          <ArrowRight className="h-4 w-4 text-accent-foreground transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="h-4 w-4 text-accent-foreground transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
         </Link>
       </div>
     </div>

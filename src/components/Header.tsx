@@ -208,7 +208,7 @@ const Header = () => {
                   >
                     <ChevronDown
                       className={`h-3.5 w-3.5 transition-transform duration-300 ${megaOpen ? "rotate-180" : ""}`}
-                      strokeWidth={2}
+                      strokeWidth={1.5}
                     />
                   </Button>
                 </div>
@@ -231,7 +231,7 @@ const Header = () => {
         <div className="hidden items-center gap-3 xl:flex">
           {isAdmin && (
             <Button asChild variant="outline" size="sm" className="h-8 border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground">
-              <Link to="/admin"><ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> Admin</Link>
+              <Link to="/admin"><ShieldCheck className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Admin</Link>
             </Button>
           )}
           {/* Search — atveras kā atsevišķa josla zem galvenes, pogas nesedzas */}
@@ -357,7 +357,7 @@ const Header = () => {
           <nav>
             {isAdmin && (
               <Button asChild variant="outline" className="mb-4 w-full border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground">
-                <Link to="/admin" onClick={() => setIsOpen(false)}><ShieldCheck className="mr-2 h-4 w-4" /> Admin režīms</Link>
+                <Link to="/admin" onClick={() => setIsOpen(false)}><ShieldCheck className="mr-2 h-4 w-4" strokeWidth={1.5} /> Admin režīms</Link>
               </Button>
             )}
             <div className="border-y border-primary-foreground/15">
