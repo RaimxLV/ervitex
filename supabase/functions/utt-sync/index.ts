@@ -162,15 +162,14 @@ async function syncData(sb: SupabaseClient) {
     if (price && price > 0) {
       priceRows.push({ sku, purchase_price: price, special_price: num(st?.specialprice), currency: str(st?.currency) ?? "EUR", updated_at: now });
     }
-    const model = str(p.modelimageurl);
-    if (model) {
-      const k = `${code}|${model}`;
-      if (!imageRows.has(k)) imageRows.set(k, { style_code: code, color_name: null, source_path: model, sort_order: 0 });
-    }
-    for (const [path, order] of [[str(p.packshotimageurl), 10], [str(p.colorimageurl), 11]] as const) {
-      if (!path) continue;
+    const paths = (v: unknown) => (str(v) ?? "").split("|").map((x) => x.trim()).filter(Boolean);
+    for (const [i, path] of paths(p.modelimageurl).entries()) {
       const k = `${code}|${path}`;
-      if (!imageRows.has(k)) imageRows.set(k, { style_code: code, color_name: color, source_path: path, sort_order: order });
+      if (!imageRows.has(k)) imageRows.set(k, { style_code: code, color_name: null, source_path: path, sort_order: i });
+    }
+    for (const [i, path] of [...paths(p.packshotimageurl), ...paths(p.colorimageurl)].entries()) {
+      const k = `${code}|${path}`;
+      if (!imageRows.has(k)) imageRows.set(k, { style_code: code, color_name: color, source_path: path, sort_order: 10 + i });
     }
   }
 
