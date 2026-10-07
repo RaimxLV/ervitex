@@ -1,5 +1,5 @@
 import { Link, useParams, Navigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, MotionConfig, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Info } from "lucide-react";
 import Layout from "@/components/Layout";
 import { AccentIcon } from "@/components/ui/accent-icon";
@@ -17,8 +17,10 @@ const fadeUp = {
   viewport: { once: true, margin: "-60px" },
 } as const;
 
+const iconTones = ["blue", "cyan", "emerald", "slate"] as const;
+
 const SectionKicker = ({ children }: { children: string }) => (
-  <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-accent">
+  <span className="font-heading text-sm font-bold uppercase tracking-normal text-value-blue">
     {children}
   </span>
 );
@@ -28,7 +30,7 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
     <div className="container">
       <motion.div {...fadeUp} transition={{ duration: 0.5 }} className="max-w-3xl">
         <SectionKicker>{extra.tagline ? extra.tagline[isLv ? "lv" : "en"] : isLv ? "Papildu iespēja" : "Extra option"}</SectionKicker>
-        <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-tight text-foreground md:text-4xl">
+        <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-normal text-foreground md:text-4xl">
           {extra.title[isLv ? "lv" : "en"]}
         </h2>
         {extra.paragraphs.map((p) => (
@@ -61,7 +63,7 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
                       {i < (extra.steps?.length ?? 0) - 1 && <div className="mt-2 w-px flex-1 bg-border" />}
                     </div>
                     <div className="pb-1 pt-2">
-                      <AccentIcon icon={Icon} />
+                      <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
                       <p className="mt-2 text-sm leading-relaxed text-foreground md:text-base">{step.text[isLv ? "lv" : "en"]}</p>
                     </div>
                   </motion.li>
@@ -72,12 +74,12 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
 
           {extra.highlights && extra.highlights.length > 0 && (
             <div className="grid content-start gap-4 self-start sm:grid-cols-2 lg:grid-cols-1">
-              {extra.highlights.map((h) => {
+              {extra.highlights.map((h, i) => {
                 const Icon = h.icon;
                 return (
-                  <div key={h.label.en} className="border border-border bg-card p-6">
-                    <AccentIcon icon={Icon} />
-                    <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <div key={h.label.en} className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-sm hover:shadow-xl">
+                    <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
+                    <p className="mt-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">
                       {h.label[isLv ? "lv" : "en"]}
                     </p>
                     <p className="mt-1 font-heading text-lg font-bold uppercase leading-snug text-foreground">
@@ -93,12 +95,12 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
 
       {(!extra.steps || extra.steps.length === 0) && extra.highlights && extra.highlights.length > 0 && (
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {extra.highlights.map((h) => {
+          {extra.highlights.map((h, i) => {
             const Icon = h.icon;
             return (
-              <div key={h.label.en} className="border border-border bg-card p-6">
-                <AccentIcon icon={Icon} />
-                <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              <div key={h.label.en} className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-sm hover:shadow-xl">
+                <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
+                <p className="mt-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">
                   {h.label[isLv ? "lv" : "en"]}
                 </p>
                 <p className="mt-1 font-heading text-lg font-bold uppercase leading-snug text-foreground">
@@ -121,6 +123,7 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
 
 const TechnologyPage = () => {
   const { slug } = useParams();
+  const reducedMotion = useReducedMotion();
   const { lang } = useLanguage();
   useTechGalleries();
   const isLv = lang === "lv";
@@ -131,6 +134,7 @@ const TechnologyPage = () => {
   const others = techs.filter((t) => t.id !== tech.id);
 
   return (
+    <MotionConfig reducedMotion="user" transition={reducedMotion ? { duration: 0 } : undefined}>
     <Layout>
       {/* Hero */}
       <section className="bg-background py-12 md:py-16">
@@ -186,14 +190,14 @@ const TechnologyPage = () => {
           <motion.dl
             {...fadeUp}
             transition={{ duration: 0.5 }}
-            className="mt-12 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-2 lg:grid-cols-4"
+            className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
           >
-            {tech.specs.map((s) => {
+            {tech.specs.map((s, i) => {
               const Icon = s.icon;
               return (
-                <div key={s.label.en} className="bg-card p-5">
-                  <AccentIcon icon={Icon} />
-                  <dt className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <div key={s.label.en} className="technology-card group rounded-[6px] border border-border bg-card p-5 shadow-sm hover:shadow-xl">
+                  <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
+                  <dt className="mt-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">
                     {s.label[lang]}
                   </dt>
                   <dd className="mt-1 text-sm font-semibold leading-snug text-foreground">{s.value[lang]}</dd>
@@ -205,11 +209,11 @@ const TechnologyPage = () => {
       </section>
 
       {/* Benefits */}
-      <section className="border-t border-border bg-muted/30 py-16 md:py-24">
+      <section className="border-t border-border bg-muted py-16 md:py-24">
         <div className="container">
           <motion.div {...fadeUp} transition={{ duration: 0.5 }} className="max-w-2xl">
             <SectionKicker>{isLv ? "Priekšrocības" : "Benefits"}</SectionKicker>
-            <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-tight text-foreground md:text-4xl">
+            <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-normal text-foreground md:text-4xl">
               {tech.benefitsTitle[lang]}
             </h2>
           </motion.div>
@@ -221,10 +225,10 @@ const TechnologyPage = () => {
                 <motion.div
                   key={b.title.en}
                   {...fadeUp}
-                  transition={{ duration: 0.4, delay: (i % 3) * 0.08 }}
-                  className="border border-border bg-card p-6 md:p-8"
+                  transition={{ duration: 0.55, delay: i * 0.09 }}
+                  className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-sm hover:shadow-xl md:p-8"
                 >
-                  <AccentIcon icon={Icon} />
+                  <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
                   <h3 className="mt-5 font-heading text-base font-bold uppercase leading-snug text-foreground">
                     {b.title[lang]}
                   </h3>
@@ -234,28 +238,12 @@ const TechnologyPage = () => {
             })}
           </div>
 
-          {/* Use cases */}
-          <motion.div {...fadeUp} transition={{ duration: 0.5 }} className="mt-16 max-w-2xl">
-            <SectionKicker>{isLv ? "Lietojums" : "Use cases"}</SectionKicker>
-            <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-tight text-foreground md:text-3xl">
-              {tech.useCasesTitle[lang]}
-            </h2>
-          </motion.div>
-          <div className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2">
-            {tech.useCases.map((u) => (
-              <div key={u.en} className="flex items-start gap-3 border-b border-border pb-4">
-                <AccentIcon icon={Check} inline className="mt-1 h-4 w-4" />
-                <span className="text-sm leading-relaxed text-foreground md:text-base">{u[lang]}</span>
-              </div>
-            ))}
-          </div>
-
           {/* Process steps (izšūšana) */}
           {tech.processSteps && tech.processSteps.length > 0 && (
             <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
               <div>
                 <SectionKicker>{isLv ? "Process" : "Process"}</SectionKicker>
-                <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-tight text-foreground md:text-3xl">
+                <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-normal text-foreground md:text-3xl">
                   {tech.processTitle?.[lang]}
                 </h2>
               </div>
@@ -276,7 +264,7 @@ const TechnologyPage = () => {
                         {i < (tech.processSteps?.length ?? 0) - 1 && <div className="mt-2 w-px flex-1 bg-border" />}
                       </div>
                       <div className="pb-1 pt-2">
-                        <AccentIcon icon={Icon} />
+                        <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
                         <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
                           {step.text[lang]}
                         </p>
@@ -293,7 +281,7 @@ const TechnologyPage = () => {
             <div className="mt-16">
               <motion.div {...fadeUp} transition={{ duration: 0.5 }} className="max-w-2xl">
                 <SectionKicker>{isLv ? "Materiāli" : "Materials"}</SectionKicker>
-                <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-tight text-foreground md:text-3xl">
+                <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-normal text-foreground md:text-3xl">
                   {tech.filmsTitle?.[lang]}
                 </h2>
               </motion.div>
@@ -304,10 +292,10 @@ const TechnologyPage = () => {
                     <motion.div
                       key={f.name.en}
                       {...fadeUp}
-                      transition={{ duration: 0.4, delay: (i % 4) * 0.08 }}
-                      className="border border-border bg-card p-6"
+                      transition={{ duration: 0.55, delay: i * 0.09 }}
+                      className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-sm hover:shadow-xl"
                     >
-                      <AccentIcon icon={Icon} />
+                      <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
                       <h3 className="mt-4 font-heading text-sm font-bold uppercase text-foreground">{f.name[lang]}</h3>
                       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.desc[lang]}</p>
                     </motion.div>
@@ -329,7 +317,7 @@ const TechnologyPage = () => {
               transition={{ duration: 0.5 }}
               className="mt-16 flex items-start gap-4 border border-border bg-card p-6 md:p-8"
             >
-              <AccentIcon icon={Info} />
+              <AccentIcon icon={Info} tone="cyan" />
               <div>
                 <p className="font-heading text-sm font-bold uppercase tracking-wider text-foreground">
                   {isLv ? "Svarīgi zināt" : "Good to know"}
@@ -338,6 +326,25 @@ const TechnologyPage = () => {
               </div>
             </motion.div>
           )}
+        </div>
+      </section>
+
+      <section className="section-dark bg-background py-14 text-foreground md:py-20" aria-labelledby="technology-use-cases">
+        <div className="container grid gap-8 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
+          <motion.div {...fadeUp} transition={{ duration: 0.55 }}>
+            <SectionKicker>{isLv ? "Lietojums" : "Use cases"}</SectionKicker>
+            <h2 id="technology-use-cases" className="mt-3 max-w-lg font-heading text-2xl font-bold uppercase leading-tight text-foreground md:text-3xl">
+              {tech.useCasesTitle[lang]}
+            </h2>
+          </motion.div>
+          <ul className="grid gap-3 self-start">
+            {tech.useCases.map((u, i) => (
+              <motion.li key={u.en} {...fadeUp} transition={{ duration: 0.55, delay: i * 0.09 }} className="flex items-start gap-4 rounded-[6px] border border-border bg-card px-5 py-4">
+                <AccentIcon icon={Check} inline tone="emerald" className="mt-1" />
+                <span className="text-sm leading-relaxed text-foreground md:text-base">{u[lang]}</span>
+              </motion.li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -382,6 +389,7 @@ const TechnologyPage = () => {
         </div>
       </section>
     </Layout>
+    </MotionConfig>
   );
 };
 

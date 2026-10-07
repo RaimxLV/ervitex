@@ -94,36 +94,30 @@ import heatTransfer4Asset from "@/assets/services/termodruka-4.webp.asset.json";
 import heatTransfer5Asset from "@/assets/services/termodruka-5.webp.asset.json";
 import heatTransfer6Asset from "@/assets/services/termodruka-6.webp.asset.json";
 
+import { GarmentBatch, PersonalisedShirt, ThreadSpools, EmbroideredPatch, RaisedStitches, FabricWeave, TransferFilm, FlockTexture, ReflectiveFilm } from "@/components/ui/print-icons";
+
 import {
   Award,
+  Focus,
+  SwatchBook,
+  FileCheck2,
+  Scan,
   BadgeEuro,
-  Blend,
-  Box,
   Clock,
   Droplets,
-  Feather,
   FileType2,
   FileDigit,
-  Frame,
   Hand,
   Layers,
-  Package,
   PackageCheck,
   Palette,
-  Pipette,
-  Printer,
   Ruler,
-  Scissors,
   Send,
-  Shapes,
   ShieldCheck,
   Shirt,
   Sparkles,
-  Sun,
   TrendingDown,
-  UserRound,
   Wind,
-  ZoomIn,
   type LucideIcon,
 } from "lucide-react";
 
@@ -235,7 +229,7 @@ export const techs: Tech[] = [
         desc: { lv: "Iespējams realizēt arī sarežģītākus dizainus.", en: "More complex designs can also be realised." },
       },
       {
-        icon: Pipette,
+        icon: SwatchBook,
         title: { lv: "Pantone krāsu saskaņošana", en: "Pantone colour matching" },
         desc: { lv: "Ja nepieciešams precīzi ievērot konkrētas zīmola krāsas.", en: "When specific brand colours must be matched precisely." },
       },
@@ -250,7 +244,7 @@ export const techs: Tech[] = [
       { lv: "Lielām apdrukas tirāžām", en: "Large print runs" },
     ],
     specs: [
-      { icon: Package, label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "25 gab.", en: "25 pcs" } },
+      { icon: GarmentBatch, label: { lv: "Minimālais daudzums", en: "Minimum quantity" }, value: { lv: "25 gab.", en: "25 pcs" } },
       { icon: Clock, label: { lv: "Izpildes laiks", en: "Turnaround" }, value: { lv: "5–8 darba dienas", en: "5–8 business days" } },
       { icon: FileType2, label: { lv: "Pieņemamie faili", en: "Accepted files" }, value: { lv: "AI, EPS, PDF (vektora formātā)", en: "AI, EPS, PDF (vector)" } },
       { icon: Palette, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "līdz 6 krāsām vienā apdrukā", en: "up to 6 colours per print" } },
@@ -285,7 +279,7 @@ export const techs: Tech[] = [
     benefitsTitle: { lv: "DTF drukas priekšrocības", en: "Advantages of DTF printing" },
     benefits: [
       {
-        icon: Package,
+        icon: GarmentBatch,
         title: { lv: "No 10 gabaliem", en: "From 10 pieces" },
         desc: { lv: "Nav nepieciešama liela tirāža.", en: "No large run is required." },
       },
@@ -295,12 +289,12 @@ export const techs: Tech[] = [
         desc: { lv: "Dizainā vari izmantot pilnu krāsu gammu, gradientus un fotogrāfijas.", en: "Use the full colour gamut, gradients and photographs in your design." },
       },
       {
-        icon: ZoomIn,
+        icon: Focus,
         title: { lv: "Smalkas detaļas", en: "Fine detail" },
         desc: { lv: "Lieliski piemērota sarežģītiem dizainiem, tekstiem, ilustrācijām un fotogrāfijām.", en: "Excellent for complex designs, lettering, illustrations and photographs." },
       },
       {
-        icon: UserRound,
+        icon: PersonalisedShirt,
         title: { lv: "Personalizācija", en: "Personalisation" },
         desc: { lv: "Katram apģērbam var pievienot savu vārdu, numuru vai citu individuālu informāciju.", en: "Each garment can have its own name, number or other individual detail." },
       },
@@ -335,7 +329,7 @@ export const techs: Tech[] = [
         stepsTitle: { lv: "Kā tas notiek?", en: "How it works" },
         steps: [
           { icon: Send, text: { lv: "Atsūti savu dizainu atbilstošā drukas kvalitātē.", en: "Send us your design at print-appropriate quality." } },
-          { icon: Printer, text: { lv: "Mēs to izdrukājam uz DTF plēves.", en: "We print it onto DTF film." } },
+          { icon: TransferFilm, text: { lv: "Mēs to izdrukājam uz DTF plēves.", en: "We print it onto DTF film." } },
           { icon: PackageCheck, text: { lv: "Saņem gatavu DTF transfēru metrāžā un vari to uzklāt uz sava tekstila.", en: "You receive a ready DTF transfer by the metre and apply it to your own textiles." } },
         ],
         highlights: [
@@ -350,7 +344,7 @@ export const techs: Tech[] = [
       },
     ],
     specs: [
-      { icon: Package, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "10 gab.", en: "10 pcs" } },
+      { icon: GarmentBatch, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "10 gab.", en: "10 pcs" } },
       { icon: Clock, label: { lv: "Izgatavošanas laiks", en: "Production time" }, value: { lv: "2–5 darba dienas", en: "2–5 business days" } },
       { icon: Palette, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "Neierobežots", en: "Unlimited" } },
       { icon: FileType2, label: { lv: "Faili", en: "Files" }, value: { lv: "PNG (300 DPI), PDF, AI", en: "PNG (300 DPI), PDF, AI" } },
@@ -391,17 +385,17 @@ export const techs: Tech[] = [
         desc: { lv: "Izšuvums ir piemērots regulārai valkāšanai un mazgāšanai.", en: "Embroidery withstands regular wear and washing." },
       },
       {
-        icon: Palette,
+        icon: ThreadSpools,
         title: { lv: "Līdz 12 diegu krāsām", en: "Up to 12 thread colours" },
         desc: { lv: "Dizainā iespējams izmantot līdz 12 dažādām diegu krāsām.", en: "Designs can use up to 12 different thread colours." },
       },
       {
-        icon: Box,
+        icon: RaisedStitches,
         title: { lv: "3D / Puff izšūšana", en: "3D / Puff embroidery" },
         desc: { lv: "Lai dizainam piešķirtu papildu apjomu un izteiksmīgumu, piedāvājam arī 3D jeb Puff izšūšanu.", en: "We also offer 3D (puff) embroidery to add volume and expressiveness to the design." },
       },
       {
-        icon: Scissors,
+        icon: EmbroideredPatch,
         title: { lv: "Uzšuves", en: "Patches" },
         desc: { lv: "Izšuvumu iespējams izgatavot arī kā atsevišķu uzšuvi, ko pēc tam var piešūt vai pielīmēt pie apģērba vai cita tekstila.", en: "Embroidery can also be made as a separate patch that is later sewn or attached to apparel or other textiles." },
       },
@@ -426,7 +420,7 @@ export const techs: Tech[] = [
         },
       },
       {
-        icon: ShieldCheck,
+        icon: FileCheck2,
         text: {
           lv: "Pirms ražošanas pārbaudām, vai dizains ir piemērots izšūšanai un vai nepieciešamas kādas korekcijas, lai gala rezultāts būtu kvalitatīvs.",
           en: "Before production we check whether the design is suitable for embroidery and whether any adjustments are needed to achieve a high-quality result.",
@@ -434,9 +428,9 @@ export const techs: Tech[] = [
       },
     ],
     specs: [
-      { icon: Package, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "No 10 gab.", en: "From 10 pcs" } },
+      { icon: GarmentBatch, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "No 10 gab.", en: "From 10 pcs" } },
       { icon: Clock, label: { lv: "Izgatavošanas laiks", en: "Production time" }, value: { lv: "5–10 darba dienas", en: "5–10 business days" } },
-      { icon: Palette, label: { lv: "Diegu krāsas", en: "Thread colours" }, value: { lv: "Plaša krāsu palete", en: "A wide colour palette" } },
+      { icon: ThreadSpools, label: { lv: "Diegu krāsas", en: "Thread colours" }, value: { lv: "Plaša krāsu palete", en: "A wide colour palette" } },
       { icon: Ruler, label: { lv: "Izšuvuma izmērs", en: "Embroidery size" }, value: { lv: "No ļoti smalkiem līdz lieliem (min. burta augstums 4 mm)", en: "From delicate to large (minimum letter height 4 mm)" } },
     ],
     images: [emb12Asset.url, emb1, emb2, emb3, emb4, emb5, emb6, emb7, emb8, emb9Asset.url, emb10Asset.url, emb11Asset.url, emb13Asset.url, emb14Asset.url, emb15Asset.url, emb16Asset.url, emb17Asset.url, emb18Asset.url, emb19Asset.url, emb20Asset.url, emb21Asset.url, emb22Asset.url, emb23Asset.url, emb24Asset.url, emb25Asset.url, emb26Asset.url, emb27Asset.url, emb28Asset.url],
@@ -465,7 +459,7 @@ export const techs: Tech[] = [
     benefitsTitle: { lv: "Sublimācijas priekšrocības", en: "Advantages of sublimation" },
     benefits: [
       {
-        icon: Blend,
+        icon: FabricWeave,
         title: { lv: "Apdruka kļūst par auduma daļu", en: "The print becomes part of the fabric" },
         desc: { lv: "Krāsa iesūcas šķiedrās, tāpēc uz auduma neveidojas atsevišķs apdrukas slānis.", en: "The ink soaks into the fibres, so no separate print layer forms on the fabric." },
       },
@@ -480,7 +474,7 @@ export const techs: Tech[] = [
         desc: { lv: "Var izmantot neierobežotu krāsu gammu, fotogrāfijas, gradientus un ļoti smalkas detaļas.", en: "An unlimited colour gamut, photographs, gradients and very fine details." },
       },
       {
-        icon: Frame,
+        icon: Scan,
         title: { lv: "Apdruka pa visu virsmu", en: "All-over printing" },
         desc: { lv: "Iespējams veidot dizainu, kas noklāj visu izstrādājuma virsmu — īpaši piemērots sporta formām un individuāliem dizainiem.", en: "Designs can cover the entire product surface — especially suited to sports kits and individual designs." },
       },
@@ -516,14 +510,14 @@ export const techs: Tech[] = [
           },
         ],
         highlights: [
-          { icon: Package, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "No 10 vienībām", en: "From 10 units" } },
+          { icon: GarmentBatch, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "No 10 vienībām", en: "From 10 units" } },
         ],
       },
     ],
     specs: [
-      { icon: Package, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "10 gab.", en: "10 pcs" } },
+      { icon: GarmentBatch, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "10 gab.", en: "10 pcs" } },
       { icon: Clock, label: { lv: "Izgatavošanas laiks", en: "Production time" }, value: { lv: "7–14 darba dienas", en: "7–14 business days" } },
-      { icon: Layers, label: { lv: "Materiāls", en: "Material" }, value: { lv: "Gaišs poliesteris", en: "Light polyester" } },
+      { icon: FabricWeave, label: { lv: "Materiāls", en: "Material" }, value: { lv: "Gaišs poliesteris", en: "Light polyester" } },
       { icon: Palette, label: { lv: "Krāsu skaits", en: "Number of colours" }, value: { lv: "Pilnkrāsu apdruka", en: "Full-colour print" } },
     ],
     images: [
@@ -574,12 +568,12 @@ export const techs: Tech[] = [
     benefitsTitle: { lv: "Pieejamās termoplēves", en: "Available films" },
     benefits: [
       {
-        icon: Shapes,
+        icon: TransferFilm,
         title: { lv: "Standarta", en: "Standard" },
         desc: { lv: "Gluda un elastīga plēve ikdienas apdrukām.", en: "A smooth and stretchy film for everyday prints." },
       },
       {
-        icon: Feather,
+        icon: FlockTexture,
         title: { lv: "Flok", en: "Flock" },
         desc: { lv: "Samtaina, mīksta un izteiksmīga virsma ar tekstila sajūtu.", en: "A velvet-like, soft and expressive surface with a textile feel." },
       },
@@ -589,7 +583,7 @@ export const techs: Tech[] = [
         desc: { lv: "Spīdīgs metālisks efekts, kas īpaši izceļas uz apģērba.", en: "A shiny metallic effect that really stands out on apparel." },
       },
       {
-        icon: Sun,
+        icon: ReflectiveFilm,
         title: { lv: "Atstarojoša", en: "Reflective" },
         desc: { lv: "Gaismu atstarojoša plēve, piemērota sporta un darba apģērbam, kā arī dizainiem, kuriem nepieciešama papildu redzamība.", en: "A light-reflective film suited to sports and workwear, as well as designs that need extra visibility." },
       },
@@ -607,7 +601,7 @@ export const techs: Tech[] = [
       en: "Suited to cotton, polyester and blended fabrics.",
     },
     specs: [
-      { icon: Package, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "10 gab.", en: "10 pcs" } },
+      { icon: GarmentBatch, label: { lv: "Minimālais pasūtījums", en: "Minimum order" }, value: { lv: "10 gab.", en: "10 pcs" } },
       { icon: Clock, label: { lv: "Izgatavošanas laiks", en: "Production time" }, value: { lv: "3–7 darba dienas", en: "3–7 business days" } },
       { icon: Layers, label: { lv: "Pieejamie materiāli", en: "Available materials" }, value: { lv: "Standarta, flok, metāliskas un atstarojošas termoplēves", en: "Standard, flock, metallic and reflective films" } },
       { icon: FileType2, label: { lv: "Faili", en: "Files" }, value: { lv: "AI, EPS, PDF — vektora formātā", en: "AI, EPS, PDF — vector format" } },
