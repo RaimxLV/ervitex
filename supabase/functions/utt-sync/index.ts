@@ -212,21 +212,28 @@ async function syncData(sb: SupabaseClient) {
 async function mirrorImages(sb: SupabaseClient) {
   const started = Date.now();
   const publicBase = `${Deno.env.get("SUPABASE_URL")}/storage/v1/object/public/${BUCKET}`;
-  let done = 0, failed = 0;
+  let done = 0, failed = 0, cursor = 0;
   while (Date.now() - started < IMAGE_BUDGET_MS) {
     const { data: batch, error } = await sb
       .from("utt_images")
       .select("id,source_path")
       .is("url", null)
       .is("failed_at", null)
+      .gt("id", cursor)
       .order("id")
-      .limit(24);
+      .limit(8);
     if (error) throw new Error(`utt_images: ${error.message}`);
     if (!batch?.length) break;
+    cursor = batch[batch.length - 1].id;
     await Promise.all(batch.map(async (img: any) => {
       const path = String(img.source_path).replace(/^\/+/, "");
       try {
         const res = await fetch(`${IMG_BASE}/${path}`);
+        if (res.status === 404) {
+          await sb.from("utt_images").update({ failed_at: new Date().toISOString() }).eq("id", img.id);
+          failed++;
+          return;
+        }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const bytes = new Uint8Array(await res.arrayBuffer());
         const type = res.headers.get("content-type") || "image/jpeg";
@@ -234,9 +241,9 @@ async function mirrorImages(sb: SupabaseClient) {
         if (up.error) throw new Error(up.error.message);
         await sb.from("utt_images").update({ url: `${publicBase}/${path}` }).eq("id", img.id);
         done++;
-      } catch (_) {
-        await sb.from("utt_images").update({ failed_at: new Date().toISOString() }).eq("id", img.id);
-        failed++;
+      } catch (e) {
+        // Transient problem: leave it pending so the next run retries it.
+        console.warn(`[utt-sync] image ${path}: ${e instanceof Error ? e.message : e}`);
       }
     }));
   }
