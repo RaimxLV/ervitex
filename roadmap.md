@@ -1,5 +1,9 @@
 # Roadmap
 
+## Ražotāju uzcenojums un kontakti — 07.10.2026
+- [ ] Craft, ProJob un Cutter & Buck koeficientu ×1,75 aizstāt ar ×1,5; atlaides un PVN nemainīt, pārrēķināt esošās kataloga cenas.
+- [ ] Piedāvāt kontaktu izkārtojumu: Laura, Ilona, Santa, Justīne pirmajā rindā; Evita otrajā; Vilnis un Ēriks atsevišķā trešajā rindā.
+
 ## Profesionālas ikonas — 07.10.2026
 - [x] Izskaidrot gatava licencēta komplekta un dizainera veidotu ikonu iespējas pēc lietotāja atsaucēm.
 - [ ] Aizvietot noraidītās ikonas; gaida lietotāja izvēlētu profesionālu komplektu vai tā failus.
