@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/Layout";
+import { AccentIcon } from "@/components/ui/accent-icon";
 import PageIntro from "@/components/PageIntro";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -348,9 +349,7 @@ const RequestPage = () => {
                   {t("Faili (logo, dizains)", "Files (logo, artwork)")}
                 </h2>
                 <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 px-4 py-10 text-center transition-colors hover:border-accent/50 hover:bg-muted/50">
-                  <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10">
-                    <Upload className="h-5 w-5 text-accent" />
-                  </span>
+                  <AccentIcon icon={Upload} className="mb-3" />
                   <span className="text-sm font-semibold leading-snug">{t("Ievelc failus šeit vai spied, lai izvēlētos", "Drop files here or click to choose")}</span>
                   <span className="mt-1.5 text-xs text-muted-foreground">
                     {t(`Līdz ${MAX_FILES} failiem, katrs līdz ${MAX_FILE_MB}MB`, `Up to ${MAX_FILES} files, ${MAX_FILE_MB}MB each`)}

@@ -125,7 +125,7 @@ const BentoCategories = () => {
                 className="inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 py-3 font-heading text-[11px] font-bold uppercase tracking-wider text-accent-foreground transition-colors hover:bg-accent/90 md:px-8 md:py-4 md:text-sm"
               >
                 {t("Izpētīt visu katalogu", "Explore all products")}
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" strokeWidth={2.5} />
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" strokeWidth={1.5} />
               </Link>
             </div>
             <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-accent/20 blur-[100px]" />

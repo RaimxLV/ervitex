@@ -16,6 +16,7 @@ import { startWorksheetPick } from "@/lib/worksheetPick";
 import RowVariantControls from "@/components/worksheet/RowVariantControls";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import DiscountField from "@/components/quote/DiscountField";
+import { AccentIcon } from "@/components/ui/accent-icon";
 
 const num = (v: string) => {
   const n = Number(String(v).replace(",", "."));
@@ -525,7 +526,7 @@ const WorksheetPage = () => {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h2 className="flex items-center gap-2 font-heading text-sm font-black uppercase tracking-wide">
-                  <Printer className="h-4 w-4 text-accent" /> Kopējās apdrukas izmaksas
+                  <AccentIcon icon={Printer} inline className="h-4 w-4" /> Kopējās apdrukas izmaksas
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">Apdruka, izšūšana vai cita personalizācija visam preču sarakstam.</p>
               </div>
@@ -629,7 +630,7 @@ const WorksheetPage = () => {
           {false && isStaff && versions.length > 0 && (
             <section className="mt-6 border-t border-border pt-5 print:hidden">
               <h2 className="flex items-center gap-2 font-heading text-sm font-black uppercase tracking-wide">
-                <History className="h-4 w-4 text-accent" /> Versiju vēsture
+                <AccentIcon icon={History} inline className="h-4 w-4" /> Versiju vēsture
               </h2>
               <div className="mt-3 divide-y divide-border rounded-sm border border-border">
                 {versions.map((version) => (

@@ -1,5 +1,7 @@
 # Architecture rules
 
+- Public red informational icons use the shared AccentIcon component, with framed facts and compact inline variants, so icon weight and presentation stay consistent without resizing controls.
+
 - Office-photo image, individual pane/door SVG contours and clipped accessible hotspots share original-photo coordinates in one cover-sized scene; matching geometry prevents hover fills and keeps annotations aligned across screen sizes. The luminous halo is a separate blurred polygon layer using an SVG feGaussianBlur filter with an oversized filter region, because CSS drop-shadow blur is clipped by each shape's own bounding box and reads as a thin line instead of light.
 
 - Quote worksheet edits use side-specific autosaved drafts; only explicit confirmation updates the shared list and creates an immutable version, preventing incomplete client/staff edits from overwriting each other.

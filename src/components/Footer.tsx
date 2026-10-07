@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin, Lock, ShieldCheck, Share2, MessageCircle, Clock, Calculator } from "lucide-react";
+import { AccentIcon } from "@/components/ui/accent-icon";
 import { useLanguage } from "@/i18n/LanguageContext";
 import ervitexLogo from "@/assets/ervitex-logo-2.svg";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
@@ -92,7 +93,7 @@ const Footer = () => {
             </h4>
             <ul className="flex flex-col gap-4 text-[15px] leading-relaxed">
               <li className="flex items-start gap-3">
-                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                <AccentIcon icon={MapPin} inline className="mt-0.5" />
                 <div>
                   <div className="font-semibold">
                     {lang === "lv" ? "Hausmaņa biroji" : "Hausman Offices"}
@@ -112,13 +113,13 @@ const Footer = () => {
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <Mail className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                <AccentIcon icon={Mail} inline className="mt-0.5" />
                 <a href="mailto:birojs@ervitex.lv" className="font-semibold hover:text-accent transition-colors">
                   birojs@ervitex.lv
                 </a>
               </li>
               <li className="flex items-start gap-3">
-                <Phone className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                <AccentIcon icon={Phone} inline className="mt-0.5" />
                 <div>
                   <a href="tel:+37167543384" className="block hover:text-accent transition-colors">+371 67543384</a>
                   <a href="tel:+37167436896" className="block hover:text-accent transition-colors">+371 67436896</a>
@@ -132,7 +133,7 @@ const Footer = () => {
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <Clock className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={SW} />
+                <AccentIcon icon={Clock} inline className="mt-0.5" />
                 <div>
                   <div className="text-primary-foreground/75">
                     {lang === "lv" ? "P. – C." : "Mon – Thu"}: 9:00 – 17:30
@@ -224,7 +225,7 @@ const Footer = () => {
       {/* OEKO-TEX badge */}
       <div className="border-t border-primary-foreground/10 bg-primary">
         <div className="container flex items-center justify-center gap-2 py-4">
-          <ShieldCheck className="h-4 w-4 text-accent" strokeWidth={SW} />
+          <AccentIcon icon={ShieldCheck} inline className="h-4 w-4" />
           <span className="text-[11px] font-heading uppercase text-primary-foreground/55 tracking-widest">OEKO-TEX® Standard 100</span>
         </div>
       </div>

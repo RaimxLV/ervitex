@@ -2,6 +2,7 @@ import { Link, useParams, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Info } from "lucide-react";
 import Layout from "@/components/Layout";
+import { AccentIcon } from "@/components/ui/accent-icon";
 import ServiceImageCarousel from "@/components/services/ServiceImageCarousel";
 import TechGallery from "@/components/services/TechGallery";
 import TechRelatedProducts from "@/components/services/TechRelatedProducts";
@@ -57,10 +58,10 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border bg-background font-heading text-sm font-bold text-foreground">
                         {i + 1}
                       </div>
-                      {i < extra.steps!.length - 1 && <div className="mt-2 w-px flex-1 bg-border" />}
+                      {i < (extra.steps?.length ?? 0) - 1 && <div className="mt-2 w-px flex-1 bg-border" />}
                     </div>
                     <div className="pb-1 pt-2">
-                      <Icon className="h-5 w-5 text-accent" strokeWidth={1.8} />
+                      <AccentIcon icon={Icon} />
                       <p className="mt-2 text-sm leading-relaxed text-foreground md:text-base">{step.text[isLv ? "lv" : "en"]}</p>
                     </div>
                   </motion.li>
@@ -75,7 +76,7 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
                 const Icon = h.icon;
                 return (
                   <div key={h.label.en} className="border border-border bg-card p-6">
-                    <Icon className="h-5 w-5 text-accent" strokeWidth={1.8} />
+                    <AccentIcon icon={Icon} />
                     <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       {h.label[isLv ? "lv" : "en"]}
                     </p>
@@ -96,7 +97,7 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
             const Icon = h.icon;
             return (
               <div key={h.label.en} className="border border-border bg-card p-6">
-                <Icon className="h-5 w-5 text-accent" strokeWidth={1.8} />
+                <AccentIcon icon={Icon} />
                 <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   {h.label[isLv ? "lv" : "en"]}
                 </p>
@@ -128,7 +129,6 @@ const TechnologyPage = () => {
   if (!tech) return <Navigate to="/#tehnologijas" replace />;
 
   const others = techs.filter((t) => t.id !== tech.id);
-  const iconSize = "h-5 w-5";
 
   return (
     <Layout>
@@ -192,7 +192,7 @@ const TechnologyPage = () => {
               const Icon = s.icon;
               return (
                 <div key={s.label.en} className="bg-card p-5">
-                  <Icon className={`${iconSize} text-accent`} strokeWidth={1.8} />
+                  <AccentIcon icon={Icon} />
                   <dt className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     {s.label[lang]}
                   </dt>
@@ -224,9 +224,7 @@ const TechnologyPage = () => {
                   transition={{ duration: 0.4, delay: (i % 3) * 0.08 }}
                   className="border border-border bg-card p-6 md:p-8"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center border border-border bg-background">
-                    <Icon className="h-5 w-5 text-accent" strokeWidth={1.8} />
-                  </div>
+                  <AccentIcon icon={Icon} />
                   <h3 className="mt-5 font-heading text-base font-bold uppercase leading-snug text-foreground">
                     {b.title[lang]}
                   </h3>
@@ -246,7 +244,7 @@ const TechnologyPage = () => {
           <div className="mt-8 grid gap-x-10 gap-y-4 sm:grid-cols-2">
             {tech.useCases.map((u) => (
               <div key={u.en} className="flex items-start gap-3 border-b border-border pb-4">
-                <Check className="mt-1 h-4 w-4 shrink-0 text-accent" strokeWidth={2.4} />
+                <AccentIcon icon={Check} inline className="mt-1 h-4 w-4" />
                 <span className="text-sm leading-relaxed text-foreground md:text-base">{u[lang]}</span>
               </div>
             ))}
@@ -275,10 +273,10 @@ const TechnologyPage = () => {
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-border bg-background font-heading text-sm font-bold text-foreground">
                           {i + 1}
                         </div>
-                        {i < tech.processSteps!.length - 1 && <div className="mt-2 w-px flex-1 bg-border" />}
+                        {i < (tech.processSteps?.length ?? 0) - 1 && <div className="mt-2 w-px flex-1 bg-border" />}
                       </div>
                       <div className="pb-1 pt-2">
-                        <Icon className="h-5 w-5 text-accent" strokeWidth={1.8} />
+                        <AccentIcon icon={Icon} />
                         <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
                           {step.text[lang]}
                         </p>
@@ -309,7 +307,7 @@ const TechnologyPage = () => {
                       transition={{ duration: 0.4, delay: (i % 4) * 0.08 }}
                       className="border border-border bg-card p-6"
                     >
-                      <Icon className={`${iconSize} text-accent`} strokeWidth={1.8} />
+                      <AccentIcon icon={Icon} />
                       <h3 className="mt-4 font-heading text-sm font-bold uppercase text-foreground">{f.name[lang]}</h3>
                       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.desc[lang]}</p>
                     </motion.div>
@@ -331,7 +329,7 @@ const TechnologyPage = () => {
               transition={{ duration: 0.5 }}
               className="mt-16 flex items-start gap-4 border border-border bg-card p-6 md:p-8"
             >
-              <Info className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={1.8} />
+              <AccentIcon icon={Info} />
               <div>
                 <p className="font-heading text-sm font-bold uppercase tracking-wider text-foreground">
                   {isLv ? "Svarīgi zināt" : "Good to know"}
