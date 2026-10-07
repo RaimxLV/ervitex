@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Mazās sarkanās ikonas — 07.10.2026
-- [ ] Auditēt publisko lapu ikonas un vienādot ar “Par mums” smalko līniju un maigā fona stilu; pārbaudīt simbolu atbilstību un skatus.
+- [x] Auditēt publisko lapu sarkanās ikonas: vienots 1,5 līniju svars un maigs fons kā “Par mums”; precizēti cenas, krāsu un grāmatvedības simboli, kopšanas ikonās vairs nav nejaušu aizvietojumu. Pārlūkā pārbaudītas visas piecas tehnoloģijas un kontakti bez kļūdām; 3 kopšanas simbolu testi sekmīgi.
 
 ## Galerijas — 06.10.2026
 - [x] Pievienot 8 optimizētās Sublimācijas bildes arī kopīgajai galerijai; WA0021 kā titula attēlu (−48,5% svara).
