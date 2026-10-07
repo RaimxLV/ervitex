@@ -116,6 +116,7 @@ async function syncData(sb: SupabaseClient) {
     const code = str(s.style);
     const brand = str(s.brand);
     if (!code || !brand || !BRANDS.includes(brand)) continue;
+    if ((str(s.category_en) ?? "").toLowerCase() === "marketing tools") continue; // catalogues and colour cards
     styleRows.set(code, {
       style_code: code,
       brand,
