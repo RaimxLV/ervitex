@@ -3,7 +3,7 @@
 ## Ražotāju uzcenojums un kontakti — 07.10.2026
 - [x] Craft, ProJob un Cutter & Buck koeficientu ×1,75 aizstāt ar ×1,5; atlaides un PVN nemainīt. Pārbaudītas 54 006 variāciju cenas bez neatbilstībām, cenu diapazoni saskan, Craft cenas redzamas publiskajā katalogā; Clique nemainīts.
 - [x] Piedāvāt kontaktu izkārtojumu: Laura, Ilona, Santa, Justīne pirmajā rindā; Evita otrajā; Vilnis un Ēriks atsevišķā trešajā rindā.
-- [ ] Ieviest kontaktu izkārtojumu; gaida lietotāja izvēli starp atsevišķu vadības joslu un nodalīšanu ar atstarpi.
+- [x] Ieviests un pārlūkā pārbaudīts kontaktu izkārtojums 4+1+2: vadība trešajā rindā ar lielāku atstarpi, bez papildu virsraksta; vienādi kartīšu platumi.
 
 ## Profesionālas ikonas — 07.10.2026
 - [x] Izskaidrot gatava licencēta komplekta un dizainera veidotu ikonu iespējas pēc lietotāja atsaucēm.

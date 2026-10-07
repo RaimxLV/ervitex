@@ -113,7 +113,7 @@ const ContactPage = () => {
             {specialists.map((member) => {
               const ps = photoSettings[member.slug];
               return (
-                <article key={member.slug} className="group flex flex-col border border-border bg-card transition-colors hover:border-accent/50">
+                <article key={member.slug} className={`group flex flex-col border border-border bg-card transition-colors hover:border-accent/50 ${member.slug === "vilnis" ? "mt-6 sm:col-start-1 sm:mt-8 lg:row-start-3" : member.slug === "eriks" ? "sm:mt-8 lg:row-start-3" : ""}`}>
                   <button
                     type="button"
                     onClick={() => setLightboxImg(member.photo)}
