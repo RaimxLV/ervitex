@@ -2452,6 +2452,186 @@ export type Database = {
         }
         Relationships: []
       }
+      utt_images: {
+        Row: {
+          color_name: string | null
+          created_at: string
+          failed_at: string | null
+          id: number
+          sort_order: number
+          source_path: string
+          style_code: string
+          url: string | null
+        }
+        Insert: {
+          color_name?: string | null
+          created_at?: string
+          failed_at?: string | null
+          id?: number
+          sort_order?: number
+          source_path: string
+          style_code: string
+          url?: string | null
+        }
+        Update: {
+          color_name?: string | null
+          created_at?: string
+          failed_at?: string | null
+          id?: number
+          sort_order?: number
+          source_path?: string
+          style_code?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "utt_images_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "utt_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
+      utt_prices: {
+        Row: {
+          currency: string
+          purchase_price: number | null
+          sku: string
+          special_price: number | null
+          updated_at: string
+        }
+        Insert: {
+          currency?: string
+          purchase_price?: number | null
+          sku: string
+          special_price?: number | null
+          updated_at?: string
+        }
+        Update: {
+          currency?: string
+          purchase_price?: number | null
+          sku?: string
+          special_price?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "utt_prices_sku_fkey"
+            columns: ["sku"]
+            isOneToOne: true
+            referencedRelation: "utt_variants"
+            referencedColumns: ["sku"]
+          },
+        ]
+      }
+      utt_styles: {
+        Row: {
+          brand: string
+          care: string | null
+          category: string | null
+          created_at: string
+          cut: string | null
+          description: string | null
+          details: string | null
+          fabric: string | null
+          gender: string | null
+          hidden_by_admin: boolean
+          is_new: boolean
+          last_synced_at: string | null
+          name: string | null
+          published: boolean
+          sizes: string[] | null
+          style_code: string
+          updated_at: string
+          weight: string | null
+        }
+        Insert: {
+          brand: string
+          care?: string | null
+          category?: string | null
+          created_at?: string
+          cut?: string | null
+          description?: string | null
+          details?: string | null
+          fabric?: string | null
+          gender?: string | null
+          hidden_by_admin?: boolean
+          is_new?: boolean
+          last_synced_at?: string | null
+          name?: string | null
+          published?: boolean
+          sizes?: string[] | null
+          style_code: string
+          updated_at?: string
+          weight?: string | null
+        }
+        Update: {
+          brand?: string
+          care?: string | null
+          category?: string | null
+          created_at?: string
+          cut?: string | null
+          description?: string | null
+          details?: string | null
+          fabric?: string | null
+          gender?: string | null
+          hidden_by_admin?: boolean
+          is_new?: boolean
+          last_synced_at?: string | null
+          name?: string | null
+          published?: boolean
+          sizes?: string[] | null
+          style_code?: string
+          updated_at?: string
+          weight?: string | null
+        }
+        Relationships: []
+      }
+      utt_variants: {
+        Row: {
+          active: boolean
+          color_hex: string | null
+          color_name: string | null
+          size: string | null
+          size_order: number
+          sku: string
+          stock: number
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          color_hex?: string | null
+          color_name?: string | null
+          size?: string | null
+          size_order?: number
+          sku: string
+          stock?: number
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          color_hex?: string | null
+          color_name?: string | null
+          size?: string | null
+          size_order?: number
+          sku?: string
+          stock?: number
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "utt_variants_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "utt_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
     }
     Views: {
       bb_public_retail_prices: {
@@ -2929,6 +3109,7 @@ export type Database = {
           total_variants: number
         }[]
       }
+      utt_markup: { Args: { _brand: string }; Returns: number }
       validate_discount: { Args: { _d: Json }; Returns: undefined }
       validate_worksheet_items: { Args: { _items: Json }; Returns: undefined }
     }
