@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
+import { AccentIcon } from "@/components/ui/accent-icon";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { techs } from "@/data/technologies";
 import { useTechGalleries } from "@/hooks/useTechGalleries";
@@ -112,7 +113,7 @@ const TechnologiesShowcase = () => {
                   ]
               ).map((item) => (
                 <li key={item} className="flex items-start gap-3 text-sm text-foreground md:text-base">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-accent" strokeWidth={2.4} />
+                  <AccentIcon icon={Check} inline className="mt-0.5 h-4 w-4" />
                   <span>{item}</span>
                 </li>
               ))}

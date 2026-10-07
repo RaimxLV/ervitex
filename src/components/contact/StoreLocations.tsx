@@ -1,6 +1,7 @@
 import { MapPin, Mail, Phone, Building2 } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import SectionHeading from "./SectionHeading";
+import { AccentIcon } from "@/components/ui/accent-icon";
 import origoPhoto from "@/assets/stores/Origo.webp";
 import dominaPhoto from "@/assets/stores/Domina.webp";
 import alfaPhoto from "@/assets/stores/Alfa.webp";
@@ -14,7 +15,7 @@ const stores = [
 ];
 
 const linkCls = "flex items-center gap-2.5 text-sm text-foreground/80 transition-colors hover:text-accent";
-const iconCls = "h-4 w-4 shrink-0 text-accent";
+const iconCls = "h-4 w-4";
 
 const StoreLocations = () => {
   const { lang } = useLanguage();
@@ -31,9 +32,7 @@ const StoreLocations = () => {
 
         {/* Office */}
         <div className="mb-5 grid gap-4 border border-border bg-card p-5 sm:mb-6 sm:grid-cols-[auto_1fr_auto] sm:items-center md:p-7">
-          <div className="flex h-12 w-12 items-center justify-center bg-foreground text-background">
-            <Building2 className="h-5 w-5" strokeWidth={1.5} />
-          </div>
+          <AccentIcon icon={Building2} />
           <div>
             <h3 className="font-heading text-base font-bold uppercase text-foreground">
               {lang === "lv" ? "T-Bode birojs" : "T-Bode office"}
@@ -41,8 +40,8 @@ const StoreLocations = () => {
             <p className="mt-1 text-sm text-muted-foreground">Braslas iela 29, Rīga, LV-1084</p>
           </div>
           <div className="flex flex-col gap-2 sm:items-end">
-            <a href="mailto:info@t-bode.lv" className={linkCls}><Mail className={iconCls} strokeWidth={1.5} />info@t-bode.lv</a>
-            <a href="tel:+37129475227" className={linkCls}><Phone className={iconCls} strokeWidth={1.5} />{tel} +371 29475227</a>
+            <a href="mailto:info@t-bode.lv" className={linkCls}><AccentIcon icon={Mail} inline className={iconCls} />info@t-bode.lv</a>
+            <a href="tel:+37129475227" className={linkCls}><AccentIcon icon={Phone} inline className={iconCls} />{tel} +371 29475227</a>
           </div>
         </div>
 
@@ -56,12 +55,12 @@ const StoreLocations = () => {
               <div className="flex grow flex-col p-4 md:p-5">
                 <h3 className="font-heading text-base font-bold uppercase text-foreground">{s.name}</h3>
                 <p className="mt-3 flex items-start gap-2.5 text-sm leading-relaxed text-muted-foreground">
-                  <MapPin className={`${iconCls} mt-0.5`} strokeWidth={1.5} />
+                  <AccentIcon icon={MapPin} inline className={`${iconCls} mt-0.5`} />
                   <span>{s.street}<br />{s.zip}</span>
                 </p>
                 <div className="mt-4 space-y-2 border-t border-border pt-4">
-                  <a href={`mailto:${s.email}`} className={linkCls}><Mail className={iconCls} strokeWidth={1.5} />{s.email}</a>
-                  <a href={`tel:${s.phone.replace(/\s/g, "")}`} className={linkCls}><Phone className={iconCls} strokeWidth={1.5} />{s.phone}</a>
+                  <a href={`mailto:${s.email}`} className={linkCls}><AccentIcon icon={Mail} inline className={iconCls} />{s.email}</a>
+                  <a href={`tel:${s.phone.replace(/\s/g, "")}`} className={linkCls}><AccentIcon icon={Phone} inline className={iconCls} />{s.phone}</a>
                 </div>
               </div>
             </article>

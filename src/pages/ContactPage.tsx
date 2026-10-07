@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Building2, Clock3, Mail, MapPin, Phone, Send, X, Loader2, ReceiptText, Navigation } from "lucide-react";
+import { Building2, Clock3, Mail, MapPin, Phone, Send, X, Loader2, ReceiptText, Navigation, Calculator } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/Layout";
+import { AccentIcon } from "@/components/ui/accent-icon";
 import PageIntro from "@/components/PageIntro";
 import { useLanguage } from "@/i18n/LanguageContext";
 import GoogleMapEmbed, { GMAPS_URL, WAZE_URL } from "@/components/GoogleMapEmbed";
@@ -134,10 +135,10 @@ const ContactPage = () => {
                     <p className="mt-1 min-h-[2.5rem] text-sm font-medium text-accent">{member.title[lang]}</p>
                     <div className="mt-4 space-y-2 border-t border-border pt-4">
                       <a href={`mailto:${member.email}`} className="flex items-center gap-2.5 truncate text-sm text-foreground/80 transition-colors hover:text-accent">
-                        <Mail className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.5} />{member.email}
+                        <AccentIcon icon={Mail} inline className="h-4 w-4" />{member.email}
                       </a>
                       <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-2.5 text-sm text-foreground/80 transition-colors hover:text-accent">
-                        <Phone className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.5} />{member.phone}
+                        <AccentIcon icon={Phone} inline className="h-4 w-4" />{member.phone}
                       </a>
                     </div>
                   </div>
@@ -169,7 +170,7 @@ const ContactPage = () => {
                       </>
                     ),
                   },
-                  { icon: Building2, label: t("contact.accounting"), content: <a href="tel:+37167552540" className="transition-colors hover:text-accent">+371 67552540</a> },
+                  { icon: Calculator, label: t("contact.accounting"), content: <a href="tel:+37167552540" className="transition-colors hover:text-accent">+371 67552540</a> },
                   {
                     icon: Clock3,
                     label: t("contact.hours"),
@@ -183,7 +184,7 @@ const ContactPage = () => {
                   },
                 ].map((item) => (
                   <div key={item.label} className="flex gap-3 py-3.5 first:pt-0 last:pb-0 md:gap-4 md:py-4">
-                    <item.icon className="mt-0.5 h-5 w-5 shrink-0 text-accent" strokeWidth={1.5} />
+                    <AccentIcon icon={item.icon} />
                     <div className="min-w-0">
                       <dt className="font-heading text-xs font-bold uppercase tracking-wider text-muted-foreground">{item.label}</dt>
                       <dd className="mt-1 text-sm leading-relaxed text-foreground md:text-base">{item.content}</dd>
@@ -237,10 +238,10 @@ const ContactPage = () => {
           </div>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:max-w-xl">
             <a href={GMAPS_URL} target="_blank" rel="noopener noreferrer" className="flex h-12 items-center justify-center gap-2 border border-border bg-card font-heading text-sm font-bold uppercase text-foreground transition-colors hover:border-accent hover:text-accent">
-              <Navigation className="h-4 w-4 text-accent" strokeWidth={1.5} />Google Maps
+              <AccentIcon icon={Navigation} inline className="h-4 w-4" />Google Maps
             </a>
             <a href={WAZE_URL} target="_blank" rel="noopener noreferrer" className="flex h-12 items-center justify-center gap-2 border border-border bg-card font-heading text-sm font-bold uppercase text-foreground transition-colors hover:border-accent hover:text-accent">
-              <Navigation className="h-4 w-4 text-accent" strokeWidth={1.5} />Waze
+              <AccentIcon icon={Navigation} inline className="h-4 w-4" />Waze
             </a>
           </div>
         </div>

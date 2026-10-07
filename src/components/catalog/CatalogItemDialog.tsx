@@ -11,6 +11,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
+import { Check } from "lucide-react";
+import { AccentIcon } from "@/components/ui/accent-icon";
 import { assignCareIcons } from "./CareIcons";
 import { GalleryImage } from "@/components/GalleryImage";
 import { warmGalleryImages } from "@/lib/galleryImages";
@@ -1581,7 +1583,7 @@ const CatalogItemDialog = ({
                         <ul className="space-y-1.5 text-sm">
                           {descriptionLines.map((b, i) => (
                             <li key={`${b}-${i}`} className="flex gap-2">
-                              <span className="flex h-5 shrink-0 items-center text-accent">✓</span>
+                              <AccentIcon icon={Check} inline className="h-5 w-4" />
                               <span className="text-foreground/90">{b}</span>
                             </li>
                           ))}
@@ -1609,11 +1611,11 @@ const CatalogItemDialog = ({
                           <span
                             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md border ${
                               c.ban
-                                ? "border-accent/40 bg-accent/10 text-accent"
+                                ? "border-transparent bg-accent/10 text-accent"
                                 : "border-border bg-background text-foreground"
                             }`}
                           >
-                            <c.Icon className="h-6 w-6" strokeWidth={1.8} />
+                            <c.Icon className="h-6 w-6" strokeWidth={1.5} />
                           </span>
                           <span className="text-sm leading-snug text-foreground/90">{c.text}</span>
                         </li>
