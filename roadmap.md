@@ -1,5 +1,8 @@
 # Roadmap
 
+## Mazās sarkanās ikonas — 07.10.2026
+- [ ] Auditēt publisko lapu ikonas un vienādot ar “Par mums” smalko līniju un maigā fona stilu; pārbaudīt simbolu atbilstību un skatus.
+
 ## Galerijas — 06.10.2026
 - [x] Pievienot 8 optimizētās Sublimācijas bildes arī kopīgajai galerijai; WA0021 kā titula attēlu (−48,5% svara).
 - [x] Auditēt galerijas: ielādēt un dekodēt pirms nomaiņas, saglabāt iepriekšējo kadru, iesildīt blakus attēlus, apturēt automātiku ārpus skata; labota arī GitHub tehnoloģiju attēlu adrese. Piecas tehnoloģijas un mozaīka pārbaudītas 1280/390 px ar aizkavētu īsto CDN attēlu piegādi; 3 automātiskie testi sekmīgi.
