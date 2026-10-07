@@ -21,3 +21,5 @@
 - Gallery navigation shares a bounded image-decode cache and commits only decoded frames, warming adjacent frames and retaining the last usable frame on download failure; this prevents empty transitions without downloading entire galleries.
 - Technology gallery asset pointers use the hosted Lovable asset origin on GitHub Pages, because GitHub cannot serve the platform asset route.
 - Technology gallery order/membership is stored as stable refs in `tech_galleries` (built-in photos as `s:<tech>:<index>`, uploads as public URLs) and applied over the static data at runtime, so saved order survives rebuilds and asset hash changes.
+
+- UTT Europe (Gildan/Kariban/Regatta) syncs through the `utt-sync` Data Export API function into `utt_*` tables; buying prices live in service-role-only `utt_prices` and images are mirrored to the `utt-images` bucket because UTT forbids hotlinking and blocks hotlinking IPs.
