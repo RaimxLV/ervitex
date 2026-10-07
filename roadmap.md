@@ -1,5 +1,9 @@
 # Roadmap
 
+## Tehnoloģiju kontrasts — 07.10.2026
+- [x] Ieviest gaišas priekšrocības un tumšu lietojuma sadaļu visām tehnoloģijām; “Par mums” krāsas un animācijas.
+- [x] Precizēt ikonas: īpaši uzzīmēti apģērbu tirāžas, personalizācijas, diegu spoļu, uzšuvju, reljefa, auduma, transfēra plēves, floka un atstarošanas simboli. Piecas lapas pārbaudītas bez kļūdām; hover pacelšanās 6px, datorā/telefonā bez pārplūdes.
+
 ## Mazās sarkanās ikonas — 07.10.2026
 - [x] Auditēt publisko lapu sarkanās ikonas: vienots 1,5 līniju svars un maigs fons kā “Par mums”; precizēti cenas, krāsu un grāmatvedības simboli, kopšanas ikonās vairs nav nejaušu aizvietojumu. Pārlūkā pārbaudītas visas piecas tehnoloģijas un kontakti bez kļūdām; 3 kopšanas simbolu testi sekmīgi.
 
