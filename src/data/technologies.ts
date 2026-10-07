@@ -622,4 +622,16 @@ if (window.location.hostname.endsWith("github.io")) {
   });
 }
 
+/** Stable references for built-in photos ("s:<tech>:<index>"), so saved order survives rebuilds. */
+export const staticImageUrls: Record<string, string> = {};
+export const defaultImageRefs: Record<string, string[]> = {};
+techs.forEach((tech) => {
+  defaultImageRefs[tech.id] = tech.images.map((src, i) => {
+    const ref = `s:${tech.id}:${i}`;
+    staticImageUrls[ref] = src;
+    return ref;
+  });
+});
+export const resolveImageRef = (ref: string) => staticImageUrls[ref] ?? (ref.startsWith("s:") ? null : ref);
+
 export const getTech = (id?: string) => techs.find((t) => t.id === id);

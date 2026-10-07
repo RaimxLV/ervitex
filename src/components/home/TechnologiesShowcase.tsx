@@ -3,11 +3,13 @@ import { motion } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { techs } from "@/data/technologies";
+import { useTechGalleries } from "@/hooks/useTechGalleries";
 
 import guaranteeImg from "@/assets/partner-section.webp";
 
 const TechnologiesShowcase = () => {
   const { lang } = useLanguage();
+  useTechGalleries();
   const isLv = lang === "lv";
 
   return (

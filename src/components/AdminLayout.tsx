@@ -25,6 +25,7 @@ const secondary: NavItem[] = [
   { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
   { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
   { to: "/admin/team-photos", icon: Images, label: "Komandas foto" },
+  { to: "/admin/galleries", icon: Images, label: "Galerijas", superOnly: true },
   { to: "/admin/users", icon: Users, label: "Lietotāji", superOnly: true },
 ];
 

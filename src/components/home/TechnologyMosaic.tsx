@@ -4,6 +4,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { prepareGalleryImage } from "@/lib/galleryImages";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useTechGalleries } from "@/hooks/useTechGalleries";
 
 type Photo = { src: string; alt: string };
 type Content = { kind: "photo"; photo: Photo } | { kind: "color"; color: number };
@@ -100,6 +101,7 @@ export default function TechnologyMosaic() {
     return () => { preload.disconnect(); viewport.disconnect(); document.removeEventListener("visibilitychange", onVisibility); };
   }, []);
 
+  const galleryVersion = useTechGalleries();
   useEffect(() => {
     if (!near) return;
     let cancelled = false;
@@ -117,7 +119,7 @@ export default function TechnologyMosaic() {
       if (!cancelled) setPhotos(mixed);
     });
     return () => { cancelled = true; };
-  }, [near, lang]);
+  }, [near, lang, galleryVersion]);
 
    const active = visible && foreground && !interacting && !selectedPhoto;
   useEffect(() => {

@@ -48,6 +48,7 @@ const AdminProducts = lazy(() => import("./pages/admin/AdminProducts.tsx"));
 const AdminProductForm = lazy(() => import("./pages/admin/AdminProductForm.tsx"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories.tsx"));
 const AdminTeamPhotos = lazy(() => import("./pages/admin/AdminTeamPhotos.tsx"));
+const AdminGalleries = lazy(() => import("./pages/admin/AdminGalleries.tsx"));
 
 
 const queryClient = new QueryClient();
@@ -98,6 +99,7 @@ const App = () => (
               <Route path="/admin/products/:id" element={<ProtectedRoute><AdminProductForm /></ProtectedRoute>} />
               <Route path="/admin/categories" element={<ProtectedRoute><AdminCategories /></ProtectedRoute>} />
               <Route path="/admin/team-photos" element={<ProtectedRoute><AdminTeamPhotos /></ProtectedRoute>} />
+              <Route path="/admin/galleries" element={<ProtectedRoute><AdminGalleries /></ProtectedRoute>} />
               <Route path="/admin/quotes" element={<ProtectedRoute><AdminQuotes /></ProtectedRoute>} />
 
               <Route path="/admin/users" element={<ProtectedRoute><AdminUsers /></ProtectedRoute>} />

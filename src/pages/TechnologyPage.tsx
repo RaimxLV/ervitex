@@ -8,6 +8,7 @@ import TechRelatedProducts from "@/components/services/TechRelatedProducts";
 
 import { useLanguage } from "@/i18n/LanguageContext";
 import { getTech, techs, type TechExtra } from "@/data/technologies";
+import { useTechGalleries } from "@/hooks/useTechGalleries";
 
 const fadeUp = {
   initial: { opacity: 0, y: 24 },
@@ -120,6 +121,7 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
 const TechnologyPage = () => {
   const { slug } = useParams();
   const { lang } = useLanguage();
+  useTechGalleries();
   const isLv = lang === "lv";
   const tech = getTech(slug);
 

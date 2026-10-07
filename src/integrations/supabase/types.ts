@@ -2416,6 +2416,24 @@ export type Database = {
         }
         Relationships: []
       }
+      tech_galleries: {
+        Row: {
+          images: string[]
+          tech_id: string
+          updated_at: string
+        }
+        Insert: {
+          images?: string[]
+          tech_id: string
+          updated_at?: string
+        }
+        Update: {
+          images?: string[]
+          tech_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
