@@ -32,6 +32,12 @@ const specialists = [
   { slug: "eriks", name: "Ēriks Lācis", title: { lv: "Tirdzniecības direktors", en: "Sales Director" }, email: "eriks@ervitex.lv", phone: "+371 29395600", phoneLabel: { lv: "Mob", en: "Mob" }, photo: eriksPhoto },
 ];
 
+const teamGroups: { label: { lv: string; en: string }; slugs: string[] }[] = [
+  { label: { lv: "Projektu vadītāji", en: "Project managers" }, slugs: ["laura", "ilona", "santa", "justine"] },
+  { label: { lv: "Mazumtirdzniecība", en: "Retail" }, slugs: ["evita"] },
+  { label: { lv: "Vadība", en: "Management" }, slugs: ["vilnis", "eriks"] },
+];
+
 type PhotoSettings = { zoom: number; position_x: number; position_y: number };
 
 const ContactPage = () => {
@@ -109,40 +115,55 @@ const ContactPage = () => {
             eyebrow={lang === "lv" ? "Komanda" : "Team"}
             title={lang === "lv" ? "Sazinieties ar kādu no mūsu speciālistiem" : "Get in touch with one of our specialists"}
           />
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
-            {specialists.map((member) => {
-              const ps = photoSettings[member.slug];
+          <div className="space-y-12 md:space-y-16">
+            {teamGroups.map((group) => {
+              const members = group.slugs
+                .map((slug) => specialists.find((m) => m.slug === slug))
+                .filter(Boolean) as typeof specialists;
               return (
-                <article key={member.slug} className={`group flex flex-col border border-border bg-card transition-colors hover:border-accent/50 ${member.slug === "vilnis" ? "mt-6 sm:col-start-1 sm:mt-8 lg:row-start-3" : member.slug === "eriks" ? "sm:mt-8 lg:row-start-3" : ""}`}>
-                  <button
-                    type="button"
-                    onClick={() => setLightboxImg(member.photo)}
-                    className="relative aspect-[4/5] w-full overflow-hidden bg-muted"
-                    aria-label={member.name}
-                  >
-                    <img
-                      src={member.photo}
-                      alt={member.name}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                      style={{
-                        transform: `translate(${((ps?.position_x ?? 50) - 50) * 0.5}%, ${((ps?.position_y ?? 50) - 50) * 0.5}%) scale(${ps?.zoom ?? 1})`,
-                      }}
-                    />
-                  </button>
-                   <div className="flex grow flex-col p-4 md:p-5">
-                    <h3 className="font-heading text-base font-bold uppercase text-foreground">{member.name}</h3>
-                    <p className="mt-1 min-h-[2.5rem] text-sm font-medium text-accent">{member.title[lang]}</p>
-                    <div className="mt-4 space-y-2 border-t border-border pt-4">
-                      <a href={`mailto:${member.email}`} className="flex items-center gap-2.5 truncate text-sm text-foreground/80 transition-colors hover:text-accent">
-                        <AccentIcon icon={Mail} inline className="h-4 w-4" />{member.email}
-                      </a>
-                      <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-2.5 text-sm text-foreground/80 transition-colors hover:text-accent">
-                        <AccentIcon icon={Phone} inline className="h-4 w-4" />{member.phone}
-                      </a>
-                    </div>
+                <div key={group.label.lv}>
+                  <div className="mb-5 flex items-center gap-4 md:mb-7">
+                    <h3 className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">{group.label[lang]}</h3>
+                    <div aria-hidden="true" className="h-px w-full bg-border" />
                   </div>
-                </article>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+                    {members.map((member) => {
+                      const ps = photoSettings[member.slug];
+                      return (
+                        <article key={member.slug} className="group flex flex-col border border-border bg-card transition-colors hover:border-accent/50">
+                          <button
+                            type="button"
+                            onClick={() => setLightboxImg(member.photo)}
+                            className="relative aspect-[4/5] w-full overflow-hidden bg-muted"
+                            aria-label={member.name}
+                          >
+                            <img
+                              src={member.photo}
+                              alt={member.name}
+                              loading="lazy"
+                              className="h-full w-full object-cover"
+                              style={{
+                                transform: `translate(${((ps?.position_x ?? 50) - 50) * 0.5}%, ${((ps?.position_y ?? 50) - 50) * 0.5}%) scale(${ps?.zoom ?? 1})`,
+                              }}
+                            />
+                          </button>
+                          <div className="flex grow flex-col p-4 md:p-5">
+                            <h3 className="font-heading text-base font-bold uppercase text-foreground">{member.name}</h3>
+                            <p className="mt-1 min-h-[2.5rem] text-sm font-medium text-accent">{member.title[lang]}</p>
+                            <div className="mt-4 space-y-2 border-t border-border pt-4">
+                              <a href={`mailto:${member.email}`} className="flex items-center gap-2.5 truncate text-sm text-foreground/80 transition-colors hover:text-accent">
+                                <AccentIcon icon={Mail} inline className="h-4 w-4" />{member.email}
+                              </a>
+                              <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-2.5 text-sm text-foreground/80 transition-colors hover:text-accent">
+                                <AccentIcon icon={Phone} inline className="h-4 w-4" />{member.phone}
+                              </a>
+                            </div>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })}
           </div>
