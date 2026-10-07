@@ -1,9 +1,9 @@
 # Roadmap
 
 ## UTT katalogs (Gildan, Kariban, Regatta) — 07.10.2026
-- [ ] Tiešs UTT API pieslēgums ar ikdienas automātisku preču, cenu un atlikumu atjaunošanu; Gildan ×2, Kariban ×1,8, Regatta ×1,75.
-- [ ] Bildes automātiski pārnest uz mūsu serveri (UTT aizliedz hotlinking).
-- [ ] Rādīt katalogā, preces skatā un admina sinhronizāciju panelī.
+- [x] Tiešs UTT API pieslēgums ar ikdienas automātisku preču, cenu un atlikumu atjaunošanu (katru nakti 02:50); Gildan ×2, Kariban ×1,8, Regatta ×1,75. 559 modeļi, 20 659 varianti.
+- [x] Bildes automātiski pārnestas uz mūsu serveri (6 802 bildes; UTT aizliedz hotlinking).
+- [x] Gildan, Kariban, Regatta ražotāju filtrā, preces skatā un admina sinhronizāciju/cenu audita panelī; pārbaudīts pārlūkā.
 
 ## Ražotāju uzcenojums un kontakti — 07.10.2026
 - [x] Craft, ProJob un Cutter & Buck koeficientu ×1,75 aizstāt ar ×1,5; atlaides un PVN nemainīt. Pārbaudītas 54 006 variāciju cenas bez neatbilstībām, cenu diapazoni saskan, Craft cenas redzamas publiskajā katalogā; Clique nemainīts.
