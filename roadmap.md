@@ -1,5 +1,9 @@
 # Roadmap
 
+## Profesionālas ikonas — 07.10.2026
+- [x] Izskaidrot gatava licencēta komplekta un dizainera veidotu ikonu iespējas pēc lietotāja atsaucēm.
+- [ ] Aizvietot noraidītās ikonas; gaida lietotāja izvēlētu profesionālu komplektu vai tā failus.
+
 ## Tehnoloģiju kontrasts — 07.10.2026
 - [x] Ieviest gaišas priekšrocības un tumšu lietojuma sadaļu visām tehnoloģijām; “Par mums” krāsas un animācijas.
 - [x] Precizēt ikonas: īpaši uzzīmēti apģērbu tirāžas, personalizācijas, diegu spoļu, uzšuvju, reljefa, auduma, transfēra plēves, floka un atstarošanas simboli. Piecas lapas pārbaudītas bez kļūdām; hover pacelšanās 6px, datorā/telefonā bez pārplūdes.
