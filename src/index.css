@@ -42,9 +42,8 @@
     --mosaic-background: 0 0% 3.1372549%;
     --mosaic-red: 0 85.03937% 50.980392%;
     --mosaic-white: 0 0% 100%;
-    --mosaic-orange: 23.839286 100% 56.078431%;
-    --mosaic-lime: 72.513369 85.388128% 57.058824%;
-    --mosaic-turquoise: 186.181818 68.46473% 47.254902%;
+    --mosaic-graphite: 0 0% 16%;
+    --mosaic-burgundy: 350 70% 28%;
 
     --value-blue: 215 72% 42%;
     --value-blue-soft: 214 70% 96%;
@@ -190,9 +189,8 @@
   .mosaic-tile:focus-within .mosaic-content img { filter: grayscale(1); }
   .mosaic-red { background: hsl(var(--mosaic-red)); }
   .mosaic-white { background: hsl(var(--mosaic-white)); }
-  .mosaic-orange { background: hsl(var(--mosaic-orange)); }
-  .mosaic-lime { background: hsl(var(--mosaic-lime)); }
-  .mosaic-turquoise { background: hsl(var(--mosaic-turquoise)); }
+  .mosaic-graphite { background: hsl(var(--mosaic-graphite)); }
+  .mosaic-burgundy { background: hsl(var(--mosaic-burgundy)); }
   @media (max-width: 1023px) {
     .mosaic-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 160px; }
   }
