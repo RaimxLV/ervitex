@@ -113,6 +113,14 @@
 
   /* Dark scope for individual sections inside the light theme (e.g. T-Bode block) */
   .section-dark {
+    --value-blue: 211 78% 70%;
+    --value-blue-soft: 215 25% 17%;
+    --value-cyan: 187 66% 66%;
+    --value-cyan-soft: 190 26% 16%;
+    --value-emerald: 156 55% 65%;
+    --value-emerald-soft: 157 24% 16%;
+    --value-slate: 215 24% 76%;
+    --value-slate-soft: 218 12% 18%;
     --background: 0 0% 4%;
     --foreground: 0 0% 95%;
     --card: 0 0% 7%;
@@ -156,6 +164,10 @@
 }
 
 @layer components {
+  .technology-card { transition: box-shadow 300ms ease, background-color 300ms ease, border-color 300ms ease, transform 300ms ease; }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .technology-card:hover { transform: translateY(-6px) !important; }
+  }
   .technology-mosaic {
     background: hsl(var(--mosaic-background));
     padding: 32px;
