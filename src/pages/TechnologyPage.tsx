@@ -329,22 +329,29 @@ const TechnologyPage = () => {
         </div>
       </section>
 
-      <section className="section-dark bg-background py-14 text-foreground md:py-20" aria-labelledby="technology-use-cases">
-        <div className="container grid gap-8 lg:grid-cols-[1fr_1.3fr] lg:gap-16">
-          <motion.div {...fadeUp} transition={{ duration: 0.55 }}>
-            <SectionKicker>{isLv ? "Lietojums" : "Use cases"}</SectionKicker>
-            <h2 id="technology-use-cases" className="mt-3 max-w-lg font-heading text-2xl font-bold uppercase leading-tight text-foreground md:text-3xl">
-              {tech.useCasesTitle[lang]}
-            </h2>
-          </motion.div>
-          <ul className="grid gap-3 self-start">
-            {tech.useCases.map((u, i) => (
-              <motion.li key={u.en} {...fadeUp} transition={{ duration: 0.55, delay: i * 0.09 }} className="flex items-start gap-4 rounded-[6px] border border-border bg-card px-5 py-4">
-                <AccentIcon icon={Check} inline tone="emerald" className="mt-1" />
-                <span className="text-sm leading-relaxed text-foreground md:text-base">{u[lang]}</span>
-              </motion.li>
-            ))}
-          </ul>
+      <section className="bg-background py-10 md:py-16" aria-labelledby="technology-use-cases">
+        <div className="container">
+          <div className="grid gap-8 overflow-hidden rounded-[6px] border border-border bg-muted px-6 py-10 shadow-xl sm:px-10 md:py-14 lg:grid-cols-[1fr_1.3fr] lg:items-center lg:gap-16 lg:px-16">
+            <motion.div {...fadeUp} transition={{ duration: 0.55 }}>
+              <SectionKicker>{isLv ? "Lietojums" : "Use cases"}</SectionKicker>
+              <h2 id="technology-use-cases" className="mt-3 max-w-lg font-heading text-2xl font-bold uppercase leading-tight text-foreground md:text-3xl">
+                {tech.useCasesTitle[lang]}
+              </h2>
+            </motion.div>
+            <ul className="grid gap-3 self-start">
+              {tech.useCases.map((u, i) => (
+                <motion.li
+                  key={u.en}
+                  {...fadeUp}
+                  transition={{ duration: 0.55, delay: i * 0.09 }}
+                  className="technology-card flex items-start gap-4 rounded-[6px] border border-border bg-card px-5 py-4 shadow-sm hover:shadow-md"
+                >
+                  <AccentIcon icon={Check} inline tone="emerald" className="mt-1" />
+                  <span className="text-sm font-semibold leading-relaxed text-foreground md:text-base">{u[lang]}</span>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
