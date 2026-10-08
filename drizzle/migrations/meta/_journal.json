@@ -8,6 +8,13 @@
       "when": 1791380791091,
       "tag": "0000_utt_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791462804764,
+      "tag": "0001_utt_regular_prices",
+      "breakpoints": true
     }
   ]
 }
