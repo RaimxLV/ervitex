@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { readCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
-import { prepareQuery, searchScore } from "@/lib/catalogSearch";
+import { exactCodeHits, prepareQuery, searchScore } from "@/lib/catalogSearch";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 interface Row {
@@ -100,6 +100,8 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
   const results = useMemo(() => {
     const pq = prepareQuery(value);
     if (!pq || !rows.length) return [];
+    const exact = exactCodeHits(rows, pq);
+    if (exact) return [...exact].slice(0, 7);
     const scored: { r: Row; s: number }[] = [];
     for (const r of rows) {
       const s = searchScore(r, pq);
