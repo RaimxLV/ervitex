@@ -9,13 +9,13 @@ import { useTechGalleries } from "@/hooks/useTechGalleries";
 type Photo = { src: string; alt: string };
 type Content = { kind: "photo"; photo: Photo } | { kind: "color"; color: number };
 type Tile = { id: number; wide?: boolean; tall?: boolean; color?: number };
-const colors = ["mosaic-red", "mosaic-white", "mosaic-graphite", "mosaic-burgundy"];
+const colors = ["mosaic-red", "mosaic-white", "mosaic-graphite"];
 // The selected composition: four rows, panoramic and square tiles, one double-height anchor.
 const initialTiles: Tile[] = [
   { id: 0, wide: true }, { id: 1, color: 0 }, { id: 2 }, { id: 3, wide: true, color: 1 },
   { id: 4 }, { id: 5, wide: true }, { id: 6 }, { id: 7, wide: true, tall: true },
   { id: 8 }, { id: 9, color: 2 }, { id: 10, wide: true },
-  { id: 11, wide: true }, { id: 12 }, { id: 13, color: 3 }, { id: 14, wide: true },
+  { id: 11, wide: true }, { id: 12 }, { id: 13, color: 2 }, { id: 14, wide: true },
 ];
 const randomDelay = () => 5000 + Math.random() * 8500;
 
