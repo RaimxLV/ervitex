@@ -1,5 +1,8 @@
 # Roadmap
 
+## Pilns publiskās lapas stila audits — 08.10.2026
+- [ ] Pārbaudīt visas publiskās lapas datorā un telefonā; noņemt zilo tekstos, visus mazos sadaļu virsrakstus vienādot sarkanus, sakārtot fontus, atstarpes un akcentus.
+
 ## Tehnoloģiju lapas lietojuma sadaļas dizains — 08.10.2026
 - [x] Saglabāts esošais “Piemērota izvēle” teksta izkārtojums un visās tehnoloģiju lapās melnais pilna platuma bloks aizvietots ar izvēlēto izteiktāko, centrēto gaiši pelēko paneli.
 
