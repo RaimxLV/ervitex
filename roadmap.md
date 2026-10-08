@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Zemākā sākuma cena — 08.10.2026
-- [ ] Kartītēs sākumā rādīt zemāko cenu un atbilstošo krāsu; preces skatā izvēlēties zemākās cenas izmēru, saglabājot apzinātu izvēli.
-- [ ] Pārbaudīt cenu izvēles testus un kartītes → preces plūsmu pārlūkā.
+- [x] Kartītēs sākumā rādīt zemāko cenu un atbilstošo krāsu; preces skatā izvēlēties zemākās cenas izmēru, saglabājot apzinātu izvēli; arī saistīto preču kartītēs.
+- [x] Četri cenu izvēles testi sekmīgi; pārlūkā GI12000 kartītē un preces skatā €2,90 ar PVN, Royal/S, bez lapas kļūdām.
 
 ## UTT katalogs (Gildan, Kariban, Regatta) — 07.10.2026
 - [x] Tiešs UTT API pieslēgums ar ikdienas automātisku preču, cenu un atlikumu atjaunošanu (katru nakti 02:50); Gildan ×2, Kariban ×1,8, Regatta ×1,75. 559 modeļi, 20 659 varianti.
