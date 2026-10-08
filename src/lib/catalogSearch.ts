@@ -36,7 +36,7 @@ const SYNONYMS: [string, string[]][] = [
   ["cimd", ["glove", "mitten"]],
   ["zek", ["sock"]],
   ["sall", ["scarf", "snood"]],
-  ["priekssaut", ["apron"]],
+  ["prieksaut", ["apron"]],
   ["lietussarg", ["umbrella"]],
   ["kruz", ["mug", "cup"]],
   ["pudel", ["bottle"]],
