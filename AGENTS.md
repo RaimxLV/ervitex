@@ -1,7 +1,7 @@
 # Architecture rules
 
 - Public informational icons use shared AccentIcon framed/inline variants and semantic tone options; print-specific Lucide-compatible symbols live in print-icons, keeping stroke weight and sizes consistent.
-- Technology content uses a separate dark-scoped use-case band and reduced-motion-aware staggered cards; scoped tokens preserve readable contrast without changing the global theme or gallery behavior.
+- Public section eyebrows use one red line-label style; blue/cyan/green/slate remain icon-only, and technology use cases sit in a light centered panel for visual continuity.
 
 - Office-photo image, individual pane/door SVG contours and clipped accessible hotspots share original-photo coordinates in one cover-sized scene; matching geometry prevents hover fills and keeps annotations aligned across screen sizes. The luminous halo is a separate blurred polygon layer using an SVG feGaussianBlur filter with an oversized filter region, because CSS drop-shadow blur is clipped by each shape's own bounding box and reads as a thin line instead of light.
 

@@ -89,11 +89,11 @@ const BentoCategories = () => {
         >
           <div className="mb-2 flex items-center gap-3">
             <div className="h-px w-8 bg-accent" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
+            <span className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
               {t("Kategorijas", "Categories")}
             </span>
           </div>
-          <h2 className="font-heading text-2xl font-bold uppercase tracking-tight text-foreground md:text-5xl">
+          <h2 className="font-heading text-2xl font-bold uppercase text-foreground md:text-5xl">
             {t("Produktu katalogs", "Product catalog")}
           </h2>
         </motion.div>

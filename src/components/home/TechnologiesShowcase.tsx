@@ -24,10 +24,13 @@ const TechnologiesShowcase = () => {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-center"
         >
-          <span className="font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-accent">
-            {isLv ? "Mūsu iespējas" : "Our capabilities"}
-          </span>
-          <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-tight text-foreground md:mt-4 md:text-5xl">
+          <div className="flex items-center justify-center gap-3">
+            <span className="h-px w-8 bg-accent" aria-hidden />
+            <span className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
+              {isLv ? "Mūsu iespējas" : "Our capabilities"}
+            </span>
+          </div>
+          <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:mt-4 md:text-5xl">
             {isLv ? "APDRUKAS RISINĀJUMI" : "Decoration technologies"}
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:mt-5 md:text-lg">
