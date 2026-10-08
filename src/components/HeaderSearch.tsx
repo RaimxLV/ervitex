@@ -200,7 +200,7 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
                   >
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-muted">
                       {r.image_url && (
-                        <img src={thumbUrl(r.image_url) || r.image_url} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
+                        <img src={thumbUrl(r.image_url, 120) || r.image_url} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
