@@ -361,6 +361,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
                       </ul>
                     ) : (
                       <ul
+                        data-lenis-prevent
                         className={cn(
                           "space-y-0.5 pr-1",
                           filtered.length > 10 && "max-h-72 overflow-y-auto"
