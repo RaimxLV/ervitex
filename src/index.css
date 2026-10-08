@@ -41,7 +41,7 @@
     --office-shadow: 220 20% 8%;
     --mosaic-background: 0 0% 3.1372549%;
     --mosaic-red: 0 85.03937% 50.980392%;
-    --mosaic-white: 0 0% 100%;
+    --mosaic-grey: 0 0% 38%;
     --mosaic-graphite: 0 0% 16%;
 
     --value-blue: 215 72% 42%;
@@ -187,7 +187,7 @@
   .mosaic-tile:hover .mosaic-content img,
   .mosaic-tile:focus-within .mosaic-content img { filter: grayscale(1); }
   .mosaic-red { background: hsl(var(--mosaic-red)); }
-  .mosaic-white { background: hsl(var(--mosaic-white)); }
+  .mosaic-grey { background: hsl(var(--mosaic-grey)); }
   .mosaic-graphite { background: hsl(var(--mosaic-graphite)); }
   @media (max-width: 1023px) {
     .mosaic-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 160px; }

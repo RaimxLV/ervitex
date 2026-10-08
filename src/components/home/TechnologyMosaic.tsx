@@ -9,7 +9,7 @@ import { useTechGalleries } from "@/hooks/useTechGalleries";
 type Photo = { src: string; alt: string };
 type Content = { kind: "photo"; photo: Photo } | { kind: "color"; color: number };
 type Tile = { id: number; wide?: boolean; tall?: boolean; color?: number };
-const colors = ["mosaic-red", "mosaic-white", "mosaic-graphite"];
+const colors = ["mosaic-red", "mosaic-grey", "mosaic-graphite"];
 // The selected composition: four rows, panoramic and square tiles, one double-height anchor.
 const initialTiles: Tile[] = [
   { id: 0, wide: true }, { id: 1, color: 0 }, { id: 2 }, { id: 3, wide: true, color: 1 },
