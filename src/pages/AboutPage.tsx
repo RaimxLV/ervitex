@@ -26,7 +26,7 @@ const AboutPage = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="font-heading text-[2rem] font-bold leading-tight tracking-tight text-foreground [text-wrap:balance] md:text-6xl">
+            className="font-heading text-[2rem] font-bold leading-tight text-foreground [text-wrap:balance] md:text-6xl"
               {t("about.storyHeadline")}
             </h2>
             <p className="mt-4 max-w-3xl text-base leading-relaxed text-foreground/70 [text-wrap:pretty] md:mt-6 md:text-lg">
@@ -116,7 +116,7 @@ const AboutPage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="font-heading text-2xl font-bold uppercase tracking-tight text-foreground md:text-4xl"
+            className="font-heading text-2xl font-bold uppercase text-foreground md:text-4xl"
           >
             {t("about.valuesTitle")}
           </motion.h2>

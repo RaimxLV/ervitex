@@ -23,7 +23,7 @@ const NotFound = () => {
           transition={{ duration: 0.6 }}
           className="text-center px-6"
         >
-          <p className="font-heading text-[10px] font-bold uppercase tracking-[0.4em] text-accent mb-4">
+          <p className="mb-4 font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
             {lang === "lv" ? "Lapa nav atrasta" : "Page not found"}
           </p>
           <h1 className="font-heading text-8xl font-black text-primary-foreground/10 md:text-[12rem] leading-none select-none">

@@ -20,9 +20,10 @@ const fadeUp = {
 const iconTones = ["blue", "cyan", "emerald", "slate"] as const;
 
 const SectionKicker = ({ children }: { children: string }) => (
-  <span className="font-heading text-sm font-bold uppercase tracking-normal text-value-blue">
-    {children}
-  </span>
+  <div className="flex items-center gap-3">
+    <span className="h-px w-8 bg-accent" aria-hidden />
+    <span className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">{children}</span>
+  </div>
 );
 
 const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
@@ -30,7 +31,7 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
     <div className="container">
       <motion.div {...fadeUp} transition={{ duration: 0.5 }} className="max-w-3xl">
         <SectionKicker>{extra.tagline ? extra.tagline[isLv ? "lv" : "en"] : isLv ? "Papildu iespēja" : "Extra option"}</SectionKicker>
-        <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-normal text-foreground md:text-4xl">
+        <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:text-4xl">
           {extra.title[isLv ? "lv" : "en"]}
         </h2>
         {extra.paragraphs.map((p) => (
@@ -213,7 +214,7 @@ const TechnologyPage = () => {
         <div className="container">
           <motion.div {...fadeUp} transition={{ duration: 0.5 }} className="max-w-2xl">
             <SectionKicker>{isLv ? "Priekšrocības" : "Benefits"}</SectionKicker>
-            <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-normal text-foreground md:text-4xl">
+            <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:text-4xl">
               {tech.benefitsTitle[lang]}
             </h2>
           </motion.div>
@@ -243,7 +244,7 @@ const TechnologyPage = () => {
             <div className="mt-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
               <div>
                 <SectionKicker>{isLv ? "Process" : "Process"}</SectionKicker>
-                <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-normal text-foreground md:text-3xl">
+                <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:text-3xl">
                   {tech.processTitle?.[lang]}
                 </h2>
               </div>
@@ -281,7 +282,7 @@ const TechnologyPage = () => {
             <div className="mt-16">
               <motion.div {...fadeUp} transition={{ duration: 0.5 }} className="max-w-2xl">
                 <SectionKicker>{isLv ? "Materiāli" : "Materials"}</SectionKicker>
-                <h2 className="mt-3 font-heading text-2xl font-bold uppercase tracking-normal text-foreground md:text-3xl">
+                <h2 className="mt-3 font-heading text-2xl font-bold uppercase text-foreground md:text-3xl">
                   {tech.filmsTitle?.[lang]}
                 </h2>
               </motion.div>

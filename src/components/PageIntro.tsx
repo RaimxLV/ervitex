@@ -40,16 +40,16 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
                 initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45 }}
-                className="mb-4 flex items-center gap-2.5 md:mb-6"
+                className="mb-4 flex items-center gap-3 md:mb-6"
               >
-                <span className="h-[3px] w-4 shrink-0 bg-accent" aria-hidden />
-                <span className="inline-flex max-w-[calc(100vw-6rem)] border border-primary-foreground/20 px-3 py-1.5 font-heading text-[10px] font-bold uppercase leading-tight text-primary-foreground/55">
+                <span className="h-px w-8 shrink-0 bg-accent" aria-hidden />
+                <span className="inline-flex max-w-[calc(100vw-6rem)] font-heading text-xs font-bold uppercase leading-tight tracking-[0.2em] text-accent">
                   {eyebrow}
                 </span>
               </motion.div>
             )}
 
-            <h1 className="flex flex-wrap gap-x-[0.24em] overflow-hidden font-heading text-[1.75rem] font-bold uppercase leading-[0.98] md:text-5xl md:leading-[0.94]">
+            <h1 className="flex flex-wrap gap-x-[0.24em] overflow-hidden font-heading text-[1.75rem] font-bold uppercase leading-none md:text-5xl">
               {words.map((word, wordIndex) => (
                 <span key={`${word}-${wordIndex}`} className="overflow-hidden pb-1">
                   <motion.span

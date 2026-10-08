@@ -46,8 +46,8 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mb-4 flex items-center gap-3 sm:mb-6"
           >
-            <div className="h-px w-10 bg-accent" />
-            <span className="font-heading text-[10px] font-bold uppercase text-accent tracking-wide">
+            <div className="h-px w-8 bg-accent" />
+            <span className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
               {lang === "lv" ? "Kopš 2003. gada" : "Since 2003"}
             </span>
           </motion.div>

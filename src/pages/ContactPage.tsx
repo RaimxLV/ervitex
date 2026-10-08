@@ -123,7 +123,7 @@ const ContactPage = () => {
               return (
                 <div key={group.label.lv}>
                   <div className="mb-5 flex items-center gap-4 md:mb-7">
-                    <h3 className="whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">{group.label[lang]}</h3>
+                    <h3 className="whitespace-nowrap font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">{group.label[lang]}</h3>
                     <div aria-hidden="true" className="h-px w-full bg-border" />
                   </div>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
