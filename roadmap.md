@@ -1,5 +1,9 @@
 # Roadmap
 
+## Meklētāja pārklājums un Stanley/Stella prioritāte — 08.10.2026
+- [x] Noņemta melnā josla; meklētāja logs atveras pāri lapas saturam, nepārbīdot lapu.
+- [x] Pārlūkā “16” piedāvā vairākas Stanley/Stella preces vispirms, “169” pirmais STTU169, ielādējas visas 8 bildes, “STTU169” atstāj vienu un atver Creator 2.0. Septiņi testi sekmīgi, lapas kļūdu nav.
+
 ## Pilns publiskās lapas stila audits — 08.10.2026
 - [x] Pārbaudītas visas publiskās lapas datorā un telefonā; zilais tekstos noņemts, mazie sadaļu virsraksti vienādoti sarkani ar līniju, sakārtots virsrakstu burtu ritms un akcenti. Nav horizontālu pārplūžu; “Par mums” ielāde pārbaudīta atsevišķi.
 

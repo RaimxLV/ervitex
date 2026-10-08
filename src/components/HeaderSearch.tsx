@@ -74,9 +74,10 @@ interface Props {
   onEmptyBlur?: () => void;
   /** Mobiļajā izvēlnē: rezultāti atveras plūsmā zem ievades, nevis pāri izvēlnei. */
   inline?: boolean;
+  onOutside?: () => void;
 }
 
-export default function HeaderSearch({ onDone, autoFocus, className, inputClassName, onEmptyBlur, inline }: Props) {
+export default function HeaderSearch({ onDone, autoFocus, className, inputClassName, onEmptyBlur, inline, onOutside }: Props) {
   const { lang } = useLanguage();
   const navigate = useNavigate();
   const [value, setValue] = useState("");
@@ -92,7 +93,10 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
   useEffect(() => {
     if (autoFocus) ensureLoaded();
     const onDown = (e: MouseEvent) => {
-      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false);
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
+        setOpen(false);
+        onOutside?.();
+      }
     };
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
@@ -107,7 +111,7 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
     const scored: { r: Row; s: number }[] = [];
     for (const r of rows) {
       const s = searchScore(r, pq);
-      if (s > 0) scored.push({ r, s: s + (r.source === "ss" ? 1 : 0) });
+      if (s > 0) scored.push({ r, s });
     }
     scored.sort((a, b) => b.s - a.s);
     return scored.slice(0, 8).map((x) => x.r);
@@ -141,7 +145,7 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
           else goAll();
         }}
       >
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary-foreground/40" strokeWidth={1.5} />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-accent" strokeWidth={1.5} />
         <Input
           value={value}
           autoFocus={autoFocus}
@@ -166,6 +170,7 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
               setActive((a) => Math.max(a - 1, -1));
             } else if (e.key === "Escape") {
               setOpen(false);
+              onDone?.();
             }
           }}
           placeholder={lang === "lv" ? "Meklēt: vestes, bikses, kods…" : "Search: vests, pants, code…"}
@@ -177,7 +182,7 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
       {open && value.trim() && (
         <div
           className={`overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-xl ${
-            inline ? "mt-2" : "absolute left-0 right-0 top-full z-50 mt-1 min-w-[20rem]"
+            inline ? "mt-2" : "absolute left-0 right-0 top-full z-50 mt-1"
           }`}
         >
           {!rows.length ? (
