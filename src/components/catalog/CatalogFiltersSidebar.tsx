@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { keywordMatch } from "@/lib/catalogSearch";
 
 export interface FilterItem {
   label: string;
@@ -109,7 +110,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
           const search = searchByKey[section.key] || "";
           const filtered = search
             ? section.items.filter((i) =>
-                i.label.toLowerCase().includes(search.toLowerCase())
+                keywordMatch(`${i.label} ${i.value || ""}`, search)
               )
             : section.items;
           const showSearch = section.items.length > 8;

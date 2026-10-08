@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { exactCodeHits, prepareQuery, searchScore } from "./catalogSearch";
+import { keywordMatch, exactCodeHits, prepareQuery, searchScore } from "./catalogSearch";
 it("digits", () => {
   const q = prepareQuery("169");
   const a = searchScore({ id: "STTU169", name: "Creator" }, q);
@@ -30,4 +30,9 @@ it("full letter code narrows to that product", () => {
 it("an exact other-brand code still excludes Stella products", () => {
   const item = { id: "GI5000", brand: "Gildan" };
   expect([...exactCodeHits([item, { id: "STTU169", source: "ss" }], prepareQuery("GI5000")) ?? []]).toEqual([item]);
+});
+it("filter keywords: priekšauts finds Aprons, T-krekls finds T-shirts", () => {
+  expect(keywordMatch("Aprons", "Priekšauts")).toBe(true);
+  expect(keywordMatch("T-shirts", "T-krekls")).toBe(true);
+  expect(keywordMatch("Aprons", "T-krekls")).toBe(false);
 });
