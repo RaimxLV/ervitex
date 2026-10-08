@@ -43,7 +43,6 @@
     --mosaic-red: 0 85.03937% 50.980392%;
     --mosaic-white: 0 0% 100%;
     --mosaic-graphite: 0 0% 16%;
-    --mosaic-burgundy: 350 70% 28%;
 
     --value-blue: 215 72% 42%;
     --value-blue-soft: 214 70% 96%;
@@ -190,7 +189,6 @@
   .mosaic-red { background: hsl(var(--mosaic-red)); }
   .mosaic-white { background: hsl(var(--mosaic-white)); }
   .mosaic-graphite { background: hsl(var(--mosaic-graphite)); }
-  .mosaic-burgundy { background: hsl(var(--mosaic-burgundy)); }
   @media (max-width: 1023px) {
     .mosaic-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 160px; }
   }
