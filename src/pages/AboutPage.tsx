@@ -26,7 +26,7 @@ const AboutPage = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            className="font-heading text-[2rem] font-bold leading-tight text-foreground [text-wrap:balance] md:text-6xl"
+            <h2 className="font-heading text-[2rem] font-bold leading-tight text-foreground [text-wrap:balance] md:text-6xl">
               {t("about.storyHeadline")}
             </h2>
             <p className="mt-4 max-w-3xl text-base leading-relaxed text-foreground/70 [text-wrap:pretty] md:mt-6 md:text-lg">
