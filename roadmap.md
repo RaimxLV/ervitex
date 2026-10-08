@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Tehnoloģiju lapas lietojuma sadaļas dizains — 08.10.2026
-- [ ] Saglabāt esošo “Piemērota izvēle” teksta izkārtojumu un piedāvāt pelēka, ierobežota fona variantus melnā pilna platuma bloka vietā; pēc izvēles ieviest visās tehnoloģiju lapās.
+- [x] Saglabāts esošais “Piemērota izvēle” teksta izkārtojums un visās tehnoloģiju lapās melnais pilna platuma bloks aizvietots ar izvēlēto izteiktāko, centrēto gaiši pelēko paneli.
 
 ## Zemākā sākuma cena — 08.10.2026
 - [x] Kartītēs sākumā rādīt zemāko cenu un atbilstošo krāsu; preces skatā izvēlēties zemākās cenas izmēru, saglabājot apzinātu izvēli; arī saistīto preču kartītēs.
