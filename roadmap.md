@@ -1,5 +1,9 @@
 # Roadmap
 
+## Meklētāja pārklājums un Stanley/Stella prioritāte — 08.10.2026
+- [ ] Noņemt melno joslu ap meklētāju; atvērt meklētāja logu pāri lapas saturam.
+- [ ] “169” rezultātos vispirms STTU169, Stanley/Stella prioritāte; pārbaudīt īstos rezultātus, bildes un pilnā koda sašaurināšanu pārlūkā un testos.
+
 ## Pilns publiskās lapas stila audits — 08.10.2026
 - [x] Pārbaudītas visas publiskās lapas datorā un telefonā; zilais tekstos noņemts, mazie sadaļu virsraksti vienādoti sarkani ar līniju, sakārtots virsrakstu burtu ritms un akcenti. Nav horizontālu pārplūžu; “Par mums” ielāde pārbaudīta atsevišķi.
 
