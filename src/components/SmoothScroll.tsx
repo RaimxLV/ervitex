@@ -3,27 +3,24 @@ import { useLocation } from "react-router-dom";
 import Lenis from "lenis";
 
 /**
- * Light wheel smoothing for the story-driven marketing pages only. Pages with
- * long data lists (catalog, admin, worksheet) and coarse-pointer devices keep
+ * Wheel smoothing for public pages. Admin, worksheet and login pages
+ * and coarse-pointer devices keep
  * native scrolling so they stay responsive.
  */
-const SMOOTH_ROUTES = ["/", "/about", "/tehnologijas"];
+const NATIVE_ROUTES = ["/admin", "/saraksts", "/login"];
 
 const SmoothScroll = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const enabled = SMOOTH_ROUTES.some((route) =>
-      route === "/" ? pathname === route : pathname.startsWith(route),
-    );
-    if (!enabled) return;
+    if (NATIVE_ROUTES.some((route) => pathname.startsWith(route))) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
     if (reduce || coarsePointer) return;
 
     const lenis = new Lenis({
-      duration: 0.72,
-      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+      duration: 1.1,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
       syncTouch: false,
       wheelMultiplier: 1,
