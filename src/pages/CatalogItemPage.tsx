@@ -8,6 +8,7 @@ import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { colorCodeCandidates } from "@/lib/colorCodeMatch";
+import { lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 
@@ -92,12 +93,13 @@ const CatalogItemPage = () => {
           for (const row of priceRows) {
             const value = Number(row.retail_price);
             if (!Number.isFinite(value) || value <= 0) continue;
-            const key = `${row.source}:${row.style_code}:${(row.color_code || "").trim().toLowerCase()}`;
-            const current = map.get(key);
-            map.set(key, {
-              price: current ? Math.min(current.price, value) : value,
-              max: current ? Math.max(current.max, value) : value,
-            });
+            for (const key of [`${row.source}:${row.style_code}`, `${row.source}:${row.style_code}:${(row.color_code || "").trim().toLowerCase()}`]) {
+              const current = map.get(key);
+              map.set(key, {
+                price: current ? Math.min(current.price, value) : value,
+                max: current ? Math.max(current.max, value) : value,
+              });
+            }
           }
           setPrices(map);
         }
@@ -167,16 +169,17 @@ const CatalogItemPage = () => {
                   hex: c.h ?? null,
                   name: c.n || "",
                 }));
-                const initialColor = r.source === "pf"
-                  ? cols[0]?.n || null
-                  : cols[0]?.c || cols[0]?.n || null;
-                let p: PriceInfo | undefined;
-                if (initialColor) {
-                  for (const k of colorCodeCandidates(initialColor)) {
+                const colorCode = (c: ColorEntry) => r.source === "pf" ? c.n : c.c || c.n;
+                const cheapest = lowestPriceColorIndex(cols, (c) => {
+                  for (const k of colorCodeCandidates(colorCode(c))) {
                     const hit = prices.get(`${r.source}:${r.id}:${k}`);
-                    if (hit) { p = hit; break; }
+                    if (hit) return hit.price;
                   }
-                }
+                  return undefined;
+                });
+                const initialColor = cheapest >= 0 ? colorCode(cols[cheapest]) : null;
+                const p = prices.get(`${r.source}:${r.id}`);
+                const rawImage = (cheapest >= 0 ? cols[cheapest]?.u : null) || r.image_url;
                 return (
                   <CatalogModelCard
                     key={`${r.source}-${r.id}`}
@@ -184,9 +187,9 @@ const CatalogItemPage = () => {
                       const colorQuery = initialColor ? `?color=${encodeURIComponent(initialColor)}` : "";
                       navigate(`/catalog/item/${r.source}/${encodeURIComponent(r.id)}${colorQuery}`);
                     }}
-                    image={thumbUrl(r.image_url)}
-                    fallbackImage={r.image_url}
-                    hoverImage={thumbUrl(r.hover_image_url)}
+                    image={thumbUrl(rawImage)}
+                    fallbackImage={rawImage}
+                    hoverImage={cheapest >= 0 ? null : thumbUrl(r.hover_image_url)}
                     imageAlt={r.name || r.id}
                     code={r.id}
                     brandBadge={r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}

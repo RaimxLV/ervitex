@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { colorCodeMatches } from "@/lib/colorCodeMatch";
+import { lowestPriceVariant } from "@/lib/catalogPriceSelection";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
@@ -1113,10 +1114,6 @@ const CatalogItemDialog = ({
           (wn ? d.colors.find((c) => canonName(c.name).includes(wn) || wn.includes(canonName(c.name))) : undefined);
         if (hit) picked = hit.code;
       }
-      pendingSizeRef.current = initialSize?.trim() || null;
-      setActiveColor(picked);
-      setLoading(false);
-
       // Per-variant prices (colour/size aware, excl. VAT, markup already applied)
       const rows: any[] = [];
       let from = 0;
@@ -1132,7 +1129,13 @@ const CatalogItemDialog = ({
         if (data.length < 1000) break;
         from += 1000;
       }
-      if (!cancelled) setVariantPrices(rows);
+      if (cancelled) return;
+      const selection = lowestPriceVariant(rows, d?.colors || [], d?.sizeAliases || {}, wanted ? picked : null, initialSize);
+      pendingSizeRef.current = selection.size;
+      setSelectedSize(selection.size);
+      setActiveColor(selection.color || picked);
+      setVariantPrices(rows);
+      setLoading(false);
 
 
     })();
