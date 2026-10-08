@@ -157,6 +157,11 @@ const ContactPage = () => {
                               <a href={`tel:${member.phone.replace(/\s/g, "")}`} className="flex items-center gap-2.5 text-sm text-foreground/80 transition-colors hover:text-accent">
                                 <AccentIcon icon={Phone} inline className="h-4 w-4" />{member.phone}
                               </a>
+                              {"phone2" in member && member.phone2 && (
+                                <a href={`tel:${member.phone2.replace(/\s/g, "")}`} className="flex items-center gap-2.5 text-sm text-foreground/80 transition-colors hover:text-accent">
+                                  <AccentIcon icon={Phone} inline className="h-4 w-4" />{member.phone2}
+                                </a>
+                              )}
                             </div>
                           </div>
                         </article>
