@@ -12,7 +12,7 @@ import { thumbUrl } from "@/lib/imageProxy";
 import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
-import { prepareQuery, searchScore } from "@/lib/catalogSearch";
+import { exactCodeHits, prepareQuery, searchScore } from "@/lib/catalogSearch";
 
 const SCROLL_KEY = "catalog-scroll";
 
@@ -631,6 +631,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   }, [filterSig]);
 
   const pq = useMemo(() => prepareQuery(q), [q]);
+  const exactHits = useMemo(() => exactCodeHits(items, pq), [items, pq]);
 
   const toggle = (set: Set<string>, setter: (s: Set<string>) => void) => (v: string) => {
     const next = new Set(set);
@@ -666,7 +667,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   );
 
   const passesExcept = (it: EnrichedItem, except: string) => {
-    if (pq && searchScore(it, pq) === 0) return false;
+    if (exactHits ? !exactHits.has(it) : pq && searchScore(it, pq) === 0) return false;
     if (stockOnly && !hasAnyStock(stockFlags, it.source, it.id)) return false;
     if (except !== "source" && sources.size && !sources.has(it.manufacturer)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
@@ -909,7 +910,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     return cmp ? [...base].sort(cmp) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, pq, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags, sort, priceOf, priceRanges, lang]);
+  }, [items, pq, exactHits, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags, sort, priceOf, priceRanges, lang]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Number.isFinite(page) ? Math.min(Math.max(page, 1), totalPages) : 1;
@@ -1366,7 +1367,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
     const m = raw.match(/^([A-Z]+\d+)C(\d{3,4})/i);
     return m ? `${m[1]}-C${m[2]}` : raw;
   };
-  const displayCode = formatCode(active?.c || item.id);
+  // UTT krāsas `c` ir krāsas nosaukums, nevis kods — rādām modeļa kodu.
+  const displayCode = formatCode(item.source === "utt" ? item.id : active?.c || item.id);
 
   // PF's catalog colour `c` is an item/article number, while variant prices
   // and the detail loader use the supplier colour code/name (BLACK, NAVY...).

@@ -142,3 +142,11 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
   }
   return score;
 };
+
+/** Ja vaicājums precīzi sakrīt ar preces kodu, atgriež tikai tās preces; citādi null. */
+export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuery | null): Set<T> | null => {
+  if (!pq || pq.compact.length < 3) return null;
+  const hits = new Set<T>();
+  for (const it of items) if (prepare(it).id.replace(/ /g, "") === pq.compact) hits.add(it);
+  return hits.size ? hits : null;
+};
