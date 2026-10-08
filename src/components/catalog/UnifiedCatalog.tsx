@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/co
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { colorCodeCandidates } from "@/lib/colorCodeMatch";
+import { lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { exactCodeHits, prepareQuery, searchScore } from "@/lib/catalogSearch";
@@ -936,8 +937,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     [filtered, safePage]
   );
 
-  // A card represents its initially shown colour, not the cheapest colour in
-  // the whole model. Load only the current page's prices to keep this fast.
+  // Find the cheapest colour using only the current page's variant prices.
   useEffect(() => {
     if (!paginated.length) {
       setVisibleVariantPrices(new Map());
@@ -1340,7 +1340,16 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   if (selectedBuckets.size > 0) {
     filterMatchIdx = item.colors.findIndex((c) => c.bucket && selectedBuckets.has(c.bucket));
   }
-  const effectiveIdx = activeIdx ?? (filterMatchIdx >= 0 ? filterMatchIdx : (item.colors.length ? 0 : null));
+  const colorPrice = (c: EnrichedColor) => {
+    const code = item.source === "pf" ? c.n : c.c || c.n;
+    for (const k of colorCodeCandidates(code)) {
+      const hit = variantPrices.get(`${item.source}:${item.id}:${k}`);
+      if (hit) return hit;
+    }
+    return undefined;
+  };
+  const cheapestIdx = lowestPriceColorIndex(item.colors, (c) => colorPrice(c)?.price);
+  const effectiveIdx = activeIdx ?? (filterMatchIdx >= 0 ? filterMatchIdx : cheapestIdx >= 0 ? cheapestIdx : (item.colors.length ? 0 : null));
   const active = effectiveIdx !== null ? item.colors[effectiveIdx] : null;
 
   const displayTitle = item.name || item.id;
@@ -1353,7 +1362,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
     .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c.h, c.bucket, c.n) }))
     .filter((c) => !!c.hex);
   const swatches = withHex.slice(0, 8).map((c) => ({
-    hex: c.hex!,
+    hex: c.hex,
     name: c.n || "",
     active: effectiveIdx !== null && c.idx === effectiveIdx,
     onSelect: () => setActiveIdx(c.idx === activeIdx ? null : c.idx),
@@ -1375,20 +1384,17 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const selectedColor = active ? (item.source === "pf" ? active.n : active.c || active.n) : null;
   // Cenu tabulas krāsu kodi ir īsāki nekā kataloga kodi (SS SKU, NWG prefikss,
   // MF ietvertais kods) — meklējam visus iespējamos atslēgu variantus.
-  let effectivePrice = priceInfo;
-  if (selectedColor) {
-    for (const k of colorCodeCandidates(selectedColor)) {
-      const hit = variantPrices.get(`${item.source}:${item.id}:${k}`);
-      if (hit) { effectivePrice = hit; break; }
-    }
-  }
-  const colorQuery = selectedColor ? `?color=${encodeURIComponent(selectedColor)}` : "";
+  const explicitColor = activeIdx !== null || filterMatchIdx >= 0;
+  const effectivePrice = explicitColor && active ? colorPrice(active) || priceInfo : priceInfo;
+  // Until colour prices arrive, let the detail resolve the cheapest variant.
+  const navigationColor = explicitColor || cheapestIdx >= 0 ? selectedColor : null;
+  const colorQuery = navigationColor ? `?color=${encodeURIComponent(navigationColor)}` : "";
 
   return (
     <CatalogModelCard
       as="a"
       href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/catalog/item/${item.source}/${encodeURIComponent(item.id)}${colorQuery}`}
-      onClick={() => onNavigate(selectedColor)}
+      onClick={() => onNavigate(navigationColor)}
       image={img}
       fallbackImage={rawImg}
       priority={priority}
