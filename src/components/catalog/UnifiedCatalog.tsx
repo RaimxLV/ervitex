@@ -1366,7 +1366,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
     const m = raw.match(/^([A-Z]+\d+)C(\d{3,4})/i);
     return m ? `${m[1]}-C${m[2]}` : raw;
   };
-  const displayCode = formatCode(active?.c || item.id);
+  // UTT krāsas `c` ir krāsas nosaukums, nevis kods — rādām modeļa kodu.
+  const displayCode = formatCode(item.source === "utt" ? item.id : active?.c || item.id);
 
   // PF's catalog colour `c` is an item/article number, while variant prices
   // and the detail loader use the supplier colour code/name (BLACK, NAVY...).
