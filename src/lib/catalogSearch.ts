@@ -116,6 +116,13 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
   const idCompact = p.id.replace(/ /g, "");
   if (idCompact === pq.compact) score += 2000;
   else if (idCompact.startsWith(pq.compact) && pq.compact.length >= 3) score += 800;
+  else if (/^\d{2,}$/.test(pq.compact)) {
+    // Tikai cipari: "169" → STTU169 (precīza ciparu grupa augstāk par daļēju)
+    const groups: string[] = idCompact.match(/\d+/g) ?? [];
+    if (groups.includes(pq.compact)) score += 1500;
+    else if (groups.some((g) => g.startsWith(pq.compact))) score += 700;
+    else if (idCompact.includes(pq.compact)) score += 400;
+  }
 
   if (p.name === pq.raw) score += 1000;
   else if (p.name.startsWith(pq.raw)) score += 500;
