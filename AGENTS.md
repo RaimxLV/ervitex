@@ -1,5 +1,7 @@
 # Architecture rules
 
+- All search entry points share searchScore and exactCodeHits so brand priority and exact-code narrowing stay consistent.
+
 - Public informational icons use shared AccentIcon framed/inline variants and semantic tone options; print-specific Lucide-compatible symbols live in print-icons, keeping stroke weight and sizes consistent.
 - Public section eyebrows use one red line-label style; blue/cyan/green/slate remain icon-only, and technology use cases sit in a light centered panel for visual continuity.
 

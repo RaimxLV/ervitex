@@ -65,6 +65,7 @@ const expand = (token: string): string[] => {
 
 interface Searchable {
   id: string;
+  source?: string;
   name?: string | null;
   brand?: string | null;
   category?: string | null;
@@ -148,7 +149,8 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
     if (!best) return 0;
     score += best;
   }
-  return score;
+  const isStella = it.source === "ss" || normalizeSearch(it.brand).replace(/ /g, "") === "stanleystella";
+  return score > 0 && isStella ? score + 3000 : score;
 };
 
 /** Ja vaicājums precīzi sakrīt ar preces kodu, atgriež tikai tās preces; citādi null. */

@@ -907,7 +907,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       // Meklējot — atbilstošākās preces vienmēr pirmās.
       const scores = new Map<EnrichedItem, number>();
       for (const it of base) scores.set(it, searchScore(it, pq));
-      return [...base].sort((a, b) => (scores.get(b)! - scores.get(a)!) || (cmp ? cmp(a, b) : 0));
+      return [...base].sort((a, b) => ((scores.get(b) ?? 0) - (scores.get(a) ?? 0)) || (cmp ? cmp(a, b) : 0));
     }
     return cmp ? [...base].sort(cmp) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
