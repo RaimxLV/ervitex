@@ -7,6 +7,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import { bucketOf, getBucket, type ColorBucketKey } from "@/lib/colorBuckets";
+import { colorCodeCandidates } from "@/lib/colorCodeMatch";
+import { lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
 
@@ -90,12 +92,12 @@ const pickRandom = <T,>(arr: T[], n: number): T[] => {
 
 const RelatedCard = ({
   row,
-  price,
+  prices,
   isLv,
   onNavigate,
 }: {
   row: Row;
-  price?: PriceInfo;
+  prices: Map<string, PriceInfo>;
   isLv: boolean;
   onNavigate: (color: string | null) => void;
 }) => {
@@ -109,20 +111,30 @@ const RelatedCard = ({
     [row.colors]
   );
 
+  const colorCode = (c: ColorEntry) => row.source === "pf" ? c.n : c.c || c.n;
+  const colorPrice = (c: ColorEntry) => {
+    for (const k of colorCodeCandidates(colorCode(c))) {
+      const hit = prices.get(`${row.source}:${row.id}:${k}`);
+      if (hit) return hit;
+    }
+    return undefined;
+  };
+  const cheapest = lowestPriceColorIndex(colors, (c) => colorPrice(c)?.price);
   const active = activeIdx !== null ? colors.find((c) => c.idx === activeIdx) ?? null : null;
-  const displayed = active || colors[0] || null;
-  const rawImg = active?.u || row.image_url;
+  const displayed = active || (cheapest >= 0 ? colors[cheapest] : colors[0]) || null;
+  const rawImg = displayed?.u || row.image_url;
+  const price = active ? colorPrice(active) : prices.get(`${row.source}:${row.id}`);
 
   const swatches = colors.slice(0, 8).map((c) => ({
-    hex: c.hex!,
+    hex: c.hex,
     name: c.n || "",
-    active: activeIdx === c.idx,
+    active: displayed?.idx === c.idx,
     onSelect: () => setActiveIdx(activeIdx === c.idx ? null : c.idx),
   }));
 
   return (
     <CatalogModelCard
-      onClick={() => onNavigate(displayed ? (row.source === "pf" ? displayed.n : displayed.c || displayed.n) : null)}
+      onClick={() => onNavigate(displayed && (active || cheapest >= 0) ? colorCode(displayed) : null)}
       image={thumbUrl(rawImg)}
       fallbackImage={rawImg}
       hoverImage={active ? null : thumbUrl(row.hover_image_url)}
@@ -238,12 +250,13 @@ const TechRelatedProducts = ({ techId }: { techId: string }) => {
         for (const row of priceRows) {
           const value = Number(row.retail_price);
           if (!Number.isFinite(value) || value <= 0) continue;
-          const key = `${row.source}:${row.style_code}:${(row.color_code || "").trim().toLowerCase()}`;
-          const current = map.get(key);
-          map.set(key, {
-            price: current ? Math.min(current.price, value) : value,
-            max: current ? Math.max(current.max, value) : value,
-          });
+          for (const key of [`${row.source}:${row.style_code}`, `${row.source}:${row.style_code}:${(row.color_code || "").trim().toLowerCase()}`]) {
+            const current = map.get(key);
+            map.set(key, {
+              price: current ? Math.min(current.price, value) : value,
+              max: current ? Math.max(current.max, value) : value,
+            });
+          }
         }
         setPrices(map);
       }
@@ -274,18 +287,11 @@ const TechRelatedProducts = ({ techId }: { techId: string }) => {
 
       <div className="mt-6 grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
         {items.map((r) => {
-          const firstColor = (r.colors || [])[0];
-          const initialColor = firstColor
-            ? (r.source === "pf" ? firstColor.n : firstColor.c || firstColor.n)
-            : null;
-          const price = initialColor
-            ? prices.get(`${r.source}:${r.id}:${initialColor.trim().toLowerCase()}`)
-            : undefined;
           return (
             <RelatedCard
               key={`${r.source}-${r.id}`}
               row={r}
-              price={price}
+              prices={prices}
               isLv={isLv}
               onNavigate={(color) => {
                 const colorQuery = color ? `?color=${encodeURIComponent(color)}` : "";
