@@ -36,7 +36,7 @@ const SYNONYMS: [string, string[]][] = [
   ["cimd", ["glove", "mitten"]],
   ["zek", ["sock"]],
   ["sall", ["scarf", "snood"]],
-  ["priekssaut", ["apron"]],
+  ["prieksaut", ["apron"]],
   ["lietussarg", ["umbrella"]],
   ["kruz", ["mug", "cup"]],
   ["pudel", ["bottle"]],
@@ -160,4 +160,14 @@ export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuer
   const hits = new Set<T>();
   for (const it of items) if (prepare(it).id.replace(/ /g, "") === pq.compact) hits.add(it);
   return hits.size ? hits : null;
+};
+
+/** Filtru meklēšana: LV/EN atslēgvārdi ("priekšauts" → Aprons, "T-krekls" → T-shirts). */
+export const keywordMatch = (text: string, query: string): boolean => {
+  const pq = prepareQuery(query);
+  if (!pq) return true;
+  const hay = ` ${normalizeSearch(text)} ${normalizeSearch(text).replace(/ /g, "")}`;
+  return pq.tokens.every(({ token, terms }) =>
+    hay.includes(token) || terms.some((t) => hay.includes(t)) || (token.length >= 5 && hay.includes(token.slice(0, -2))),
+  );
 };
