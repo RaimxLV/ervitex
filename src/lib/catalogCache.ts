@@ -13,7 +13,7 @@ const STORE = "scopes";
 const DB_VERSION = 1;
 
 /** Bump when the cached row shape changes so old entries are ignored. */
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3;
 
 /** Cached data older than this is refreshed before being trusted for display. */
 export const CATALOG_CACHE_TTL_MS = 12 * 60 * 60 * 1000;

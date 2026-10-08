@@ -25,7 +25,7 @@ const loadRows = (): Promise<Row[]> => {
     let items: Row[] = [];
     let prices: any[] = [];
     const cached = await readCatalogCache("all");
-    if (cached) {
+    if (cached && !cached.stale) {
       items = cached.entry.items as Row[];
       prices = cached.entry.prices as any[];
     } else {
