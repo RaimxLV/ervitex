@@ -114,9 +114,10 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
   let score = 0;
 
   const idCompact = p.id.replace(/ /g, "");
-  if (idCompact === pq.compact) score += 2000;
+  const digitsOnly = /^\d{2,}$/.test(pq.compact);
+  if (idCompact === pq.compact) score += digitsOnly ? 1500 : 2000;
   else if (idCompact.startsWith(pq.compact) && pq.compact.length >= 3) score += 800;
-  else if (/^\d{2,}$/.test(pq.compact)) {
+  else if (digitsOnly) {
     // Tikai cipari: "169" → STTU169 (precīza ciparu grupa augstāk par daļēju)
     const groups: string[] = idCompact.match(/\d+/g) ?? [];
     if (groups.includes(pq.compact)) score += 1500;
@@ -152,7 +153,8 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
 
 /** Ja vaicājums precīzi sakrīt ar preces kodu, atgriež tikai tās preces; citādi null. */
 export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuery | null): Set<T> | null => {
-  if (!pq || pq.compact.length < 3) return null;
+  // Tikai cipari ("169") var būt vairāku ražotāju kodos — rāda visus līdzīgos.
+  if (!pq || pq.compact.length < 3 || /^\d+$/.test(pq.compact)) return null;
   const hits = new Set<T>();
   for (const it of items) if (prepare(it).id.replace(/ /g, "") === pq.compact) hits.add(it);
   return hits.size ? hits : null;

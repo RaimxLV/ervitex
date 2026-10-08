@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { readCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { exactCodeHits, prepareQuery, searchScore } from "@/lib/catalogSearch";
+import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 interface Row {
@@ -15,6 +16,7 @@ interface Row {
   brand: string | null;
   category: string | null;
   group_name: string | null;
+  image_url?: string | null;
 }
 
 let loadPromise: Promise<Row[]> | null = null;
@@ -43,7 +45,7 @@ const loadRows = (): Promise<Row[]> => {
         return rows;
       };
       [items, prices] = await Promise.all([
-        fetchAll("catalog_items", "source,id,name,brand,category,group_name", "id"),
+        fetchAll("catalog_items", "source,id,name,brand,category,group_name,image_url", "id"),
         fetchAll("catalog_price_ranges", "source,style_code,min_price", "style_code"),
       ]);
     }
@@ -101,14 +103,14 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
     const pq = prepareQuery(value);
     if (!pq || !rows.length) return [];
     const exact = exactCodeHits(rows, pq);
-    if (exact) return [...exact].slice(0, 7);
+    if (exact) return [...exact].slice(0, 8);
     const scored: { r: Row; s: number }[] = [];
     for (const r of rows) {
       const s = searchScore(r, pq);
       if (s > 0) scored.push({ r, s: s + (r.source === "ss" ? 1 : 0) });
     }
     scored.sort((a, b) => b.s - a.s);
-    return scored.slice(0, 7).map((x) => x.r);
+    return scored.slice(0, 8).map((x) => x.r);
   }, [value, rows]);
 
   const finish = () => {
@@ -192,13 +194,20 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
                       finish();
                     }}
                     onMouseEnter={() => setActive(i)}
-                    className={`flex w-full items-baseline justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
+                    className={`flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors ${
                       i === active ? "bg-muted" : "hover:bg-muted"
                     }`}
                   >
-                    <span className="min-w-0 truncate font-medium">{r.name}</span>
-                    <span className="shrink-0 text-xs text-muted-foreground">
-                      {r.brand ? `${r.brand} · ` : ""}{r.id}
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-muted">
+                      {r.image_url && (
+                        <img src={thumbUrl(r.image_url, 120) || r.image_url} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium">{r.name}</span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {r.brand ? `${r.brand} · ` : ""}{r.id}
+                      </span>
                     </span>
                   </Link>
                 </li>
