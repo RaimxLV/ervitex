@@ -51,6 +51,17 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
     navigate(step);
   }, [images.length, navigate]);
 
+  // Auto-advance: pauses when off-screen, tab hidden, lightbox open, or reduced motion.
+  useEffect(() => {
+    if (reduced || !near || lightbox !== null || images.length <= 4) return;
+    const id = window.setInterval(() => {
+      if (document.hidden) return;
+      setDirection(1);
+      navigate(1);
+    }, 4500);
+    return () => window.clearInterval(id);
+  }, [reduced, near, lightbox, images.length, navigate]);
+
   const moveLightbox = useCallback((step: number) => {
     if (lightbox === null || images.length < 2) return;
     const next = (lightbox + step + images.length) % images.length;
