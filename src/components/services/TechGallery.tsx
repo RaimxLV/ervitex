@@ -51,6 +51,17 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
     navigate(step);
   }, [images.length, navigate]);
 
+  // Auto-advance: pauses when off-screen, tab hidden, lightbox open, or reduced motion.
+  useEffect(() => {
+    if (reduced || !near || lightbox !== null || images.length <= 4) return;
+    const id = window.setInterval(() => {
+      if (document.hidden) return;
+      setDirection(1);
+      navigate(1);
+    }, 4500);
+    return () => window.clearInterval(id);
+  }, [reduced, near, lightbox, images.length, navigate]);
+
   const moveLightbox = useCallback((step: number) => {
     if (lightbox === null || images.length < 2) return;
     const next = (lightbox + step + images.length) % images.length;
@@ -109,7 +120,7 @@ const TechGallery = ({ images, alt }: TechGalleryProps) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 1 }}
-                transition={{ duration: reduced ? 0 : 0.4, ease: "easeOut" }}
+                transition={{ duration: reduced ? 0 : 0.5, ease: "easeOut", delay: reduced ? 0 : slot * 0.14 }}
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035]"
               />
             </AnimatePresence>
