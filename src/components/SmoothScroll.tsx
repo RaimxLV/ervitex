@@ -3,8 +3,8 @@ import { useLocation } from "react-router-dom";
 import Lenis from "lenis";
 
 /**
- * Light wheel smoothing for the story-driven marketing pages only. Pages with
- * long data lists (catalog, admin, worksheet) and coarse-pointer devices keep
+ * Wheel smoothing for public pages. Admin, worksheet and login pages
+ * and coarse-pointer devices keep
  * native scrolling so they stay responsive.
  */
 const NATIVE_ROUTES = ["/admin", "/saraksts", "/login"];
