@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { money } from "@/lib/offer";
 import type { WorksheetItem } from "@/lib/worksheet";
 import { useVariants } from "./useVariants";
@@ -53,25 +54,28 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-5">
       {colors.length > 0 && (
         <div>
           <span className="mb-1.5 block text-[10px] uppercase tracking-wider text-muted-foreground">Krāsa</span>
           <div className="flex flex-wrap gap-1.5">
             {colors.map((c) => (
-              <button
+              <Button
                 key={c.c || c.n}
                 type="button"
                 title={c.n}
                 disabled={disabled}
+                variant="outline"
+                size="sm"
+                aria-pressed={(c.n || "") === (item.colorName || "")}
                 onClick={() => pickColor(c.c)}
-                className={`flex items-center gap-1.5 rounded-full border px-2 py-1 text-[11px] disabled:opacity-50 ${
-                  (c.n || "") === (item.colorName || "") ? "border-accent" : "border-border"
+                className={`h-auto min-h-9 max-w-full gap-2 whitespace-normal rounded-sm px-3 py-2 text-left text-xs disabled:opacity-50 ${
+                  (c.n || "") === (item.colorName || "") ? "border-accent bg-accent/10 text-foreground" : "border-border"
                 }`}
               >
-                <span className="h-3 w-3 rounded-full border border-border" style={{ background: c.h || "#ccc" }} />
+                <span className="h-3 w-3 shrink-0 rounded-full border border-border bg-muted" style={c.h ? { background: c.h } : undefined} />
                 {c.n}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -84,18 +88,21 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
             {sizes.map((s) => {
               const active = isCurrent(s);
               return (
-                <button
+                <Button
                   key={s.size}
                   type="button"
                   disabled={disabled}
+                  variant="outline"
+                  size="sm"
+                  aria-pressed={active}
                   onClick={() => pickSize(s.size)}
                   title={s.price ? money(s.price) : "cena pēc pieprasījuma"}
-                  className={`rounded-sm border px-2.5 py-1 text-[11px] font-semibold disabled:opacity-50 ${
-                    active ? "border-accent bg-accent/10" : "border-border"
+                  className={`h-9 min-w-10 rounded-sm px-3 text-xs font-semibold disabled:opacity-50 ${
+                    active ? "border-accent bg-accent/10 text-foreground" : "border-border"
                   }`}
                 >
                   {s.size}
-                </button>
+                </Button>
               );
             })}
           </div>
