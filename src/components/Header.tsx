@@ -167,14 +167,14 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-primary/95 backdrop-blur-md text-primary-foreground">
       <div className="relative flex h-16 items-center justify-between gap-2 px-4 sm:px-6 md:h-20">
-        <Link to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
+        <Link to="/" className="flex shrink-0 items-center gap-2 sm:gap-3">
           <img src={ervitexLogo} alt="Ervitex" className="h-7 w-auto shrink-0 sm:h-8 md:h-10" />
           <span className="hidden h-5 w-px shrink-0 bg-primary-foreground/20 min-[370px]:block sm:h-6" />
-          <img src={stellaLogo} alt="Stanley/Stella Dealer" className="hidden h-4 w-auto shrink opacity-70 min-[370px]:block sm:h-5 md:h-6" />
+          <img src={stellaLogo} alt="Stanley/Stella Dealer" className="hidden h-4 w-auto shrink opacity-70 min-[370px]:block sm:h-5" />
         </Link>
 
         {/* Desktop nav */}
-        <nav className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-6 xl:flex">
+        <nav className="mx-auto hidden items-center gap-3.5 whitespace-nowrap px-2 xl:flex">
           {navItems.map((item) => {
             const isCatalog = item.path === "/catalog";
             const active = location.pathname === item.path;
@@ -190,7 +190,7 @@ const Header = () => {
                   <Link
                     to={item.path}
                     onFocus={openMega}
-                    className={`text-base font-medium uppercase transition-colors hover:text-accent ${
+                    className={`text-[0.9rem] font-medium uppercase transition-colors hover:text-accent ${
                       active ? "text-accent" : "text-primary-foreground/70"
                     }`}
                   >
@@ -218,7 +218,7 @@ const Header = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`text-base font-medium uppercase transition-colors hover:text-accent ${
+                className={`text-[0.9rem] font-medium uppercase transition-colors hover:text-accent ${
                   active ? "text-accent" : "text-primary-foreground/70"
                 }`}
               >
