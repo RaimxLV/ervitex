@@ -273,7 +273,6 @@ const WorksheetPage = () => {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
         <h1 className="font-heading text-2xl font-black uppercase">Saraksts nav atrasts</h1>
-        <p className="text-sm text-muted-foreground">Saite var būt nepilna vai novecojusi. Raksti mums uz birojs@ervitex.lv.</p>
         <Button asChild variant="outline"><Link to="/">Uz sākumlapu</Link></Button>
       </div>
     );
@@ -285,8 +284,8 @@ const WorksheetPage = () => {
   )}&body=${encodeURIComponent(`${window.location.href}\n\nKopā bez PVN ${totals.net.toFixed(2)} EUR\nKopā ar PVN ${totals.gross.toFixed(2)} EUR\n`)}`;
 
   return (
-    <div className="public-readable min-h-screen bg-muted/30 py-4 sm:py-8 print:bg-white print:py-0">
-      <div className="mx-auto max-w-5xl px-3 sm:px-4">
+    <div className="public-readable min-h-screen bg-muted/30 py-4 sm:py-8 print:bg-background print:py-0">
+      <div className="mx-auto max-w-6xl px-3 sm:px-6 print:max-w-none print:px-0">
         <div className="mb-3 flex items-center justify-between print:hidden">
           <Link to="/catalog" className="inline-flex items-center gap-1.5 font-heading text-[11px] uppercase tracking-widest text-muted-foreground hover:text-foreground">
             <Store className="h-3.5 w-3.5" /> Ervitex katalogs
@@ -296,15 +295,18 @@ const WorksheetPage = () => {
           </Button>
         </div>
 
-        <article className="rounded-md border border-border bg-card p-4 sm:p-7">
-          <header className="border-b border-border pb-5">
-            <img src={logo} alt="Ervitex" className="h-7 w-auto" />
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <article className="rounded-md border border-border bg-card p-4 sm:p-8 lg:p-10 print:border-0 print:p-0">
+          <header className="border-b border-border pb-7">
+            <img src={logo} alt="Ervitex" className="h-11 w-auto max-w-full sm:h-14" />
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <h1 className="font-heading text-xl font-black uppercase leading-tight sm:text-3xl">{isStaff ? "Preču saraksts" : "Jūsu preces"}</h1>
-                <p className="mt-1.5 break-words text-sm text-muted-foreground">
-                  {[sheet.company, sheet.name, sheet.email, sheet.phone].filter(Boolean).join(" · ")}
-                </p>
+                <div className="mt-4 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+                  {sheet.company && <div><span className="block text-xs text-muted-foreground">Uzņēmums</span><span className="break-words font-medium">{sheet.company}</span></div>}
+                  {sheet.name && <div><span className="block text-xs text-muted-foreground">Kontaktpersona</span><span className="break-words font-medium">{sheet.name}</span></div>}
+                  {sheet.email && <div><span className="block text-xs text-muted-foreground">E-pasts</span><a href={`mailto:${sheet.email}`} className="break-all hover:underline">{sheet.email}</a></div>}
+                  {sheet.phone && <div><span className="block text-xs text-muted-foreground">Tālrunis</span><a href={`tel:${sheet.phone}`} className="hover:underline">{sheet.phone}</a></div>}
+                </div>
               </div>
             </div>
             {sheet.assigned_pm_name && (
@@ -331,17 +333,15 @@ const WorksheetPage = () => {
 
           </header>
 
-          <div className="mt-5 space-y-2">
-            {!readOnly && (
-              <div className="flex items-center justify-between gap-2 print:hidden">
-                <span className="font-heading text-[11px] font-black uppercase tracking-widest text-muted-foreground">
+          <div className="mt-7 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="section-kicker font-heading text-xs font-bold uppercase text-accent">
                   Preces ({items.length})
                 </span>
-                <Button size="sm" variant="outline" onClick={() => goCatalog("add")}>
+                {!readOnly && <Button size="sm" variant="outline" className="print:hidden" onClick={() => goCatalog("add")}>
                   <Plus className="mr-1.5 h-3.5 w-3.5" /> Pievienot no kataloga
-                </Button>
+                </Button>}
               </div>
-            )}
 
             {items.length === 0 && (
               <p className="rounded-md border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
@@ -349,54 +349,52 @@ const WorksheetPage = () => {
               </p>
             )}
 
-
+            {items.length > 0 && <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,.45fr)_minmax(0,.6fr)_minmax(0,1fr)] gap-4 border-b border-border px-4 pb-2 text-xs font-medium text-muted-foreground md:grid print:grid">
+              <span>Prece</span><span>Krāsa</span><span>Izmērs</span><span className="text-right">Daudzums</span><span className="text-right">Summa</span>
+            </div>}
             {items.map((i) => {
               const open = !readOnly && openId === i.id;
               return (
-              <div key={i.id} className="overflow-hidden rounded-md border border-border bg-background">
-                <div className="flex flex-wrap items-center gap-3 p-2.5 sm:flex-nowrap sm:p-3">
+              <div key={i.id} className="overflow-hidden rounded-md border border-border bg-background print:break-inside-avoid">
+                <div className="grid grid-cols-3 items-start gap-x-4 gap-y-4 p-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,.45fr)_minmax(0,.6fr)_minmax(0,1fr)] md:items-center print:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,.45fr)_minmax(0,.6fr)_minmax(0,1fr)]">
                   <div
-                    className={`flex min-w-0 flex-1 items-center gap-3 text-left ${readOnly ? "" : "cursor-pointer"}`}
-                    onClick={readOnly ? undefined : () => setOpenId(open ? null : i.id)}
+                    className="col-span-3 flex min-w-0 items-center gap-3 text-left md:col-span-1 print:col-span-1"
                   >
                     {i.image ? (
-                      <img src={i.image} alt={i.name} loading="lazy" className="h-14 w-14 shrink-0 rounded-sm border border-border object-contain p-0.5" />
+                      <img src={i.image} alt={i.name} loading="lazy" className="h-16 w-16 shrink-0 rounded-sm object-contain" />
                     ) : (
-                      <span className="h-14 w-14 shrink-0 rounded-sm border border-dashed border-border" />
+                      <span className="h-16 w-16 shrink-0 rounded-sm border border-dashed border-border" />
                     )}
                     <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold">{i.name}</span>
-                      {(i.code || i.brand) && <span className="block text-xs text-muted-foreground">{[i.code, i.brand].filter(Boolean).join(" · ")}</span>}
-                      <span className="mt-1.5 flex flex-wrap gap-1.5 text-xs">
-                        <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5">
-                          {i.colorHex && <span className="mr-1.5 inline-block h-2.5 w-2.5 -translate-y-px rounded-full border border-border align-middle" style={{ background: i.colorHex }} />}
-                          <span className="text-muted-foreground">Krāsa </span><b className="font-medium">{i.colorName || "—"}</b>
-                        </span>
-                        <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Izmērs </span><b className="font-medium">{i.size || "—"}</b></span>
-                        <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Daudzums </span><b className="font-medium">{i.qty} gab.</b></span>
+                      <span className="block break-words text-base font-semibold leading-snug">{i.name}</span>
+                      {i.code && <span className="mt-1 block font-mono text-sm font-medium">{i.code}</span>}
+                      {i.brand && <span className="mt-0.5 block text-xs text-muted-foreground">{i.brand}</span>}
                         {(i.prints || []).some((print) => print.scope !== "order") && (
-                          <span className="rounded-sm border border-border bg-muted/50 px-2 py-0.5"><span className="text-muted-foreground">Apdruka </span><b className="font-medium">{(i.prints || []).filter((print) => print.scope !== "order").map((p) => p.method).join(" + ")}</b></span>
+                          <span className="mt-2 block text-xs text-muted-foreground">{(i.prints || []).filter((print) => print.scope !== "order").map((p) => p.method).join(" + ")}</span>
                         )}
-                      </span>
                     </span>
                   </div>
-                  <span className="ml-auto flex shrink-0 items-center gap-2">
-                    <span className="text-right">
-                      <span className="block font-heading text-sm font-black tabular-nums">{money(lineNet(i))}</span>
-                      <span className="block text-xs text-muted-foreground tabular-nums">ar PVN {money(lineNet(i) * (1 + (sheet.vat_rate || 21) / 100))}</span>
-                    </span>
+                  <div className="min-w-0 text-sm"><span className="mb-1 block text-xs text-muted-foreground md:hidden print:hidden">Krāsa</span><span className="flex items-start gap-2">{i.colorHex && <span className="mt-1 h-3 w-3 shrink-0 rounded-full border border-border" style={{ background: i.colorHex }} />}<span className="break-words font-medium">{i.colorName || "—"}</span></span></div>
+                  <div className="text-sm"><span className="mb-1 block text-xs text-muted-foreground md:hidden print:hidden">Izmērs</span><span className="font-medium">{i.size || "—"}</span></div>
+                  <div className="text-right text-sm"><span className="mb-1 block text-xs text-muted-foreground md:hidden print:hidden">Daudzums</span><span className="font-medium tabular-nums">{i.qty} gab.</span></div>
+                  <div className="col-span-3 border-t border-border pt-3 text-right md:col-span-1 md:border-0 md:pt-0 print:col-span-1 print:border-0 print:pt-0">
+                    <span className="block font-heading text-base font-bold tabular-nums">{money(lineNet(i))}</span>
+                    <span className="block text-xs text-muted-foreground">bez PVN</span>
+                    <span className="mt-1 block text-xs text-muted-foreground tabular-nums">{money(lineNet(i) * (1 + (sheet.vat_rate || 21) / 100))} ar PVN</span>
+                  </div>
+                </div>
+                {!readOnly && <div className="flex justify-end gap-2 border-t border-border px-4 py-2 print:hidden">
                     {!readOnly && (
                       <Button size="sm" variant="outline" className="print:hidden" onClick={() => goCatalog("swap", i)}>
                         <Repeat className="mr-1.5 h-3.5 w-3.5" /> Nomainīt preci
                       </Button>
                     )}
                     {!readOnly && (
-                      <button type="button" onClick={() => setOpenId(open ? null : i.id)} aria-label="Atvērt" className="p-1 print:hidden">
-                        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
-                      </button>
+                      <Button type="button" size="sm" variant="ghost" onClick={() => setOpenId(open ? null : i.id)} aria-expanded={open} aria-label={open ? "Aizvērt preces rediģēšanu" : "Rediģēt preci"}>
+                        {open ? "Aizvērt" : "Rediģēt"}<ChevronDown className={`ml-2 h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+                      </Button>
                     )}
-                  </span>
-                </div>
+                </div>}
 
                 {readOnly && i.note?.trim() ? (
                   <div className="border-t border-border px-3 py-2.5 sm:px-4">
@@ -407,12 +405,12 @@ const WorksheetPage = () => {
                 ) : null}
 
                 {open && (
-                  <div className="border-t border-border p-3 sm:p-4">
+                  <div className="border-t border-border p-4 sm:p-5 print:hidden">
                     <div>
                       <RowVariantControls item={i} disabled={readOnly} onChange={(changes) => patch(i.id, changes)} />
                     </div>
 
-                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
                       <label className="block">
                         <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted-foreground">Skaits</span>
                         <Input type="number" min={0} value={i.qty} disabled={readOnly} onChange={(e) => patch(i.id, { qty: Math.max(0, Math.round(num(e.target.value))) })} />
@@ -438,7 +436,7 @@ const WorksheetPage = () => {
                     </div>
 
                     {/* Apdruka */}
-                    <div className="mt-3 rounded-sm border border-border/70 bg-muted/40 p-3">
+                    <div className="mt-5 border-t border-border pt-5">
                       <div className="flex items-center justify-between">
                         <span className="font-heading text-[11px] font-black uppercase tracking-wider">Apdruka</span>
                         {!readOnly && (
@@ -453,7 +451,7 @@ const WorksheetPage = () => {
                       ) : (
                         <div className="mt-2 space-y-2">
                           {(i.prints || []).map((p, idx) => p.scope === "order" ? null : (
-                            <div key={idx} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_130px_120px_auto]">
+                            <div key={idx} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_130px_120px_auto]">
                               <select
                                 className="h-10 rounded-md border border-input bg-background px-3 text-sm"
                                 value={p.method}
@@ -522,30 +520,25 @@ const WorksheetPage = () => {
             })}
           </div>
 
-          {(!readOnly || orderPrints.length > 0) && (<section className="mt-6 border-t border-border pt-5">
+          {(!readOnly || orderPrints.length > 0) && (<section className={`mt-8 border-t border-border pt-6 ${orderPrints.length === 0 ? "print:hidden" : ""}`}>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="flex items-center gap-2 font-heading text-sm font-black uppercase tracking-wide">
+                <h2 className="flex items-center gap-2 font-heading text-xs font-bold uppercase text-accent">
                   <AccentIcon icon={Printer} inline className="h-4 w-4" /> Kopējās apdrukas izmaksas
                 </h2>
-                <p className="mt-1 text-sm text-muted-foreground">Apdruka, izšūšana vai cita personalizācija visam preču sarakstam.</p>
               </div>
               {!readOnly && (
-                <Button size="sm" variant="outline" onClick={addOrderPrint} disabled={items.length === 0}>
+                <Button size="sm" variant="outline" className="print:hidden" onClick={addOrderPrint} disabled={items.length === 0}>
                   <Plus className="mr-1.5 h-3.5 w-3.5" /> Pievienot apdrukas cenu
                 </Button>
               )}
             </div>
 
-            {orderPrints.length === 0 ? (
-              <div className="mt-3 border border-dashed border-border bg-muted/20 px-4 py-5 text-center text-sm text-muted-foreground">
-                Apdrukas izmaksas nav pievienotas.
-              </div>
-            ) : (
+            {orderPrints.length > 0 && (
               <div className="mt-3 divide-y divide-border border border-border bg-background">
                 {orderPrints.map(({ itemId, index, print }, rowIndex) => (
-                  readOnly ? (
-                    <div key={`${itemId}-${index}`} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 p-3 text-sm">
+                  <div key={`${itemId}-${index}`}>
+                    <div className={`${readOnly ? "flex" : "hidden print:flex"} flex-wrap items-center justify-between gap-x-4 gap-y-1 p-3 text-sm`}>
                       <span className="min-w-0">
                         <span className="font-medium">{print.method}</span>
                         {print.placement?.trim() && <span className="text-muted-foreground"> · {print.placement}</span>}
@@ -553,8 +546,7 @@ const WorksheetPage = () => {
                       </span>
                       <span className="tabular-nums">{money(print.price)}</span>
                     </div>
-                  ) : (
-                  <div key={`${itemId}-${index}`} className="grid grid-cols-1 gap-3 p-3 sm:grid-cols-[minmax(150px,1fr)_minmax(150px,1fr)_130px_130px_auto] sm:items-end">
+                  {!readOnly && <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_130px_130px_auto] sm:items-end print:hidden">
                     <label>
                       <span className="mb-1 block text-xs font-medium text-muted-foreground">Veids</span>
                       <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={print.method} disabled={readOnly} onChange={(e) => patchPrint(itemId, index, { method: e.target.value })}>
@@ -581,8 +573,8 @@ const WorksheetPage = () => {
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     )}
+                  </div>}
                   </div>
-                  )
                 ))}
                 <div className="flex justify-between gap-4 bg-muted/30 px-3 py-3 text-sm font-semibold">
                   <span>Apdruka kopā bez PVN</span>
@@ -593,10 +585,10 @@ const WorksheetPage = () => {
           </section>)}
 
           {/* Kopsummas */}
-          <section className="mt-6 border-t border-border pt-5">
-            <div className="ml-auto w-full border border-border bg-muted/20 p-4 sm:max-w-md">
-              <h2 className="mb-3 font-heading text-sm font-black uppercase tracking-wide">Kopsavilkums</h2>
-              <dl className="space-y-2 text-sm">
+          <section className="mt-8 border-t border-border pt-6 print:break-inside-avoid">
+            <div className="ml-auto w-full sm:max-w-md">
+              <h2 className="mb-4 font-heading text-xs font-bold uppercase text-accent">Kopsavilkums</h2>
+              <dl className="space-y-3 text-sm">
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Gabali kopā</dt><dd className="tabular-nums">{totals.qty}</dd></div>
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Preces bez PVN</dt><dd className="tabular-nums">{money(totals.goods)}</dd></div>
               {totals.print > 0 && <div className="flex justify-between gap-4"><dt className="text-muted-foreground">Apdruka bez PVN</dt><dd className="tabular-nums">{money(totals.print)}</dd></div>}
@@ -610,7 +602,7 @@ const WorksheetPage = () => {
               <div className="flex justify-between gap-4"><dt className="text-muted-foreground">PVN {sheet.vat_rate}%</dt><dd className="tabular-nums">{money(totals.vat)}</dd></div>
               <div className="flex items-baseline justify-between gap-4 border-t border-border pt-2.5 text-base">
                 <dt className="font-heading text-sm font-black uppercase tracking-wide">Kopā ar PVN</dt>
-                <dd className="font-heading font-black tabular-nums text-accent">{money(totals.gross)}</dd>
+                <dd className="font-heading text-xl font-bold tabular-nums text-accent">{money(totals.gross)}</dd>
               </div>
               </dl>
             </div>
@@ -618,7 +610,7 @@ const WorksheetPage = () => {
 
           {isStaff && hasBilling(billing) && (
             <section className="mt-6 border-t border-border pt-5">
-              <h2 className="font-heading text-sm font-black uppercase tracking-wide">Rekvizīti</h2>
+              <h2 className="font-heading text-xs font-bold uppercase text-accent">Rekvizīti</h2>
               <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
                 {BILLING_FIELDS.filter((f) => (billing?.[f.key] || "").trim()).map((f) => (
                   <div key={f.key}><dt className="text-xs uppercase tracking-wider text-muted-foreground">{f.label}</dt><dd className="select-all">{billing?.[f.key]}</dd></div>
@@ -653,13 +645,7 @@ const WorksheetPage = () => {
           )}
 
           {!readOnly && (
-            <section className="mt-6 space-y-4 border-t border-border pt-5 print:hidden">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-heading text-sm font-black uppercase tracking-wide">1. Saglabā sarakstu</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Apstiprina pašreizējās preces, daudzumus un cenas.</p>
-                </div>
-                <div className="flex flex-wrap gap-2">
+            <section className="mt-8 flex flex-wrap items-center justify-end gap-3 border-t border-border pt-6 print:hidden">
                   {(dirty || sheet.draft_items) && (
                     <Button variant="outline" onClick={discardDraft} disabled={saving || actionBusy}>
                       <Undo2 className="mr-2 h-4 w-4" /> Atcelt izmaiņas
@@ -669,38 +655,14 @@ const WorksheetPage = () => {
                     {saving || actionBusy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
                     Saglabāt izmaiņas
                   </Button>
-                </div>
-              </div>
-
               {isStaff && (
-                <div className="border-t border-border pt-4">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="font-heading text-sm font-black uppercase tracking-wide">2. Ielīmē saiti parastajā e-pastā</p>
-                      <p className="mt-1 text-sm text-muted-foreground">Nokopē un ielīmē zem savas atbildes klientam.</p>
-                    </div>
                     <Button variant="outline" onClick={copyEmailLink} disabled={dirty || !!sheet.draft_items || saving || actionBusy}>
                       <Copy className="mr-2 h-4 w-4" /> Kopēt e-pastam
                     </Button>
-                  </div>
-                  <div className="mt-3 rounded-sm border border-dashed border-border bg-background p-4">
-                    <span className="inline-flex font-heading text-sm font-black uppercase text-destructive underline decoration-2 underline-offset-4">
-                      Atvērt preču sarakstu →
-                    </span>
-                  </div>
-                </div>
               )}
-
-
-              <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-heading text-sm font-black uppercase tracking-wide">{isStaff ? "3. Aizver, kad darbs pabeigts" : "2. Aizver, kad darbs pabeigts"}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">Sarakstu var atvērt vēlreiz no tās pašas saites.</p>
-                </div>
                 <Button variant="ghost" onClick={closeView}>
                   <DoorOpen className="mr-2 h-4 w-4" /> Aizvērt
                 </Button>
-              </div>
             </section>
           )}
         </article>
