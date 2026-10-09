@@ -9,7 +9,12 @@
 - [x] Izkārtojums un tekstu stili paliek tādi paši; tikai „Vairumtirdzniecības” kļūst par galveno, lielāko vārdu (pilns izmērs ~99 px datorā); pārējās rindas netiek aiztiktas. Konteineris paplašināts uz 52rem un vertikālais padding samazināts, lai statistika paliek redzama. Pārbaudīts 1449x893, 1280x900 un 390x844 — bez pārplūdes un kļūdām; build OK.
 
 
+## Sākumlapas virsraksta izskats — 09.10.2026
+- [x] „tekstila risinājumi” ar mazo „t”; „& industriālā” un „apdruka” katrs savā rindā (kopā 4 rindas).
+- [x] viss virsraksts krietni treknāks — `.hero-ultra` (`-webkit-text-stroke: 0.028em`), jo fonta maksimums ir 700; rindas augstums 0.95, lai 4 rindas un statistika joprojām der ekrānā (1449x893: statistikas apakša 880 px). Pārbaudīts pārlūkā: malas tīras, rindas nepārklājas, abas pogas un skaitļi redzami.
+
 ## Meklētāja pārklājums un Stanley/Stella prioritāte — 08.10.2026
+
 - [x] Noņemta melnā josla; meklētāja logs atveras pāri lapas saturam, nepārbīdot lapu.
 - [x] Pārlūkā “16” piedāvā vairākas Stanley/Stella preces vispirms, “169” pirmais STTU169, ielādējas visas 8 bildes, “STTU169” atstāj vienu un atver Creator 2.0. Septiņi testi sekmīgi, lapas kļūdu nav.
 
