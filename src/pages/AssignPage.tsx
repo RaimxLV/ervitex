@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ASSIGNEES, assigneeBySlug } from "@/data/assignees";
-import logo from "@/assets/ervitex-logo-2.svg";
+import logo from "@/assets/ervitex-logo-dark.svg";
 
 const AssignPage = () => {
   const { token } = useParams<{ token: string }>();
