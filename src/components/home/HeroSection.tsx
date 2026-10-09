@@ -59,19 +59,14 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="font-heading text-[2.15rem] font-bold leading-[1] text-primary-foreground min-[370px]:text-[2.3rem] sm:text-5xl md:text-7xl lg:text-[5.5rem]"
           >
-            <span className="block text-[0.78em] tracking-[-0.01em] text-accent">
+            <span className="block text-[0.62em] tracking-[-0.01em] text-accent">
               {lang === "lv" ? "Vairumtirdzniecības" : "Wholesale"}
             </span>
-            {lang === "lv" ? "Tekstila" : "Textile"}
-            <br />
-            {lang === "lv" ? "risinājumi" : "Solutions"}
-            <br />
-            <span className="text-accent">
-              {lang === "lv" ? "& industriālā" : "& Industrial"}
+            <span className="block text-[0.86em] sm:text-[0.92em]">
+              {lang === "lv" ? "Tekstila risinājumi" : "Textile Solutions"}
             </span>
-            <br />
-            <span className="text-accent">
-              {lang === "lv" ? "apdruka" : "Printing"}
+            <span className="block text-[0.7em] text-accent sm:text-[0.78em]">
+              {lang === "lv" ? "& industriālā apdruka" : "& Industrial Printing"}
             </span>
           </motion.h1>
 
