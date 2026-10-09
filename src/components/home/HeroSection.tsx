@@ -59,6 +59,9 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="font-heading text-[2.15rem] font-bold leading-[1] text-primary-foreground min-[370px]:text-[2.3rem] sm:text-5xl md:text-7xl lg:text-[5.5rem]"
           >
+            <span className="block text-[0.78em] tracking-[-0.01em] text-accent">
+              {lang === "lv" ? "Vairumtirdzniecības" : "Wholesale"}
+            </span>
             {lang === "lv" ? "Tekstila" : "Textile"}
             <br />
             {lang === "lv" ? "risinājumi" : "Solutions"}
