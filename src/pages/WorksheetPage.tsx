@@ -10,7 +10,7 @@ import {
   type Billing, type Discount, type PrintLine, type Worksheet, type WorksheetItem, type WorksheetVersion,
 } from "@/lib/worksheet";
 import { CheckCircle2, ChevronDown, Clock3, Copy, DoorOpen, History, Loader2, Mail, Plus, Printer, Repeat, RotateCcw, Store, Trash2, Undo2, X } from "lucide-react";
-import logo from "@/assets/ervitex-logo-2.svg";
+import logo from "@/assets/ervitex-logo-dark.svg";
 import { useAuth } from "@/hooks/useAuth";
 import { startWorksheetPick } from "@/lib/worksheetPick";
 import RowVariantControls from "@/components/worksheet/RowVariantControls";

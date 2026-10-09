@@ -8,7 +8,7 @@ import {
   PRINT_DISCLAIMER_LV, PRINT_DISCLAIMER_EN,
 } from "@/lib/offer";
 import { Printer, MessageCircle, Mail, ClipboardList, ArrowUpRight, Store } from "lucide-react";
-import logo from "@/assets/ervitex-logo-2.svg";
+import logo from "@/assets/ervitex-logo-dark.svg";
 
 const OfferPage = () => {
   const { token } = useParams<{ token: string }>();
