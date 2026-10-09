@@ -1,5 +1,8 @@
 # Roadmap
 
+## Komandas foto nomaiņa — 09.10.2026
+- [x] Pievienota “Nomainīt foto” poga katram cilvēkam, jaunā foto priekšskatījums, optimizācija un saglabāšana ar esošo kadrējumu. Autentificētā pārlūkā pārbaudīta izvēle, saglabāšana, pārlāde, attēls kontaktos un palielinājums; sākotnējais foto/kadrējums pēc testa atjaunots. Bez lapas kļūdām, build OK.
+
 ## Preču saraksta izskata audits — 09.10.2026
 - [x] Palielināts logo, noņemti apdrukas skaidrojumi un numurētās instrukcijas, prece/krāsa/izmērs/daudzums/summa sakārtoti saskaņotās kolonās; kontakti atsevišķos laukos, apdruka un kopsavilkums vienādoti. Īsts saraksts pārbaudīts klienta un autentificēta admina skatā, atvērta rediģēšana un pārbaudīts drukas skats; bez pārplūdes un lapas kļūdām, build OK. Cenas un saglabāšanas loģika nemainīta.
 

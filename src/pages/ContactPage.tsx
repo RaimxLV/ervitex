@@ -38,7 +38,7 @@ const teamGroups: { label: { lv: string; en: string }; slugs: string[] }[] = [
   { label: { lv: "Vadība", en: "Management" }, slugs: ["vilnis", "eriks"] },
 ];
 
-type PhotoSettings = { zoom: number; position_x: number; position_y: number };
+type PhotoSettings = { zoom: number; position_x: number; position_y: number; photo_url?: string | null };
 
 const ContactPage = () => {
   const { toast } = useToast();
@@ -50,10 +50,10 @@ const ContactPage = () => {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    supabase.from("team_photo_settings").select("slug, zoom, position_x, position_y").then(({ data }) => {
+    supabase.from("team_photo_settings").select("slug, zoom, position_x, position_y, photo_url").then(({ data }) => {
       const next: Record<string, PhotoSettings> = {};
       data?.forEach((row) => {
-        next[row.slug] = { zoom: Number(row.zoom), position_x: Number(row.position_x), position_y: Number(row.position_y) };
+        next[row.slug] = { zoom: Number(row.zoom), position_x: Number(row.position_x), position_y: Number(row.position_y), photo_url: row.photo_url };
       });
       setPhotoSettings(next);
     });
@@ -133,12 +133,12 @@ const ContactPage = () => {
                         <article key={member.slug} className="group flex flex-col border border-border bg-card transition-colors hover:border-accent/50">
                           <button
                             type="button"
-                            onClick={() => setLightboxImg(member.photo)}
+                            onClick={() => setLightboxImg(ps?.photo_url || member.photo)}
                             className="relative aspect-[4/5] w-full overflow-hidden bg-muted"
                             aria-label={member.name}
                           >
                             <img
-                              src={member.photo}
+                              src={ps?.photo_url || member.photo}
                               alt={member.name}
                               loading="lazy"
                               className="h-full w-full object-cover"
@@ -292,7 +292,7 @@ const ContactPage = () => {
               <X className="h-5 w-5" strokeWidth={1.2} />
             </button>
             {(() => {
-              const member = specialists.find((s) => s.photo === lightboxImg);
+              const member = specialists.find((s) => (photoSettings[s.slug]?.photo_url || s.photo) === lightboxImg);
               return member ? (
                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-card/90 backdrop-blur-sm px-6 py-3 text-center shadow-lg">
                   <p className="font-heading text-sm font-bold uppercase text-foreground">{member.name}</p>
