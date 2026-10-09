@@ -5,7 +5,8 @@
 - Public informational icons use shared AccentIcon framed/inline variants and semantic tone options; print-specific Lucide-compatible symbols live in print-icons, keeping stroke weight and sizes consistent.
 - Public section eyebrows use one red line-label style; blue/cyan/green/slate remain icon-only, and technology use cases sit in a light centered panel for visual continuity.
 
-- Office-photo image, individual pane/door SVG contours and clipped accessible hotspots share original-photo coordinates in one cover-sized scene; matching geometry prevents hover fills and keeps annotations aligned across screen sizes. The luminous halo is a separate blurred polygon layer using an SVG feGaussianBlur filter with an oversized filter region, because CSS drop-shadow blur is clipped by each shape's own bounding box.
+- Office-photo contours and hotspots share photo coordinates in one cover-sized scene for alignment; halos use separate SVG feGaussianBlur polygons with oversized regions to avoid shape clipping.
+- Team photo overrides use immutable product-images files and team_photo_settings.photo_url alongside framing; static portraits remain fallbacks, with admin-only writes.
 
 - Quote worksheet edits use side-specific autosaved drafts; only explicit confirmation updates the shared list and creates an immutable version, preventing incomplete client/staff edits from overwriting each other.
 - Quote workflow history is append-only in `quote_events`; assignment and status changes must remain visible even when the current quote row changes.
