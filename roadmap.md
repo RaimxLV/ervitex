@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Preču saraksta izskata audits — 09.10.2026
-- [ ] Palielināt logo, noņemt skaidrojošos tekstus, sakārtot preču datus kolonās un vienādot sadaļas; pārbaudīt īstu sarakstu un PDF izskatu.
+- [x] Palielināts logo, noņemti apdrukas skaidrojumi un numurētās instrukcijas, prece/krāsa/izmērs/daudzums/summa sakārtoti saskaņotās kolonās; kontakti atsevišķos laukos, apdruka un kopsavilkums vienādoti. Īsts saraksts pārbaudīts klienta un autentificēta admina skatā, atvērta rediģēšana un pārbaudīts drukas skats; bez pārplūdes un lapas kļūdām, build OK. Cenas un saglabāšanas loģika nemainīta.
 
 ## Sākumlapas virsraksta maketi — 09.10.2026
 - [ ] Jauns izkārtojums: „Vairumtirdzniecības tekstila risinājumi" kā viena frāze — tikai „Vairumtirdzniecības" izcelts un sarkans, „tekstila risinājumi" balts; „& industriālā apdruka" sarkans. Piedāvāt variantus, ieviest izvēlēto un pārbaudīt datorā un telefonā.
