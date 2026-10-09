@@ -6,7 +6,7 @@
 ## Sākumlapas galvenais virsraksts — 09.10.2026
 - [x] Virsraksts nomainīts uz „Vairumtirdzniecības tekstila risinājumi & industriālā apdruka”; „Vairumtirdzniecības” sarkanā krāsā; izlikts trijās rindās, lai abas pogas un statistika paliek redzami bez ritināšanas. Pārbaudīts 1449x893, 1280x900 un 390x844.
 - [x] Galvenē novērsta sadursme: „Stanley/Stella” nozīmīte un meklēšanas ikona vairs nesaskaras ar izvēlnes vārdiem; izvēlnes vienumi nepārlaužas; 1280–1920 px bez pārplūdes.
-- [ ] Izkārtojums un tekstu stili paliek tādi paši; tikai „Vairumtirdzniecības” kļūst par galveno, lielāko vārdu; pārējās rindas netiek aiztiktas. Pārbaudīt datorā un telefonā bez pārplūdes.
+- [x] Izkārtojums un tekstu stili paliek tādi paši; tikai „Vairumtirdzniecības” kļūst par galveno, lielāko vārdu (pilns izmērs ~99 px datorā); pārējās rindas netiek aiztiktas. Konteineris paplašināts uz 52rem un vertikālais padding samazināts, lai statistika paliek redzama. Pārbaudīts 1449x893, 1280x900 un 390x844 — bez pārplūdes un kļūdām; build OK.
 
 
 ## Meklētāja pārklājums un Stanley/Stella prioritāte — 08.10.2026
