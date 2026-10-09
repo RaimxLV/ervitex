@@ -174,7 +174,7 @@ const Header = () => {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="mx-auto hidden items-center gap-3.5 px-2 xl:flex">
+        <nav className="mx-auto hidden items-center gap-3.5 whitespace-nowrap px-2 xl:flex">
           {navItems.map((item) => {
             const isCatalog = item.path === "/catalog";
             const active = location.pathname === item.path;
