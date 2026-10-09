@@ -190,7 +190,7 @@ const Header = () => {
                   <Link
                     to={item.path}
                     onFocus={openMega}
-                    className={`text-base font-medium uppercase transition-colors hover:text-accent ${
+                    className={`text-[0.9rem] font-medium uppercase transition-colors hover:text-accent ${
                       active ? "text-accent" : "text-primary-foreground/70"
                     }`}
                   >
@@ -218,7 +218,7 @@ const Header = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`text-base font-medium uppercase transition-colors hover:text-accent ${
+                className={`text-[0.9rem] font-medium uppercase transition-colors hover:text-accent ${
                   active ? "text-accent" : "text-primary-foreground/70"
                 }`}
               >
