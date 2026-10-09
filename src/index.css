@@ -414,6 +414,16 @@
   .animate-promo-pulse { animation: promo-pulse 3s ease-in-out infinite; }
   .animate-promo-ticker { animation: promo-ticker 26s linear infinite; }
 
+  /* --- Hero headline extra weight: Space Grotesk tops out at 700, so the
+         strokes are thickened with a centred stroke in the text's own colour. --- */
+  .hero-ultra {
+    -webkit-text-stroke: 0.028em currentColor;
+    paint-order: stroke fill;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+
   /* --- Glitch / neon outline wordmark --- */
   @keyframes glitch-shift-a {
     0%, 100% { transform: translate(0, 0); opacity: .75; }
