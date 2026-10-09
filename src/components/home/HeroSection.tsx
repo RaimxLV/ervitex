@@ -36,7 +36,7 @@ const HeroSection = () => {
 
 
       {/* ── LAYER 4: content ── */}
-      <div className="container relative z-10 py-12 pointer-events-none sm:py-24">
+      <div className="container relative z-10 py-12 pointer-events-none sm:py-16">
 
         <div className="max-w-[min(37rem,86vw)] md:max-w-3xl">
           {/* Eyebrow */}
