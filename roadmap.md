@@ -1,5 +1,8 @@
 # Roadmap
 
+## Sākumlapas virsraksta maketi — 09.10.2026
+- [ ] Jauns izkārtojums: „Vairumtirdzniecības tekstila risinājumi" kā viena frāze — tikai „Vairumtirdzniecības" izcelts un sarkans, „tekstila risinājumi" balts; „& industriālā apdruka" sarkans. Piedāvāt variantus, ieviest izvēlēto un pārbaudīt datorā un telefonā.
+
 ## Sākumlapas galvenais virsraksts — 09.10.2026
 - [x] Virsraksts nomainīts uz „Vairumtirdzniecības tekstila risinājumi & industriālā apdruka”; „Vairumtirdzniecības” sarkanā krāsā; izlikts trijās rindās, lai abas pogas un statistika paliek redzami bez ritināšanas. Pārbaudīts 1449x893, 1280x900 un 390x844.
 - [x] Galvenē novērsta sadursme: „Stanley/Stella” nozīmīte un meklēšanas ikona vairs nesaskaras ar izvēlnes vārdiem; izvēlnes vienumi nepārlaužas; 1280–1920 px bez pārplūdes.
