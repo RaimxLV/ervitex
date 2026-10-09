@@ -38,7 +38,7 @@ const HeroSection = () => {
       {/* ── LAYER 4: content ── */}
       <div className="container relative z-10 py-12 pointer-events-none sm:py-16">
 
-        <div className="max-w-[min(37rem,86vw)] md:max-w-3xl">
+        <div className="max-w-[min(37rem,86vw)] md:max-w-[52rem]">
           {/* Eyebrow */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -59,7 +59,7 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="font-heading text-[2.15rem] font-bold leading-[1] text-primary-foreground min-[370px]:text-[2.3rem] sm:text-5xl md:text-7xl lg:text-[5.5rem]"
           >
-            <span className="block text-[0.62em] tracking-[-0.01em] text-accent">
+            <span className="block tracking-[-0.01em] text-accent">
               {lang === "lv" ? "Vairumtirdzniecības" : "Wholesale"}
             </span>
             <span className="block text-[0.86em] sm:text-[0.92em]">
