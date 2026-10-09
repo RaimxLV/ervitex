@@ -401,12 +401,6 @@ const RequestPage = () => {
                       <dd className="font-heading text-2xl font-black text-accent">€{(cartNet * 1.21).toFixed(2)}</dd>
                     </div>
                   </dl>
-                  <p className="mt-4 text-[11px] leading-snug text-background/50">
-                    {t(
-                      "Cenas ir informatīvas, par preci bez apdrukas. Apdrukas un izšuvumu izmaksas aprēķinām atsevišķi.",
-                      "Prices are indicative, for the product without decoration. Printing and embroidery are quoted separately.",
-                    )}
-                  </p>
                 </section>
               )}
 
