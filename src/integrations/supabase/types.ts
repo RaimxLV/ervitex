@@ -2394,6 +2394,7 @@ export type Database = {
       }
       team_photo_settings: {
         Row: {
+          photo_url: string | null
           position_x: number
           position_y: number
           slug: string
@@ -2401,6 +2402,7 @@ export type Database = {
           zoom: number
         }
         Insert: {
+          photo_url?: string | null
           position_x?: number
           position_y?: number
           slug: string
@@ -2408,6 +2410,7 @@ export type Database = {
           zoom?: number
         }
         Update: {
+          photo_url?: string | null
           position_x?: number
           position_y?: number
           slug?: string

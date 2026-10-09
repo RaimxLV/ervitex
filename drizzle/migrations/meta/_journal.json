@@ -15,6 +15,13 @@
       "when": 1791462804764,
       "tag": "0001_utt_regular_prices",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791546348558,
+      "tag": "0002_team_photo_replacement",
+      "breakpoints": true
     }
   ]
 }
