@@ -124,7 +124,7 @@ const HeroSection = () => {
           </motion.div>
 
           {/* Stats */}
-          <div className="mt-7 grid max-w-[23rem] grid-cols-3 gap-3 border-t border-primary-foreground/10 pt-4 sm:mt-14 sm:flex sm:max-w-none sm:gap-10 sm:pt-7">
+          <div className="mt-7 grid max-w-[23rem] grid-cols-3 gap-3 border-t border-primary-foreground/10 pt-4 sm:mt-10 sm:flex sm:max-w-none sm:gap-10 sm:pt-6">
             {[
               { value: "28+", label: lang === "lv" ? "Gadi pieredzē" : "Years Experience" },
               { value: "6000+", label: lang === "lv" ? "Produkti" : "Products" },
