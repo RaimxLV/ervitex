@@ -57,18 +57,22 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="font-heading text-[2.15rem] font-bold leading-[1] text-primary-foreground min-[370px]:text-[2.3rem] sm:text-5xl md:text-7xl lg:text-[5.5rem]"
+            className="hero-ultra font-heading text-[2.15rem] font-bold leading-[1] text-primary-foreground min-[370px]:text-[2.3rem] sm:text-5xl md:text-7xl lg:text-[5.5rem]"
           >
             <span className="block tracking-[-0.01em] text-accent">
               {lang === "lv" ? "Vairumtirdzniecības" : "Wholesale"}
             </span>
             <span className="block text-[0.86em] sm:text-[0.92em]">
-              {lang === "lv" ? "Tekstila risinājumi" : "Textile Solutions"}
+              {lang === "lv" ? "tekstila risinājumi" : "textile solutions"}
             </span>
             <span className="block text-[0.7em] text-accent sm:text-[0.78em]">
-              {lang === "lv" ? "& industriālā apdruka" : "& Industrial Printing"}
+              {lang === "lv" ? "& industriālā" : "& Industrial"}
+            </span>
+            <span className="block text-[0.7em] text-accent sm:text-[0.78em]">
+              {lang === "lv" ? "apdruka" : "Printing"}
             </span>
           </motion.h1>
+
 
           {/* Subtitle */}
           <p className="mt-5 max-w-[22rem] text-[0.8rem] leading-[1.65] text-primary-foreground/55 sm:mt-6 sm:text-sm md:max-w-md md:text-base">
