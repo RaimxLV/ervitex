@@ -112,7 +112,6 @@ export const offerPlainText = (offer: Offer, lang: "lv" | "en" = "lv") => {
     `PVN ${offer.vat_rate}%: ${money(vat)}`,
     `${lang === "lv" ? "Kopā ar PVN" : "Total incl. VAT"}: ${money(gross)}`,
     "",
-    lang === "lv" ? PRINT_DISCLAIMER_LV : PRINT_DISCLAIMER_EN,
     offer.token ? `\n${offerUrl(offer.token)}` : "",
   ]
     .filter((l) => l !== "")

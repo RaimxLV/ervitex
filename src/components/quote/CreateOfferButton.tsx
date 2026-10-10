@@ -6,7 +6,7 @@ import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-export function CreateOfferButton({ fromCart = false, compact = false }: { fromCart?: boolean; compact?: boolean }) {
+export function CreateOfferButton({ fromCart = false, compact = false, iconOnly = false }: { fromCart?: boolean; compact?: boolean; iconOnly?: boolean }) {
   const [busy, setBusy] = useState(false);
   const { items } = useQuoteCart();
   const { toast } = useToast();
@@ -24,8 +24,9 @@ export function CreateOfferButton({ fromCart = false, compact = false }: { fromC
     } finally { setBusy(false); }
   };
   return <Button onClick={create} disabled={busy} variant={fromCart ? "outline" : "default"}
-    size={compact ? "sm" : "default"} className={fromCart ? "" : "bg-accent text-accent-foreground hover:bg-accent/90"}>
-    {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : fromCart ? <ClipboardList className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
-    {fromCart ? `No groza (${items.length})` : "Izveidot piedāvājumu"}
+    aria-label={iconOnly ? "Izveidot piedāvājumu" : undefined} title={iconOnly ? "Izveidot piedāvājumu" : undefined}
+    size={iconOnly ? "icon" : compact ? "sm" : "default"} className={fromCart ? "" : "bg-accent text-accent-foreground hover:bg-accent/90"}>
+    {busy ? <Loader2 className={`${iconOnly ? "" : "mr-2"} h-4 w-4 animate-spin`} /> : fromCart ? <ClipboardList className="mr-2 h-4 w-4" /> : <Plus className={`${iconOnly ? "" : "mr-2"} h-4 w-4`} />}
+    {!iconOnly && (fromCart ? `No groza (${items.length})` : "Izveidot piedāvājumu")}
   </Button>;
 }

@@ -501,17 +501,17 @@ const AdminOfferEdit = () => {
             {hits.length > 0 && (
               <div className="mt-3 max-h-64 divide-y divide-border overflow-y-auto rounded-sm border border-border">
                 {hits.map((h) => (
-                  <button
+                  <Button variant="ghost"
                     key={`${h.source}-${h.id}`}
                     onClick={() => pick(h)}
-                    className={`flex w-full items-center gap-3 p-2 text-left hover:bg-muted ${picked?.id === h.id && picked?.source === h.source ? "bg-muted" : ""}`}
+                    className={`flex h-auto w-full justify-start items-center gap-3 rounded-none p-3 text-left hover:bg-muted ${picked?.id === h.id && picked?.source === h.source ? "bg-muted" : ""}`}
                   >
                     {h.image_url && <img src={h.image_url} alt="" loading="lazy" className="h-10 w-10 rounded-sm object-cover" />}
                     <span className="min-w-0">
                       <span className="block truncate text-sm text-foreground">{h.name}</span>
                       <span className="block truncate text-xs text-muted-foreground">{h.id} · {h.brand || h.source.toUpperCase()}</span>
                     </span>
-                  </button>
+                  </Button>
                 ))}
               </div>
             )}
@@ -525,15 +525,15 @@ const AdminOfferEdit = () => {
                     <Label className="text-xs">Krāsa</Label>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {colorRows.map((c) => (
-                        <button
+                        <Button variant="outline" size="sm"
                           key={c.c || c.n}
                           onClick={() => setActiveColor(c.c ?? null)}
                           title={c.n}
-                          className={`flex items-center gap-2 rounded-full border px-2 py-1 text-xs ${activeColor === c.c ? "border-accent bg-background" : "border-border"}`}
+                          className={`flex items-center gap-2 rounded-sm border px-2 py-1 text-xs ${activeColor === c.c ? "border-accent bg-background" : "border-border"}`}
                         >
-                          <span className="h-3 w-3 rounded-full border border-border" style={{ background: c.h || "#ccc" }} />
+                          <span className="h-3 w-3 rounded-full border border-border bg-muted" style={c.h ? { background: c.h } : undefined} />
                           {c.n}
-                        </button>
+                        </Button>
                       ))}
                     </div>
                   </div>
@@ -547,6 +547,7 @@ const AdminOfferEdit = () => {
                       {!swapTarget && (
                         <Input
                           type="number"
+                          aria-label={`Skaits izmēram ${r.size}`}
                           min={0}
                           className="mt-1 h-8"
                           value={qtyBySize[r.size] ?? ""}
@@ -601,34 +602,34 @@ const AdminOfferEdit = () => {
                     <label><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Cena bez PVN</span><DecimalInput aria-label={`Cena ${i.code} ${i.size || ""}`} value={i.unitPrice} placeholder="0,00" onValueChange={(v) => patchItem(i.id, { unitPrice: v })} className="h-10" /></label>
                     <div className="text-right tabular-nums"><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Summa bez PVN</span><p className="text-sm font-semibold">{money((i.unitPrice || 0) * i.qty + itemPrintNet(i))}</p><p className="mt-1 text-xs text-muted-foreground">{money(((i.unitPrice || 0) * i.qty + itemPrintNet(i)) * (1 + offer.vat_rate / 100))} ar PVN</p></div>
                     <Button type="button" size="icon" variant="ghost" aria-label="Dzēst pozīciju" onClick={() => removeItem(i.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
-                    <div className="col-span-2 space-y-2 sm:col-span-3 xl:col-span-7 xl:pl-19">
+                    <div className="col-span-2 space-y-2 sm:col-span-3 xl:col-span-7 xl:pl-20">
                       {(i.prints || []).map((p, n) => {
                         const setP = (c: Partial<NonNullable<OfferItem["prints"]>[number]>) =>
                           patchItem(i.id, { prints: (i.prints || []).map((x, k) => (k === n ? { ...x, ...c } : x)) });
                         return (
-                          <div key={n} className="flex flex-wrap items-center gap-1.5">
+                          <div key={n} className="grid grid-cols-2 items-end gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_110px_100px_36px]">
                             <select value={p.method} onChange={(e) => setP({ method: e.target.value })} className="h-8 rounded-sm border border-input bg-background px-2 text-[13px]">
                               {PRINT_METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
                             </select>
-                            <Input value={p.placement || ""} placeholder="Vieta" onChange={(e) => setP({ placement: e.target.value })} className="h-8 w-32 px-2 text-[13px]" />
-                            <DecimalInput value={p.price} placeholder="€ bez PVN" onValueChange={(v) => setP({ price: v })} className="h-8 w-24 px-2 text-[13px]" />
+                            <Input value={p.placement || ""} placeholder="Vieta" onChange={(e) => setP({ placement: e.target.value })} className="h-8 w-full px-2 text-[13px]" />
+                            <DecimalInput value={p.price} placeholder="€ bez PVN" onValueChange={(v) => setP({ price: v })} className="h-8 w-full px-2 text-[13px]" />
                             <select value={p.mode || "unit"} onChange={(e) => setP({ mode: e.target.value as "unit" | "total" })} className="h-8 rounded-sm border border-input bg-background px-2 text-[13px]">
                               <option value="unit">/ gab.</option>
                               <option value="total">kopā</option>
                             </select>
-                            <button type="button" aria-label="Dzēst apdruku" onClick={() => patchItem(i.id, { prints: (i.prints || []).filter((_, k) => k !== n) })} className="flex h-7 w-7 items-center justify-center text-muted-foreground hover:text-destructive">
+                            <Button size="icon" variant="ghost" type="button" aria-label="Dzēst apdruku" onClick={() => patchItem(i.id, { prints: (i.prints || []).filter((_, k) => k !== n) })} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                               <Trash2 className="h-3.5 w-3.5" />
-                            </button>
+                            </Button>
                           </div>
                         );
                       })}
-                      <button
+                      <Button variant="ghost" size="sm"
                         type="button"
                         onClick={() => patchItem(i.id, { prints: [...(i.prints || []), { method: PRINT_METHODS[0], placement: "", price: null, mode: "unit" }] })}
-                        className="inline-flex items-center gap-1 text-[12px] font-semibold text-accent hover:underline"
+                        className="inline-flex items-center gap-1 px-0 text-xs font-semibold text-accent"
                       >
-                        + Apdruka / izšūšana
-                      </button>
+                        <Plus className="mr-1 h-3.5 w-3.5" /> Apdruka / izšūšana
+                      </Button>
                     </div>
                   </div>
                 ))}
