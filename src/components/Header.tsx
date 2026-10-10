@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import CatalogMegaMenu, { MobileCatalogMenu } from "@/components/CatalogMegaMenu";
 import HeaderSearch from "@/components/HeaderSearch";
 import { useAuth } from "@/hooks/useAuth";
+import { CreateOfferButton } from "@/components/quote/CreateOfferButton";
 
 const navItems = [
   { key: "nav.home" as const, path: "/" },
@@ -229,6 +230,7 @@ const Header = () => {
         </nav>
 
         <div className="hidden items-center gap-3 xl:flex">
+          {isAdmin && <CreateOfferButton iconOnly />}
           {isAdmin && (
             <Button asChild variant="outline" size="sm" className="h-8 border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground">
               <Link to="/admin"><ShieldCheck className="mr-1.5 h-3.5 w-3.5" strokeWidth={1.5} /> Admin</Link>
@@ -358,6 +360,7 @@ const Header = () => {
         <div className="max-h-[calc(100svh-4rem)] overflow-y-auto overscroll-contain border-t border-primary-foreground/10 bg-primary px-4 pb-6 pt-4 xl:hidden md:max-h-[calc(100svh-5rem)]">
           <HeaderSearch inline className="mb-4" inputClassName="h-10" onDone={() => setIsOpen(false)} />
           <nav>
+            {isAdmin && <div className="mb-3"><CreateOfferButton /></div>}
             {isAdmin && (
               <Button asChild variant="outline" className="mb-4 w-full border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground">
                 <Link to="/admin" onClick={() => setIsOpen(false)}><ShieldCheck className="mr-2 h-4 w-4" strokeWidth={1.5} /> Admin režīms</Link>
