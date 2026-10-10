@@ -1,6 +1,8 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { CreateOfferButton } from "@/components/quote/CreateOfferButton";
+import logo from "@/assets/ervitex-logo-dark.svg";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   MessageSquare, LogOut, LayoutDashboard, Users, ArrowLeft,
@@ -55,11 +57,12 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             <Button variant="ghost" size="icon" onClick={() => navigate("/")} aria-label="Uz veikalu">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <Link to="/admin" className="font-heading text-base font-black uppercase tracking-wider text-accent">
-              Ervitex
+            <Link to="/admin" className="shrink-0" aria-label="Ervitex administrācija">
+              <img src={logo} alt="Ervitex" className="h-8 w-auto sm:h-10" />
             </Link>
           </div>
           <div className="flex items-center gap-2">
+            <div className="hidden lg:block"><CreateOfferButton compact /></div>
             <span className="hidden max-w-[180px] truncate text-xs text-muted-foreground sm:block">{user?.email}</span>
             <Button variant="outline" size="sm" className="text-xs" onClick={handleSignOut}>
               <LogOut className="h-3.5 w-3.5 sm:mr-2" />

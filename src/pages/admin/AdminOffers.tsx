@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
+import { CreateOfferButton } from "@/components/quote/CreateOfferButton";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -24,8 +25,8 @@ interface Row {
 
 const STATUS: Record<string, { label: string; cls: string }> = {
   draft: { label: "Melnraksts", cls: "bg-muted text-muted-foreground" },
-  sent: { label: "Nosūtīts", cls: "bg-blue-500 text-white" },
-  accepted: { label: "Apstiprināts", cls: "bg-emerald-600 text-white" },
+  sent: { label: "Nosūtīts", cls: "bg-accent/10 text-accent" },
+  accepted: { label: "Apstiprināts", cls: "bg-secondary text-secondary-foreground" },
   closed: { label: "Slēgts", cls: "bg-foreground text-background" },
 };
 
@@ -125,24 +126,18 @@ const AdminOffers = () => {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-heading text-xl sm:text-2xl font-black uppercase tracking-wide text-foreground">Piedāvājumi klientiem</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Saliec preču sarakstu klientam, saglabā un nosūti saiti pa e-pastu vai WhatsApp.
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{rows.length} piedāvājumi</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {cartItems.length > 0 && (
             <>
-              <Button variant="outline" size="sm" onClick={() => create(true)}>
-                <ClipboardList className="mr-2 h-4 w-4" /> No pieprasījuma groza ({cartItems.length})
-              </Button>
+              <CreateOfferButton fromCart />
               <Button variant="outline" size="sm" onClick={copyLinkFromCart}>
                 <Link2 className="mr-2 h-4 w-4" /> Kopēt piedāvājuma saiti
               </Button>
             </>
           )}
-          <Button size="sm" onClick={() => create(false)}>
-            <Plus className="mr-2 h-4 w-4" /> Jauns piedāvājums
-          </Button>
+          <CreateOfferButton />
         </div>
       </div>
 
