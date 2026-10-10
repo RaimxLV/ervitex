@@ -1,3 +1,4 @@
+import logo from "@/assets/ervitex-logo-dark.svg";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -40,17 +41,17 @@ const STATUS_META: Record<string, { label: string; hint: string; cls: string }> 
   draft: {
     label: "Melnraksts",
     hint: "Saite vēl nedarbojas. Statuss mainīsies automātiski, tiklīdz nosūtīsi piedāvājumu klientam.",
-    cls: "border-amber-300 bg-amber-50 text-amber-700",
+    cls: "border-border bg-muted text-muted-foreground",
   },
   sent: {
     label: "Nosūtīts",
     hint: "Saite ir publicēta — klients var atvērt piedāvājumu.",
-    cls: "border-blue-300 bg-blue-50 text-blue-700",
+    cls: "border-accent/30 bg-accent/10 text-accent",
   },
   accepted: {
     label: "Apstiprināts",
     hint: "Klients piedāvājumu apstiprināja. Saite paliek aktīva.",
-    cls: "border-emerald-300 bg-emerald-50 text-emerald-700",
+    cls: "border-border bg-secondary text-secondary-foreground",
   },
   closed: {
     label: "Slēgts",
@@ -89,7 +90,7 @@ const AdminOfferEdit = () => {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from("pm_offers").select("*").eq("id", id!).maybeSingle();
+      const { data, error } = await supabase.from("pm_offers").select("*").eq("id", id || "").maybeSingle();
       if (error) toast({ title: "Kļūda", description: error.message, variant: "destructive" });
       else if (data) {
         const row = data as any;
@@ -394,10 +395,11 @@ const AdminOfferEdit = () => {
     <AdminLayout>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
+          <img src={logo} alt="Ervitex" className="h-12 w-auto sm:h-14" />
           <Button asChild variant="outline" size="sm">
             <Link to="/admin/offers"><ArrowLeft className="mr-2 h-4 w-4" /> Visi piedāvājumi</Link>
           </Button>
-          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${st.cls}`}>
+          <span className={`inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase ${st.cls}`}>
             <span className="h-1.5 w-1.5 rounded-full bg-current" /> {st.label}
           </span>
         </div>
@@ -409,11 +411,11 @@ const AdminOfferEdit = () => {
       </div>
 
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1fr,360px]">
+      <div className="mt-6 grid min-w-0 gap-8 2xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-6">
           {/* Client */}
-          <section className="rounded-sm border border-border p-4 sm:p-5">
-            <h2 className="font-heading text-sm font-black uppercase tracking-widest text-foreground">Piedāvājuma dati</h2>
+          <section className="border-b border-border pb-6">
+            <h2 className="font-heading text-xs font-bold uppercase text-accent">Piedāvājuma dati</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <Label className="text-xs">Nosaukums</Label>
@@ -442,7 +444,7 @@ const AdminOfferEdit = () => {
 
 
               <div>
-                <Label className="text-xs">Projektu vadītājs (atbildes saņēmējs)</Label>
+                <Label className="text-xs">Projektu vadītājs</Label>
                 <Select
                   value={offer.pm_email || OFFICE_EMAIL}
                   onValueChange={(v) =>
@@ -464,7 +466,7 @@ const AdminOfferEdit = () => {
                     )}
                   </SelectContent>
                 </Select>
-                <p className="mt-1 text-[11px] text-muted-foreground">Klienta atbilde e-pastā nonāks šeit.</p>
+
               </div>
               <div className="sm:col-span-2">
                 <Label className="text-xs">Piezīme klientam</Label>
@@ -475,8 +477,8 @@ const AdminOfferEdit = () => {
           </section>
 
           {/* Picker */}
-          <section id="preces-izvele" className="rounded-sm border border-border p-4 sm:p-5">
-            <h2 className="font-heading text-sm font-black uppercase tracking-widest text-foreground">
+          <section id="preces-izvele" className="scroll-mt-36 border-b border-border pb-6">
+            <h2 className="font-heading text-xs font-bold uppercase text-accent">
               {swapTarget ? "Nomainīt modeli" : "Pievienot preci"}
             </h2>
             {swapTarget && (
@@ -569,69 +571,37 @@ const AdminOfferEdit = () => {
           </section>
 
           {/* Items */}
-          <section className="rounded-sm border border-border p-4 sm:p-5">
-            <h2 className="font-heading text-sm font-black uppercase tracking-widest text-foreground">
+          <section className="border-b border-border pb-6">
+            <h2 className="font-heading text-xs font-bold uppercase text-accent">
               Preces ({totals.qty} gab.)
             </h2>
             {offer.items.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">Vēl nav pievienota neviena prece.</p>
             ) : (
-              <div className="mt-3 divide-y divide-border border-y border-border">
+              <div className="mt-4 divide-y divide-border border-y border-border">
+                <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_60px_80px_105px_120px_36px] gap-3 bg-muted/50 px-3 py-3 text-xs font-semibold text-muted-foreground xl:grid">
+                  <span>Prece</span><span>Krāsa</span><span>Izmērs</span><span className="text-center">Skaits</span><span>Cena bez PVN</span><span className="text-right">Summa bez PVN</span><span />
+                </div>
                 {offer.items.map((i) => (
-                  <div key={i.id} className="grid gap-1.5 py-2 sm:grid-cols-[1fr,70px,100px,110px,32px] sm:items-center sm:gap-2">
-                    <div className="flex min-w-0 items-center gap-2">
-                      {i.image && <img src={i.image} alt="" loading="lazy" className="h-9 w-9 shrink-0 rounded-sm object-cover" />}
+                  <div key={i.id} className="grid grid-cols-2 gap-3 py-4 sm:grid-cols-3 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_60px_80px_105px_120px_36px] xl:items-center xl:px-3">
+                    <div className="col-span-2 flex min-w-0 items-start gap-3 sm:col-span-3 xl:col-span-1">
+                      {i.image && <img src={i.image} alt="" loading="lazy" className="h-16 w-16 shrink-0 border border-border bg-background object-contain" />}
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[13px] leading-tight text-foreground">{i.name}</p>
-                        <p className="truncate text-[11px] text-muted-foreground">
-                          {i.code}{i.colorName && ` · ${i.colorName}`}{i.size && ` · ${i.size}`}
-                        </p>
+                        <p className="break-words text-sm font-semibold text-foreground">{i.name}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{i.code}</p>
+                        {firstOfGroup.has(i.id) && <Button size="sm" variant="ghost" className="mt-1 h-7 px-0 text-xs text-accent" onClick={() => {
+                          setSwapKey(groupKey(i)); setPicked(null); setQ("");
+                          document.getElementById("preces-izvele")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }}><Repeat className="mr-1.5 h-3.5 w-3.5" /> Cits modelis</Button>}
                       </div>
-                      {firstOfGroup.has(i.id) && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSwapKey(groupKey(i));
-                            setPicked(null);
-                            setQ("");
-                            document.getElementById("preces-izvele")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                          }}
-                          className="inline-flex shrink-0 items-center gap-1 rounded-sm border border-border px-2 py-1 text-[11px] font-semibold text-foreground hover:border-accent hover:text-accent"
-                        >
-                          <Repeat className="h-3.5 w-3.5" /> Cits modelis
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        aria-label="Dzēst pozīciju"
-                        onClick={() => removeItem(i.id)}
-                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:text-destructive sm:hidden"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
                     </div>
-                    <Input type="number" min={1} value={i.qty} onChange={(e) => patchItem(i.id, { qty: Math.max(1, Number(e.target.value) || 1) })} className="h-8 px-2 text-center text-[13px]" />
-                    <DecimalInput
-                      value={i.unitPrice}
-                      placeholder="cena"
-                      onValueChange={(v) => patchItem(i.id, { unitPrice: v })}
-                      className="h-8 px-2 text-[13px]"
-                    />
-                    <div className="text-right leading-tight">
-                      <p className="text-[13px] font-medium text-foreground">{money((i.unitPrice || 0) * i.qty + itemPrintNet(i))}</p>
-                      <p className="text-[10px] text-muted-foreground">
-                        {money(((i.unitPrice || 0) * i.qty + itemPrintNet(i)) * (1 + offer.vat_rate / 100))} ar PVN
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      aria-label="Dzēst pozīciju"
-                      onClick={() => removeItem(i.id)}
-                      className="hidden h-7 w-7 items-center justify-center rounded text-muted-foreground hover:text-destructive sm:flex"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                    <div className="space-y-1.5 sm:col-span-5 sm:pl-11">
+                    <div className="min-w-0"><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Krāsa</span><span className="flex items-center gap-2 break-words text-sm">{i.colorHex && <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-border" style={{ background: i.colorHex }} />}{i.colorName || "—"}</span></div>
+                    <div><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Izmērs</span><span className="text-sm">{i.size || "—"}</span></div>
+                    <label><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Skaits</span><Input aria-label={`Skaits ${i.code} ${i.size || ""}`} type="number" min={1} value={i.qty} onChange={(e) => patchItem(i.id, { qty: Math.max(1, Number(e.target.value) || 1) })} className="h-10 text-center" /></label>
+                    <label><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Cena bez PVN</span><DecimalInput aria-label={`Cena ${i.code} ${i.size || ""}`} value={i.unitPrice} placeholder="0,00" onValueChange={(v) => patchItem(i.id, { unitPrice: v })} className="h-10" /></label>
+                    <div className="text-right tabular-nums"><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Summa bez PVN</span><p className="text-sm font-semibold">{money((i.unitPrice || 0) * i.qty + itemPrintNet(i))}</p><p className="mt-1 text-xs text-muted-foreground">{money(((i.unitPrice || 0) * i.qty + itemPrintNet(i)) * (1 + offer.vat_rate / 100))} ar PVN</p></div>
+                    <Button type="button" size="icon" variant="ghost" aria-label="Dzēst pozīciju" onClick={() => removeItem(i.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                    <div className="col-span-2 space-y-2 sm:col-span-3 xl:col-span-7 xl:pl-19">
                       {(i.prints || []).map((p, n) => {
                         const setP = (c: Partial<NonNullable<OfferItem["prints"]>[number]>) =>
                           patchItem(i.id, { prints: (i.prints || []).map((x, k) => (k === n ? { ...x, ...c } : x)) });
@@ -671,8 +641,8 @@ const AdminOfferEdit = () => {
         {/* Sidebar */}
         <aside className="space-y-4">
           {/* Status */}
-          <div className="rounded-sm border border-border p-4">
-            <h3 className="font-heading text-sm font-black uppercase tracking-widest">Statuss</h3>
+          <div className="border-t border-border pt-5">
+            <h3 className="font-heading text-xs font-bold uppercase text-accent">Statuss</h3>
             <ol className="mt-3 flex items-center gap-1">
               {STATUS_FLOW.map((s, i) => {
                 const active = STATUS_FLOW.indexOf(offer.status) >= i;
@@ -686,7 +656,7 @@ const AdminOfferEdit = () => {
                 );
               })}
             </ol>
-            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">{st.hint}</p>
+            
             <div className="mt-3 flex flex-wrap gap-2">
               {offer.status === "sent" && (
                 <Button size="sm" variant="outline" onClick={() => save("accepted")} disabled={saving}>Atzīmēt kā apstiprinātu</Button>
@@ -698,14 +668,14 @@ const AdminOfferEdit = () => {
                 <Button size="sm" variant="ghost" onClick={() => save("draft")} disabled={saving}>Atgriezt melnrakstā</Button>
               )}
               {offer.status === "draft" && (
-                <Button size="sm" variant="outline" onClick={() => save("sent")} disabled={saving}>Publicēt saiti bez e-pasta</Button>
+                <Button size="sm" variant="outline" onClick={() => save("sent")} disabled={saving}>Publicēt saiti</Button>
               )}
             </div>
           </div>
 
-          <div className="rounded-sm border border-border p-4">
-            <h3 className="font-heading text-sm font-black uppercase tracking-widest">Kopsavilkums</h3>
-            <dl className="mt-3 space-y-1 text-sm">
+          <div className="border-t border-border pt-5">
+            <h3 className="font-heading text-xs font-bold uppercase text-accent">Kopsavilkums</h3>
+            <dl className="mt-4 space-y-3 text-sm tabular-nums">
               <div className="flex justify-between"><dt className="text-muted-foreground">Preces</dt><dd>{money(totals.goods)}</dd></div>
               <div className="flex justify-between"><dt className="text-muted-foreground">Apdruka</dt><dd>{money(totals.print)}</dd></div>
               <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">Atlaide</dt><dd><DiscountField value={offer.discount ?? null} onChange={(d) => setOffer((o) => ({ ...o, discount: d }))} /></dd></div>
@@ -714,14 +684,12 @@ const AdminOfferEdit = () => {
               <div className="flex justify-between"><dt className="text-muted-foreground">PVN {offer.vat_rate}%</dt><dd>{money(totals.vat)}</dd></div>
               <div className="flex justify-between border-t border-border pt-1 text-base"><dt className="font-semibold">Kopā ar PVN</dt><dd className="font-black text-accent">{money(totals.gross)}</dd></div>
             </dl>
-            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">{PRINT_DISCLAIMER_LV}</p>
+            
           </div>
 
-          <div className="rounded-sm border border-border p-4 space-y-2">
-            <h3 className="font-heading text-sm font-black uppercase tracking-widest">Nosūtīt klientam</h3>
-            {offer.status === "draft" && (
-              <p className="text-xs text-amber-600">Saite kļūs aktīva automātiski, tiklīdz nosūtīsi vai kopēsi to klientam.</p>
-            )}
+          <div className="space-y-3 border-t border-border pt-5">
+            <h3 className="font-heading text-xs font-bold uppercase text-accent">Nosūtīt klientam</h3>
+
 
             <Input readOnly value={link} className="text-xs" onFocus={(e) => e.currentTarget.select()} />
 
@@ -740,11 +708,9 @@ const AdminOfferEdit = () => {
               onClick={() => sendEmail("test")}
               disabled={sendingEmail !== null || saving}
             >
-              {sendingEmail === "test" ? "Sūta testu…" : `Nosūtīt testu${user?.email ? ` (${user.email})` : ""}`}
+              {sendingEmail === "test" ? "Sūta testu…" : "Nosūtīt testu sev"}
             </Button>
-            <p className="text-[11px] text-muted-foreground">
-              Sūtot klientam, piedāvājums tiek saglabāts un saite automātiski publicēta.
-            </p>
+
 
             <div className="grid grid-cols-2 gap-2">
 

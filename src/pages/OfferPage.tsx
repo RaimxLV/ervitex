@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import {
   money, itemPrintNet, offerTotals, offerPlainText, type Offer, type OfferItem,
-  PRINT_DISCLAIMER_LV, PRINT_DISCLAIMER_EN,
+  
 } from "@/lib/offer";
 import { Printer, MessageCircle, Mail, ClipboardList, ArrowUpRight, Store } from "lucide-react";
 import logo from "@/assets/ervitex-logo-dark.svg";
@@ -24,7 +24,7 @@ const OfferPage = () => {
       let row = Array.isArray(data) ? data[0] : data;
       if (!row) {
         // Admins may preview drafts
-        const { data: direct } = await supabase.from("pm_offers").select("*").eq("token", token!).maybeSingle();
+        const { data: direct } = await supabase.from("pm_offers").select("*").eq("token", (token || "")).maybeSingle();
         row = direct as any;
       }
       if (row) setOffer({ ...(row as any), items: (((row as any).items || []) as OfferItem[]) });
@@ -61,8 +61,8 @@ const OfferPage = () => {
   };
 
   return (
-    <div className="public-readable min-h-screen bg-muted/30 py-4 sm:py-8 print:bg-white print:py-0">
-      <div className="mx-auto max-w-4xl px-3 sm:px-4 print:max-w-none print:px-0">
+    <div className="public-readable min-h-screen bg-muted/30 py-4 sm:py-8 print:bg-background print:py-0">
+      <div className="mx-auto max-w-6xl px-3 sm:px-4 print:max-w-none print:px-0">
         {/* Actions — hidden in print */}
         <div className="mb-3 sm:mb-5 print:hidden">
           <Link
@@ -91,11 +91,11 @@ const OfferPage = () => {
           </div>
         </div>
 
-        <article className="rounded-md border border-border bg-card p-4 sm:p-8 print:border-0 print:p-0">
+        <article className="bg-card p-4 sm:p-8 print:border-0 print:p-0">
           <header className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <img src={logo} alt="Ervitex" className="h-7 w-auto sm:h-8" />
-              <h1 className="mt-4 font-heading text-xl font-black uppercase leading-tight tracking-tight text-foreground sm:text-3xl">
+              <img src={logo} alt="Ervitex" className="h-12 w-auto sm:h-16" />
+              <h1 className="mt-4 font-heading text-xl font-black uppercase leading-tight text-foreground sm:text-3xl">
                 {offer.title || t("Piedāvājums", "Offer")}
               </h1>
               {[offer.client_name, offer.client_company].filter(Boolean).length > 0 && (
@@ -119,9 +119,10 @@ const OfferPage = () => {
 
           {/* Items — table on desktop / print, cards on mobile */}
           <div className="mt-6 hidden sm:block print:block">
-            <table className="w-full text-sm">
+            <table className="w-full table-fixed text-sm">
+              <colgroup><col className="w-[36%]" /><col className="w-[19%]" /><col className="w-[9%]" /><col className="w-[8%]" /><col className="w-[13%]" /><col className="w-[15%]" /></colgroup>
               <thead>
-                <tr className="border-b border-border text-left text-[10px] uppercase tracking-widest text-muted-foreground">
+                <tr className="border-b border-border text-left text-xs uppercase text-muted-foreground">
                   <th className="py-2.5 font-semibold">{t("Prece", "Item")}</th>
                   <th className="py-2.5 font-semibold">{t("Krāsa", "Colour")}</th>
                   <th className="py-2.5 font-semibold">{t("Izmērs", "Size")}</th>
@@ -153,7 +154,7 @@ const OfferPage = () => {
                       </Link>
                     </td>
                     <td className="py-3 pr-3">
-                      <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 break-words">
                         {i.colorHex && <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-border" style={{ background: i.colorHex }} />}
                         {i.colorName || "—"}
                       </span>
@@ -179,7 +180,7 @@ const OfferPage = () => {
 
           <ul className="mt-5 space-y-3 sm:hidden print:hidden">
             {offer.items.map((i) => (
-              <li key={i.id} className="rounded-md border border-border bg-background p-3">
+              <li key={i.id} className="border-b border-border pb-5">
                 <Link to={itemLink(i)} className="group flex gap-3">
                   {i.image && (
                     <img
@@ -191,9 +192,9 @@ const OfferPage = () => {
                   )}
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium leading-snug text-foreground group-hover:text-accent">{i.name}</p>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">{i.code}{i.brand ? ` · ${i.brand}` : ""}</p>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1.5">
+                    <p className="mt-0.5 text-sm text-muted-foreground">{i.code}{i.brand ? ` · ${i.brand}` : ""}</p>
+                    <div className="mt-3 grid grid-cols-2 gap-3 text-sm text-foreground">
+                      <span className="col-span-2 inline-flex items-center gap-1.5">
                         {i.colorHex && <span className="h-3 w-3 rounded-full border border-border" style={{ background: i.colorHex }} />}
                         {i.colorName || "—"}
                       </span>
@@ -255,38 +256,7 @@ const OfferPage = () => {
             </dl>
           </div>
 
-          <p className="mt-6 rounded-sm border border-dashed border-border p-4 text-xs leading-relaxed text-muted-foreground">
-            {lang === "lv" ? PRINT_DISCLAIMER_LV : PRINT_DISCLAIMER_EN}
-          </p>
-
-          <div className="mt-8 flex flex-col gap-4 rounded-md border border-border bg-muted/40 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5 print:hidden">
-            <div>
-              <p className="font-heading text-sm font-black uppercase tracking-wide text-foreground">
-                {t("Vēlies redzēt vairāk?", "Want to see more?")}
-              </p>
-              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                {t(
-                  "Ienāc mūsu veikala katalogā — visi zīmoli, krāsas un izmēri.",
-                  "Browse our shop catalog — all brands, colours and sizes.",
-                )}
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row sm:shrink-0">
-              <Button asChild>
-                <Link to="/catalog">
-                  <Store className="mr-2 h-4 w-4" /> {t("Doties uz katalogu", "Go to catalog")}
-                </Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <a href={`mailto:${pmEmail}?subject=${encodeURIComponent(offer.title || "Piedāvājums")}`}>
-                  <Mail className="mr-2 h-4 w-4" /> {t("Rakstīt projektu vadītājam", "Email project manager")}
-                </a>
-              </Button>
-            </div>
-          </div>
-
-
-          <p className="mt-4 text-xs text-muted-foreground">
+          <p className="mt-8 border-t border-border pt-4 text-sm text-muted-foreground">
             {t("Tavs kontakts", "Your contact")}: {offer.pm_name ? `${offer.pm_name} · ` : ""}
             <a className="underline" href={`mailto:${pmEmail}`}>{pmEmail}</a>
           </p>
