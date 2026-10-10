@@ -368,12 +368,12 @@ const AddToQuoteBlock = ({
             {added ? (
               <>
                 <Check className="mr-2 h-4 w-4 shrink-0" />
-                {t("Pievienots pieprasījumam", "Added to request")}
+                {isAdmin ? t("Pievienots piedāvājumam", "Added to offer") : t("Pievienots pieprasījumam", "Added to request")}
               </>
             ) : (
               <>
                 <PlusIcon className="mr-2 h-4 w-4 shrink-0" />
-                {t("Pievienot pieprasījuma sarakstam", "Add to request list")}
+                {isAdmin ? t("Pievienot piedāvājumam", "Add to offer") : t("Pievienot pieprasījuma sarakstam", "Add to request list")}
               </>
             )}
           </Button>
