@@ -6,6 +6,8 @@ import { Check, ListPlus, Minus, Palette, Plus, ClipboardList, Send, Trash2, Plu
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { useCreateOffer } from "@/components/quote/CreateOfferButton";
 
 const STEPS = [
   { icon: Palette, lv: "Izvēlies krāsu un izmērus", en: "Pick colour and sizes" },
@@ -34,6 +36,8 @@ const AddToQuoteBlock = ({
 }: Props) => {
   const { items, add, updateQty, remove } = useQuoteCart();
   const { lang } = useLanguage();
+  const { isAdmin } = useAuth();
+  const { create: createOffer, busy: offerBusy } = useCreateOffer();
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
 
   // Cart lines for THIS product+color (drive the quantity inputs)
@@ -143,14 +147,16 @@ const AddToQuoteBlock = ({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="font-heading text-base font-black uppercase tracking-wider text-foreground">
-            {t("Izveido pieprasījumu", "Create a request")}
+            {isAdmin ? t("Izveido piedāvājumu", "Create an offer") : t("Izveido pieprasījumu", "Create a request")}
           </p>
+          {!isAdmin && (
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
             {t(
               "Izveido pieprasījumu — pēc nosūtīšanas ar jums sazināsies mūsu projekta vadītāja.",
               "Create a request — once you send it, our project manager will get in touch.",
             )}
           </p>
+          )}
         </div>
         {flash && (
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
@@ -371,6 +377,18 @@ const AddToQuoteBlock = ({
               </>
             )}
           </Button>
+          {isAdmin ? (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={items.length === 0 || offerBusy}
+              onClick={() => createOffer(true)}
+              className="h-auto min-h-9 w-full min-w-0 whitespace-normal break-words px-3 py-2 text-center leading-tight font-heading text-xs uppercase tracking-widest sm:w-auto"
+            >
+              <ClipboardList className="mr-2 h-4 w-4 shrink-0" />
+              {t("Izveidot piedāvājumu", "Create offer")}
+            </Button>
+          ) : (
           <Button
             asChild
             size="sm"
@@ -383,6 +401,7 @@ const AddToQuoteBlock = ({
               {t("Uz pieprasījumu", "Go to request")}
             </Link>
           </Button>
+          )}
         </div>
 
 
