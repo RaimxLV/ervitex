@@ -1,5 +1,10 @@
 # Roadmap
 
+## Piedāvājumu veidošanas sakārtošana — 10.10.2026
+- [ ] Redzama “Izveidot piedāvājumu” poga darbiniekiem esošajā piedāvājumu sadaļā.
+- [ ] Vienots piedāvājumu saraksta, rediģēšanas un klienta piedāvājuma izskats: logo, kolonnas, pārskatāmi lauki bez skaidrojumiem.
+- [ ] Pārbaudīt īstu piedāvājuma izveidi, saglabāšanu un klienta skatu.
+
 ## Komandas foto nomaiņa — 09.10.2026
 - [x] Pievienota “Nomainīt foto” poga katram cilvēkam, jaunā foto priekšskatījums, optimizācija un saglabāšana ar esošo kadrējumu. Autentificētā pārlūkā pārbaudīta izvēle, saglabāšana, pārlāde, attēls kontaktos un palielinājums; sākotnējais foto/kadrējums pēc testa atjaunots. Bez lapas kļūdām, build OK.
 
