@@ -1,6 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OfferWorkspace from "@/components/quote/OfferWorkspace";
+import { QuoteItemsTable } from "@/components/quote/QuoteItemsTable";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AccentIcon } from "@/components/ui/accent-icon";
 import logo from "@/assets/ervitex-logo-dark.svg";
 import { useCreateOffer } from "@/components/quote/CreateOfferButton";
@@ -14,7 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Upload, Send, X, ArrowLeft } from "lucide-react";
+import { Trash2, Upload, Send } from "lucide-react";
 
 const MAX_FILES = 10;
 const MAX_FILE_MB = 15;
@@ -51,15 +53,11 @@ const RequestPage = () => {
 
   const removeFile = (idx: number) => setFiles((prev) => prev.filter((_, i) => i !== idx));
 
-  const grouped = useMemo(() => {
-    const map = new Map<string, typeof items>();
-    for (const it of items) {
-      const k = `${it.source}:${it.productId}:${it.colorCode || ""}`;
-      if (!map.has(k)) map.set(k, []);
-      map.get(k)?.push(it);
-    }
-    return [...map.values()];
-  }, [items]);
+  const createFromForm = () => createOffer(true, {
+    client_name: form.name.trim(), client_email: form.email.trim() || null,
+    client_phone: form.phone.trim() || null, client_company: form.company.trim() || null,
+    client_billing: billing, note: print.notes || null,
+  }, print.method && print.method !== "none" ? [{ method: ({ silkscreen: "Sietspiede", dtf: "DTF", termodruka: "Termodruka", embroidery: "Izšūšana", sublimation: "Sublimācija", other: "Cita" } as Record<string, string>)[print.method] || print.method, placement: print.placement || null, price: null, mode: "unit" }] : []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,32 +148,11 @@ const RequestPage = () => {
 
   return (
     <OfferWorkspace>
-      <div className="container mx-auto max-w-[1440px] px-4 py-7 sm:py-10">
+      <div className="quote-form">
         <header className="mb-7 border-b border-border pb-6">
           <img src={logo} alt="Ervitex" className="mb-5 h-14 w-auto sm:h-16" />
           <h1 className="font-heading text-2xl font-black uppercase sm:text-3xl">{isAdmin ? t("Mans piedāvājums", "My offer") : t("Mans pieprasījums", "My request")}</h1>
         </header>
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <Button asChild variant="ghost" size="sm" className="-ml-2 font-heading text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
-            <Link to="/catalog">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("Atgriezties katalogā", "Back to catalog")}
-            </Link>
-          </Button>
-          {isAdmin && items.length > 0 && (
-            <Button
-              type="button"
-              size="sm"
-              variant="secondary"
-              className="font-heading text-xs uppercase tracking-widest"
-              onClick={() => createOffer(true)}
-              disabled={creatingOffer}
-            >
-              {t("Izveidot piedāvājumu klientam", "Create client offer")}
-            </Button>
-          )}
-        </div>
-
         {items.length === 0 ? (
           <div className="rounded-sm border border-dashed border-border bg-card/50 px-5 py-10 text-center sm:rounded-sm sm:p-14">
             <p className="mx-auto max-w-sm text-sm text-muted-foreground">
@@ -186,7 +163,7 @@ const RequestPage = () => {
             </Button>
           </div>
         ) : (
-          <form onSubmit={submit} className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr),400px] lg:gap-8">
+          <form onSubmit={submit} className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
             <div className="min-w-0 space-y-6 sm:space-y-8">
 
               {/* Items */}
@@ -196,116 +173,29 @@ const RequestPage = () => {
                     {t("Preces", "Items")}
                     <span className="ml-2 align-middle font-heading text-sm font-bold text-muted-foreground">{totalQty} {t("gab.", "pcs")}</span>
                   </h2>
-                  <button
-                    type="button"
-                    onClick={clear}
-                    className="font-heading text-[11px] font-bold uppercase tracking-widest text-muted-foreground underline-offset-4 transition-colors hover:text-destructive hover:underline"
-                  >
-                    {t("Notīrīt visu", "Clear all")}
-                  </button>
+                  <Button type="button" variant="ghost" size="sm" onClick={clear} className="text-muted-foreground"><Trash2 className="h-4 w-4" />{t("Notīrīt visu", "Clear all")}</Button>
                 </div>
-                <div className="space-y-4">
-                  {grouped.map((group) => {
-                    const head = group[0];
-                    const groupNet = group.reduce((s, it) => s + (it.unitPrice || 0) * it.qty, 0);
-                    const groupQty = group.reduce((s, it) => s + it.qty, 0);
-                    return (
-                      <article
-                        key={head.productId + head.colorCode}
-                        className="group flex gap-4 rounded-sm border-b border-border bg-card p-4 sm:gap-5 sm:p-5"
-                      >
-                        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-sm border border-border/60 bg-background sm:h-24 sm:w-24">
-                          {head.image ? (
-                            <img src={head.image} alt={head.name} className="h-full w-full object-contain p-1.5" />
-                          ) : (
-                            <div className="h-full w-full bg-muted" />
-                          )}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <h3 className="line-clamp-2 text-[15px] font-bold leading-tight sm:text-base">{head.name}</h3>
-                              <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                                <span className="font-mono tracking-tight">{head.code}</span>
-                                {head.colorName && (
-                                  <>
-                                    <span aria-hidden>·</span>
-                                    {head.colorHex && (
-                                      <span className="inline-block h-3 w-3 shrink-0 rounded-full ring-1 ring-inset ring-border" style={{ backgroundColor: head.colorHex }} />
-                                    )}
-                                    <span className="truncate">{head.colorName}</span>
-                                  </>
-                                )}
-                              </p>
-                            </div>
-                            {groupNet > 0 && (
-                              <div className="shrink-0 text-right">
-                                <p className="font-heading text-base font-black leading-none sm:text-lg">€{groupNet.toFixed(2)}</p>
-                                <p className="mt-1 text-[11px] text-muted-foreground">€{(groupNet * 1.21).toFixed(2)} {t("ar PVN", "incl. VAT")}</p>
-                              </div>
-                            )}
-                          </div>
-                          <div className="mt-3 space-y-2">
-                            <div className="grid grid-cols-[40px_64px_minmax(0,1fr)_minmax(0,1fr)] gap-2 text-[10px] text-muted-foreground"><span>Izmērs</span><span>Skaits</span><span>Cena/gab.</span><span className="text-right">Summa</span></div>
-                            {group.map((it) => (
-                              <div key={it.id} className="grid grid-cols-[40px_64px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-2 border-t border-border py-2">
-                                <span className="min-w-9 shrink-0 rounded-md border border-border bg-background px-1.5 py-1 text-center font-heading text-xs font-bold">
-                                  {it.size || "—"}
-                                </span>
-                                <Input
-                                  type="number"
-                                  min={1}
-                                  inputMode="numeric"
-                                  value={it.qty}
-                                  onChange={(e) => updateQty(it.id, parseInt(e.target.value) || 1)}
-                                  className="h-8 w-14 border-border bg-background px-1 text-center text-sm font-semibold"
-                                />
-                                {it.unitPrice ? (
-                                  <span className="min-w-0 break-words text-xs text-muted-foreground">
-                                    €{it.unitPrice.toFixed(2)} / {t("gab.", "pc")}
-                                  </span>
-                                ) : null}
-                                <span className="ml-auto flex shrink-0 items-center gap-1.5">
-                                  <span className="text-sm font-bold">€{((it.unitPrice || 0) * it.qty).toFixed(2)}</span>
-                                  <button
-                                    type="button"
-                                    aria-label={t("Dzēst", "Remove")}
-                                    className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                                    onClick={() => remove(it.id)}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </button>
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
+                <QuoteItemsTable items={items.map((i) => ({ ...i, unitPrice: i.unitPrice ?? null }))} onQuantity={updateQty} onRemove={remove} />
               </section>
 
               {/* Print details */}
               <section className="border-t border-border py-6">
                 <h2 className="mb-6 section-kicker font-heading text-xs font-bold uppercase text-accent">
-                  {t("Apdrukas informācija", "Print details")}
+                  {t("Apdruka visām precēm", "Decoration for all items")}
                 </h2>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
-                    <select
-                      value={print.method}
-                      onChange={(e) => setPrint({ ...print, method: e.target.value })}
-                      className="h-11 w-full rounded-sm border border-input bg-background px-3 text-sm transition-colors focus:border-accent focus:outline-none"
-                    >
-                      <option value="">{t("Nezinu / konsultēties", "Not sure / consult")}</option>
-                      <option value="silkscreen">{t("Sietspiede", "Silkscreen")}</option>
-                      <option value="dtf">{t("DTF druka", "DTF printing")}</option>
-                      <option value="termodruka">{t("Termodruka", "Heat transfer")}</option>
-                      <option value="embroidery">{t("Izšuvums", "Embroidery")}</option>
-                      <option value="none">{t("Bez apdrukas", "No print")}</option>
-                    </select>
+                    <Select value={print.method || "consult"} onValueChange={(value) => setPrint({ ...print, method: value === "consult" ? "" : value })}>
+                      <SelectTrigger aria-label={t("Apdrukas metode visām precēm", "Print method for all items")}><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="consult">{t("Nezinu / konsultēties", "Not sure / consult")}</SelectItem>
+                        <SelectItem value="silkscreen">{t("Sietspiede", "Screen print")}</SelectItem>
+                        <SelectItem value="dtf">DTF</SelectItem><SelectItem value="termodruka">{t("Termodruka", "Heat transfer")}</SelectItem>
+                        <SelectItem value="embroidery">{t("Izšūšana", "Embroidery")}</SelectItem><SelectItem value="sublimation">{t("Sublimācija", "Sublimation")}</SelectItem><SelectItem value="other">{t("Cita", "Other")}</SelectItem>
+                        <SelectItem value="none">{t("Bez apdrukas", "No print")}</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vēlamais termiņš", "Deadline")}</Label>
@@ -313,6 +203,10 @@ const RequestPage = () => {
                   </div>
                 </div>
 
+                <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                  <label className="space-y-2"><span className="quote-label">{t("Apdrukas vieta", "Print placement")}</span><Input value={print.placement} onChange={(e) => setPrint({ ...print, placement: e.target.value })} /></label>
+                  <label className="space-y-2"><span className="quote-label">{t("Krāsu skaits", "Number of colours")}</span><Input value={print.colors} onChange={(e) => setPrint({ ...print, colors: e.target.value })} /></label>
+                </div>
                 <div className="mt-5 space-y-2">
                   <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
                   <Textarea rows={4} className="resize-none rounded-sm" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
@@ -357,7 +251,7 @@ const RequestPage = () => {
             </div>
 
             {/* Right column */}
-            <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
+            <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
               {/* Summary */}
               {cartNet > 0 && (
                 <section className="border-y border-border bg-card py-6">
@@ -428,7 +322,7 @@ const RequestPage = () => {
 
               <Button
                 type={isAdmin ? "button" : "submit"}
-                onClick={isAdmin ? () => createOffer(true) : undefined}
+                onClick={isAdmin ? createFromForm : undefined}
                 disabled={sending || creatingOffer || items.length === 0}
                 className="h-14 w-full rounded-sm bg-accent font-heading text-sm font-black uppercase tracking-widest text-accent-foreground shadow-lg transition-transform hover:bg-accent/90 active:scale-[0.99]"
               >

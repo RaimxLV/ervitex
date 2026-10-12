@@ -1,3 +1,5 @@
+import { getOrderPrints, orderPrintingNet } from "./orderPrinting";
+
 export interface OfferItem {
   id: string;
   source: string;
@@ -14,7 +16,7 @@ export interface OfferItem {
   unitPrice: number | null;
   note?: string | null;
   /** Apdrukas / izšūšanas rindas */
-  prints?: { method: string; placement?: string | null; price: number | null; mode?: "unit" | "total" }[];
+  prints?: { method: string; placement?: string | null; price: number | null; mode?: "unit" | "total"; scope?: "item" | "order" }[];
 }
 
 export interface OfferDiscount { type: "percent" | "amount"; value: number }
@@ -50,15 +52,15 @@ export const round2 = (v: number) => Math.round(v * 100) / 100;
 
 /** Apdruka šai precei kopā, bez PVN. */
 export const itemPrintNet = (i: OfferItem) =>
-  round2((i.prints || []).reduce((s, p) => s + (Number(p.price) || 0) * (p.mode === "total" ? 1 : Number(i.qty) || 0), 0));
+  round2((i.prints || []).filter((p) => p.scope !== "order").reduce((s, p) => s + (Number(p.price) || 0) * (p.mode === "total" ? 1 : Number(i.qty) || 0), 0));
 
 export const offerTotals = (items: OfferItem[], vatRate = VAT_DEFAULT, discount?: OfferDiscount | null) => {
   const goods = round2(items.reduce((s, i) => s + (i.unitPrice || 0) * i.qty, 0));
-  const print = round2(items.reduce((s, i) => s + itemPrintNet(i), 0));
+  const print = round2(items.reduce((s, i) => s + itemPrintNet(i), 0) + orderPrintingNet(items));
   const subtotal = round2(goods + print);
   const dv = Number(discount?.value) || 0;
   // Atlaide tikai no precēm — nekad no apdrukas/izšūšanas.
-  const disc = dv > 0 ? round2(Math.min(goods, discount!.type === "percent" ? (goods * Math.min(dv, 100)) / 100 : dv)) : 0;
+  const disc = dv > 0 && discount ? round2(Math.min(goods, discount.type === "percent" ? (goods * Math.min(dv, 100)) / 100 : dv)) : 0;
   const net = round2(subtotal - disc);
   const vat = round2((net * vatRate) / 100);
   return { goods, print, subtotal, discount: disc, net, vat, gross: round2(net + vat), qty: items.reduce((s, i) => s + i.qty, 0) };
@@ -97,7 +99,7 @@ export const offerPlainText = (offer: Offer, lang: "lv" | "en" = "lv") => {
   const lines = offer.items.map((i) => {
     const bits = [i.name, i.code, i.colorName, i.size].filter(Boolean).join(" · ");
     const price = i.unitPrice ? ` — ${i.qty} gab. × ${money(i.unitPrice)} = ${money(i.unitPrice * i.qty)}` : ` — ${i.qty} gab.`;
-    const prints = (i.prints || []).filter((p) => Number(p.price) > 0).map((p) =>
+    const prints = (i.prints || []).filter((p) => p.scope !== "order").map((p) =>
       `   + ${p.method}${p.placement ? ` (${p.placement})` : ""}: ${money(Number(p.price))}${p.mode === "total" ? "" : ` × ${i.qty}`}`);
     return [`• ${bits}${price}`, ...prints].join("\n");
   });
@@ -106,6 +108,7 @@ export const offerPlainText = (offer: Offer, lang: "lv" | "en" = "lv") => {
     offer.client_name ? `${lang === "lv" ? "Klients" : "Client"}: ${offer.client_name}` : "",
     "",
     ...lines,
+    ...getOrderPrints(offer.items).map((p) => `${lang === "lv" ? "Apdruka visām precēm" : "Decoration for all items"}: ${p.method}${p.placement ? ` (${p.placement})` : ""}${p.price ? ` — ${money(p.price)}${p.mode === "total" ? " kopā" : " / gab."}` : ""}`),
     "",
     disc > 0 ? `${lang === "lv" ? "Atlaide" : "Discount"}: −${money(disc)}` : "",
     `${lang === "lv" ? "Kopā bez PVN" : "Total excl. VAT"}: ${money(net)}`,

@@ -1,3 +1,5 @@
+import { setOrderPrints, type OfferPrint } from "@/lib/orderPrinting";
+import type { Offer } from "@/lib/offer";
 import { offerEditorPath } from "@/lib/offerNavigation";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -13,12 +15,12 @@ export function useCreateOffer() {
   const { items, clear } = useQuoteCart();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const create = async (fromCart: boolean) => {
+  const create = async (fromCart: boolean, details: Partial<Pick<Offer, "client_name" | "client_email" | "client_phone" | "client_company" | "client_billing" | "note">> = {}, prints: OfferPrint[] = []) => {
     setBusy(true);
     try {
       const lines = fromCart ? items.map(({ id, source, productId, name, code, brand, image, colorName, colorHex, size, qty, unitPrice }) => ({ id, source, productId, name, code, brand, image, colorName, colorHex, size, qty, unitPrice: unitPrice ?? null })) : [];
       const { data, error } = await supabase.from("pm_offers")
-        .insert({ title: "Piedāvājums", items: lines }).select("id").single();
+        .insert({ title: "Piedāvājums", ...details, items: setOrderPrints(lines, prints) as any }).select("id").single();
       if (error || !data) throw error || new Error("Neizdevās izveidot");
       if (fromCart) clear();
       navigate(offerEditorPath(data.id));
