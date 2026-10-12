@@ -58,6 +58,20 @@ const FilterOrderEditor = ({ sections: initial, onSave, onClose }: Props) => {
       items: arrayMove(sec.items, sec.items.findIndex((i) => i.value === e.active.id), sec.items.findIndex((i) => i.value === e.over!.id)),
     }));
   };
+  const moveNested = (key: string, parent: string) => (e: DragEndEvent) => {
+    if (!e.over || e.active.id === e.over.id) return;
+    setSections((s) => s.map((sec) => {
+      if (sec.key !== key || !sec.nestedItems?.[parent]) return sec;
+      const list = sec.nestedItems[parent];
+      return {
+        ...sec,
+        nestedItems: {
+          ...sec.nestedItems,
+          [parent]: arrayMove(list, list.findIndex((i) => i.value === e.active.id), list.findIndex((i) => i.value === e.over!.id)),
+        },
+      };
+    }));
+  };
 
   const save = async () => {
     setSaving(true);
