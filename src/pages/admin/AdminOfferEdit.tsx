@@ -3,7 +3,9 @@ import { DecimalInput } from "@/components/ui/decimal-input";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import AdminLayout from "@/components/AdminLayout";
+import OfferWorkspace from "@/components/quote/OfferWorkspace";
+import { ColorSelector } from "@/components/quote/ColorSelector";
+import { SizeQuantityTable } from "@/components/quote/SizeQuantityTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -386,18 +388,18 @@ const AdminOfferEdit = () => {
 
 
   if (loading) {
-    return <AdminLayout><p className="py-10 text-center text-muted-foreground">Ielādē...</p></AdminLayout>;
+    return <OfferWorkspace><p className="py-10 text-center text-muted-foreground">Ielādē...</p></OfferWorkspace>;
   }
 
   const st = STATUS_META[offer.status] || STATUS_META.draft;
 
   return (
-    <AdminLayout>
+    <OfferWorkspace>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <img src={logo} alt="Ervitex" className="h-12 w-auto sm:h-14" />
+          <img src={logo} alt="Ervitex" className="h-14 w-auto max-w-full sm:h-16" />
           <Button asChild variant="outline" size="sm">
-            <Link to="/admin/offers"><ArrowLeft className="mr-2 h-4 w-4" /> Visi piedāvājumi</Link>
+            <Link to="/offers"><ArrowLeft className="mr-2 h-4 w-4" /> Visi piedāvājumi</Link>
           </Button>
           <span className={`inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase ${st.cls}`}>
             <span className="h-1.5 w-1.5 rounded-full bg-current" /> {st.label}
@@ -411,11 +413,11 @@ const AdminOfferEdit = () => {
       </div>
 
 
-      <div className="mt-6 grid min-w-0 gap-8 2xl:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="mt-6 grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_300px]">
         <div className="space-y-6">
           {/* Client */}
           <section className="border-b border-border pb-6">
-            <h2 className="font-heading text-xs font-bold uppercase text-accent">Piedāvājuma dati</h2>
+            <h2 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Piedāvājuma dati</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <Label className="text-xs">Nosaukums</Label>
@@ -478,7 +480,7 @@ const AdminOfferEdit = () => {
 
           {/* Picker */}
           <section id="preces-izvele" className="scroll-mt-36 border-b border-border pb-6">
-            <h2 className="font-heading text-xs font-bold uppercase text-accent">
+            <h2 className="section-kicker font-heading text-xs font-bold uppercase text-accent">
               {swapTarget ? "Nomainīt modeli" : "Pievienot preci"}
             </h2>
             {swapTarget && (
@@ -517,53 +519,24 @@ const AdminOfferEdit = () => {
             )}
 
             {picked && (
-              <div className="mt-4 rounded-sm border border-accent/50 bg-accent/5 p-3">
+              <div className="mt-4 border-t border-border pt-5">
                 <p className="text-sm font-medium text-foreground">{picked.name} <span className="text-muted-foreground">({picked.id})</span></p>
 
                 {colorRows.length > 0 && (
                   <div className="mt-3">
                     <Label className="text-xs">Krāsa</Label>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {colorRows.map((c) => (
-                        <Button variant="outline" size="sm"
-                          key={c.c || c.n}
-                          onClick={() => setActiveColor(c.c ?? null)}
-                          title={c.n}
-                          className={`flex items-center gap-2 rounded-sm border px-2 py-1 text-xs ${activeColor === c.c ? "border-accent bg-background" : "border-border"}`}
-                        >
-                          <span className="h-3 w-3 rounded-full border border-border bg-muted" style={c.h ? { background: c.h } : undefined} />
-                          {c.n}
-                        </Button>
-                      ))}
-                    </div>
+                    <div className="mt-2"><ColorSelector colors={colorRows.map((c, index) => ({ code: c.c || String(index), name: c.n || c.c || "—", hex: c.h }))} value={activeColor} onChange={(code) => { setActiveColor(code); setQtyBySize({}); }} /></div>
                   </div>
                 )}
 
-                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {sizeRows.map((r) => (
-                    <div key={r.size} className="rounded-sm border border-border bg-background p-2">
-                      <p className="text-xs font-semibold text-foreground">{r.size}</p>
-                      <p className="text-[11px] text-muted-foreground">{r.price ? money(r.price) : "cena pēc pieprasījuma"}</p>
-                      {!swapTarget && (
-                        <Input
-                          type="number"
-                          aria-label={`Skaits izmēram ${r.size}`}
-                          min={0}
-                          className="mt-1 h-8"
-                          value={qtyBySize[r.size] ?? ""}
-                          onChange={(e) => setQtyBySize({ ...qtyBySize, [r.size]: Math.max(0, Number(e.target.value) || 0) })}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
+                <div className="mt-4"><SizeQuantityTable rows={sizeRows} quantities={qtyBySize} readOnly={!!swapTarget} onChange={(size, qty) => setQtyBySize((previous) => ({ ...previous, [size]: qty }))} /></div>
 
                 {swapTarget ? (
-                  <Button size="sm" className="mt-3" onClick={swapPicked}>
+                  <Button size="sm" className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90" onClick={swapPicked}>
                     <Repeat className="mr-2 h-4 w-4" /> Nomainīt uz šo modeli
                   </Button>
                 ) : (
-                  <Button size="sm" className="mt-3" onClick={addPicked}>
+                  <Button size="sm" className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90" onClick={addPicked}>
                     <Plus className="mr-2 h-4 w-4" /> Pievienot piedāvājumam
                   </Button>
                 )}
@@ -573,7 +546,7 @@ const AdminOfferEdit = () => {
 
           {/* Items */}
           <section className="border-b border-border pb-6">
-            <h2 className="font-heading text-xs font-bold uppercase text-accent">
+            <h2 className="section-kicker font-heading text-xs font-bold uppercase text-accent">
               Preces ({totals.qty} gab.)
             </h2>
             {offer.items.length === 0 ? (
@@ -640,17 +613,17 @@ const AdminOfferEdit = () => {
         </div>
 
         {/* Sidebar */}
-        <aside className="space-y-4">
+        <aside className="space-y-5 xl:sticky xl:top-6 xl:self-start">
           {/* Status */}
           <div className="border-t border-border pt-5">
-            <h3 className="font-heading text-xs font-bold uppercase text-accent">Statuss</h3>
+            <h3 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Statuss</h3>
             <ol className="mt-3 flex items-center gap-1">
               {STATUS_FLOW.map((s, i) => {
                 const active = STATUS_FLOW.indexOf(offer.status) >= i;
                 return (
                   <li key={s} className="flex-1">
                     <div className={`h-1.5 rounded-full ${active ? "bg-accent" : "bg-muted"}`} />
-                    <span className={`mt-1 block text-[10px] uppercase tracking-wide ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                    <span className={`mt-1 block break-words text-[10px] uppercase ${active ? "text-foreground" : "text-muted-foreground"}`}>
                       {STATUS_META[s].label}
                     </span>
                   </li>
@@ -675,7 +648,7 @@ const AdminOfferEdit = () => {
           </div>
 
           <div className="border-t border-border pt-5">
-            <h3 className="font-heading text-xs font-bold uppercase text-accent">Kopsavilkums</h3>
+            <h3 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Kopsavilkums</h3>
             <dl className="mt-4 space-y-3 text-sm tabular-nums">
               <div className="flex justify-between"><dt className="text-muted-foreground">Preces</dt><dd>{money(totals.goods)}</dd></div>
               <div className="flex justify-between"><dt className="text-muted-foreground">Apdruka</dt><dd>{money(totals.print)}</dd></div>
@@ -689,7 +662,7 @@ const AdminOfferEdit = () => {
           </div>
 
           <div className="space-y-3 border-t border-border pt-5">
-            <h3 className="font-heading text-xs font-bold uppercase text-accent">Nosūtīt klientam</h3>
+            <h3 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Nosūtīt klientam</h3>
 
 
             <Input readOnly value={link} className="text-xs" onFocus={(e) => e.currentTarget.select()} />
@@ -729,7 +702,7 @@ const AdminOfferEdit = () => {
           </div>
         </aside>
       </div>
-    </AdminLayout>
+    </OfferWorkspace>
   );
 };
 

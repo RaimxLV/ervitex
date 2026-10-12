@@ -297,7 +297,7 @@ const WorksheetPage = () => {
 
         <article className="rounded-md border border-border bg-card p-4 sm:p-8 lg:p-10 print:border-0 print:p-0">
           <header className="border-b border-border pb-7">
-            <img src={logo} alt="Ervitex" className="h-11 w-auto max-w-full sm:h-14" />
+            <img src={logo} alt="Ervitex" className="h-14 w-auto max-w-full sm:h-16" />
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <h1 className="font-heading text-xl font-black uppercase leading-tight sm:text-3xl">{isStaff ? "Preču saraksts" : "Jūsu preces"}</h1>

@@ -1,9 +1,10 @@
 # Architecture rules
 
 - Search entry points share searchScore/exactCodeHits for consistent ranking.
-- Offer creation uses shared CreateOfferButton and existing pm_offers drafts to avoid divergent flows.
+- Offer creation shares CreateOfferButton and existing pm_offers drafts; staff edit in protected /offers routes with OfferWorkspace, never the admin shell.
+- Catalog, offer and worksheet color controls share ColorSelector; quantity pickers share SizeQuantityTable to prevent presentation drift.
 
-- Public informational icons use shared AccentIcon framed/inline variants and semantic tone options; print-specific Lucide-compatible symbols live in print-icons, keeping stroke weight and sizes consistent.
+- Public icons share AccentIcon framed/inline variants and semantic tones; print-icons holds Lucide-compatible print symbols for consistent strokes and sizes.
 - Public section eyebrows use one red line-label style; blue/cyan/green/slate remain icon-only, and technology use cases sit in a light centered panel for visual continuity.
 
 - Office-photo contours and hotspots share photo coordinates in one cover-sized scene for alignment; halos use separate SVG feGaussianBlur polygons with oversized regions to avoid shape clipping.
@@ -11,13 +12,13 @@
 
 - Quote worksheet edits use side-specific autosaved drafts; only explicit confirmation updates the shared list and creates an immutable version, preventing incomplete client/staff edits from overwriting each other.
 - Quote workflow history is append-only in `quote_events`; assignment and status changes must remain visible even when the current quote row changes.
-- Client communication stays in normal email; the worksheet only edits and confirms products, then copies a reusable HTML/plain-text burgundy list link for email replies, maximizing compatibility across mail clients and dark mode.
+- Communication stays in normal email; worksheets edit/confirm products and copy an HTML/plain-text burgundy list link for mail-client and dark-mode compatibility.
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
 - Catalog cards default to the cheapest positive-priced colour and product views select its cheapest size via shared catalogPriceSelection helpers; explicit colour/size choices take precedence, keeping card and detail prices aligned.
 - "Ir noliktavā" is a manual admin flag in `stock_flags` per colour (`item_id` = `${id}::${color_code}`; bare `${id}` rows are legacy model-wide flags), separate from supplier data so syncs never erase it; it shows only in the product view for the selected colour, never on catalog cards; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.
 - Shared worksheet printing costs use `PrintLine.scope = "order"` inside the existing side-specific item drafts, preserving autosave/version behavior without a second persistence path.
 - Stock mutation controls render only after the authenticated admin role resolves, and every mutation revalidates the live user and role before writing; public users only see the outlined availability label.
-- Public pages (not admin/worksheet/login) use Lenis wheel smoothing on fine-pointer devices and native touch scrolling; its WebGL hero depth reacts to scroll and, on fine-pointer devices, to eased mouse movement, renders only while values change and pauses off-screen, balancing visible depth with smooth performance.
+- Public pages use fine-pointer Lenis and native touch scrolling; admin/offers/worksheet/login stay native. WebGL hero depth follows scroll/eased fine-pointer movement, renders on change and pauses off-screen for performance.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - Per-route title/description/canonical/robots are set client-side by `RouteSeo`; private token and admin routes are always noindex.
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.

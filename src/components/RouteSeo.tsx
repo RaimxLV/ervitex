@@ -24,7 +24,7 @@ const STATIC: Record<string, Meta> = {
   "/login": { title: "Ieiet | Ervitex", desc: DEFAULT_DESC, noindex: true },
 };
 
-const PRIVATE = [/^\/admin/, /^\/saraksts\//, /^\/piedavajums\//, /^\/assign/];
+const PRIVATE = [/^\/admin/, /^\/offers(?:\/|$)/, /^\/saraksts\//, /^\/piedavajums\//, /^\/assign/];
 
 function setMeta(attr: "name" | "property", key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);

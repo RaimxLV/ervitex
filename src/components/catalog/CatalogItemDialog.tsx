@@ -11,6 +11,7 @@ import { lowestPriceVariant } from "@/lib/catalogPriceSelection";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
+import { ColorSelector } from "@/components/quote/ColorSelector";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
 import { Check } from "lucide-react";
 import { AccentIcon } from "@/components/ui/accent-icon";
@@ -1581,28 +1582,7 @@ const CatalogItemDialog = ({
                       {currentColor ? `${currentColor.name} - ${currentColor.code}` : label.allColors}
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {displayDetail.colors.map((c) => {
-                      const isActive = c.code === activeColor;
-                      const hex = resolveHex(c.hex, c.name);
-                      const colorInStock = stockFlags.has(stockKey(source, id, c.code));
-                      return (
-                        <span key={c.code} className="relative inline-flex">
-                          <button
-                            type="button"
-                            onClick={() => { setActiveColor(c.code); setImgIndex(0); }}
-                            title={`${c.name} – ${c.code}${colorInStock ? (lang === "lv" ? " – ir noliktavā" : " – in stock") : ""}`}
-                            aria-label={c.name}
-                            className={`h-7 w-7 rounded-full border-2 transition-transform ${isActive ? "border-foreground ring-2 ring-foreground/30 scale-110" : isLightHex(hex) ? "border-neutral-500 hover:scale-105" : "border-border hover:scale-105"}`}
-                            style={swatchBackground(c.hex, c.name)}
-                          />
-                          {colorInStock && (
-                            <span className="pointer-events-none absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border border-card bg-success" />
-                          )}
-                        </span>
-                      );
-                    })}
-                  </div>
+                  <ColorSelector colors={displayDetail.colors.map((c) => ({ code: c.code, name: c.name, hex: resolveHex(c.hex, c.name), swatchStyle: swatchBackground(c.hex, c.name), inStock: stockFlags.has(stockKey(source, id, c.code)) }))} value={activeColor} onChange={(code) => { setActiveColor(code); setImgIndex(0); }} />
                 </div>
               )}
 

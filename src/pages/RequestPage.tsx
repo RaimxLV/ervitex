@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Layout from "@/components/Layout";
+import OfferWorkspace from "@/components/quote/OfferWorkspace";
 import { AccentIcon } from "@/components/ui/accent-icon";
-import PageIntro from "@/components/PageIntro";
+import logo from "@/assets/ervitex-logo-dark.svg";
+import { useCreateOffer } from "@/components/quote/CreateOfferButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,31 +32,10 @@ const RequestPage = () => {
   const [print, setPrint] = useState({ method: "", placement: "", colors: "", deadline: "", notes: "" });
   const [files, setFiles] = useState<File[]>([]);
   const [sending, setSending] = useState(false);
-  const [creatingOffer, setCreatingOffer] = useState(false);
+  const { create: createOffer, busy: creatingOffer } = useCreateOffer();
   const { isAdmin } = useAuth();
 
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
-
-  const createOffer = async () => {
-    setCreatingOffer(true);
-    const payload = items.map((i) => ({
-      id: i.id, source: i.source, productId: i.productId, name: i.name, code: i.code,
-      brand: i.brand, image: i.image, colorName: i.colorName, colorHex: i.colorHex,
-      size: i.size, qty: i.qty, unitPrice: i.unitPrice ?? null,
-    }));
-    const { data, error } = await supabase
-      .from("pm_offers")
-      .insert({ title: "Piedāvājums", items: payload as any })
-      .select("id")
-      .single();
-    setCreatingOffer(false);
-    if (error || !data) {
-      toast({ title: t("Kļūda", "Error"), description: error?.message, variant: "destructive" });
-      return;
-    }
-    navigate(`/admin/offers/${data.id}`);
-  };
-
 
   const handleFiles = (list: FileList | null) => {
     if (!list) return;
@@ -76,7 +56,7 @@ const RequestPage = () => {
     for (const it of items) {
       const k = `${it.source}:${it.productId}:${it.colorCode || ""}`;
       if (!map.has(k)) map.set(k, []);
-      map.get(k)!.push(it);
+      map.get(k)?.push(it);
     }
     return [...map.values()];
   }, [items]);
@@ -169,16 +149,12 @@ const RequestPage = () => {
   };
 
   return (
-    <Layout>
-      <PageIntro
-        title={t("Mans pieprasījums", "My request")}
-        subtitle={t(
-          "Pārbaudi preces un nosūti pieprasījumu — mēs sazināsimies tuvākajā laikā.",
-          "Review items and send the request — we'll get back to you shortly.",
-        )}
-        eyebrow={t("Pasūtījuma sagatavošana", "Preparing your order")}
-      />
-      <div className="container mx-auto max-w-6xl px-4 py-7 sm:py-14">
+    <OfferWorkspace>
+      <div className="container mx-auto max-w-[1440px] px-4 py-7 sm:py-10">
+        <header className="mb-7 border-b border-border pb-6">
+          <img src={logo} alt="Ervitex" className="mb-5 h-14 w-auto sm:h-16" />
+          <h1 className="font-heading text-2xl font-black uppercase sm:text-3xl">{isAdmin ? t("Mans piedāvājums", "My offer") : t("Mans pieprasījums", "My request")}</h1>
+        </header>
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <Button asChild variant="ghost" size="sm" className="-ml-2 font-heading text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground">
             <Link to="/catalog">
@@ -192,7 +168,7 @@ const RequestPage = () => {
               size="sm"
               variant="secondary"
               className="font-heading text-xs uppercase tracking-widest"
-              onClick={createOffer}
+              onClick={() => createOffer(true)}
               disabled={creatingOffer}
             >
               {t("Izveidot piedāvājumu klientam", "Create client offer")}
@@ -201,9 +177,9 @@ const RequestPage = () => {
         </div>
 
         {items.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border bg-card/50 px-5 py-10 text-center sm:rounded-2xl sm:p-14">
-            <p className="mx-auto max-w-sm text-sm leading-relaxed text-muted-foreground sm:text-base">
-              {t("Pieprasījums ir tukšs. Pārlūko katalogu un pievieno preces.", "Your request is empty. Browse the catalog and add items.")}
+          <div className="rounded-sm border border-dashed border-border bg-card/50 px-5 py-10 text-center sm:rounded-sm sm:p-14">
+            <p className="mx-auto max-w-sm text-sm text-muted-foreground">
+              {t("Saraksts ir tukšs", "List is empty")}
             </p>
             <Button asChild className="mt-5 h-11 bg-accent px-5 font-heading text-xs uppercase tracking-widest text-accent-foreground hover:bg-accent/90 sm:mt-6">
               <Link to="/catalog">{t("Atvērt katalogu", "Open catalog")}</Link>
@@ -216,7 +192,7 @@ const RequestPage = () => {
               {/* Items */}
               <section>
                 <div className="mb-5 flex items-end justify-between gap-3 border-b-2 border-foreground pb-3">
-                  <h2 className="font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
+                  <h2 className="section-kicker font-heading text-xs font-bold uppercase text-accent">
                     {t("Preces", "Items")}
                     <span className="ml-2 align-middle font-heading text-sm font-bold text-muted-foreground">{totalQty} {t("gab.", "pcs")}</span>
                   </h2>
@@ -236,9 +212,9 @@ const RequestPage = () => {
                     return (
                       <article
                         key={head.productId + head.colorCode}
-                        className="group flex gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:gap-5 sm:p-5"
+                        className="group flex gap-4 rounded-sm border-b border-border bg-card p-4 sm:gap-5 sm:p-5"
                       >
-                        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border border-border/60 bg-white sm:h-24 sm:w-24">
+                        <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-sm border border-border/60 bg-background sm:h-24 sm:w-24">
                           {head.image ? (
                             <img src={head.image} alt={head.name} className="h-full w-full object-contain p-1.5" />
                           ) : (
@@ -255,7 +231,7 @@ const RequestPage = () => {
                                   <>
                                     <span aria-hidden>·</span>
                                     {head.colorHex && (
-                                      <span className="inline-block h-3 w-3 shrink-0 rounded-full ring-1 ring-inset ring-black/15" style={{ backgroundColor: head.colorHex }} />
+                                      <span className="inline-block h-3 w-3 shrink-0 rounded-full ring-1 ring-inset ring-border" style={{ backgroundColor: head.colorHex }} />
                                     )}
                                     <span className="truncate">{head.colorName}</span>
                                   </>
@@ -270,8 +246,9 @@ const RequestPage = () => {
                             )}
                           </div>
                           <div className="mt-3 space-y-2">
+                            <div className="grid grid-cols-[40px_64px_minmax(0,1fr)_minmax(0,1fr)] gap-2 text-[10px] text-muted-foreground"><span>Izmērs</span><span>Skaits</span><span>Cena/gab.</span><span className="text-right">Summa</span></div>
                             {group.map((it) => (
-                              <div key={it.id} className="flex flex-wrap items-center gap-2 rounded-lg bg-muted/40 px-2.5 py-1.5">
+                              <div key={it.id} className="grid grid-cols-[40px_64px_minmax(0,1fr)_minmax(0,1fr)] items-center gap-2 border-t border-border py-2">
                                 <span className="min-w-9 shrink-0 rounded-md border border-border bg-background px-1.5 py-1 text-center font-heading text-xs font-bold">
                                   {it.size || "—"}
                                 </span>
@@ -284,7 +261,7 @@ const RequestPage = () => {
                                   className="h-8 w-14 border-border bg-background px-1 text-center text-sm font-semibold"
                                 />
                                 {it.unitPrice ? (
-                                  <span className="hidden min-w-0 truncate text-xs text-muted-foreground sm:inline">
+                                  <span className="min-w-0 break-words text-xs text-muted-foreground">
                                     €{it.unitPrice.toFixed(2)} / {t("gab.", "pc")}
                                   </span>
                                 ) : null}
@@ -310,8 +287,8 @@ const RequestPage = () => {
               </section>
 
               {/* Print details */}
-              <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
-                <h2 className="mb-6 font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
+              <section className="border-t border-border py-6">
+                <h2 className="mb-6 section-kicker font-heading text-xs font-bold uppercase text-accent">
                   {t("Apdrukas informācija", "Print details")}
                 </h2>
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -320,7 +297,7 @@ const RequestPage = () => {
                     <select
                       value={print.method}
                       onChange={(e) => setPrint({ ...print, method: e.target.value })}
-                      className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm transition-colors focus:border-accent focus:outline-none"
+                      className="h-11 w-full rounded-sm border border-input bg-background px-3 text-sm transition-colors focus:border-accent focus:outline-none"
                     >
                       <option value="">{t("Nezinu / konsultēties", "Not sure / consult")}</option>
                       <option value="silkscreen">{t("Sietspiede", "Silkscreen")}</option>
@@ -332,25 +309,25 @@ const RequestPage = () => {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vēlamais termiņš", "Deadline")}</Label>
-                    <Input className="h-11 rounded-lg" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
+                    <Input className="h-11 rounded-sm" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
                   </div>
                 </div>
 
                 <div className="mt-5 space-y-2">
                   <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
-                  <Textarea rows={4} className="resize-none rounded-lg" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
+                  <Textarea rows={4} className="resize-none rounded-sm" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
                 </div>
               </section>
 
 
               {/* Files */}
-              <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
-                <h2 className="mb-6 font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
+              <section className="border-t border-border py-6">
+                <h2 className="mb-6 section-kicker font-heading text-xs font-bold uppercase text-accent">
                   {t("Faili (logo, dizains)", "Files (logo, artwork)")}
                 </h2>
-                <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30 px-4 py-10 text-center transition-colors hover:border-accent/50 hover:bg-muted/50">
+                <label className="flex cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed border-border bg-muted/30 px-4 py-10 text-center transition-colors hover:border-accent/50 hover:bg-muted/50">
                   <AccentIcon icon={Upload} className="mb-3" />
-                  <span className="text-sm font-semibold leading-snug">{t("Ievelc failus šeit vai spied, lai izvēlētos", "Drop files here or click to choose")}</span>
+                  <span className="text-sm font-semibold leading-snug">{t("Pievienot failus", "Add files")}</span>
                   <span className="mt-1.5 text-xs text-muted-foreground">
                     {t(`Līdz ${MAX_FILES} failiem, katrs līdz ${MAX_FILE_MB}MB`, `Up to ${MAX_FILES} files, ${MAX_FILE_MB}MB each`)}
                   </span>
@@ -365,7 +342,7 @@ const RequestPage = () => {
                 {files.length > 0 && (
                   <ul className="mt-4 space-y-2 text-sm">
                     {files.map((f, i) => (
-                      <li key={i} className="flex min-w-0 items-center gap-3 rounded-lg border border-border bg-background py-2 pl-4 pr-2">
+                      <li key={i} className="flex min-w-0 items-center gap-3 rounded-sm border border-border bg-background py-2 pl-4 pr-2">
                         <span className="min-w-0 flex-1 truncate font-medium">
                           {f.name} <span className="text-xs font-normal text-muted-foreground">({(f.size / 1024 / 1024).toFixed(2)}MB)</span>
                         </span>
@@ -383,20 +360,20 @@ const RequestPage = () => {
             <aside className="space-y-5 lg:sticky lg:top-24 lg:self-start">
               {/* Summary */}
               {cartNet > 0 && (
-                <section className="rounded-2xl bg-foreground p-6 text-background shadow-lg sm:p-7">
+                <section className="border-y border-border bg-card py-6">
                   <h2 className="mb-5 font-heading text-lg font-black uppercase tracking-wide">
                     {t("Kopsavilkums", "Summary")}
                   </h2>
                   <dl className="space-y-2.5 text-sm">
                     <div className="flex justify-between">
-                      <dt className="text-background/60">{t("Kopā bez PVN", "Total excl. VAT")}</dt>
+                      <dt className="text-muted-foreground">{t("Kopā bez PVN", "Total excl. VAT")}</dt>
                       <dd className="font-semibold">€{cartNet.toFixed(2)}</dd>
                     </div>
                     <div className="flex justify-between">
-                      <dt className="text-background/60">{t("PVN 21%", "VAT 21%")}</dt>
+                      <dt className="text-muted-foreground">{t("PVN 21%", "VAT 21%")}</dt>
                       <dd className="font-semibold">€{(cartNet * 0.21).toFixed(2)}</dd>
                     </div>
-                    <div className="mt-2 flex items-baseline justify-between border-t border-background/20 pt-4">
+                    <div className="mt-2 flex items-baseline justify-between border-t border-border pt-4">
                       <dt className="font-heading text-sm font-bold uppercase tracking-wide">{t("Kopā ar PVN", "Total incl. VAT")}</dt>
                       <dd className="font-heading text-2xl font-black text-accent">€{(cartNet * 1.21).toFixed(2)}</dd>
                     </div>
@@ -405,28 +382,28 @@ const RequestPage = () => {
               )}
 
               {/* Contact */}
-              <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-7">
-                <h2 className="mb-6 font-heading text-xl font-black uppercase tracking-wide sm:text-2xl">
+              <section className="border-t border-border py-6">
+                <h2 className="mb-6 section-kicker font-heading text-xs font-bold uppercase text-accent">
                   {t("Tavi kontakti", "Your contacts")}
                 </h2>
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vārds", "Name")} *</Label>
-                    <Input className="h-11 rounded-lg" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                    <Input className="h-11 rounded-sm" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("E-pasts", "Email")} *</Label>
-                    <Input type="email" className="h-11 rounded-lg" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                    <Input type="email" className="h-11 rounded-sm" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Tālrunis", "Phone")}</Label>
-                    <Input className="h-11 rounded-lg" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                    <Input className="h-11 rounded-sm" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Uzņēmums", "Company")}</Label>
-                    <Input className="h-11 rounded-lg" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                    <Input className="h-11 rounded-sm" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
                   </div>
-                  <details className="group rounded-lg border border-border">
+                  <details className="group rounded-sm border border-border">
                     <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs font-semibold uppercase tracking-wider text-foreground">
                       {t("Rekvizīti rēķinam", "Billing details")}
                       <span className="text-accent transition-transform group-open:rotate-45">+</span>
@@ -441,7 +418,7 @@ const RequestPage = () => {
                       ] as const).map(([k, label]) => (
                         <div key={k} className="space-y-1.5">
                           <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</Label>
-                          <Input className="h-11 rounded-lg" maxLength={300} value={billing[k]} onChange={(e) => setBilling({ ...billing, [k]: e.target.value })} />
+                          <Input className="h-11 rounded-sm" maxLength={300} value={billing[k]} onChange={(e) => setBilling({ ...billing, [k]: e.target.value })} />
                         </div>
                       ))}
                     </div>
@@ -450,19 +427,20 @@ const RequestPage = () => {
               </section>
 
               <Button
-                type="submit"
-                disabled={sending || items.length === 0}
-                className="h-14 w-full rounded-xl bg-accent font-heading text-sm font-black uppercase tracking-widest text-accent-foreground shadow-lg transition-transform hover:bg-accent/90 active:scale-[0.99]"
+                type={isAdmin ? "button" : "submit"}
+                onClick={isAdmin ? () => createOffer(true) : undefined}
+                disabled={sending || creatingOffer || items.length === 0}
+                className="h-14 w-full rounded-sm bg-accent font-heading text-sm font-black uppercase tracking-widest text-accent-foreground shadow-lg transition-transform hover:bg-accent/90 active:scale-[0.99]"
               >
                 <Send className="mr-2 h-4 w-4" />
-                {sending ? t("Sūta...", "Sending...") : t("Nosūtīt pieprasījumu", "Send request")}
+                {isAdmin ? t("Izveidot piedāvājumu", "Create offer") : sending ? t("Sūta...", "Sending...") : t("Nosūtīt pieprasījumu", "Send request")}
               </Button>
             </aside>
 
           </form>
         )}
       </div>
-    </Layout>
+    </OfferWorkspace>
   );
 };
 

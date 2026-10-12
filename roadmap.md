@@ -1,5 +1,10 @@
 # Roadmap
 
+## Vienotas formas un piedāvājumi ārpus admina — 12.10.2026
+- [x] Kopīga krāsu izvēle ar nosaukumiem un ritināmu režģi katalogā, piedāvājumā un preču sarakstā; vienota izmēru/cenu/skaita tabula, instrukciju bloki noņemti.
+- [x] Piedāvājumi atveras aizsargātā /offers darbinieka skatā bez admina izvēlnes; vecās admina adreses izmanto to pašu skatu.
+- [x] Pieprasījuma forma, logo, lauki un kopsavilkums saskaņoti. Autentificēti pārbaudīts STTU169, Black, S, 3 gab. → piedāvājums → saglabāšana → pārlāde; arī krāsu/izmēru izvēle redaktorā un publiskā pieprasījuma forma bez pārplūdes. 7 testi veiksmīgi, runtime kļūdu nav, build OK; e-pasti netika sūtīti.
+
 ## Piedāvājumu veidošanas sakārtošana — 10.10.2026
 - [x] Redzama “Izveidot piedāvājumu” poga piedāvājumu sadaļā, admina augšējā joslā un darbiniekiem galvenajā izvēlnē; kopīgs veidošanas ceļš, iespēja sākt no groza.
 - [x] Piedāvājumu saraksts, rediģēšana un klienta piedāvājums sakārtoti ar logo, kolonām, vienotiem laukiem un sarkaniem akcentiem bez skaidrojumiem; cenu un piekļuves noteikumi nemainīti.

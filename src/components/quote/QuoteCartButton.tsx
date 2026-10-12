@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 import { ClipboardList, Loader2 } from "lucide-react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
@@ -18,7 +19,8 @@ const QuoteCartButton = () => {
   if (pick) return null;
   if (totalQty === 0) return null;
   if (location.pathname.startsWith("/request")) return null;
-  if (location.pathname.startsWith("/admin")) return null;
+  if (location.pathname.startsWith("/offers")) return null;
+   if (location.pathname.startsWith("/admin")) return null;
 
   const lines = items.length;
   const cls = "group fixed bottom-5 right-5 z-40 flex items-center gap-3 rounded-full bg-accent px-5 py-3.5 font-heading text-xs font-black uppercase tracking-widest text-accent-foreground shadow-2xl ring-2 ring-accent/40 transition-all hover:scale-105 hover:bg-accent/90 sm:bottom-8 sm:right-8 animate-in fade-in slide-in-from-bottom-4";
@@ -41,9 +43,9 @@ const QuoteCartButton = () => {
 
   if (isAdmin) {
     return (
-      <button type="button" disabled={busy} onClick={() => create(true)} className={cls}>
+      <Button type="button" disabled={busy} onClick={() => create(true)} className={cls}>
         {inner(t("Izveidot piedāvājumu", "Create offer"))}
-      </button>
+      </Button>
     );
   }
 

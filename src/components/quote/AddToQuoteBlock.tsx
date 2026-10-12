@@ -1,19 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Check, ListPlus, Minus, Palette, Plus, ClipboardList, Send, Trash2, Plus as PlusIcon } from "lucide-react";
+import { SizeQuantityTable } from "./SizeQuantityTable";
+import { Check, ClipboardList, Trash2, Plus as PlusIcon } from "lucide-react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useCreateOffer } from "@/components/quote/CreateOfferButton";
-
-const STEPS = [
-  { icon: Palette, lv: "Izvēlies krāsu un izmērus", en: "Pick colour and sizes" },
-  { icon: ListPlus, lv: "Ievadi daudzumu", en: "Enter quantity" },
-  { icon: Send, lv: "Nosūti pieprasījumu", en: "Send the request" },
-];
 
 interface Props {
   source: string;
@@ -57,7 +51,8 @@ const AddToQuoteBlock = ({
     for (const it of otherColorLines) {
       const key = it.colorCode || "-";
       if (!map.has(key)) map.set(key, { name: it.colorName || "-", hex: it.colorHex, qty: 0, lines: [] });
-      const g = map.get(key)!;
+      const g = map.get(key);
+      if (!g) continue;
       g.qty += it.qty;
       g.lines.push(it);
     }
@@ -143,55 +138,25 @@ const AddToQuoteBlock = ({
   };
 
   return (
-    <div className="rounded-md border-2 border-accent/60 bg-accent/5 p-4 space-y-4">
+    <div className="border-t border-border py-5 space-y-4">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="font-heading text-base font-black uppercase tracking-wider text-foreground">
             {isAdmin ? t("Izveido piedāvājumu", "Create an offer") : t("Izveido pieprasījumu", "Create a request")}
           </p>
-          {!isAdmin && (
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-            {t(
-              "Izveido pieprasījumu — pēc nosūtīšanas ar jums sazināsies mūsu projekta vadītāja.",
-              "Create a request — once you send it, our project manager will get in touch.",
-            )}
-          </p>
-          )}
         </div>
         {flash && (
-          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-700">
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-accent">
             <Check className="h-3 w-3" /> {t("Saglabāts", "Saved")}
           </span>
         )}
       </div>
 
-      {/* Kā tas darbojas — soļi viens zem otra */}
-      <ol className="rounded border border-accent/40 bg-background px-3 py-3">
-        {STEPS.map((s, i) => {
-          const Icon = s.icon;
-          const isLast = i === STEPS.length - 1;
-          return (
-            <li key={s.lv} className={`relative flex items-start gap-3 ${isLast ? "" : "pb-4"}`}>
-              {!isLast && <span className="absolute bottom-[-2px] left-[13px] top-7 w-px bg-accent/40" aria-hidden />}
-              <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent font-heading text-xs font-black text-accent-foreground">
-                {i + 1}
-              </span>
-              <div className="flex min-w-0 flex-1 items-center gap-2.5 pt-1">
-                <Icon className="h-4 w-4 shrink-0 text-accent" strokeWidth={1.75} />
-                <span className="font-heading text-sm font-bold uppercase tracking-wide text-foreground">
-                  {t(s.lv, s.en)}
-                </span>
-              </div>
-            </li>
-          );
-        })}
-      </ol>
-
       {/* Current color header */}
       <div className="flex items-center justify-between gap-2 rounded border border-border bg-background px-3 py-2">
         <div className="flex items-center gap-2 min-w-0">
           {colorHex && (
-            <span className="inline-block h-5 w-5 rounded-full border border-black/20" style={{ backgroundColor: colorHex }} />
+            <span className="inline-block h-5 w-5 rounded-sm border border-border" style={{ backgroundColor: colorHex }} />
           )}
           <div className="min-w-0">
             <p className="truncate text-xs font-bold uppercase tracking-wider">
@@ -213,84 +178,7 @@ const AddToQuoteBlock = ({
         )}
       </div>
 
-      {sizes.length > 0 ? (
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-          {sizes.map((s) => {
-            const v = qtyBySize[s] || 0;
-            const unit = sizePrices?.[s];
-            return (
-              <div
-                key={s}
-                className={`flex flex-col items-center rounded border p-1.5 transition-colors ${
-                  v > 0 ? "border-accent bg-accent/10" : "border-border bg-background"
-                }`}
-              >
-                <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{s}</span>
-                {unit !== undefined && (
-                  <span className="text-[10px] font-semibold text-foreground">€{unit.toFixed(2)}</span>
-                )}
-                <div className="mt-1 flex w-full items-center">
-                  <button
-                    type="button"
-                    onClick={() => setSize(s, v - 1)}
-                    className="flex h-7 w-7 items-center justify-center text-muted-foreground hover:text-foreground disabled:opacity-30"
-                    disabled={v <= 0}
-                    aria-label="decrease"
-                  >
-                    <Minus className="h-3 w-3" />
-                  </button>
-                  <Input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    value={v || ""}
-                    onChange={(e) => setSize(s, parseInt(e.target.value) || 0)}
-                    className="h-7 w-full border-0 bg-transparent p-0 text-center text-sm font-bold focus-visible:ring-0"
-                    placeholder="0"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setSize(s, v + 1)}
-                    className="flex h-7 w-7 items-center justify-center text-muted-foreground hover:text-foreground"
-                    aria-label="increase"
-                  >
-                    <Plus className="h-3 w-3" />
-                  </button>
-                </div>
-                {unit !== undefined && v > 0 && (
-                  <span className="mt-0.5 text-[10px] font-bold text-accent">€{(unit * v).toFixed(2)}</span>
-                )}
-              </div>
-            );
-          })}
-
-        </div>
-      ) : (
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setSize("-", (qtyBySize["-"] || 0) - 1)}
-            className="flex h-9 w-9 items-center justify-center rounded border border-border"
-          >
-            <Minus className="h-4 w-4" />
-          </button>
-          <Input
-            type="number"
-            min={0}
-            value={qtyBySize["-"] || ""}
-            onChange={(e) => setSize("-", parseInt(e.target.value) || 0)}
-            className="h-9 text-center font-bold"
-            placeholder="0"
-          />
-          <button
-            type="button"
-            onClick={() => setSize("-", (qtyBySize["-"] || 0) + 1)}
-            className="flex h-9 w-9 items-center justify-center rounded border border-border"
-          >
-            <Plus className="h-4 w-4" />
-          </button>
-        </div>
-      )}
+      <SizeQuantityTable rows={(sizes.length ? sizes : ["-"]).map((size) => ({ size, price: sizePrices?.[size] ?? null }))} quantities={qtyBySize} onChange={setSize} />
 
       {/* Summary of other colors already in cart for this product */}
       {otherGrouped.length > 0 && (
@@ -312,7 +200,7 @@ const AddToQuoteBlock = ({
             {otherGrouped.map((g) => (
               <li key={g.code} className="flex items-center gap-2 text-xs">
                 {g.hex && (
-                  <span className="inline-block h-4 w-4 rounded-full border border-black/20" style={{ backgroundColor: g.hex }} />
+                  <span className="inline-block h-4 w-4 rounded-sm border border-border" style={{ backgroundColor: g.hex }} />
                 )}
                 <span className="flex-1 truncate">{g.name}</span>
                 <span className="font-semibold">
