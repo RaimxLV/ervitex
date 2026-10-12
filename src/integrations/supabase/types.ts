@@ -176,6 +176,27 @@ export type Database = {
           },
         ]
       }
+      catalog_filter_order: {
+        Row: {
+          key: string
+          order_values: string[]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          key: string
+          order_values?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          key?: string
+          order_values?: string[]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       catalog_overrides: {
         Row: {
           description_en: string | null
