@@ -23,8 +23,8 @@
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - RouteSeo sets client-side title/description/canonical/robots; private token and admin routes stay noindex.
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
-- The homepage technology mosaic derives its photo pool from all `techs` galleries, loads images near the viewport, decodes replacements before fading, and pauses timers off-screen/in hidden tabs, during pointer/keyboard interaction or image dialogs, and for reduced motion; enlarged photos use the shared accessible Dialog.
-- Gallery navigation shares a bounded image-decode cache and commits only decoded frames, warming adjacent frames and retaining the last usable frame on download failure; this prevents empty transitions without downloading entire galleries.
+- Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
+- Galleries share bounded decoding, warm adjacent frames and retain the last frame on failure to avoid blanks. Catalog hover replaces only loaded photos with exclusive visibility; Malfini prefers clean front photos over ghosted dimension diagrams.
 - Technology gallery asset pointers use the hosted Lovable asset origin on GitHub Pages, because GitHub cannot serve the platform asset route.
 - Technology gallery order/membership is stored as stable refs in `tech_galleries` (built-in photos as `s:<tech>:<index>`, uploads as public URLs) and applied over the static data at runtime, so saved order survives rebuilds and asset hash changes.
 
