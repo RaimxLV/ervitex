@@ -1,4 +1,4 @@
-import { forwardRef, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
@@ -102,9 +102,18 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
     const [ready, setReady] = useState(false);
     const [hovered, setHovered] = useState(false);
     const [hoverFailed, setHoverFailed] = useState(false);
+    const [hoverReady, setHoverReady] = useState(false);
+    const baseImageRef = useRef<HTMLImageElement | null>(null);
     const triedFallback = useRef(false);
     const triedHoverFallback = useRef(false);
-    const showHover = !!hoverImage && !hoverFailed;
+    const showHover = !!hoverImage && !hoverFailed && hoverReady;
+    useEffect(() => {
+      setReady(Boolean(baseImageRef.current?.complete && baseImageRef.current.naturalWidth > 0));
+      setHoverReady(false);
+      setHoverFailed(false);
+      triedFallback.current = false;
+      triedHoverFallback.current = false;
+    }, [image, hoverImage]);
     // Kā saite: parastais klikšķis atver šeit, Ctrl/Cmd/vidējais klikšķis atver jaunā cilnē.
     const asLink = as === "a" && !!href;
     const Tag = asLink ? "a" : "button";
@@ -128,6 +137,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
             <>
               {!ready && <div className="absolute inset-0 animate-pulse bg-neutral-100" />}
               <img
+                ref={baseImageRef}
                 src={image}
                 alt={imageAlt}
                 loading={priority ? "eager" : "lazy"}
@@ -144,7 +154,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
                   setReady(true);
                   el.style.display = "none";
                 }}
-                className={`absolute inset-0 h-full w-full object-contain p-2 transition-opacity duration-300 ${ready ? "opacity-100" : "opacity-0"} ${showHover ? "group-hover:opacity-0" : ""}`}
+                className={`absolute inset-0 h-full w-full object-contain p-2 ${ready ? "opacity-100" : "opacity-0"} ${showHover ? "group-hover:opacity-0" : ""}`}
               />
               {hoverImage && hovered && !hoverFailed && (
                 <img
@@ -152,6 +162,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
                   alt=""
                   loading="lazy"
                   decoding="async"
+                  onLoad={() => setHoverReady(true)}
                   onError={(e) => {
                     const el = e.currentTarget as HTMLImageElement;
                     const raw = unproxyUrl(hoverImage);
@@ -162,7 +173,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
                     }
                     setHoverFailed(true);
                   }}
-                  className="absolute inset-0 h-full w-full object-contain p-2 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  className={`absolute inset-0 h-full w-full object-contain p-2 opacity-0 ${showHover ? "group-hover:opacity-100" : ""}`}
                 />
               )}
             </>

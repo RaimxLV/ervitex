@@ -170,13 +170,15 @@ const AddToQuoteBlock = ({
           </div>
         </div>
         {totalHere > 0 && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={clearThisColor}
             className="flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground hover:text-destructive"
           >
             <Trash2 className="h-3 w-3" /> {t("Notīrīt", "Clear")}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -184,42 +186,53 @@ const AddToQuoteBlock = ({
 
       {/* Summary of other colors already in cart for this product */}
       {otherGrouped.length > 0 && (
-        <div className="rounded border border-border bg-background p-3">
+        <div className="border-y border-border py-3">
           <div className="mb-2 flex items-center justify-between gap-2">
             <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
               {t("Šai precei jau pievienots citās krāsās", "Already added in other colors")}
             </p>
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => { for (const l of otherColorLines) remove(l.id); clearThisColor(); }}
               className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-accent hover:underline"
             >
               <Trash2 className="h-3.5 w-3.5" />
               {t("Notīrīt visu", "Clear all")}
-            </button>
+            </Button>
           </div>
-          <ul className="space-y-1.5">
-            {otherGrouped.map((g) => (
-              <li key={g.code} className="flex items-center gap-2 text-xs">
-                {g.hex && (
-                  <span className="inline-block h-4 w-4 rounded-sm border border-border" style={{ backgroundColor: g.hex }} />
-                )}
-                <span className="flex-1 truncate">{g.name}</span>
-                <span className="font-semibold">
-                  {g.lines.map((l) => `${l.size || "—"}×${l.qty}`).join(", ")}
-                </span>
-                <span className="text-muted-foreground">= {g.qty} {t("gab.", "pcs")}</span>
-                <button
-                  type="button"
-                  aria-label={t(`Dzēst ${g.name}`, `Remove ${g.name}`)}
-                  onClick={() => { for (const l of g.lines) remove(l.id); }}
-                  className="rounded p-1 text-muted-foreground hover:bg-accent/10 hover:text-accent"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </li>
-            ))}
-          </ul>
+          <table className="w-full table-fixed text-left text-xs">
+            <thead className="text-muted-foreground">
+              <tr className="border-b border-border">
+                <th className="w-[42%] py-2 font-medium">{t("Krāsa", "Colour")}</th>
+                <th className="w-[24%] py-2 font-medium">{t("Izmērs", "Size")}</th>
+                <th className="py-2 text-right font-medium">{t("Skaits", "Quantity")}</th>
+                <th className="w-9"><span className="sr-only">{t("Dzēst", "Remove")}</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {otherGrouped.flatMap((g) => g.lines.map((line) => (
+                <tr key={line.id} className="border-b border-border last:border-0">
+                  <td className="py-2 pr-2">
+                    <span className="flex min-w-0 items-center gap-2">
+                      {g.hex && <span className="h-4 w-4 shrink-0 rounded-sm border border-border" style={{ backgroundColor: g.hex }} />}
+                      <span className="break-words">{g.name}</span>
+                    </span>
+                  </td>
+                  <td className="py-2 font-semibold">{line.size || "—"}</td>
+                  <td className="py-2 text-right font-semibold tabular-nums">{line.qty} <span className="font-normal text-muted-foreground">{t("gab.", "pcs")}</span></td>
+                  <td className="py-2 text-right">
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-accent"
+                      aria-label={t(`Dzēst ${g.name}, ${line.size || "—"}`, `Remove ${g.name}, ${line.size || "—"}`)}
+                      onClick={() => remove(line.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </td>
+                </tr>
+              )))}
+            </tbody>
+          </table>
         </div>
       )}
 

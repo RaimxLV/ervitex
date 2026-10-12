@@ -713,7 +713,13 @@ async function loadMF(styleCode: string): Promise<ProductDetail | null> {
 
   const imgByColor = new Map<string, string[]>();
   const shared: string[] = [];
-  for (const im of images) {
+  // Malfini's d view is a dimension diagram with ghost contours, not a clean photo.
+  const cleanImages = images.filter((im) => String(im.view_code).toLowerCase() !== "d");
+  const orderedImages = [...(cleanImages.length ? cleanImages : images)].sort((a, b) => {
+    const rank = (view: unknown) => ({ a: 0, c: 1, b: 2 }[String(view).toLowerCase()] ?? 3);
+    return rank(a.view_code) - rank(b.view_code);
+  });
+  for (const im of orderedImages) {
     if (!im.url) continue;
     const key = (im.color_code || "").toString();
     if (key) {
