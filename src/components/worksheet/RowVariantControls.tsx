@@ -1,3 +1,4 @@
+import { ColorSelector } from "@/components/quote/ColorSelector";
 import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -58,26 +59,7 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
       {colors.length > 0 && (
         <div>
           <span className="mb-1.5 block text-[10px] uppercase tracking-wider text-muted-foreground">Krāsa</span>
-          <div className="flex flex-wrap gap-1.5">
-            {colors.map((c) => (
-              <Button
-                key={c.c || c.n}
-                type="button"
-                title={c.n}
-                disabled={disabled}
-                variant="outline"
-                size="sm"
-                aria-pressed={(c.n || "") === (item.colorName || "")}
-                onClick={() => pickColor(c.c)}
-                className={`h-auto min-h-9 max-w-full gap-2 whitespace-normal rounded-sm px-3 py-2 text-left text-xs disabled:opacity-50 ${
-                  (c.n || "") === (item.colorName || "") ? "border-accent bg-accent/10 text-foreground" : "border-border"
-                }`}
-              >
-                <span className="h-3 w-3 shrink-0 rounded-full border border-border bg-muted" style={c.h ? { background: c.h } : undefined} />
-                {c.n}
-              </Button>
-            ))}
-          </div>
+          <ColorSelector colors={colors.map((c, index) => ({ code: c.c || String(index), name: c.n || c.c || "—", hex: c.h }))} value={activeColor} disabled={disabled} onChange={pickColor} />
         </div>
       )}
 

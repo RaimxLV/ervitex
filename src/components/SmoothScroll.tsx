@@ -7,7 +7,7 @@ import Lenis from "lenis";
  * and coarse-pointer devices keep
  * native scrolling so they stay responsive.
  */
-const NATIVE_ROUTES = ["/admin", "/saraksts", "/login"];
+const NATIVE_ROUTES = ["/offers", "/admin", "/saraksts", "/login"];
 
 const SmoothScroll = () => {
   const { pathname } = useLocation();

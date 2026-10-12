@@ -1,7 +1,8 @@
 # Architecture rules
 
 - Search entry points share searchScore/exactCodeHits for consistent ranking.
-- Offer creation uses shared CreateOfferButton and existing pm_offers drafts to avoid divergent flows.
+- Offer creation shares CreateOfferButton and existing pm_offers drafts; staff edit in protected /offers routes with OfferWorkspace, never the admin shell.
+- Catalog, offer and worksheet color controls share ColorSelector; quantity pickers share SizeQuantityTable to prevent presentation drift.
 
 - Public informational icons use shared AccentIcon framed/inline variants and semantic tone options; print-specific Lucide-compatible symbols live in print-icons, keeping stroke weight and sizes consistent.
 - Public section eyebrows use one red line-label style; blue/cyan/green/slate remain icon-only, and technology use cases sit in a light centered panel for visual continuity.

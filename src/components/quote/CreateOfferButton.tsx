@@ -1,3 +1,4 @@
+import { offerEditorPath } from "@/lib/offerNavigation";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Loader2, ClipboardList } from "lucide-react";
@@ -20,7 +21,7 @@ export function useCreateOffer() {
         .insert({ title: "Piedāvājums", items: lines }).select("id").single();
       if (error || !data) throw error || new Error("Neizdevās izveidot");
       if (fromCart) clear();
-      navigate(`/admin/offers/${data.id}`);
+      navigate(offerEditorPath(data.id));
     } catch {
       toast({ title: "Neizdevās izveidot piedāvājumu", variant: "destructive" });
     } finally { setBusy(false); }
@@ -31,7 +32,7 @@ export function useCreateOffer() {
 export function CreateOfferButton({ fromCart = false, compact = false, iconOnly = false }: { fromCart?: boolean; compact?: boolean; iconOnly?: boolean }) {
   const { items } = useQuoteCart();
   const { create, busy } = useCreateOffer();
-  return <Button onClick={() => create(fromCart)} disabled={busy} variant={fromCart ? "outline" : "default"}
+  return <Button onClick={() => create(fromCart || items.length > 0)} disabled={busy} variant={fromCart ? "outline" : "default"}
     aria-label={iconOnly ? "Izveidot piedāvājumu" : undefined} title={iconOnly ? "Izveidot piedāvājumu" : undefined}
     size={iconOnly ? "icon" : compact ? "sm" : "default"} className={fromCart ? "" : "bg-accent text-accent-foreground hover:bg-accent/90"}>
     {busy ? <Loader2 className={`${iconOnly ? "" : "mr-2"} h-4 w-4 animate-spin`} /> : fromCart ? <ClipboardList className="mr-2 h-4 w-4" /> : <Plus className={`${iconOnly ? "" : "mr-2"} h-4 w-4`} />}

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import AdminLayout from "@/components/AdminLayout";
+import OfferWorkspace from "@/components/quote/OfferWorkspace";
+import { offerEditorPath } from "@/lib/offerNavigation";
+import logo from "@/assets/ervitex-logo-dark.svg";
 import { Button } from "@/components/ui/button";
 import { CreateOfferButton } from "@/components/quote/CreateOfferButton";
 import { Badge } from "@/components/ui/badge";
@@ -95,9 +97,10 @@ const AdminOffers = () => {
   );
 
   return (
-    <AdminLayout>
+    <OfferWorkspace>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
+          <img src={logo} alt="Ervitex" className="mb-5 h-14 w-auto sm:h-16" />
           <h1 className="font-heading text-xl sm:text-2xl font-black uppercase tracking-wide text-foreground">Piedāvājumi klientiem</h1>
           <p className="mt-1 text-sm text-muted-foreground">{rows.length} piedāvājumi</p>
         </div>
@@ -133,7 +136,7 @@ const AdminOffers = () => {
           return (
             <div key={r.id} className="grid gap-4 py-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_80px_130px_130px_150px] xl:items-center xl:px-4">
               <div className="min-w-0">
-                <Link to={`/admin/offers/${r.id}`} className="break-words font-semibold text-foreground hover:text-accent">{r.title || "Bez nosaukuma"}</Link>
+                <Link to={offerEditorPath(r.id)} className="break-words font-semibold text-foreground hover:text-accent">{r.title || "Bez nosaukuma"}</Link>
                 <p className="mt-1 text-sm text-muted-foreground">{[r.client_name, r.client_company].filter(Boolean).join(" · ") || "Klients nav norādīts"}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("lv")}</p>
               </div>
@@ -143,7 +146,7 @@ const AdminOffers = () => {
               <div className="text-sm font-semibold tabular-nums"><span className="mr-2 text-xs font-normal text-muted-foreground xl:hidden">Ar PVN</span>{money(totals.gross)}</div>
               <div className="flex gap-2">
                 <Button asChild size="sm" variant="outline">
-                  <Link to={`/admin/offers/${r.id}`}><Pencil className="mr-2 h-3 w-3" /> Rediģēt</Link>
+                  <Link to={offerEditorPath(r.id)}><Pencil className="mr-2 h-3 w-3" /> Rediģēt</Link>
                 </Button>
                 <Button aria-label="Dzēst piedāvājumu" size="sm" variant="ghost" onClick={() => remove(r.id)} className="text-destructive">
                   <Trash2 className="h-4 w-4" />
@@ -153,7 +156,7 @@ const AdminOffers = () => {
           );
         })}
       </div>
-    </AdminLayout>
+    </OfferWorkspace>
   );
 };
 

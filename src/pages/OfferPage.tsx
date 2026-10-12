@@ -94,7 +94,7 @@ const OfferPage = () => {
         <article className="bg-card p-4 sm:p-8 print:border-0 print:p-0">
           <header className="flex flex-col gap-4 border-b border-border pb-5 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
-              <img src={logo} alt="Ervitex" className="h-12 w-auto sm:h-16" />
+              <img src={logo} alt="Ervitex" className="h-14 w-auto max-w-full sm:h-16" />
               <h1 className="mt-4 font-heading text-xl font-black uppercase leading-tight text-foreground sm:text-3xl">
                 {offer.title || t("Piedāvājums", "Offer")}
               </h1>

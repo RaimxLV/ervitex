@@ -91,6 +91,8 @@ const App = () => (
               <Route path="/saraksts/:token" element={<WorksheetPage />} />
               <Route path="/nodot/:token" element={<AssignPage />} />
               <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/offers" element={<ProtectedRoute><AdminOffers /></ProtectedRoute>} />
+              <Route path="/offers/:id" element={<ProtectedRoute><AdminOfferEdit /></ProtectedRoute>} />
               <Route path="/admin/offers" element={<ProtectedRoute><AdminOffers /></ProtectedRoute>} />
               <Route path="/admin/offers/:id" element={<ProtectedRoute><AdminOfferEdit /></ProtectedRoute>} />
 
