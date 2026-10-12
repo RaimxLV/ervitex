@@ -9,6 +9,9 @@ export const HEAVY_IMAGE_HOSTS = [
   "d2csxpduxe849s.cloudfront.net",
   "mediahub.beechfieldbrands.com",
   "cdn.fruitoftheloom.eu",
+  // Our mirrored UTT / Falk&Ross originals are 850–1300 px.
+  "ifwshbcwsehekbadsooh.supabase.co/storage/v1/object/public/utt-images",
+  "ifwshbcwsehekbadsooh.supabase.co/storage/v1/object/public/falkross-images",
 ];
 
 /** Resized WebP variant of a partner image (no-op for light hosts). */
