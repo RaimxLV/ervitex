@@ -1,5 +1,10 @@
 # Roadmap
 
+## Preču skata labojumi — 12.10.2026
+- [ ] Atjaunot īsu trīs soļu infografiku pie preces un pieprasījuma.
+- [ ] Latviskot specifikāciju un aprakstus, atdalīt kopšanu ar atbilstošām ikonām.
+- [ ] Atjaunot saistītās preces jaunajiem katalogiem un pārbaudīt pārlūkā.
+
 ## Pieprasījuma un piedāvājuma kolonnu audits — 12.10.2026
 - [x] Vienots preču, kontaktu un kopsavilkuma izkārtojums abām formām.
 - [x] Kopīga apdruka visām precēm ar cenu par vienību vai kopā; saglabāšana un klienta skats pārbaudīti, e-pasta datos kopīgā apdruka atsevišķi.
