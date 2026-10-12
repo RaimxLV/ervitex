@@ -43,6 +43,13 @@
       "when": 1791797145600,
       "tag": "0005_utt_clearance_price_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791810824451,
+      "tag": "0006_migration",
+      "breakpoints": true
     }
   ]
 }
