@@ -926,7 +926,8 @@ async function loadUTT(styleCode: string): Promise<ProductDetail | null> {
   const colors: ColorDetail[] = colorOrder.map((key) => {
     const info = colorInfo.get(key)!;
     const own = imgByColor.get(key) || [];
-    const merged = [...new Set([...own, ...shared])];
+    // Model photos without a colour often show another colour; use them only when the colour has none of its own.
+    const merged = own.length ? [...new Set(own)] : [...new Set(shared)];
     return { code: info.name, name: info.name, hex: info.hex, images: merged, sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes) };
   });
   if (colors.length === 0 && shared.length) {
@@ -1012,7 +1013,8 @@ async function loadFR(styleCode: string): Promise<ProductDetail | null> {
   const colors: ColorDetail[] = colorOrder.map((key) => {
     const info = colorInfo.get(key)!;
     const own = imgByColor.get(key) || [];
-    const merged = [...new Set([...own, ...shared])];
+    // Model photos without a colour often show another colour; use them only when the colour has none of its own.
+    const merged = own.length ? [...new Set(own)] : [...new Set(shared)];
     return { code: info.name, name: info.name, hex: info.hex, images: merged, sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes) };
   });
   if (colors.length === 0 && shared.length) {
@@ -1486,15 +1488,7 @@ const CatalogItemDialog = ({
             <div className="relative aspect-square md:aspect-[4/5] max-h-[70vh] w-full overflow-hidden bg-white flex items-center justify-center">
               {mainImg ? (
                 <>
-                  {/* Instant low-res preview so the frame is never blank */}
-                  <img
-                    src={thumbUrl(mainImg, 96) || mainImg}
-                    alt=""
-                    aria-hidden
-                    data-preview={mainImg}
-                    className="absolute inset-0 h-full w-full object-contain blur-[8px] scale-105 transition-opacity duration-300"
-                  />
-                  <GalleryImage
+<GalleryImage
                     src={thumbUrl(mainImg, 900) || mainImg}
                     fallback={mainImg}
                     alt={currentColor?.name || displayDetail.title || id}
