@@ -517,11 +517,11 @@
 @layer components {
   .quote-form { min-width: 0; }
   .quote-form label, .quote-label {
-    display: block;
     font-size: 12px;
     font-weight: 600;
     color: hsl(var(--muted-foreground));
   }
+  .quote-label { display: block; }
   .quote-form input, .quote-form [role="combobox"] {
     min-height: 44px;
     border-radius: var(--radius);
