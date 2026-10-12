@@ -1,4 +1,4 @@
-export type CatalogSource = "ss" | "nwg" | "pf" | "bb" | "mf" | "ru" | "utt";
+export type CatalogSource = "ss" | "nwg" | "pf" | "bb" | "mf" | "ru" | "utt" | "fr";
 
 export const SOURCE_META: Record<CatalogSource, { label: string; href: string; code: string }> = {
   ss: { label: "Stanley/Stella", href: "/stanley-stella", code: "S/S" },
@@ -8,4 +8,5 @@ export const SOURCE_META: Record<CatalogSource, { label: string; href: string; c
   mf: { label: "Malfini", href: "/malfini", code: "MF" },
   ru: { label: "Russell", href: "/catalog?source=ru", code: "RU" },
   utt: { label: "Gildan / Kariban / Regatta", href: "/catalog?source=utt", code: "UTT" },
+  fr: { label: "Build Your Brand / Flexfit", href: "/catalog?source=fr", code: "FR" },
 };

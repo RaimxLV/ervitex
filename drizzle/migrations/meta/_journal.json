@@ -29,6 +29,13 @@
       "when": 1791791419429,
       "tag": "0003_falkross_tables_and_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791792060281,
+      "tag": "0004_falkross_queue_public",
+      "breakpoints": true
     }
   ]
 }

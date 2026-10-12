@@ -472,6 +472,36 @@ export type Database = {
         }
         Relationships: []
       }
+      falkross_queue: {
+        Row: {
+          attempts: number
+          brand: string
+          done: boolean
+          mpn: string
+          title: string | null
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          attempts?: number
+          brand: string
+          done?: boolean
+          mpn: string
+          title?: string | null
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          attempts?: number
+          brand?: string
+          done?: boolean
+          mpn?: string
+          title?: string | null
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       falkross_styles: {
         Row: {
           brand: string

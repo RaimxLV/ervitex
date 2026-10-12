@@ -267,6 +267,12 @@ async function isAllowed(req: Request): Promise<boolean> {
   const token = auth.replace(/^Bearer\s+/i, "");
   if (!token) return false;
   if (token === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) return true;
+  // Scheduled calls may carry an older-format service key: verify it by an admin-only call.
+  try {
+    const svc = createClient(Deno.env.get("SUPABASE_URL")!, token, { auth: { persistSession: false } });
+    const { error } = await svc.auth.admin.listUsers({ page: 1, perPage: 1 });
+    if (!error) return true;
+  } catch { /* not a service key */ }
   const userClient = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
     global: { headers: { Authorization: `Bearer ${token}` } },
   });
