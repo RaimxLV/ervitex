@@ -3,7 +3,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 const TrustedBrands = () => {
   const { lang } = useLanguage();
   return (
-    <section aria-label={lang === "lv" ? "Ražotāji" : "Manufacturers"} className="brand-marquee border-y border-border bg-catalog-card-media py-7 md:py-10">
+    <section aria-label={lang === "lv" ? "Ražotāji" : "Manufacturers"} className="brand-marquee catalog-card-media border-y border-border py-7 md:py-10">
       <div className="container">
         <div className="overflow-hidden">
           <div className="brand-marquee-track flex w-max">

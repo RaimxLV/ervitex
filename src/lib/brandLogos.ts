@@ -1,5 +1,5 @@
 export interface BrandLogoEntry { name: string; src: string; sourcePage: string }
-export const normalizeBrandName = (name: string) => name.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]/g, "");
+export const normalizeBrandName = (name: string) => name.replace(/[®™©]/g, "").toLowerCase().normalize("NFKD").replace(/[^a-z0-9]/g, "");
 const pointers = import.meta.glob<{ default: { url: string } }>("../assets/brands/*.asset.json", { eager: true });
 const sources = import.meta.glob<{ default: { name: string; sourcePage: string } }>("../assets/brands/*.source.json", { eager: true });
 export const brandLogos: BrandLogoEntry[] = Object.entries(sources).flatMap(([path, source]) => {
