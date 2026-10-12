@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Attēli un preču izvēle — 12.10.2026
-- [ ] Auditēt attēlu dubultošanos visos attēlošanas ceļos un pārbaudīt W51 pārlūkā.
-- [ ] Nomainīt trīs soļus uz Raimonda norādīto tekstu.
-- [ ] Citu krāsu pievienotos izmērus un skaitu izkārtot atsevišķās kolonnās; pārbaudīt krāsu maiņu un pieprasījumu.
+- [x] Auditēti attēlošanas ceļi, 11 lapas un visas 37 foto norādes (pieejamas); vietējo foto precīzu kopiju nav. W51 dubultā kontūra ir piegādātāja d diagrammā: Malfini preces skatā priekšroka tīram a foto, diagrammas izlaistas, ja ir foto. Kartīšu alternatīvie foto parādās tikai pēc ielādes, bez divu siluetu pārklāšanās. Ne katrs piegādātāju kataloga foto vizuāli pārskatīts.
+- [x] Trīs soļi nomainīti precīzi uz Raimonda norādīto tekstu, darbiniekiem pēdējais solis attiecas uz piedāvājumu.
+- [x] Citu krāsu izmērs un skaits atsevišķās kolonnās. Pārlūkā W51 44/46 — 5 gab., 48/50 — 2 gab.; krāsas maiņa, vienas rindas dzēšana un pieprasījums ar atlikušajiem 5 gab. pārbaudīti. 15 esošie testi sekmīgi, build OK, lapas kļūdu nav; e-pasts nav nosūtīts.
 
 ## Preču skata labojumi — 12.10.2026
 - [x] Atjaunot īsu trīs soļu infografiku pie preces un pieprasījuma.
