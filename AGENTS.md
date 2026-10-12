@@ -31,3 +31,4 @@
 - UTT Europe (Gildan/Kariban/Regatta) syncs through the `utt-sync` Data Export API function into `utt_*` tables; buying prices live in service-role-only `utt_prices` and images are mirrored to the `utt-images` bucket because UTT forbids hotlinking and blocks hotlinking IPs.
 - Headings are thickened with `.hero-ultra` (-webkit-text-stroke) because the heading face caps at 700; its leading must be repeated per breakpoint, since theme text sizes emit their own line-height.
 
+- Catalog filter order (sections and items) lives in `catalog_filter_order` (admin-only writes, public read) and is applied with applyOrder so new filters append after saved ones; the IndexedDB catalog cache is only served when its row count matches the live count and the grid renders only after all batches, so stale supplier lists never flash.
