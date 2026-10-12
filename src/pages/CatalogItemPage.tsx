@@ -73,7 +73,8 @@ const CatalogItemPage = () => {
         if (cancelled) return;
         const candidates = (rel || []) as unknown as RelatedItem[];
         const matching = inferredCategory ? candidates.filter(r => categoryFromName(r.name) === inferredCategory) : candidates;
-        const list = (matching.length ? matching : candidates.filter(r => r.brand === cur.brand)).slice(0, 6);
+        const ranked = matching.length ? matching : candidates.filter(r => r.brand === cur.brand);
+        const list = [...ranked].sort((a, b) => Number(b.brand === cur.brand) - Number(a.brand === cur.brand)).slice(0, 6);
         setRelated(list);
 
         if (list.length) {

@@ -3,6 +3,11 @@ import { BleachBan, TumbleDry, DryCleanBan, Iron, assignCareIcons } from "./Care
 import { TriangleAlert, WashingMachine } from "lucide-react";
 
 describe("care icon meaning", () => {
+  it("preserves Latvian drying and dry cleaning prohibitions", () => {
+    const items = assignCareIcons(["Nežāvēt veļas žāvētājā", "Netīrīt ķīmiski"]);
+    expect(items.map(item => item.Icon)).toEqual([TumbleDry, DryCleanBan]);
+    expect(items.every(item => item.ban)).toBe(true);
+  });
   it("does not mark permitted tumble drying as prohibited", () => {
     const item = assignCareIcons(["Tumble dry at reduced temperature, max. 60 °C"])[0];
     expect(item.Icon).toBe(TumbleDry);

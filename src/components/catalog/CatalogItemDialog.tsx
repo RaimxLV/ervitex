@@ -1406,7 +1406,7 @@ const CatalogItemDialog = ({
       })
     : rawLines;
 
-  const materialText = translated?.material || rawMaterial;
+  const materialText = (translated?.material || rawMaterial)?.replace(/\s*\|\s*/g, " · ");
   const careText = translated?.care || rawCare;
   const careList = useMemo(() => (careText ? careClauses(careText) : []), [careText]);
   const careItems = useMemo(() => assignCareIcons(careList), [careList]);
@@ -1717,7 +1717,7 @@ const CatalogItemDialog = ({
                                 {translateLabel(s.label, lang)}
                               </dt>
                               <dd className="mt-0.5 text-sm text-foreground">
-                                {translateValue(s.value, lang)}
+                                {translateValue(s.value, lang).replace(/\s*\|\s*/g, " · ")}
                               </dd>
                             </div>
                           ))}
