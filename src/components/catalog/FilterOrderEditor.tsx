@@ -12,6 +12,8 @@ export interface EditableSection {
   key: string;
   title: string;
   items: { value: string; label: string }[];
+  /** Nested second level (e.g. brands under a manufacturer), keyed by parent value. */
+  nestedItems?: Record<string, { value: string; label: string }[]>;
 }
 
 interface Props {
