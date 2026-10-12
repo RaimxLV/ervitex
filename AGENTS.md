@@ -2,7 +2,7 @@
 
 - Search entry points share searchScore/exactCodeHits for consistent ranking.
 - Offer creation shares CreateOfferButton and existing pm_offers drafts; staff edit in protected /offers routes with OfferWorkspace, never the admin shell.
-- Catalog, offer and worksheet color controls share ColorSelector; quantity pickers share SizeQuantityTable to prevent presentation drift.
+- Colors share ColorSelector; pickers share SizeQuantityTable; request/offer rows share QuoteItemsTable and PrintRows to prevent drift.
 
 - Public icons share AccentIcon framed/inline variants and semantic tones; print-icons holds Lucide-compatible print symbols for consistent strokes and sizes.
 - Public section eyebrows use one red line-label style; blue/cyan/green/slate remain icon-only, and technology use cases sit in a light centered panel for visual continuity.
@@ -16,7 +16,7 @@
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
 - Catalog cards default to the cheapest positive-priced colour and product views select its cheapest size via shared catalogPriceSelection helpers; explicit colour/size choices take precedence, keeping card and detail prices aligned.
 - "Ir noliktavā" is a manual admin flag in `stock_flags` per colour (`item_id` = `${id}::${color_code}`; bare `${id}` rows are legacy model-wide flags), separate from supplier data so syncs never erase it; it shows only in the product view for the selected colour, never on catalog cards; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.
-- Shared worksheet printing costs use `PrintLine.scope = "order"` inside the existing side-specific item drafts, preserving autosave/version behavior without a second persistence path.
+- Shared worksheet/offer prints use scope="order" in existing item JSON; orderPrinting preserves offer-wide prints on deletion, preventing duplicate charges and extra storage.
 - Stock mutation controls render only after the authenticated admin role resolves, and every mutation revalidates the live user and role before writing; public users only see the outlined availability label.
 - Public pages use fine-pointer Lenis and native touch scrolling; admin/offers/worksheet/login stay native. WebGL hero depth follows scroll/eased fine-pointer movement, renders on change and pauses off-screen for performance.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
