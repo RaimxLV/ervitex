@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -42,15 +42,17 @@ const FilterOrderEditor = ({ sections: initial, onSave, onClose }: Props) => {
   const [sections, setSections] = useState(initial);
   const [open, setOpen] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  useEffect(() => { console.log("DBGMOUNT"); }, []);
+  useEffect(() => { console.log("DBGSTATE", sections.map((x) => x.key).join(",")); }, [sections]);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
   const moveSections = (e: DragEndEvent) => {
-    console.log("DBGDRAG", e.active.id, e.over?.id);
-    if (!e.over || e.active.id === e.over.id) return;
-    setSections((s) => arrayMove(s, s.findIndex((x) => x.key === e.active.id), s.findIndex((x) => x.key === e.over!.id)));
+    const a = String(e.active.id), o = e.over ? String(e.over.id) : null;
+    if (!o || a === o) return;
+    setSections((s) => arrayMove(s, s.findIndex((x) => x.key === a), s.findIndex((x) => x.key === o)));
   };
   const moveItems = (key: string) => (e: DragEndEvent) => {
     if (!e.over || e.active.id === e.over.id) return;
