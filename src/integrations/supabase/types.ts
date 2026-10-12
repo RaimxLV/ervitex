@@ -410,6 +410,175 @@ export type Database = {
         }
         Relationships: []
       }
+      falkross_images: {
+        Row: {
+          color_name: string | null
+          created_at: string
+          failed_at: string | null
+          id: number
+          sort_order: number
+          source_path: string
+          style_code: string
+          url: string | null
+        }
+        Insert: {
+          color_name?: string | null
+          created_at?: string
+          failed_at?: string | null
+          id?: number
+          sort_order?: number
+          source_path: string
+          style_code: string
+          url?: string | null
+        }
+        Update: {
+          color_name?: string | null
+          created_at?: string
+          failed_at?: string | null
+          id?: number
+          sort_order?: number
+          source_path?: string
+          style_code?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "falkross_images_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "falkross_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
+      falkross_prices: {
+        Row: {
+          currency: string
+          purchase_price: number | null
+          sku: string
+          updated_at: string
+        }
+        Insert: {
+          currency?: string
+          purchase_price?: number | null
+          sku: string
+          updated_at?: string
+        }
+        Update: {
+          currency?: string
+          purchase_price?: number | null
+          sku?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      falkross_styles: {
+        Row: {
+          brand: string
+          care: string | null
+          category: string | null
+          created_at: string
+          cut: string | null
+          description: string | null
+          details: string | null
+          fabric: string | null
+          gender: string | null
+          hidden_by_admin: boolean
+          is_new: boolean
+          last_synced_at: string | null
+          name: string | null
+          published: boolean
+          sizes: string[] | null
+          style_code: string
+          updated_at: string
+          weight: string | null
+        }
+        Insert: {
+          brand: string
+          care?: string | null
+          category?: string | null
+          created_at?: string
+          cut?: string | null
+          description?: string | null
+          details?: string | null
+          fabric?: string | null
+          gender?: string | null
+          hidden_by_admin?: boolean
+          is_new?: boolean
+          last_synced_at?: string | null
+          name?: string | null
+          published?: boolean
+          sizes?: string[] | null
+          style_code: string
+          updated_at?: string
+          weight?: string | null
+        }
+        Update: {
+          brand?: string
+          care?: string | null
+          category?: string | null
+          created_at?: string
+          cut?: string | null
+          description?: string | null
+          details?: string | null
+          fabric?: string | null
+          gender?: string | null
+          hidden_by_admin?: boolean
+          is_new?: boolean
+          last_synced_at?: string | null
+          name?: string | null
+          published?: boolean
+          sizes?: string[] | null
+          style_code?: string
+          updated_at?: string
+          weight?: string | null
+        }
+        Relationships: []
+      }
+      falkross_variants: {
+        Row: {
+          active: boolean
+          color_hex: string | null
+          color_name: string | null
+          size: string | null
+          size_order: number
+          sku: string
+          stock: number
+          style_code: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          color_hex?: string | null
+          color_name?: string | null
+          size?: string | null
+          size_order?: number
+          sku: string
+          stock?: number
+          style_code: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          color_hex?: string | null
+          color_name?: string | null
+          size?: string | null
+          size_order?: number
+          sku?: string
+          stock?: number
+          style_code?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "falkross_variants_style_code_fkey"
+            columns: ["style_code"]
+            isOneToOne: false
+            referencedRelation: "falkross_styles"
+            referencedColumns: ["style_code"]
+          },
+        ]
+      }
       mega_menu_items: {
         Row: {
           active: boolean
