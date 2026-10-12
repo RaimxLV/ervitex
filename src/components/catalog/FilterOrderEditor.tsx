@@ -12,6 +12,8 @@ export interface EditableSection {
   key: string;
   title: string;
   items: { value: string; label: string }[];
+  /** Nested second level (e.g. brands under a manufacturer), keyed by parent value. */
+  nestedItems?: Record<string, { value: string; label: string }[]>;
 }
 
 interface Props {
@@ -56,11 +58,33 @@ const FilterOrderEditor = ({ sections: initial, onSave, onClose }: Props) => {
       items: arrayMove(sec.items, sec.items.findIndex((i) => i.value === e.active.id), sec.items.findIndex((i) => i.value === e.over!.id)),
     }));
   };
+  const moveNested = (key: string, parent: string) => (e: DragEndEvent) => {
+    if (!e.over || e.active.id === e.over.id) return;
+    setSections((s) => s.map((sec) => {
+      if (sec.key !== key || !sec.nestedItems?.[parent]) return sec;
+      const list = sec.nestedItems[parent];
+      const idOf = (i: { value: string }) => `${parent}/${i.value}`;
+      return {
+        ...sec,
+        nestedItems: {
+          ...sec.nestedItems,
+          [parent]: arrayMove(list, list.findIndex((i) => idOf(i) === e.active.id), list.findIndex((i) => idOf(i) === e.over!.id)),
+        },
+      };
+    }));
+  };
 
   const save = async () => {
     setSaving(true);
     const next: FilterOrderMap = { [SECTIONS_ORDER_KEY]: sections.map((s) => s.key) };
-    for (const s of sections) next[s.key] = s.items.map((i) => i.value);
+    for (const s of sections) {
+      next[s.key] = s.items.map((i) => i.value);
+      if (s.nestedItems) {
+        for (const [parent, list] of Object.entries(s.nestedItems)) {
+          next[`${s.key}:${parent}`] = list.map((i) => i.value);
+        }
+      }
+    }
     const err = await onSave(next);
     setSaving(false);
     if (!err) onClose();
@@ -84,9 +108,24 @@ const FilterOrderEditor = ({ sections: initial, onSave, onClose }: Props) => {
                     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={moveItems(s.key)}>
                       <SortableContext items={s.items.map((i) => i.value)} strategy={verticalListSortingStrategy}>
                         {s.items.map((i) => (
-                          <Row key={i.value} id={i.value}>
-                            <span className="truncate py-1.5 pr-2 text-sm">{i.label}</span>
-                          </Row>
+                          <div key={i.value}>
+                            <Row id={i.value}>
+                              <span className="truncate py-1.5 pr-2 text-sm">{i.label}</span>
+                            </Row>
+                            {s.nestedItems?.[i.value] && (
+                              <div className="ml-6 mt-1 space-y-1 border-l border-border pl-2">
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={moveNested(s.key, i.value)}>
+                                  <SortableContext items={s.nestedItems[i.value].map((n) => `${i.value}/${n.value}`)} strategy={verticalListSortingStrategy}>
+                                    {s.nestedItems[i.value].map((n) => (
+                                      <Row key={n.value} id={`${i.value}/${n.value}`}>
+                                        <span className="truncate py-1 pr-2 text-xs text-muted-foreground">{n.label}</span>
+                                      </Row>
+                                    ))}
+                                  </SortableContext>
+                                </DndContext>
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </SortableContext>
                     </DndContext>
