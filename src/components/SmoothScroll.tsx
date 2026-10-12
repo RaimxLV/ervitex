@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Lenis from "lenis";
+import "lenis/dist/lenis.css";
 
 /**
  * Wheel smoothing for public pages. Admin, worksheet and login pages
@@ -18,9 +19,9 @@ const SmoothScroll = () => {
     const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
     if (reduce || coarsePointer) return;
 
+    // lerp follows the wheel from the first frame (duration-based easing felt delayed).
     const lenis = new Lenis({
-      duration: 1.1,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      lerp: 0.16,
       smoothWheel: true,
       syncTouch: false,
       wheelMultiplier: 1,
