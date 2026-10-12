@@ -17,8 +17,8 @@ const BRANDS = [
   { slug: "Build-Your-Brand-", brand: "Build Your Brand" },
   { slug: "Flexfit-", brand: "Flexfit" },
 ];
-const DATA_BUDGET_MS = 170_000;
-const IMAGE_BUDGET_MS = 100_000;
+const DATA_BUDGET_MS = 100_000;
+const IMAGE_BUDGET_MS = 90_000;
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36";
 
 const json = (body: unknown, status = 200) =>
