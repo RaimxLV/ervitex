@@ -272,6 +272,7 @@ const AdminOfferEdit = () => {
         client_email: next.client_email,
         client_phone: next.client_phone,
         note: next.note,
+        client_billing: next.client_billing || null,
         status: next.status,
         vat_rate: next.vat_rate,
         pm_name: next.pm_name || null,
@@ -502,7 +503,7 @@ const AdminOfferEdit = () => {
           </section>
           <section className="border-b border-border pb-6">
             <h2 className="section-kicker mb-5 font-heading text-xs font-bold uppercase text-accent">Apdruka visām precēm</h2>
-            <PrintRows value={getOrderPrints(offer.items)} onChange={(prints) => setOffer((o) => ({ ...o, items: setOrderPrints(o.items, prints) }))} addLabel="Pievienot kopīgu apdruku" />
+            <PrintRows disabled={offer.items.length === 0} value={getOrderPrints(offer.items)} onChange={(prints) => setOffer((o) => ({ ...o, items: setOrderPrints(o.items, prints) }))} addLabel="Pievienot kopīgu apdruku" />
           </section>
         </div>
 
