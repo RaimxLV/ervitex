@@ -19,6 +19,7 @@ import { assignCareIcons } from "./CareIcons";
 import { GalleryImage } from "@/components/GalleryImage";
 import { warmGalleryImages } from "@/lib/galleryImages";
 import { separateProductSpecs, productTextLines, splitCareInstructions } from "@/lib/productContent";
+import { BrandLogo } from "@/components/BrandLogo";
 
 
 interface Props {
@@ -1571,11 +1572,7 @@ const CatalogItemDialog = ({
                     </Link>
                   </span>
                 </div>
-                {displayBrand && (
-                  <span className="rounded-full bg-foreground px-3 py-1 font-heading text-[10px] font-bold uppercase tracking-widest text-background">
-                    {displayBrand}
-                  </span>
-                )}
+                <BrandLogo brand={displayBrand || SOURCE_META[source].label} className="h-10 w-32" />
               </div>
 
                 <h1 className="font-heading text-3xl font-black uppercase tracking-wide">

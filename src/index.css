@@ -162,6 +162,14 @@
 }
 
 @layer components {
+  .brand-marquee-track { animation: brand-marquee-scroll 180s linear infinite; }
+  .brand-marquee:hover .brand-marquee-track { animation-play-state: paused; }
+  @keyframes brand-marquee-scroll { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .brand-marquee-track { animation: none; }
+    .brand-marquee .overflow-hidden { overflow-x: auto; }
+    .brand-marquee-track > [aria-hidden="true"] { display: none; }
+  }
   .technology-card { transition: box-shadow 300ms ease, background-color 300ms ease, border-color 300ms ease, transform 300ms ease; }
   @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     .technology-card:hover { transform: translateY(-6px) !important; }

@@ -1,5 +1,11 @@
 # Roadmap
 
+## Ražotāju logotipi — 12.10.2026
+- [x] Iegūti 56 oficiāli ražotāju/piegādātāju logo, sākumlapas slīdošā josla ar pauzi zem peles un samazinātas kustības atbalstu.
+- [x] Kopīgs logo preču kartītēs, saistītajās precēs un preces skatā; filtri nemainīti.
+- [x] Īstais Build Your Brand katalogs un BY429 atvēršana pārbaudīti pārlūkā; logo ielādējas, lapas kļūdu nav.
+- [ ] Graid, RFX un STAC logo: oficiālais PF Concept zīmolu avots tos nepiedāvā; līdz pārbaudīta materiāla saņemšanai saglabāts zīmola teksts, logo nav izdomāts.
+
 ## Kompakts pieteikums un trīs soļi — 12.10.2026
 - [x] Samazināts pieteikuma virsraksts; instrukcija no pieteikuma formas noņemta. Pie preces trīs vienāda platuma soļi ar ikonām, numuriem un virziena norādēm; pārlūkā pārbaudīts, build OK.
 
