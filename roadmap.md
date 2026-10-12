@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Pieprasījuma un piedāvājuma kolonnu audits — 12.10.2026
-- [ ] Vienots preču, kontaktu un kopsavilkuma izkārtojums abām formām.
-- [ ] Kopīga apdruka visām precēm, saglabāšana, klienta un e-pasta attēlojums bez dubultas summēšanas.
-- [ ] Testi un reāla piedāvājuma saglabāšanas/pārlādes pārbaude; klienta formas pārbaude bez testa e-pastu sūtīšanas.
+- [x] Vienots preču, kontaktu un kopsavilkuma izkārtojums abām formām.
+- [x] Kopīga apdruka visām precēm ar cenu par vienību vai kopā; saglabāšana un klienta skats pārbaudīti, e-pasta datos kopīgā apdruka atsevišķi.
+- [x] 5 testi sekmīgi; autentificēti STTU169, 3 gab., kopīga DTF €4/gab. saglabāta un pārlādēta, publicētā klienta skatā vienreiz. Pārbaudes piedāvājumi dzēsti; klienta forma ar 2 izmēriem un Sietspiedi pārbaudīta bez pārplūdes/kļūdām. E-pasti un klienta pieprasījums pārbaudē netika nosūtīti.
 
 ## Vienotas formas un piedāvājumi ārpus admina — 12.10.2026
 - [x] Kopīga krāsu izvēle ar nosaukumiem un ritināmu režģi katalogā, piedāvājumā un preču sarakstā; vienota izmēru/cenu/skaita tabula, instrukciju bloki noņemti.

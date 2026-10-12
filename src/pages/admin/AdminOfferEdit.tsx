@@ -17,7 +17,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import DiscountField from "@/components/quote/DiscountField";
-import { PRINT_METHODS } from "@/lib/worksheet";
 import { money, itemPrintNet, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
 import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
 import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Repeat, Save, Search, Send, Trash2, Plus } from "lucide-react";
@@ -204,16 +203,6 @@ const AdminOfferEdit = () => {
     () => (swapKey ? offer.items.find((i) => groupKey(i) === swapKey) || null : null),
     [swapKey, offer.items],
   );
-  const firstOfGroup = useMemo(() => {
-    const seen = new Set<string>();
-    const ids = new Set<string>();
-    for (const i of offer.items) {
-      const k = groupKey(i);
-      if (!seen.has(k)) { seen.add(k); ids.add(i.id); }
-    }
-    return ids;
-  }, [offer.items]);
-
   /** Nomaina modeli/krāsu visai grupai, saglabājot izmērus un daudzumus */
   const swapPicked = () => {
     if (!picked || !swapKey) return;

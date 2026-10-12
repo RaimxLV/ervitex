@@ -16,7 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Upload, Send, X, ArrowLeft } from "lucide-react";
+import { Trash2, Upload, Send } from "lucide-react";
 
 const MAX_FILES = 10;
 const MAX_FILE_MB = 15;
