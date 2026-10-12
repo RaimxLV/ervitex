@@ -418,70 +418,7 @@ const AdminOfferEdit = () => {
 
       <h1 className="mb-7 font-heading text-2xl font-black uppercase sm:text-3xl">Mans piedāvājums</h1>
       <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="space-y-6">
-          {/* Client */}
-          <section className="border-b border-border pb-6">
-            <h2 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Piedāvājuma dati</h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <Label className="text-xs">Nosaukums</Label>
-                <Input value={offer.title} onChange={(e) => setOffer({ ...offer, title: e.target.value })} placeholder="Piem. Komandas krekli — SIA Piemērs" />
-              </div>
-              <div>
-                <Label className="text-xs">Klients</Label>
-                <Input value={offer.client_name} onChange={(e) => setOffer({ ...offer, client_name: e.target.value })} />
-              </div>
-              <div>
-                <Label className="text-xs">Uzņēmums</Label>
-                <Input value={offer.client_company || ""} onChange={(e) => setOffer({ ...offer, client_company: e.target.value })} />
-              </div>
-              <div>
-                <Label className="text-xs">E-pasts</Label>
-                <Input type="email" value={offer.client_email || ""} onChange={(e) => setOffer({ ...offer, client_email: e.target.value })} />
-              </div>
-              <div>
-                <Label className="text-xs">Telefons</Label>
-                <Input value={offer.client_phone || ""} onChange={(e) => setOffer({ ...offer, client_phone: e.target.value })} placeholder="+371…" />
-              </div>
-              <div>
-                <Label className="text-xs">PVN %</Label>
-                <Input type="number" value={offer.vat_rate} onChange={(e) => setOffer({ ...offer, vat_rate: Number(e.target.value) || 0 })} />
-              </div>
-
-
-              <div>
-                <Label className="text-xs">Projektu vadītājs</Label>
-                <Select
-                  value={offer.pm_email || OFFICE_EMAIL}
-                  onValueChange={(v) =>
-                    setOffer({
-                      ...offer,
-                      pm_email: v,
-                      pm_name: PROJECT_MANAGERS.find((p) => p.email === v)?.name || (v === OFFICE_EMAIL ? "Ervitex birojs" : offer.pm_name || ""),
-                    })
-                  }
-                >
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {PROJECT_MANAGERS.map((p) => (
-                      <SelectItem key={p.email} value={p.email}>{p.name} · {p.email}</SelectItem>
-                    ))}
-                    <SelectItem value={OFFICE_EMAIL}>Ervitex birojs · {OFFICE_EMAIL}</SelectItem>
-                    {offer.pm_email && !PROJECT_MANAGERS.some((p) => p.email === offer.pm_email) && offer.pm_email !== OFFICE_EMAIL && (
-                      <SelectItem value={offer.pm_email}>{offer.pm_email}</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-
-              </div>
-              <div className="sm:col-span-2">
-                <Label className="text-xs">Piezīme klientam</Label>
-                <Textarea rows={3} value={offer.note || ""} onChange={(e) => setOffer({ ...offer, note: e.target.value })} placeholder="Apdrukas veids, izmērs, termiņi…" />
-              </div>
-
-            </div>
-          </section>
-
+        <div className="min-w-0 space-y-6">
           {/* Picker */}
           <section id="preces-izvele" className="scroll-mt-36 border-b border-border pb-6">
             <h2 className="section-kicker font-heading text-xs font-bold uppercase text-accent">
@@ -617,6 +554,70 @@ const AdminOfferEdit = () => {
             </dl>
             
           </div>
+
+          {/* Client */}
+          <section className="border-b border-border pb-6">
+            <h2 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Piedāvājuma dati</h2>
+            <div className="mt-4 grid gap-4">
+              <div className="">
+                <Label className="text-xs">Nosaukums</Label>
+                <Input value={offer.title} onChange={(e) => setOffer({ ...offer, title: e.target.value })} placeholder="Piem. Komandas krekli — SIA Piemērs" />
+              </div>
+              <div>
+                <Label className="text-xs">Klients</Label>
+                <Input value={offer.client_name} onChange={(e) => setOffer({ ...offer, client_name: e.target.value })} />
+              </div>
+              <div>
+                <Label className="text-xs">Uzņēmums</Label>
+                <Input value={offer.client_company || ""} onChange={(e) => setOffer({ ...offer, client_company: e.target.value })} />
+              </div>
+              <div>
+                <Label className="text-xs">E-pasts</Label>
+                <Input type="email" value={offer.client_email || ""} onChange={(e) => setOffer({ ...offer, client_email: e.target.value })} />
+              </div>
+              <div>
+                <Label className="text-xs">Telefons</Label>
+                <Input value={offer.client_phone || ""} onChange={(e) => setOffer({ ...offer, client_phone: e.target.value })} placeholder="+371…" />
+              </div>
+              <div>
+                <Label className="text-xs">PVN %</Label>
+                <Input type="number" value={offer.vat_rate} onChange={(e) => setOffer({ ...offer, vat_rate: Number(e.target.value) || 0 })} />
+              </div>
+
+
+              <div>
+                <Label className="text-xs">Projektu vadītājs</Label>
+                <Select
+                  value={offer.pm_email || OFFICE_EMAIL}
+                  onValueChange={(v) =>
+                    setOffer({
+                      ...offer,
+                      pm_email: v,
+                      pm_name: PROJECT_MANAGERS.find((p) => p.email === v)?.name || (v === OFFICE_EMAIL ? "Ervitex birojs" : offer.pm_name || ""),
+                    })
+                  }
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {PROJECT_MANAGERS.map((p) => (
+                      <SelectItem key={p.email} value={p.email}>{p.name} · {p.email}</SelectItem>
+                    ))}
+                    <SelectItem value={OFFICE_EMAIL}>Ervitex birojs · {OFFICE_EMAIL}</SelectItem>
+                    {offer.pm_email && !PROJECT_MANAGERS.some((p) => p.email === offer.pm_email) && offer.pm_email !== OFFICE_EMAIL && (
+                      <SelectItem value={offer.pm_email}>{offer.pm_email}</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+
+              </div>
+              <div className="">
+                <Label className="text-xs">Piezīme klientam</Label>
+                <Textarea rows={3} value={offer.note || ""} onChange={(e) => setOffer({ ...offer, note: e.target.value })} placeholder="Apdrukas veids, izmērs, termiņi…" />
+              </div>
+
+            </div>
+          </section>
+
 
           <div className="space-y-3 border-t border-border pt-5">
             <h3 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Nosūtīt klientam</h3>
