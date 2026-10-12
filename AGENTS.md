@@ -1,8 +1,9 @@
 # Architecture rules
 
-- Search entry points share searchScore/exactCodeHits for consistent ranking.
+- Search shares searchScore/exactCodeHits for consistent ranking.
+- productContent separates supplier care/specs; fingerprint translation caches to avoid stale metadata.
 - Offer creation shares CreateOfferButton and existing pm_offers drafts; staff edit in protected /offers routes with OfferWorkspace, never the admin shell.
-- Colors share ColorSelector; pickers share SizeQuantityTable; request/offer rows share QuoteItemsTable and PrintRows to prevent drift.
+- Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows and QuoteSteps to prevent UI drift.
 
 - Public icons share AccentIcon framed/inline variants and semantic tones; print-icons holds Lucide-compatible print symbols for consistent strokes and sizes.
 - Public section eyebrows use one red line-label style; blue/cyan/green/slate remain icon-only, and technology use cases sit in a light centered panel for visual continuity.
