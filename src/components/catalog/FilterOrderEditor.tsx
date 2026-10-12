@@ -107,9 +107,24 @@ const FilterOrderEditor = ({ sections: initial, onSave, onClose }: Props) => {
                     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={moveItems(s.key)}>
                       <SortableContext items={s.items.map((i) => i.value)} strategy={verticalListSortingStrategy}>
                         {s.items.map((i) => (
-                          <Row key={i.value} id={i.value}>
-                            <span className="truncate py-1.5 pr-2 text-sm">{i.label}</span>
-                          </Row>
+                          <div key={i.value}>
+                            <Row id={i.value}>
+                              <span className="truncate py-1.5 pr-2 text-sm">{i.label}</span>
+                            </Row>
+                            {s.nestedItems?.[i.value] && (
+                              <div className="ml-6 mt-1 space-y-1 border-l border-border pl-2">
+                                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={moveNested(s.key, i.value)}>
+                                  <SortableContext items={s.nestedItems[i.value].map((n) => `${i.value}/${n.value}`)} strategy={verticalListSortingStrategy}>
+                                    {s.nestedItems[i.value].map((n) => (
+                                      <Row key={n.value} id={`${i.value}/${n.value}`}>
+                                        <span className="truncate py-1 pr-2 text-xs text-muted-foreground">{n.label}</span>
+                                      </Row>
+                                    ))}
+                                  </SortableContext>
+                                </DndContext>
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </SortableContext>
                     </DndContext>
