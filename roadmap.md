@@ -1,5 +1,8 @@
 # Roadmap
 
+## Kompakts pieteikums un trīs soļi — 12.10.2026
+- [x] Samazināts pieteikuma virsraksts; instrukcija no pieteikuma formas noņemta. Pie preces trīs vienāda platuma soļi ar ikonām, numuriem un virziena norādēm; pārlūkā pārbaudīts, build OK.
+
 ## Attēli un preču izvēle — 12.10.2026
 - [x] Auditēti attēlošanas ceļi, 11 lapas un visas 37 foto norādes (pieejamas); vietējo foto precīzu kopiju nav. W51 dubultā kontūra ir piegādātāja d diagrammā: Malfini preces skatā priekšroka tīram a foto, diagrammas izlaistas, ja ir foto. Kartīšu alternatīvie foto parādās tikai pēc ielādes, bez divu siluetu pārklāšanās. Ne katrs piegādātāju kataloga foto vizuāli pārskatīts.
 - [x] Trīs soļi nomainīti precīzi uz Raimonda norādīto tekstu, darbiniekiem pēdējais solis attiecas uz piedāvājumu.
