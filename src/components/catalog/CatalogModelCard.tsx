@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
 import { unproxyUrl } from "@/lib/imageProxy";
+import { BrandLogo } from "@/components/BrandLogo";
 
 
 const VALID_HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
@@ -216,8 +217,8 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
               </span>
             )}
             {brandBadge && (
-               <span className="codebar-brand flex min-w-0 flex-1 items-center justify-end overflow-hidden border-l border-primary-foreground/20 px-1.5 py-1 text-right font-heading font-bold uppercase sm:px-3 sm:py-1.5">
-                <span className="truncate">{brandBadge}</span>
+               <span className="flex min-w-0 flex-1 items-center justify-end overflow-hidden border-l border-primary-foreground/20">
+                <BrandLogo brand={brandBadge} className="h-7 w-[72px] max-w-full sm:h-9 sm:w-28" />
               </span>
             )}
           </div>

@@ -1,26 +1,17 @@
-const brands = [
-  "Stanley/Stella", "Craft", "Clique", "ProJob", "Cutter & Buck",
-  "Elevate", "Roly", "Russell", "Beechfield Brands", "Malfini",
-  "Prezentmateriāli",
-];
-
+import { brandLogos } from "@/lib/brandLogos";
+import { useLanguage } from "@/i18n/LanguageContext";
 const TrustedBrands = () => {
+  const { lang } = useLanguage();
   return (
-    <section className="border-y border-border bg-background py-7 md:py-12">
+    <section aria-label={lang === "lv" ? "Ražotāji" : "Manufacturers"} className="brand-marquee border-y border-border bg-catalog-card-media py-7 md:py-10">
       <div className="container">
-        {/* Scrolling brand logos (text-based, monochrome) */}
         <div className="overflow-hidden">
-          <div className="flex animate-scroll-left whitespace-nowrap">
-            {[...Array(3)].map((_, setIdx) => (
-              <div key={setIdx} className="flex shrink-0">
-                {brands.map((brand, i) => (
-                  <div
-                    key={`${setIdx}-${i}`}
-                    className="mx-6 flex items-center md:mx-10"
-                  >
-                    <span className="font-heading text-lg font-bold uppercase text-muted-foreground/40 transition-colors duration-300 hover:text-foreground md:text-xl">
-                      {brand}
-                    </span>
+          <div className="brand-marquee-track flex w-max">
+            {[0, 1].map((setIdx) => (
+              <div key={setIdx} aria-hidden={setIdx === 1 ? true : undefined} className="flex shrink-0 items-center">
+                {brandLogos.map((brand) => (
+                  <div key={`${setIdx}-${brand.name}`} className="mx-7 flex h-12 w-28 shrink-0 items-center justify-center md:mx-10 md:h-14 md:w-36">
+                    <img src={brand.src} alt={setIdx === 0 ? brand.name : ""} title={brand.name} loading="lazy" decoding="async" className="h-full w-full object-contain" />
                   </div>
                 ))}
               </div>
@@ -31,5 +22,4 @@ const TrustedBrands = () => {
     </section>
   );
 };
-
 export default TrustedBrands;
