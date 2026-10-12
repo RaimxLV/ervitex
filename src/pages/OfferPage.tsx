@@ -1,3 +1,4 @@
+import { getOrderPrints } from "@/lib/orderPrinting";
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -166,7 +167,7 @@ const OfferPage = () => {
                     </td>
                     <td className="py-3 text-right font-medium tabular-nums whitespace-nowrap">
                       {i.unitPrice || itemPrintNet(i) ? money((i.unitPrice || 0) * i.qty + itemPrintNet(i)) : "—"}
-                      {(i.prints || []).filter((p) => Number(p.price) > 0).map((p, k) => (
+                      {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
                         <span key={k} className="block text-[11px] font-normal text-muted-foreground">
                           + {p.method}{p.placement ? ` (${p.placement})` : ""} {money(Number(p.price))}{p.mode === "total" ? "" : ` / ${t("gab.", "pc")}`}
                         </span>
@@ -209,7 +210,7 @@ const OfferPage = () => {
                         <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">
                           {i.unitPrice ? `${money(i.unitPrice)} / ${t("gab.", "pc")}` : t("pēc pieprasījuma", "on request")}
                         </span>
-                        {(i.prints || []).filter((p) => Number(p.price) > 0).map((p, k) => (
+                        {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
                           <span key={k} className="block text-[10px] text-muted-foreground">+ {p.method} {money(Number(p.price))}{p.mode === "total" ? "" : ` / ${t("gab.", "pc")}`}</span>
                         ))}
                         {(i.unitPrice || itemPrintNet(i)) ? (
@@ -223,6 +224,10 @@ const OfferPage = () => {
             ))}
           </ul>
 
+          {getOrderPrints(offer.items).length > 0 && <section className="mt-6 border-t border-border py-5">
+            <h2 className="section-kicker mb-4 font-heading text-xs font-bold uppercase text-accent">{t("Apdruka visām precēm", "Decoration for all items")}</h2>
+            {getOrderPrints(offer.items).map((p, index) => <div key={index} className="flex flex-wrap justify-between gap-3 py-2 text-sm"><span className="font-semibold">{p.method}{p.placement ? ` · ${p.placement}` : ""}</span><span className="tabular-nums">{p.price ? `${money(p.price)} ${p.mode === "total" ? t("kopā", "total") : t("/ gab.", "/ unit")}` : "—"}</span></div>)}
+          </section>}
           <div className="mt-6 flex justify-end border-t border-border pt-5">
             <dl className="w-full space-y-1.5 text-sm sm:max-w-xs">
               <div className="flex justify-between gap-4">

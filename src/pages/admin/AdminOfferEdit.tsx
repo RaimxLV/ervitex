@@ -1,3 +1,6 @@
+import { QuoteItemsTable } from "@/components/quote/QuoteItemsTable";
+import { PrintRows } from "@/components/quote/PrintRows";
+import { getOrderPrints, setOrderPrints, removeOfferItem } from "@/lib/orderPrinting";
 import logo from "@/assets/ervitex-logo-dark.svg";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -253,7 +256,7 @@ const AdminOfferEdit = () => {
   const patchItem = (itemId: string, patch: Partial<OfferItem>) =>
     setOffer((o) => ({ ...o, items: o.items.map((i) => (i.id === itemId ? { ...i, ...patch } : i)) }));
   const removeItem = (itemId: string) =>
-    setOffer((o) => ({ ...o, items: o.items.filter((i) => i.id !== itemId) }));
+    setOffer((o) => ({ ...o, items: removeOfferItem(o.items, itemId) }));
 
   const totals = offerTotals(offer.items, offer.vat_rate, offer.discount);
 
@@ -348,7 +351,7 @@ const AdminOfferEdit = () => {
         templateData: {
           title: offer.title || "Ervitex piedāvājums",
           clientName: offer.client_name || "",
-          note: offer.note || "",
+          note: [offer.note, ...getOrderPrints(offer.items).map((p) => `Apdruka visām precēm: ${p.method}${p.placement ? ` (${p.placement})` : ""}${p.price ? ` — ${money(p.price)}${p.mode === "total" ? " kopā" : " / gab."}` : ""}`)].filter(Boolean).join("\n"),
           pmName,
           pmEmail,
 
@@ -360,7 +363,7 @@ const AdminOfferEdit = () => {
             qty: i.qty,
             unitPrice: i.unitPrice ? money(i.unitPrice) : null,
             lineTotal: i.unitPrice || itemPrintNet(i) ? money((i.unitPrice || 0) * i.qty + itemPrintNet(i)) : "",
-            prints: (i.prints || []).filter((p) => Number(p.price) > 0).map((p) => `${p.method}${p.placement ? ` (${p.placement})` : ""}: ${money(Number(p.price))}${p.mode === "total" ? " kopā" : " / gab."}`),
+            prints: (i.prints || []).filter((p) => p.scope !== "order").map((p) => `${p.method}${p.placement ? ` (${p.placement})` : ""}: ${money(Number(p.price))}${p.mode === "total" ? " kopā" : " / gab."}`),
           })),
           discount: t.discount > 0 ? `−${money(t.discount)}${offer.discount?.type === "percent" ? ` (${offer.discount.value}%)` : ""}` : "",
           totalQty: t.qty,
@@ -395,7 +398,8 @@ const AdminOfferEdit = () => {
 
   return (
     <OfferWorkspace>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="quote-form">
+      <header className="mb-7 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-6">
         <div className="flex flex-wrap items-center gap-3">
           <img src={logo} alt="Ervitex" className="h-14 w-auto max-w-full sm:h-16" />
           <Button asChild variant="outline" size="sm">
@@ -410,10 +414,10 @@ const AdminOfferEdit = () => {
             <Save className="mr-2 h-4 w-4" /> Saglabāt
           </Button>
         </div>
-      </div>
+      </header>
 
-
-      <div className="mt-6 grid min-w-0 gap-8 xl:grid-cols-[minmax(0,1fr)_300px]">
+      <h1 className="mb-7 font-heading text-2xl font-black uppercase sm:text-3xl">Mans piedāvājums</h1>
+      <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-6">
           {/* Client */}
           <section className="border-b border-border pb-6">
@@ -552,68 +556,21 @@ const AdminOfferEdit = () => {
             {offer.items.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">Vēl nav pievienota neviena prece.</p>
             ) : (
-              <div className="mt-4 divide-y divide-border border-y border-border">
-                <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_60px_80px_105px_120px_36px] gap-3 bg-muted/50 px-3 py-3 text-xs font-semibold text-muted-foreground xl:grid">
-                  <span>Prece</span><span>Krāsa</span><span>Izmērs</span><span className="text-center">Skaits</span><span>Cena bez PVN</span><span className="text-right">Summa bez PVN</span><span />
-                </div>
-                {offer.items.map((i) => (
-                  <div key={i.id} className="grid grid-cols-2 gap-3 py-4 sm:grid-cols-3 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_60px_80px_105px_120px_36px] xl:items-center xl:px-3">
-                    <div className="col-span-2 flex min-w-0 items-start gap-3 sm:col-span-3 xl:col-span-1">
-                      {i.image && <img src={i.image} alt="" loading="lazy" className="h-16 w-16 shrink-0 border border-border bg-background object-contain" />}
-                      <div className="min-w-0 flex-1">
-                        <p className="break-words text-sm font-semibold text-foreground">{i.name}</p>
-                        <p className="mt-1 text-sm text-muted-foreground">{i.code}</p>
-                        {firstOfGroup.has(i.id) && <Button size="sm" variant="ghost" className="mt-1 h-7 px-0 text-xs text-accent" onClick={() => {
-                          setSwapKey(groupKey(i)); setPicked(null); setQ("");
-                          document.getElementById("preces-izvele")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }}><Repeat className="mr-1.5 h-3.5 w-3.5" /> Cits modelis</Button>}
-                      </div>
-                    </div>
-                    <div className="min-w-0"><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Krāsa</span><span className="flex items-center gap-2 break-words text-sm">{i.colorHex && <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-border" style={{ background: i.colorHex }} />}{i.colorName || "—"}</span></div>
-                    <div><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Izmērs</span><span className="text-sm">{i.size || "—"}</span></div>
-                    <label><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Skaits</span><Input aria-label={`Skaits ${i.code} ${i.size || ""}`} type="number" min={1} value={i.qty} onChange={(e) => patchItem(i.id, { qty: Math.max(1, Number(e.target.value) || 1) })} className="h-10 text-center" /></label>
-                    <label><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Cena bez PVN</span><DecimalInput aria-label={`Cena ${i.code} ${i.size || ""}`} value={i.unitPrice} placeholder="0,00" onValueChange={(v) => patchItem(i.id, { unitPrice: v })} className="h-10" /></label>
-                    <div className="text-right tabular-nums"><span className="mb-1 block text-xs text-muted-foreground xl:hidden">Summa bez PVN</span><p className="text-sm font-semibold">{money((i.unitPrice || 0) * i.qty + itemPrintNet(i))}</p><p className="mt-1 text-xs text-muted-foreground">{money(((i.unitPrice || 0) * i.qty + itemPrintNet(i)) * (1 + offer.vat_rate / 100))} ar PVN</p></div>
-                    <Button type="button" size="icon" variant="ghost" aria-label="Dzēst pozīciju" onClick={() => removeItem(i.id)} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
-                    <div className="col-span-2 space-y-2 sm:col-span-3 xl:col-span-7 xl:pl-20">
-                      {(i.prints || []).map((p, n) => {
-                        const setP = (c: Partial<NonNullable<OfferItem["prints"]>[number]>) =>
-                          patchItem(i.id, { prints: (i.prints || []).map((x, k) => (k === n ? { ...x, ...c } : x)) });
-                        return (
-                          <div key={n} className="grid grid-cols-2 items-end gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_110px_100px_36px]">
-                            <select value={p.method} onChange={(e) => setP({ method: e.target.value })} className="h-8 rounded-sm border border-input bg-background px-2 text-[13px]">
-                              {PRINT_METHODS.map((m) => <option key={m} value={m}>{m}</option>)}
-                            </select>
-                            <Input value={p.placement || ""} placeholder="Vieta" onChange={(e) => setP({ placement: e.target.value })} className="h-8 w-full px-2 text-[13px]" />
-                            <DecimalInput value={p.price} placeholder="€ bez PVN" onValueChange={(v) => setP({ price: v })} className="h-8 w-full px-2 text-[13px]" />
-                            <select value={p.mode || "unit"} onChange={(e) => setP({ mode: e.target.value as "unit" | "total" })} className="h-8 rounded-sm border border-input bg-background px-2 text-[13px]">
-                              <option value="unit">/ gab.</option>
-                              <option value="total">kopā</option>
-                            </select>
-                            <Button size="icon" variant="ghost" type="button" aria-label="Dzēst apdruku" onClick={() => patchItem(i.id, { prints: (i.prints || []).filter((_, k) => k !== n) })} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
-                        );
-                      })}
-                      <Button variant="ghost" size="sm"
-                        type="button"
-                        onClick={() => patchItem(i.id, { prints: [...(i.prints || []), { method: PRINT_METHODS[0], placement: "", price: null, mode: "unit" }] })}
-                        className="inline-flex items-center gap-1 px-0 text-xs font-semibold text-accent"
-                      >
-                        <Plus className="mr-1 h-3.5 w-3.5" /> Apdruka / izšūšana
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <div className="mt-4"><QuoteItemsTable items={offer.items} onQuantity={(id, qty) => patchItem(id, { qty })} onPrice={(id, unitPrice) => patchItem(id, { unitPrice })} onRemove={removeItem}
+                groupAction={(i) => <Button type="button" size="sm" variant="ghost" className="mt-1 px-0 text-accent" onClick={() => { setSwapKey(groupKey(i)); setPicked(null); setQ(""); document.getElementById("preces-izvele")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><Repeat className="h-4 w-4" />Cits modelis</Button>}
+                itemDetails={(i) => <PrintRows value={(i.prints || []).filter((p) => p.scope !== "order")} onChange={(prints) => patchItem(i.id, { prints: [...prints, ...(i.prints || []).filter((p) => p.scope === "order")] })} addLabel={`Apdruka · ${i.size || "—"}`} />}
+              /></div>
 
             )}
+          </section>
+          <section className="border-b border-border pb-6">
+            <h2 className="section-kicker mb-5 font-heading text-xs font-bold uppercase text-accent">Apdruka visām precēm</h2>
+            <PrintRows value={getOrderPrints(offer.items)} onChange={(prints) => setOffer((o) => ({ ...o, items: setOrderPrints(o.items, prints) }))} addLabel="Pievienot kopīgu apdruku" />
           </section>
         </div>
 
         {/* Sidebar */}
-        <aside className="space-y-5 xl:sticky xl:top-6 xl:self-start">
+        <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
           {/* Status */}
           <div className="border-t border-border pt-5">
             <h3 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Statuss</h3>
@@ -701,6 +658,7 @@ const AdminOfferEdit = () => {
             </div>
           </div>
         </aside>
+      </div>
       </div>
     </OfferWorkspace>
   );
