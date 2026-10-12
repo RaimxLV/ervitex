@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import OfferWorkspace from "@/components/quote/OfferWorkspace";
 import { QuoteItemsTable } from "@/components/quote/QuoteItemsTable";
-import { QuoteSteps } from "@/components/quote/QuoteSteps";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AccentIcon } from "@/components/ui/accent-icon";
 import logo from "@/assets/ervitex-logo-dark.svg";
@@ -152,9 +151,8 @@ const RequestPage = () => {
       <div className="quote-form">
         <header className="mb-7 border-b border-border pb-6">
           <img src={logo} alt="Ervitex" className="mb-5 h-14 w-auto sm:h-16" />
-          <h1 className="font-heading text-2xl font-black uppercase sm:text-3xl">{isAdmin ? t("Mans piedāvājums", "My offer") : t("Mans pieprasījums", "My request")}</h1>
+          <h1 className="font-heading text-lg font-bold uppercase leading-snug sm:text-xl">{isAdmin ? t("Mans piedāvājums", "My offer") : t("Mans pieprasījums", "My request")}</h1>
         </header>
-        <div className="mb-6"><QuoteSteps offer={isAdmin} /></div>
         {items.length === 0 ? (
           <div className="rounded-sm border border-dashed border-border bg-card/50 px-5 py-10 text-center sm:rounded-sm sm:p-14">
             <p className="mx-auto max-w-sm text-sm text-muted-foreground">
