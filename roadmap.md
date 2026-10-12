@@ -1,5 +1,10 @@
 # Roadmap
 
+## Ražotāju logotipi — 12.10.2026
+- [ ] Iegūt pieslēgto ražotāju oficiālos logo un ievietot sākumlapas slīdošajā joslā.
+- [ ] Preču kartītēs un preces skatā aizvietot ražotāja tekstu ar mazu logo; filtrus nemainīt.
+- [ ] Pārbaudīt logo ielādi un izkārtojumu pārlūkā.
+
 ## Kompakts pieteikums un trīs soļi — 12.10.2026
 - [x] Samazināts pieteikuma virsraksts; instrukcija no pieteikuma formas noņemta. Pie preces trīs vienāda platuma soļi ar ikonām, numuriem un virziena norādēm; pārlūkā pārbaudīts, build OK.
 
