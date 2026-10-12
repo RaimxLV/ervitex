@@ -76,7 +76,14 @@ const FilterOrderEditor = ({ sections: initial, onSave, onClose }: Props) => {
   const save = async () => {
     setSaving(true);
     const next: FilterOrderMap = { [SECTIONS_ORDER_KEY]: sections.map((s) => s.key) };
-    for (const s of sections) next[s.key] = s.items.map((i) => i.value);
+    for (const s of sections) {
+      next[s.key] = s.items.map((i) => i.value);
+      if (s.nestedItems) {
+        for (const [parent, list] of Object.entries(s.nestedItems)) {
+          next[`${s.key}:${parent}`] = list.map((i) => i.value);
+        }
+      }
+    }
     const err = await onSave(next);
     setSaving(false);
     if (!err) onClose();
