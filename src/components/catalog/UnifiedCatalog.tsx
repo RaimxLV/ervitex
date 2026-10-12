@@ -741,10 +741,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       const list = Array.from(counts, ([label, count]) => ({ label, value: label, count }))
         .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
       // Manufacturers with a single brand (e.g. Stanley/Stella) get no sub-list.
-      if (list.length > 1) nested[manufacturer.value] = list;
+      if (list.length > 1) nested[manufacturer.value] = applyOrder(list, filterOrder[`source:${manufacturer.value}`], (i) => i.value);
     }
     return nested;
-  }, [items, sourceItems]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items, sourceItems, filterOrder]);
 
   // ── LV translations for facet values ──
   const CATEGORY_LV: Record<string, string> = {
