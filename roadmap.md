@@ -1,5 +1,11 @@
 # Roadmap
 
+## Preču skata labojumi — 12.10.2026
+- [x] Atjaunot īsu trīs soļu infografiku pie preces un pieprasījuma.
+- [x] Tulkojumā iekļaut visu specifikāciju; aprakstus sadalīt punktos, kopšanu izņemt no specifikācijas un rādīt ar ikonām. Pārbaudīts BY070, KA551 un STTU169, pievienošana pieprasījumam; e-pasts nav nosūtīts.
+- [x] Atjaunot saistītās preces jaunajiem katalogiem: bez kategorijas atlasīt pēc preces tipa, prioritāte tam pašam zīmolam.
+- [ ] Falk&Ross kopšanas dati: piegādātāja importā visiem 255 modeļiem lauks tukšs; vajadzīgs pārbaudīts piegādātāja kopšanas datu avots, instrukcijas neizdomāt.
+
 ## Pieprasījuma un piedāvājuma kolonnu audits — 12.10.2026
 - [x] Vienots preču, kontaktu un kopsavilkuma izkārtojums abām formām.
 - [x] Kopīga apdruka visām precēm ar cenu par vienību vai kopā; saglabāšana un klienta skats pārbaudīti, e-pasta datos kopīgā apdruka atsevišķi.

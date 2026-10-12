@@ -18,6 +18,7 @@ import { AccentIcon } from "@/components/ui/accent-icon";
 import { assignCareIcons } from "./CareIcons";
 import { GalleryImage } from "@/components/GalleryImage";
 import { warmGalleryImages } from "@/lib/galleryImages";
+import { separateProductSpecs, productTextLines, splitCareInstructions } from "@/lib/productContent";
 
 
 interface Props {
@@ -121,18 +122,7 @@ const cleanText = (v?: unknown): string | null => {
 };
 
 // Kopšanas nosacījumi: teksts sadalīts īsos punktos, katram tiek atbilstoša ikona.
-const CARE_CLAUSE_SPLIT = /[\n•·;]+|\.\s+|,\s+/;
-const careClauses = (text: string): string[] => {
-  const out: string[] = [];
-  for (const piece of text.split(CARE_CLAUSE_SPLIT)) {
-    const p = piece.replace(/\s+/g, " ").replace(/[.\s]+$/, "").trim();
-    if (!p) continue;
-    const withCap = p.charAt(0).toUpperCase() + p.slice(1);
-    if (out.length && p.length < 10) out[out.length - 1] = `${out[out.length - 1]}, ${p}`;
-    else out.push(withCap);
-  }
-  return out.slice(0, 8);
-};
+const careClauses = splitCareInstructions;
 
 const addSpec = (arr: { label: string; value: string }[], label: string, value?: unknown, suffix = "") => {
   const v = cleanText(value);
@@ -1338,9 +1328,10 @@ const CatalogItemDialog = ({
 
 
 
-  const rawDescriptionLines = displayDetail.features.length ? displayDetail.features : lines(displayDetail.description || descriptionFallback);
-  const rawMaterial = displayDetail.material || null;
-  const rawCare = displayDetail.care || null;
+  const normalizedContent = separateProductSpecs(displayDetail.specs, displayDetail.care, displayDetail.material);
+  const rawDescriptionLines = productTextLines(displayDetail.features.length ? displayDetail.features.join("\n") : displayDetail.description || descriptionFallback || "");
+  const rawMaterial = normalizedContent.material;
+  const rawCare = normalizedContent.care;
   const rawShort = displayDetail.shortDescription || descriptionFallback || null;
 
   // On-demand LV auto-translation (cached in sessionStorage per model+lang)
@@ -1349,6 +1340,7 @@ const CatalogItemDialog = ({
     lines: string[];
     material: string | null;
     care: string | null;
+    specs: { label: string; value: string }[];
   } | null>(null);
 
   useEffect(() => {
@@ -1362,15 +1354,18 @@ const CatalogItemDialog = ({
     const linesEnd = items.length;
     push(rawMaterial);
     push(rawCare);
+    const specsStart = items.length;
+    for (const spec of normalizedContent.specs) { push(translateLabel(spec.label, "lv")); push(translateValue(spec.value, "lv")); }
     const nonEmpty = items.some((x) => x && /[a-zA-Z]/.test(x));
     if (!nonEmpty) return;
-    const cacheKey = `xlat:${source}:${id}:lv:v3`;
+    const fingerprint = JSON.stringify(items).split("").reduce((hash, c) => Math.imul(hash, 31) + c.charCodeAt(0) | 0, 0);
+    const cacheKey = `xlat:${source}:${id}:lv:${fingerprint}:v4`;
     // Purge stale translation caches from earlier versions (they may contain
     // raw supplier price tables that have since been cleaned out of the data).
     try {
       for (let i = sessionStorage.length - 1; i >= 0; i--) {
         const k = sessionStorage.key(i);
-        if (k && k.startsWith("xlat:") && !k.endsWith(":v3")) sessionStorage.removeItem(k);
+        if (k && k.startsWith("xlat:") && !k.endsWith(":v4")) sessionStorage.removeItem(k);
       }
     } catch { /* ignore */ }
     const cached = typeof sessionStorage !== "undefined" ? sessionStorage.getItem(cacheKey) : null;
@@ -1383,13 +1378,14 @@ const CatalogItemDialog = ({
         const { data, error } = await supabase.functions.invoke("translate-text", {
           body: { texts: items, target: "lv" },
         });
-        if (cancelled || error || !data?.translations) return;
+        if (cancelled || error || !Array.isArray(data?.translations) || data.translations.length !== items.length) return;
         const out = data.translations as string[];
         const result = {
           short: out[0] || null,
           lines: out.slice(linesStart, linesEnd).filter(Boolean),
           material: out[linesEnd] || null,
           care: out[linesEnd + 1] || null,
+          specs: normalizedContent.specs.map((spec, index) => ({ label: out[specsStart + index * 2] || spec.label, value: out[specsStart + index * 2 + 1] || spec.value })),
         };
         setTranslated(result);
         try { sessionStorage.setItem(cacheKey, JSON.stringify(result)); } catch { /* ignore */ }
@@ -1399,7 +1395,7 @@ const CatalogItemDialog = ({
   }, [lang, detail, source, id]);
 
   const shortDescription = translated?.short || rawShort;
-  const rawLines = translated?.lines.length ? translated.lines : rawDescriptionLines;
+  const rawLines = translated?.lines.length ? productTextLines(translated.lines.join("\n")) : rawDescriptionLines;
   // Avoid duplicating the intro paragraph inside the "Description" block
   const norm = (s: string) => s.replace(/\s+/g, " ").replace(/[•·✓\-–—]/g, "").trim().toLowerCase();
   const shortNorm = shortDescription ? norm(shortDescription) : "";
@@ -1410,7 +1406,7 @@ const CatalogItemDialog = ({
       })
     : rawLines;
 
-  const materialText = translated?.material || rawMaterial;
+  const materialText = (translated?.material || rawMaterial)?.replace(/\s*\|\s*/g, " · ");
   const careText = translated?.care || rawCare;
   const careList = useMemo(() => (careText ? careClauses(careText) : []), [careText]);
   const careItems = useMemo(() => assignCareIcons(careList), [careList]);
@@ -1473,9 +1469,9 @@ const CatalogItemDialog = ({
   const displayCategory = displayDetail.category || category;
 
   // Filter out redundant specs (already shown as top pills) and translate them
-  const filteredSpecs = (displayDetail.specs || []).filter((s) => {
+  const filteredSpecs = (lang === "lv" && translated?.specs ? translated.specs : normalizedContent.specs).filter((s) => {
     const l = s.label.toLowerCase();
-    return l !== "brand"; // brand is shown as a pill
+    return l !== "brand" && l !== "zīmols"; // brand is shown as a pill
   });
 
   // Specifikācija un apraksts blakus kolonnās, kad abu ir pietiekami
@@ -1721,7 +1717,7 @@ const CatalogItemDialog = ({
                                 {translateLabel(s.label, lang)}
                               </dt>
                               <dd className="mt-0.5 text-sm text-foreground">
-                                {translateValue(s.value, lang)}
+                                {translateValue(s.value, lang).replace(/\s*\|\s*/g, " · ")}
                               </dd>
                             </div>
                           ))}
@@ -1732,11 +1728,11 @@ const CatalogItemDialog = ({
                     {descriptionLines.length > 0 && (
                       <div>
                         <h4 className="mb-2 font-heading text-sm font-bold uppercase tracking-wider">{label.description}</h4>
-                        <ul className="space-y-1.5 text-sm">
+                        <ul className="space-y-3 text-sm leading-relaxed">
                           {descriptionLines.map((b, i) => (
                             <li key={`${b}-${i}`} className="flex gap-2">
                               <AccentIcon icon={Check} inline className="h-5 w-4" />
-                              <span className="text-foreground/90">{b}</span>
+                              <span className="min-w-0 break-words text-foreground/90">{b}</span>
                             </li>
                           ))}
                         </ul>

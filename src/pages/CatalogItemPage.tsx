@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { categoryFromName } from "@/lib/catalogCategory";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 
@@ -48,6 +49,7 @@ const CatalogItemPage = () => {
   // Load current item meta + related
   useEffect(() => {
     if (!validSource || !id) return;
+    setMeta(null); setRelated([]); setPrices(new Map());
     let cancelled = false;
     (async () => {
       const { data: current } = await supabase
@@ -60,16 +62,19 @@ const CatalogItemPage = () => {
       const cur = current as unknown as RelatedItem | null;
       setMeta(cur);
 
-      if (cur?.category) {
-        const { data: rel } = await supabase
-          .from("catalog_items" as any)
+      if (cur) {
+        const inferredCategory = categoryFromName(cur.name);
+        const query = supabase.from("catalog_items" as any)
           .select("source,id,name,brand,category,image_url,hover_image_url,colors")
-          .eq("source", validSource)
-          .eq("category", cur.category)
-          .neq("id", id)
-          .limit(12);
+          .eq("source", validSource).neq("id", id);
+        const { data: rel } = cur.category
+          ? await query.eq("category", cur.category).order("id").limit(12)
+          : await query.order("id").range(0, 999);
         if (cancelled) return;
-        const list = ((rel || []) as unknown as RelatedItem[]).slice(0, 8);
+        const candidates = (rel || []) as unknown as RelatedItem[];
+        const matching = inferredCategory ? candidates.filter(r => categoryFromName(r.name) === inferredCategory) : candidates;
+        const ranked = matching.length ? matching : candidates.filter(r => r.brand === cur.brand);
+        const list = [...ranked].sort((a, b) => Number(b.brand === cur.brand) - Number(a.brand === cur.brand)).slice(0, 6);
         setRelated(list);
 
         if (list.length) {

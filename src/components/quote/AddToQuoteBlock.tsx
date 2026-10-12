@@ -8,6 +8,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useCreateOffer } from "@/components/quote/CreateOfferButton";
+import { QuoteSteps } from "./QuoteSteps";
 
 interface Props {
   source: string;
@@ -139,6 +140,7 @@ const AddToQuoteBlock = ({
 
   return (
     <div className="border-t border-border py-5 space-y-4">
+      <QuoteSteps offer={isAdmin} />
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="font-heading text-base font-black uppercase tracking-wider text-foreground">
