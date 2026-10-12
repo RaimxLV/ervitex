@@ -48,6 +48,7 @@ const FilterOrderEditor = ({ sections: initial, onSave, onClose }: Props) => {
   );
 
   const moveSections = (e: DragEndEvent) => {
+    console.log("DBGDRAG", e.active.id, e.over?.id);
     if (!e.over || e.active.id === e.over.id) return;
     setSections((s) => arrayMove(s, s.findIndex((x) => x.key === e.active.id), s.findIndex((x) => x.key === e.over!.id)));
   };
