@@ -1108,6 +1108,14 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           key: sec.key,
           title: sec.title,
           items: sec.items.map((i) => ({ value: i.value ?? i.label, label: i.label })),
+          nestedItems: sec.nestedItems
+            ? Object.fromEntries(
+                Object.entries(sec.nestedItems).map(([parent, list]) => [
+                  parent,
+                  list.map((i) => ({ value: i.value ?? i.label, label: i.label })),
+                ])
+              )
+            : undefined,
         }))}
         onSave={saveFilterOrder}
         onClose={() => setArranging(false)}
