@@ -451,7 +451,7 @@ async function syncData(sb: SupabaseClient): Promise<Record<string, unknown>> {
     }
     retiredStyles = retire.length;
     const { error: refreshError } = await sb.rpc("refresh_catalog_prices");
-    if (refreshError) throw new Error(`refresh_catalog_prices: ${refreshError.message}`);
+    if (refreshError) console.warn(`[falkross-sync] refresh_catalog_prices deferred to nightly job: ${refreshError.message}`);
     continueImages();
   }
 
