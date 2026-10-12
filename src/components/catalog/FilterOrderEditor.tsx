@@ -63,11 +63,12 @@ const FilterOrderEditor = ({ sections: initial, onSave, onClose }: Props) => {
     setSections((s) => s.map((sec) => {
       if (sec.key !== key || !sec.nestedItems?.[parent]) return sec;
       const list = sec.nestedItems[parent];
+      const idOf = (i: { value: string }) => `${parent}/${i.value}`;
       return {
         ...sec,
         nestedItems: {
           ...sec.nestedItems,
-          [parent]: arrayMove(list, list.findIndex((i) => i.value === e.active.id), list.findIndex((i) => i.value === e.over!.id)),
+          [parent]: arrayMove(list, list.findIndex((i) => idOf(i) === e.active.id), list.findIndex((i) => idOf(i) === e.over!.id)),
         },
       };
     }));
