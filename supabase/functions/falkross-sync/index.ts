@@ -103,7 +103,11 @@ async function chipHex(url: string, cookieHeader: string | null): Promise<string
         r += px[i]; g += px[i + 1]; b += px[i + 2]; count++;
       }
     }
-    if (!count) return null;
+    if (!count) {
+      // Pure black/white chips: every pixel was skipped above, so average them all.
+      for (let i = 0; i < px.length; i += 4 * Math.max(1, Math.floor(n / 2000))) { r += px[i]; g += px[i + 1]; b += px[i + 2]; count++; }
+      if (!count) return null;
+    }
     const hex = (v: number) => Math.round(v / count).toString(16).padStart(2, "0");
     return `#${hex(r)}${hex(g)}${hex(b)}`;
   } catch {
