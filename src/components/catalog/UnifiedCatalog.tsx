@@ -22,6 +22,10 @@ import CatalogFiltersSidebar, {
   type FilterSection,
 } from "@/components/catalog/CatalogFiltersSidebar";
 import { useStockFlags, hasAnyStock } from "@/hooks/useStockFlags";
+import { useAuth } from "@/hooks/useAuth";
+import { useFilterOrder } from "@/hooks/useFilterOrder";
+import { applyOrder, SECTIONS_ORDER_KEY } from "@/lib/filterOrder";
+import FilterOrderEditor from "@/components/catalog/FilterOrderEditor";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
@@ -380,6 +384,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [sort, setSort] = useState<string>(searchParams.get("sort") || "newest");
   const [stockOnly, setStockOnly] = useState(searchParams.get("stock") === "1");
   const stockFlags = useStockFlags();
+  const { isAdmin, loading: authLoading } = useAuth();
+  const { order: filterOrder, save: saveFilterOrder } = useFilterOrder();
+  const [arranging, setArranging] = useState(false);
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
   // Tracks the query string this component itself wrote, so that navigations
@@ -526,9 +533,19 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       // 0) Disk cache (IndexedDB): render immediately from the previous visit
       //    and revalidate in the background (stale-while-revalidate).
       let servedFromCache = false;
-      const persisted = await readCatalogCache(cacheKey);
+      // Only trust the disk cache when it still has the same number of rows as
+      // the live catalog; otherwise an old visit's supplier list flashes first
+      // and newly connected catalogs pop into the filters a second later.
+      const [persisted, liveCount] = await Promise.all([
+        readCatalogCache(cacheKey),
+        (() => {
+          let q = supabase.from("catalog_items" as any).select("id", { count: "exact", head: true });
+          if (lockedSource) q = q.eq("source", lockedSource);
+          return q.then((r) => (r.error ? null : r.count ?? null));
+        })(),
+      ]);
       if (cancelled) return;
-      if (persisted) {
+      if (persisted && !persisted.stale && liveCount !== null && persisted.entry.items.length === liveCount) {
         const cachedItems = enrich((persisted.entry.items as unknown) as CatalogItem[]);
         const cachedRanges = toRanges((persisted.entry.prices as unknown) as any[]);
         if (cachedItems.length) {
@@ -564,11 +581,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       let priceRows = ((firstPrices.data || []) as unknown) as any[];
       const priceTotal = firstPrices.count ?? priceRows.length;
 
-      if (!servedFromCache) {
-        setItems(allItems);
-        setPriceRanges(toRanges(priceRows));
-        setLoaded(true);
-      }
 
       // 2) Remaining batches in parallel, then merge in one update.
       const itemOffsets: number[] = [];
@@ -580,6 +592,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         CATALOG_CACHE.set(cacheKey, { items: allItems, ranges });
         setItems(allItems);
         setPriceRanges(ranges);
+        setLoaded(true);
         void writeCatalogCache(cacheKey, rawItems, priceRows);
         return;
       }
@@ -602,6 +615,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       CATALOG_CACHE.set(cacheKey, { items: allItems, ranges });
       setItems(allItems);
       setPriceRanges(ranges);
+      setLoaded(true);
       void writeCatalogCache(cacheKey, rawItems, priceRows);
     })().catch(() => {
       if (!cancelled) {
@@ -1077,6 +1091,41 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
   );
 
+  const orderedSections: FilterSection[] = applyOrder(
+    filterSections.map((sec) => ({
+      ...sec,
+      items: applyOrder(sec.items, filterOrder[sec.key], (i) => i.value ?? i.label),
+    })),
+    filterOrder[SECTIONS_ORDER_KEY],
+    (sec) => sec.key,
+  );
+  const canArrange = !authLoading && isAdmin;
+  const renderFilters = (props: { hideHeader?: boolean; heading?: string }) =>
+    arranging && canArrange ? (
+      <FilterOrderEditor
+        sections={orderedSections.map((sec) => ({
+          key: sec.key,
+          title: sec.title,
+          items: sec.items.map((i) => ({ value: i.value ?? i.label, label: i.label })),
+        }))}
+        onSave={saveFilterOrder}
+        onClose={() => setArranging(false)}
+      />
+    ) : (
+      <>
+        {canArrange && (
+          <button
+            type="button"
+            onClick={() => setArranging(true)}
+            className="mb-2 w-full rounded-md border border-dashed border-border px-3 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground transition hover:border-accent hover:text-accent"
+          >
+            {lang === "lv" ? "Kārtot filtrus" : "Arrange filters"}
+          </button>
+        )}
+        <CatalogFiltersSidebar sections={orderedSections} onClearAll={clearAll} {...props} />
+      </>
+    );
+
   const totalSelectedFilters =
     sources.size + brands.size + categories.size + groups.size + genders.size + colors.size + (stockOnly ? 1 : 0);
 
@@ -1130,11 +1179,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                   </SheetTitle>
                 </SheetHeader>
                 <div>
-                  <CatalogFiltersSidebar
-                    sections={filterSections}
-                    onClearAll={clearAll}
-                    hideHeader
-                  />
+                  {renderFilters({ hideHeader: true })}
                 </div>
               </SheetContent>
 
@@ -1165,11 +1210,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
         <div className="flex flex-col gap-8 lg:flex-row">
           <div className="hidden lg:block lg:w-80 lg:shrink-0">
-            <CatalogFiltersSidebar
-              sections={filterSections}
-              onClearAll={clearAll}
-              heading={lang === "lv" ? "Filtri" : "Filters"}
-            />
+            {renderFilters({ heading: lang === "lv" ? "Filtri" : "Filters" })}
           </div>
 
           <div className="min-w-0 flex-1">
