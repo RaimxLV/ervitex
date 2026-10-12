@@ -4,6 +4,7 @@
 - [x] Iegūti 56 oficiāli ražotāju/piegādātāju logo, sākumlapas slīdošā josla ar pauzi zem peles un samazinātas kustības atbalstu.
 - [x] Kopīgs logo preču kartītēs, saistītajās precēs un preces skatā; filtri nemainīti.
 - [x] Īstais Build Your Brand katalogs un BY429 atvēršana pārbaudīti pārlūkā; logo ielādējas, lapas kļūdu nav.
+- [x] Kartīšu melnā josla sašaurināta tikai līdz preču kodam: logo un tā fons uz balta kartītes pamata; pārbaudīts pārlūkā (Cutter & Buck kartītes, 24 kodi), build OK.
 - [ ] Graid, RFX un STAC logo: oficiālais PF Concept zīmolu avots tos nepiedāvā; līdz pārbaudīta materiāla saņemšanai saglabāts zīmola teksts, logo nav izdomāts.
 
 ## Kompakts pieteikums un trīs soļi — 12.10.2026
