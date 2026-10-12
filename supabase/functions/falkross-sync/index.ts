@@ -196,20 +196,20 @@ interface Card { url: string; brand: string; mpn: string; title: string; }
 
 function parseListing(html: string, brand: string): Card[] {
   const out: Card[] = [];
-  const re = /<a class="articleBoxImage[^"]*"[^>]*href="([^"]+)"[\s\S]{0,5000}?product_mpn">\s*([^<]+)<\/span>[\s\S]{0,2000}?<\/a>\s*<div class="product_info_box_wrapper">([\s\S]{0,3000})/g;
-  for (const m of html.matchAll(re)) {
-    const url = m[1].split("?")[0].replace(/&/g, "&");
-    const mpn = m[2].trim();
-    const box = m[3];
-    const title = stripTags(decodeEnt(/product_title"[^>]*>([^<]+)</.exec(box)?.[1] ?? "")).trim();
-    if (!url || !mpn) continue;
-    out.push({ url, brand, mpn, title: title || mpn });
+  const parts = html.split(/<a class="articleBoxImage/).slice(1);
+  for (const part of parts) {
+    const href = /href="([^"]+)"/.exec(part)?.[1];
+    const mpn = /class="product_mpn"[^>]*>\s*([^<]+?)\s*</.exec(part)?.[1];
+    const title = /class="product_title"[^>]*>\s*([^<]+?)\s*</.exec(part)?.[1];
+    if (!href || !mpn) continue;
+    const url = decodeEnt(href).split("?")[0].replace(/^http:/, "https:");
+    out.push({ url, brand, mpn: mpn.trim(), title: decodeEnt(title || mpn).trim() });
   }
   return out;
 }
 
 function parseProductPage(html: string) {
-  const formAction = /<form class="js-oxProductForm" action="([^"]+)"/.exec(html)?.[1]?.replace(/&/g, "&");
+  const formAction = decodeEnt(/<form class="js-oxProductForm" action="([^"]+)"/.exec(html)?.[1] ?? "") || undefined;
   const formFields: Record<string, string> = {};
   const formStart = html.indexOf("js-oxProductForm");
   if (formAction && formStart >= 0) {
@@ -232,8 +232,8 @@ function parseProductPage(html: string) {
     colors.push({
       name,
       chipUrl: chipUrl ?? "",
-      picturePath: m[2].replace(/^https?:\/\/[^/]+/, "").replace(/&/g, "&"),
-      zoomPath: m[1].replace(/^https?:\/\/[^/]+/, "").replace(/&/g, "&"),
+      picturePath: decodeEnt(m[2]).replace(/^https?:\/\/[^/]+/, ""),
+      zoomPath: decodeEnt(m[1]).replace(/^https?:\/\/[^/]+/, ""),
       sort: colors.length,
     });
   }
@@ -258,7 +258,7 @@ function parseMatrix(content: string): { sizes: string[]; lines: MatrixLine[] } 
   for (const row of rows) {
     if (!row.includes("color_text first-column")) continue;
     const tds = [...row.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map((m) => stripTags(decodeEnt(m[1])).replace(/\s+/g, " ").trim());
-    sizeTexts.push(...tds.slice(1).filter(Boolean));
+    sizeTexts.push(...tds.slice(1).filter((t) => t && !/quantity|menge/i.test(t)));
     break;
   }
   const lines: MatrixLine[] = [];
@@ -351,7 +351,7 @@ async function processProduct(sb: SupabaseClient, fr: FrSession, card: Card): Pr
     if (color.zoomPath) {
       imageRows.push({
         style_code: card.mpn, color_name: color.name, source_path: color.zoomPath,
-        sort_order: color.sort, updated_at: undefined,
+        sort_order: color.sort,
       });
     }
   }
@@ -374,7 +374,7 @@ async function processProduct(sb: SupabaseClient, fr: FrSession, card: Card): Pr
 }
 
 function colorFields(colorName: string): Record<string, string> {
-  return { renderPartial: "newMatrixLine", renderNewid: "1", renderColor: colorName, listtype: "search" };
+  return { fnc: "", mlinesID: "1", renderPartial: "newMatrixLine", renderNewid: "1", renderColor: colorName, listtype: "search" };
 }
 
 /* ---------- modes ---------- */
@@ -385,8 +385,8 @@ async function buildQueue(sb: SupabaseClient, fr: FrSession): Promise<number> {
     const seen = new Set<string>();
     for (let page = 0; page < 40; page++) {
       const u = page === 0
-        ? `${BASE}/en/Brands/${slug}?shp=5&lang=1`
-        : `${BASE}/en/Brands/${slug}pgNr-${page}/?shp=5&lang=1`;
+        ? `${BASE}/en/Brands/${slug}/?shp=5&lang=1`
+        : `${BASE}/en/Brands/${slug}/pgNr-${page}/?shp=5&lang=1`;
       const cards = parseListing(await fr.getText(u), brand).filter((c) => !seen.has(c.url));
       if (!cards.length) break;
       cards.forEach((c) => seen.add(c.url));
@@ -412,7 +412,7 @@ async function syncData(sb: SupabaseClient): Promise<Record<string, unknown>> {
   for (;;) {
     const { data: batch, error } = await sb
       .from("falkross_queue")
-      .select("url,brand,mpn,title")
+      .select("url,brand,mpn,title,attempts")
       .eq("done", false)
       .lt("attempts", 3)
       .order("url")
@@ -525,6 +525,12 @@ async function isAllowed(req: Request): Promise<boolean> {
   const token = auth.replace(/^Bearer\s+/i, "");
   if (!token) return false;
   if (token === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) return true;
+  // Scheduled calls may carry an older-format service key: verify it by an admin-only call.
+  try {
+    const svc = createClient(Deno.env.get("SUPABASE_URL")!, token, { auth: { persistSession: false } });
+    const { error } = await svc.auth.admin.listUsers({ page: 1, perPage: 1 });
+    if (!error) return true;
+  } catch { /* not a service key */ }
   const userClient = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
     global: { headers: { Authorization: `Bearer ${token}` } },
   });
@@ -551,6 +557,7 @@ Deno.serve(async (req) => {
       const queued = await buildQueue(sb, fr);
       const { count: pending } = await sb.from("falkross_queue").select("url", { count: "exact", head: true }).eq("done", false).lt("attempts", 3);
       await finish({ status: "success", message: `Rinda: ${queued}, gaida apstrādi ${pending ?? 0}`, details: { queued, pending } });
+      if ((pending ?? 0) > 0) continueData();
       return json({ ok: true, mode, queued, pending });
     }
     if (mode === "images") {

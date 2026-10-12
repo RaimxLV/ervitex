@@ -114,6 +114,8 @@ const MANUFACTURERS: { key: string; label: string }[] = [
   { key: "utt-gildan", label: "Gildan" },
   { key: "utt-kariban", label: "Kariban" },
   { key: "utt-regatta", label: "Regatta" },
+  { key: "fr-build-your-brand", label: "Build Your Brand" },
+  { key: "fr-flexfit", label: "Flexfit" },
   { key: "pf", label: "Prezentmateriāli" },
   { key: "bb", label: "Beechfield Brands" },
   { key: "mf", label: "Malfini" },
@@ -160,6 +162,7 @@ const manufacturerOf = (source: CatalogSource, brand: string | null): string | n
     if (b.includes("regatta")) return "utt-regatta";
     return null;
   }
+  if ((source as string) === "fr") return b.includes("flexfit") ? "fr-flexfit" : "fr-build-your-brand";
   return source;
 };
 
@@ -1377,7 +1380,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
     return m ? `${m[1]}-C${m[2]}` : raw;
   };
   // UTT krāsas `c` ir krāsas nosaukums, nevis kods — rādām modeļa kodu.
-  const displayCode = formatCode(item.source === "utt" ? item.id : active?.c || item.id);
+  const displayCode = formatCode((item.source === "utt" || item.source === "fr") ? item.id : active?.c || item.id);
 
   // PF's catalog colour `c` is an item/article number, while variant prices
   // and the detail loader use the supplier colour code/name (BLACK, NAVY...).
