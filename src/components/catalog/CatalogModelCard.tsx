@@ -103,11 +103,12 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
     const [hovered, setHovered] = useState(false);
     const [hoverFailed, setHoverFailed] = useState(false);
     const [hoverReady, setHoverReady] = useState(false);
+    const baseImageRef = useRef<HTMLImageElement | null>(null);
     const triedFallback = useRef(false);
     const triedHoverFallback = useRef(false);
     const showHover = !!hoverImage && !hoverFailed && hoverReady;
     useEffect(() => {
-      setReady(false);
+      setReady(Boolean(baseImageRef.current?.complete && baseImageRef.current.naturalWidth > 0));
       setHoverReady(false);
       setHoverFailed(false);
       triedFallback.current = false;
@@ -136,6 +137,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
             <>
               {!ready && <div className="absolute inset-0 animate-pulse bg-neutral-100" />}
               <img
+                ref={baseImageRef}
                 src={image}
                 alt={imageAlt}
                 loading={priority ? "eager" : "lazy"}
