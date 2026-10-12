@@ -1,5 +1,10 @@
 # Roadmap
 
+## Pieprasījuma un piedāvājuma kolonnu audits — 12.10.2026
+- [ ] Vienots preču, kontaktu un kopsavilkuma izkārtojums abām formām.
+- [ ] Kopīga apdruka visām precēm, saglabāšana, klienta un e-pasta attēlojums bez dubultas summēšanas.
+- [ ] Testi un reāla piedāvājuma saglabāšanas/pārlādes pārbaude; klienta formas pārbaude bez testa e-pastu sūtīšanas.
+
 ## Vienotas formas un piedāvājumi ārpus admina — 12.10.2026
 - [x] Kopīga krāsu izvēle ar nosaukumiem un ritināmu režģi katalogā, piedāvājumā un preču sarakstā; vienota izmēru/cenu/skaita tabula, instrukciju bloki noņemti.
 - [x] Piedāvājumi atveras aizsargātā /offers darbinieka skatā bez admina izvēlnes; vecās admina adreses izmanto to pašu skatu.
