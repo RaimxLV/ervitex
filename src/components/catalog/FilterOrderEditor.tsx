@@ -48,18 +48,21 @@ const FilterOrderEditor = ({ sections: initial, onSave, onClose }: Props) => {
   );
 
   const moveSections = (e: DragEndEvent) => {
-    if (!e.over || e.active.id === e.over.id) return;
-    setSections((s) => arrayMove(s, s.findIndex((x) => x.key === e.active.id), s.findIndex((x) => x.key === e.over!.id)));
+    const a = String(e.active.id), o = e.over ? String(e.over.id) : null;
+    if (!o || a === o) return;
+    setSections((s) => arrayMove(s, s.findIndex((x) => x.key === a), s.findIndex((x) => x.key === o)));
   };
   const moveItems = (key: string) => (e: DragEndEvent) => {
-    if (!e.over || e.active.id === e.over.id) return;
+    const a = String(e.active.id), o = e.over ? String(e.over.id) : null;
+    if (!o || a === o) return;
     setSections((s) => s.map((sec) => sec.key !== key ? sec : {
       ...sec,
-      items: arrayMove(sec.items, sec.items.findIndex((i) => i.value === e.active.id), sec.items.findIndex((i) => i.value === e.over!.id)),
+      items: arrayMove(sec.items, sec.items.findIndex((i) => i.value === a), sec.items.findIndex((i) => i.value === o)),
     }));
   };
   const moveNested = (key: string, parent: string) => (e: DragEndEvent) => {
-    if (!e.over || e.active.id === e.over.id) return;
+    const a = String(e.active.id), o = e.over ? String(e.over.id) : null;
+    if (!o || a === o) return;
     setSections((s) => s.map((sec) => {
       if (sec.key !== key || !sec.nestedItems?.[parent]) return sec;
       const list = sec.nestedItems[parent];
@@ -68,7 +71,7 @@ const FilterOrderEditor = ({ sections: initial, onSave, onClose }: Props) => {
         ...sec,
         nestedItems: {
           ...sec.nestedItems,
-          [parent]: arrayMove(list, list.findIndex((i) => idOf(i) === e.active.id), list.findIndex((i) => idOf(i) === e.over!.id)),
+          [parent]: arrayMove(list, list.findIndex((i) => idOf(i) === a), list.findIndex((i) => idOf(i) === o)),
         },
       };
     }));
