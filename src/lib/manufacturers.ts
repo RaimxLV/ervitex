@@ -1,6 +1,5 @@
 /** Virtual manufacturer taxonomy for the catalog "Ražotājs" filter (default order). */
 export const MANUFACTURERS: { key: string; label: string }[] = [
-  { key: "etx", label: "ETX Latvia" },
   { key: "ss", label: "Stanley/Stella" },
   { key: "nwg-craft", label: "Craft" },
   { key: "nwg-clique", label: "Clique" },
@@ -17,4 +16,5 @@ export const MANUFACTURERS: { key: string; label: string }[] = [
   { key: "pf", label: "Prezentmateriāli" },
   { key: "bb", label: "Beechfield Brands" },
   { key: "mf", label: "Malfini" },
+  { key: "etx", label: "ETX Latvia" },
 ];

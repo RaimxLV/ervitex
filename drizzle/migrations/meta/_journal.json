@@ -57,6 +57,13 @@
       "when": 1791886412987,
       "tag": "0007_include_etx_manual_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791886711348,
+      "tag": "0008_etx_prices_survive_supplier_refresh",
+      "breakpoints": true
     }
   ]
 }

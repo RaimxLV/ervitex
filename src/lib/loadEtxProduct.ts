@@ -26,6 +26,7 @@ export async function loadEtxProduct(id: string, lang: "lv" | "en") {
     specs: [],
     notice: null,
     sizes: availableSizes,
+    images: gallery,
     colors: (colors.data || []).map(c => ({
       code: c.id, name: c.name, hex: c.hex_code,
       images: gallery, sizes: availableSizes,

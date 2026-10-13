@@ -6,10 +6,10 @@
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows and QuoteSteps to prevent UI drift.
 
 - Public icons share AccentIcon framed/inline variants and semantic tones; print-icons holds Lucide-compatible print symbols for consistent strokes and sizes.
-- Public section eyebrows use one red line-label style; blue/cyan/green/slate remain icon-only, and technology use cases sit in a light centered panel for visual continuity.
+- Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
 
-- Office-photo contours and hotspots share photo coordinates in one cover-sized scene for alignment; halos use separate SVG feGaussianBlur polygons with oversized regions to avoid shape clipping.
-- Team photo overrides use immutable product-images files and team_photo_settings.photo_url alongside framing; static portraits remain fallbacks, with admin-only writes.
+- Office contours/hotspots share cover-scene coordinates; halos use separate feGaussianBlur polygons with oversized regions to prevent clipping.
+- Team overrides use immutable product-images files and team_photo_settings.photo_url/framing; static portraits are fallbacks; writes are admin-only.
 
 - Quote worksheet edits use side-specific autosaved drafts; only explicit confirmation updates the shared list and creates an immutable version, preventing incomplete client/staff edits from overwriting each other.
 - Quote workflow history is append-only in `quote_events`; assignment and status changes must remain visible even when the current quote row changes.
@@ -31,4 +31,5 @@
 - UTT Europe (Gildan/Kariban/Regatta) syncs through the `utt-sync` Data Export API function into `utt_*` tables; buying prices live in service-role-only `utt_prices` and images are mirrored to the `utt-images` bucket because UTT forbids hotlinking and blocks hotlinking IPs.
 - Headings are thickened with `.hero-ultra` (-webkit-text-stroke) because the heading face caps at 700; its leading must be repeated per breakpoint, since theme text sizes emit their own line-height.
 
-- Filter order in `catalog_filter_order`; disk cache only if row count is live, render after all batches.
+- Filter order in catalog_filter_order; disk cache needs live row count; render after all batches.
+- Unsynced products reuse products/images/sizes via catalog_items; refreshes rebuild manual retail prices. UUIDs never display as manufacturer codes.

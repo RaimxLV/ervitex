@@ -51,6 +51,7 @@ interface ColorDetail {
 }
 
 interface ProductDetail {
+  images?: string[];
   title: string;
   code: string;
   brand: string | null;
@@ -1252,7 +1253,7 @@ const CatalogItemDialog = ({
     stockFlags.has(stockKey(source, id));
 
   const gallery = useMemo(() => {
-    if (!currentColor) return image ? [image] : [];
+    if (!currentColor) return displayDetail.images?.length ? displayDetail.images : image ? [image] : [];
     if (currentColor.images.length) return currentColor.images;
     for (const c of displayDetail.colors || []) if (c.images.length) return c.images.slice(0, 1);
     return image ? [image] : [];
@@ -1661,7 +1662,7 @@ const CatalogItemDialog = ({
                       {label.colors} ({displayDetail.colors.length})
                     </h4>
                     <span className="text-xs text-muted-foreground">
-                      {currentColor ? `${currentColor.name} - ${currentColor.code}` : label.allColors}
+                      {currentColor ? source === "etx" ? currentColor.name : `${currentColor.name} - ${currentColor.code}` : label.allColors}
                     </span>
                   </div>
                   <ColorSelector colors={displayDetail.colors.map((c) => ({ code: c.code, name: c.name, hex: resolveHex(c.hex, c.name), swatchStyle: swatchBackground(c.hex, c.name), inStock: stockFlags.has(stockKey(source, id, c.code)) }))} value={activeColor} onChange={(code) => { setActiveColor(code); setImgIndex(0); }} />
