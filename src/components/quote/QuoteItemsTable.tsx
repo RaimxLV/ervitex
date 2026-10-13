@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { DecimalInput } from "@/components/ui/decimal-input";
+import { QtyStepper } from "@/components/quote/QtyStepper";
 import { money, itemPrintNet, type OfferItem } from "@/lib/offer";
 import { useLanguage } from "@/i18n/LanguageContext";
 
