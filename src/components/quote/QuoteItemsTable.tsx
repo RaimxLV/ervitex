@@ -27,7 +27,7 @@ export function QuoteItemsTable({ items, onQuantity, onRemove, onPrice, groupAct
         <span className="break-words font-semibold">{i.size || "—"}</span><QtyStepper ariaLabel={`Skaits ${i.code} ${i.size || ""}`} value={i.qty} min={1} className="w-16 justify-self-center" onChange={(qty) => onQuantity(i.id, Math.max(1, qty))} />
         {onPrice ? <DecimalInput aria-label={`Cena ${i.code} ${i.size || ""}`} value={i.unitPrice} onValueChange={(v) => onPrice(i.id, v)} className="min-w-0 px-2" /> : <span className="break-words">{i.unitPrice ? money(i.unitPrice) : "—"}</span>}
         <span className="break-words text-right font-semibold">{i.unitPrice || itemPrintNet(i) ? money((i.unitPrice || 0) * i.qty + itemPrintNet(i)) : "—"}</span><Button type="button" variant="ghost" size="icon" aria-label={`Dzēst ${i.code} ${i.size || ""}`} onClick={() => onRemove(i.id)} className="h-9 w-9 text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
-      </div>{itemDetails && <div className="border-t border-border px-2 py-3 sm:px-3">{itemDetails(i)}</div>}</div>)}
+      </div>{itemDetails && <div className="border-t border-border bg-card px-2 py-3 sm:px-3">{itemDetails(i)}</div>}</div>)}
     </article>;
   })}</div>;
 }
