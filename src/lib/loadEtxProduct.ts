@@ -1,0 +1,34 @@
+import { supabase } from "@/integrations/supabase/client";
+
+/** Unsynced products reuse the existing editable product records and galleries. */
+export async function loadEtxProduct(id: string, lang: "lv" | "en") {
+  const [product, images, colors, sizes] = await Promise.all([
+    supabase.from("products").select("name_lv,name_en,description_lv,description_en,long_description_lv,long_description_en,material,brand,category_id,active,hidden_manual").eq("id", id).eq("brand", "ETX Latvia").maybeSingle(),
+    supabase.from("product_images").select("url").eq("product_id", id).order("sort_order"),
+    supabase.from("product_colors").select("id,name,hex_code,image_url").eq("product_id", id).order("created_at"),
+    supabase.from("product_sizes").select("size").eq("product_id", id).order("sort_order"),
+  ]);
+  const p = product.data;
+  if (!p || !p.active || p.hidden_manual) return null;
+  const gallery = (images.data || []).map(i => i.url);
+  const availableSizes = (sizes.data || []).map(s => s.size);
+  return {
+    title: lang === "lv" ? p.name_lv : p.name_en,
+    code: "",
+    brand: p.brand,
+    category: lang === "lv" ? "Sporta formas sublimācija" : "Sublimation sportswear",
+    gender: null,
+    shortDescription: lang === "lv" ? p.description_lv : p.description_en,
+    description: lang === "lv" ? p.long_description_lv : p.long_description_en,
+    features: [],
+    material: p.material,
+    care: null,
+    specs: [],
+    notice: null,
+    sizes: availableSizes,
+    colors: (colors.data || []).map(c => ({
+      code: c.id, name: c.name, hex: c.hex_code,
+      images: gallery, sizes: availableSizes,
+    })),
+  };
+}

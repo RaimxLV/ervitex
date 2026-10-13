@@ -9,6 +9,7 @@ import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCat
 import { bucketOf, getBucket, type ColorBucketKey } from "@/lib/colorBuckets";
 import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { ETX_CATEGORY, ETX_BRAND, sublimationProducts } from "@/lib/etxCatalog";
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
 
@@ -63,17 +64,8 @@ const TECH_CATEGORIES: Record<string, { cats: string[]; link: string }> = {
     link: "/catalog?category=Headwear,Polos",
   },
   sublimacija: {
-    cats: [
-      "Standard Mugs",
-      "Insulated Mugs",
-      "Travel Mugs",
-      "Sports Bottles",
-      "Water Bottles",
-      "Insulated Bottles",
-      "Fitness & Sport",
-      "Tops",
-    ],
-    link: "/catalog?category=Mugs,Bottles",
+    cats: [ETX_CATEGORY],
+    link: "/catalog?source=etx",
   },
   termodruka: {
     cats: ["T-shirts", "Tops", "Hoodies", "Hoodie sweatshirts", "Sweatshirts", "Crew neck sweatshirts", "Sportswear"],
@@ -139,7 +131,7 @@ const RelatedCard = ({
       fallbackImage={rawImg}
       hoverImage={active ? null : thumbUrl(row.hover_image_url)}
       imageAlt={row.name || row.id}
-      code={row.id}
+      code={row.source === "etx" ? null : row.id}
       brandBadge={
         row.brand && row.brand.toLowerCase() !== "unbranded"
           ? row.brand
@@ -211,17 +203,19 @@ const TechRelatedProducts = ({ techId }: { techId: string }) => {
     let cancelled = false;
     (async () => {
       // Keep the payload small: a random slice of matching models is plenty for 4 cards.
-      const offset = Math.floor(Math.random() * 6) * 24;
-      const { data } = await supabase
+      const offset = techId === "sublimacija" ? 0 : Math.floor(Math.random() * 6) * 24;
+      let query = supabase
         .from("catalog_items" as any)
         .select("source,id,name,brand,category,image_url,hover_image_url,colors")
         .in("category", conf.cats)
         .not("image_url", "is", null)
         .order("id")
         .range(offset, offset + 23);
+      if (techId === "sublimacija") query = query.eq("source", "etx").eq("brand", ETX_BRAND);
+      const { data } = await query;
       if (cancelled) return;
       const rows = ((data || []) as unknown as Row[]).filter((r) => r.name && r.image_url);
-      const picked = pickRandom(rows, 4);
+      const picked = techId === "sublimacija" ? sublimationProducts(rows) : pickRandom(rows, 4);
       setItems(picked);
 
       if (picked.length) {
