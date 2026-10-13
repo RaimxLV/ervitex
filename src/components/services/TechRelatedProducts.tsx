@@ -133,7 +133,7 @@ const RelatedCard = ({
       imageAlt={row.name || row.id}
       code={row.source === "etx" ? null : row.id}
       brandBadge={
-        row.brand && row.brand.toLowerCase() !== "unbranded"
+        row.source === "etx" ? null : row.brand && row.brand.toLowerCase() !== "unbranded"
           ? row.brand
           : SOURCE_META[row.source]?.label ?? null
       }
