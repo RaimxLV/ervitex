@@ -198,3 +198,8 @@
 - [x] Pilnībā pārbaudīt saraksta saglabāšanu, kopēšanu, aizvēršanu un nodošanu no e-pasta.
 - [x] Noņemt projektu vadītāju izvēles pogas no e-pasta un aizstāt saraksta pogu ar universālu bordo teksta saiti.
 - [x] Sietspiedes galerijai pievienot vēl 2 bildes (BOLD reljefs, ceha kaudze uz oranža) un optimizēt uz WebP.
+
+## ETX Latvia — 13.10.2026
+- [ ] Pārnest piecu sporta formu pilnus tekstus un neatkarīgas foto kopijas.
+- [ ] ETX Latvia filtrs, logo, kategorija un esošās kartītes/preču/pieprasījumu plūsma.
+- [ ] Sublimācijas saistītajos produktos tikai piecas ETX preces; pārbaudīt pārlūkā un testos.
