@@ -459,7 +459,7 @@ const AdminOfferEdit = () => {
                   {picked.image_url && <img src={picked.image_url} alt="" className="h-16 w-16 shrink-0 border border-border bg-background object-contain" />}
                   <span className="min-w-0 flex-1 whitespace-normal">
                     <span className="block text-base font-semibold">{picked.name}</span>
-                    <span className="mt-1 block font-mono text-sm text-muted-foreground">{picked.source === "etx" ? picked.brand : picked.id}</span>
+                    <span className="mt-1 block font-mono text-sm text-muted-foreground">{picked.source === "etx" ? "Sporta formas (Sublimācija)" : picked.id}</span>
                     <span className="mt-1 block text-xs text-muted-foreground">{colorRows.find((c) => c.c === activeColor)?.n || ""}</span>
                   </span>
                   <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${pickerOpen ? "rotate-180" : ""}`} />

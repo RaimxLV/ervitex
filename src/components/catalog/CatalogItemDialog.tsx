@@ -1150,7 +1150,7 @@ const CatalogItemDialog = ({
     material: null,
     care: null,
     specs: [
-      ...(brand ? [{ label: "Brand", value: brand }] : []),
+      ...(brand ? [{ label: "Brand", value: brand === "ETX Latvia" ? "Sporta formas (Sublimācija)" : brand }] : []),
       ...(category ? [{ label: "Category", value: category }] : []),
     ],
     notice: null,
@@ -1449,8 +1449,8 @@ const CatalogItemDialog = ({
     },
   }[lang];
 
-  // Resolve brand for display: hide "Unbranded" / empty
-  const rawBrand = (displayDetail.brand || brand || "").trim();
+  // Resolve brand for display: hide "Unbranded" / empty; ETX items show the sublimation label
+  const rawBrand = source === "etx" ? SOURCE_META[source].label : (displayDetail.brand || brand || "").trim();
   const displayBrand = rawBrand && rawBrand.toLowerCase() !== "unbranded" ? rawBrand : null;
   const displayCode = source === "etx" ? "" : displayDetail.code || id;
   // Variant article number for the selected colour (+ size, when picked)
