@@ -76,8 +76,8 @@ export const translations = {
   },
   "about.storyTitle": { lv: "Mūsu stāsts", en: "Our Story" },
   "about.storyKicker": {
-    lv: "Kopš 2003. gada",
-    en: "Since 2003",
+    lv: "Kopš 1998. gada",
+    en: "Since 1998",
   },
   "about.storyHeadline": {
     lv: "Kāpēc izvēlēties mūs?",
@@ -150,7 +150,7 @@ export const translations = {
 
   // Why choose us items
   "why.experience": { lv: "28+ gadu pieredze", en: "28+ Years of Expertise" },
-  "why.experienceDesc": { lv: "Uzticams tekstila partneris kopš 2003. gada ar dziļu nozares izpratni.", en: "A trusted textile partner since 2003 with deep industry knowledge." },
+  "why.experienceDesc": { lv: "Uzticams tekstila partneris kopš 1998. gada ar dziļu nozares izpratni.", en: "A trusted textile partner since 1998 with deep industry knowledge." },
   "why.turnaround": { lv: "Ātra izpilde", en: "Fast Turnaround" },
   "why.turnaroundDesc": { lv: "Efektīva ražošana un uzticama piegāde visā Eiropā.", en: "Efficient production and reliable delivery across Europe." },
   "why.quality": { lv: "Premium kvalitāte", en: "Premium Quality" },
@@ -164,8 +164,8 @@ export const translations = {
 
   // Footer
   "footer.desc": {
-    lv: "Vairumtirdzniecības apģērbs un aksesuāri ar profesionālu apdruku un izšūšanu kopš 2003. gada.",
-    en: "Wholesale apparel and accessories with professional printing and embroidery since 2003.",
+    lv: "Vairumtirdzniecības apģērbs un aksesuāri ar profesionālu apdruku un izšūšanu kopš 1998. gada.",
+    en: "Wholesale apparel and accessories with professional printing and embroidery since 1998.",
   },
   "footer.navigation": { lv: "Navigācija", en: "Navigation" },
   "footer.services": { lv: "Apdrukas risinājumi", en: "Decoration solutions" },

@@ -48,7 +48,7 @@ const HeroSection = () => {
           >
             <div className="h-px w-8 bg-accent" />
             <span className="font-heading text-xs font-bold uppercase tracking-[0.2em] text-accent">
-              {lang === "lv" ? "Kopš 2003. gada" : "Since 2003"}
+              {lang === "lv" ? "Kopš 1998. gada" : "Since 1998"}
             </span>
           </motion.div>
 
@@ -79,7 +79,7 @@ const HeroSection = () => {
             {lang === "lv" ? (
               <>
                 <span className="block font-heading font-bold uppercase tracking-wide text-primary-foreground">
-                  ERVITEX — JŪSU UZTICAMAIS PARTNERIS PROMO APĢĒRBU UN APDRUKAS PAKALPOJUMOS<br />KOPŠ 2003. GADA
+                  ERVITEX — JŪSU UZTICAMAIS PARTNERIS PROMO APĢĒRBU UN APDRUKAS PAKALPOJUMOS<br />KOPŠ 1998. GADA
                 </span>
                 <span className="mt-2 block">
                   Profesionalitāte, pieredze, precizitāte<br />un pārbaudītas tehnoloģijas.
@@ -88,7 +88,7 @@ const HeroSection = () => {
             ) : (
               <>
                 <span className="block font-heading font-bold uppercase tracking-wide text-primary-foreground">
-                  ERVITEX — YOUR TRUSTED PARTNER IN PROMOTIONAL APPAREL AND PRINTING SERVICES<br />SINCE 2003
+                  ERVITEX — YOUR TRUSTED PARTNER IN PROMOTIONAL APPAREL AND PRINTING SERVICES<br />SINCE 1998
                 </span>
                 <span className="mt-2 block">
                   Professionalism, experience, precision<br />and proven technologies.
