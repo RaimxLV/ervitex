@@ -19,7 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import DiscountField from "@/components/quote/DiscountField";
 import { money, itemPrintNet, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
 import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
-import { ArrowLeft, Copy, ExternalLink, Mail, MessageCircle, Printer, Repeat, Save, Search, Send, Trash2, Plus } from "lucide-react";
+import { ArrowLeft, ChevronDown, Copy, ExternalLink, Mail, MessageCircle, Printer, Repeat, Save, Search, Send, Trash2, Plus } from "lucide-react";
 
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
@@ -41,31 +41,6 @@ interface CatalogHit {
 
 interface VariantPrice { color_code: string | null; size: string | null; retail_price: number }
 
-const STATUS_META: Record<string, { label: string; hint: string; cls: string }> = {
-  draft: {
-    label: "Melnraksts",
-    hint: "Saite vēl nedarbojas. Statuss mainīsies automātiski, tiklīdz nosūtīsi piedāvājumu klientam.",
-    cls: "border-border bg-muted text-muted-foreground",
-  },
-  sent: {
-    label: "Nosūtīts",
-    hint: "Saite ir publicēta — klients var atvērt piedāvājumu.",
-    cls: "border-accent/30 bg-accent/10 text-accent",
-  },
-  accepted: {
-    label: "Apstiprināts",
-    hint: "Klients piedāvājumu apstiprināja. Saite paliek aktīva.",
-    cls: "border-border bg-secondary text-secondary-foreground",
-  },
-  closed: {
-    label: "Slēgts",
-    hint: "Piedāvājums arhivēts. Saite joprojām atveras.",
-    cls: "border-border bg-muted text-muted-foreground",
-  },
-};
-
-const STATUS_FLOW = ["draft", "sent", "accepted", "closed"];
-
 const emptyOffer: Offer = {
   id: "", title: "", client_name: "", client_company: null, client_email: null, client_phone: null,
   note: null, status: "draft", vat_rate: 21, items: [], created_at: "", updated_at: "",
@@ -86,6 +61,10 @@ const AdminOfferEdit = () => {
   const [hits, setHits] = useState<CatalogHit[]>([]);
   const [searching, setSearching] = useState(false);
   const [picked, setPicked] = useState<CatalogHit | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [loadingVariants, setLoadingVariants] = useState(false);
+  const pickerRef = useRef<HTMLElement>(null);
+  const pickVersion = useRef(0);
   const [prices, setPrices] = useState<VariantPrice[]>([]);
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [qtyBySize, setQtyBySize] = useState<Record<string, number>>({});
@@ -111,10 +90,27 @@ const AdminOfferEdit = () => {
   }, [id, user?.email]);
 
 
+  useEffect(() => {
+    if (!pickerOpen) return;
+    const dismiss = (event: PointerEvent) => {
+      if (event.target instanceof Node && !pickerRef.current?.contains(event.target)) setPickerOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPickerOpen(false);
+    };
+    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", dismiss);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [pickerOpen]);
+
   // debounce search
   useEffect(() => {
     window.clearTimeout(debounce.current);
-    if (q.trim().length < 2) { setHits([]); return; }
+    if (q.trim().length < 2) { setHits([]); setSearching(false); return; }
+    let cancelled = false;
     setSearching(true);
     debounce.current = window.setTimeout(async () => {
       const term = q.trim();
@@ -123,13 +119,21 @@ const AdminOfferEdit = () => {
         .select("source,id,name,brand,image_url,colors")
         .or(`name.ilike.%${term}%,id.ilike.%${term}%`)
         .limit(25);
+      if (cancelled) return;
       setHits(((data || []) as unknown) as CatalogHit[]);
       setSearching(false);
     }, 300);
+    return () => { cancelled = true; window.clearTimeout(debounce.current); };
   }, [q]);
 
   const pick = async (hit: CatalogHit) => {
+    const version = ++pickVersion.current;
     setPicked(hit);
+    setPickerOpen(true);
+    setLoadingVariants(true);
+    setPrices([]);
+    setQ("");
+    setHits([]);
     setQtyBySize({});
     setActiveColor(hit.colors?.[0]?.c ?? null);
     const rows: VariantPrice[] = [];
@@ -146,7 +150,9 @@ const AdminOfferEdit = () => {
       if (data.length < 1000) break;
       from += 1000;
     }
+    if (version !== pickVersion.current) return;
     setPrices(rows);
+    setLoadingVariants(false);
   };
 
   const colorRows = useMemo(
@@ -194,6 +200,7 @@ const AdminOfferEdit = () => {
     }
     setOffer((o) => ({ ...o, items: [...o.items, ...lines] }));
     setQtyBySize({});
+    setPickerOpen(false);
     toast({ title: `Pievienots: ${lines.length} rindas` });
   };
 
@@ -384,7 +391,6 @@ const AdminOfferEdit = () => {
     return <OfferWorkspace><p className="py-10 text-center text-muted-foreground">Ielādē...</p></OfferWorkspace>;
   }
 
-  const st = STATUS_META[offer.status] || STATUS_META.draft;
 
   return (
     <OfferWorkspace>
@@ -395,9 +401,7 @@ const AdminOfferEdit = () => {
           <Button asChild variant="outline" size="sm">
             <Link to="/offers"><ArrowLeft className="mr-2 h-4 w-4" /> Visi piedāvājumi</Link>
           </Button>
-          <span className={`inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-semibold uppercase ${st.cls}`}>
-            <span className="h-1.5 w-1.5 rounded-full bg-current" /> {st.label}
-          </span>
+
         </div>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" onClick={() => save()} disabled={saving}>
@@ -410,7 +414,7 @@ const AdminOfferEdit = () => {
       <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-6">
           {/* Picker */}
-          <section id="preces-izvele" className="scroll-mt-36 border-b border-border pb-6">
+          <section ref={pickerRef} id="preces-izvele" className="scroll-mt-36 border-b border-border pb-6">
             <h2 className="section-kicker font-heading text-xs font-bold uppercase text-accent">
               {swapTarget ? "Nomainīt modeli" : "Pievienot preci"}
             </h2>
@@ -427,7 +431,7 @@ const AdminOfferEdit = () => {
             )}
             <div className="relative mt-3">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="pl-9" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Meklēt pēc nosaukuma vai koda…" />
+              <Input className="pl-9" value={q} onChange={(e) => { setQ(e.target.value); setPickerOpen(false); }} placeholder="Meklēt pēc nosaukuma vai koda…" />
             </div>
 
             {searching && <p className="mt-2 text-xs text-muted-foreground">Meklē…</p>}
@@ -451,8 +455,16 @@ const AdminOfferEdit = () => {
 
             {picked && (
               <div className="mt-4 border-t border-border pt-5">
-                <p className="text-sm font-medium text-foreground">{picked.name} <span className="text-muted-foreground">({picked.id})</span></p>
-
+                <Button type="button" variant="ghost" aria-expanded={pickerOpen} aria-controls="offer-variant-picker" onClick={() => setPickerOpen((open) => !open)} className="h-auto w-full justify-start gap-4 px-0 py-2 text-left hover:bg-muted/50">
+                  {picked.image_url && <img src={picked.image_url} alt="" className="h-16 w-16 shrink-0 border border-border bg-background object-contain" />}
+                  <span className="min-w-0 flex-1 whitespace-normal">
+                    <span className="block text-base font-semibold">{picked.name}</span>
+                    <span className="mt-1 block font-mono text-sm text-muted-foreground">{picked.source === "etx" ? picked.brand : picked.id}</span>
+                    <span className="mt-1 block text-xs text-muted-foreground">{colorRows.find((c) => c.c === activeColor)?.n || ""}</span>
+                  </span>
+                  <ChevronDown className={`h-4 w-4 shrink-0 transition-transform ${pickerOpen ? "rotate-180" : ""}`} />
+                </Button>
+                {pickerOpen && <div id="offer-variant-picker" className="mt-4 space-y-4 border-t border-border pt-4">
                 {colorRows.length > 0 && (
                   <div className="mt-3">
                     <Label className="text-xs">Krāsa</Label>
@@ -460,17 +472,18 @@ const AdminOfferEdit = () => {
                   </div>
                 )}
 
-                <div className="mt-4"><SizeQuantityTable rows={sizeRows} quantities={qtyBySize} readOnly={!!swapTarget} onChange={(size, qty) => setQtyBySize((previous) => ({ ...previous, [size]: qty }))} /></div>
+                {loadingVariants ? <p className="py-4 text-sm text-muted-foreground">Ielādē…</p> : <div className="mt-4"><SizeQuantityTable rows={sizeRows} quantities={qtyBySize} readOnly={!!swapTarget} onChange={(size, qty) => setQtyBySize((previous) => ({ ...previous, [size]: qty }))} /></div>}
 
                 {swapTarget ? (
-                  <Button size="sm" className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90" onClick={swapPicked}>
+                  <Button size="sm" className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants} onClick={swapPicked}>
                     <Repeat className="mr-2 h-4 w-4" /> Nomainīt uz šo modeli
                   </Button>
                 ) : (
-                  <Button size="sm" className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90" onClick={addPicked}>
+                  <Button size="sm" className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants || !Object.values(qtyBySize).some((qty) => qty > 0)} onClick={addPicked}>
                     <Plus className="mr-2 h-4 w-4" /> Pievienot piedāvājumam
                   </Button>
                 )}
+                </div>}
               </div>
             )}
           </section>
@@ -483,9 +496,16 @@ const AdminOfferEdit = () => {
             {offer.items.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">Vēl nav pievienota neviena prece.</p>
             ) : (
-              <div className="mt-4"><QuoteItemsTable items={offer.items} onQuantity={(id, qty) => patchItem(id, { qty })} onPrice={(id, unitPrice) => patchItem(id, { unitPrice })} onRemove={removeItem}
+              <div className="mt-4"><QuoteItemsTable items={offer.items} onGroupSelect={(item) => {
+                  setSwapKey(null);
+                  void (async () => {
+                    const { data } = await supabase.from("catalog_items" as any).select("source,id,name,brand,image_url,colors").eq("source", item.source).eq("id", item.productId).maybeSingle();
+                    if (data && pickerRef.current) { await pick(data as unknown as CatalogHit); setActiveColor((data as unknown as CatalogHit).colors?.find((c) => c.n === item.colorName)?.c || null); }
+                  })();
+                  document.getElementById("preces-izvele")?.scrollIntoView({ block: "start" });
+                }} onQuantity={(id, qty) => patchItem(id, { qty })} onPrice={(id, unitPrice) => patchItem(id, { unitPrice })} onRemove={removeItem}
                 groupAction={(i) => <Button type="button" size="sm" variant="ghost" className="mt-1 px-0 text-accent" onClick={() => { setSwapKey(groupKey(i)); setPicked(null); setQ(""); document.getElementById("preces-izvele")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><Repeat className="h-4 w-4" />Cits modelis</Button>}
-                itemDetails={(i) => <PrintRows value={(i.prints || []).filter((p) => p.scope !== "order")} onChange={(prints) => patchItem(i.id, { prints: [...prints, ...(i.prints || []).filter((p) => p.scope === "order")] })} addLabel={`Apdruka · ${i.size || "—"}`} />}
+                itemDetails={(i) => <PrintRows value={(i.prints || []).filter((p) => p.scope !== "order")} onChange={(prints) => patchItem(i.id, { prints: [...prints, ...(i.prints || []).filter((p) => p.scope === "order")] })} addLabel="Apdruka" />}
               /></div>
 
             )}
@@ -498,39 +518,6 @@ const AdminOfferEdit = () => {
 
         {/* Sidebar */}
         <aside className="space-y-5 lg:sticky lg:top-6 lg:self-start">
-          {/* Status */}
-          <div className="border-t border-border pt-5">
-            <h3 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Statuss</h3>
-            <ol className="mt-3 flex items-center gap-1">
-              {STATUS_FLOW.map((s, i) => {
-                const active = STATUS_FLOW.indexOf(offer.status) >= i;
-                return (
-                  <li key={s} className="flex-1">
-                    <div className={`h-1.5 rounded-full ${active ? "bg-accent" : "bg-muted"}`} />
-                    <span className={`mt-1 block break-words text-[10px] uppercase ${active ? "text-foreground" : "text-muted-foreground"}`}>
-                      {STATUS_META[s].label}
-                    </span>
-                  </li>
-                );
-              })}
-            </ol>
-            
-            <div className="mt-3 flex flex-wrap gap-2">
-              {offer.status === "sent" && (
-                <Button size="sm" variant="outline" onClick={() => save("accepted")} disabled={saving}>Atzīmēt kā apstiprinātu</Button>
-              )}
-              {(offer.status === "sent" || offer.status === "accepted") && (
-                <Button size="sm" variant="outline" onClick={() => save("closed")} disabled={saving}>Slēgt</Button>
-              )}
-              {offer.status !== "draft" && (
-                <Button size="sm" variant="ghost" onClick={() => save("draft")} disabled={saving}>Atgriezt melnrakstā</Button>
-              )}
-              {offer.status === "draft" && (
-                <Button size="sm" variant="outline" onClick={() => save("sent")} disabled={saving}>Publicēt saiti</Button>
-              )}
-            </div>
-          </div>
-
           <div className="border-t border-border pt-5">
             <h3 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Kopsavilkums</h3>
             <dl className="mt-4 space-y-3 text-sm tabular-nums">

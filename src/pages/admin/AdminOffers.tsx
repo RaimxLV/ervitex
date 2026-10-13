@@ -6,7 +6,6 @@ import { offerEditorPath } from "@/lib/offerNavigation";
 import logo from "@/assets/ervitex-logo-dark.svg";
 import { Button } from "@/components/ui/button";
 import { CreateOfferButton } from "@/components/quote/CreateOfferButton";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
@@ -24,13 +23,6 @@ interface Row {
   vat_rate: number;
   created_at: string;
 }
-
-const STATUS: Record<string, { label: string; cls: string }> = {
-  draft: { label: "Melnraksts", cls: "bg-muted text-muted-foreground" },
-  sent: { label: "Nosūtīts", cls: "bg-accent/10 text-accent" },
-  accepted: { label: "Apstiprināts", cls: "bg-secondary text-secondary-foreground" },
-  closed: { label: "Slēgts", cls: "bg-foreground text-background" },
-};
 
 const AdminOffers = () => {
   const [rows, setRows] = useState<Row[]>([]);
@@ -125,22 +117,20 @@ const AdminOffers = () => {
       />
 
       <div className="mt-6 divide-y divide-border border-y border-border">
-        <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1fr)_80px_130px_130px_150px] gap-4 bg-muted/50 p-4 text-xs font-semibold text-muted-foreground xl:grid"><span>Piedāvājums / klients</span><span>Statuss</span><span>Skaits</span><span>Bez PVN</span><span>Ar PVN</span><span /></div>
+        <div className="hidden grid-cols-[minmax(0,2fr)_80px_130px_130px_150px] gap-4 bg-muted/50 p-4 text-xs font-semibold text-muted-foreground xl:grid"><span>Piedāvājums / klients</span><span>Skaits</span><span>Bez PVN</span><span>Ar PVN</span><span /></div>
         {loading ? (
           <p className="py-8 text-center text-muted-foreground">Ielādē...</p>
         ) : filtered.length === 0 ? (
           <p className="py-8 text-center text-muted-foreground">Nav piedāvājumu</p>
         ) : filtered.map((r) => {
           const totals = offerTotals(r.items || [], r.vat_rate);
-          const st = STATUS[r.status] || STATUS.draft;
           return (
-            <div key={r.id} className="grid gap-4 py-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_80px_130px_130px_150px] xl:items-center xl:px-4">
+            <div key={r.id} className="grid gap-4 py-4 xl:grid-cols-[minmax(0,2fr)_80px_130px_130px_150px] xl:items-center xl:px-4">
               <div className="min-w-0">
                 <Link to={offerEditorPath(r.id)} className="break-words font-semibold text-foreground hover:text-accent">{r.title || "Bez nosaukuma"}</Link>
                 <p className="mt-1 text-sm text-muted-foreground">{[r.client_name, r.client_company].filter(Boolean).join(" · ") || "Klients nav norādīts"}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString("lv")}</p>
               </div>
-              <div><Badge className={st.cls}>{st.label}</Badge></div>
               <div className="text-sm tabular-nums">{totals.qty} gab.</div>
               <div className="text-sm tabular-nums"><span className="mr-2 text-xs text-muted-foreground xl:hidden">Bez PVN</span>{money(totals.net)}</div>
               <div className="text-sm font-semibold tabular-nums"><span className="mr-2 text-xs font-normal text-muted-foreground xl:hidden">Ar PVN</span>{money(totals.gross)}</div>
