@@ -20,6 +20,7 @@ import { GalleryImage } from "@/components/GalleryImage";
 import { warmGalleryImages } from "@/lib/galleryImages";
 import { separateProductSpecs, productTextLines, splitCareInstructions } from "@/lib/productContent";
 import { BrandLogo } from "@/components/BrandLogo";
+import { loadEtxProduct } from "@/lib/loadEtxProduct";
 
 
 interface Props {
@@ -1183,6 +1184,7 @@ const CatalogItemDialog = ({
         : source === "ru" ? loadRU
         : source === "utt" ? loadUTT
         : source === "fr" ? loadFR
+        : source === "etx" ? (productId: string) => loadEtxProduct(productId, lang)
         : loadPF;
       const d = await loader(id).catch(() => null);
       if (cancelled) return;
@@ -1227,7 +1229,7 @@ const CatalogItemDialog = ({
 
     })();
     return () => { cancelled = true; };
-  }, [isOpen, source, id, initialColor, initialSize]);
+  }, [isOpen, source, id, initialColor, initialSize, source === "etx" ? lang : null]);
 
   useEffect(() => {
     if (pendingSizeRef.current) {
@@ -1352,7 +1354,7 @@ const CatalogItemDialog = ({
 
   useEffect(() => {
     setTranslated(null);
-    if (lang !== "lv" || !detail) return;
+    if (lang !== "lv" || !detail || source === "etx") return;
     const items: string[] = [];
     const push = (s: string | null) => { items.push(s || ""); };
     push(rawShort);
@@ -1449,7 +1451,7 @@ const CatalogItemDialog = ({
   // Resolve brand for display: hide "Unbranded" / empty
   const rawBrand = (displayDetail.brand || brand || "").trim();
   const displayBrand = rawBrand && rawBrand.toLowerCase() !== "unbranded" ? rawBrand : null;
-  const displayCode = displayDetail.code || id;
+  const displayCode = source === "etx" ? "" : displayDetail.code || id;
   // Variant article number for the selected colour (+ size, when picked)
   const variantCode = (() => {
     const map = displayDetail.skus;
@@ -1552,10 +1554,10 @@ const CatalogItemDialog = ({
               {/* Meta row: code + supplier on left, brand on right */}
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <span className="inline-flex items-center gap-2 rounded bg-primary px-3 py-1.5 font-mono text-base font-bold uppercase tracking-wider text-primary-foreground">
+                  {displayCode && <span className="inline-flex items-center gap-2 rounded bg-primary px-3 py-1.5 font-mono text-base font-bold uppercase tracking-wider text-primary-foreground">
                     <span className="text-[10px] font-semibold uppercase tracking-widest opacity-70">{label.code}</span>
                     {displayCode}
-                  </span>
+                  </span>}
                   {/* Variant article number kept in the DOM for internal use, hidden from customers */}
                   {variantCode && variantCode !== displayCode && (
                     <span className="hidden" data-article-no={variantCode} aria-hidden="true" />

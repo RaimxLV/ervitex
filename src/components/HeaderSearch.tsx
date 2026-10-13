@@ -53,7 +53,7 @@ const loadRows = (): Promise<Row[]> => {
       prices.filter((p) => Number(p.min_price) > 0).map((p) => `${p.source}:${p.style_code}`),
     );
     return items
-      .filter((it) => it?.id && it.name && priced.has(`${it.source}:${it.id}`))
+      .filter((it) => it?.id && it.name && (it.source === "etx" || priced.has(`${it.source}:${it.id}`)))
       .map((it) => ({
         ...it,
         category:

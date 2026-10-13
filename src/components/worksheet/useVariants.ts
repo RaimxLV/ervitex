@@ -74,6 +74,10 @@ export const priceForVariant = (
 
 
 export const fetchVariantPrices = async (source: string, styleCode: string) => {
+  if (source === "etx") {
+    const { data } = await supabase.from("product_sizes").select("size").eq("product_id", styleCode).order("sort_order");
+    return (data || []).map(row => ({ color_code: null, size: row.size, retail_price: 0 }));
+  }
   const rows: VariantPrice[] = [];
   let from = 0;
   for (;;) {
