@@ -208,3 +208,8 @@
 - [x] Pārnesti piecu sporta formu pilni teksti un deviņas neatkarīgas foto kopijas.
 - [x] ETX Latvia filtrs, logo, kategorija un esošās kartītes/preču/pieprasījumu plūsma; basketbola forma 20 gab. pārbaudīta sarakstā, e-pasts nav nosūtīts.
 - [x] Sublimācijas saistītajos produktos tikai piecas ETX preces; pārbaudīts pārlūkā un 9 testos. Cenu atsvaidzināšana saglabā manuālās ETX cenas.
+
+## Sublimācijas preču foto nomaiņa — 13.10.2026
+- [ ] Optimizēt un pēc nosaukuma piesaistīt piecas jaunās bildes.
+- [ ] Aizvietot vecās preču galerijas un krāsu attēlus; izņemt vecās norādes.
+- [ ] Pārbaudīt kartītes un preču attēlus pārlūkā.
