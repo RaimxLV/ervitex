@@ -2,8 +2,8 @@
 
 - Search shares searchScore/exactCodeHits for consistent ranking.
 - productContent separates supplier care/specs; fingerprint translation caches to avoid stale metadata.
-- Offers share CreateOfferButton and pm_offers drafts; staff use protected /offers with OfferWorkspace, never the admin shell.
-- Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows and QuoteSteps to prevent UI drift.
+- Offers use CreateOfferButton and protected /offers with OfferWorkspace; sharing activates drafts automatically, without manual statuses.
+- Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows and QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers.
 
 - Public icons share AccentIcon framed/inline variants and semantic tones; print-icons holds Lucide-compatible print symbols for consistent strokes and sizes.
 - Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
@@ -19,7 +19,7 @@
 - "Ir noliktavā" is a manual admin flag in `stock_flags` per colour (`item_id` = `${id}::${color_code}`; bare `${id}` rows are legacy model-wide flags), separate from supplier data so syncs never erase it; it shows only in the product view for the selected colour, never on catalog cards; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.
 - Shared worksheet/offer prints use scope="order" in existing item JSON; orderPrinting preserves offer-wide prints on deletion, preventing duplicate charges and extra storage.
 - Stock mutation controls render only after the authenticated admin role resolves, and every mutation revalidates the live user and role before writing; public users only see the outlined availability label.
-- All pages use native browser scrolling (no Lenis), because JS wheel smoothing jumps when the main thread is busy. WebGL hero depth follows scroll/eased fine-pointer movement, renders on change and pauses off-screen for performance.
+- Native browser scrolling only (no Lenis: busy-thread jumps). WebGL depth follows scroll/eased fine-pointer movement, renders on change and pauses off-screen.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - RouteSeo sets client-side title/description/canonical/robots; private token and admin routes stay noindex.
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
