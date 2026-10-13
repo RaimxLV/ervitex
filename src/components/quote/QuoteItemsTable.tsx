@@ -6,7 +6,7 @@ import { DecimalInput } from "@/components/ui/decimal-input";
 import { money, itemPrintNet, type OfferItem } from "@/lib/offer";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-export function QuoteItemsTable({ items, onQuantity, onRemove, onPrice, groupAction, itemDetails }: {
+export function QuoteItemsTable({ items, onQuantity, onRemove, onPrice, groupAction, itemDetails, onGroupSelect }: {
   items: OfferItem[]; onQuantity: (id: string, qty: number) => void; onRemove: (id: string) => void;
   onPrice?: (id: string, price: number | null) => void; groupAction?: (item: OfferItem) => ReactNode; itemDetails?: (item: OfferItem) => ReactNode;
   onGroupSelect?: (item: OfferItem) => void;
@@ -20,7 +20,7 @@ export function QuoteItemsTable({ items, onQuantity, onRemove, onPrice, groupAct
     return <article key={key} className="py-5 sm:py-6">
       <div className="mb-4 flex items-start gap-4">
         {head.image && <img src={head.image} alt={head.name} loading="lazy" className="h-20 w-20 shrink-0 border border-border bg-background object-contain p-1" />}
-        <div className="min-w-0 flex-1"><h3 className="break-words text-base font-semibold leading-snug">{head.name}</h3><p className="mt-1 font-mono text-sm text-muted-foreground">{head.code}</p><p className="mt-2 flex items-center gap-2 text-sm">{head.colorHex && <span className="h-4 w-4 shrink-0 rounded-sm border border-border" style={{ backgroundColor: head.colorHex }} />}{head.colorName || "—"}</p>{groupAction?.(head)}</div>
+        <div className="min-w-0 flex-1">{onGroupSelect ? <Button type="button" variant="ghost" className="h-auto max-w-full justify-start whitespace-normal px-0 py-1 text-left text-base font-semibold" onClick={() => onGroupSelect(head)}>{head.name}</Button> : <h3 className="break-words text-base font-semibold leading-snug">{head.name}</h3>}<p className="mt-1 font-mono text-sm text-muted-foreground">{head.code}</p><p className="mt-2 flex items-center gap-2 text-sm">{head.colorHex && <span className="h-4 w-4 shrink-0 rounded-sm border border-border" style={{ backgroundColor: head.colorHex }} />}{head.colorName || "—"}</p>{groupAction?.(head)}</div>
       </div>
       <div className="grid grid-cols-[50px_64px_minmax(0,1fr)_minmax(0,1fr)_36px] items-center gap-2 bg-muted/50 px-2 py-3 text-[11px] font-semibold text-muted-foreground sm:grid-cols-[70px_80px_minmax(0,1fr)_minmax(0,1fr)_40px] sm:gap-3 sm:px-3"><span>{t("Izmērs", "Size")}</span><span className="text-center">{t("Skaits", "Qty")}</span><span>{t("Cena bez PVN", "Price excl. VAT")}</span><span className="text-right">{t("Summa bez PVN", "Total excl. VAT")}</span><span /></div>
       {group.map((i) => <div key={i.id}><div className="grid grid-cols-[50px_64px_minmax(0,1fr)_minmax(0,1fr)_36px] items-center gap-2 border-t border-border px-2 py-3 text-sm tabular-nums sm:grid-cols-[70px_80px_minmax(0,1fr)_minmax(0,1fr)_40px] sm:gap-3 sm:px-3">

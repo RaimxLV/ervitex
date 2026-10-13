@@ -497,10 +497,11 @@ const AdminOfferEdit = () => {
               <p className="mt-3 text-sm text-muted-foreground">Vēl nav pievienota neviena prece.</p>
             ) : (
               <div className="mt-4"><QuoteItemsTable items={offer.items} onGroupSelect={(item) => {
-                  void pick({ source: item.source, id: item.productId, name: item.name, brand: item.brand, image_url: item.image, colors: null }).then(async () => {
+                  setSwapKey(null);
+                  void (async () => {
                     const { data } = await supabase.from("catalog_items" as any).select("source,id,name,brand,image_url,colors").eq("source", item.source).eq("id", item.productId).maybeSingle();
                     if (data && pickerRef.current) { await pick(data as unknown as CatalogHit); setActiveColor((data as unknown as CatalogHit).colors?.find((c) => c.n === item.colorName)?.c || null); }
-                  });
+                  })();
                   document.getElementById("preces-izvele")?.scrollIntoView({ block: "start" });
                 }} onQuantity={(id, qty) => patchItem(id, { qty })} onPrice={(id, unitPrice) => patchItem(id, { unitPrice })} onRemove={removeItem}
                 groupAction={(i) => <Button type="button" size="sm" variant="ghost" className="mt-1 px-0 text-accent" onClick={() => { setSwapKey(groupKey(i)); setPicked(null); setQ(""); document.getElementById("preces-izvele")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><Repeat className="h-4 w-4" />Cits modelis</Button>}

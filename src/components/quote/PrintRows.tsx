@@ -20,6 +20,6 @@ export function PrintRows({ value, onChange, priced = true, addLabel, disabled =
         <Button type="button" variant="ghost" size="icon" aria-label={t("Dzēst apdruku", "Remove print")} onClick={() => onChange(value.filter((_, n) => n !== index))} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
       </div>;
     })}
-    <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={() => onChange([...value, { method: "Sietspiede", placement: "", price: null, mode: "unit" }])}><Plus className="h-4 w-4" />{addLabel || t("Pievienot apdruku", "Add decoration")}</Button>
+    <Button type="button" size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={disabled} onClick={() => onChange([...value, { method: "Sietspiede", placement: "", price: null, mode: "unit" }])}><Plus className="h-4 w-4" />{addLabel || t("Pievienot apdruku", "Add decoration")}</Button>
   </div>;
 }
