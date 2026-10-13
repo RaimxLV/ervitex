@@ -1441,7 +1441,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       priority={priority}
       hoverImage={hover}
       imageAlt={displayTitle}
-      code={displayCode}
+      code={item.source === "etx" ? null : displayCode}
       brandBadge={item.brand && item.brand.toLowerCase() !== "unbranded" ? item.brand : SOURCE_META[item.source].label}
       title={displayTitle}
       subtitle={active?.n || item.description}

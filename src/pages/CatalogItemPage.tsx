@@ -29,7 +29,7 @@ interface RelatedItem {
 interface PriceInfo { price: number; max: number }
 
 const isValidSource = (s: string | undefined): s is CatalogSource =>
-  !!s && ["ss", "nwg", "pf", "bb", "mf", "ru", "utt", "fr"].includes(s);
+  !!s && ["ss", "nwg", "pf", "bb", "mf", "ru", "utt", "fr", "etx"].includes(s);
 
 
 
@@ -196,7 +196,7 @@ const CatalogItemPage = () => {
                     fallbackImage={rawImage}
                     hoverImage={cheapest >= 0 ? null : thumbUrl(r.hover_image_url)}
                     imageAlt={r.name || r.id}
-                    code={r.id}
+                    code={r.source === "etx" ? null : r.id}
                     brandBadge={r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
                     title={r.name || r.id}
                     subtitle={r.category}
