@@ -1,5 +1,10 @@
 # Roadmap
 
+## Piedāvājuma formas sakārtošana — 13.10.2026
+- [ ] Apdrukas poga bez izmēra, vienots sarkans akcents; statusu darbības un kolonna noņemtas.
+- [ ] Preces izvēle sakļaujas pēc pievienošanas, atveras ar klikšķi un aizveras ārpus tās; saglabāti kopīgie formu elementi.
+- [ ] Pārbaudīt darbinieka izvēli, pievienošanu, atkārtotu atvēršanu un saglabāšanu pārlūkā.
+
 ## Ražotāju logotipi — 12.10.2026
 - [x] Iegūti 56 oficiāli ražotāju/piegādātāju logo, sākumlapas slīdošā josla ar pauzi zem peles un samazinātas kustības atbalstu.
 - [x] Kopīgs logo preču kartītēs, saistītajās precēs un preces skatā; filtri nemainīti.
