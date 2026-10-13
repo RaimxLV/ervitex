@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Piedāvājuma formas sakārtošana — 13.10.2026
-- [ ] Apdrukas poga bez izmēra, vienots sarkans akcents; statusu darbības un kolonna noņemtas.
-- [ ] Preces izvēle sakļaujas pēc pievienošanas, atveras ar klikšķi un aizveras ārpus tās; saglabāti kopīgie formu elementi.
-- [ ] Pārbaudīt darbinieka izvēli, pievienošanu, atkārtotu atvēršanu un saglabāšanu pārlūkā.
+- [x] Apdrukas poga bez izmēra, vienots sarkans akcents; statusu darbības un kolonna noņemtas.
+- [x] Preces izvēle sakļaujas pēc pievienošanas, atveras ar klikšķi un aizveras ārpus tās vai ar Escape; saglabāti kopīgie formu elementi.
+- [x] Pārlūkā pārbaudīta darbinieka izvēle (STTU169, Black, S, 3 gab.), pievienošana, atkārtota atvēršana un apdrukas/cenas saglabāšana; 5 testi sekmīgi, lapas kļūdu un mobilās pārplūdes nav. E-pasts nav sūtīts.
 
 ## Ražotāju logotipi — 12.10.2026
 - [x] Iegūti 56 oficiāli ražotāju/piegādātāju logo, sākumlapas slīdošā josla ar pauzi zem peles un samazinātas kustības atbalstu.
