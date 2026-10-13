@@ -1,7 +1,7 @@
 export type CatalogSource = "ss" | "nwg" | "pf" | "bb" | "mf" | "ru" | "utt" | "fr" | "etx";
 
 export const SOURCE_META: Record<CatalogSource, { label: string; href: string; code: string }> = {
-  etx: { label: "ETX Latvia", href: "/catalog?source=etx", code: "ETX" },
+  etx: { label: "Sporta formas (Sublimācija)", href: "/catalog?source=etx", code: "ETX" },
   ss: { label: "Stanley/Stella", href: "/stanley-stella", code: "S/S" },
   nwg: { label: "Craft / Clique / ProJob / Cutter & Buck", href: "/nwg", code: "BR" },
   pf: { label: "PF Concept", href: "/pf-concept", code: "PFC" },
