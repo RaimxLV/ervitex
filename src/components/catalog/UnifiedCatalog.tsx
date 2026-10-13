@@ -484,10 +484,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           })();
           const manufacturer = manufacturerOf(it.source, brand);
           if (!manufacturer) return null;
+          const category = normalizeCategory(it.category, it.name);
+          // Ervitex apavus netirgo — visa apavu kategorija izņemta no kataloga.
+          if (category && /shoe|footwear|sneaker|boot|sandal|apav/i.test(category)) return null;
           return {
             ...it,
             brand,
-            category: normalizeCategory(it.category, it.name),
+            category,
             group_name: normalizeText(it.group_name),
             gender: normalizeGender(it.gender),
             colors: colorList,
