@@ -9,6 +9,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 export function QuoteItemsTable({ items, onQuantity, onRemove, onPrice, groupAction, itemDetails }: {
   items: OfferItem[]; onQuantity: (id: string, qty: number) => void; onRemove: (id: string) => void;
   onPrice?: (id: string, price: number | null) => void; groupAction?: (item: OfferItem) => ReactNode; itemDetails?: (item: OfferItem) => ReactNode;
+  onGroupSelect?: (item: OfferItem) => void;
 }) {
   const { lang } = useLanguage();
   const t = (lv: string, en: string) => lang === "lv" ? lv : en;
