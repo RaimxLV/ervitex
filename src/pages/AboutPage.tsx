@@ -14,17 +14,29 @@ const AboutPage = () => {
     <Layout>
       <PageIntro
         title={t("about.title")}
-        subtitle={t("about.heroText")}
         eyebrow={lang === "lv" ? "Uzņēmuma profils" : "Company profile"}
       />
 
       <AbandonedStoryScene>
-        <div className="container pb-12 pt-12 text-foreground md:pb-24 md:pt-28">
+        <div className="container pb-12 pt-10 text-foreground md:pb-24 md:pt-16">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-3xl border-t border-foreground/10 pt-5 md:pt-7"
+          >
+            <p className="text-base font-light leading-relaxed text-foreground/75 [text-wrap:pretty] md:text-lg md:leading-relaxed">
+              {t("about.heroText")}
+            </p>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
+            className="mt-9 md:mt-14"
           >
             <h2 className="font-heading text-[2rem] font-bold leading-tight text-foreground [text-wrap:balance] md:text-6xl">
               {t("about.storyHeadline")}
