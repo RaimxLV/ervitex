@@ -8,13 +8,14 @@ import { sportswearGross, teamSportswearPrices } from "@/lib/teamSportswear";
 export default function TeamSportswearCard({ lang }: { lang: "lv" | "en" }) {
   const lv = lang === "lv";
   const title = lv ? "Komandu sporta formas" : "Team sportswear";
+  const photoUrl = photo.url.startsWith("/") ? `https://ervitex.lovable.app${photo.url}` : photo.url;
   const format = (price: number) => new Intl.NumberFormat(lv ? "lv-LV" : "en-IE", { style: "currency", currency: "EUR" }).format(price);
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="ghost" className="group relative h-full min-h-0 w-full overflow-hidden rounded-none border border-border bg-primary p-0 text-primary-foreground hover:bg-primary hover:text-primary-foreground focus-visible:ring-accent" aria-label={lv ? "Komandu sporta formas — cenrādis" : "Team sportswear — price list"}>
           <span className="relative block aspect-[3/4] w-full self-start">
-            <img src={photo.url} alt={title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-700 motion-safe:group-hover:scale-105" />
+            <img src={photoUrl} alt={title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-700 motion-safe:group-hover:scale-105" />
           </span>
           <span className="absolute inset-0 flex items-center justify-center px-3">
             <span className="w-full border-y border-primary-foreground/25 bg-primary/85 px-2 py-5 text-center backdrop-blur-sm motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:-translate-y-1 sm:px-4 sm:py-7">

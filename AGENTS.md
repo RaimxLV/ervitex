@@ -1,6 +1,6 @@
 # Architecture rules
 
-- Search shares searchScore/exactCodeHits for ranking.
+- Search shares searchScore/exactCodeHits.
 - productContent separates supplier care/specs; fingerprint translation caches to avoid stale metadata.
 - Offers use CreateOfferButton and protected /offers with OfferWorkspace; sharing activates drafts automatically, without manual statuses.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows and QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers.
