@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Pencil, Trash2, Search, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, X, Copy } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -268,6 +268,9 @@ const AdminProducts = () => {
                     <Button variant="ghost" size="icon" asChild>
                       <Link to={`/admin/products/${p.id}`}><Pencil className="h-4 w-4" /></Link>
                     </Button>
+                    <Button variant="ghost" size="icon" asChild title="Dublēt">
+                      <Link to={`/admin/products/new?copy=${p.id}`} aria-label="Dublēt"><Copy className="h-4 w-4" /></Link>
+                    </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -330,6 +333,9 @@ const AdminProducts = () => {
                 <div className="flex flex-col gap-1">
                   <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
                     <Link to={`/admin/products/${p.id}`}><Pencil className="h-3.5 w-3.5" /></Link>
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                    <Link to={`/admin/products/new?copy=${p.id}`} aria-label="Dublēt"><Copy className="h-3.5 w-3.5" /></Link>
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>

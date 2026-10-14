@@ -20,6 +20,9 @@ interface ColorEntry { name: string; hex_code: string; image_url: string; }
 const AdminProductForm = () => {
   const { id } = useParams();
   const isEdit = !!id && id !== "new";
+  const [searchParams] = useSearchParams();
+  const copyId = !isEdit ? searchParams.get("copy") : null;
+  const sourceId = isEdit ? id : copyId;
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -43,11 +46,11 @@ const AdminProductForm = () => {
     supabase.from("categories").select("id, name_lv, slug").order("sort_order").then(({ data }) => {
       setCategories(data || []);
     });
-    if (isEdit) loadProduct();
-  }, [id]);
+    if (sourceId) loadProduct();
+  }, [id, copyId]);
 
   const loadProduct = async () => {
-    const { data: product } = await supabase.from("products").select("*").eq("id", id!).single();
+    const { data: product } = await supabase.from("products").select("*").eq("id", sourceId!).single();
     if (!product) return navigate("/admin/products");
     setForm({
       name_lv: product.name_lv, name_en: product.name_en,
