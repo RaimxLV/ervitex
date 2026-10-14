@@ -1,5 +1,10 @@
 # Roadmap
 
+## Sporta formu jaunās kartītes un Ervitex logo — 14.10.2026
+- [x] Jaunās manuāli izveidotās sporta formu preces parādās katalogā uzreiz pēc saglabāšanas.
+- [x] Sporta formu kartītēs un saistītajās precēs redzams iesūtītais Ervitex logo.
+- [x] Pārbaudītas visas 12 sporta formu kartītes un 12 logo datorā; jaunie dvieļi, bufs un polo redzami, 14 testi un build sekmīgi.
+
 ## Komandu sporta formu cenrādis un secība — 14.10.2026
 - [x] Pievienota pēdējā informatīvā kartīte ar optimizētu lietotāja foto, centrētu tekstu, animāciju un cenrādi bez/ar PVN.
 - [x] Admina sadaļā „Mūsu produkti” poga „Kartīšu secība”: vilkšana un augšup/lejup pogas, saglabāšana.

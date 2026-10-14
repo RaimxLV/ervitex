@@ -197,7 +197,7 @@ const CatalogItemPage = () => {
                     hoverImage={cheapest >= 0 ? null : thumbUrl(r.hover_image_url)}
                     imageAlt={r.name || r.id}
                     code={r.source === "etx" ? null : r.id}
-                    brandBadge={r.source === "etx" ? null : r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
+                    brandBadge={r.source === "etx" ? "Ervitex" : r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
                     title={r.name || r.id}
                     subtitle={r.category}
                     swatches={swatches}
