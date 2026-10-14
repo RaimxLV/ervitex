@@ -13,6 +13,7 @@ import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
+import { HEADWEAR_TYPES, headwearType, isHeadwearCategory, matchesHeadwearType, type HeadwearType } from "@/lib/headwearTypes";
 import { exactCodeHits, prepareQuery, searchScore } from "@/lib/catalogSearch";
 
 const SCROLL_KEY = "catalog-scroll";
@@ -112,6 +113,7 @@ interface EnrichedItem extends Omit<CatalogItem, "colors"> {
   colors: EnrichedColor[];
   buckets: Set<ColorBucketKey>;
   manufacturer: string;
+  headwearType: HeadwearType;
 }
 
 /**
@@ -376,6 +378,10 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [groups, setGroups] = useState<Set<string>>(
     new Set((searchParams.get("group") || "").split(",").filter(Boolean))
   );
+  const [headwearTypes, setHeadwearTypes] = useState<Set<string>>(
+    new Set((searchParams.get("headwear") || "").split(",").filter((key) => HEADWEAR_TYPES.some((t) => t.key === key)))
+  );
+  const headwearActive = [...categories].some(isHeadwearCategory);
   const [genders, setGenders] = useState<Set<string>>(
     new Set((searchParams.get("gender") || "").split(",").filter(Boolean))
   );
@@ -403,6 +409,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (sources.size) p.set("source", [...sources].join(","));
     if (brands.size) p.set("brand", [...brands].join(","));
     if (categories.size) p.set("category", [...categories].join(","));
+    if (headwearActive && headwearTypes.size) p.set("headwear", [...headwearTypes].join(","));
     if (groups.size) p.set("group", [...groups].join(","));
     if (genders.size) p.set("gender", [...genders].join(","));
     if (colors.size) p.set("color", [...colors].join(","));
@@ -411,7 +418,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (page > 1) p.set("page", String(page));
     lastWrittenSearch.current = p.toString();
     setSearchParams(p, { replace: true });
-  }, [q, sources, brands, categories, groups, genders, colors, sort, page, stockOnly, setSearchParams]);
+  }, [q, sources, brands, categories, headwearTypes, headwearActive, groups, genders, colors, sort, page, stockOnly, setSearchParams]);
 
   // External URL changes (e.g. clicking another mega menu category while the
   // catalog is already mounted) must reset the filters to the incoming params.
@@ -433,6 +440,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       ),
     );
     setGroups(new Set((searchParams.get("group") || "").split(",").filter(Boolean)));
+    setHeadwearTypes(new Set((searchParams.get("headwear") || "").split(",").filter((key) => HEADWEAR_TYPES.some((t) => t.key === key))));
     setGenders(new Set((searchParams.get("gender") || "").split(",").filter(Boolean)));
     setColors(new Set((searchParams.get("color") || "").split(",").filter(Boolean)));
     setSort(searchParams.get("sort") || "newest");
@@ -481,7 +489,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     };
 
     const ITEM_COLUMNS =
-      "source,id,name,brand,category,group_name,gender,image_url,hover_image_url,colors";
+      "source,id,name,description,brand,category,group_name,gender,image_url,hover_image_url,colors";
     const PRICE_COLUMNS = "source,style_code,min_price,max_price,currency";
 
     const enrich = (all: CatalogItem[]): EnrichedItem[] =>
@@ -513,6 +521,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             colors: colorList,
             buckets,
             manufacturer,
+            headwearType: headwearType(it.name, it.description),
           } as EnrichedItem;
         })
         .filter((x): x is EnrichedItem => x !== null);
@@ -638,7 +647,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   // Atiestata uz 1. lapu tikai tad, ja lietotājs tiešām maina filtrus —
   // nevis ielādējot vai atgriežoties no preces lapas ar ?page=8.
-  const filterSig = [q, [...sources], [...brands], [...categories], [...groups], [...genders], [...colors], sort]
+  const filterSig = [q, [...sources], [...brands], [...categories], headwearActive ? [...headwearTypes] : [], [...groups], [...genders], [...colors], sort]
     .map((v) => (Array.isArray(v) ? [...v].sort().join(",") : v))
     .join("|");
   const prevFilterSig = useRef(filterSig);
@@ -694,6 +703,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (except !== "source" && sources.size && !sources.has(it.manufacturer)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
     if (except !== "category" && categories.size && (!it.category || !categories.has(it.category))) return false;
+    if (except !== "headwear" && except !== "category" && !matchesHeadwearType(it.category, it.headwearType, headwearTypes, headwearActive)) return false;
     if (except !== "group" && groups.size && (!it.group_name || !groups.has(it.group_name))) return false;
     if (except !== "gender" && genders.size && (!it.gender || !genders.has(it.gender))) return false;
     if (except !== "color" && colors.size) {
@@ -718,7 +728,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items, q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags]
+    [items, q, sources, brands, categories, headwearTypes, headwearActive, groups, genders, colors, stockOnly, stockFlags]
   );
 
   // "Ražotājs" facet — virtual manufacturer taxonomy (see MANUFACTURERS above).
@@ -732,7 +742,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       }))
       .filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, lang, q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags]);
+  }, [items, lang, q, sources, brands, categories, headwearTypes, headwearActive, groups, genders, colors, stockOnly, stockFlags]);
 
   const sourceBrandItems = useMemo(() => {
     const nested: Record<string, { label: string; value: string; count: number }[]> = {};
@@ -870,6 +880,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     () => facet("group", (it) => it.group_name).map((x) => ({ value: x.label, label: grpLoc(x.label), count: x.count })),
     [facet, lang]
   );
+  const headwearItems = useMemo(() => {
+    const counts = new Map(facet("headwear", (it) => isHeadwearCategory(it.category) ? it.headwearType : null).map((it) => [it.label, it.count]));
+    return HEADWEAR_TYPES.map((type) => ({ value: type.key, label: lang === "lv" ? type.lv : type.en, count: counts.get(type.key) || 0 }))
+      .filter((it) => it.count > 0 || headwearTypes.has(it.value));
+  }, [facet, lang, headwearTypes]);
   const genderItems = useMemo(
     () => facet("gender", (it) => it.gender).map((x) => ({ value: x.label, label: genLoc(x.label), count: x.count })),
     [facet, lang]
@@ -887,7 +902,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       count: counts.get(b.key) || 0,
     })).filter((x) => x.count > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, lang, q, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags]);
+  }, [items, lang, q, sources, brands, categories, headwearTypes, headwearActive, groups, genders, colors, stockOnly, stockFlags]);
 
   const priceOf = useCallback(
     (it: EnrichedItem): number | null => {
@@ -940,7 +955,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     return cmp ? [...base].sort(cmp) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, pq, exactHits, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags, sort, priceOf, priceRanges, lang, filterOrder]);
+  }, [items, pq, exactHits, sources, brands, categories, headwearTypes, headwearActive, groups, genders, colors, stockOnly, stockFlags, sort, priceOf, priceRanges, lang, filterOrder]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Number.isFinite(page) ? Math.min(Math.max(page, 1), totalPages) : 1;
@@ -1045,6 +1060,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     setSources(new Set());
     setBrands(new Set());
     setCategories(new Set());
+    setHeadwearTypes(new Set());
     setGroups(new Set());
     setGenders(new Set());
     setColors(new Set());
@@ -1111,6 +1127,15 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     filterOrder[SECTIONS_ORDER_KEY],
     (sec) => sec.key,
   );
+  if (headwearActive) {
+    orderedSections.splice(orderedSections.findIndex((sec) => sec.key === "category") + 1, 0, {
+      key: "headwear",
+      title: lang === "lv" ? "Cepuru veids" : "Headwear type",
+      items: headwearItems,
+      selected: headwearTypes,
+      onToggle: toggle(headwearTypes, setHeadwearTypes),
+    });
+  }
   // Filter ordering lives in the admin panel (/admin/filters).
   const canArrange = false && !authLoading && isAdmin;
   const renderFilters = (props: { hideHeader?: boolean; heading?: string }) =>
@@ -1148,7 +1173,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     );
 
   const totalSelectedFilters =
-    sources.size + brands.size + categories.size + groups.size + genders.size + colors.size + (stockOnly ? 1 : 0);
+    sources.size + brands.size + categories.size + groups.size + genders.size + colors.size + (headwearActive ? headwearTypes.size : 0) + (stockOnly ? 1 : 0);
   const isSublimationCatalog = !lockedSource && sources.size === 1 && sources.has("etx");
 
 

@@ -26,7 +26,7 @@
 - Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
 - Galleries share bounded decoding, warm adjacent frames and retain the last frame on failure to avoid blanks. Catalog hover replaces only loaded photos with exclusive visibility; Malfini prefers clean front photos over ghosted dimension diagrams.
 - Hosted logo pointers and BrandLogo serve all cards; ETX cards use Ervitex; filters unchanged.
-- Technology gallery order/membership is stored as stable refs in `tech_galleries` (built-in photos as `s:<tech>:<index>`, uploads as public URLs) and applied over the static data at runtime, so saved order survives rebuilds and asset hash changes.
+- tech_galleries stores stable order/membership refs (s:<tech>:<index> for built-ins, public URLs for uploads), applied over static data so rebuilds preserve order.
 
 - UTT uses `utt-sync` Data Export into `utt_*`; service-role-only `utt_prices`; images mirrored in `utt-images` because UTT blocks hotlinking.
 - Headings are thickened with `.hero-ultra` (-webkit-text-stroke) because the heading face caps at 700; its leading must be repeated per breakpoint, since theme text sizes emit their own line-height.
@@ -34,4 +34,5 @@
 - ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
 
-- QuoteCartButton owns mobile dock visibility and safe-area page clearance so page endings stay reachable; desktop CTA floats.
+- QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.
+- Headwear uses shared name/description classification and a conditional URL facet after category; bump cache schema when fields change to prevent stale types.
