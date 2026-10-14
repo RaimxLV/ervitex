@@ -84,6 +84,8 @@ export interface CatalogModelCardProps {
   swatches?: { hex: string | null; name: string; active?: boolean; onSelect?: () => void }[];
   extraSwatches?: number;
   price?: ReactNode;
+  /** Full-width black strip below the logo bar (sublimation cards, no code). */
+  fullWidthCodeBar?: boolean;
   footer?: ReactNode;
   noImageLabel: string;
   lang?: string;
@@ -95,8 +97,8 @@ export interface CatalogModelCardProps {
  * portrait 3:4 image, model code chip, brand chip, uniform swatches and price line.
  */
 const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
-  (
-    { onClick, as, href, image, fallbackImage, hoverImage, imageAlt, priority, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, footer, noImageLabel, lang = "lv" },
+    (
+    { onClick, as, href, image, fallbackImage, hoverImage, imageAlt, priority, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, fullWidthCodeBar, footer, noImageLabel, lang = "lv" },
     ref
   ) => {
     const [copied, setCopied] = useState(false);
@@ -223,6 +225,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
             )}
           </div>
         )}
+        {fullWidthCodeBar && <div aria-hidden="true" className="h-7 w-full bg-primary sm:h-9" />}
 
 
         <div className="flex flex-1 flex-col gap-1 p-2 sm:gap-1.5 sm:p-3">
