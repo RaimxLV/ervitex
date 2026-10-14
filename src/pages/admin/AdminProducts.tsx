@@ -7,11 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, Pencil, Trash2, Search, X, Copy } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, X, Copy, ListOrdered } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import ManualProductOrder from "@/components/catalog/ManualProductOrder";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useFilterOrder } from "@/hooks/useFilterOrder";
+import { MANUAL_PRODUCT_ORDER_KEY } from "@/lib/teamSportswear";
 import { useToast } from "@/hooks/use-toast";
 
 interface ProductRow {
@@ -24,6 +28,7 @@ interface ProductRow {
   featured: boolean | null;
   is_new: boolean | null;
   active: boolean | null;
+  hidden_manual: boolean;
   retail_price: number | null;
   wholesale_price: number | null;
   product_images: { url: string }[];
@@ -44,6 +49,8 @@ const AdminProducts = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [page, setPage] = useState(1);
   const { toast } = useToast();
+  const [ordering, setOrdering] = useState(false);
+  const { order, ready: orderReady, save: saveOrder } = useFilterOrder();
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -158,10 +165,20 @@ const AdminProducts = () => {
             {filtered.length} no {products.length} produktiem
           </p>
         </div>
+        <div className="flex flex-wrap gap-2">
+        <Button variant="outline" disabled={loading || !orderReady} onClick={() => setOrdering(true)}><ListOrdered className="mr-2 h-4 w-4" /> Kartīšu secība</Button>
         <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest">
           <Link to="/admin/products/new"><Plus className="mr-2 h-4 w-4" /> Pievienot jaunu</Link>
         </Button>
+        </div>
       </div>
+
+      <Dialog open={ordering} onOpenChange={setOrdering}>
+        <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto" aria-describedby={undefined}>
+          <DialogHeader><DialogTitle>Sporta formu kartīšu secība</DialogTitle></DialogHeader>
+          {ordering && <ManualProductOrder products={products.filter(p => p.brand === "ETX Latvia" && p.active !== false && !p.hidden_manual)} order={order[MANUAL_PRODUCT_ORDER_KEY]} save={saveOrder} onClose={() => setOrdering(false)} />}
+        </DialogContent>
+      </Dialog>
 
       {/* Filtri */}
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
