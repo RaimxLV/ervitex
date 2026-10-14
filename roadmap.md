@@ -1,5 +1,9 @@
 # Roadmap
 
+## Telefona pieprasījuma poga un cepuru filtri — 14.10.2026
+- [ ] Telefonā kompakta pieprasījuma josla ar apakšējo drošo vietu; pārbaudīt atvēršanu un lapas beigas.
+- [ ] Pārbaudīt piegādātāju cepuru tipu/materiālu datus un paskaidrot esošo filtru ierobežojumu.
+
 ## Sporta formu ražotājs un vilkšanas secība — 14.10.2026
 - [x] Visām sporta formu kartītēm un ražotāja laukiem norādīts Ervitex; iekšējā piegādātāja atslēga nemainīta.
 - [x] Kartīšu vilkšana un secības saglabāšana pieejama no sporta formu kataloga un admina sadaļas; priekšskatījumā pievienoti foto.
