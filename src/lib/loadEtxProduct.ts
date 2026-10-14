@@ -1,5 +1,13 @@
 import { supabase } from "@/integrations/supabase/client";
 
+const MATERIAL_EN: Record<string, string> = {
+  "pārstrādāts poliesters": "Recycled polyester",
+  "poliesters": "Polyester",
+  "kokvilna": "Cotton",
+};
+export const etxMaterialEn = (m: string | null) =>
+  m ? MATERIAL_EN[m.trim().toLowerCase()] ?? m : m;
+
 /** Unsynced products reuse the existing editable product records and galleries. */
 export async function loadEtxProduct(id: string, lang: "lv" | "en") {
   const [product, images, colors, sizes] = await Promise.all([
@@ -21,7 +29,7 @@ export async function loadEtxProduct(id: string, lang: "lv" | "en") {
     shortDescription: lang === "lv" ? p.description_lv : p.description_en,
     description: lang === "lv" ? p.long_description_lv : p.long_description_en,
     features: [],
-    material: p.material,
+    material: lang === "lv" ? p.material : etxMaterialEn(p.material),
     care: null,
     specs: [],
     notice: null,

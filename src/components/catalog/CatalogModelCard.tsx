@@ -1,3 +1,4 @@
+import ervitexWhiteLogo from "@/assets/ervitex-logo-2.svg";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
@@ -188,7 +189,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
           )}
         </div>
 
-        {(code || brandBadge) && (
+        {!fullWidthCodeBar && (code || brandBadge) && (
           <div className="catalog-card-media flex flex-row items-stretch border-t border-border">
             {code && (
                  <span className="flex min-w-0 shrink items-center gap-1.5 bg-primary px-1.5 py-1 text-primary-foreground sm:shrink-0 sm:px-3 sm:py-1.5">
@@ -225,7 +226,11 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
             )}
           </div>
         )}
-        {fullWidthCodeBar && <div aria-hidden="true" className="h-7 w-full bg-primary sm:h-9" />}
+        {fullWidthCodeBar && (
+          <div className="catalog-card-media flex h-9 w-full items-center justify-end border-t border-border bg-primary px-2 sm:h-12 sm:px-3">
+            <img src={ervitexWhiteLogo} alt="Ervitex" className="h-5 w-auto max-w-[70%] object-contain sm:h-7" loading="lazy" decoding="async" />
+          </div>
+        )}
 
 
         <div className="flex flex-1 flex-col gap-1 p-2 sm:gap-1.5 sm:p-3">

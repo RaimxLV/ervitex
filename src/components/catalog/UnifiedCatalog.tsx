@@ -28,6 +28,18 @@ import { applyOrder, SECTIONS_ORDER_KEY } from "@/lib/filterOrder";
 import { MANUFACTURERS } from "@/lib/manufacturers";
 import FilterOrderEditor from "@/components/catalog/FilterOrderEditor";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
+
+/** English names for manual sportswear cards; catalog rows only carry Latvian text. */
+const etxNamesEn: Record<string, { name: string; description: string | null }> = {};
+let etxNamesPromise: Promise<void> | null = null;
+function loadEtxNamesEn() {
+  etxNamesPromise ??= Promise.resolve(
+    supabase.from("products").select("id,name_en,description_en").eq("brand", "ETX Latvia").then(({ data }) => {
+      for (const r of data || []) if (r.name_en) etxNamesEn[r.id] = { name: r.name_en, description: r.description_en };
+    }),
+  );
+  return etxNamesPromise;
+}
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import SublimationCatalogIntro from "@/components/catalog/SublimationCatalogIntro";
@@ -1391,6 +1403,13 @@ interface CardProps {
 
 const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, fromLabel, priority }: CardProps) => {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const [, setEtxNamesTick] = useState(0);
+  useEffect(() => {
+    if (item.source !== "etx" || lang !== "en" || etxNamesEn[item.id]) return;
+    let alive = true;
+    loadEtxNamesEn().then(() => alive && setEtxNamesTick((n) => n + 1));
+    return () => { alive = false; };
+  }, [item.source, item.id, lang]);
 
   // Filter-driven initial match
   let filterMatchIdx = -1;
@@ -1409,7 +1428,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const effectiveIdx = activeIdx ?? (filterMatchIdx >= 0 ? filterMatchIdx : cheapestIdx >= 0 ? cheapestIdx : (item.colors.length ? 0 : null));
   const active = effectiveIdx !== null ? item.colors[effectiveIdx] : null;
 
-  const displayTitle = item.name || item.id;
+  const etxEn = item.source === "etx" && lang === "en" ? etxNamesEn[item.id] : undefined;
+  const displayTitle = etxEn?.name || item.name || item.id;
   const matchedImg = active?.u || null;
   const rawImg = resolveImgUrl(item.source, matchedImg ?? item.image_url);
   const img = thumbUrl(rawImg);
@@ -1461,7 +1481,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       brandBadge={item.source === "etx" ? "Ervitex" : item.brand && item.brand.toLowerCase() !== "unbranded" ? item.brand : SOURCE_META[item.source].label}
       fullWidthCodeBar={item.source === "etx"}
       title={displayTitle}
-      subtitle={active?.n || item.description}
+      subtitle={etxEn?.description || active?.n || item.description}
       swatches={swatches}
       extraSwatches={extra}
       noImageLabel={noImageLabel}
