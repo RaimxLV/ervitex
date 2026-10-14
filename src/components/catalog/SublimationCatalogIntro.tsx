@@ -1,4 +1,4 @@
-import { Activity, Palette, Shirt, Sun, Trophy, Users } from "lucide-react";
+import { Activity, Palette, Shirt, Users } from "lucide-react";
 import { AccentIcon } from "@/components/ui/accent-icon";
 
 type SublimationCatalogIntroProps = {
@@ -8,33 +8,29 @@ type SublimationCatalogIntroProps = {
 const content = {
   lv: {
     eyebrow: "Ražots Latvijā",
-    title: "Pilnībā personalizētas sporta formas",
-    lead: 'SIA "Ervitex" piedāvā augstākās kvalitātes, pilnībā personalizētu tekstilizstrādājumu ražošanu, kas īpaši pielāgota jūsu uzņēmuma, biznesa vai sporta komandas vajadzībām.',
-    printTitle: "Sublimācijas apdruka — bez dizaina un krāsu ierobežojumiem",
-    print: "Mūsu pamatvirziens ir sublimācijas apģērbu ražošana un apdruka. Atšķirībā no standarta metodēm, sublimācija ļauj ne tikai uzdrukāt uzņēmuma logo vai tekstu uz gatava apģērba, bet pilnībā radīt paša izstrādājuma fona krāsu un unikālu dizainu no nulles. Jūsu idejām nav krāsu, toņu pāreju vai dizaina ierobežojumu, turklāt druka ir elpojoša un nenomazgājama.",
-    made: "Mēs izgatavojam",
+    title: "Pilnībā personalizētu apģērbu izgatavošana",
+    lead: 'SIA "Ervitex" piedāvā izgatavot pilnībā personalizētus tekstilizstrādājumus, pielāgotus jūsu komandai, uzņēmumam vai biznesam.',
+    printTitle: "Sublimācijas apdruka bez dizaina ierobežojumiem",
+    print: "Sublimācijas produktu ražošana un apdruka ietver ne vien logo un klasiskās informācijas uzdrukāšanu, bet arī paša izstrādājuma fona krāsas vai fona dizaina veidošanu. Līdz ar to šajā tehnikā izstrādājumiem nav nekādu krāsu vai dizaina ierobežojumu.",
+    made: "Šajā tehnikā izgatavojam",
     items: [
-      { icon: Users, title: "Sporta formas komandām", text: "Basketbola, futbola, volejbola un florbola formas" },
+      { icon: Users, title: "Sporta formas komandām", text: "Basketbola, futbola, volejbola, pludmales volejbola un florbola formas" },
       { icon: Activity, title: "Aktīvās atpūtas apģērbus", text: "Skriešanas, maratonu un orientēšanās kreklus" },
-      { icon: Sun, title: "Vasaras sporta apģērbus", text: "Pludmales volejbola kreklus un topus" },
-      { icon: Shirt, title: "Citus tekstilizstrādājumus", text: "T-kreklus un speciāla dizaina apģērbus jūsu zīmolam" },
+      { icon: Shirt, title: "Citus tekstilizstrādājumus", text: "T-kreklus un speciāli pielāgotus izstrādājumus" },
     ],
-    closing: "Izceliet savu komandu vai zīmolu ar unikālu vizuālo identitāti!",
   },
   en: {
     eyebrow: "Made in Latvia",
-    title: "Fully personalised sportswear",
-    lead: "Ervitex produces premium, fully personalised textile products tailored to the needs of your company, business or sports team.",
-    printTitle: "Sublimation printing — without design or colour limits",
-    print: "Our core specialisation is sublimated garment production and printing. Unlike standard methods, sublimation can create the complete background colour and an original design from scratch—not only add a logo or text to a finished garment. There are no limits on colours, gradients or design, while the print remains breathable and permanent.",
-    made: "We produce",
+    title: "Fully personalised garment production",
+    lead: "Ervitex produces fully personalised textile items tailored to your team, company or business.",
+    printTitle: "Sublimation printing without design limits",
+    print: "Sublimated product production and printing includes not only applying a logo and standard information, but also creating the product's own background colour or background design. As a result, items made with this technique have no colour or design limitations.",
+    made: "In this technique we produce",
     items: [
-      { icon: Users, title: "Team sports kits", text: "Basketball, football, volleyball and floorball uniforms" },
+      { icon: Users, title: "Team sports kits", text: "Basketball, football, volleyball, beach volleyball and floorball uniforms" },
       { icon: Activity, title: "Activewear", text: "Running, marathon and orienteering shirts" },
-      { icon: Sun, title: "Summer sportswear", text: "Beach volleyball shirts and tops" },
-      { icon: Shirt, title: "Other textile products", text: "T-shirts and custom-designed garments for your brand" },
+      { icon: Shirt, title: "Other textile products", text: "T-shirts and specially customised items" },
     ],
-    closing: "Give your team or brand a unique visual identity.",
   },
 };
 
@@ -71,7 +67,7 @@ const SublimationCatalogIntro = ({ lang }: SublimationCatalogIntroProps) => {
               <AccentIcon icon={Trophy} inline />
               <h3 className="font-heading text-sm font-bold uppercase text-foreground md:text-base">{copy.made}</h3>
             </div>
-            <ul className="mt-5 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+            <ul className="mt-5 grid gap-y-5">
               {copy.items.map(({ icon, title, text }) => (
                 <li key={title} className="group flex items-start gap-3 border-t border-border pt-4">
                   <AccentIcon icon={icon} className="h-10 w-10" />
@@ -82,9 +78,6 @@ const SublimationCatalogIntro = ({ lang }: SublimationCatalogIntroProps) => {
                 </li>
               ))}
             </ul>
-            <p className="mt-7 border-t border-border pt-5 font-heading text-base font-bold uppercase leading-snug text-foreground md:text-lg">
-              {copy.closing}
-            </p>
           </div>
         </div>
       </div>
