@@ -1133,7 +1133,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     <Layout>
       <PageIntro
         title={isSublimationCatalog
-          ? (lang === "lv" ? "Sporta formas (Sublimācija)" : "Sportswear (Sublimation)")
+          ? (lang === "lv" ? "Sporta formas" : "Sportswear")
           : t.title}
         subtitle={t.subtitle}
         eyebrow={isSublimationCatalog
