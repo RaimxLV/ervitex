@@ -28,7 +28,7 @@ import { applyOrder, SECTIONS_ORDER_KEY } from "@/lib/filterOrder";
 import { MANUFACTURERS } from "@/lib/manufacturers";
 import FilterOrderEditor from "@/components/catalog/FilterOrderEditor";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
-import ManualProductOrder from "@/components/catalog/ManualProductOrder";
+import { ManualProductGridOrder } from "@/components/catalog/ManualProductOrder";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 /** English names for manual sportswear cards; catalog rows only carry Latvian text. */
