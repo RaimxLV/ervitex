@@ -432,7 +432,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       setPriceRanges(cached.ranges);
       setLoadError(false);
       setLoaded(true);
-      return;
     }
 
     let cancelled = false;
@@ -1459,7 +1458,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       hoverImage={hover}
       imageAlt={displayTitle}
       code={item.source === "etx" ? null : displayCode}
-      brandBadge={item.source === "etx" ? null : item.brand && item.brand.toLowerCase() !== "unbranded" ? item.brand : SOURCE_META[item.source].label}
+      brandBadge={item.source === "etx" ? "Ervitex" : item.brand && item.brand.toLowerCase() !== "unbranded" ? item.brand : SOURCE_META[item.source].label}
       title={displayTitle}
       subtitle={active?.n || item.description}
       swatches={swatches}

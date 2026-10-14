@@ -10,6 +10,8 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, X, Upload } from "lucide-react";
+import { clearCatalogCache } from "@/lib/catalogCache";
+import { catalogBrandForCategory } from "@/lib/etxCatalog";
 
 const PRINTING_TECHS = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
 const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
@@ -139,11 +141,13 @@ const AdminProductForm = () => {
     const retailPrice = form.retail_price ? parseFloat(form.retail_price) : null;
     const wholesalePrice = form.wholesale_price ? parseFloat(form.wholesale_price) : null;
 
+    const selectedCategory = categories.find((category) => category.id === form.category_id);
     const productData = {
       name_lv: form.name_lv, name_en: form.name_en,
       description_lv: form.description_lv, description_en: form.description_en,
       long_description_lv: form.long_description_lv, long_description_en: form.long_description_en,
-      material: form.material, brand: form.brand,
+      material: form.material,
+      brand: catalogBrandForCategory(selectedCategory?.name_lv, selectedCategory?.slug, form.brand),
       category_id: form.category_id || null,
       min_order: form.min_order,
       retail_price: retailPrice && retailPrice > 0 ? retailPrice : null,
@@ -189,6 +193,7 @@ const AdminProductForm = () => {
       );
     }
 
+    await clearCatalogCache();
     setSaving(false);
     toast({ title: isEdit ? "Produkts atjaunināts" : "Produkts izveidots" });
     navigate("/admin/products");
