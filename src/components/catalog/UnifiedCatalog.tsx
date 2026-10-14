@@ -1169,7 +1169,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto" aria-describedby={undefined}>
           <DialogHeader><DialogTitle>{lang === "lv" ? "Sporta formu kartīšu secība" : "Sportswear card order"}</DialogTitle></DialogHeader>
           {orderingProducts && isAdmin && <ManualProductOrder
-            products={items.filter(item => item.source === "etx").map(item => ({ id: item.id, name_lv: item.name || item.id, image: item.image }))}
+            products={items.filter(item => item.source === "etx").map(item => ({ id: item.id, name_lv: item.name || item.id, image: item.image_url }))}
             order={filterOrder[MANUAL_PRODUCT_ORDER_KEY]}
             save={saveFilterOrder}
             onClose={() => { setOrderingProducts(false); setSort("newest"); setPage(1); }}
