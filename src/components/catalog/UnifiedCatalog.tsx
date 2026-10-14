@@ -31,6 +31,8 @@ import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import SublimationCatalogIntro from "@/components/catalog/SublimationCatalogIntro";
+import TeamSportswearCard from "@/components/catalog/TeamSportswearCard";
+import { MANUAL_PRODUCT_ORDER_KEY } from "@/lib/teamSportswear";
 import {
   COLOR_BUCKETS,
   bucketOf,
@@ -370,7 +372,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [stockOnly, setStockOnly] = useState(searchParams.get("stock") === "1");
   const stockFlags = useStockFlags();
   const { isAdmin, loading: authLoading } = useAuth();
-  const { order: filterOrder, save: saveFilterOrder } = useFilterOrder();
+  const { order: filterOrder, ready: filterOrderReady, save: saveFilterOrder } = useFilterOrder();
   const [arranging, setArranging] = useState(false);
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
@@ -895,9 +897,16 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (sort === "az") cmp = cmpName;
     else if (sort === "za") cmp = (a, b) => cmpName(b, a);
     else if (sort === "newest" || sort === "featured") {
-      cmp = (a, b) =>
-        Number(b.source === "ss") - Number(a.source === "ss") ||
-        (b.id || "").localeCompare(a.id || "", "en", { numeric: true, sensitivity: "base" });
+      const ranks = new Map((filterOrder[MANUAL_PRODUCT_ORDER_KEY] || []).map((id, index) => [id, index]));
+      cmp = (a, b) => {
+        if (a.source === "etx" && b.source === "etx") {
+          const ar = ranks.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+          const br = ranks.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+          if (ar !== br) return ar - br;
+        }
+        return Number(b.source === "ss") - Number(a.source === "ss") ||
+          (b.id || "").localeCompare(a.id || "", "en", { numeric: true, sensitivity: "base" });
+      };
     } else if (sort === "price_asc" || sort === "price_desc") {
       const dir = sort === "price_asc" ? 1 : -1;
       cmp = (a, b) => {
@@ -917,7 +926,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     return cmp ? [...base].sort(cmp) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, pq, exactHits, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags, sort, priceOf, priceRanges, lang]);
+  }, [items, pq, exactHits, sources, brands, categories, groups, genders, colors, stockOnly, stockFlags, sort, priceOf, priceRanges, lang, filterOrder]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Number.isFinite(page) ? Math.min(Math.max(page, 1), totalPages) : 1;
@@ -1233,7 +1242,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 </button>
               </div>
             )}
-            {!loaded ? (
+            {!loaded || !filterOrderReady ? (
               <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                 {Array.from({ length: 12 }).map((_, i) => (
                   <div key={i} className="overflow-hidden border border-border bg-card">
@@ -1291,6 +1300,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       }}
                     />
                   ))}
+                  {isSublimationCatalog && safePage === totalPages && !q.trim() && !stockOnly && colors.size === 0 && <TeamSportswearCard lang={lang} />}
                 </div>
 
                 {totalPages > 1 && (

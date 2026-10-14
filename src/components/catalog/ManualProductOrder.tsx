@@ -6,7 +6,7 @@ import { ArrowDown, ArrowUp, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { applyOrder } from "@/lib/filterOrder";
 import { MANUAL_PRODUCT_ORDER_KEY } from "@/lib/teamSportswear";
-import { useFilterOrder } from "@/hooks/useFilterOrder";
+import type { FilterOrderMap } from "@/hooks/useFilterOrder";
 import { useToast } from "@/hooks/use-toast";
 
 type Item = { id: string; name_lv: string };
@@ -21,10 +21,9 @@ function OrderRow({ item, index, count, move }: { item: Item; index: number; cou
   </div>;
 }
 
-export default function ManualProductOrder({ products, order, onClose }: { products: Item[]; order: string[] | undefined; onClose: () => void }) {
+export default function ManualProductOrder({ products, order, save, onClose }: { products: Item[]; order: string[] | undefined; save: (next: FilterOrderMap) => Promise<{ message: string } | null>; onClose: () => void }) {
   const [items, setItems] = useState(() => applyOrder(products, order, p => p.id));
   const [saving, setSaving] = useState(false);
-  const { save } = useFilterOrder();
   const { toast } = useToast();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
   const move = (from: number, to: number) => setItems(cur => arrayMove(cur, from, to));

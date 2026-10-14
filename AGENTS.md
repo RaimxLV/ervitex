@@ -1,6 +1,6 @@
 # Architecture rules
 
-- Search shares searchScore/exactCodeHits for consistent ranking.
+- Search shares searchScore/exactCodeHits for ranking.
 - productContent separates supplier care/specs; fingerprint translation caches to avoid stale metadata.
 - Offers use CreateOfferButton and protected /offers with OfferWorkspace; sharing activates drafts automatically, without manual statuses.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows and QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers.
@@ -31,5 +31,5 @@
 - UTT Europe (Gildan/Kariban/Regatta) syncs through the `utt-sync` Data Export API function into `utt_*` tables; buying prices live in service-role-only `utt_prices` and images are mirrored to the `utt-images` bucket because UTT forbids hotlinking and blocks hotlinking IPs.
 - Headings are thickened with `.hero-ultra` (-webkit-text-stroke) because the heading face caps at 700; its leading must be repeated per breakpoint, since theme text sizes emit their own line-height.
 
-- Filter order in catalog_filter_order; disk cache needs live row count; render after all batches.
-- Unsynced products reuse products/images/sizes via catalog_items; refreshes rebuild manual retail prices. UUIDs never display as manufacturer codes.
+- Filter/manual-product order uses catalog_filter_order; render after all batches and live cache count checks. Informational cards are not purchasable.
+- Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.

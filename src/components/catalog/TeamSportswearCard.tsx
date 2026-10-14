@@ -48,7 +48,7 @@ export default function TeamSportswearCard({ lang }: { lang: "lv" | "en" }) {
         </div>
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border bg-muted/50 px-5 py-5 sm:px-8">
           <p className="flex items-center gap-2 text-sm font-medium"><Users className="h-5 w-5 shrink-0 text-accent" />{lv ? "Sīkāka informācija pie projektu vadītāja." : "Contact a project manager for more information."}</p>
-          <Button asChild variant="outline" size="sm"><Link to="/contacts">{lv ? "Kontakti" : "Contacts"}<ArrowUpRight className="ml-2 h-4 w-4" /></Link></Button>
+          <Button asChild variant="outline" size="sm"><Link to="/contact">{lv ? "Kontakti" : "Contacts"}<ArrowUpRight className="ml-2 h-4 w-4" /></Link></Button>
         </div>
       </DialogContent>
     </Dialog>
