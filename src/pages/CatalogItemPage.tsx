@@ -198,6 +198,7 @@ const CatalogItemPage = () => {
                     imageAlt={r.name || r.id}
                     code={r.source === "etx" ? null : r.id}
                     brandBadge={r.source === "etx" ? "Ervitex" : r.brand && r.brand.toLowerCase() !== "unbranded" ? r.brand : SOURCE_META[r.source].label}
+                    fullWidthCodeBar={r.source === "etx"}
                     title={r.name || r.id}
                     subtitle={r.category}
                     swatches={swatches}
