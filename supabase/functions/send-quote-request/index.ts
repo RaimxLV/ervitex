@@ -1,5 +1,6 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { sendAppEmail } from "../_shared/send-app-email.ts";
 
 const OFFICE_EMAIL = "birojs@ervitex.lv";
 
@@ -86,10 +87,7 @@ Deno.serve(async (req) => {
 
     // 1) Internal notification to office — with Reply-To set to the customer so
     //    staff can just hit "Reply" in their inbox.
-    const { error: officeErr } = await supabase.functions.invoke("send-transactional-email", {
-      body: {
-        templateName: "quote-request",
-        recipientEmail: OFFICE_EMAIL,
+    const officeRes = await sendAppEmail("quote-request", OFFICE_EMAIL, {
         replyTo: quote.email,
         fromEmail: OFFICE_EMAIL,
         fromName: quote.name,
@@ -99,24 +97,19 @@ Deno.serve(async (req) => {
           worksheetUrl: worksheetUrl ? `${worksheetUrl}?v=pm` : "",
           files: signedUrls,
         },
-      },
     });
-    results.push({ to: OFFICE_EMAIL, template: "quote-request", ok: !officeErr, error: officeErr?.message });
+    results.push({ to: OFFICE_EMAIL, template: "quote-request", ok: officeRes.ok, error: officeRes.ok ? undefined : officeRes.error || officeRes.reason });
 
     // 2) Auto-confirmation to the customer (no attachments/staff-only notes)
     if (quote.email) {
-      const { error: custErr } = await supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "quote-confirmation",
-          recipientEmail: quote.email,
+      const custRes = await sendAppEmail("quote-confirmation", quote.email, {
           replyTo: pm.email,
           fromEmail: pm.email,
           fromName: pm.name,
           idempotencyKey: `quote-${quote.id}-customer`,
           templateData: baseData,
-        },
       });
-      results.push({ to: quote.email, template: "quote-confirmation", ok: !custErr, error: custErr?.message });
+      results.push({ to: quote.email, template: "quote-confirmation", ok: custRes.ok, error: custRes.ok ? undefined : custRes.error || custRes.reason });
     }
 
     const delivered = results.some(r => r.ok);

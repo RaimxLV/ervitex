@@ -1,6 +1,7 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { ASSIGNEES, assigneeBySlug } from '../_shared/assignees.ts'
+import { sendAppEmail } from '../_shared/send-app-email.ts'
 
 const OFFICE_EMAIL = 'birojs@ervitex.lv'
 
@@ -99,10 +100,7 @@ Deno.serve(async (req) => {
     if (signed?.signedUrl) files.push(signed.signedUrl)
   }
 
-  const { data: mailData, error: mailErr } = await supabase.functions.invoke('send-transactional-email', {
-    body: {
-      templateName: 'quote-assigned',
-      recipientEmail: person.email,
+  const mailRes = await sendAppEmail('quote-assigned', person.email, {
       replyTo: quote.email,
       fromEmail: person.email.endsWith('@ervitex.lv') ? person.email : 'birojs@ervitex.lv',
       fromName: quote.name,
@@ -122,17 +120,16 @@ Deno.serve(async (req) => {
         deadline: quote.deadline || '',
         worksheetUrl: `https://raimxlv.github.io/ervitex/saraksts/${token}?v=pm`,
       },
-    },
   })
 
-  const emailed = !mailErr && (mailData as { error?: unknown } | null)?.error == null
+  const emailed = mailRes.ok
 
   if (wantsJson) {
     return json(200, {
       ok: true,
       emailed,
       assignee: { name: person.name, email: person.email },
-      error: emailed ? null : (mailErr?.message || 'email failed'),
+      error: emailed ? null : (mailRes.ok ? null : mailRes.error || mailRes.reason),
     })
   }
 

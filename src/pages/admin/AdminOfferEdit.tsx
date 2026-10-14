@@ -339,9 +339,9 @@ const AdminOfferEdit = () => {
     const t = offerTotals(offer.items, offer.vat_rate, offer.discount);
     const pmEmail = (offer.pm_email || user?.email || OFFICE_EMAIL).trim();
     const pmName = offer.pm_name || "";
-    const { error } = await supabase.functions.invoke("send-transactional-email", {
+    const { error } = await supabase.functions.invoke("send-pm-offer", {
       body: {
-        templateName: "pm-offer",
+        offerId: offer.id,
         recipientEmail: to,
         replyTo: pmEmail,
         idempotencyKey: `pm-offer-${offer.id}-${mode}-${Date.now()}`,
