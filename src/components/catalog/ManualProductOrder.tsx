@@ -9,12 +9,13 @@ import { MANUAL_PRODUCT_ORDER_KEY } from "@/lib/teamSportswear";
 import type { FilterOrderMap } from "@/hooks/useFilterOrder";
 import { useToast } from "@/hooks/use-toast";
 
-type Item = { id: string; name_lv: string };
+type Item = { id: string; name_lv: string; image?: string | null; product_images?: { url: string }[] };
 function OrderRow({ item, index, count, move }: { item: Item; index: number; count: number; move: (from: number, to: number) => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({ id: item.id });
   return <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={`flex items-center gap-2 border border-border bg-card p-2 ${isDragging ? "relative z-10 ring-2 ring-accent" : ""}`}>
-    <Button variant="ghost" size="icon" className="shrink-0 cursor-grab touch-none" aria-label={`Pārvilkt ${item.name_lv}`} {...attributes} {...listeners}><GripVertical className="h-4 w-4" /></Button>
+    <Button ref={setActivatorNodeRef} variant="ghost" size="icon" className="shrink-0 cursor-grab touch-none active:cursor-grabbing" aria-label={`Pārvilkt ${item.name_lv}`} {...attributes} {...listeners}><GripVertical className="h-4 w-4" /></Button>
     <span className="w-5 shrink-0 text-xs tabular-nums text-muted-foreground">{index + 1}</span>
+    {(item.image || item.product_images?.[0]?.url) && <img src={item.image || item.product_images?.[0]?.url} alt="" className="h-10 w-10 shrink-0 bg-muted object-contain" loading="lazy" />}
     <span className="min-w-0 flex-1 text-sm font-medium">{item.name_lv}</span>
     <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" title="Uz augšu" aria-label={`${item.name_lv} uz augšu`} disabled={index === 0} onClick={() => move(index, index - 1)}><ArrowUp className="h-4 w-4" /></Button>
     <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" title="Uz leju" aria-label={`${item.name_lv} uz leju`} disabled={index === count - 1} onClick={() => move(index, index + 1)}><ArrowDown className="h-4 w-4" /></Button>

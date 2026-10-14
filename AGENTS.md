@@ -31,5 +31,5 @@
 - UTT Europe (Gildan/Kariban/Regatta) syncs through the `utt-sync` Data Export API function into `utt_*` tables; buying prices live in service-role-only `utt_prices` and images are mirrored to the `utt-images` bucket because UTT forbids hotlinking and blocks hotlinking IPs.
 - Headings are thickened with `.hero-ultra` (-webkit-text-stroke) because the heading face caps at 700; its leading must be repeated per breakpoint, since theme text sizes emit their own line-height.
 
-- Filter/manual-product order uses catalog_filter_order; render after all batches and live cache count checks. Informational cards are not purchasable.
+- ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.

@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useFilterOrder } from "@/hooks/useFilterOrder";
 import { MANUAL_PRODUCT_ORDER_KEY } from "@/lib/teamSportswear";
 import { useToast } from "@/hooks/use-toast";
+import { publicCatalogBrand } from "@/lib/etxCatalog";
 
 interface ProductRow {
   id: string;
@@ -100,7 +101,7 @@ const AdminProducts = () => {
 
   const brands = useMemo(() => {
     const set = new Set<string>();
-    products.forEach(p => { if (p.brand) set.add(p.brand); });
+    products.forEach(p => { const brand = publicCatalogBrand(p.brand); if (brand) set.add(brand); });
     return Array.from(set).sort();
   }, [products]);
 
@@ -111,11 +112,11 @@ const AdminProducts = () => {
       list = list.filter(p =>
         p.name_en.toLowerCase().includes(q) ||
         p.name_lv.toLowerCase().includes(q) ||
-        (p.brand && p.brand.toLowerCase().includes(q))
+        (publicCatalogBrand(p.brand)?.toLowerCase().includes(q))
       );
     }
     if (filterCategory !== "all") list = list.filter(p => p.category_id === filterCategory);
-    if (filterBrand !== "all") list = list.filter(p => p.brand === filterBrand);
+    if (filterBrand !== "all") list = list.filter(p => publicCatalogBrand(p.brand) === filterBrand);
     if (filterStatus === "active") list = list.filter(p => p.active !== false);
     else if (filterStatus === "inactive") list = list.filter(p => p.active === false);
     else if (filterStatus === "featured") list = list.filter(p => p.featured);
@@ -257,7 +258,7 @@ const AdminProducts = () => {
                     </div>
                   </div>
                 </td>
-                <td className="p-3 text-muted-foreground text-xs">{p.brand || "—"}</td>
+                <td className="p-3 text-muted-foreground text-xs">{publicCatalogBrand(p.brand) || "—"}</td>
                 <td className="p-3 text-muted-foreground">{p.categories?.name_lv || "—"}</td>
                 <td className="p-3">
                   {p.retail_price && p.retail_price > 0
@@ -332,7 +333,7 @@ const AdminProducts = () => {
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm text-foreground truncate">{p.name_lv}</p>
-                  <p className="text-xs text-muted-foreground">{p.brand || "—"} · {p.categories?.name_lv || "—"}</p>
+                  <p className="text-xs text-muted-foreground">{publicCatalogBrand(p.brand) || "—"} · {p.categories?.name_lv || "—"}</p>
                   <div className="mt-1 flex items-center gap-2">
                     <span className="text-sm font-medium">
                       {p.retail_price && p.retail_price > 0 ? `€${p.retail_price}` : <span className="text-xs italic text-muted-foreground">Pēc pieprasījuma</span>}

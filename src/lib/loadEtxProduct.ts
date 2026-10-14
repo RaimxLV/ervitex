@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { ETX_PUBLIC_BRAND } from "@/lib/etxCatalog";
 
 const MATERIAL_EN: Record<string, string> = {
   "pārstrādāts poliesters": "Recycled polyester",
@@ -23,7 +24,7 @@ export async function loadEtxProduct(id: string, lang: "lv" | "en") {
   return {
     title: lang === "lv" ? p.name_lv : p.name_en,
     code: "",
-    brand: p.brand,
+    brand: ETX_PUBLIC_BRAND,
     category: lang === "lv" ? "Sporta formas sublimācija" : "Sublimation sportswear",
     gender: null,
     shortDescription: lang === "lv" ? p.description_lv : p.description_en,

@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, X, Upload } from "lucide-react";
 import { clearCatalogCache } from "@/lib/catalogCache";
-import { catalogBrandForCategory } from "@/lib/etxCatalog";
+import { catalogBrandForCategory, publicCatalogBrand } from "@/lib/etxCatalog";
 
 const PRINTING_TECHS = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
 const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
@@ -58,7 +58,7 @@ const AdminProductForm = () => {
       name_lv: copyId ? `${product.name_lv} (kopija)` : product.name_lv, name_en: copyId ? `${product.name_en} (copy)` : product.name_en,
       description_lv: product.description_lv || "", description_en: product.description_en || "",
       long_description_lv: product.long_description_lv || "", long_description_en: product.long_description_en || "",
-      material: product.material || "", brand: product.brand || "",
+      material: product.material || "", brand: publicCatalogBrand(product.brand) || "",
       category_id: product.category_id || "",
       min_order: product.min_order || 1,
       retail_price: product.retail_price?.toString() || "",
