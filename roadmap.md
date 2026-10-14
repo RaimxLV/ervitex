@@ -1,5 +1,9 @@
 # Roadmap
 
+## Telefona pieprasījuma poga un cepuru filtri — 14.10.2026
+- [x] Telefonā kompakta 44 px pieprasījuma poga apakšējā joslā ar drošo vietu; pārbaudīta lapas apakša un 2 gab. izvēles atvēršana pieprasījumā, kļūdu nav.
+- [x] Pārbaudīti piegādātāju cepuru tipi/materiāli: katalogs apvieno tos Caps & Hats; materiālu filtra nav, BB materiāla lauks tukšs, citiem piegādātājiem auduma dati pieejami. Filtri šajā pārbaudē nav mainīti.
+
 ## Sporta formu ražotājs un vilkšanas secība — 14.10.2026
 - [x] Visām sporta formu kartītēm un ražotāja laukiem norādīts Ervitex; iekšējā piegādātāja atslēga nemainīta.
 - [x] Kartīšu vilkšana un secības saglabāšana pieejama no sporta formu kataloga un admina sadaļas; priekšskatījumā pievienoti foto.

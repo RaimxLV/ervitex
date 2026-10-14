@@ -523,6 +523,17 @@
 
 
 @layer components {
+  .quote-cart-dock {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+  @media (max-width: 639px) {
+    body.has-quote-dock {
+      padding-bottom: calc(61px + env(safe-area-inset-bottom));
+    }
+    html:has(body.has-quote-dock) {
+      scroll-padding-bottom: calc(69px + env(safe-area-inset-bottom));
+    }
+  }
   .quote-form { min-width: 0; }
   .quote-form label, .quote-label {
     font-size: 12px;

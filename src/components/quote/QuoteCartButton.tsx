@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
-import { ClipboardList, Loader2 } from "lucide-react";
+import { ClipboardList, Loader2, ArrowRight } from "lucide-react";
+import { useEffect } from "react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useWorksheetPick } from "@/lib/worksheetPick";
@@ -16,40 +17,45 @@ const QuoteCartButton = () => {
   const { create, busy } = useCreateOffer();
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
 
-  if (pick) return null;
-  if (totalQty === 0) return null;
-  if (location.pathname.startsWith("/request")) return null;
-  if (location.pathname.startsWith("/offers")) return null;
-   if (location.pathname.startsWith("/admin")) return null;
+  const visible = !pick && totalQty > 0 &&
+    !["/request", "/offers", "/admin"].some((path) => location.pathname.startsWith(path));
+
+  useEffect(() => {
+    document.body.classList.toggle("has-quote-dock", visible);
+    return () => document.body.classList.remove("has-quote-dock");
+  }, [visible]);
+
+  if (!visible) return null;
 
   const lines = items.length;
-  const cls = "group fixed bottom-5 right-5 z-40 flex items-center gap-3 rounded-full bg-accent px-5 py-3.5 font-heading text-xs font-black uppercase tracking-widest text-accent-foreground shadow-2xl ring-2 ring-accent/40 transition-all hover:scale-105 hover:bg-accent/90 sm:bottom-8 sm:right-8 animate-in fade-in slide-in-from-bottom-4";
+  const cls = "group flex h-11 w-full items-center justify-start gap-3 rounded-sm bg-accent px-3 font-heading text-xs font-bold text-accent-foreground transition-colors hover:bg-accent/90 sm:h-auto sm:w-auto sm:rounded-full sm:px-5 sm:py-3.5 sm:uppercase sm:tracking-widest sm:shadow-2xl sm:ring-2 sm:ring-accent/40";
   const inner = (label: string) => (
     <>
-      <span className="relative flex h-8 w-8 items-center justify-center rounded-full bg-accent-foreground text-accent">
+      <span className="relative flex h-7 w-7 shrink-0 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-accent-foreground text-accent">
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ClipboardList className="h-4 w-4" />}
         <span className="absolute -right-1 -top-1 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-foreground px-1 text-[10px] font-black text-background">
           {lines}
         </span>
       </span>
-      <span className="flex flex-col items-start leading-tight">
+      <span className="flex min-w-0 flex-1 flex-col items-start leading-tight">
         <span>{label}</span>
         <span className="text-[10px] font-semibold tracking-wide opacity-80">
           {totalQty} {t("gab.", "pcs")} · {lines} {t("pozīcij.", "lines")}
         </span>
       </span>
+      <ArrowRight className="ml-auto h-4 w-4 shrink-0 sm:hidden" aria-hidden="true" />
     </>
   );
 
-  if (isAdmin) {
-    return (
-      <Button type="button" disabled={busy} onClick={() => create(true)} className={cls}>
+  return (
+    <div className="quote-cart-dock fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background px-3 pt-2 sm:inset-x-auto sm:bottom-8 sm:right-8 sm:border-0 sm:bg-transparent sm:p-0">
+      {isAdmin ? <Button type="button" disabled={busy} onClick={() => create(true)} className={cls}>
         {inner(t("Izveidot piedāvājumu", "Create offer"))}
-      </Button>
-    );
-  }
-
-  return <Link to="/request" className={cls}>{inner(t("Mans pieprasījums", "My request"))}</Link>;
+      </Button> : <Button asChild className={cls}>
+        <Link to="/request">{inner(t("Mans pieprasījums", "My request"))}</Link>
+      </Button>}
+    </div>
+  );
 };
 
 export default QuoteCartButton;
