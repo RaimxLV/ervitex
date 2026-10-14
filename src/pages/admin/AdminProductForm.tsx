@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,9 @@ interface ColorEntry { name: string; hex_code: string; image_url: string; }
 const AdminProductForm = () => {
   const { id } = useParams();
   const isEdit = !!id && id !== "new";
+  const [searchParams] = useSearchParams();
+  const copyId = !isEdit ? searchParams.get("copy") : null;
+  const sourceId = isEdit ? id : copyId;
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -43,14 +46,14 @@ const AdminProductForm = () => {
     supabase.from("categories").select("id, name_lv, slug").order("sort_order").then(({ data }) => {
       setCategories(data || []);
     });
-    if (isEdit) loadProduct();
-  }, [id]);
+    if (sourceId) loadProduct();
+  }, [id, copyId]);
 
   const loadProduct = async () => {
-    const { data: product } = await supabase.from("products").select("*").eq("id", id!).single();
+    const { data: product } = await supabase.from("products").select("*").eq("id", sourceId!).single();
     if (!product) return navigate("/admin/products");
     setForm({
-      name_lv: product.name_lv, name_en: product.name_en,
+      name_lv: copyId ? `${product.name_lv} (kopija)` : product.name_lv, name_en: copyId ? `${product.name_en} (copy)` : product.name_en,
       description_lv: product.description_lv || "", description_en: product.description_en || "",
       long_description_lv: product.long_description_lv || "", long_description_en: product.long_description_en || "",
       material: product.material || "", brand: product.brand || "",
@@ -67,11 +70,11 @@ const AdminProductForm = () => {
       hidden_manual: (product as any).hidden_manual || false,
       hide_when_oos: (product as any).hide_when_oos || false,
     });
-    const { data: imgs } = await supabase.from("product_images").select("url").eq("product_id", id!).order("sort_order");
+    const { data: imgs } = await supabase.from("product_images").select("url").eq("product_id", sourceId!).order("sort_order");
     setImageUrls(imgs?.map(i => i.url) || []);
-    const { data: clrs } = await supabase.from("product_colors").select("name, hex_code, image_url").eq("product_id", id!);
+    const { data: clrs } = await supabase.from("product_colors").select("name, hex_code, image_url").eq("product_id", sourceId!);
     setColors(clrs?.map(c => ({ name: c.name, hex_code: c.hex_code || "#000000", image_url: c.image_url || "" })) || []);
-    const { data: szs } = await supabase.from("product_sizes").select("size").eq("product_id", id!).order("sort_order");
+    const { data: szs } = await supabase.from("product_sizes").select("size").eq("product_id", sourceId!).order("sort_order");
     setSizes(szs?.map(s => s.size) || []);
   };
 
@@ -212,7 +215,7 @@ const AdminProductForm = () => {
       </Button>
 
       <h1 className="font-heading text-xl sm:text-2xl font-black uppercase tracking-wide text-foreground">
-        {isEdit ? "Labot produktu" : "Jauns produkts"}
+        {isEdit ? "Labot produktu" : copyId ? "Produkta dublikāts" : "Jauns produkts"}
       </h1>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-2">
@@ -402,6 +405,7 @@ const AdminProductForm = () => {
         <Button onClick={handleSave} disabled={saving} className="bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest">
           {saving ? "Saglabā..." : isEdit ? "Saglabāt izmaiņas" : "Izveidot produktu"}
         </Button>
+        {isEdit && <Button variant="outline" onClick={() => navigate(`/admin/products/new?copy=${id}`)}>Dublēt</Button>}
         <Button variant="outline" onClick={() => navigate("/admin/products")}>Atcelt</Button>
       </div>
     </AdminLayout>
