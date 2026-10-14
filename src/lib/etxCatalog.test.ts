@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { catalogBrandForCategory, ETX_BRAND, sublimationProducts } from "./etxCatalog";
+import { catalogBrandForCategory, ETX_BRAND, publicCatalogBrand, sublimationProducts } from "./etxCatalog";
+
+describe("Sporta formu ražotājs", () => {
+  it("visām sporta formām rāda Ervitex, nevis veco piegādātāja nosaukumu", () => {
+    expect(publicCatalogBrand("ETX Latvia")).toBe("Ervitex");
+    expect(publicCatalogBrand("ETX Latvia", "etx")).toBe("Ervitex");
+    expect(publicCatalogBrand(null, "etx")).toBe("Ervitex");
+    expect(publicCatalogBrand("Craft", "nwg")).toBe("Craft");
+  });
+});
 
 describe("Sublimācijas saistītās preces", () => {
   it("atstāj tikai ETX Latvia sporta formas sublimācijas kategorijā", () => {

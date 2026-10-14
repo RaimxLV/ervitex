@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronsLeft, ChevronsRight, SlidersHorizontal } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, SlidersHorizontal, ListOrdered } from "lucide-react";
 import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,8 @@ import { applyOrder, SECTIONS_ORDER_KEY } from "@/lib/filterOrder";
 import { MANUFACTURERS } from "@/lib/manufacturers";
 import FilterOrderEditor from "@/components/catalog/FilterOrderEditor";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
+import ManualProductOrder from "@/components/catalog/ManualProductOrder";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 /** English names for manual sportswear cards; catalog rows only carry Latvian text. */
 const etxNamesEn: Record<string, { name: string; description: string | null }> = {};
@@ -386,6 +388,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const { isAdmin, loading: authLoading } = useAuth();
   const { order: filterOrder, ready: filterOrderReady, save: saveFilterOrder } = useFilterOrder();
   const [arranging, setArranging] = useState(false);
+  const [orderingProducts, setOrderingProducts] = useState(false);
   const [page, setPage] = useState(parseInt(searchParams.get("page") || "1", 10));
 
   // Tracks the query string this component itself wrote, so that navigations
@@ -1162,6 +1165,17 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         compact
       />
       {isSublimationCatalog && <SublimationCatalogIntro lang={lang} />}
+      <Dialog open={orderingProducts && isAdmin} onOpenChange={setOrderingProducts}>
+        <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto" aria-describedby={undefined}>
+          <DialogHeader><DialogTitle>{lang === "lv" ? "Sporta formu kartīšu secība" : "Sportswear card order"}</DialogTitle></DialogHeader>
+          {orderingProducts && isAdmin && <ManualProductOrder
+            products={items.filter(item => item.source === "etx").map(item => ({ id: item.id, name_lv: item.name || item.id, image: item.image }))}
+            order={filterOrder[MANUAL_PRODUCT_ORDER_KEY]}
+            save={saveFilterOrder}
+            onClose={() => { setOrderingProducts(false); setSort("newest"); setPage(1); }}
+          />}
+        </DialogContent>
+      </Dialog>
       <div className="container px-4 py-5 md:py-10">
         <div className="mb-5 space-y-3 md:mb-6">
           <div className="relative w-full md:max-w-xl">
@@ -1173,6 +1187,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            {isSublimationCatalog && !authLoading && isAdmin && <Button variant="outline" disabled={!loaded || !filterOrderReady} onClick={() => setOrderingProducts(true)} className="gap-2">
+              <ListOrdered className="h-4 w-4" />{lang === "lv" ? "Kartīšu secība" : "Card order"}
+            </Button>}
             {/* Mobile filter trigger */}
             <Sheet>
               <SheetTrigger asChild>

@@ -9,7 +9,7 @@ export function useFilterOrder() {
 
   useEffect(() => {
     let cancelled = false;
-    supabase
+    const load = () => { supabase
       .from("catalog_filter_order")
       .select("key, order_values")
       .then(({ data }) => {
@@ -19,7 +19,10 @@ export function useFilterOrder() {
         setOrder(map);
         setReady(true);
       });
-    return () => { cancelled = true; };
+    };
+    load();
+    window.addEventListener("catalog-order-updated", load);
+    return () => { cancelled = true; window.removeEventListener("catalog-order-updated", load); };
   }, []);
 
   const save = useCallback(async (next: FilterOrderMap) => {
@@ -28,7 +31,10 @@ export function useFilterOrder() {
       key, order_values, updated_at: new Date().toISOString(), updated_by: u.user?.id ?? null,
     }));
     const { error } = await supabase.from("catalog_filter_order").upsert(rows, { onConflict: "key" });
-    if (!error) setOrder((cur) => ({ ...cur, ...next }));
+    if (!error) {
+      setOrder((cur) => ({ ...cur, ...next }));
+      window.dispatchEvent(new Event("catalog-order-updated"));
+    }
     return error;
   }, []);
 

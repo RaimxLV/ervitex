@@ -1150,7 +1150,7 @@ const CatalogItemDialog = ({
     material: null,
     care: null,
     specs: [
-      ...(brand ? [{ label: "Brand", value: brand === "ETX Latvia" ? "Sporta formas (Sublimācija)" : brand }] : []),
+      ...(brand ? [{ label: "Brand", value: source === "etx" || brand === "ETX Latvia" ? "Ervitex" : brand }] : []),
       ...(category ? [{ label: "Category", value: category }] : []),
     ],
     notice: null,
@@ -1162,7 +1162,7 @@ const CatalogItemDialog = ({
       images: image ? [image] : [],
       sizes: [],
     })),
-  }), [name, id, brand, category, descriptionFallback, swatches, image, lang]);
+  }), [name, id, brand, source, category, descriptionFallback, swatches, image, lang]);
 
   const displayDetail = useMemo<ProductDetail>(() => detail || fallbackDetail, [detail, fallbackDetail]);
 
@@ -1449,8 +1449,8 @@ const CatalogItemDialog = ({
     },
   }[lang];
 
-  // Resolve brand for display: hide "Unbranded" / empty; ETX items show the sublimation label
-  const rawBrand = source === "etx" ? SOURCE_META[source].label : (displayDetail.brand || brand || "").trim();
+  // The source key is internal; sportswear is manufactured by Ervitex.
+  const rawBrand = source === "etx" ? "Ervitex" : (displayDetail.brand || brand || "").trim();
   const displayBrand = rawBrand && rawBrand.toLowerCase() !== "unbranded" ? rawBrand : null;
   const displayCode = source === "etx" ? "" : displayDetail.code || id;
   // Variant article number for the selected colour (+ size, when picked)
