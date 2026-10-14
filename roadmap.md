@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Cepuru veidu filtri — 14.10.2026
-- [ ] Iedalīt cepures pēc piegādātāju nosaukumiem un aprakstiem, pievienot papildu filtru tikai cepuru izvēlei.
-- [ ] Pārbaudīt filtru izvēli, rezultātus, pārlādi un paslēpšanu citās kategorijās.
+- [x] Cepuru veidi pēc piegādātāju nosaukumiem un pieejamajiem aprakstiem; papildfiltrs tikai izvēloties cepures, neskaidrie veidi paliek „Citas galvassegas”.
+- [x] Pārlūkā pārbaudītas panamas, izvēles saglabāšanās pēc pārlādes, paslēpšana pie T-krekliem un Trucker izvēle telefonā; 30 testi sekmīgi, build OK.
 
 ## Telefona pieprasījuma poga un cepuru filtri — 14.10.2026
 - [x] Telefonā kompakta 44 px pieprasījuma poga apakšējā joslā ar drošo vietu; pārbaudīta lapas apakša un 2 gab. izvēles atvēršana pieprasījumā, kļūdu nav.
