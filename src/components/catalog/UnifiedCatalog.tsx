@@ -30,6 +30,7 @@ import FilterOrderEditor from "@/components/catalog/FilterOrderEditor";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
+import SublimationCatalogIntro from "@/components/catalog/SublimationCatalogIntro";
 import {
   COLOR_BUCKETS,
   bucketOf,
@@ -1125,16 +1126,22 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
   const totalSelectedFilters =
     sources.size + brands.size + categories.size + groups.size + genders.size + colors.size + (stockOnly ? 1 : 0);
+  const isSublimationCatalog = !lockedSource && sources.size === 1 && sources.has("etx");
 
 
   return (
     <Layout>
       <PageIntro
-        title={t.title}
+        title={isSublimationCatalog
+          ? (lang === "lv" ? "Sporta formas (Sublimācija)" : "Sportswear (Sublimation)")
+          : t.title}
         subtitle={t.subtitle}
-        eyebrow={lang === "lv" ? "Produktu atlase" : "Product selection"}
+        eyebrow={isSublimationCatalog
+          ? (lang === "lv" ? "Individuāla ražošana" : "Custom production")
+          : (lang === "lv" ? "Produktu atlase" : "Product selection")}
         compact
       />
+      {isSublimationCatalog && <SublimationCatalogIntro lang={lang} />}
       <div className="container px-4 py-5 md:py-10">
         <div className="mb-5 space-y-3 md:mb-6">
           <div className="relative w-full md:max-w-xl">

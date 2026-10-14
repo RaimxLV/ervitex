@@ -1,5 +1,9 @@
 # Roadmap
 
+## Sporta formu kataloga ievads — 14.10.2026
+- [ ] Sporta formu sadaļā ievietot Raimonda doto sublimācijas aprakstu, sakārtotu kompaktā ievadā ar ikonām, netraucējot produktu kartītēm.
+- [ ] Pārbaudīt sporta formu kataloga izskatu datorā un telefonā; pārējiem katalogiem ievadu nerādīt.
+
 ## Piedāvājuma formas sakārtošana — 13.10.2026
 - [x] Apdrukas poga bez izmēra, vienots sarkans akcents; statusu darbības un kolonna noņemtas.
 - [x] Preces izvēle sakļaujas pēc pievienošanas, atveras ar klikšķi un aizveras ārpus tās vai ar Escape; saglabāti kopīgie formu elementi.
