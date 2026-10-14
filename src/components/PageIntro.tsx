@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 type PageIntroProps = {
   title: string;
@@ -10,6 +11,8 @@ type PageIntroProps = {
 
 const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
   const reduceMotion = useReducedMotion();
+  const { lang } = useLanguage();
+  const lv = lang === "lv";
   const words = title.split(" ");
 
   return (
@@ -33,6 +36,18 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent_0%,hsl(var(--primary-foreground)/0.18)_35%,hsl(var(--primary-foreground)/0.18)_65%,transparent_100%)]" />
 
       <div className="container relative flex min-h-[148px] items-end py-6 md:min-h-[190px] md:py-8">
+        {/* Brand tagline — mirrors the homepage headline in miniature */}
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, x: 16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="pointer-events-none absolute right-4 top-5 hidden border-r-2 border-accent pr-4 text-right font-heading font-bold uppercase leading-[1.05] md:block lg:top-6"
+          aria-hidden
+        >
+          <span className="block text-sm tracking-[0.04em] text-accent lg:text-base">{lv ? "Vairumtirdzniecības" : "Wholesale"}</span>
+          <span className="block text-xs normal-case tracking-[0.02em] text-primary-foreground lg:text-sm">{lv ? "tekstila risinājumi" : "textile solutions"}</span>
+          <span className="block text-[0.7rem] tracking-[0.06em] text-accent lg:text-xs">{lv ? "& industriālā apdruka" : "& industrial printing"}</span>
+        </motion.div>
         <div className="grid w-full gap-4 md:grid-cols-[minmax(0,0.9fr)_minmax(280px,1.1fr)] md:items-end md:gap-12">
           <div className="min-w-0">
             {eyebrow && (
