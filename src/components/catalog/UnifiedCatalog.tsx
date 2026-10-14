@@ -1403,6 +1403,13 @@ interface CardProps {
 
 const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, fromLabel, priority }: CardProps) => {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const [, setEtxNamesTick] = useState(0);
+  useEffect(() => {
+    if (item.source !== "etx" || lang !== "en" || etxNamesEn[item.id]) return;
+    let alive = true;
+    loadEtxNamesEn().then(() => alive && setEtxNamesTick((n) => n + 1));
+    return () => { alive = false; };
+  }, [item.source, item.id, lang]);
 
   // Filter-driven initial match
   let filterMatchIdx = -1;
