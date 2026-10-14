@@ -1,4 +1,4 @@
-import { Activity, Palette, Shirt, Users } from "lucide-react";
+import { Activity, Palette, Shirt, Trophy, Users } from "lucide-react";
 import { AccentIcon } from "@/components/ui/accent-icon";
 
 type SublimationCatalogIntroProps = {
