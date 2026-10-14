@@ -1459,6 +1459,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       imageAlt={displayTitle}
       code={item.source === "etx" ? null : displayCode}
       brandBadge={item.source === "etx" ? "Ervitex" : item.brand && item.brand.toLowerCase() !== "unbranded" ? item.brand : SOURCE_META[item.source].label}
+      fullWidthCodeBar={item.source === "etx"}
       title={displayTitle}
       subtitle={active?.n || item.description}
       swatches={swatches}
