@@ -64,6 +64,13 @@
       "when": 1791886711348,
       "tag": "0008_etx_prices_survive_supplier_refresh",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791986348120,
+      "tag": "0009_etx_prices_net",
+      "breakpoints": true
     }
   ]
 }
