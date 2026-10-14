@@ -104,7 +104,6 @@ const ContactPage = () => {
     <Layout>
       <PageIntro
         title={t("contact.title")}
-        subtitle={t("contact.subtitle")}
         eyebrow={lang === "lv" ? "Sāksim sarunu" : "Start a conversation"}
       />
 
