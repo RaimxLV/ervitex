@@ -1,5 +1,10 @@
 # Roadmap
 
+## Komandu sporta formu cenrādis un secība — 14.10.2026
+- [ ] Pievienot pēdējo informatīvo kartīti ar lietotāja foto, centrētu tekstu, animāciju un cenrādi bez/ar PVN.
+- [ ] Admina sadaļā „Mūsu produkti” ļaut saglabāt sporta formu kartīšu secību.
+- [ ] Pārbaudīt cenrādi un secības saglabāšanu pārlūkā un testos.
+
 ## Sporta formu kataloga ievads — 14.10.2026
 - [x] Sporta formu sadaļā ievietots Raimonda dotais sublimācijas apraksts, sakārtots kompaktā ievadā ar ikonām, netraucējot produktu kartītēm.
 - [x] Teksts nomainīts uz precīzāko versiju: „Pilnībā personalizētu apģērbu izgatavošana”, „Šajā tehnikā izgatavojam”, trīs punkti (pludmales volejbola formas iekļautas sporta formās); beigu frāze un atsevišķais vasaras punkts noņemti. Pārbaudīts pārlūkā, build OK.
