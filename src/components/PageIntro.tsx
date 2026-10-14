@@ -68,7 +68,7 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
             </h1>
 
           </div>
-          <div className="flex min-w-0 flex-col gap-5">
+          <div className={`flex min-w-0 flex-col gap-5${subtitle ? "" : " md:self-start"}`}>
         {/* Brand tagline — mirrors the homepage headline in miniature */}
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, x: 16 }}

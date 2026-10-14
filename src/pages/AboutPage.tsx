@@ -14,7 +14,6 @@ const AboutPage = () => {
     <Layout>
       <PageIntro
         title={t("about.title")}
-        subtitle={t("about.heroText")}
         eyebrow={lang === "lv" ? "Uzņēmuma profils" : "Company profile"}
       />
 
