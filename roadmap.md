@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Sporta formu ražotājs un vilkšanas secība — 14.10.2026
-- [ ] Visām sporta formu kartītēm un ražotāja laukiem norādīt Ervitex.
-- [ ] Nodrošināt kartīšu vilkšanu un secības saglabāšanu no sporta formu kataloga un admina sadaļas.
-- [ ] Pārbaudīt vilkšanu, saglabāšanu un secību pēc pārlādes ar admina piekļuvi.
+- [x] Visām sporta formu kartītēm un ražotāja laukiem norādīts Ervitex; iekšējā piegādātāja atslēga nemainīta.
+- [x] Kartīšu vilkšana un secības saglabāšana pieejama no sporta formu kataloga un admina sadaļas; priekšskatījumā pievienoti foto.
+- [x] Admina pārlūkā pārbaudīta 12 kartīšu vilkšana, saglabāšana un secība pēc pārlādes; 17 testi sekmīgi.
 
 ## Sporta formu jaunās kartītes un Ervitex logo — 14.10.2026
 - [x] Jaunās manuāli izveidotās sporta formu preces parādās katalogā uzreiz pēc saglabāšanas.

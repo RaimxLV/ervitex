@@ -1565,13 +1565,13 @@ const CatalogItemDialog = ({
                   )}
 
                   <span className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                    {label.supplier}:{" "}
+                    {source === "etx" ? (lang === "lv" ? "Ražotājs" : "Manufacturer") : label.supplier}:{" "}
                     <Link
                       to={SOURCE_META[source].href}
                       className="font-semibold text-foreground hover:text-accent"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {SOURCE_META[source].label}
+                      {source === "etx" ? "Ervitex" : SOURCE_META[source].label}
                     </Link>
                   </span>
                 </div>
