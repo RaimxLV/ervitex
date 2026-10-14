@@ -1165,17 +1165,6 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         compact
       />
       {isSublimationCatalog && <SublimationCatalogIntro lang={lang} />}
-      <Dialog open={orderingProducts && isAdmin} onOpenChange={setOrderingProducts}>
-        <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto" aria-describedby={undefined}>
-          <DialogHeader><DialogTitle>{lang === "lv" ? "Sporta formu kartīšu secība" : "Sportswear card order"}</DialogTitle></DialogHeader>
-          {orderingProducts && isAdmin && <ManualProductOrder
-            products={items.filter(item => item.source === "etx").map(item => ({ id: item.id, name_lv: item.name || item.id, image: item.image_url }))}
-            order={filterOrder[MANUAL_PRODUCT_ORDER_KEY]}
-            save={saveFilterOrder}
-            onClose={() => { setOrderingProducts(false); setSort("newest"); setPage(1); }}
-          />}
-        </DialogContent>
-      </Dialog>
       <div className="container px-4 py-5 md:py-10">
         <div className="mb-5 space-y-3 md:mb-6">
           <div className="relative w-full md:max-w-xl">
@@ -1300,6 +1289,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                   {t.clearAll}
                 </Button>
               </div>
+            ) : orderingProducts && isAdmin ? (
+              <ManualProductGridOrder
+                products={items.filter(item => item.source === "etx").map(item => ({ id: item.id, name_lv: item.name || item.id, image: item.image_url }))}
+                order={filterOrder[MANUAL_PRODUCT_ORDER_KEY]}
+                save={saveFilterOrder}
+                onClose={() => { setOrderingProducts(false); setSort("newest"); setPage(1); }}
+              />
             ) : (
               <>
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
