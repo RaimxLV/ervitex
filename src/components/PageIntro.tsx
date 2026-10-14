@@ -68,13 +68,13 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
             </h1>
 
           </div>
-          <div className={`flex min-w-0 flex-col gap-5${subtitle ? "" : " md:self-start"}`}>
+          <div className="flex min-w-0 flex-col gap-5">
         {/* Brand tagline — mirrors the homepage headline in miniature */}
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, x: 16 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="pointer-events-none hidden self-end border-r-2 border-accent pr-4 text-right font-heading font-bold uppercase leading-[1.05] md:block"
+          className="pointer-events-none hidden self-end border-r-2 border-accent pr-4 pb-1 text-right font-heading font-bold uppercase leading-[1.05] md:block"
           aria-hidden
         >
           <span className="block text-sm tracking-[0.04em] text-accent lg:text-base">{lv ? "Vairumtirdzniecības" : "Wholesale"}</span>
