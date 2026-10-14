@@ -2,6 +2,7 @@
 
 ## Sporta formu kataloga ievads — 14.10.2026
 - [x] Sporta formu sadaļā ievietots Raimonda dotais sublimācijas apraksts, sakārtots kompaktā ievadā ar ikonām, netraucējot produktu kartītēm.
+- [x] Teksts nomainīts uz precīzāko versiju: „Pilnībā personalizētu apģērbu izgatavošana”, „Šajā tehnikā izgatavojam”, trīs punkti (pludmales volejbola formas iekļautas sporta formās); beigu frāze un atsevišķais vasaras punkts noņemti. Pārbaudīts pārlūkā, build OK.
 - [x] Sporta formu kataloga izskats un produktu redzamība pārbaudīta datorā un telefonā; pārējiem katalogiem ievadu nerāda, build OK.
 
 ## Piedāvājuma formas sakārtošana — 13.10.2026
