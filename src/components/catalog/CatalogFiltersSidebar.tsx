@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Minus, Check, Search, SlidersHorizontal, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -64,7 +65,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
   const t = useMemo(
     () => ({
       filters: heading ?? (lang === "lv" ? "Filtri" : "Filters"),
-      clear: lang === "lv" ? "Notīrīt visu" : "Clear all",
+      clear: lang === "lv" ? "Notīrīt filtrus" : "Clear filters",
       searchIn: lang === "lv" ? "Meklēt" : "Search",
       empty: lang === "lv" ? "Nav opciju" : "No options",
     }),
