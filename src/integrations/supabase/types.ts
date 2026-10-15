@@ -272,6 +272,21 @@ export type Database = {
         }
         Relationships: []
       }
+      catalog_remnants: {
+        Row: {
+          source: string
+          style_code: string
+        }
+        Insert: {
+          source: string
+          style_code: string
+        }
+        Update: {
+          source?: string
+          style_code?: string
+        }
+        Relationships: []
+      }
       catalog_variant_prices: {
         Row: {
           color_code: string | null
@@ -3272,6 +3287,7 @@ export type Database = {
       }
       refresh_catalog_items_mv: { Args: never; Returns: undefined }
       refresh_catalog_prices: { Args: never; Returns: undefined }
+      refresh_catalog_remnants: { Args: never; Returns: undefined }
       refresh_mf_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
