@@ -33,6 +33,7 @@ import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
 import { Route as AdminTeamPhotosRouteImport } from './routes/admin.team-photos'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as CatalogIndexRouteImport } from './routes/catalog.index'
+import { Route as IndexDotphpSplatRouteImport } from './routes/index[.]php.$'
 import { Route as NodotTokenRouteImport } from './routes/nodot.$token'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersIdRouteImport } from './routes/offers.$id'
@@ -165,6 +166,11 @@ const CatalogIndexRoute = CatalogIndexRouteImport.update({
   path: '/catalog/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IndexDotphpSplatRoute = IndexDotphpSplatRouteImport.update({
+  id: '/index.php/$',
+  path: '/index.php/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NodotTokenRoute = NodotTokenRouteImport.update({
   id: '/nodot/$token',
   path: '/nodot/$token',
@@ -244,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/team-photos': typeof AdminTeamPhotosRoute
   '/admin/users': typeof AdminUsersRoute
+  '/index.php/$': typeof IndexDotphpSplatRoute
   '/nodot/$token': typeof NodotTokenRoute
   '/offers/$id': typeof OffersIdRoute
   '/piedavajums/$token': typeof PiedavajumsTokenRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByTo {
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/team-photos': typeof AdminTeamPhotosRoute
   '/admin/users': typeof AdminUsersRoute
+  '/index.php/$': typeof IndexDotphpSplatRoute
   '/nodot/$token': typeof NodotTokenRoute
   '/offers/$id': typeof OffersIdRoute
   '/piedavajums/$token': typeof PiedavajumsTokenRoute
@@ -319,6 +327,7 @@ export interface FileRoutesById {
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/team-photos': typeof AdminTeamPhotosRoute
   '/admin/users': typeof AdminUsersRoute
+  '/index.php/$': typeof IndexDotphpSplatRoute
   '/nodot/$token': typeof NodotTokenRoute
   '/offers/$id': typeof OffersIdRoute
   '/piedavajums/$token': typeof PiedavajumsTokenRoute
@@ -358,6 +367,7 @@ export interface FileRouteTypes {
     | '/admin/quotes'
     | '/admin/team-photos'
     | '/admin/users'
+    | '/index.php/$'
     | '/nodot/$token'
     | '/offers/$id'
     | '/piedavajums/$token'
@@ -395,6 +405,7 @@ export interface FileRouteTypes {
     | '/admin/quotes'
     | '/admin/team-photos'
     | '/admin/users'
+    | '/index.php/$'
     | '/nodot/$token'
     | '/offers/$id'
     | '/piedavajums/$token'
@@ -432,6 +443,7 @@ export interface FileRouteTypes {
     | '/admin/quotes'
     | '/admin/team-photos'
     | '/admin/users'
+    | '/index.php/$'
     | '/nodot/$token'
     | '/offers/$id'
     | '/piedavajums/$token'
@@ -470,6 +482,7 @@ export interface RootRouteChildren {
   AdminQuotesRoute: typeof AdminQuotesRoute
   AdminTeamPhotosRoute: typeof AdminTeamPhotosRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  IndexDotphpSplatRoute: typeof IndexDotphpSplatRoute
   NodotTokenRoute: typeof NodotTokenRoute
   OffersIdRoute: typeof OffersIdRoute
   PiedavajumsTokenRoute: typeof PiedavajumsTokenRoute
@@ -655,6 +668,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/index.php/$': {
+      id: '/index.php/$'
+      path: '/index.php/$'
+      fullPath: '/index.php/$'
+      preLoaderRoute: typeof IndexDotphpSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/nodot/$token': {
       id: '/nodot/$token'
       path: '/nodot/$token'
@@ -758,6 +778,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminQuotesRoute: AdminQuotesRoute,
   AdminTeamPhotosRoute: AdminTeamPhotosRoute,
   AdminUsersRoute: AdminUsersRoute,
+  IndexDotphpSplatRoute: IndexDotphpSplatRoute,
   NodotTokenRoute: NodotTokenRoute,
   OffersIdRoute: OffersIdRoute,
   PiedavajumsTokenRoute: PiedavajumsTokenRoute,
