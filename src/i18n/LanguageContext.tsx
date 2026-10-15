@@ -23,7 +23,8 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const t = useCallback((key: TranslationKey) => {
-    return translations[key]?.[lang] || key;
+    const years = new Date().getFullYear() - 1998;
+    return (translations[key]?.[lang] || key).replace(/\{years\}/g, String(years));
   }, [lang]);
 
   return (
