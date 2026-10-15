@@ -1,6 +1,26 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@config "../tailwind.config.ts";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Tailwind v3 compatibility: keep the previous default border colour and
+   button cursor so the design stays identical after the v4 upgrade. */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 
 @layer base {
   :root {
@@ -457,7 +477,7 @@
 
   .animate-promo-drift { animation: promo-drift 14s ease-in-out infinite; }
   .animate-promo-drift-alt { animation: promo-drift-alt 18s ease-in-out infinite; }
-  .animate-promo-pulse { animation: promo-pulse 3s ease-in-out infinite; }
+
   .animate-promo-ticker { animation: promo-ticker 26s linear infinite; }
 
   /* --- Hero headline extra weight: Space Grotesk tops out at 700, so the
@@ -523,14 +543,12 @@
     46% { opacity: 0; }
   }
 
-  .animate-glitch-spark { animation: glitch-spark 3s steps(1, end) infinite; }
 
   @keyframes promo-pulse-cta {
     0%, 100% { transform: scale(1); box-shadow: 0 10px 30px -10px hsl(var(--accent) / 0.6); }
     50% { transform: scale(1.03); box-shadow: 0 18px 48px -8px hsl(var(--accent) / 0.85); }
   }
 
-  .animate-promo-pulse-cta { animation: promo-pulse-cta 2.4s ease-in-out infinite; }
 
 
   .glitch-layer-a { animation: glitch-shift-a 2.6s steps(1, end) infinite; }
@@ -587,3 +605,9 @@
   .quote-form textarea { color: hsl(var(--foreground)); }
   .quote-form aside button { white-space: normal; height: auto; min-height: 44px; }
 }
+
+@utility animate-promo-pulse-cta { animation: promo-pulse-cta 2.4s ease-in-out infinite; }
+
+@utility animate-promo-pulse { animation: promo-pulse 3s ease-in-out infinite; }
+
+@utility animate-glitch-spark { animation: glitch-spark 3s steps(1, end) infinite; }

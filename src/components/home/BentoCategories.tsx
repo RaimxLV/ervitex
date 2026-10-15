@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -155,7 +155,7 @@ const BentoCategories = () => {
                   className="h-full w-full bg-muted object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
                 <div
-                  className={`absolute bottom-3 left-3 rounded-lg border px-2.5 py-1.5 shadow-sm md:bottom-4 md:left-4 md:px-3 ${
+                  className={`absolute bottom-3 left-3 rounded-lg border px-2.5 py-1.5 shadow-xs md:bottom-4 md:left-4 md:px-3 ${
                     tile.highlight
                       ? "border-accent bg-accent"
                       : "border-border bg-card"

@@ -58,13 +58,13 @@ const ServiceImageCarousel = ({ images, alt }: ServiceImageCarouselProps) => {
           <>
             <Button type="button" variant="ghost" size="icon" aria-label="Iepriekšējais titula attēls"
               onClick={(e) => { e.stopPropagation(); prev(); }}
-              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground backdrop-blur-sm transition hover:bg-background"
+              className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground backdrop-blur-xs transition hover:bg-background"
             >
               <ChevronLeft className="h-5 w-5" />
             </Button>
             <Button type="button" variant="ghost" size="icon" aria-label="Nākamais titula attēls"
               onClick={(e) => { e.stopPropagation(); next(); }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground backdrop-blur-sm transition hover:bg-background"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-background/80 p-1.5 text-foreground backdrop-blur-xs transition hover:bg-background"
             >
               <ChevronRight className="h-5 w-5" />
             </Button>
@@ -92,7 +92,7 @@ const ServiceImageCarousel = ({ images, alt }: ServiceImageCarouselProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/90 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/90 backdrop-blur-xs"
             onClick={() => setLightbox(false)}
             role="dialog" aria-modal="true" aria-label={alt}
           >

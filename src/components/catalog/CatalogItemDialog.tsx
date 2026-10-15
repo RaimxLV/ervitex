@@ -10,7 +10,7 @@ import { colorCodeMatches } from "@/lib/colorCodeMatch";
 import { lowestPriceVariant } from "@/lib/catalogPriceSelection";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { ColorSelector } from "@/components/quote/ColorSelector";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
 import { OrderMinimumNotice } from "@/components/quote/OrderMinimumNotice";
@@ -1221,7 +1221,7 @@ const CatalogItemDialog = ({
         from += 1000;
       }
       if (cancelled) return;
-      const selection = lowestPriceVariant(rows, d?.colors || [], d?.sizeAliases || {}, wanted ? picked : null, initialSize);
+      const selection = lowestPriceVariant(rows, d?.colors || [], (d && "sizeAliases" in d ? d.sizeAliases : undefined) || {}, wanted ? picked : null, initialSize);
       pendingSizeRef.current = selection.size;
       setSelectedSize(selection.size);
       setActiveColor(selection.color || picked);

@@ -4,7 +4,7 @@ import { getOrderPrints, setOrderPrints, removeOfferItem } from "@/lib/orderPrin
 import logo from "@/assets/ervitex-logo-dark.svg";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import OfferWorkspace from "@/components/quote/OfferWorkspace";
 import { ColorSelector } from "@/components/quote/ColorSelector";
@@ -69,7 +69,7 @@ const AdminOfferEdit = () => {
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [qtyBySize, setQtyBySize] = useState<Record<string, number>>({});
   const [swapKey, setSwapKey] = useState<string | null>(null);
-  const debounce = useRef<number>();
+  const debounce = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     (async () => {

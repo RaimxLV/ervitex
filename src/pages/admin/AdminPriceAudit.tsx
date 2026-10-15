@@ -3,7 +3,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { RefreshCw, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
 
 const SOURCES: { code: string; label: string; formula: string }[] = [

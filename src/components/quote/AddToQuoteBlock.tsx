@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { SizeQuantityTable } from "./SizeQuantityTable";
 import { Check, ClipboardList, Trash2, Plus as PlusIcon } from "lucide-react";

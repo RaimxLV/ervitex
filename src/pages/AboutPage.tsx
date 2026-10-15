@@ -155,7 +155,7 @@ const AboutPage = () => {
                   viewport={{ once: true, amount: 0.35 }}
                   transition={{ duration: 0.55, delay: i * 0.09 }}
                   whileHover={{ y: -6 }}
-                  className="group flex flex-col border border-border bg-card p-5 shadow-sm transition-shadow duration-300 hover:shadow-xl sm:min-h-[390px] sm:p-7"
+                  className="group flex flex-col border border-border bg-card p-5 shadow-xs transition-shadow duration-300 hover:shadow-xl sm:min-h-[390px] sm:p-7"
                 >
                   <div className={`flex h-12 w-12 items-center justify-center rounded-md transition-colors duration-300 ${item.surface} ${item.accent} ${item.tileHover}`}>
                     <item.icon className="h-6 w-6" strokeWidth={SW} />

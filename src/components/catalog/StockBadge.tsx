@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 /** Kompakta noliktavas atzīme, kas pārklājas ar attēlu un nemaina kartītes augstumu. */
 export const StockRibbon = ({ lang }: { lang: string }) => (
-  <div className="pointer-events-none absolute inset-x-2 bottom-2 z-[2] flex h-7 items-center justify-center gap-1.5 border border-success bg-card/90 px-3 font-heading text-[10px] font-bold uppercase text-success backdrop-blur-sm">
+  <div className="pointer-events-none absolute inset-x-2 bottom-2 z-[2] flex h-7 items-center justify-center gap-1.5 border border-success bg-card/90 px-3 font-heading text-[10px] font-bold uppercase text-success backdrop-blur-xs">
     <PackageCheck className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
     {lang === "lv" ? "Ir noliktavā" : "In stock"}
   </div>

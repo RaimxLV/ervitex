@@ -1,5 +1,5 @@
 import { ArrowUpRight, Users } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import photo from "@/assets/etx/team-sportswear.webp.asset.json";
@@ -18,7 +18,7 @@ export default function TeamSportswearCard({ lang }: { lang: "lv" | "en" }) {
             <img src={photoUrl} alt={title} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-700 motion-safe:group-hover:scale-105" />
           </span>
           <span className="absolute inset-0 flex items-center justify-center px-3">
-            <span className="w-full border-y border-primary-foreground/25 bg-primary/85 px-2 py-5 text-center backdrop-blur-sm motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:-translate-y-1 sm:px-4 sm:py-7">
+            <span className="w-full border-y border-primary-foreground/25 bg-primary/85 px-2 py-5 text-center backdrop-blur-xs motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:-translate-y-1 sm:px-4 sm:py-7">
               <span className="block whitespace-normal font-heading text-lg font-black uppercase leading-tight sm:text-2xl">{title}</span>
               <span className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-primary-foreground/80">{lv ? "Cenrādis" : "Price list"}<ArrowUpRight className="h-4 w-4 text-accent motion-safe:transition-transform motion-safe:group-hover:translate-x-1 motion-safe:group-hover:-translate-y-1" /></span>
             </span>

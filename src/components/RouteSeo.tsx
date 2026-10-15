@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "@/lib/router-compat";
 
 const SITE = "https://raimxlv.github.io/ervitex";
 const DEFAULT_TITLE = "Ervitex — apģērbu vairumtirdzniecība un apdruka Rīgā";

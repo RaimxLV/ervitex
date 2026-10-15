@@ -120,14 +120,14 @@ const ModernGallery = ({
       {/* Arrows — visible on hover */}
       <button
         onClick={() => { go(-1); resetTimer(); }}
-        className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100"
+        className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white opacity-0 backdrop-blur-xs transition-opacity group-hover:opacity-100"
         aria-label="Previous"
       >
         <ChevronLeft className="h-5 w-5" strokeWidth={1.6} />
       </button>
       <button
         onClick={() => { go(1); resetTimer(); }}
-        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100"
+        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white opacity-0 backdrop-blur-xs transition-opacity group-hover:opacity-100"
         aria-label="Next"
       >
         <ChevronRight className="h-5 w-5" strokeWidth={1.6} />

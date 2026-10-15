@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { motion } from "framer-motion";
 import { Check, ArrowRight } from "lucide-react";
 import { AccentIcon } from "@/components/ui/accent-icon";

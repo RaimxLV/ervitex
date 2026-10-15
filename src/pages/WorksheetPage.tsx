@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -509,7 +509,7 @@ const WorksheetPage = () => {
                           rows={3}
                           value={i.note || ""}
                           onChange={(e) => patch(i.id, { note: e.target.value })}
-                          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
                         />
                       </label>
                     )}
@@ -544,7 +544,7 @@ const WorksheetPage = () => {
                         {print.placement?.trim() && <span className="text-muted-foreground"> · {print.placement}</span>}
                         {print.mode !== "total" && <span className="text-xs text-muted-foreground"> / gab.</span>}
                       </span>
-                      <span className="tabular-nums">{money(print.price)}</span>
+                      <span className="tabular-nums">{money(print.price ?? 0)}</span>
                     </div>
                   {!readOnly && <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_130px_130px_auto] sm:items-end print:hidden">
                     <label>
@@ -633,7 +633,7 @@ const WorksheetPage = () => {
                       <Clock3 className="h-3.5 w-3.5" /> {new Date(version.created_at).toLocaleString("lv-LV")}
                     </span>
                     <span className="text-xs text-muted-foreground">{version.items.length} preces</span>
-                    {!readOnly && version.revision !== sheet.revision && (
+                    {!readOnly && version.revision !== sheet?.revision && (
                       <Button className="ml-auto" size="sm" variant="ghost" onClick={() => restoreVersion(version)} disabled={actionBusy}>
                         <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Atjaunot
                       </Button>

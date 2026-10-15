@@ -1,0 +1,18 @@
+{"functions": [
+  {"name": "admin-users", "classification": "internal-only", "signal": "called from 1 src/ file; uses service-role admin API", "outcome": "left"},
+  {"name": "translate-text", "classification": "internal-only", "signal": "called from 1 src/ file", "outcome": "left"},
+  {"name": "beechfield-sync", "classification": "cron target", "signal": "referenced in supabase/migrations (cron schedule)", "outcome": "left"},
+  {"name": "malfini-sync", "classification": "cron target", "signal": "referenced in supabase/migrations (cron schedule)", "outcome": "left"},
+  {"name": "nwg-price-sync", "classification": "cron target", "signal": "referenced in supabase/migrations (cron schedule)", "outcome": "left"},
+  {"name": "nwg-sync", "classification": "cron target", "signal": "referenced in supabase/migrations (cron schedule)", "outcome": "left"},
+  {"name": "pf-concept-sync", "classification": "cron target", "signal": "referenced in supabase/migrations (cron schedule)", "outcome": "left"},
+  {"name": "stanley-stella-sync", "classification": "cron target", "signal": "referenced in supabase/migrations (cron schedule)", "outcome": "left"},
+  {"name": "falkross-sync", "classification": "cron target", "signal": "weekly Monday-night catalog refresh scheduled outside migrations", "outcome": "left"},
+  {"name": "utt-sync", "classification": "cron target", "signal": "weekly Monday-night catalog refresh scheduled outside migrations", "outcome": "left"},
+  {"name": "nwg-size-names", "classification": "unknown", "signal": "no internal call sites", "outcome": "left"},
+  {"name": "handle-email-events", "classification": "webhook receiver", "signal": "email provider event webhook, no internal callers", "outcome": "left"},
+  {"name": "preview-transactional-email", "classification": "unknown", "signal": "email template preview endpoint, no internal callers", "outcome": "left"},
+  {"name": "quote-action", "classification": "custom response", "signal": "token links embedded in sent emails (fixed external URL)", "outcome": "left"},
+  {"name": "send-pm-offer", "classification": "Deno-only dependency", "signal": "uses shared Deno email templates/queue in supabase/functions/_shared", "outcome": "left"},
+  {"name": "send-quote-request", "classification": "Deno-only dependency", "signal": "uses shared Deno email templates/queue in supabase/functions/_shared", "outcome": "left"}
+]}

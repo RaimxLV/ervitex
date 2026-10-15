@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "@/lib/router-compat";
 import OfferWorkspace from "@/components/quote/OfferWorkspace";
 import { QuoteItemsTable } from "@/components/quote/QuoteItemsTable";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";

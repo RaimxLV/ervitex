@@ -222,7 +222,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, canClear, className, head
                               className={cn(
                                 "group/chip flex items-center gap-2 rounded-md border px-2.5 py-2 text-left text-sm transition",
                                 isSelected
-                                  ? "border-accent bg-accent/5 shadow-sm"
+                                  ? "border-accent bg-accent/5 shadow-xs"
                                   : "border-border hover:border-foreground/30 hover:bg-muted/60"
                               )}
                             >
