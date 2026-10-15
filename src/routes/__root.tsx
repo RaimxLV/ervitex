@@ -67,7 +67,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: TITLE },
       { name: "description", content: DESCRIPTION },
       { name: "author", content: "SIA Ervitex" },
-      { name: "robots", content: "noindex, nofollow" },
       { name: "theme-color", content: "#0d0d0d" },
       { property: "og:type", content: "website" },
       { property: "og:title", content: TITLE },

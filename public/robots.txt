@@ -1,2 +1,11 @@
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /request
+Disallow: /offers
+Disallow: /piedavajums/
+Disallow: /saraksts/
+Disallow: /nodot/
+
+Sitemap: https://www.ervitex.lv/sitemap.xml
