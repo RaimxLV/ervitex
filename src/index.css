@@ -414,6 +414,22 @@
 }
 
 @layer utilities {
+  @keyframes order-notice-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes order-notice-glow {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--accent) / 0); }
+    50% { box-shadow: 0 0 18px 2px hsl(var(--accent) / 0.3); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .order-notice, .order-notice-icon {
+      animation: none;
+    }
+  }
+
   @keyframes promo-drift {
     0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
     50% { transform: translate3d(6%, -8%, 0) scale(1.15); }
