@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "@/lib/router-compat";
-import { ChevronsLeft, ChevronsRight, SlidersHorizontal, ListOrdered, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, SlidersHorizontal, ListOrdered, X } from "lucide-react";
+import { useCatalogCardImages } from "@/hooks/useCatalogCardImages";
 import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import { Button } from "@/components/ui/button";
@@ -401,6 +402,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   // coming from outside (mega menu links while already on /catalog) can be
   // detected and applied instead of being overwritten by the local state.
   const lastWrittenSearch = useRef<string | null>(null);
+  const lastReadSearch = useRef(searchParams.toString());
   const urlSyncing = useRef(false);
 
   useEffect(() => {
@@ -424,6 +426,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   // catalog is already mounted) must reset the filters to the incoming params.
   useEffect(() => {
     const incoming = searchParams.toString();
+    if (lastReadSearch.current === incoming) return;
+    lastReadSearch.current = incoming;
     if (lastWrittenSearch.current === incoming) return;
     lastWrittenSearch.current = incoming;
     urlSyncing.current = true;
@@ -1383,7 +1387,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 </div>
 
                 {totalPages > 1 && (
-                  <nav className="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label={lang === "lv" ? "Kataloga lapas" : "Catalog pages"}>
+                  <nav className="mt-6 grid grid-cols-[2.5rem_2.5rem_minmax(0,1fr)_2.5rem_2.5rem] items-center gap-1.5 border-t border-border pt-5 sm:mt-8 sm:flex sm:justify-center sm:gap-2" aria-label={lang === "lv" ? "Kataloga lapas" : "Catalog pages"}>
                     <Button
                       variant="outline"
                       size="icon"
@@ -1391,7 +1395,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       onClick={() => goToPage(1)}
                       aria-label={t.first}
                       title={t.first}
-                      className="h-9 w-9"
+                      className="h-10 w-10 sm:h-9 sm:w-9"
                     >
                       <ChevronsLeft className="h-4 w-4" />
                     </Button>
@@ -1400,11 +1404,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       size="sm"
                       disabled={safePage <= 1}
                       onClick={() => goToPage(safePage - 1)}
-                      className="font-heading text-xs uppercase tracking-wider"
+                      aria-label={t.prev}
+                      title={t.prev}
+                      className="h-10 w-10 p-0 sm:h-9 sm:w-auto sm:px-3 font-heading text-xs uppercase"
                     >
-                      ← {t.prev}
+                      <ChevronLeft className="sm:hidden" /><span className="hidden sm:inline">← {t.prev}</span>
                     </Button>
-                    <div className="flex items-center gap-2 px-1">
+                    <div className="flex min-w-0 items-center justify-center gap-1 sm:gap-2">
                       <label htmlFor="catalog-page-input" className="sr-only">{t.page}</label>
                       <Input
                         id="catalog-page-input"
@@ -1418,19 +1424,21 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                           if (event.key === "Enter") submitPageInput();
                         }}
                         onBlur={submitPageInput}
-                        className="h-9 w-16 px-2 text-center text-sm tabular-nums"
+                        className="h-10 w-10 shrink-0 px-0 text-center text-sm tabular-nums sm:h-9 sm:w-16 sm:px-2"
                         aria-label={t.page}
                       />
-                      <span className="text-sm tabular-nums text-muted-foreground">{t.of} {totalPages}</span>
+                      <span className="whitespace-nowrap text-xs tabular-nums text-muted-foreground sm:text-sm">{t.of} {totalPages}</span>
                     </div>
                     <Button
                       variant="outline"
                       size="sm"
                       disabled={safePage >= totalPages}
                       onClick={() => goToPage(safePage + 1)}
-                      className="font-heading text-xs uppercase tracking-wider"
+                      aria-label={t.next}
+                      title={t.next}
+                      className="h-10 w-10 p-0 sm:h-9 sm:w-auto sm:px-3 font-heading text-xs uppercase"
                     >
-                      {t.next} →
+                      <ChevronRight className="sm:hidden" /><span className="hidden sm:inline">{t.next} →</span>
                     </Button>
                     <Button
                       variant="outline"
@@ -1439,7 +1447,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       onClick={() => goToPage(totalPages)}
                       aria-label={t.last}
                       title={t.last}
-                      className="h-9 w-9"
+                      className="h-10 w-10 sm:h-9 sm:w-9"
                     >
                       <ChevronsRight className="h-4 w-4" />
                     </Button>
@@ -1534,9 +1542,13 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   // Until colour prices arrive, let the detail resolve the cheapest variant.
   const navigationColor = explicitColor || cheapestIdx >= 0 ? selectedColor : null;
   const colorQuery = navigationColor ? `?color=${encodeURIComponent(navigationColor)}` : "";
+  const cardRef = useRef<HTMLElement | null>(null);
+  const cardImages = useCatalogCardImages(cardRef, item.source, item.id, active?.c || active?.n || null, img);
 
   return (
     <CatalogModelCard
+      ref={cardRef}
+      images={cardImages}
       as="a"
       href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/catalog/item/${item.source}/${encodeURIComponent(item.id)}${colorQuery}`}
       onClick={() => onNavigate(navigationColor)}

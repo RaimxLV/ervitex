@@ -21,7 +21,7 @@
 - SSR (TanStack Start, Lovable hosting only): render paths avoid browser globals; route head() uses lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap.xml is built from catalog_items minus remnants/footwear so it stays current.
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
 - Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
-- Galleries share bounded decoding, warm adjacent frames and retain the last frame on failure to avoid blanks. Catalog hover replaces only loaded photos with exclusive visibility; Malfini prefers clean front photos over ghosted dimension diagrams.
+- Galleries decode before switching and retain frames on failure. Mobile cards fetch nearby public images by colour; controls sit outside links to prevent navigation. Hover shows only loaded photos; Malfini prefers clean fronts over diagrams.
 - BrandLogo serves all cards; ETX shows Ervitex.
 - tech_galleries stores stable order/membership refs (s:<tech>:<index> for built-ins, public URLs for uploads), applied over static data so rebuilds preserve order.
 - UTT uses `utt-sync` Data Export into `utt_*`; service-role-only `utt_prices`; images mirrored in `utt-images` because UTT blocks hotlinking.

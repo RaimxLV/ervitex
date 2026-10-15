@@ -1,7 +1,9 @@
 import ervitexWhiteLogo from "@/assets/ervitex-logo-2.svg";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useGalleryNavigation } from "@/hooks/useGalleryNavigation";
 import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
 import { unproxyUrl } from "@/lib/imageProxy";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -74,6 +76,7 @@ export interface CatalogModelCardProps {
   /** Original (unproxied) URL used if the thumbnail fails to load. */
   fallbackImage?: string | null;
   hoverImage?: string | null;
+  images?: string[];
   imageAlt: string;
   /** Above-the-fold cards load immediately instead of lazily. */
   priority?: boolean;
@@ -99,7 +102,7 @@ export interface CatalogModelCardProps {
  */
 const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
     (
-    { onClick, as, href, image, fallbackImage, hoverImage, imageAlt, priority, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, fullWidthCodeBar, footer, noImageLabel, lang = "lv" },
+    { onClick, as, href, image, fallbackImage, hoverImage, images, imageAlt, priority, code, brandBadge, topRight, title, subtitle, swatches, extraSwatches, price, fullWidthCodeBar, footer, noImageLabel, lang = "lv" },
     ref
   ) => {
     const [copied, setCopied] = useState(false);
@@ -110,7 +113,12 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
     const baseImageRef = useRef<HTMLImageElement | null>(null);
     const triedFallback = useRef(false);
     const triedHoverFallback = useRef(false);
-    const showHover = !!hoverImage && !hoverFailed && hoverReady;
+    const frames = [...new Set([image, ...(images || []), hoverImage].filter((src): src is string => Boolean(src)))];
+    const [interacted, setInteracted] = useState(false);
+    const gallery = useGalleryNavigation(frames, 1, interacted);
+    const touchStart = useRef<{ x: number; y: number } | null>(null);
+    const suppressClickUntil = useRef(0);
+    const showHover = gallery.index === 0 && !!hoverImage && !hoverFailed && hoverReady;
     useEffect(() => {
       setReady(Boolean(baseImageRef.current?.complete && baseImageRef.current.naturalWidth > 0));
       setHoverReady(false);
@@ -122,6 +130,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
     const asLink = as === "a" && !!href;
     const Tag = asLink ? "a" : "button";
     const handleClick = (e: React.MouseEvent) => {
+      if (Date.now() < suppressClickUntil.current) { e.preventDefault(); e.stopPropagation(); return; }
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
       e.preventDefault();
       onClick?.();
@@ -132,17 +141,35 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
       <Tag
         ref={ref as React.Ref<any>}
         {...(asLink ? { href } : { type: "button" as const })}
-        onClick={asLink ? handleClick : onClick}
+        onClick={handleClick}
         onMouseEnter={() => setHovered(true)}
         className="group flex h-full w-full flex-col overflow-hidden border border-border bg-white text-left transition-colors hover:border-accent focus:outline-hidden focus:ring-2 focus:ring-accent"
       >
-        <div className="relative aspect-[3/4] w-full shrink-0 overflow-hidden bg-white">
+        <div className="relative aspect-[3/4] w-full shrink-0 touch-pan-y overflow-hidden bg-card"
+          onTouchStart={(event) => {
+            const touch = event.touches[0];
+            if (!touch) return;
+            touchStart.current = { x: touch.clientX, y: touch.clientY };
+            setInteracted(true);
+          }}
+          onTouchEnd={(event) => {
+            const start = touchStart.current;
+            touchStart.current = null;
+            const touch = event.changedTouches[0];
+            if (!start || !touch || frames.length < 2) return;
+            const dx = touch.clientX - start.x;
+            const dy = touch.clientY - start.y;
+            if (Math.abs(dx) < 30 || Math.abs(dx) <= Math.abs(dy) * 1.3) return;
+            suppressClickUntil.current = Date.now() + 500;
+            gallery.move(dx < 0 ? 1 : -1);
+          }}
+          onTouchCancel={() => { touchStart.current = null; }}>
           {image ? (
             <>
               {!ready && <div className="absolute inset-0 animate-pulse bg-neutral-100" />}
               <img
                 ref={baseImageRef}
-                src={image}
+                src={frames[gallery.index] || image}
                 alt={imageAlt}
                 loading={priority ? "eager" : "lazy"}
                 fetchPriority={priority ? "high" : "auto"}
@@ -271,7 +298,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
                     onTouchStart={clickable ? (e) => e.stopPropagation() : undefined}
                     onClick={
                       clickable
-                        ? (e) => { e.stopPropagation(); e.preventDefault(); s.onSelect!(); }
+                        ? (e) => { e.stopPropagation(); e.preventDefault(); s.onSelect?.(); }
                         : undefined
                     }
                      className={`inline-block h-5 w-5 rounded-full transition-transform sm:h-4 sm:w-4 ${
@@ -296,6 +323,19 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
           {footer}
         </div>
       </Tag>
+      {frames.length > 1 && (
+        <div className="pointer-events-none absolute inset-x-0 top-0 aspect-[3/4] sm:hidden">
+          <div className="absolute inset-x-1 bottom-2 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-1">
+            <Button type="button" variant="outline" size="icon" aria-label={lang === "lv" ? "Iepriekšējais attēls" : "Previous image"} title={lang === "lv" ? "Iepriekšējais attēls" : "Previous image"}
+              className="pointer-events-auto h-8 w-8 rounded-full border-border/70 bg-card/95 text-foreground"
+              onClick={() => { setInteracted(true); gallery.move(-1); }}><ChevronLeft /></Button>
+            <span className="mx-auto rounded-full bg-card/95 px-2 py-1 text-[10px] tabular-nums text-muted-foreground" aria-live="polite">{gallery.index + 1} / {frames.length}</span>
+            <Button type="button" variant="outline" size="icon" aria-label={lang === "lv" ? "Nākamais attēls" : "Next image"} title={lang === "lv" ? "Nākamais attēls" : "Next image"}
+              className="pointer-events-auto h-8 w-8 rounded-full border-border/70 bg-card/95 text-foreground"
+              onClick={() => { setInteracted(true); gallery.move(1); }}><ChevronRight /></Button>
+          </div>
+        </div>
+      )}
       </div>
     );
   }
