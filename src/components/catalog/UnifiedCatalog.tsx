@@ -402,6 +402,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   // coming from outside (mega menu links while already on /catalog) can be
   // detected and applied instead of being overwritten by the local state.
   const lastWrittenSearch = useRef<string | null>(null);
+  const lastReadSearch = useRef(searchParams.toString());
   const urlSyncing = useRef(false);
 
   useEffect(() => {
@@ -425,6 +426,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   // catalog is already mounted) must reset the filters to the incoming params.
   useEffect(() => {
     const incoming = searchParams.toString();
+    if (lastReadSearch.current === incoming) return;
+    lastReadSearch.current = incoming;
     if (lastWrittenSearch.current === incoming) return;
     lastWrittenSearch.current = incoming;
     urlSyncing.current = true;
