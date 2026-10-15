@@ -2,6 +2,8 @@
 
 Ejam secīgi; katrs solis beidzas ar pārbaudi, un tikai tad sākam nākamo.
 
+**Galvenais noteikums:** dizains, uzbūve, saturs un informācija lapā NEMAINĀS. Visi SEO darbi notiek „aizkulisēs” — virsrakstos meklētājiem, aprakstos, sitemap, pārvirzēs un tehniskajos datos.
+
 ## 1. solis — Kolēģu piekļuves (uzreiz)
 - Laurai, Samantai, Ilonai un Justīnei izveidot vai pārbaudīt kontus admin panelim.
 - Katram — pagaidu parole, kas pirmajā ielogošanās reizē jānomaina, un poga „Aizmirsu paroli”.
@@ -44,7 +46,7 @@ Ejam secīgi; katrs solis beidzas ar pārbaudi, un tikai tad sākam nākamo.
 
 ## 8. solis — Pozīciju celšana (pastāvīgi)
 - Atslēgvārdu izpēte Latvijā: „apdruka uz krekliem”, „reklāmas apģērbs”, „vairumtirdzniecība T-krekli” u.c.
-- Kategoriju lapām īsi, cilvēcīgi ievadteksti; tehnoloģiju lapām biežāk uzdotie jautājumi.
+- Jaunus tekstus lapās liekam tikai ar Raimonda atsevišķu apstiprinājumu.
 - Ātruma pārbaude telefonā, attēlu nosaukumi un apraksti.
 - Ikmēneša atskaite: kur esam, kas jāuzlabo.
 
