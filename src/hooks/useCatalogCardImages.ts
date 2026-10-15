@@ -50,9 +50,9 @@ async function fetchImages(source: string, id: string): Promise<ImageRow[]> {
       return (data || []).map(r => ({ color: r.color_name, url: r.url }));
     }
     case "etx": {
-      const { data, error } = await supabase.from("product_images").select("image_url").eq("product_id", id).order("sort_order");
+      const { data, error } = await supabase.from("product_images").select("url").eq("product_id", id).order("sort_order");
       if (error) throw error;
-      return (data || []).map(r => ({ url: r.image_url }));
+      return (data || []).map(r => ({ url: r.url }));
     }
     default: return [];
   }
