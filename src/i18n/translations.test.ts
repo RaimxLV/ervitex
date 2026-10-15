@@ -3,7 +3,7 @@ import { translations } from "./translations";
 
 const years = new Date().getFullYear() - 1998;
 
-const withYears = (lv: string) => lv.replaceAll("{years}", String(years));
+const withYears = (lv: string) => lv.replace(/\{years\}/g, String(years));
 
 describe("founding year auto-increment", () => {
   it("year texts use the {years} placeholder", () => {
