@@ -103,11 +103,11 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, canClear, className, head
               onClick={onClearAll}
               disabled={!clearEnabled}
               className={cn(
-                "h-8 gap-1.5 border-border px-3 font-heading text-[11px] font-bold uppercase tracking-wider transition-colors hover:border-accent hover:text-accent",
+                "h-9 gap-2 border-border px-4 font-heading text-[11px] font-bold uppercase tracking-wider transition-colors hover:border-accent hover:bg-accent hover:text-accent-foreground",
                 !clearEnabled && "opacity-45"
               )}
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="h-3.5 w-3.5" strokeWidth={2.5} />
               {t.clear}
             </Button>
           )}
