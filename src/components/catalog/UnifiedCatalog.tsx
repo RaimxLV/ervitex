@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronsLeft, ChevronsRight, SlidersHorizontal, ListOrdered } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, SlidersHorizontal, ListOrdered, X } from "lucide-react";
 import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import { Button } from "@/components/ui/button";
@@ -1176,7 +1176,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             {lang === "lv" ? "Kārtot filtrus" : "Arrange filters"}
           </button>
         )}
-        <CatalogFiltersSidebar sections={orderedSections} onClearAll={clearAll} {...props} />
+        <CatalogFiltersSidebar sections={orderedSections} onClearAll={clearAll} canClear={totalSelectedFilters > 0} {...props} />
       </>
     );
 
@@ -1240,6 +1240,19 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       </span>
                     )}
                   </SheetTitle>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={clearAll}
+                    disabled={totalSelectedFilters === 0}
+                    className={`mt-1 w-full gap-1.5 border-border font-heading text-[11px] font-bold uppercase tracking-wider transition-colors hover:border-accent hover:text-accent ${
+                      totalSelectedFilters === 0 ? "opacity-45" : ""
+                    }`}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                    {lang === "lv" ? "Notīrīt filtrus" : "Clear filters"}
+                  </Button>
                 </SheetHeader>
                 <div>
                   {renderFilters({ hideHeader: true })}

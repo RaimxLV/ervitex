@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Minus, Check, Search, SlidersHorizontal, X, ChevronDown, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -36,6 +37,8 @@ export interface FilterSection {
 interface Props {
   sections: FilterSection[];
   onClearAll?: () => void;
+  /** Overrides the "filters are active" check used to enable the clear button. */
+  canClear?: boolean;
   className?: string;
   /** Optional heading override; defaults to "Filtri / Filters" */
   heading?: string;
@@ -43,7 +46,7 @@ interface Props {
   hideHeader?: boolean;
 }
 
-const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideHeader }: Props) => {
+const CatalogFiltersSidebar = ({ sections, onClearAll, canClear, className, heading, hideHeader }: Props) => {
   const { lang } = useLanguage();
   const isMobile = useIsMobile();
   // On mobile, all sections default to collapsed. On desktop, all open.
@@ -64,7 +67,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
   const t = useMemo(
     () => ({
       filters: heading ?? (lang === "lv" ? "Filtri" : "Filters"),
-      clear: lang === "lv" ? "Notīrīt visu" : "Clear all",
+      clear: lang === "lv" ? "Notīrīt filtrus" : "Clear filters",
       searchIn: lang === "lv" ? "Meklēt" : "Search",
       empty: lang === "lv" ? "Nav opciju" : "No options",
     }),
@@ -72,6 +75,7 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
   );
 
   const totalSelected = sections.reduce((sum, s) => sum + s.selected.size, 0);
+  const clearEnabled = canClear ?? totalSelected > 0;
   const visible = sections.filter((s) => s.items.length > 0);
   if (visible.length === 0) return null;
 
@@ -91,13 +95,21 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
               </span>
             )}
           </div>
-          {totalSelected > 0 && onClearAll && (
-            <button
+          {onClearAll && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
               onClick={onClearAll}
-              className="text-xs font-medium uppercase tracking-wider text-muted-foreground transition hover:text-accent"
+              disabled={!clearEnabled}
+              className={cn(
+                "h-8 gap-1.5 border-border px-3 font-heading text-[11px] font-bold uppercase tracking-wider transition-colors hover:border-accent hover:text-accent",
+                !clearEnabled && "opacity-45"
+              )}
             >
+              <X className="h-3.5 w-3.5" />
               {t.clear}
-            </button>
+            </Button>
           )}
         </div>
       )}
