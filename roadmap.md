@@ -1,5 +1,9 @@
 # Roadmap
 
+## Kategoriju pasūtījuma paziņojumi — 15.10.2026
+- [x] Kopīgs informatīvs paziņojums pie klienta preces daudzumu izvēles, atbilstoši kategorijai; minimumi un ieteikumi LV/EN, bez nosūtīšanas bloķēšanas.
+- [x] 17 testi sekmīgi; pārlūkā pārbaudītas visas 7 grupas, mobilā rakstāmlietu paziņojuma izkārtojums un Creator 2.0 10 gab. pievienošana ar nolasīšanu pieprasījumā. E-pasts nav sūtīts; lapas kļūdu nav, build OK.
+
 ## Attēlu sakārtošana un publiskās lapas audits — 15.10.2026
 - [x] Saglabāti 7 pašreizējie optimizētie komandas foto; dzēsti 7 vecie vietējie foto un 4 neizmantotās augšupielādes; arī projektu vadītāju foto izmanto jaunos attēlus.
 - [x] 5 smagie PNG (7 preču kartītes) pārvērsti WebP: 6,15 MB → 449 KB (−93%); pārējie sporta formu foto jau optimizēti. Cenas un secība nemainītas; turpmāk admina augšupielādes arī optimizējas.
