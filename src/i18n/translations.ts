@@ -71,8 +71,8 @@ export const translations = {
   // About page
   "about.title": { lv: "Par Ervitex", en: "About Ervitex" },
   "about.heroText": {
-    lv: "Vairāk nekā 28 gadu laikā esam kļuvuši par vienu no vadošajiem tekstila un industriālās apdrukas uzņēmumiem Latvijā. Apvienojot augstākās kvalitātes materiālus, modernākās tehnoloģijas un uzkrāto pieredzi, nodrošinām uzticamus risinājumus uzņēmumiem un sadarbības partneriem Latvijā, Baltijā, kā arī Eiropā.",
-    en: "Over more than 28 years, we have become one of the leading textile and industrial printing companies in Latvia. By combining the highest quality materials, state-of-the-art technology and expertise, we provide reliable solutions for companies and partners in Latvia, the Baltics and Europe.",
+    lv: "Vairāk nekā {years} gadu laikā esam kļuvuši par vienu no vadošajiem tekstila un industriālās apdrukas uzņēmumiem Latvijā. Apvienojot augstākās kvalitātes materiālus, modernākās tehnoloģijas un uzkrāto pieredzi, nodrošinām uzticamus risinājumus uzņēmumiem un sadarbības partneriem Latvijā, Baltijā, kā arī Eiropā.",
+    en: "Over more than {years} years, we have become one of the leading textile and industrial printing companies in Latvia. By combining the highest quality materials, state-of-the-art technology and expertise, we provide reliable solutions for companies and partners in Latvia, the Baltics and Europe.",
   },
   "about.storyTitle": { lv: "Mūsu stāsts", en: "Our Story" },
   "about.storyKicker": {
@@ -108,8 +108,8 @@ export const translations = {
   },
   "about.blockStabilityTitle": { lv: "Pieredze, kurai var uzticēties", en: "Experience you can trust" },
   "about.blockStabilityBody1": {
-    lv: "Vairāk nekā 28 gados esam pilnveidojuši katru ražošanas posmu, lai klientiem nodrošinātu nemainīgi augstu kvalitāti, precīzus termiņus un prognozējamu rezultātu. Mūsu reputācija balstās uz uzticamību, profesionālu attieksmi un ilgtermiņa sadarbību.",
-    en: "Over more than 28 years we have refined every stage of production to give clients consistently high quality, precise deadlines and predictable results. Our reputation rests on reliability, professionalism and long-term cooperation.",
+    lv: "Vairāk nekā {years} gados esam pilnveidojuši katru ražošanas posmu, lai klientiem nodrošinātu nemainīgi augstu kvalitāti, precīzus termiņus un prognozējamu rezultātu. Mūsu reputācija balstās uz uzticamību, profesionālu attieksmi un ilgtermiņa sadarbību.",
+    en: "Over more than {years} years we have refined every stage of production to give clients consistently high quality, precise deadlines and predictable results. Our reputation rests on reliability, professionalism and long-term cooperation.",
   },
   "about.blockCapacityTitle": { lv: "Kvalitāte, ko nodrošina tehnoloģijas", en: "Quality driven by technology" },
   "about.blockCapacityBody1": {
@@ -120,7 +120,7 @@ export const translations = {
 
   "about.valuesTitle": { lv: "Kas mūs virza", en: "What Drives Us" },
   "about.precision": { lv: "Pieredze", en: "Experience" },
-  "about.precisionDesc": { lv: "Vairāk nekā 28 gadu pieredze tekstila un apdrukas nozarē.\n\nGadu gaitā esam uzkrājuši plašas zināšanas un izpratni par nozari, klientu vajadzībām un kvalitatīva rezultāta nodrošināšanu. Pieredze ļauj mums profesionāli īstenot gan ikdienas, gan individuālus projektus.", en: "More than 28 years of experience in the textile and printing industry.\n\nOver the years we have built broad knowledge and understanding of the industry, client needs and delivering quality results. This experience lets us professionally carry out both everyday and individual projects." },
+  "about.precisionDesc": { lv: "Vairāk nekā {years} gadu pieredze tekstila un apdrukas nozarē.\n\nGadu gaitā esam uzkrājuši plašas zināšanas un izpratni par nozari, klientu vajadzībām un kvalitatīva rezultāta nodrošināšanu. Pieredze ļauj mums profesionāli īstenot gan ikdienas, gan individuālus projektus.", en: "More than {years} years of experience in the textile and printing industry.\n\nOver the years we have built broad knowledge and understanding of the industry, client needs and delivering quality results. This experience lets us professionally carry out both everyday and individual projects." },
   "about.partnership": { lv: "Tehnoloģijas", en: "Technologies" },
   "about.partnershipDesc": { lv: "Mūsdienīgas tehnoloģijas precīzam rezultātam.\n\nIzmantojam sietspiedes, digitālās transfērdrukas (DTF), mašīnizšūšanas, termodrukas, sublimācijas un citas apdrukas tehnoloģijas. Katram projektam izvēlamies piemērotāko risinājumu, ņemot vērā izstrādājumu, dizainu un paredzēto lietojumu.", en: "Modern technology for a precise result.\n\nWe use screen printing, digital transfer (DTF), machine embroidery, heat transfer, sublimation and other printing technologies. For every project we choose the most suitable solution based on the product, design and intended use." },
   "about.quality": { lv: "Kvalitāte", en: "Quality" },
@@ -149,7 +149,7 @@ export const translations = {
   "contact.sentDesc": { lv: "Sazināsimies ar jums 24 stundu laikā.", en: "We'll get back to you within 24 hours." },
 
   // Why choose us items
-  "why.experience": { lv: "28+ gadu pieredze", en: "28+ Years of Expertise" },
+  "why.experience": { lv: "{years}+ gadu pieredze", en: "{years}+ Years of Expertise" },
   "why.experienceDesc": { lv: "Uzticams tekstila partneris kopš 1998. gada ar dziļu nozares izpratni.", en: "A trusted textile partner since 1998 with deep industry knowledge." },
   "why.turnaround": { lv: "Ātra izpilde", en: "Fast Turnaround" },
   "why.turnaroundDesc": { lv: "Efektīva ražošana un uzticama piegāde visā Eiropā.", en: "Efficient production and reliable delivery across Europe." },
