@@ -88,7 +88,8 @@ export function useCatalogCardImages(ref: RefObject<HTMLElement | null>, source:
     pending.then(data => { if (alive) setRows(data); }).catch(() => { requests.delete(key); });
     return () => { alive = false; };
   }, [near, source, id]);
-  const candidates = colorCodeCandidates(color).map(value => value.toLowerCase());
+  const ssColor = source === "ss" ? color?.match(/C\d{3}/i)?.[0] : null;
+  const candidates = colorCodeCandidates(ssColor || color).map(value => value.toLowerCase());
   const own = rows.filter(row => row.color && colorCodeCandidates(row.color).some(value => candidates.includes(value.toLowerCase())));
   const selected = own.length ? own : rows.filter(row => !row.color);
   return [...new Set([first, ...selected.map(row => thumbUrl(row.url || row.alternate || null))].filter((url): url is string => Boolean(url)))];
