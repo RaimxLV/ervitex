@@ -92,13 +92,21 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, className, heading, hideH
               </span>
             )}
           </div>
-          {totalSelected > 0 && onClearAll && (
-            <button
+          {onClearAll && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
               onClick={onClearAll}
-              className="text-xs font-medium uppercase tracking-wider text-muted-foreground transition hover:text-accent"
+              disabled={totalSelected === 0}
+              className={cn(
+                "h-8 gap-1.5 border-border px-3 font-heading text-[11px] font-bold uppercase tracking-wider transition-colors hover:border-accent hover:text-accent",
+                totalSelected === 0 && "opacity-45"
+              )}
             >
+              <X className="h-3.5 w-3.5" />
               {t.clear}
-            </button>
+            </Button>
           )}
         </div>
       )}
