@@ -20,6 +20,7 @@ import { Route as PfConceptRouteImport } from './routes/pf-concept'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RequestRouteImport } from './routes/request'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StanleyStellaRouteImport } from './routes/stanley-stella'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -97,6 +98,11 @@ const RequestRoute = RequestRouteImport.update({
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StanleyStellaRoute = StanleyStellaRouteImport.update({
@@ -227,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stanley-stella': typeof StanleyStellaRoute
   '/terms': typeof TermsRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stanley-stella': typeof StanleyStellaRoute
   '/terms': typeof TermsRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/request': typeof RequestRoute
   '/services': typeof ServicesRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stanley-stella': typeof StanleyStellaRoute
   '/terms': typeof TermsRoute
   '/admin/categories': typeof AdminCategoriesRoute
@@ -338,6 +347,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/request'
     | '/services'
+    | '/sitemap.xml'
     | '/stanley-stella'
     | '/terms'
     | '/admin/categories'
@@ -374,6 +384,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/request'
     | '/services'
+    | '/sitemap.xml'
     | '/stanley-stella'
     | '/terms'
     | '/admin/categories'
@@ -410,6 +421,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/request'
     | '/services'
+    | '/sitemap.xml'
     | '/stanley-stella'
     | '/terms'
     | '/admin/categories'
@@ -447,6 +459,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RequestRoute: typeof RequestRoute
   ServicesRoute: typeof ServicesRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StanleyStellaRoute: typeof StanleyStellaRoute
   TermsRoute: typeof TermsRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
@@ -549,6 +562,13 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stanley-stella': {
@@ -727,6 +747,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RequestRoute: RequestRoute,
   ServicesRoute: ServicesRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   StanleyStellaRoute: StanleyStellaRoute,
   TermsRoute: TermsRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,

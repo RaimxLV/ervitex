@@ -97,7 +97,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://res.cloudinary.com", crossOrigin: "anonymous" },
       { rel: "dns-prefetch", href: "https://images.nwgmedia.com" },
       { rel: "dns-prefetch", href: "https://images.pfconcept.com" },
-      { rel: "canonical", href: "https://raimxlv.github.io/ervitex/" },
     ],
     scripts: [
       { children: HEAD_BOOTSTRAP_SCRIPT },
