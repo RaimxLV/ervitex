@@ -1,5 +1,9 @@
 # Roadmap
 
+## Kategoriju pasūtījuma paziņojumi — 15.10.2026
+- [ ] Kopīgs informatīvs paziņojums pie klienta preces daudzumu izvēles, atbilstoši kategorijai.
+- [ ] Pārbaudīt konkrētos minimumus testos un preces pievienošanu pārlūkā.
+
 ## Attēlu sakārtošana un publiskās lapas audits — 15.10.2026
 - [x] Saglabāti 7 pašreizējie optimizētie komandas foto; dzēsti 7 vecie vietējie foto un 4 neizmantotās augšupielādes; arī projektu vadītāju foto izmanto jaunos attēlus.
 - [x] 5 smagie PNG (7 preču kartītes) pārvērsti WebP: 6,15 MB → 449 KB (−93%); pārējie sporta formu foto jau optimizēti. Cenas un secība nemainītas; turpmāk admina augšupielādes arī optimizējas.
