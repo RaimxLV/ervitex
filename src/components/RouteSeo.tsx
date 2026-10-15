@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "@/lib/router-compat";
 
-const SITE = "https://raimxlv.github.io/ervitex";
+import { SITE } from "@/lib/seo";
 const DEFAULT_TITLE = "Ervitex — apģērbu vairumtirdzniecība un apdruka Rīgā";
 const DEFAULT_DESC =
   "SIA Ervitex — reklāmas apģērbu un tekstila vairumtirdzniecība ar sietspiedi, DTF, izšūšanu, sublimāciju un termodruku. " + (new Date().getFullYear() - 1998) + "+ gadu pieredze, birojs Rīgā.";
