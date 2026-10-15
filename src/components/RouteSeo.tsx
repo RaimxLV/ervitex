@@ -10,7 +10,7 @@ type Meta = { title: string; desc: string; noindex?: boolean };
 
 const STATIC: Record<string, Meta> = {
   "/": { title: DEFAULT_TITLE, desc: DEFAULT_DESC },
-  "/catalog": { title: "Katalogs — 6000+ apģērbu un aksesuāru modeļu | Ervitex", desc: "T-krekli, hūdiji, polo, jakas, darba apģērbs un aksesuāri no Stanley/Stella, NWG, PF Concept, Malfini un Beechfield. Cenas ar PVN, apdruka pēc pieprasījuma." },
+  "/catalog": { title: "Katalogs — 7000+ apģērbu un aksesuāru modeļu | Ervitex", desc: "T-krekli, hūdiji, polo, jakas, darba apģērbs un aksesuāri no Stanley/Stella, NWG, PF Concept, Malfini un Beechfield. Cenas ar PVN, apdruka pēc pieprasījuma." },
   "/about": { title: `Par Ervitex — ${new Date().getFullYear() - 1998}+ gadu pieredze tekstila apdrukā`, desc: "Ervitex stāsts, tehnoloģijas un kvalitātes principi. Vairumtirdzniecība un profesionāla apģērbu apdruka Rīgā." },
   "/contact": { title: "Kontakti — Ervitex birojs un T-Bode veikali Rīgā", desc: "Braslas iela 29, Rīga. Tālr. +371 67543384, birojs@ervitex.lv. Projektu vadītāji, darba laiks un T-Bode veikalu adreses." },
   "/request": { title: "Pieprasījums | Ervitex", desc: DEFAULT_DESC, noindex: true },
