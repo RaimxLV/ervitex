@@ -59,7 +59,12 @@ export function pageHead(path: string, override?: Partial<PageMeta>) {
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: m.title },
       { name: "twitter:description", content: m.desc },
-      ...(m.noindex ? [{ name: "googlebot", content: "noindex, nofollow" }] : []),
+      ...(m.noindex
+        ? [
+            { name: "robots", content: "noindex, nofollow" },
+            { name: "googlebot", content: "noindex, nofollow" },
+          ]
+        : [{ name: "robots", content: "index, follow" }]),
     ],
     links: m.noindex
       ? []
