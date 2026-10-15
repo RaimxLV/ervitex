@@ -9,9 +9,12 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import { useCreateOffer } from "@/components/quote/CreateOfferButton";
 import { QuoteSteps } from "./QuoteSteps";
+import { OrderMinimumNotice } from "./OrderMinimumNotice";
 
 interface Props {
   source: string;
+  category?: string | null;
+  classificationName?: string | null;
   productId: string;
   name: string;
   code: string;
@@ -27,7 +30,7 @@ interface Props {
 }
 
 const AddToQuoteBlock = ({
-  source, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes, sizePrices, onClose,
+  source, category, classificationName, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes, sizePrices, onClose,
 }: Props) => {
   const { items, add, updateQty, remove } = useQuoteCart();
   const { lang } = useLanguage();
@@ -182,6 +185,7 @@ const AddToQuoteBlock = ({
         )}
       </div>
 
+      {!isAdmin && <OrderMinimumNotice source={source} category={category} name={classificationName || name} />}
       <SizeQuantityTable rows={(sizes.length ? sizes : ["-"]).map((size) => ({ size, price: sizePrices?.[size] ?? null }))} quantities={qtyBySize} onChange={setSize} />
 
       {/* Summary of other colors already in cart for this product */}

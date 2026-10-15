@@ -1687,6 +1687,8 @@ const CatalogItemDialog = ({
               {!loading && (
                 <AddToQuoteBlock
                   source={source}
+                  category={category || detail?.category}
+                  classificationName={name || detail?.title}
                   productId={id}
                   sizePrices={sizePriceMap}
 

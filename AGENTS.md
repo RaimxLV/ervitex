@@ -3,7 +3,7 @@
 - Search shares searchScore/exactCodeHits.
 - productContent separates supplier care/specs; fingerprint translation caches to avoid stale metadata.
 - Offers use CreateOfferButton and protected /offers with OfferWorkspace; sharing activates drafts automatically, without manual statuses.
-- Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows and QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers.
+- Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums, not translations; guidance never blocks requests.
 
 - Public icons share AccentIcon framed/inline variants and semantic tones; print-icons holds Lucide-compatible print symbols for consistent strokes and sizes.
 - Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
@@ -12,7 +12,7 @@
 - Team uses immutable photo_url/framing and current CDN fallbacks; admin-only writes. Manual uploads share WebP optimization to avoid heavy originals.
 
 - Quote worksheet edits use side-specific autosaved drafts; only explicit confirmation updates the shared list and creates an immutable version, preventing incomplete client/staff edits from overwriting each other.
-- Quote workflow history is append-only in `quote_events`; assignment and status changes must remain visible even when the current quote row changes.
+- `quote_events` is append-only; assignment/status history survives quote row changes.
 - Communication stays in normal email; worksheets edit/confirm products and copy an HTML/plain-text burgundy list link for mail-client and dark-mode compatibility.
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
 - Catalog cards default to the cheapest positive-priced colour and product views select its cheapest size via shared catalogPriceSelection helpers; explicit colour/size choices take precedence, keeping card and detail prices aligned.
@@ -29,10 +29,10 @@
 - tech_galleries stores stable order/membership refs (s:<tech>:<index> for built-ins, public URLs for uploads), applied over static data so rebuilds preserve order.
 
 - UTT uses `utt-sync` Data Export into `utt_*`; service-role-only `utt_prices`; images mirrored in `utt-images` because UTT blocks hotlinking.
-- Headings are thickened with `.hero-ultra` (-webkit-text-stroke) because the heading face caps at 700; its leading must be repeated per breakpoint, since theme text sizes emit their own line-height.
+- `.hero-ultra` thickens the 700-capped heading face with -webkit-text-stroke; repeat leading per breakpoint to override theme text-size line-height.
 
 - ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
 
 - QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.
-- Headwear uses shared name/description classification and a conditional URL facet after category; bump cache schema when fields change to prevent stale types.
+- Headwear shares name/description classification and a category-conditional URL facet; bump cache schema on field changes to avoid stale types.
