@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Kategoriju pasūtījuma paziņojumi — 15.10.2026
-- [ ] Kopīgs informatīvs paziņojums pie klienta preces daudzumu izvēles, atbilstoši kategorijai.
-- [ ] Pārbaudīt konkrētos minimumus testos un preces pievienošanu pārlūkā.
+- [x] Kopīgs informatīvs paziņojums pie klienta preces daudzumu izvēles, atbilstoši kategorijai; minimumi un ieteikumi LV/EN, bez nosūtīšanas bloķēšanas.
+- [x] 17 testi sekmīgi; pārlūkā pārbaudītas visas 7 grupas, mobilā rakstāmlietu paziņojuma izkārtojums un Creator 2.0 10 gab. pievienošana ar nolasīšanu pieprasījumā. E-pasts nav sūtīts; lapas kļūdu nav, build OK.
 
 ## Attēlu sakārtošana un publiskās lapas audits — 15.10.2026
 - [x] Saglabāti 7 pašreizējie optimizētie komandas foto; dzēsti 7 vecie vietējie foto un 4 neizmantotās augšupielādes; arī projektu vadītāju foto izmanto jaunos attēlus.
