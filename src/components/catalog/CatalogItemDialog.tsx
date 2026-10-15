@@ -13,6 +13,7 @@ import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "react-router-dom";
 import { ColorSelector } from "@/components/quote/ColorSelector";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
+import { OrderMinimumNotice } from "@/components/quote/OrderMinimumNotice";
 import { Check } from "lucide-react";
 import { AccentIcon } from "@/components/ui/accent-icon";
 import { assignCareIcons } from "./CareIcons";
@@ -1545,6 +1546,7 @@ const CatalogItemDialog = ({
                 ))}
               </div>
             )}
+            {!loading && !canFlagStock && <OrderMinimumNotice source={source} category={category || detail?.category} name={name || detail?.title} className="hidden md:block" />}
           </div>
 
           <div className="space-y-6">
@@ -1689,6 +1691,7 @@ const CatalogItemDialog = ({
                   source={source}
                   category={category || detail?.category}
                   classificationName={name || detail?.title}
+                  minimumNoticeClassName="md:hidden"
                   productId={id}
                   sizePrices={sizePriceMap}
 

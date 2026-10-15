@@ -3,7 +3,7 @@
 - Search shares searchScore/exactCodeHits.
 - productContent separates supplier care/specs; fingerprint translation caches to avoid stale metadata.
 - Offers use CreateOfferButton and protected /offers with OfferWorkspace; sharing activates drafts automatically, without manual statuses.
-- Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums, not translations; guidance never blocks requests.
+- Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
 
 - Public icons share AccentIcon framed/inline variants and semantic tones; print-icons holds Lucide-compatible print symbols for consistent strokes and sizes.
 - Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
