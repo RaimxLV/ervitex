@@ -9,7 +9,7 @@
 - Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
 
 - Office contours/hotspots share cover-scene coordinates; halos use separate feGaussianBlur polygons with oversized regions to prevent clipping.
-- Team overrides use immutable product-images files and team_photo_settings.photo_url/framing; static portraits are fallbacks; writes are admin-only.
+- Team uses immutable photo_url/framing and current CDN fallbacks; admin-only writes. Manual uploads share WebP optimization to avoid heavy originals.
 
 - Quote worksheet edits use side-specific autosaved drafts; only explicit confirmation updates the shared list and creates an immutable version, preventing incomplete client/staff edits from overwriting each other.
 - Quote workflow history is append-only in `quote_events`; assignment and status changes must remain visible even when the current quote row changes.
