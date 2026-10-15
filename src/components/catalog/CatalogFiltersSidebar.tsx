@@ -452,23 +452,6 @@ const CatalogFiltersSidebar = ({ sections, onClearAll, canClear, className, head
           );
         })}
       </div>
-
-      {/* The mobile drawer renders no header, so its clear button sits under the sections. */}
-      {hideHeader && onClearAll && (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onClearAll}
-          disabled={!clearEnabled}
-          className={cn(
-            "w-full gap-2 border-border font-heading text-[11px] font-bold uppercase tracking-wider transition-colors hover:border-accent hover:text-accent",
-            !clearEnabled && "opacity-45"
-          )}
-        >
-          <X className="h-3.5 w-3.5" />
-          {t.clear}
-        </Button>
-      )}
     </aside>
   );
 };
