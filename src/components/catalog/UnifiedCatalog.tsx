@@ -809,7 +809,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     "Towels": "Dvieļi", "Shirts": "Krekli",
     "Crew neck sweatshirts": "Džemperi ar apaļu izgriezumu",
     "Hoodie sweatshirts": "Jakas ar kapuci",
-    "Personal Care": "Personīgā aprūpe", "Fitness & Sport": "Fitness & sports",
+    "Personal Care": "Personīgā aprūpe", "Fitness & Sport": "Fitness un sports",
     "Sunglasses": "Saulesbrilles", "Computer Accessories": "Datoru aksesuāri",
     "Serving Boards & Sets": "Servēšanas dēļi", "Bodywarmers": "Vestes",
     "Toiletry Bags": "Kosmētikas somas", "Stands & Holders": "Statīvi & turētāji",
