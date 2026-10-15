@@ -4,7 +4,7 @@ export function useGalleryVisibility() {
   const ref = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [foreground, setForeground] = useState(!document.hidden);
+  const [foreground, setForeground] = useState(() => typeof document === "undefined" || !document.hidden);
   useEffect(() => {
     const node = ref.current;
     if (!node) return;

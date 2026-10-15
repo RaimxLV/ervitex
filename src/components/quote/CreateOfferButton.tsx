@@ -2,7 +2,7 @@ import { setOrderPrints, type OfferPrint } from "@/lib/orderPrinting";
 import type { Offer } from "@/lib/offer";
 import { offerEditorPath } from "@/lib/offerNavigation";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@/lib/router-compat";
 import { Plus, Loader2, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuoteCart } from "@/hooks/useQuoteCart";

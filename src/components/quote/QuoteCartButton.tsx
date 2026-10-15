@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "@/lib/router-compat";
 import { ClipboardList, Loader2, ArrowRight } from "lucide-react";
 import { useEffect } from "react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";

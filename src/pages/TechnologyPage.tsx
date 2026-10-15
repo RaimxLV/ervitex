@@ -1,4 +1,4 @@
-import { Link, useParams, Navigate } from "react-router-dom";
+import { Link, useParams, Navigate } from "@/lib/router-compat";
 import { motion, MotionConfig, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Info } from "lucide-react";
 import Layout from "@/components/Layout";
@@ -78,7 +78,7 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
               {extra.highlights.map((h, i) => {
                 const Icon = h.icon;
                 return (
-                  <div key={h.label.en} className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-sm hover:shadow-xl">
+                  <div key={h.label.en} className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-xs hover:shadow-xl">
                     <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
                     <p className="mt-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">
                       {h.label[isLv ? "lv" : "en"]}
@@ -99,7 +99,7 @@ const ExtraSection = ({ extra, isLv }: { extra: TechExtra; isLv: boolean }) => (
           {extra.highlights.map((h, i) => {
             const Icon = h.icon;
             return (
-              <div key={h.label.en} className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-sm hover:shadow-xl">
+              <div key={h.label.en} className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-xs hover:shadow-xl">
                 <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
                 <p className="mt-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">
                   {h.label[isLv ? "lv" : "en"]}
@@ -196,7 +196,7 @@ const TechnologyPage = () => {
             {tech.specs.map((s, i) => {
               const Icon = s.icon;
               return (
-                <div key={s.label.en} className="technology-card group rounded-[6px] border border-border bg-card p-5 shadow-sm hover:shadow-xl">
+                <div key={s.label.en} className="technology-card group rounded-[6px] border border-border bg-card p-5 shadow-xs hover:shadow-xl">
                   <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
                   <dt className="mt-3 text-sm font-bold uppercase tracking-wider text-muted-foreground">
                     {s.label[lang]}
@@ -227,7 +227,7 @@ const TechnologyPage = () => {
                   key={b.title.en}
                   {...fadeUp}
                   transition={{ duration: 0.55, delay: i * 0.09 }}
-                  className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-sm hover:shadow-xl md:p-8"
+                  className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-xs hover:shadow-xl md:p-8"
                 >
                   <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
                   <h3 className="mt-5 font-heading text-base font-bold uppercase leading-snug text-foreground">
@@ -294,7 +294,7 @@ const TechnologyPage = () => {
                       key={f.name.en}
                       {...fadeUp}
                       transition={{ duration: 0.55, delay: i * 0.09 }}
-                      className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-sm hover:shadow-xl"
+                      className="technology-card group rounded-[6px] border border-border bg-card p-6 shadow-xs hover:shadow-xl"
                     >
                       <AccentIcon icon={Icon} tone={iconTones[i % iconTones.length]} />
                       <h3 className="mt-4 font-heading text-sm font-bold uppercase text-foreground">{f.name[lang]}</h3>
@@ -345,7 +345,7 @@ const TechnologyPage = () => {
                   key={u.en}
                   {...fadeUp}
                   transition={{ duration: 0.55, delay: i * 0.09 }}
-                  className="technology-card flex items-start gap-4 rounded-[6px] border border-border bg-card px-5 py-4 shadow-sm hover:shadow-md"
+                  className="technology-card flex items-start gap-4 rounded-[6px] border border-border bg-card px-5 py-4 shadow-xs hover:shadow-md"
                 >
                   <AccentIcon icon={Check} inline tone="emerald" className="mt-1" />
                   <span className="text-sm font-semibold leading-relaxed text-foreground md:text-base">{u[lang]}</span>

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "@/lib/router-compat";
 import { Mail, Phone, MapPin, Lock, ShieldCheck, Share2, MessageCircle, Clock, Calculator } from "lucide-react";
 import { AccentIcon } from "@/components/ui/accent-icon";
 import { useLanguage } from "@/i18n/LanguageContext";

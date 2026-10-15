@@ -83,7 +83,7 @@ export default function TechnologyMosaic() {
   const section = useRef<HTMLElement>(null);
   const [near, setNear] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [foreground, setForeground] = useState(!document.hidden);
+  const [foreground, setForeground] = useState(() => typeof document === "undefined" || !document.hidden);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [tiles, setTiles] = useState(initialTiles);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);

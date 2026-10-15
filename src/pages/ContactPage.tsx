@@ -293,7 +293,7 @@ const ContactPage = () => {
             {(() => {
               const member = specialists.find((s) => (photoSettings[s.slug]?.photo_url || s.photo) === lightboxImg);
               return member ? (
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-card/90 backdrop-blur-sm px-6 py-3 text-center shadow-lg">
+                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-card/90 backdrop-blur-xs px-6 py-3 text-center shadow-lg">
                   <p className="font-heading text-sm font-bold uppercase text-foreground">{member.name}</p>
                   <p className="text-xs text-accent">{member.title[lang]}</p>
                 </div>

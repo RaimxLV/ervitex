@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 const LAT = 56.9617;
@@ -15,7 +14,12 @@ const GoogleMapEmbed = ({ className = "h-[320px] sm:h-[420px]" }: { className?: 
   useEffect(() => {
     const el = mapRef.current;
     if (!el) return;
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
 
+    // Leaflet touches window at import time, so load it only in the browser.
+    void import("leaflet").then(({ default: L }) => {
+    if (cancelled) return;
     const map = L.map(el, {
       center: [LAT, LNG],
       zoom: 16,
@@ -43,10 +47,16 @@ const GoogleMapEmbed = ({ className = "h-[320px] sm:h-[420px]" }: { className?: 
     ro.observe(el);
     const t = window.setTimeout(() => map.invalidateSize(), 300);
 
-    return () => {
+    cleanup = () => {
       window.clearTimeout(t);
       ro.disconnect();
       map.remove();
+    };
+    });
+
+    return () => {
+      cancelled = true;
+      cleanup?.();
     };
   }, []);
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
 import { translations, type Language, type TranslationKey } from "./translations";
 
 interface LanguageContextType {
@@ -12,10 +12,14 @@ const g = globalThis as unknown as { __ervitexLangCtx?: React.Context<LanguageCo
 const LanguageContext = g.__ervitexLangCtx ?? (g.__ervitexLangCtx = createContext<LanguageContextType | null>(null));
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [lang, setLangState] = useState<Language>(() => {
-    const saved = localStorage.getItem("ervitex-lang");
-    return (saved === "en" || saved === "lv") ? saved : "lv";
-  });
+  // Server render and first client render use Latvian; a saved English choice
+  // is applied right after hydration so the markup always matches.
+  const [lang, setLangState] = useState<Language>("lv");
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("ervitex-lang");
+    if (saved === "en") setLangState("en");
+  }, []);
 
   const setLang = useCallback((newLang: Language) => {
     setLangState(newLang);

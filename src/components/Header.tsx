@@ -3,7 +3,7 @@ import ervitexLogo from "@/assets/ervitex-logo-2.svg";
 import stellaLogo from "@/assets/stella-dealer-logo-white.png";
 import latviaFlag from "@/assets/flags/lv-round.svg";
 import unitedKingdomFlag from "@/assets/flags/gb-round.svg";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "@/lib/router-compat";
 import { Menu, X, Phone, Search, Share2, ChevronDown, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "@/lib/router-compat";
 import { ChevronsLeft, ChevronsRight, SlidersHorizontal, ListOrdered, X } from "lucide-react";
 import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
@@ -1275,7 +1275,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="h-10 min-w-0 flex-1 rounded-md border border-border bg-background px-2 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-accent sm:flex-none"
+              className="h-10 min-w-0 flex-1 rounded-md border border-border bg-background px-2 text-xs font-medium focus:outline-hidden focus:ring-2 focus:ring-accent sm:flex-none"
             >
               <option value="featured">{lang === "lv" ? "Ieteiktie" : "Featured"}</option>
               <option value="newest">{lang === "lv" ? "Pēc jaunākā" : "Newest"}</option>

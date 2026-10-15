@@ -1,0 +1,11 @@
+{
+  "customizations": [
+    { "token": ":root / .dark / .section-dark CSS variables (Ervitex palette, office, mosaic, value, glow, sidebar)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "tailwind theme extend (fontFamily heading/body, semantic colors incl. success/value/glow, radius, keyframes, animations, container)", "source": "tailwind.config.ts", "reappliedIn": "src/styles.css (@config ../tailwind.config.ts)" },
+    { "token": "@layer base / components / utilities custom rules (hero-ultra, public-readable, office, quote-form, etc.)", "source": "src/index.css", "reappliedIn": "src/styles.css" },
+    { "token": "animate-promo-pulse", "source": "src/index.css", "reappliedIn": "src/styles.css (@utility)" },
+    { "token": "animate-promo-pulse-cta", "source": "src/index.css", "reappliedIn": "src/styles.css (@utility)" },
+    { "token": "animate-glitch-spark", "source": "src/index.css", "reappliedIn": "src/styles.css (@utility)" },
+    { "token": "tailwindcss-animate utilities", "source": "tailwind.config.ts plugins", "reappliedIn": "src/styles.css (tw-animate-css)" }
+  ]
+}
