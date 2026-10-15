@@ -21,7 +21,7 @@
 - Stock mutation controls render only after the authenticated admin role resolves, and every mutation revalidates the live user and role before writing; public users only see the outlined availability label.
 - Native browser scrolling only (no Lenis: busy-thread jumps). WebGL depth follows scroll/eased fine-pointer movement, renders on change and pauses off-screen.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
-- RouteSeo sets client-side title/description/canonical/robots; private token and admin routes stay noindex.
+- SSR (TanStack Start, Lovable hosting only): render paths avoid browser globals; product loaders emit SEO head; RouteSeo keeps private routes noindex.
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
 - Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
 - Galleries share bounded decoding, warm adjacent frames and retain the last frame on failure to avoid blanks. Catalog hover replaces only loaded photos with exclusive visibility; Malfini prefers clean front photos over ghosted dimension diagrams.
