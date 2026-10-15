@@ -492,10 +492,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       "source,id,name,description,brand,category,group_name,gender,image_url,hover_image_url,colors";
     const PRICE_COLUMNS = "source,style_code,min_price,max_price,currency";
 
+    // Ražotāju atlikumi: apģērbs ar vienu krāsu un 1–2 izmēriem netiek rādīts.
+    const remnants = new Set<string>();
     const enrich = (all: CatalogItem[]): EnrichedItem[] =>
       all
         .map((it) => {
           if (isIncompleteNwgShell(it)) return null;
+          if (remnants.has(`${it.source}:${it.id}`)) return null;
           const buckets = new Set<ColorBucketKey>();
           const raw = (it.colors || []) as ColorEntry[];
           const colorList: EnrichedColor[] = raw.map((c) => {
@@ -552,15 +555,17 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       // Only trust the disk cache when it still has the same number of rows as
       // the live catalog; otherwise an old visit's supplier list flashes first
       // and newly connected catalogs pop into the filters a second later.
-      const [persisted, liveCount] = await Promise.all([
+      const [persisted, liveCount, remnantRows] = await Promise.all([
         readCatalogCache(cacheKey),
         (() => {
           let q = supabase.from("catalog_items" as any).select("id", { count: "exact", head: true });
           if (lockedSource) q = q.eq("source", lockedSource);
           return q.then((r) => (r.error ? null : r.count ?? null));
         })(),
+        supabase.rpc("catalog_remnant_styles" as any).then((r) => (r.error ? [] : ((r.data as any[]) || []))),
       ]);
       if (cancelled) return;
+      for (const r of remnantRows) remnants.add(`${r.source}:${r.style_code}`);
       if (persisted && !persisted.stale && liveCount !== null && persisted.entry.items.length === liveCount) {
         const cachedItems = enrich((persisted.entry.items as unknown) as CatalogItem[]);
         const cachedRanges = toRanges((persisted.entry.prices as unknown) as any[]);
