@@ -3125,6 +3125,13 @@ export type Database = {
       }
     }
     Functions: {
+      catalog_remnant_styles: {
+        Args: never
+        Returns: {
+          source: string
+          style_code: string
+        }[]
+      }
       confirm_quote_worksheet: {
         Args: { _by?: string; _token: string }
         Returns: number
