@@ -36,3 +36,4 @@
 
 - QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.
 - Headwear shares name/description classification and a category-conditional URL facet; bump cache schema on field changes to avoid stale types.
+- Route SEO lives in src/lib/seo.ts (pageHead/privateHead per route head(), canonical www.ervitex.lv); sitemap.xml is generated server-side from catalog_items minus remnants/footwear so it never goes stale.
