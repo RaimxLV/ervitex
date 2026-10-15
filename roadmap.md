@@ -1,9 +1,10 @@
 # Roadmap
 
 ## Attēlu sakārtošana un publiskās lapas audits — 15.10.2026
-- [ ] Saglabāt pašreiz izvēlētās komandas fotogrāfijas, optimizēt tās un izdzēst neizmantotās kontaktu fotogrāfijas.
-- [ ] Optimizēt sporta formu attēlus, saglabājot produktus, cenas un attēlu secību.
-- [ ] Pārbaudīt publiskās lapas, katalogu un attēlu pieejamību; novērst apstiprinātās attēlu kļūdas.
+- [x] Saglabāti 7 pašreizējie optimizētie komandas foto; dzēsti 7 vecie vietējie foto un 4 neizmantotās augšupielādes; arī projektu vadītāju foto izmanto jaunos attēlus.
+- [x] 5 smagie PNG (7 preču kartītes) pārvērsti WebP: 6,15 MB → 449 KB (−93%); pārējie sporta formu foto jau optimizēti. Cenas un secība nemainītas; turpmāk admina augšupielādes arī optimizējas.
+- [x] Pārbaudītas publiskās lapas un piegādātāju katalogi datorā/telefonā, visi 7 portreti, 12 sporta formu preču lapas un admina augšupielāde; 24 testi sekmīgi. Visām 7276 kataloga rindām pārbaudīta attēlu norādes esamība, ne katra piegādātāja fotogrāfija vizuāli.
+- [ ] 5 Craft modeļiem katalogā trūkst attēlu: C18379, C18380, 1914226, C18265, 1917176; vajadzīgi piegādātāja attēli, aizvietojumi nav izdomāti.
 
 ## Cepuru veidu filtri — 14.10.2026
 - [x] Cepuru veidi pēc piegādātāju nosaukumiem un pieejamajiem aprakstiem; papildfiltrs tikai izvēloties cepures, neskaidrie veidi paliek „Citas galvassegas”.

@@ -1,7 +1,7 @@
-import lauraPhoto from "@/assets/team/laura-daukste.webp";
-import ilonaPhoto from "@/assets/team/ilona-romanovska.webp";
-import santaPhoto from "@/assets/team/santa-zvaigzne.webp";
-import justinePhoto from "@/assets/team/justine-strunka.webp";
+import lauraPhoto from "@/assets/team/team-laura.webp.asset.json";
+import ilonaPhoto from "@/assets/team/team-ilona.webp.asset.json";
+import santaPhoto from "@/assets/team/team-santa.webp.asset.json";
+import justinePhoto from "@/assets/team/team-justine.webp.asset.json";
 
 export interface ProjectManager {
   slug: string;
@@ -19,7 +19,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" },
     email: "laura@ervitex.lv",
     phone: "+371 26164635",
-    photo: lauraPhoto,
+    photo: `https://ervitex.lovable.app${lauraPhoto.url}`,
   },
   {
     slug: "ilona",
@@ -27,7 +27,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Projektu vadītāja", en: "Project Manager" },
     email: "ilona@ervitex.lv",
     phone: "+371 29494626",
-    photo: ilonaPhoto,
+    photo: `https://ervitex.lovable.app${ilonaPhoto.url}`,
   },
   {
     slug: "santa",
@@ -35,7 +35,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Projektu vadītāja", en: "Project Manager" },
     email: "santa.k@ervitex.lv",
     phone: "+371 67436899",
-    photo: santaPhoto,
+    photo: `https://ervitex.lovable.app${santaPhoto.url}`,
   },
   {
     slug: "justine",
@@ -43,7 +43,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Projektu vadītāja", en: "Project Manager" },
     email: "justine@ervitex.lv",
     phone: "+371 29725412",
-    photo: justinePhoto,
+    photo: `https://ervitex.lovable.app${justinePhoto.url}`,
   },
 ];
 
