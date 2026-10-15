@@ -1,5 +1,10 @@
 # Roadmap
 
+## Attēlu sakārtošana un publiskās lapas audits — 15.10.2026
+- [ ] Saglabāt pašreiz izvēlētās komandas fotogrāfijas, optimizēt tās un izdzēst neizmantotās kontaktu fotogrāfijas.
+- [ ] Optimizēt sporta formu attēlus, saglabājot produktus, cenas un attēlu secību.
+- [ ] Pārbaudīt publiskās lapas, katalogu un attēlu pieejamību; novērst apstiprinātās attēlu kļūdas.
+
 ## Cepuru veidu filtri — 14.10.2026
 - [x] Cepuru veidi pēc piegādātāju nosaukumiem un pieejamajiem aprakstiem; papildfiltrs tikai izvēloties cepures, neskaidrie veidi paliek „Citas galvassegas”.
 - [x] Pārlūkā pārbaudītas panamas, izvēles saglabāšanās pēc pārlādes, paslēpšana pie T-krekliem un Trucker izvēle telefonā; 30 testi sekmīgi, build OK.
