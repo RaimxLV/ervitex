@@ -512,6 +512,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           const category = normalizeCategory(it.category, it.name);
           // Ervitex apavus netirgo — visa apavu kategorija izņemta no kataloga.
           if (category && /shoe|footwear|sneaker|boot|sandal|apav/i.test(category)) return null;
+          // Paslēpts: Regatta darba apģērbs un Craft zeķes.
+          if (manufacturer === "utt-regatta" && category && /workwear|darba/i.test(category)) return null;
+          if (manufacturer === "nwg-craft" && category && /sock|zeķ/i.test(category)) return null;
           return {
             ...it,
             brand,
