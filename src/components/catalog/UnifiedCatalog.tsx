@@ -562,7 +562,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           if (lockedSource) q = q.eq("source", lockedSource);
           return q.then((r) => (r.error ? null : r.count ?? null));
         })(),
-        supabase.rpc("catalog_remnant_styles" as any).then((r) => (r.error ? [] : ((r.data as any[]) || []))),
+        supabase.from("catalog_remnants" as any).select("source,style_code").range(0, 4999).then((r) => (r.error ? [] : ((r.data as any[]) || []))),
       ]);
       if (cancelled) return;
       for (const r of remnantRows) remnants.add(`${r.source}:${r.style_code}`);
