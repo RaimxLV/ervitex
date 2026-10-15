@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronsLeft, ChevronsRight, SlidersHorizontal, ListOrdered } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, SlidersHorizontal, ListOrdered, X } from "lucide-react";
 import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import { Button } from "@/components/ui/button";
@@ -1176,7 +1176,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             {lang === "lv" ? "Kārtot filtrus" : "Arrange filters"}
           </button>
         )}
-        <CatalogFiltersSidebar sections={orderedSections} onClearAll={clearAll} {...props} />
+        <CatalogFiltersSidebar sections={orderedSections} onClearAll={clearAll} canClear={totalSelectedFilters > 0} {...props} />
       </>
     );
 
