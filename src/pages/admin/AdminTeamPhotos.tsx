@@ -6,13 +6,13 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { prepareTeamPhoto } from "@/lib/teamPhoto";
-import vilnisPhoto from "@/assets/team/vilnis-lacis.webp";
-import eriksPhoto from "@/assets/team/eriks-lacis.webp";
-import lauraPhoto from "@/assets/team/laura-daukste.webp";
-import ilonaPhoto from "@/assets/team/ilona-romanovska.webp";
-import santaPhoto from "@/assets/team/santa-zvaigzne.webp";
-import justinePhoto from "@/assets/team/justine-strunka.webp";
-import evitaPhoto from "@/assets/team/evita-nesterova.webp";
+import vilnisPhotoAsset from "@/assets/team/team-vilnis.webp.asset.json";
+import eriksPhotoAsset from "@/assets/team/team-eriks.webp.asset.json";
+import lauraPhotoAsset from "@/assets/team/team-laura.webp.asset.json";
+import ilonaPhotoAsset from "@/assets/team/team-ilona.webp.asset.json";
+import santaPhotoAsset from "@/assets/team/team-santa.webp.asset.json";
+import justinePhotoAsset from "@/assets/team/team-justine.webp.asset.json";
+import evitaPhotoAsset from "@/assets/team/team-evita.webp.asset.json";
 
 type PhotoSettings = {
   slug: string;
@@ -23,13 +23,13 @@ type PhotoSettings = {
 };
 
 const people = [
-  { slug: "vilnis", name: "Vilnis Lācis", photo: vilnisPhoto },
-  { slug: "eriks", name: "Ēriks Lācis", photo: eriksPhoto },
-  { slug: "laura", name: "Laura Daukšte", photo: lauraPhoto },
-  { slug: "ilona", name: "Ilona Romanovska", photo: ilonaPhoto },
-  { slug: "santa", name: "Santa Zvaigzne", photo: santaPhoto },
-  { slug: "justine", name: "Justīne Strunka", photo: justinePhoto },
-  { slug: "evita", name: "Evita Ņesterova", photo: evitaPhoto },
+  { slug: "vilnis", name: "Vilnis Lācis", photo: `https://ervitex.lovable.app${vilnisPhotoAsset.url}` },
+  { slug: "eriks", name: "Ēriks Lācis", photo: `https://ervitex.lovable.app${eriksPhotoAsset.url}` },
+  { slug: "laura", name: "Laura Daukšte", photo: `https://ervitex.lovable.app${lauraPhotoAsset.url}` },
+  { slug: "ilona", name: "Ilona Romanovska", photo: `https://ervitex.lovable.app${ilonaPhotoAsset.url}` },
+  { slug: "santa", name: "Santa Zvaigzne", photo: `https://ervitex.lovable.app${santaPhotoAsset.url}` },
+  { slug: "justine", name: "Justīne Strunka", photo: `https://ervitex.lovable.app${justinePhotoAsset.url}` },
+  { slug: "evita", name: "Evita Ņesterova", photo: `https://ervitex.lovable.app${evitaPhotoAsset.url}` },
 ];
 
 const defaults = (slug: string): PhotoSettings => ({ slug, zoom: 1, position_x: 50, position_y: 50 });

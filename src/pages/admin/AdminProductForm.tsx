@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, X, Upload } from "lucide-react";
 import { clearCatalogCache } from "@/lib/catalogCache";
 import { catalogBrandForCategory, publicCatalogBrand } from "@/lib/etxCatalog";
+import { prepareTeamPhoto } from "@/lib/teamPhoto";
 
 const PRINTING_TECHS = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
 const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
@@ -81,15 +82,18 @@ const AdminProductForm = () => {
   };
 
   const uploadFile = async (file: File): Promise<string | null> => {
-    const ext = file.name.split(".").pop();
-    const path = `${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from("product-images").upload(path, file);
-    if (error) {
-      toast({ title: "Augšupielāde neizdevās", description: error.message, variant: "destructive" });
+    try {
+      const photo = await prepareTeamPhoto(file);
+      const path = `${crypto.randomUUID()}.webp`;
+      const { error } = await supabase.storage.from("product-images").upload(path, photo, {
+        contentType: "image/webp", cacheControl: "31536000",
+      });
+      if (error) throw error;
+      return supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+    } catch (error) {
+      toast({ title: "Augšupielāde neizdevās", description: error instanceof Error ? error.message : undefined, variant: "destructive" });
       return null;
     }
-    const { data } = supabase.storage.from("product-images").getPublicUrl(path);
-    return data.publicUrl;
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

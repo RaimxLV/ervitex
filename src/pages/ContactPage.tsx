@@ -14,22 +14,22 @@ import GoogleMapEmbed, { GMAPS_URL, WAZE_URL } from "@/components/GoogleMapEmbed
 import HausmanaKvartalsMap from "@/components/HausmanaKvartalsMap";
 import StoreLocations from "@/components/contact/StoreLocations";
 import SectionHeading from "@/components/contact/SectionHeading";
-import vilnisPhoto from "@/assets/team/vilnis-lacis.webp";
-import eriksPhoto from "@/assets/team/eriks-lacis.webp";
-import lauraPhoto from "@/assets/team/laura-daukste.webp";
-import ilonaPhoto from "@/assets/team/ilona-romanovska.webp";
-import santaPhoto from "@/assets/team/santa-zvaigzne.webp";
-import justinePhoto from "@/assets/team/justine-strunka.webp";
-import evitaPhoto from "@/assets/team/evita-nesterova.webp";
+import vilnisPhotoAsset from "@/assets/team/team-vilnis.webp.asset.json";
+import eriksPhotoAsset from "@/assets/team/team-eriks.webp.asset.json";
+import lauraPhotoAsset from "@/assets/team/team-laura.webp.asset.json";
+import ilonaPhotoAsset from "@/assets/team/team-ilona.webp.asset.json";
+import santaPhotoAsset from "@/assets/team/team-santa.webp.asset.json";
+import justinePhotoAsset from "@/assets/team/team-justine.webp.asset.json";
+import evitaPhotoAsset from "@/assets/team/team-evita.webp.asset.json";
 
 const specialists = [
-  { slug: "laura", name: "Laura Daukšte", title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" }, email: "laura@ervitex.lv", phone: "+371 26164635", phoneLabel: { lv: "Mob", en: "Mob" }, photo: lauraPhoto },
-  { slug: "ilona", name: "Ilona Romanovska", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "ilona@ervitex.lv", phone: "+371 29494626", phone2: "+371 67436896", phoneLabel: { lv: "Mob", en: "Mob" }, photo: ilonaPhoto },
-  { slug: "santa", name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "+371 67436899", phone2: "+371 27122420", phoneLabel: { lv: "Tel", en: "Tel" }, photo: santaPhoto },
-  { slug: "justine", name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "+371 29725412", phone2: "+371 67543384", phoneLabel: { lv: "Mob", en: "Mob" }, photo: justinePhoto },
-  { slug: "evita", name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: evitaPhoto },
-  { slug: "vilnis", name: "Vilnis Lācis", title: { lv: "Valdes priekšsēdētājs", en: "Chairman of the Board" }, email: "vilnis@ervitex.lv", phone: "+371 67543384", phoneLabel: { lv: "Tel", en: "Tel" }, photo: vilnisPhoto },
-  { slug: "eriks", name: "Ēriks Lācis", title: { lv: "Tirdzniecības direktors", en: "Sales Director" }, email: "eriks@ervitex.lv", phone: "+371 29395600", phoneLabel: { lv: "Mob", en: "Mob" }, photo: eriksPhoto },
+  { slug: "laura", name: "Laura Daukšte", title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" }, email: "laura@ervitex.lv", phone: "+371 26164635", phoneLabel: { lv: "Mob", en: "Mob" }, photo: `https://ervitex.lovable.app${lauraPhotoAsset.url}` },
+  { slug: "ilona", name: "Ilona Romanovska", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "ilona@ervitex.lv", phone: "+371 29494626", phone2: "+371 67436896", phoneLabel: { lv: "Mob", en: "Mob" }, photo: `https://ervitex.lovable.app${ilonaPhotoAsset.url}` },
+  { slug: "santa", name: "Santa Zvaigzne", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "santa.k@ervitex.lv", phone: "+371 67436899", phone2: "+371 27122420", phoneLabel: { lv: "Tel", en: "Tel" }, photo: `https://ervitex.lovable.app${santaPhotoAsset.url}` },
+  { slug: "justine", name: "Justīne Strunka", title: { lv: "Projektu vadītāja", en: "Project Manager" }, email: "justine@ervitex.lv", phone: "+371 29725412", phone2: "+371 67543384", phoneLabel: { lv: "Mob", en: "Mob" }, photo: `https://ervitex.lovable.app${justinePhotoAsset.url}` },
+  { slug: "evita", name: "Evita Ņesterova", title: { lv: "Mazumtirdzniecība", en: "Retail" }, email: "evita@ervitex.lv", phone: "+371 29475227", phoneLabel: { lv: "Tel", en: "Tel" }, photo: `https://ervitex.lovable.app${evitaPhotoAsset.url}` },
+  { slug: "vilnis", name: "Vilnis Lācis", title: { lv: "Valdes priekšsēdētājs", en: "Chairman of the Board" }, email: "vilnis@ervitex.lv", phone: "+371 67543384", phoneLabel: { lv: "Tel", en: "Tel" }, photo: `https://ervitex.lovable.app${vilnisPhotoAsset.url}` },
+  { slug: "eriks", name: "Ēriks Lācis", title: { lv: "Tirdzniecības direktors", en: "Sales Director" }, email: "eriks@ervitex.lv", phone: "+371 29395600", phoneLabel: { lv: "Mob", en: "Mob" }, photo: `https://ervitex.lovable.app${eriksPhotoAsset.url}` },
 ];
 
 const teamGroups: { label: { lv: string; en: string }; slugs: string[] }[] = [
