@@ -318,14 +318,15 @@ const RetailSection = () => {
             )}
           </h2>
 
-          <p className="mt-5 max-w-2xl text-base font-bold leading-snug tracking-tight sm:mt-8 sm:text-2xl lg:text-[1.75rem]">
+          <p className="mt-5 max-w-2xl text-base font-bold leading-snug tracking-tight [text-wrap:balance] sm:mt-8 sm:text-2xl lg:text-[1.75rem]">
             {lang === "lv" ? (
               <>
                 Izveido savu dizainu{" "}
                 <span className="font-extrabold uppercase text-accent drop-shadow-[0_0_18px_hsl(var(--accent)/0.6)]">
                   ONLINE
                 </span>{" "}
-                un saņem 1–2 dienās jebkurā pakomātā visā LATVIJĀ.
+                un saņem <span className="whitespace-nowrap">1–2 dienās</span> jebkurā{" "}
+                <span className="whitespace-nowrap">pakomātā</span> visā LATVIJĀ.
               </>
             ) : (
               <>
@@ -333,7 +334,8 @@ const RetailSection = () => {
                 <span className="font-extrabold uppercase text-accent drop-shadow-[0_0_18px_hsl(var(--accent)/0.6)]">
                   ONLINE
                 </span>{" "}
-                and get it in 1–2 days to any parcel locker in Latvia.
+                and get it in <span className="whitespace-nowrap">1–2 days</span> to any{" "}
+                <span className="whitespace-nowrap">parcel locker</span> in Latvia.
               </>
             )}
           </p>
