@@ -52,8 +52,10 @@ const loadRows = (): Promise<Row[]> => {
     const priced = new Set(
       prices.filter((p) => Number(p.min_price) > 0).map((p) => `${p.source}:${p.style_code}`),
     );
+    const { data: rem } = await supabase.from("catalog_remnants" as any).select("source,style_code").range(0, 4999);
+    const remnants = new Set(((rem || []) as any[]).map((r) => `${r.source}:${r.style_code}`));
     return items
-      .filter((it) => it?.id && it.name && (it.source === "etx" || priced.has(`${it.source}:${it.id}`)))
+      .filter((it) => it?.id && it.name && !remnants.has(`${it.source}:${it.id}`) && (it.source === "etx" || priced.has(`${it.source}:${it.id}`)))
       .map((it) => ({
         ...it,
         category:
