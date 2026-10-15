@@ -2,7 +2,7 @@
 
 ## Pasūtīšanas paziņojuma noformējums — 15.10.2026
 - [x] Datorā paziņojums zem foto kreisajā pusē, telefonā pie daudzumiem; bez kategoriju virsrakstiem, dabiskāks LV/EN teksts un atturīgs izkārtojums.
-- [ ] Pārbaudīt preces skatu datorā un telefonā, kā arī minimumu testus.
+- [x] STWW973 pārbaudīts datorā un telefonā: viens redzams paziņojums pareizajā vietā, bez pārplūdes un lapas kļūdām; 13 minimumu testi sekmīgi, build OK.
 
 ## Kategoriju pasūtījuma paziņojumi — 15.10.2026
 - [x] Kopīgs informatīvs paziņojums pie klienta preces daudzumu izvēles, atbilstoši kategorijai; minimumi un ieteikumi LV/EN, bez nosūtīšanas bloķēšanas.
