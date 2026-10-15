@@ -86,7 +86,9 @@ export function useSearchParams(): [URLSearchParams, (init: URLSearchParams | Re
   const loc = tsLocation();
   const nav = tsNavigate();
   const router = useRouter();
-  const params = useMemo(() => new URLSearchParams(loc.searchStr ?? ""), [loc.searchStr]);
+  const params = useMemo(() => new URLSearchParams(
+    Object.entries(loc.search).map(([key, value]) => [key, String(value)]),
+  ), [loc.search]);
   const setParams = useCallback(
     (
       init: URLSearchParams | Record<string, string> | ((prev: URLSearchParams) => URLSearchParams),
@@ -96,7 +98,7 @@ export function useSearchParams(): [URLSearchParams, (init: URLSearchParams | Re
       // snapshot — react-router passes call-time params, and chained updates
       // within one tick must see each other's writes.
       const live = router.state.location;
-      const current = new URLSearchParams(live.searchStr ?? "");
+      const current = new URLSearchParams(Object.entries(live.search).map(([key, value]) => [key, String(value)]));
       const next =
         typeof init === "function"
           ? init(current)
