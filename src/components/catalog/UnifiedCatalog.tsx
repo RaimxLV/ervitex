@@ -1231,15 +1231,30 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               </SheetTrigger>
               <SheetContent side="left" className="w-[88vw] max-w-sm overflow-y-auto p-4">
                 <SheetHeader className="mb-3 text-left">
-                  <SheetTitle className="font-heading text-[11px] font-bold uppercase tracking-[0.18em] flex items-center gap-2">
-                    <SlidersHorizontal className="h-3.5 w-3.5 text-accent" />
-                    {lang === "lv" ? "Filtri" : "Filters"}
-                    {totalSelectedFilters > 0 && (
-                      <span className="rounded-full bg-accent px-2 py-[1px] text-[10px] font-bold text-accent-foreground">
-                        {totalSelectedFilters}
-                      </span>
-                    )}
-                  </SheetTitle>
+                  <div className="flex items-center justify-between gap-3">
+                    <SheetTitle className="font-heading text-[11px] font-bold uppercase tracking-[0.18em] flex items-center gap-2">
+                      <SlidersHorizontal className="h-3.5 w-3.5 text-accent" />
+                      {lang === "lv" ? "Filtri" : "Filters"}
+                      {totalSelectedFilters > 0 && (
+                        <span className="rounded-full bg-accent px-2 py-[1px] text-[10px] font-bold text-accent-foreground">
+                          {totalSelectedFilters}
+                        </span>
+                      )}
+                    </SheetTitle>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={clearAll}
+                      disabled={totalSelectedFilters === 0}
+                      className={`h-8 shrink-0 gap-1.5 border-border px-3 font-heading text-[11px] font-bold uppercase tracking-wider transition-colors hover:border-accent hover:text-accent ${
+                        totalSelectedFilters === 0 ? "opacity-45" : ""
+                      }`}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                      {lang === "lv" ? "Notīrīt filtrus" : "Clear filters"}
+                    </Button>
+                  </div>
                 </SheetHeader>
                 <div>
                   {renderFilters({ hideHeader: true })}
