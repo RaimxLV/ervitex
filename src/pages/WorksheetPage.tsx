@@ -14,6 +14,7 @@ import logo from "@/assets/ervitex-logo-dark.svg";
 import { useAuth } from "@/hooks/useAuth";
 import { startWorksheetPick } from "@/lib/worksheetPick";
 import RowVariantControls from "@/components/worksheet/RowVariantControls";
+import { fillMissingPrices } from "@/lib/fillMissingPrices";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import DiscountField from "@/components/quote/DiscountField";
 import { AccentIcon } from "@/components/ui/accent-icon";
@@ -119,6 +120,23 @@ const WorksheetPage = () => {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  // Rindām bez cenas PM skatā cenu ieliekam no kataloga (mūsu cena bez PVN) un saglabājam melnrakstu.
+  const priceFilled = useRef(false);
+  useEffect(() => {
+    if (loading || !isAdmin || sheet?.locked || priceFilled.current) return;
+    if (!items.some((i) => !(Number(i.unitPrice) > 0))) return;
+    priceFilled.current = true;
+    (async () => {
+      const filled = await fillMissingPrices(items);
+      const changed = filled.filter((f, idx) => f.unitPrice !== items[idx].unitPrice);
+      if (!changed.length) return;
+      const byId = new Map(changed.map((c) => [c.id, c.unitPrice]));
+      setItems((prev) => prev.map((i) => (byId.has(i.id) && !(Number(i.unitPrice) > 0) ? { ...i, unitPrice: byId.get(i.id) } : i)));
+      setDirty(true);
+      setSaveState("idle");
+    })();
+  }, [loading, isAdmin, sheet?.locked, items]);
 
   const totals = useMemo(() => worksheetTotals(items, sheet?.vat_rate ?? 21, discount), [items, sheet?.vat_rate, discount]);
   const orderPrints = useMemo(
