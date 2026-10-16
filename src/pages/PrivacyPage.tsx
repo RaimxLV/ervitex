@@ -168,6 +168,11 @@ const PrivacyPage = () => {
                     ))}
                   </ul>
                 )}
+                {section.afterBullets?.map((p) => (
+                  <p key={p.slice(0, 32)} className="mt-3 leading-relaxed text-muted-foreground">
+                    <EmailText text={p} />
+                  </p>
+                ))}
               </div>
             </li>
           ))}
