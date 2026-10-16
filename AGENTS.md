@@ -22,7 +22,7 @@
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
 - Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
 - Galleries decode before switching and retain frames on failure. Mobile cards fetch nearby public images by colour; controls sit outside links to prevent navigation. Hover shows only loaded photos; Malfini prefers clean fronts over diagrams.
-- BrandLogo serves cards; ETX shows Ervitex. Russell galleries share russellImagesForColor; no unclassified campaigns or other-colour fallback.
+- BrandLogo serves cards; ETX shows Ervitex. Russell shares model/colour validation and supplier colorProductMap labels to avoid wrong photos.
 - tech_galleries stores stable order/membership refs (s:<tech>:<index> for built-ins, public URLs for uploads), applied over static data so rebuilds preserve order.
 - UTT uses `utt-sync` Data Export into `utt_*`; service-role-only `utt_prices`; images mirrored in `utt-images` because UTT blocks hotlinking.
 - `.hero-ultra` uses -webkit-text-stroke for weight; repeat leading per breakpoint.
