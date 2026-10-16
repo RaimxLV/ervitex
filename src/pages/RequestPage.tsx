@@ -143,7 +143,7 @@ const RequestPage = () => {
       clear();
       navigate("/");
     } catch (err: any) {
-      toast({ title: t("Kļūda", "Error"), description: err.message, variant: "destructive" });
+      toast({ title: t("Kļūda", "Error"), description: /rate_limited/.test(err?.message || "") ? t("Pārāk daudz pieprasījumu. Mēģini pēc minūtes.", "Too many requests. Try again in a minute.") : err.message, variant: "destructive" });
     } finally {
       setSending(false);
     }
