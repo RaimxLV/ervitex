@@ -66,25 +66,13 @@ export const offerTotals = (items: OfferItem[], vatRate = VAT_DEFAULT, discount?
   return { goods, print, subtotal, discount: disc, net, vat, gross: round2(net + vat), qty: items.reduce((s, i) => s + i.qty, 0) };
 };
 
-/** Publiskā, strādājošā lapas bāze (GitHub Pages), ko izmanto, ja nav pieejams window. */
+/** Publiskā lapas adrese. */
 const PUBLIC_APP_BASE = "https://www.ervitex.lv";
 
-/**
- * Absolūta saite uz piedāvājumu klientam.
- * Ja admins strādā uz publiskās vietnes (GitHub Pages / ervitex domēna), lieto to pašu hostu;
- * citādi (Lovable preview u.c.) vienmēr lieto publisko GitHub Pages adresi, lai klientam saite strādā.
- */
-export const offerUrl = (token: string) => {
-  let base = PUBLIC_APP_BASE;
-  if (typeof window !== "undefined") {
-    const host = window.location.hostname;
-    const isPublic = host.endsWith("github.io") || host.endsWith("ervitex.lv");
-    if (isPublic) base = `${window.location.origin}${import.meta.env.BASE_URL || "/"}`.replace(/\/+$/, "");
-  }
-  return `${base}/piedavajums/${token}`;
-};
+/** Absolūta saite uz piedāvājumu klientam — vienmēr www.ervitex.lv. */
+export const offerUrl = (token: string) => `${PUBLIC_APP_BASE}/piedavajums/${token}`;
 
-/** Relatīva saite (ņem vērā GitHub Pages apakšceļu) — priekš iekšējiem `<a href>`. */
+/** Relatīva saite priekš iekšējiem `<a href>`. */
 export const offerPath = (token: string, search = "") =>
   `${(import.meta.env.BASE_URL || "/").replace(/\/+$/, "")}/piedavajums/${token}${search}`;
 

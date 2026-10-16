@@ -610,12 +610,6 @@ export const techs: Tech[] = [
   },
 ];
 
-// GitHub Pages cannot serve Lovable's asset route from its own origin.
-if (typeof window !== "undefined" && window.location.hostname.endsWith("github.io")) {
-  techs.forEach((tech) => {
-    tech.images = tech.images.map((src) => src.startsWith("/__l5e/assets-v1/") ? `https://ervitex.lovable.app${src}` : src);
-  });
-}
 
 /** Stable references for built-in photos ("s:<tech>:<index>"), so saved order survives rebuilds. */
 export const staticImageUrls: Record<string, string> = {};
