@@ -23,9 +23,12 @@ export function initAnalytics() {
   document.head.appendChild(script);
 
   window.dataLayer = window.dataLayer || [];
-  window.gtag = function gtag(...args: unknown[]) {
-    window.dataLayer!.push(args);
-  };
+  // gtag.js needs the real Arguments object; plain arrays are ignored and no hits are sent.
+  window.gtag = function gtag() {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer!.push(arguments);
+  } as (...args: unknown[]) => void;
+  window.gtag("set", "developer_id.dZjgwMW", true);
   window.gtag("js", new Date());
   window.gtag("config", measurementId);
 }
