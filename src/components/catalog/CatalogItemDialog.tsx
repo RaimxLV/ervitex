@@ -14,7 +14,7 @@ import { Link } from "@/lib/router-compat";
 import { ColorSelector } from "@/components/quote/ColorSelector";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
 import { OrderMinimumNotice } from "@/components/quote/OrderMinimumNotice";
-import { Check } from "lucide-react";
+import { Check, Share2, Link2 } from "lucide-react";
 import { AccentIcon } from "@/components/ui/accent-icon";
 import { assignCareIcons } from "./CareIcons";
 import { GalleryImage } from "@/components/GalleryImage";
@@ -1135,6 +1135,7 @@ const CatalogItemDialog = ({
     { color_code: string | null; size: string | null; retail_price: number; currency: string | null }[]
   >([]);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   /** Size that must be applied right after the initial colour preselection. */
   const pendingSizeRef = useRef<string | null>(null);
 
@@ -1263,6 +1264,15 @@ const CatalogItemDialog = ({
   }, [currentColor, displayDetail, image, source]);
 
   const mainImg = gallery[imgIndex] || gallery[0] || (source === "ru" && currentColor ? null : image);
+
+  // Dalīšanas saite uz produkta lapu (www.ervitex.lv) ar izvēlēto krāsu.
+  const shareUrl = useMemo(() => {
+    const base = typeof window !== "undefined" && window.location.hostname.endsWith("ervitex.lv")
+      ? window.location.origin
+      : "https://www.ervitex.lv";
+    const colorQuery = currentColor?.code ? `?color=${encodeURIComponent(currentColor.code)}` : "";
+    return `${base}/catalog/item/${source}/${encodeURIComponent(id)}${colorQuery}`;
+  }, [source, id, currentColor?.code]);
   useEffect(() => {
     if (!open || !gallery.length) return;
     warmGalleryImages([gallery[(imgIndex + 1) % gallery.length], gallery[(imgIndex - 1 + gallery.length) % gallery.length]]
@@ -1436,6 +1446,9 @@ const CatalogItemDialog = ({
       allColors: "Visas krāsas",
       code: "Kods",
       supplier: "Piegādātājs",
+      share: "Dalīties",
+      copy: "Kopēt saiti",
+      copied: "Nokopēts",
     },
     en: {
       description: "Description",
@@ -1449,6 +1462,9 @@ const CatalogItemDialog = ({
       allColors: "All colours",
       code: "Code",
       supplier: "Supplier",
+      share: "Share",
+      copy: "Copy link",
+      copied: "Copied",
     },
   }[lang];
 
