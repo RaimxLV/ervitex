@@ -603,6 +603,18 @@ const AdminOfferEdit = () => {
             <Input readOnly value={link} className="text-xs" onFocus={(e) => e.currentTarget.select()} />
 
             <Button
+              variant="outline"
+              className="w-full"
+              disabled={!offer.token || saving}
+              onClick={async () => {
+                const w = window.open("", "_blank");
+                await save();
+                if (offer.token) { if (w) w.location.href = offerPath(offer.token); else window.open(offerPath(offer.token), "_blank"); }
+              }}
+            >
+              <ExternalLink className="mr-2 h-4 w-4" /> Apskatīt piedāvājumu
+            </Button>
+            <Button
               className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
               onClick={() => sendEmail("client")}
               disabled={sendingEmail !== null || saving}
