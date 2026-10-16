@@ -1564,6 +1564,68 @@ const CatalogItemDialog = ({
                 ))}
               </div>
             )}
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 font-heading text-[11px] font-semibold uppercase tracking-wider"
+                onClick={async () => {
+                  if (navigator.share) {
+                    try {
+                      await navigator.share({ title: displayDetail.title || name || id, url: shareUrl });
+                    } catch {
+                      /* lietotājs atcēla */
+                    }
+                    return;
+                  }
+                  try {
+                    if (navigator.clipboard?.writeText) {
+                      await navigator.clipboard.writeText(shareUrl);
+                    } else {
+                      const ta = document.createElement("textarea");
+                      ta.value = shareUrl;
+                      document.body.appendChild(ta);
+                      ta.select();
+                      document.execCommand("copy");
+                      ta.remove();
+                    }
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  } catch {
+                    /* ignorējam */
+                  }
+                }}
+              >
+                <Share2 className="mr-1.5 h-3.5 w-3.5" />
+                {label.share}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 font-heading text-[11px] font-semibold uppercase tracking-wider"
+                onClick={async () => {
+                  try {
+                    if (navigator.clipboard?.writeText) {
+                      await navigator.clipboard.writeText(shareUrl);
+                    } else {
+                      const ta = document.createElement("textarea");
+                      ta.value = shareUrl;
+                      document.body.appendChild(ta);
+                      ta.select();
+                      document.execCommand("copy");
+                      ta.remove();
+                    }
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  } catch {
+                    /* ignorējam */
+                  }
+                }}
+              >
+                {copied ? <Check className="mr-1.5 h-3.5 w-3.5" /> : <Link2 className="mr-1.5 h-3.5 w-3.5" />}
+                {copied ? label.copied : label.copy}
+              </Button>
+            </div>
             {!loading && !canFlagStock && <OrderMinimumNotice source={source} category={category || detail?.category} name={name || detail?.title} className="hidden md:block" />}
           </div>
 
