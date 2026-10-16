@@ -25,6 +25,7 @@ import RouteSeo from "@/components/RouteSeo";
 import NotFound from "@/pages/NotFound";
 import { HEAD_BOOTSTRAP_SCRIPT } from "@/lib/head-bootstrap";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
+import { initAnalytics, trackPageView } from "@/lib/analytics";
 
 const TITLE = "Ervitex — apģērbu vairumtirdzniecība un apdruka Rīgā";
 const DESCRIPTION =
