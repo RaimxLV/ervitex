@@ -143,17 +143,8 @@ export const worksheetTotals = (items: WorksheetItem[], vatRate = 21, discount?:
 
 const PUBLIC_APP_BASE = "https://www.ervitex.lv";
 
-/** Absolūta saite uz kopīgo preču sarakstu (darbojas arī no e-pasta). */
-export const worksheetUrl = (token: string) => {
-  let base = PUBLIC_APP_BASE;
-  if (typeof window !== "undefined") {
-    const host = window.location.hostname;
-    if (host.endsWith("github.io") || host.endsWith("ervitex.lv")) {
-      base = `${window.location.origin}${import.meta.env.BASE_URL || "/"}`.replace(/\/+$/, "");
-    }
-  }
-  return `${base}/saraksts/${token}`;
-};
+/** Absolūta saite uz kopīgo preču sarakstu — vienmēr www.ervitex.lv. */
+export const worksheetUrl = (token: string) => `${PUBLIC_APP_BASE}/saraksts/${token}`;
 
 /** Relatīva saite iekšējai navigācijai. */
 export const worksheetPath = (token: string) =>
