@@ -356,7 +356,7 @@ const WorksheetPage = () => {
               const open = !readOnly && openId === i.id;
               return (
               <div key={i.id} className="overflow-hidden rounded-md border border-border bg-background print:break-inside-avoid">
-                <div className="grid grid-cols-3 items-start gap-x-4 gap-y-4 p-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,.45fr)_minmax(0,.6fr)_minmax(0,1fr)] md:items-center print:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,.45fr)_minmax(0,.6fr)_minmax(0,1fr)]">
+                <div className="grid grid-cols-3 items-start gap-x-4 gap-y-4 p-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,.45fr)_minmax(0,.6fr)_minmax(0,.7fr)_minmax(0,1fr)] md:items-center print:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,.45fr)_minmax(0,.6fr)_minmax(0,.7fr)_minmax(0,1fr)]">
                   <div
                     className="col-span-3 flex min-w-0 items-center gap-3 text-left md:col-span-1 print:col-span-1"
                   >
@@ -377,10 +377,11 @@ const WorksheetPage = () => {
                   <div className="min-w-0 text-sm"><span className="mb-1 block text-xs text-muted-foreground md:hidden print:hidden">Krāsa</span><span className="flex items-start gap-2">{i.colorHex && <span className="mt-1 h-3 w-3 shrink-0 rounded-full border border-border" style={{ background: i.colorHex }} />}<span className="break-words font-medium">{i.colorName || "—"}</span></span></div>
                   <div className="text-sm"><span className="mb-1 block text-xs text-muted-foreground md:hidden print:hidden">Izmērs</span><span className="font-medium">{i.size || "—"}</span></div>
                   <div className="text-right text-sm"><span className="mb-1 block text-xs text-muted-foreground md:hidden print:hidden">Daudzums</span><span className="font-medium tabular-nums">{i.qty} gab.</span></div>
+                  <div className="text-right text-sm tabular-nums"><span className="mb-1 block text-xs text-muted-foreground md:hidden print:hidden">1 gab.</span><span className="font-medium">{i.unitPrice ? money(i.unitPrice) : "—"}</span></div>
                   <div className="col-span-3 border-t border-border pt-3 text-right md:col-span-1 md:border-0 md:pt-0 print:col-span-1 print:border-0 print:pt-0">
-                    <span className="block font-heading text-base font-bold tabular-nums">{money(lineNet(i))}</span>
+                    <span className="block font-heading text-base font-bold tabular-nums">{lineNet(i) ? money(lineNet(i)) : "—"}</span>
                     <span className="block text-xs text-muted-foreground">bez PVN</span>
-                    <span className="mt-1 block text-xs text-muted-foreground tabular-nums">{money(lineNet(i) * (1 + (sheet.vat_rate || 21) / 100))} ar PVN</span>
+                    <span className="mt-1 block text-xs text-muted-foreground tabular-nums">{lineNet(i) ? money(lineNet(i) * (1 + (sheet.vat_rate || 21) / 100)) : "—"} ar PVN</span>
                   </div>
                 </div>
                 {!readOnly && <div className="flex justify-end gap-2 border-t border-border px-4 py-2 print:hidden">
