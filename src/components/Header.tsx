@@ -167,15 +167,15 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-primary/95 backdrop-blur-md text-primary-foreground">
-      <div className="relative flex h-16 items-center justify-between gap-2 px-4 sm:px-6 md:h-20">
-        <Link to="/" className="flex shrink-0 items-center gap-2 sm:gap-3">
+      <div className="relative grid h-16 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 sm:px-6 md:h-20 xl:flex xl:justify-between">
+        <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
           <img src={ervitexLogo} alt="Ervitex" className="h-9 w-auto shrink-0 sm:h-11 md:h-[52px]" />
           <span className="hidden h-6 w-px shrink-0 bg-primary-foreground/20 min-[370px]:block sm:h-7" />
           <img src={stellaLogo} alt="Stanley/Stella Dealer" className="hidden h-[21px] w-auto shrink opacity-70 min-[370px]:block sm:h-[27px]" />
         </Link>
 
         {/* Desktop nav */}
-        <nav className="mx-auto hidden items-center gap-7 whitespace-nowrap px-2 xl:flex">
+        <nav className="mx-auto hidden min-w-0 items-center gap-3 whitespace-nowrap px-2 xl:flex 2xl:gap-7">
           {navItems.map((item) => {
             const isCatalog = item.path === "/catalog";
             const active = location.pathname === item.path;
@@ -229,7 +229,7 @@ const Header = () => {
           })}
         </nav>
 
-        <div className="hidden items-center gap-3 xl:flex">
+        <div className="hidden shrink-0 items-center gap-1 xl:flex 2xl:gap-3">
           {isAdmin && <CreateOfferButton iconOnly />}
           {isAdmin && (
             <Button asChild variant="outline" size="sm" className="h-8 border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground">
@@ -303,9 +303,9 @@ const Header = () => {
           {/* Language switcher */}
           <LanguageSwitcher lang={lang} setLang={setLang} />
 
-          <a href="tel:+37167543384" className="flex items-center gap-1.5 whitespace-nowrap text-sm text-primary-foreground/70 hover:text-primary-foreground">
-            <Phone className="h-4 w-4" strokeWidth={1.5} />
-            +371 675 43384
+          <a href="tel:+37167543384" aria-label="+371 675 43384" title="+371 675 43384" className="flex shrink-0 items-center gap-1.5 whitespace-nowrap p-2 text-sm text-primary-foreground/70 hover:text-primary-foreground 2xl:p-0">
+            <Phone className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+            <span className="hidden 2xl:inline">+371 675 43384</span>
           </a>
         </div>
 
