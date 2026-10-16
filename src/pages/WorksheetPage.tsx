@@ -124,7 +124,7 @@ const WorksheetPage = () => {
   // Rindām bez cenas PM skatā cenu ieliekam no kataloga (mūsu cena bez PVN) un saglabājam melnrakstu.
   const priceFilled = useRef(false);
   useEffect(() => {
-    if (loading || !isAdmin || sheet?.locked || priceFilled.current) return;
+    if (loading || priceFilled.current) return;
     if (!items.some((i) => !(Number(i.unitPrice) > 0))) return;
     priceFilled.current = true;
     (async () => {
@@ -133,8 +133,11 @@ const WorksheetPage = () => {
       if (!changed.length) return;
       const byId = new Map(changed.map((c) => [c.id, c.unitPrice]));
       setItems((prev) => prev.map((i) => (byId.has(i.id) && !(Number(i.unitPrice) > 0) ? { ...i, unitPrice: byId.get(i.id) ?? null } : i)));
-      setDirty(true);
-      setSaveState("idle");
+      // Saglabā tikai PM; citiem cena tikai parādās skatā.
+      if (isAdmin && !sheet?.locked) {
+        setDirty(true);
+        setSaveState("idle");
+      }
     })();
   }, [loading, isAdmin, sheet?.locked, items]);
 
