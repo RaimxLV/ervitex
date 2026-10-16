@@ -127,6 +127,14 @@ const RouteFallback = () => <div className="min-h-[60svh]" />;
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    initAnalytics();
+    return router.subscribe("onResolved", (event) => {
+      trackPageView(event.toLocation.pathname + event.toLocation.searchStr);
+    });
+  }, [router]);
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
