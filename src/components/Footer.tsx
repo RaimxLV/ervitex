@@ -108,7 +108,7 @@ const Footer = () => {
                     Rīga, LV-1084
                   </div>
                   <div className="mt-1 text-primary-foreground/60 text-sm">
-                    {lang === "lv" ? "Reģ. Nr." : "Reg. No."} LV40002074377
+                    {lang === "lv" ? "Reģ. Nr." : "Reg. No."} 40002074377
                   </div>
                 </div>
               </li>
