@@ -16,7 +16,7 @@
 - "Ir noliktavā" is a manual admin flag in `stock_flags` per colour (`item_id` = `${id}::${color_code}`; bare `${id}` rows are legacy model-wide flags), separate from supplier data so syncs never erase it; it shows only in the product view for the selected colour, never on catalog cards; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.
 - Shared worksheet/offer prints use scope="order" in existing item JSON; orderPrinting preserves offer-wide prints on deletion, preventing duplicate charges and extra storage.
 - Stock mutation controls render only after the authenticated admin role resolves, and every mutation revalidates the live user and role before writing; public users only see the outlined availability label.
-- Native browser scrolling only (no Lenis: busy-thread jumps). WebGL depth follows scroll/eased fine-pointer movement, renders on change and pauses off-screen.
+- Native scrolling; ScrollToTop uses resolvedLocation so pending pages do not jump. WebGL follows scroll/eased pointers, renders on change, pauses off-screen.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - SSR (TanStack Start, Lovable hosting only): render paths avoid browser globals; route head() uses lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap.xml is built from catalog_items minus remnants/footwear so it stays current.
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
