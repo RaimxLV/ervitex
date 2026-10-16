@@ -1,8 +1,7 @@
 import ervitexWhiteLogo from "@/assets/ervitex-logo-2.svg";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Check, Copy, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Check, Copy } from "lucide-react";
 import { useGalleryNavigation } from "@/hooks/useGalleryNavigation";
 import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
 import { unproxyUrl } from "@/lib/imageProxy";
