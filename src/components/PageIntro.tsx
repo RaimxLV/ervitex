@@ -79,7 +79,7 @@ const PageIntro = ({ title, subtitle, eyebrow }: PageIntroProps) => {
         >
           <span className="block text-sm tracking-[0.04em] text-accent lg:text-base">{lv ? "Vairumtirdzniecības" : "Wholesale"}</span>
           <span className="block text-xs normal-case tracking-[0.02em] text-primary-foreground lg:text-sm">{lv ? "tekstila risinājumi" : "textile solutions"}</span>
-          <span className="block text-[0.7rem] tracking-[0.06em] text-accent lg:text-xs">{lv ? "& industriālā apdruka" : "& industrial printing"}</span>
+          <span className="block text-[0.7rem] tracking-[0.06em] text-accent lg:text-xs">{lv ? "un industriālā apdruka" : "and industrial printing"}</span>
         </motion.div>
           {subtitle && (
             <motion.div
