@@ -324,15 +324,11 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
         </div>
       </Tag>
       {frames.length > 1 && (
-        <div className="pointer-events-none absolute inset-x-0 top-0 aspect-[3/4] sm:hidden">
-          <div className="absolute inset-x-1 bottom-2 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-1">
-            <Button type="button" variant="outline" size="icon" aria-label={lang === "lv" ? "Iepriekšējais attēls" : "Previous image"} title={lang === "lv" ? "Iepriekšējais attēls" : "Previous image"}
-              className="pointer-events-auto h-8 w-8 rounded-full border-border/70 bg-card/95 text-foreground"
-              onClick={() => { setInteracted(true); gallery.move(-1); }}><ChevronLeft /></Button>
-            <span className="mx-auto rounded-full bg-card/95 px-2 py-1 text-[10px] tabular-nums text-muted-foreground" aria-live="polite">{gallery.index + 1} / {frames.length}</span>
-            <Button type="button" variant="outline" size="icon" aria-label={lang === "lv" ? "Nākamais attēls" : "Next image"} title={lang === "lv" ? "Nākamais attēls" : "Next image"}
-              className="pointer-events-auto h-8 w-8 rounded-full border-border/70 bg-card/95 text-foreground"
-              onClick={() => { setInteracted(true); gallery.move(1); }}><ChevronRight /></Button>
+        <div className="pointer-events-none absolute inset-x-0 top-0 aspect-[3/4] sm:hidden" aria-live="polite">
+          <div className="absolute inset-x-0 bottom-2 flex justify-center gap-1">
+            {frames.slice(0, 8).map((_, i) => (
+              <span key={i} className={`h-1.5 rounded-full transition-all ${i === gallery.index ? "w-4 bg-foreground/70" : "w-1.5 bg-foreground/25"}`} />
+            ))}
           </div>
         </div>
       )}
