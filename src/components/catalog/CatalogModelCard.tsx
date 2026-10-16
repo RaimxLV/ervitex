@@ -115,6 +115,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
     const triedHoverFallback = useRef(false);
     const frames = [...new Set([image, ...(images || []), hoverImage].filter((src): src is string => Boolean(src)))];
     const [interacted, setInteracted] = useState(false);
+    const [dragX, setDragX] = useState(0);
     const gallery = useGalleryNavigation(frames, 1, interacted);
     const touchStart = useRef<{ x: number; y: number } | null>(null);
     const suppressClickUntil = useRef(0);
@@ -146,15 +147,25 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
         className="group flex h-full w-full flex-col overflow-hidden border border-border bg-white text-left transition-colors hover:border-accent focus:outline-hidden focus:ring-2 focus:ring-accent"
       >
         <div className="relative aspect-[3/4] w-full shrink-0 touch-pan-y overflow-hidden bg-card"
+          style={{ transform: dragX ? `translateX(${dragX}px)` : undefined, transition: dragX ? "none" : "transform 200ms ease-out" }}
           onTouchStart={(event) => {
             const touch = event.touches[0];
             if (!touch) return;
             touchStart.current = { x: touch.clientX, y: touch.clientY };
             setInteracted(true);
           }}
+          onTouchMove={(event) => {
+            const start = touchStart.current;
+            const touch = event.touches[0];
+            if (!start || !touch || frames.length < 2) return;
+            const dx = touch.clientX - start.x;
+            const dy = touch.clientY - start.y;
+            if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.3) setDragX(Math.max(-80, Math.min(80, dx * 0.6)));
+          }}
           onTouchEnd={(event) => {
             const start = touchStart.current;
             touchStart.current = null;
+            setDragX(0);
             const touch = event.changedTouches[0];
             if (!start || !touch || frames.length < 2) return;
             const dx = touch.clientX - start.x;
@@ -163,7 +174,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
             suppressClickUntil.current = Date.now() + 500;
             gallery.move(dx < 0 ? 1 : -1);
           }}
-          onTouchCancel={() => { touchStart.current = null; }}>
+          onTouchCancel={() => { touchStart.current = null; setDragX(0); }}>
           {image ? (
             <>
               {!ready && <div className="absolute inset-0 animate-pulse bg-neutral-100" />}
