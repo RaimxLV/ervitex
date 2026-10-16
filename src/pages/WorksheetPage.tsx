@@ -349,8 +349,8 @@ const WorksheetPage = () => {
               </p>
             )}
 
-            {items.length > 0 && <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,.45fr)_minmax(0,.6fr)_minmax(0,1fr)] gap-4 border-b border-border px-4 pb-2 text-xs font-medium text-muted-foreground md:grid print:grid">
-              <span>Prece</span><span>Krāsa</span><span>Izmērs</span><span className="text-right">Daudzums</span><span className="text-right">Summa</span>
+            {items.length > 0 && <div className="hidden grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,.45fr)_minmax(0,.6fr)_minmax(0,.7fr)_minmax(0,1fr)] gap-4 border-b border-border px-4 pb-2 text-xs font-medium text-muted-foreground md:grid print:grid">
+              <span>Prece</span><span>Krāsa</span><span>Izmērs</span><span className="text-right">Daudzums</span><span className="text-right">1 gab.</span><span className="text-right">Summa</span>
             </div>}
             {items.map((i) => {
               const open = !readOnly && openId === i.id;
