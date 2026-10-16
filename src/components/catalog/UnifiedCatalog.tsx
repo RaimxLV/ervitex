@@ -989,7 +989,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const goToPage = (value: number) => {
     const nextPage = Math.min(Math.max(Math.round(value) || 1, 1), totalPages);
     setPage(nextPage);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: window.matchMedia("(max-width: 767px), (prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
   };
 
   const submitPageInput = () => {
@@ -1362,7 +1362,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                     <CatalogCard
                       key={`${it.source}-${it.id}`}
                       item={it}
-                      priority={idx < 8}
+                      priority={idx < 4}
                       lang={lang}
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}

@@ -70,11 +70,28 @@ export function useCatalogCardImages(ref: RefObject<HTMLElement | null>, source:
     const element = ref.current;
     if (!element) return;
     const media = window.matchMedia("(max-width: 767px), (pointer: coarse)");
+    const image = element.querySelector("img");
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let visible = false;
+    const schedule = () => {
+      if (!visible || !media.matches || timer !== undefined) return;
+      // Main photos take priority over gallery metadata during page changes.
+      timer = setTimeout(() => { setNear(true); observer.disconnect(); }, 200);
+    };
     const observer = new IntersectionObserver(entries => {
-      if (entries.some(entry => entry.isIntersecting) && media.matches) setNear(true);
-    }, { rootMargin: "150px" });
+      visible = entries.some(entry => entry.isIntersecting);
+      if (!visible && timer !== undefined) { clearTimeout(timer); timer = undefined; }
+      if (!image || image.complete) schedule();
+    }, { rootMargin: "50px" });
+    image?.addEventListener("load", schedule);
+    image?.addEventListener("error", schedule);
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (timer !== undefined) clearTimeout(timer);
+      image?.removeEventListener("load", schedule);
+      image?.removeEventListener("error", schedule);
+    };
   }, [ref]);
   useEffect(() => {
     if (!near) return;
