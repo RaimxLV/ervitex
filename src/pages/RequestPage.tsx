@@ -61,6 +61,9 @@ const RequestPage = () => {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (((e.currentTarget as HTMLFormElement).elements.namedItem("website") as HTMLInputElement | null)?.value) {
+      return;
+    }
     if (items.length === 0) {
       toast({ title: t("Pieprasījums ir tukšs", "Request is empty"), variant: "destructive" });
       return;
@@ -164,6 +167,10 @@ const RequestPage = () => {
           </div>
         ) : (
           <form onSubmit={submit} className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
+      <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
+        <label>Website<input type="text" name="website" tabIndex={-1} autoComplete="off" defaultValue="" /></label>
+      </div>
+      
             <div className="min-w-0 space-y-6 sm:space-y-8">
 
               {/* Items */}
