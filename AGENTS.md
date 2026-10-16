@@ -22,10 +22,10 @@
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
 - Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
 - Galleries decode before switching and retain frames on failure. Mobile cards fetch nearby public images by colour; controls sit outside links to prevent navigation. Hover shows only loaded photos; Malfini prefers clean fronts over diagrams.
-- BrandLogo serves all cards; ETX shows Ervitex.
+- BrandLogo serves cards; ETX shows Ervitex. Russell galleries share russellImagesForColor; no unclassified campaigns or other-colour fallback.
 - tech_galleries stores stable order/membership refs (s:<tech>:<index> for built-ins, public URLs for uploads), applied over static data so rebuilds preserve order.
 - UTT uses `utt-sync` Data Export into `utt_*`; service-role-only `utt_prices`; images mirrored in `utt-images` because UTT blocks hotlinking.
-- `.hero-ultra` thickens the 700-capped heading face with -webkit-text-stroke; repeat leading per breakpoint to override theme text-size line-height.
+- `.hero-ultra` uses -webkit-text-stroke for weight; repeat leading per breakpoint.
 - ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
 - QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.

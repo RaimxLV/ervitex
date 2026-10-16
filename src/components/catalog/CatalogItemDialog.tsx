@@ -22,6 +22,7 @@ import { warmGalleryImages } from "@/lib/galleryImages";
 import { separateProductSpecs, productTextLines, splitCareInstructions } from "@/lib/productContent";
 import { BrandLogo } from "@/components/BrandLogo";
 import { loadEtxProduct } from "@/lib/loadEtxProduct";
+import { russellImagesForColor } from "@/lib/russellImages";
 
 
 interface Props {
@@ -832,12 +833,12 @@ async function loadRU(styleCode: string): Promise<ProductDetail | null> {
   const sizes: string[] = Array.isArray(style.sizes) ? style.sizes.filter(Boolean) : [];
   const colors: ColorDetail[] = variants.map((v: any) => {
     const key = (v.color_name || "").toLowerCase();
-    const imgs = imgByColor.get(key) || [];
+    const imgs = russellImagesForColor(styleCode, v.color_name || "", images);
     return {
       code: v.color_name || key || "default",
       name: v.color_name || "",
       hex: cleanHex(v.color_hex),
-      images: imgs.length ? imgs : shared,
+      images: imgs,
       sizes: uniqueSortedSizes(sizes),
     };
   });
@@ -1256,11 +1257,12 @@ const CatalogItemDialog = ({
   const gallery = useMemo(() => {
     if (!currentColor) return displayDetail.images?.length ? displayDetail.images : image ? [image] : [];
     if (currentColor.images.length) return currentColor.images;
+    if (source === "ru") return [];
     for (const c of displayDetail.colors || []) if (c.images.length) return c.images.slice(0, 1);
     return image ? [image] : [];
-  }, [currentColor, displayDetail, image]);
+  }, [currentColor, displayDetail, image, source]);
 
-  const mainImg = gallery[imgIndex] || gallery[0] || image;
+  const mainImg = gallery[imgIndex] || gallery[0] || (source === "ru" && currentColor ? null : image);
   useEffect(() => {
     if (!open || !gallery.length) return;
     warmGalleryImages([gallery[(imgIndex + 1) % gallery.length], gallery[(imgIndex - 1 + gallery.length) % gallery.length]]

@@ -3,6 +3,7 @@ import type { RefObject } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { thumbUrl } from "@/lib/imageProxy";
+import { russellImagesForColor } from "@/lib/russellImages";
 
 type ImageRow = { color?: string | null; url?: string | null; alternate?: string | null; view?: string | null };
 
@@ -37,7 +38,7 @@ async function fetchImages(source: string, id: string): Promise<ImageRow[]> {
     case "ru": {
       const { data, error } = await supabase.from("ru_images").select("color_name,url").eq("style_code", id).order("sort_order");
       if (error) throw error;
-      return (data || []).map(r => ({ color: r.color_name, url: r.url }));
+      return (data || []).map(r => ({ color: r.color_name || (russellImagesForColor(id, "Black", [r]).length ? "Black" : "unclassified"), url: r.url }));
     }
     case "utt": {
       const { data, error } = await supabase.from("utt_images").select("color_name,url").eq("style_code", id).order("sort_order");
