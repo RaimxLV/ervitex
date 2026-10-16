@@ -66,7 +66,7 @@ const HeroSection = () => {
               {lang === "lv" ? "tekstila risinājumi" : "textile solutions"}
             </span>
             <span className="block text-[0.7em] text-accent sm:text-[0.78em]">
-              {lang === "lv" ? "& industriālā" : "& Industrial"}
+              {lang === "lv" ? "un industriālā" : "and Industrial"}
             </span>
             <span className="block text-[0.7em] text-accent sm:text-[0.78em]">
               {lang === "lv" ? "apdruka" : "Printing"}
