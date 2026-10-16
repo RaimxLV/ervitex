@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
     }
 
     const worksheetUrl = quote.action_token
-      ? `https://raimxlv.github.io/ervitex/saraksts/${quote.action_token}`
+      ? `https://www.ervitex.lv/saraksts/${quote.action_token}`
       : "";
 
     const baseData = {

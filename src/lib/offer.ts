@@ -67,7 +67,7 @@ export const offerTotals = (items: OfferItem[], vatRate = VAT_DEFAULT, discount?
 };
 
 /** Publiskā, strādājošā lapas bāze (GitHub Pages), ko izmanto, ja nav pieejams window. */
-const PUBLIC_APP_BASE = "https://raimxlv.github.io/ervitex";
+const PUBLIC_APP_BASE = "https://www.ervitex.lv";
 
 /**
  * Absolūta saite uz piedāvājumu klientam.

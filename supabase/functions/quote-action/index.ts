@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
         print_placement: quote.print_placement || '',
         print_colors: quote.print_colors || '',
         deadline: quote.deadline || '',
-        worksheetUrl: `https://raimxlv.github.io/ervitex/saraksts/${token}?v=pm`,
+        worksheetUrl: `https://www.ervitex.lv/saraksts/${token}?v=pm`,
       },
   })
 

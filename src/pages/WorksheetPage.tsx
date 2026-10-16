@@ -44,7 +44,7 @@ const WorksheetPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isStaff = isAdmin;
-  const publicUrl = `https://raimxlv.github.io/ervitex/saraksts/${token}`;
+  const publicUrl = `https://www.ervitex.lv/saraksts/${token}`;
 
   const copyEmailLink = async () => {
     const label = "ATVĒRT PREČU SARAKSTU";

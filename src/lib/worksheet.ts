@@ -141,7 +141,7 @@ export const worksheetTotals = (items: WorksheetItem[], vatRate = 21, discount?:
   };
 };
 
-const PUBLIC_APP_BASE = "https://raimxlv.github.io/ervitex";
+const PUBLIC_APP_BASE = "https://www.ervitex.lv";
 
 /** Absolūta saite uz kopīgo preču sarakstu (darbojas arī no e-pasta). */
 export const worksheetUrl = (token: string) => {
