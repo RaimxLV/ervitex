@@ -3,6 +3,7 @@ import { forwardRef, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { useGalleryNavigation } from "@/hooks/useGalleryNavigation";
+import { prepareGalleryImage } from "@/lib/galleryImages";
 import { bucketFromName, bucketFromHex, getBucket } from "@/lib/colorBuckets";
 import { unproxyUrl } from "@/lib/imageProxy";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -106,13 +107,22 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
   ) => {
     const [copied, setCopied] = useState(false);
     const [ready, setReady] = useState(false);
+    // Keep the previous colour on screen until the next one is decoded (no grey flash).
+    const [shownImage, setShownImage] = useState(image);
+    useEffect(() => {
+      if (!image || !shownImage || image === shownImage) { setShownImage(image); return; }
+      let live = true;
+      const done = () => { if (live) setShownImage(image); };
+      prepareGalleryImage(image).then(done, done);
+      return () => { live = false; };
+    }, [image]);
     const [hovered, setHovered] = useState(false);
     const [hoverFailed, setHoverFailed] = useState(false);
     const [hoverReady, setHoverReady] = useState(false);
     const baseImageRef = useRef<HTMLImageElement | null>(null);
     const triedFallback = useRef(false);
     const triedHoverFallback = useRef(false);
-    const frames = [...new Set([image, ...(images || []), hoverImage].filter((src): src is string => Boolean(src)))];
+    const frames = [...new Set([shownImage, ...(images || []), hoverImage].filter((src): src is string => Boolean(src)))];
     const [interacted, setInteracted] = useState(false);
     const [dragX, setDragX] = useState(0);
     const gallery = useGalleryNavigation(frames, 1, interacted);
@@ -133,7 +143,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
       setHoverFailed(false);
       triedFallback.current = false;
       triedHoverFallback.current = false;
-    }, [image, hoverImage]);
+    }, [shownImage, hoverImage]);
     // Kā saite: parastais klikšķis atver šeit, Ctrl/Cmd/vidējais klikšķis atver jaunā cilnē.
     const asLink = as === "a" && !!href;
     const Tag = asLink ? "a" : "button";
@@ -187,7 +197,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
               {!ready && <div className="absolute inset-0 animate-pulse bg-neutral-100" />}
               <img
                 ref={baseImageRef}
-                src={frames[gallery.index] || image}
+                src={frames[gallery.index] || shownImage || image}
                 alt={imageAlt}
                 loading={priority ? "eager" : "lazy"}
                 fetchPriority={priority ? "high" : "auto"}
