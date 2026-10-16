@@ -2,7 +2,12 @@ import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-type Section = { title: string; paragraphs?: string[]; bullets?: { lead?: string; text: string }[] };
+type Section = {
+  title: string;
+  paragraphs?: string[];
+  bullets?: { lead?: string; text: string }[];
+  afterBullets?: string[];
+};
 
 const SECTIONS_LV: Section[] = [
   {
@@ -81,10 +86,7 @@ const SECTIONS_EN: Section[] = [
       { text: 'individuals – cooperation partners, employees, and third parties who receive or transfer any information to SIA "Ervitex" in connection with the provision of services (including contact persons, payers, etc.);' },
       { text: 'users of the website maintained by SIA "Ervitex".' },
     ],
-  },
-  {
-    title: "Legal Basis",
-    paragraphs: [
+    afterBullets: [
       'SIA "Ervitex" cares for personal privacy and data protection in accordance with Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and other laws in the field of privacy and data processing.',
       "This privacy policy applies to data processing regardless of the form in which the data is submitted, obtained or processed.",
     ],
