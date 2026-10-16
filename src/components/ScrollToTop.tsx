@@ -1,8 +1,11 @@
 import { useEffect } from "react";
-import { useLocation } from "@/lib/router-compat";
+import { useRouterState } from "@tanstack/react-router";
 
 const ScrollToTop = () => {
-  const { pathname, hash } = useLocation();
+  // The target URL changes before its loader finishes; scroll only once it mounts.
+  const { pathname, hash } = useRouterState({
+    select: (state) => state.resolvedLocation ?? state.location,
+  });
 
   useEffect(() => {
     if (hash) {
