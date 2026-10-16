@@ -21,6 +21,9 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (((e.currentTarget as HTMLFormElement).elements.namedItem("website") as HTMLInputElement | null)?.value) {
+      return;
+    }
     const name = form.name.trim();
     const email = form.email.trim();
     const phone = form.phone.trim();
@@ -52,7 +55,7 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
     });
     setSending(false);
     if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: "Error", description: /rate_limited/.test(error.message) ? (lang === "lv" ? "Pārāk daudz pieprasījumu. Mēģini pēc minūtes." : "Too many requests. Try again in a minute.") : error.message, variant: "destructive" });
     } else {
       try {
         await supabase.functions.invoke("send-quote-request", { body: { request_id: requestId, file_urls: [] } });
@@ -66,6 +69,10 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
+        <label>Website<input type="text" name="website" tabIndex={-1} autoComplete="off" defaultValue="" /></label>
+      </div>
+      
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label className="text-xs uppercase tracking-wider">{lang === "lv" ? "Vārds *" : "Name *"}</Label>
