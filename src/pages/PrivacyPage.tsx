@@ -2,8 +2,131 @@ import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import { useLanguage } from "@/i18n/LanguageContext";
 
+type Section = { title: string; paragraphs?: string[]; bullets?: { lead?: string; text: string }[] };
+
+const SECTIONS_LV: Section[] = [
+  {
+    title: "Pārzinis",
+    paragraphs: ['SIA "Ervitex", reģ. nr. 40002074377, Braslas iela 29, Rīga, LV-1084, Latvija. E-pasts: birojs@ervitex.lv'],
+  },
+  {
+    title: "Kādus datus mēs apkopojam",
+    bullets: [
+      { lead: "Kontaktinformācija", text: "vārds, e-pasts, tālrunis, uzņēmums, ko jūs norādāt saziņas vai cenu pieprasījumu formās." },
+      { lead: "Tehniskie dati", text: "IP adrese, pārlūkprogrammas tips, apmeklējuma laiks (tīmekļa servera žurnāli)." },
+      { lead: "Sīkdatnes", text: "tikai tehniski nepieciešamās sīkdatnes sesijas uzturēšanai." },
+    ],
+  },
+  {
+    title: "Datu apstrādes mērķi",
+    paragraphs: [
+      "Nodrošināt uzņēmuma rīcībā nonākušo fizisko personu datu aizsardzību un izmantošanu atbilstoši spēkā esošiem normatīvajiem aktiem un sniegt fiziskajai personai – datu subjektam – informāciju par personas datu apstrādes nolūku, apjomu, aizsardzību un apstrādes termiņu datu iegūšanas laikā un apstrādājot datu subjekta personas datus.",
+    ],
+  },
+  {
+    title: "Darbības apjoms",
+    paragraphs: [
+      'Privātuma politiku piemēro privātuma un personas datu aizsardzības nodrošināšanai attiecībā uz:',
+    ],
+    bullets: [
+      { text: 'fiziskajām personām – sadarbības partneriem, darbiniekiem, kā arī trešajām personām, kuras saistībā ar pakalpojumu sniegšanu saņem vai nodod SIA "Ervitex" jebkādu informāciju (tajā skaitā kontaktpersonas, maksātāji u.c.);' },
+      { text: 'SIA "Ervitex" uzturētās mājaslapas lietotājiem.' },
+    ],
+  },
+  {
+    title: "Normatīvais pamats",
+    paragraphs: [
+      'SIA "Ervitex" rūpējas par personu privātumu un personas datu aizsardzību, ievēro personu tiesības uz personas datu apstrādes likumību saskaņā ar Eiropas Parlamenta un Padomes 27.04.2016. Regulu 2016/679 par fizisko personu aizsardzību attiecībā uz personas datu apstrādi un šādu datu brīvu apriti un citiem normatīvajiem aktiem privātuma un datu apstrādes jomā.',
+      "Privātuma politika attiecināma uz datu apstrādi neatkarīgi no tā, kādā formā dati iesniegti, iegūti un tiek apstrādāti.",
+    ],
+  },
+  {
+    title: "Datu glabāšana",
+    paragraphs: [
+      "Kontaktformu dati tiek glabāti līdz pieprasījuma izpildei, bet ne ilgāk par 2 gadiem. Tehniskie žurnāli tiek dzēsti pēc 90 dienām.",
+    ],
+  },
+  {
+    title: "Jūsu tiesības",
+    paragraphs: [
+      "Jums ir tiesības pieprasīt piekļuvi saviem datiem, labot tos, pieprasīt tos dzēst vai ierobežot to apstrādi, rakstot uz birojs@ervitex.lv.",
+    ],
+  },
+  {
+    title: "Kontakti",
+    paragraphs: ["Jautājumu gadījumā sazinieties ar mums: birojs@ervitex.lv vai +371 29475227."],
+  },
+];
+
+const SECTIONS_EN: Section[] = [
+  {
+    title: "Data Controller",
+    paragraphs: ['SIA "Ervitex", reg. no. 40002074377, Braslas street 29, Riga, LV-1084, Latvia. Email: birojs@ervitex.lv'],
+  },
+  {
+    title: "Data We Collect",
+    bullets: [
+      { lead: "Contact information", text: "name, email, phone, company provided through contact or quote request forms." },
+      { lead: "Technical data", text: "IP address, browser type, visit time (web server logs)." },
+      { lead: "Cookies", text: "only technically necessary cookies for session management." },
+    ],
+  },
+  {
+    title: "Purpose of Processing",
+    paragraphs: [
+      "To ensure the protection and use of personal data received by the company in accordance with the laws in force, and to inform the data subject about the purpose, scope, protection and retention period of personal data processing when the data is obtained and processed.",
+    ],
+  },
+  {
+    title: "Scope",
+    paragraphs: ["This privacy policy applies to privacy and personal data protection in relation to:"],
+    bullets: [
+      { text: 'individuals – cooperation partners, employees, and third parties who receive or transfer any information to SIA "Ervitex" in connection with the provision of services (including contact persons, payers, etc.);' },
+      { text: 'users of the website maintained by SIA "Ervitex".' },
+    ],
+  },
+  {
+    title: "Legal Basis",
+    paragraphs: [
+      'SIA "Ervitex" cares for personal privacy and data protection in accordance with Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and other laws in the field of privacy and data processing.',
+      "This privacy policy applies to data processing regardless of the form in which the data is submitted, obtained or processed.",
+    ],
+  },
+  {
+    title: "Data Retention",
+    paragraphs: [
+      "Contact form data is stored until the request is fulfilled, but no longer than 2 years. Technical logs are deleted after 90 days.",
+    ],
+  },
+  {
+    title: "Your Rights",
+    paragraphs: [
+      "You have the right to request access to your data, correct it, request its deletion or restrict its processing by writing to birojs@ervitex.lv.",
+    ],
+  },
+  {
+    title: "Contact",
+    paragraphs: ["For questions, contact us: birojs@ervitex.lv or +371 29475227."],
+  },
+];
+
+const EmailText = ({ text }: { text: string }) => {
+  const parts = text.split("birojs@ervitex.lv");
+  if (parts.length === 1) return <>{text}</>;
+  return (
+    <>
+      {parts[0]}
+      <a href="mailto:birojs@ervitex.lv" className="text-accent transition-colors hover:text-accent/80">
+        birojs@ervitex.lv
+      </a>
+      {parts.slice(1).join("birojs@ervitex.lv")}
+    </>
+  );
+};
+
 const PrivacyPage = () => {
   const { lang } = useLanguage();
+  const sections = lang === "lv" ? SECTIONS_LV : SECTIONS_EN;
 
   return (
     <Layout>
@@ -13,55 +136,43 @@ const PrivacyPage = () => {
       />
 
       <section className="container max-w-3xl py-16 md:py-24">
-        <div className="prose prose-sm max-w-none text-foreground prose-headings:font-heading prose-headings:uppercase prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground">
-          {lang === "lv" ? (
-            <>
-              <p className="text-xs text-muted-foreground/60">Spēkā no: 2025. gada 1. janvāra</p>
-              <h2>1. Pārzinis</h2>
-              <p>SIA "Ervitex", reģ. nr. LV40002074377, Braslas iela 29, Rīga, LV-1084, Latvija. E-pasts: <a href="mailto:birojs@ervitex.lv" className="text-accent hover:text-accent/80">birojs@ervitex.lv</a></p>
-              <h2>2. Kādus datus mēs apkopojam</h2>
-              <ul>
-                <li><strong>Kontaktinformācija</strong> — vārds, e-pasts, tālrunis, uzņēmums, ko jūs norādāt saziņas vai cenu pieprasījumu formās.</li>
-                <li><strong>Tehniskie dati</strong> — IP adrese, pārlūkprogrammas tips, apmeklējuma laiks (tīmekļa servera žurnāli).</li>
-                <li><strong>Sīkdatnes</strong> — tikai tehniski nepieciešamās sīkdatnes sesijas uzturēšanai.</li>
-              </ul>
-              <h2>3. Datu apstrādes mērķi</h2>
-              <ul>
-                <li>Atbildēt uz jūsu pieprasījumiem un piedāvāt cenas.</li>
-                <li>Nodrošināt mājaslapas tehnisku darbību un drošību.</li>
-              </ul>
-              <h2>4. Datu glabāšana</h2>
-              <p>Kontaktformu dati tiek glabāti līdz pieprasījuma izpildei, bet ne ilgāk par 2 gadiem. Tehniskie žurnāli tiek dzēsti pēc 90 dienām.</p>
-              <h2>5. Jūsu tiesības</h2>
-              <p>Jums ir tiesības pieprasīt piekļuvi saviem datiem, labot tos, dzēst vai ierobežot to apstrādi, rakstot uz <a href="mailto:birojs@ervitex.lv" className="text-accent hover:text-accent/80">birojs@ervitex.lv</a>.</p>
-              <h2>6. Kontakti</h2>
-              <p>Jautājumu gadījumā sazinieties ar mums: <a href="mailto:birojs@ervitex.lv" className="text-accent hover:text-accent/80">birojs@ervitex.lv</a> vai +371 29475227.</p>
-            </>
-          ) : (
-            <>
-              <p className="text-xs text-muted-foreground/60">Effective: January 1, 2025</p>
-              <h2>1. Data Controller</h2>
-              <p>SIA "Ervitex", reg. no. LV40002074377, Braslas street 29, Riga, LV-1084, Latvia. Email: <a href="mailto:birojs@ervitex.lv" className="text-accent hover:text-accent/80">birojs@ervitex.lv</a></p>
-              <h2>2. Data We Collect</h2>
-              <ul>
-                <li><strong>Contact information</strong> — name, email, phone, company provided through contact or quote request forms.</li>
-                <li><strong>Technical data</strong> — IP address, browser type, visit time (web server logs).</li>
-                <li><strong>Cookies</strong> — only technically necessary cookies for session management.</li>
-              </ul>
-              <h2>3. Purpose of Processing</h2>
-              <ul>
-                <li>Respond to your inquiries and provide quotes.</li>
-                <li>Ensure technical operation and security of the website.</li>
-              </ul>
-              <h2>4. Data Retention</h2>
-              <p>Contact form data is stored until the request is fulfilled, but no longer than 2 years. Technical logs are deleted after 90 days.</p>
-              <h2>5. Your Rights</h2>
-              <p>You have the right to access, correct, delete, or restrict processing of your data by writing to <a href="mailto:birojs@ervitex.lv" className="text-accent hover:text-accent/80">birojs@ervitex.lv</a>.</p>
-              <h2>6. Contact</h2>
-              <p>For questions, contact us: <a href="mailto:birojs@ervitex.lv" className="text-accent hover:text-accent/80">birojs@ervitex.lv</a> or +371 29475227.</p>
-            </>
-          )}
-        </div>
+        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground/60">
+          {lang === "lv" ? "Spēkā no: 2025. gada 1. janvāra" : "Effective: January 1, 2025"}
+        </p>
+
+        <ol className="mt-10">
+          {sections.map((section, i) => (
+            <li
+              key={section.title}
+              className="grid gap-3 border-t border-border/60 py-8 last:border-b sm:grid-cols-[3.5rem_1fr] sm:gap-6"
+            >
+              <span className="font-heading text-sm font-bold tracking-widest text-accent">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <h2 className="font-heading text-lg font-bold uppercase tracking-wide text-foreground">
+                  {section.title}
+                </h2>
+                {section.paragraphs?.map((p) => (
+                  <p key={p.slice(0, 32)} className="mt-3 leading-relaxed text-muted-foreground">
+                    <EmailText text={p} />
+                  </p>
+                ))}
+                {section.bullets && (
+                  <ul className="mt-3 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground marker:text-accent">
+                    {section.bullets.map((b) => (
+                      <li key={b.text.slice(0, 32)}>
+                        {b.lead && <strong className="text-foreground">{b.lead}</strong>}
+                        {b.lead ? " — " : ""}
+                        {b.text}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
       </section>
     </Layout>
   );
