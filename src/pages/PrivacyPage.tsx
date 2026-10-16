@@ -2,7 +2,12 @@ import Layout from "@/components/Layout";
 import PageIntro from "@/components/PageIntro";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-type Section = { title: string; paragraphs?: string[]; bullets?: { lead?: string; text: string }[] };
+type Section = {
+  title: string;
+  paragraphs?: string[];
+  bullets?: { lead?: string; text: string }[];
+  afterBullets?: string[];
+};
 
 const SECTIONS_LV: Section[] = [
   {
@@ -32,10 +37,7 @@ const SECTIONS_LV: Section[] = [
       { text: 'fiziskajām personām – sadarbības partneriem, darbiniekiem, kā arī trešajām personām, kuras saistībā ar pakalpojumu sniegšanu saņem vai nodod SIA "Ervitex" jebkādu informāciju (tajā skaitā kontaktpersonas, maksātāji u.c.);' },
       { text: 'SIA "Ervitex" uzturētās mājaslapas lietotājiem.' },
     ],
-  },
-  {
-    title: "Normatīvais pamats",
-    paragraphs: [
+    afterBullets: [
       'SIA "Ervitex" rūpējas par personu privātumu un personas datu aizsardzību, ievēro personu tiesības uz personas datu apstrādes likumību saskaņā ar Eiropas Parlamenta un Padomes 27.04.2016. Regulu 2016/679 par fizisko personu aizsardzību attiecībā uz personas datu apstrādi un šādu datu brīvu apriti un citiem normatīvajiem aktiem privātuma un datu apstrādes jomā.',
       "Privātuma politika attiecināma uz datu apstrādi neatkarīgi no tā, kādā formā dati iesniegti, iegūti un tiek apstrādāti.",
     ],
@@ -84,10 +86,7 @@ const SECTIONS_EN: Section[] = [
       { text: 'individuals – cooperation partners, employees, and third parties who receive or transfer any information to SIA "Ervitex" in connection with the provision of services (including contact persons, payers, etc.);' },
       { text: 'users of the website maintained by SIA "Ervitex".' },
     ],
-  },
-  {
-    title: "Legal Basis",
-    paragraphs: [
+    afterBullets: [
       'SIA "Ervitex" cares for personal privacy and data protection in accordance with Regulation (EU) 2016/679 of the European Parliament and of the Council of 27 April 2016 on the protection of natural persons with regard to the processing of personal data and on the free movement of such data, and other laws in the field of privacy and data processing.',
       "This privacy policy applies to data processing regardless of the form in which the data is submitted, obtained or processed.",
     ],
@@ -169,6 +168,11 @@ const PrivacyPage = () => {
                     ))}
                   </ul>
                 )}
+                {section.afterBullets?.map((p) => (
+                  <p key={p.slice(0, 32)} className="mt-3 leading-relaxed text-muted-foreground">
+                    <EmailText text={p} />
+                  </p>
+                ))}
               </div>
             </li>
           ))}
