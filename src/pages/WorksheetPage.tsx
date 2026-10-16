@@ -132,7 +132,7 @@ const WorksheetPage = () => {
       const changed = filled.filter((f, idx) => f.unitPrice !== items[idx].unitPrice);
       if (!changed.length) return;
       const byId = new Map(changed.map((c) => [c.id, c.unitPrice]));
-      setItems((prev) => prev.map((i) => (byId.has(i.id) && !(Number(i.unitPrice) > 0) ? { ...i, unitPrice: byId.get(i.id) } : i)));
+      setItems((prev) => prev.map((i) => (byId.has(i.id) && !(Number(i.unitPrice) > 0) ? { ...i, unitPrice: byId.get(i.id) ?? null } : i)));
       setDirty(true);
       setSaveState("idle");
     })();
