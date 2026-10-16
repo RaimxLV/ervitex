@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { fillMissingPrices } from "@/lib/fillMissingPrices";
 
 /** Creates a pm_offers draft (optionally from the cart, which is then emptied) and opens the editor. */
 export function useCreateOffer() {
@@ -18,7 +19,8 @@ export function useCreateOffer() {
   const create = async (fromCart: boolean, details: Partial<Pick<Offer, "client_name" | "client_email" | "client_phone" | "client_company" | "client_billing" | "note">> = {}, prints: OfferPrint[] = []) => {
     setBusy(true);
     try {
-      const lines = fromCart ? items.map(({ id, source, productId, name, code, brand, image, colorName, colorHex, size, qty, unitPrice }) => ({ id, source, productId, name, code, brand, image, colorName, colorHex, size, qty, unitPrice: unitPrice ?? null })) : [];
+      const priced = fromCart ? await fillMissingPrices(items) : [];
+      const lines = priced.map(({ id, source, productId, name, code, brand, image, colorName, colorHex, size, qty, unitPrice }) => ({ id, source, productId, name, code, brand, image, colorName, colorHex, size, qty, unitPrice: unitPrice ?? null }));
       const { data, error } = await supabase.from("pm_offers")
         .insert({ title: "Piedāvājums", ...details, items: setOrderPrints(lines, prints) as any }).select("id").single();
       if (error || !data) throw error || new Error("Neizdevās izveidot");

@@ -20,6 +20,8 @@ import DiscountField from "@/components/quote/DiscountField";
 import { money, itemPrintNet, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
 import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
 import { ArrowLeft, ChevronDown, Copy, ExternalLink, Mail, MessageCircle, Printer, Repeat, Save, Search, Send, Trash2, Plus } from "lucide-react";
+import { fillMissingPrices } from "@/lib/fillMissingPrices";
+import { colorMatches } from "@/components/worksheet/useVariants";
 
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
@@ -78,9 +80,11 @@ const AdminOfferEdit = () => {
       else if (data) {
         const row = data as any;
         const me = PROJECT_MANAGERS.find((p) => p.email.toLowerCase() === (user?.email || "").toLowerCase());
+        // Rindām bez cenas cenu ņemam no piegādātāja kataloga.
+        const items = await fillMissingPrices((row.items || []) as OfferItem[]);
         setOffer({
           ...row,
-          items: (row.items || []) as OfferItem[],
+          items,
           pm_email: row.pm_email || me?.email || user?.email || OFFICE_EMAIL,
           pm_name: row.pm_name || me?.name || "",
         });
@@ -162,12 +166,15 @@ const AdminOfferEdit = () => {
 
   const sizeRows = useMemo(() => {
     if (!picked) return [] as { size: string; price: number | null }[];
-    const forColor = prices.filter((p) => !activeColor || !p.color_code || p.color_code === activeColor);
+    const colorName = (picked.colors || []).find((c) => c.c === activeColor)?.n;
+    const forColor = prices.filter((p) => !activeColor || !p.color_code || colorMatches(p.color_code, activeColor) || colorMatches(p.color_code, colorName));
     const map = new Map<string, number | null>();
     for (const p of (forColor.length ? forColor : prices)) {
-      const s = p.size || "-";
-      const price = Number(p.retail_price);
-      if (!map.has(s) || (map.get(s) ?? 0) < price) map.set(s, Number.isFinite(price) && price > 0 ? price : null);
+      const s = (p.size || "").trim() || "-";
+      const n = Number(p.retail_price);
+      const price = Number.isFinite(n) && n > 0 ? n : null;
+      const cur = map.get(s);
+      if (!map.has(s) || (price !== null && (cur == null || price < cur))) map.set(s, price);
     }
     if (map.size === 0) map.set("-", null);
     return [...map.entries()]

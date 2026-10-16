@@ -105,9 +105,10 @@ const AddToQuoteBlock = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncKey]);
 
+  const priceOf = (size: string) => sizePrices?.[size] ?? sizePrices?.["-"] ?? null;
   const totalHere = Object.values(qtyBySize).reduce((a, b) => a + b, 0);
   const sumHere = Object.entries(qtyBySize).reduce(
-    (a, [size, qty]) => a + (sizePrices?.[size] || 0) * qty,
+    (a, [size, qty]) => a + (priceOf(size) || 0) * qty,
     0,
   );
   const totalOther = otherColorLines.reduce((a, l) => a + l.qty, 0);
@@ -128,7 +129,7 @@ const AddToQuoteBlock = ({
         source, productId, name, code, brand, image,
         colorCode, colorName, colorHex,
         size: cartSize, qty,
-        unitPrice: sizePrices?.[size] ?? null,
+        unitPrice: priceOf(size),
       });
 
     }
@@ -187,7 +188,7 @@ const AddToQuoteBlock = ({
       </div>
 
       {!isAdmin && <OrderMinimumNotice source={source} category={category} name={classificationName || name} className={minimumNoticeClassName} />}
-      <SizeQuantityTable rows={(sizes.length ? sizes : ["-"]).map((size) => ({ size, price: sizePrices?.[size] ?? null }))} quantities={qtyBySize} onChange={setSize} />
+      <SizeQuantityTable rows={(sizes.length ? sizes : ["-"]).map((size) => ({ size, price: priceOf(size) }))} quantities={qtyBySize} onChange={setSize} />
 
       {/* Summary of other colors already in cart for this product */}
       {otherGrouped.length > 0 && (
