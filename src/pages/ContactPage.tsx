@@ -183,7 +183,8 @@ const ContactPage = () => {
               <dl className="divide-y divide-border">
                 {[
                   { icon: MapPin, label: t("contact.address"), content: <>Hausmaņa biroji, „D” ieeja, 2. stāvs<br />Braslas iela 29, Vidzemes priekšpilsēta,<br />Rīga, LV-1084</> },
-                  { icon: ReceiptText, label: t("contact.regNr"), content: <>LV40002074377</> },
+                  { icon: ReceiptText, label: t("contact.regNr"), content: <>40002074377</> },
+                  { icon: ReceiptText, label: lang === "lv" ? "PVN reģ. nr." : "VAT No.", content: <>LV40002074377</> },
                   { icon: Mail, label: t("contact.officeEmail"), content: <a href="mailto:birojs@ervitex.lv" className="transition-colors hover:text-accent">birojs@ervitex.lv</a> },
                   {
                     icon: Phone,
