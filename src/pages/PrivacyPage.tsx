@@ -32,10 +32,7 @@ const SECTIONS_LV: Section[] = [
       { text: 'fiziskajām personām – sadarbības partneriem, darbiniekiem, kā arī trešajām personām, kuras saistībā ar pakalpojumu sniegšanu saņem vai nodod SIA "Ervitex" jebkādu informāciju (tajā skaitā kontaktpersonas, maksātāji u.c.);' },
       { text: 'SIA "Ervitex" uzturētās mājaslapas lietotājiem.' },
     ],
-  },
-  {
-    title: "Normatīvais pamats",
-    paragraphs: [
+    afterBullets: [
       'SIA "Ervitex" rūpējas par personu privātumu un personas datu aizsardzību, ievēro personu tiesības uz personas datu apstrādes likumību saskaņā ar Eiropas Parlamenta un Padomes 27.04.2016. Regulu 2016/679 par fizisko personu aizsardzību attiecībā uz personas datu apstrādi un šādu datu brīvu apriti un citiem normatīvajiem aktiem privātuma un datu apstrādes jomā.',
       "Privātuma politika attiecināma uz datu apstrādi neatkarīgi no tā, kādā formā dati iesniegti, iegūti un tiek apstrādāti.",
     ],
