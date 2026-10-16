@@ -25,6 +25,7 @@ import RouteSeo from "@/components/RouteSeo";
 import NotFound from "@/pages/NotFound";
 import { HEAD_BOOTSTRAP_SCRIPT } from "@/lib/head-bootstrap";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
+import { initAnalytics, trackPageView } from "@/lib/analytics";
 
 const TITLE = "Ervitex — apģērbu vairumtirdzniecība un apdruka Rīgā";
 const DESCRIPTION =
@@ -126,6 +127,14 @@ const RouteFallback = () => <div className="min-h-[60svh]" />;
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    initAnalytics();
+    return router.subscribe("onResolved", (event) => {
+      trackPageView(event.toLocation.pathname + event.toLocation.searchStr);
+    });
+  }, [router]);
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
