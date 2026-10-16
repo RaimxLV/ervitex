@@ -1,8 +1,8 @@
 /**
  * Several partner CDNs serve print-resolution originals (NWG "highres" files are
  * 4–7 MB each). Route those through an image resizing CDN so the UI receives
- * small WebP files. Hosts that already serve reasonable sizes (Cloudinary for
- * Stanley/Stella) are left untouched.
+ * small WebP files. Cloudinary images use native transformations instead of
+ * another proxy; its named supplier preset can otherwise return 1500px files.
  */
 export const HEAVY_IMAGE_HOSTS = [
   "images.nwgmedia.com",
@@ -17,6 +17,14 @@ export const HEAVY_IMAGE_HOSTS = [
 /** Resized WebP variant of a partner image (no-op for light hosts). */
 export const thumbUrl = (u: string | null, width = 500): string | null => {
   if (!u) return null;
+  if (u.startsWith("https://res.cloudinary.com/")) {
+    const transform = `f_auto,q_auto,c_limit,w_${width}`;
+    // Preserve named supplier presets and the complete model/colour filename.
+    if (/\/t_[^/]+\//.test(u)) {
+      return u.replace(/(\/t_[^/]+\/)(?:f_auto,q_auto,c_limit,w_\d+\/)?/, `$1${transform}/`);
+    }
+    return u.replace(/(\/image\/upload\/)(?:f_auto,q_auto,c_limit,w_\d+\/)?/, `$1${transform}/`);
+  }
   if (!HEAVY_IMAGE_HOSTS.some((h) => u.includes(h))) return u;
   return `https://wsrv.nl/?url=${encodeURIComponent(u.replace(/^https?:\/\//, ""))}&w=${width}&output=webp&q=82&we`;
 };
