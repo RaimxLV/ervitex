@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Pārbaudīt visu piegādātāju krāsu attēlus un atjaunot Russell pārējo krāsu foto bez citas krāsas aizvietošanas.
 - [x] Telefona katalogā sakārtot lapu pārslēgšanu un atjaunot attēlu šķiršanu kartītēs; pārbaudīt abas darbības.
 - [ ] Palaišana uz www.ervitex.lv pēc plāna (dizainu, uzbūvi un saturu nemainīt)
 - [x] 4. solis: lapu virsraksti/apraksti serverī, kanoniskās adreses uz www.ervitex.lv, dinamiskā lapu karte, llms.txt
