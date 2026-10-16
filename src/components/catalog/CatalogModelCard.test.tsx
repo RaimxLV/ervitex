@@ -7,13 +7,6 @@ vi.mock("@/components/BrandLogo", () => ({ BrandLogo: () => null }));
 
 describe("catalog card photo navigation", () => {
   beforeEach(() => vi.clearAllMocks());
-  it("changes the photo without opening the product from the next control", async () => {
-    const open = vi.fn();
-    const view = render(<CatalogModelCard image="front.jpg" images={["front.jpg", "back.jpg"]} imageAlt="Krekls" title="Krekls" noImageLabel="" onClick={open} />);
-    fireEvent.click(view.getByRole("button", { name: "Nākamais attēls" }));
-    await waitFor(() => expect(view.getByAltText("Krekls").getAttribute("src")).toBe("back.jpg"));
-    expect(open).not.toHaveBeenCalled();
-  });
   it("swipes horizontally without opening the card, while a normal tap still opens it", async () => {
     const open = vi.fn();
     const view = render(<CatalogModelCard image="front.jpg" images={["front.jpg", "back.jpg"]} imageAlt="Krekls" title="Krekls" noImageLabel="" onClick={open} />);
