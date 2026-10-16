@@ -1,5 +1,5 @@
 import { ColorSelector } from "@/components/quote/ColorSelector";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { money } from "@/lib/offer";
@@ -20,6 +20,20 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
     [colors, item.colorName],
   );
   const sizes = useMemo(() => sizesFor(activeColor), [activeColor, sizesFor]);
+
+  // Auto-labojums: ja prece saglabāta ar cenu 0 bet katalogā ir cena, pievieno to automātiski.
+  const autofixed = useRef(false);
+  useEffect(() => {
+    if (autofixed.current || loading || item.unitPrice) return;
+    const match = sizes.find((s) => {
+      const want = (item.size || "-").trim().toLowerCase();
+      return s.size.toLowerCase() === want || s.raw.toLowerCase() === want;
+    }) ?? sizes[0];
+    if (match?.price) {
+      autofixed.current = true;
+      onChange({ unitPrice: match.price });
+    }
+  }, [loading, sizes, item.unitPrice, item.size, onChange]);
   const isCurrent = (s: { size: string; raw: string }) =>
     (item.size || "-").trim().toLowerCase() === s.size.toLowerCase() ||
     (item.size || "-").trim().toLowerCase() === s.raw.toLowerCase();
