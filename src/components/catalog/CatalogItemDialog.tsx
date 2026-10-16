@@ -1340,8 +1340,8 @@ const CatalogItemDialog = ({
     const map: Record<string, number> = {};
     for (const r of rows) {
       const raw = (r.size ?? "").toString().trim();
-      if (!raw) continue;
-      const size = rawToLabel[raw.toLowerCase()] || raw;
+      // Preces bez izmēra (somas, cepures) — cena zem "-", lai tā nonāk grozā.
+      const size = raw ? rawToLabel[raw.toLowerCase()] || raw : "-";
       const v = Number(r.retail_price);
       if (!Number.isFinite(v) || v <= 0) continue;
       if (map[size] === undefined || v < map[size]) map[size] = v;

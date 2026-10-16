@@ -61,7 +61,9 @@ export const priceForVariant = (
     const raw = (r.size || "-").trim() || "-";
     return norm(raw) === want || norm(label(raw)) === want;
   });
-  const pool = bySize.length ? bySize : [];
+  // Modelim bez izmēriem (somas, cepures) der jebkura rinda.
+  const sizeless = rows.length > 0 && rows.every((r) => !(r.size || "").trim());
+  const pool = bySize.length ? bySize : sizeless ? rows : [];
   const byColor = colorCode ? pool.filter((r) => colorMatches(r.color_code, colorCode)) : [];
   const chosen = byColor.length ? byColor : pool;
   const values = chosen.map((r) => Number(r.retail_price)).filter((n) => Number.isFinite(n) && n > 0);
