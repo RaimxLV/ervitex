@@ -1816,6 +1816,24 @@ export type Database = {
           },
         ]
       }
+      quote_request_rate_limits: {
+        Row: {
+          created_at: string
+          id: number
+          ip: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          ip: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          ip?: string
+        }
+        Relationships: []
+      }
       quote_requests: {
         Row: {
           action_token: string | null
