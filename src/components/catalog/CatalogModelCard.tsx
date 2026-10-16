@@ -118,6 +118,14 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
     const gallery = useGalleryNavigation(frames, 1, interacted);
     const touchStart = useRef<{ x: number; y: number } | null>(null);
     const suppressClickUntil = useRef(0);
+    const colorOptions = (swatches || []).filter((s) => s.onSelect);
+    const canSwipeColors = colorOptions.length > 1;
+    const canSwipe = canSwipeColors || frames.length > 1;
+    const swipe = (step: number) => {
+      if (!canSwipeColors) return gallery.move(step);
+      const current = Math.max(0, colorOptions.findIndex((s) => s.active));
+      colorOptions[(current + step + colorOptions.length) % colorOptions.length].onSelect?.();
+    };
     const showHover = gallery.index === 0 && !!hoverImage && !hoverFailed && hoverReady;
     useEffect(() => {
       setReady(Boolean(baseImageRef.current?.complete && baseImageRef.current.naturalWidth > 0));
@@ -156,7 +164,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
           onTouchMove={(event) => {
             const start = touchStart.current;
             const touch = event.touches[0];
-            if (!start || !touch || frames.length < 2) return;
+            if (!start || !touch || !canSwipe) return;
             const dx = touch.clientX - start.x;
             const dy = touch.clientY - start.y;
             if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.3) setDragX(Math.max(-80, Math.min(80, dx * 0.6)));
@@ -166,12 +174,12 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
             touchStart.current = null;
             setDragX(0);
             const touch = event.changedTouches[0];
-            if (!start || !touch || frames.length < 2) return;
+            if (!start || !touch || !canSwipe) return;
             const dx = touch.clientX - start.x;
             const dy = touch.clientY - start.y;
             if (Math.abs(dx) < 30 || Math.abs(dx) <= Math.abs(dy) * 1.3) return;
             suppressClickUntil.current = Date.now() + 500;
-            gallery.move(dx < 0 ? 1 : -1);
+            swipe(dx < 0 ? 1 : -1);
           }}
           onTouchCancel={() => { touchStart.current = null; setDragX(0); }}>
           {image ? (
@@ -333,7 +341,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
           {footer}
         </div>
       </Tag>
-      {frames.length > 1 && (
+      {!canSwipeColors && frames.length > 1 && (
         <div className="pointer-events-none absolute inset-x-0 top-0 aspect-[3/4] sm:hidden" aria-live="polite">
           <div className="absolute inset-x-0 bottom-2 flex justify-center gap-1">
             {frames.slice(0, 8).map((_, i) => (
