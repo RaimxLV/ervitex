@@ -29,4 +29,4 @@
 - ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
 - QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.
-- Headwear shares name/description classification and a category-conditional URL facet; bump cache schema on field changes to avoid stale types.
+- Headwear shares name/description classification and a category-only URL facet; bump cache schema on field changes to prevent stale types.
