@@ -1,6 +1,6 @@
 # Architecture rules
 
-- Search shares searchScore/exactCodeHits.
+- Search shares searchScore/exactCodeHits; legacy redirects preserve catalog facets/audience for relevance.
 - productContent separates supplier care/specs; fingerprint translation caches.
 - Offers use CreateOfferButton and protected /offers with OfferWorkspace; sharing activates drafts automatically, without manual statuses.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
@@ -18,7 +18,7 @@
 - Stock mutation controls render only after the authenticated admin role resolves, and every mutation revalidates the live user and role before writing; public users only see the outlined availability label.
 - Native scrolling; ScrollToTop uses resolvedLocation so pending pages do not jump. WebGL follows scroll/eased pointers, renders on change, pauses off-screen.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
-- SSR (TanStack Start, Lovable hosting only): render paths avoid browser globals; route head() uses lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap.xml is built from catalog_items minus remnants/footwear so it stays current.
+- TanStack Start SSR on Lovable avoids browser globals; heads use lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap uses catalog_items minus remnants/footwear.
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
 - Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
 - Galleries decode before switching, retain frames on failure. Mobile colour photos load after primary images; controls stay outside links. Hover needs loaded photos; Malfini prefers fronts. Cloudinary uses native resizing to cut downloads.
