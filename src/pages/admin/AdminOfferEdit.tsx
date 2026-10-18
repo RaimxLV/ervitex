@@ -56,7 +56,7 @@ const AdminOfferEdit = () => {
   const [offer, setOffer] = useState<Offer>(emptyOffer);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [sendingEmail, setSendingEmail] = useState<"client" | "test" | null>(null);
+  const [sendingEmail, setSendingEmail] = useState<"client" | null>(null);
 
   // --- product picker state
   const [q, setQ] = useState("");
@@ -376,7 +376,7 @@ const AdminOfferEdit = () => {
           vatRate: offer.vat_rate,
           url: offer.token ? offerUrl(offer.token) : "",
           disclaimer: PRINT_DISCLAIMER_LV,
-          isTest: mode === "test",
+          isTest: false,
         },
       },
     });
@@ -385,11 +385,11 @@ const AdminOfferEdit = () => {
       toast({ title: "Neizdevās nosūtīt", description: error.message, variant: "destructive" });
       return;
     }
-    if (mode === "client" && offer.status === "draft") {
+    if (offer.status === "draft") {
       // Status changes automatically on a successful send
       await save("sent");
     }
-    toast({ title: mode === "test" ? `Tests nosūtīts uz ${to}` : `Piedāvājums nosūtīts: ${to}` });
+    toast({ title: `Piedāvājums nosūtīts: ${to}` });
   };
 
 
