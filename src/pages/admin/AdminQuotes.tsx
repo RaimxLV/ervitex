@@ -197,6 +197,30 @@ const AdminQuotes = () => {
         />
       </div>
 
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {PM_TABS.map((t) => {
+          const count =
+            t.slug === "all"
+              ? quotes.length
+              : quotes.filter((row) => row.assigned_pm_slug === t.slug).length;
+          return (
+            <button
+              key={t.slug}
+              type="button"
+              onClick={() => setTab(t.slug)}
+              className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+                tab === t.slug
+                  ? "bg-accent font-semibold text-accent-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label}
+              <span className="ml-1.5 text-xs opacity-70">{count}</span>
+            </button>
+          );
+        })}
+      </div>
+
       <div className="mt-6 space-y-4">
         {loading ? (
           <p className="py-8 text-center text-muted-foreground">Ielādē...</p>
@@ -236,9 +260,15 @@ const AdminQuotes = () => {
                       )}
                     </span>
                   </span>
-                  <span className="hidden shrink-0 text-right text-xs text-muted-foreground sm:block">
-                    {new Date(row.created_at).toLocaleDateString("lv")}
-                    <span className="block">{age === 0 ? "šodien" : `${age} d. atpakaļ`}</span>
+                  <span className="flex shrink-0 flex-col items-end gap-1">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${ageBadgeClass(age)}`}
+                    >
+                      {ageLabel(age)}
+                    </span>
+                    <span className="hidden text-xs text-muted-foreground sm:block">
+                      {new Date(row.created_at).toLocaleDateString("lv")}
+                    </span>
                   </span>
                   <ChevronDown
                     className={`mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
