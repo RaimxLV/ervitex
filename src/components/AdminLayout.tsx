@@ -15,9 +15,9 @@ type NavItem = { to: string; icon: typeof FileText; label: string; short?: strin
 
 /** Primary items — always visible (desktop strip + mobile bottom bar). */
 const primary: NavItem[] = [
-  { to: "/admin", icon: LayoutDashboard, label: "Panelis", short: "Panelis" },
-  { to: "/admin/offers", icon: FileText, label: "Piedāvājumi", short: "Piedāv." },
   { to: "/admin/quotes", icon: MessageSquare, label: "Pieprasījumi", short: "Pieprs." },
+  { to: "/admin/offers", icon: FileText, label: "Piedāvājumi", short: "Piedāv." },
+  { to: "/admin", icon: LayoutDashboard, label: "Panelis", short: "Panelis" },
   { to: "/admin/products", icon: Package, label: "Mūsu produkti", short: "Produkti" },
 ];
 

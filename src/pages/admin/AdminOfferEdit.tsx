@@ -323,12 +323,12 @@ const AdminOfferEdit = () => {
 
 
   // Real send through the platform email system
-  const sendEmail = async (mode: "client" | "test") => {
-    const to = mode === "client" ? (offer.client_email || "").trim() : (user?.email || "").trim();
+  const sendEmail = async () => {
+    const to = (offer.client_email || "").trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
       toast({
-        title: mode === "client" ? "Nav klienta e-pasta" : "Nav tava e-pasta",
-        description: mode === "client" ? "Ievadi klienta e-pastu un saglabā." : "Pieslēdzies ar e-pasta kontu.",
+        title: "Nav klienta e-pasta",
+        description: "Ievadi klienta e-pastu un saglabā.",
         variant: "destructive",
       });
       return;
@@ -338,10 +338,9 @@ const AdminOfferEdit = () => {
       return;
     }
 
-    setSendingEmail(mode);
+    setSendingEmail("client");
     // Publish the link first so the client can open it
-    if (mode === "client") await save("sent");
-    else await save();
+    await save("sent");
 
     const t = offerTotals(offer.items, offer.vat_rate, offer.discount);
     const pmEmail = (offer.pm_email || user?.email || OFFICE_EMAIL).trim();
