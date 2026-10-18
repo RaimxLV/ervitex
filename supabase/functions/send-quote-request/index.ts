@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
           files: signedUrls,
         },
     });
-    results.push({ to: OFFICE_EMAIL, template: "quote-request", ok: officeRes.ok, error: officeRes.ok ? undefined : officeRes.error || officeRes.reason });
+    results.push({ to: notifyEmail, template: "quote-request", ok: officeRes.ok, error: officeRes.ok ? undefined : officeRes.error || officeRes.reason });
 
     // 2) Auto-confirmation to the customer (no attachments/staff-only notes)
     if (quote.email) {

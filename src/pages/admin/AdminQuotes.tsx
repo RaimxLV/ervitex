@@ -71,11 +71,30 @@ const EVENT_LABELS: Record<string, string> = {
 
 const daysSince = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
 
+const PM_TABS = [
+  { slug: "all", label: "Visi" },
+  { slug: "laura", label: "Laura" },
+  { slug: "ilona", label: "Ilona" },
+  { slug: "justine", label: "Justīne" },
+  { slug: "santa", label: "Santa" },
+];
+
+/** Krāsu indikators pēc pieprasījuma vecuma: šodiena — zaļš, 1–2 d. — dzeltens, 3+ d. — sarkans. */
+const ageBadgeClass = (age: number) =>
+  age === 0
+    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+    : age <= 2
+      ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+      : "bg-destructive/15 text-destructive";
+
+const ageLabel = (age: number) => (age === 0 ? "Šodien" : age === 1 ? "Vakar" : `${age} d.`);
+
 const AdminQuotes = () => {
   const [quotes, setQuotes] = useState<QuoteRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [q, setQ] = useState("");
+  const [tab, setTab] = useState("all");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [events, setEvents] = useState<QuoteEvent[]>([]);
   const { toast } = useToast();
@@ -149,6 +168,7 @@ const AdminQuotes = () => {
 
   const visible = quotes
     .filter(matches)
+    .filter((row) => tab === "all" || row.assigned_pm_slug === tab)
     .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
 
   return (
