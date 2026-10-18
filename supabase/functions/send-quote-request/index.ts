@@ -77,17 +77,46 @@ Deno.serve(async (req) => {
       })(),
     };
 
+    // Jaunie pieprasījumi automātiski tiek sadalīti pa apli starp projektu vadītājām.
+    const ROTATION = [
+      { slug: "laura", name: "Laura", email: "birojs@ervitex.lv" },
+      { slug: "ilona", name: "Ilona", email: "ilona@ervitex.lv" },
+      { slug: "justine", name: "Justīne", email: "justine@ervitex.lv" },
+      { slug: "santa", name: "Santa", email: "santa.k@ervitex.lv" },
+    ];
+    if (!quote.assigned_pm_slug) {
+      const { count } = await supabase
+        .from("quote_requests")
+        .select("id", { count: "exact", head: true })
+        .in("assigned_pm_slug", ROTATION.map((p) => p.slug));
+      const next = ROTATION[(count ?? 0) % ROTATION.length];
+      await supabase
+        .from("quote_requests")
+        .update({
+          assigned_pm_slug: next.slug,
+          assigned_pm_name: next.name,
+          assigned_pm_email: next.email,
+          assigned_at: new Date().toISOString(),
+        })
+        .eq("id", quote.id)
+        .is("assigned_pm_slug", null);
+      quote.assigned_pm_slug = next.slug;
+      quote.assigned_pm_name = next.name;
+      quote.assigned_pm_email = next.email;
+    }
+
     // Klients saņem vēstuli no konkrētās projektu vadītājas (līdz nodošanai — Laura).
     const pm = {
-      email: quote.assigned_pm_email || "laura@ervitex.lv",
+      email: quote.assigned_pm_email || "birojs@ervitex.lv",
       name: quote.assigned_pm_name || "Laura",
     };
 
     const results: Array<{ to: string; template: string; ok: boolean; error?: string }> = [];
 
-    // 1) Internal notification to office — with Reply-To set to the customer so
-    //    staff can just hit "Reply" in their inbox.
-    const officeRes = await sendAppEmail("quote-request", OFFICE_EMAIL, {
+    // 1) Internal notification to the assigned project manager — with Reply-To
+    //    set to the customer so staff can just hit "Reply" in their inbox.
+    const notifyEmail = quote.assigned_pm_email || OFFICE_EMAIL;
+    const officeRes = await sendAppEmail("quote-request", notifyEmail, {
         replyTo: quote.email,
         fromEmail: OFFICE_EMAIL,
         fromName: quote.name,

@@ -350,7 +350,7 @@ const AdminOfferEdit = () => {
         offerId: offer.id,
         recipientEmail: to,
         replyTo: pmEmail,
-        idempotencyKey: `pm-offer-${offer.id}-${mode}-${Date.now()}`,
+        idempotencyKey: `pm-offer-${offer.id}-client-${Date.now()}`,
         templateData: {
           title: offer.title || "Ervitex piedāvājums",
           clientName: offer.client_name || "",
@@ -622,20 +622,11 @@ const AdminOfferEdit = () => {
             </Button>
             <Button
               className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-              onClick={() => sendEmail("client")}
+              onClick={() => sendEmail()}
               disabled={sendingEmail !== null || saving}
             >
               <Send className="mr-2 h-4 w-4" />
               {sendingEmail === "client" ? "Sūta…" : "Nosūtīt piedāvājumu klientam"}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={() => sendEmail("test")}
-              disabled={sendingEmail !== null || saving}
-            >
-              {sendingEmail === "test" ? "Sūta testu…" : "Nosūtīt testu sev"}
             </Button>
 
 
