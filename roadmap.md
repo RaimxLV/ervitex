@@ -1,6 +1,9 @@
 # Roadmap
+- [x] Salīdzināt vecā servera sitemap 500 URL ar saišu karti — iztrūkstošu ceļu nav; pārbaudīt 45 jaunās publiskās lapas/preces un 9 aktuālos SEO pamatkritērijus.
+- [x] Lēnā publiskā pārbaudē visi 363 unikālie vecā sitemap ceļi (500 ieraksti) pārbaudīti: sākumlapa 200, pārējie 362 dod 301, bez 429/404/5xx.
+- [ ] Ervitex Google Search Console dati — Raimonda pieejamajā kontā nav verificētas Ervitex vietnes; faktiskā indeksācija/Latvijas klikšķi nav pārbaudāmi.
 - [x] Izlabot veco kategoriju/apakškategoriju galamērķus; 498 vecās adreses dod 301, 16 testi un somu/cimdu/bērnu preču atlase pārbaudīta priekšskatījumā.
-- [ ] Publicēt kategoriju pārviržu labojumus — gaida publicēšanu.
+- [x] Kategoriju pārviržu labojumi apstiprināti publicētajā www.ervitex.lv: auduma somas, cimdi, bērnu preces/T-krekli un mugursomas.
 - [x] Datateks serverī ieslēgta ervitex.lv → www.ervitex.lv 301 pārvirze; HTTP/HTTPS, adreses/parametri un jaunā sākumlapa pārlūkā pārbaudīti; pasts/DNS neskarti, oriģināla rezerves kopija saglabāta servera private mapē.
 - [x] Paātrināt kataloga attēlu ielādi un lapošanu telefonā; 14 testi un telefona lapu/bilžu pārslēgšana pārbaudīti.
 - [x] Pārbaudīt visu piegādātāju attēlu atlases ceļus un paraugpreces; atjaunoti 5487 Russell foto 93 modeļiem/601 krāsai, izslēgti 104 piegādātāja bojātie URL; visas 19 konkrētās preces krāsas pārbaudītas www.ervitex.lv.
