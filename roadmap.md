@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Paplašināti atklāt nepārbaudītās vecās/publiskās adreses, pārbaudīt pārvirzes un meklētāju piekļuvi Latvijas klientu piesaistei.
 - [x] Izlabot veco kategoriju/apakškategoriju galamērķus; 498 vecās adreses dod 301, 16 testi un somu/cimdu/bērnu preču atlase pārbaudīta priekšskatījumā.
 - [ ] Publicēt kategoriju pārviržu labojumus — gaida publicēšanu.
 - [x] Datateks serverī ieslēgta ervitex.lv → www.ervitex.lv 301 pārvirze; HTTP/HTTPS, adreses/parametri un jaunā sākumlapa pārlūkā pārbaudīti; pasts/DNS neskarti, oriģināla rezerves kopija saglabāta servera private mapē.
