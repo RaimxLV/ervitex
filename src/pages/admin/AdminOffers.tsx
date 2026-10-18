@@ -22,19 +22,29 @@ interface Row {
   items: OfferItem[];
   vat_rate: number;
   created_at: string;
+  pm_email: string | null;
 }
+
+const PM_TABS = [
+  { key: "all", label: "Visi", emails: [] as string[] },
+  { key: "laura", label: "Laura", emails: ["laura@ervitex.lv", "birojs@ervitex.lv"] },
+  { key: "ilona", label: "Ilona", emails: ["ilona@ervitex.lv"] },
+  { key: "justine", label: "Justīne", emails: ["justine@ervitex.lv"] },
+  { key: "santa", label: "Santa", emails: ["santa.k@ervitex.lv"] },
+];
 
 const AdminOffers = () => {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
+  const [tab, setTab] = useState("all");
   const { toast } = useToast();
   const { items: cartItems } = useQuoteCart();
 
   const load = async () => {
     const { data, error } = await supabase
       .from("pm_offers")
-      .select("id,token,title,client_name,client_company,status,items,vat_rate,created_at")
+      .select("id,token,title,client_name,client_company,status,items,vat_rate,created_at,pm_email")
       .order("created_at", { ascending: false });
     if (error) toast({ title: "Kļūda", description: error.message, variant: "destructive" });
     else setRows((data as unknown as Row[]) || []);
@@ -83,9 +93,16 @@ const AdminOffers = () => {
     else load();
   };
 
-  const filtered = rows.filter((r) =>
-    !q.trim() ||
-    [r.title, r.client_name, r.client_company].filter(Boolean).join(" ").toLowerCase().includes(q.toLowerCase()),
+  const activeTab = PM_TABS.find((t) => t.key === tab) ?? PM_TABS[0];
+  const filtered = rows.filter(
+    (r) =>
+      (activeTab.key === "all" || activeTab.emails.includes((r.pm_email || "").toLowerCase())) &&
+      (!q.trim() ||
+        [r.title, r.client_name, r.client_company]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(q.toLowerCase())),
   );
 
   return (
@@ -115,6 +132,30 @@ const AdminOffers = () => {
         placeholder="Meklēt pēc klienta vai nosaukuma…"
         className="mt-6 max-w-sm"
       />
+
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {PM_TABS.map((t) => {
+          const count =
+            t.key === "all"
+              ? rows.length
+              : rows.filter((r) => t.emails.includes((r.pm_email || "").toLowerCase())).length;
+          return (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setTab(t.key)}
+              className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+                tab === t.key
+                  ? "bg-accent font-semibold text-accent-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label}
+              <span className="ml-1.5 text-xs opacity-70">{count}</span>
+            </button>
+          );
+        })}
+      </div>
 
       <div className="mt-6 divide-y divide-border border-y border-border">
         <div className="hidden grid-cols-[minmax(0,2fr)_80px_130px_130px_150px] gap-4 bg-muted/50 p-4 text-xs font-semibold text-muted-foreground xl:grid"><span>Piedāvājums / klients</span><span>Skaits</span><span>Bez PVN</span><span>Ar PVN</span><span /></div>

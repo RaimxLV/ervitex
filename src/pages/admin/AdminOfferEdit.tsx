@@ -56,7 +56,7 @@ const AdminOfferEdit = () => {
   const [offer, setOffer] = useState<Offer>(emptyOffer);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [sendingEmail, setSendingEmail] = useState<"client" | "test" | null>(null);
+  const [sendingEmail, setSendingEmail] = useState<"client" | null>(null);
 
   // --- product picker state
   const [q, setQ] = useState("");
@@ -323,12 +323,12 @@ const AdminOfferEdit = () => {
 
 
   // Real send through the platform email system
-  const sendEmail = async (mode: "client" | "test") => {
-    const to = mode === "client" ? (offer.client_email || "").trim() : (user?.email || "").trim();
+  const sendEmail = async () => {
+    const to = (offer.client_email || "").trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
       toast({
-        title: mode === "client" ? "Nav klienta e-pasta" : "Nav tava e-pasta",
-        description: mode === "client" ? "Ievadi klienta e-pastu un saglabā." : "Pieslēdzies ar e-pasta kontu.",
+        title: "Nav klienta e-pasta",
+        description: "Ievadi klienta e-pastu un saglabā.",
         variant: "destructive",
       });
       return;
@@ -338,10 +338,9 @@ const AdminOfferEdit = () => {
       return;
     }
 
-    setSendingEmail(mode);
+    setSendingEmail("client");
     // Publish the link first so the client can open it
-    if (mode === "client") await save("sent");
-    else await save();
+    await save("sent");
 
     const t = offerTotals(offer.items, offer.vat_rate, offer.discount);
     const pmEmail = (offer.pm_email || user?.email || OFFICE_EMAIL).trim();
@@ -351,7 +350,7 @@ const AdminOfferEdit = () => {
         offerId: offer.id,
         recipientEmail: to,
         replyTo: pmEmail,
-        idempotencyKey: `pm-offer-${offer.id}-${mode}-${Date.now()}`,
+        idempotencyKey: `pm-offer-${offer.id}-client-${Date.now()}`,
         templateData: {
           title: offer.title || "Ervitex piedāvājums",
           clientName: offer.client_name || "",
@@ -377,7 +376,7 @@ const AdminOfferEdit = () => {
           vatRate: offer.vat_rate,
           url: offer.token ? offerUrl(offer.token) : "",
           disclaimer: PRINT_DISCLAIMER_LV,
-          isTest: mode === "test",
+          isTest: false,
         },
       },
     });
@@ -386,11 +385,11 @@ const AdminOfferEdit = () => {
       toast({ title: "Neizdevās nosūtīt", description: error.message, variant: "destructive" });
       return;
     }
-    if (mode === "client" && offer.status === "draft") {
+    if (offer.status === "draft") {
       // Status changes automatically on a successful send
       await save("sent");
     }
-    toast({ title: mode === "test" ? `Tests nosūtīts uz ${to}` : `Piedāvājums nosūtīts: ${to}` });
+    toast({ title: `Piedāvājums nosūtīts: ${to}` });
   };
 
 
@@ -623,20 +622,11 @@ const AdminOfferEdit = () => {
             </Button>
             <Button
               className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-              onClick={() => sendEmail("client")}
+              onClick={() => sendEmail()}
               disabled={sendingEmail !== null || saving}
             >
               <Send className="mr-2 h-4 w-4" />
               {sendingEmail === "client" ? "Sūta…" : "Nosūtīt piedāvājumu klientam"}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={() => sendEmail("test")}
-              disabled={sendingEmail !== null || saving}
-            >
-              {sendingEmail === "test" ? "Sūta testu…" : "Nosūtīt testu sev"}
             </Button>
 
 

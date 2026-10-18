@@ -71,11 +71,30 @@ const EVENT_LABELS: Record<string, string> = {
 
 const daysSince = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
 
+const PM_TABS = [
+  { slug: "all", label: "Visi" },
+  { slug: "laura", label: "Laura" },
+  { slug: "ilona", label: "Ilona" },
+  { slug: "justine", label: "Justīne" },
+  { slug: "santa", label: "Santa" },
+];
+
+/** Krāsu indikators pēc pieprasījuma vecuma: šodiena — zaļš, 1–2 d. — dzeltens, 3+ d. — sarkans. */
+const ageBadgeClass = (age: number) =>
+  age === 0
+    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+    : age <= 2
+      ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+      : "bg-destructive/15 text-destructive";
+
+const ageLabel = (age: number) => (age === 0 ? "Šodien" : age === 1 ? "Vakar" : `${age} d.`);
+
 const AdminQuotes = () => {
   const [quotes, setQuotes] = useState<QuoteRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [q, setQ] = useState("");
+  const [tab, setTab] = useState("all");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [events, setEvents] = useState<QuoteEvent[]>([]);
   const { toast } = useToast();
@@ -149,6 +168,7 @@ const AdminQuotes = () => {
 
   const visible = quotes
     .filter(matches)
+    .filter((row) => tab === "all" || row.assigned_pm_slug === tab)
     .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
 
   return (
@@ -175,6 +195,30 @@ const AdminQuotes = () => {
           placeholder="Meklēt: klients, uzņēmums, e-pasts, telefons, prece…"
           className="sm:max-w-sm"
         />
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {PM_TABS.map((t) => {
+          const count =
+            t.slug === "all"
+              ? quotes.length
+              : quotes.filter((row) => row.assigned_pm_slug === t.slug).length;
+          return (
+            <button
+              key={t.slug}
+              type="button"
+              onClick={() => setTab(t.slug)}
+              className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
+                tab === t.slug
+                  ? "bg-accent font-semibold text-accent-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label}
+              <span className="ml-1.5 text-xs opacity-70">{count}</span>
+            </button>
+          );
+        })}
       </div>
 
       <div className="mt-6 space-y-4">
@@ -216,9 +260,15 @@ const AdminQuotes = () => {
                       )}
                     </span>
                   </span>
-                  <span className="hidden shrink-0 text-right text-xs text-muted-foreground sm:block">
-                    {new Date(row.created_at).toLocaleDateString("lv")}
-                    <span className="block">{age === 0 ? "šodien" : `${age} d. atpakaļ`}</span>
+                  <span className="flex shrink-0 flex-col items-end gap-1">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${ageBadgeClass(age)}`}
+                    >
+                      {ageLabel(age)}
+                    </span>
+                    <span className="hidden text-xs text-muted-foreground sm:block">
+                      {new Date(row.created_at).toLocaleDateString("lv")}
+                    </span>
                   </span>
                   <ChevronDown
                     className={`mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform ${
