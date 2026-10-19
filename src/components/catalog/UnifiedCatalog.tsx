@@ -10,7 +10,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
-import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";

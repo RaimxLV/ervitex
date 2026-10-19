@@ -7,7 +7,6 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import { bucketOf, getBucket, type ColorBucketKey } from "@/lib/colorBuckets";
-import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { ETX_CATEGORY, ETX_BRAND, sublimationProducts } from "@/lib/etxCatalog";
 
