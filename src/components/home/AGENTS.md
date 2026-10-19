@@ -1,0 +1,1 @@
+- `.hero-ultra`: -webkit-text-stroke weight; leading per breakpoint.

@@ -1,0 +1,1 @@
+- Worksheet/offer prices come only from the exact colour+size row (colourless rows only for model-wide sources ru/etx); unknown or conflicting combinations stay null, never min/median of other variants, so clients never see another variant's price.
