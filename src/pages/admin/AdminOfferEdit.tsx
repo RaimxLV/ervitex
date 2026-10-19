@@ -17,12 +17,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import DiscountField from "@/components/quote/DiscountField";
-import { money, itemPrintNet, itemDiscountNet, itemDiscountPercent, itemTotalNet, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
+import { money, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem } from "@/lib/offer";
 import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
 import { ArrowLeft, ChevronDown, Copy, ExternalLink, Mail, MessageCircle, Printer, Repeat, Save, Search, Send, Trash2, Plus } from "lucide-react";
 import { fillMissingPrices } from "@/lib/fillMissingPrices";
 import { colorMatches } from "@/components/worksheet/useVariants";
 import { useOfferDraft } from "@/hooks/useOfferDraft";
+import { useServerFn } from "@tanstack/react-start";
+import { sendOffer } from "@/lib/sendOffer.functions";
 
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
@@ -54,6 +56,7 @@ const AdminOfferEdit = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const { user } = useAuth();
+  const sendSavedOffer = useServerFn(sendOffer);
   const { offer, setOffer, initialize, persist, saveState, saveError } = useOfferDraft(user?.id, id, emptyOffer);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -333,54 +336,17 @@ const AdminOfferEdit = () => {
     // Publish the link first so the client can open it
     if (!await save("sent")) { setSendingEmail(null); return; }
 
-    const t = offerTotals(offer.items, offer.vat_rate, offer.discount);
-    const pmEmail = (offer.pm_email || user?.email || OFFICE_EMAIL).trim();
-    const pmName = offer.pm_name || "";
-    const { error } = await supabase.functions.invoke("send-pm-offer", {
-      body: {
-        offerId: offer.id,
-        recipientEmail: to,
-        replyTo: pmEmail,
-        idempotencyKey: `pm-offer-${offer.id}-client-${Date.now()}`,
-        templateData: {
-          title: offer.title || "Ervitex piedāvājums",
-          clientName: offer.client_name || "",
-          note: [offer.note, ...getOrderPrints(offer.items).map((p) => `Apdruka visām precēm: ${p.method}${p.placement ? ` (${p.placement})` : ""}${p.price ? ` — ${money(p.price)}${p.mode === "total" ? " kopā" : " / gab."}` : ""}`)].filter(Boolean).join("\n"),
-          pmName,
-          pmEmail,
-
-          items: offer.items.map((i) => ({
-            name: i.name,
-            code: i.code,
-            colorName: i.colorName,
-            size: i.size,
-            qty: i.qty,
-            unitPrice: i.unitPrice ? money(i.unitPrice) : null,
-            discountPercent: itemDiscountPercent(i),
-            discountAmount: money(itemDiscountNet(i)),
-            lineTotal: i.unitPrice || itemPrintNet(i) ? money(itemTotalNet(i)) : "",
-            prints: (i.prints || []).filter((p) => p.scope !== "order").map((p) => `${p.method}${p.placement ? ` (${p.placement})` : ""}: ${money(Number(p.price))}${p.mode === "total" ? " kopā" : " / gab."}`),
-          })),
-          discount: t.discount > 0 ? `−${money(t.discount)}${offer.discount?.type === "percent" ? ` (${offer.discount.value}%)` : ""}` : "",
-          totalQty: t.qty,
-          net: money(t.net),
-          vat: money(t.vat),
-          gross: money(t.gross),
-          vatRate: offer.vat_rate,
-          url: offer.token ? offerUrl(offer.token) : "",
-          disclaimer: PRINT_DISCLAIMER_LV,
-          isTest: false,
-        },
-      },
-    });
-    setSendingEmail(null);
-    if (error) {
-      toast({ title: "Neizdevās nosūtīt", description: error.message, variant: "destructive" });
+    try {
+      const result = await sendSavedOffer({ data: { offerId: offer.id } });
+      if (!result.sent) {
+        toast({ title: "Šai adresei e-pasta piegāde ir bloķēta", variant: "destructive" });
+        return;
+      }
+    } catch {
+      toast({ title: "Neizdevās nosūtīt", variant: "destructive" });
       return;
-    }
-    if (offer.status === "draft") {
-      // Status changes automatically on a successful send
-      await save("sent");
+    } finally {
+      setSendingEmail(null);
     }
     toast({ title: `Piedāvājums nosūtīts: ${to}` });
   };
