@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { grossFromNet } from "@/lib/vat";
 
 export interface CatalogItemSeo {
   source: string;
@@ -8,6 +9,7 @@ export interface CatalogItemSeo {
   category: string | null;
   description: string | null;
   image: string | null;
+  /** Public GROSS prices (incl. 21% VAT), matching what the page displays. */
   lowPrice: number | null;
   highPrice: number | null;
 }
@@ -18,7 +20,10 @@ const VALID_SOURCES = ["ss", "nwg", "pf", "bb", "mf", "ru", "utt", "fr", "etx"];
 export async function loadCatalogItemSeo(source: string, id: string): Promise<CatalogItemSeo | null> {
   if (!VALID_SOURCES.includes(source) || !id) return null;
   try {
-    const [{ data: item }, { data: prices }] = await Promise.all([
+    // catalog_variant_prices.retail_price is NET. Min/max come from two
+    // ordered limit-1 queries, so the range is exact for any variant count
+    // (no row-cap truncation).
+    const [{ data: item }, { data: minRow }, { data: maxRow }] = await Promise.all([
       supabase
         .from("catalog_items")
         .select("source,id,name,brand,category,description,image_url")
@@ -32,10 +37,22 @@ export async function loadCatalogItemSeo(source: string, id: string): Promise<Ca
         .eq("style_code", id)
         .gt("retail_price", 0)
         .order("retail_price", { ascending: true })
-        .limit(1000),
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("catalog_variant_prices")
+        .select("retail_price")
+        .eq("source", source)
+        .eq("style_code", id)
+        .gt("retail_price", 0)
+        .order("retail_price", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
     if (!item?.name) return null;
-    const values = (prices ?? []).map((row) => Number(row.retail_price)).filter((v) => Number.isFinite(v) && v > 0);
+    const lowNet = Number(minRow?.retail_price);
+    const highNet = Number(maxRow?.retail_price);
+    const hasPrices = Number.isFinite(lowNet) && lowNet > 0 && Number.isFinite(highNet) && highNet > 0;
     return {
       source,
       id,
@@ -44,8 +61,9 @@ export async function loadCatalogItemSeo(source: string, id: string): Promise<Ca
       category: item.category,
       description: item.description,
       image: item.image_url,
-      lowPrice: values.length ? Math.min(...values) : null,
-      highPrice: values.length ? Math.max(...values) : null,
+      // JSON-LD must publish the same gross prices visitors see (net × 1.21).
+      lowPrice: hasPrices ? grossFromNet(lowNet) : null,
+      highPrice: hasPrices ? grossFromNet(highNet) : null,
     };
   } catch {
     return null;
