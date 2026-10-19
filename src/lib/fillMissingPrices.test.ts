@@ -33,4 +33,11 @@ describe("fillMissingPrices", () => {
     );
     expect(line.unitPrice).toBe(12);
   });
+
+  it("unit price is the single quantity=1 price for 1, 10 and 100 pieces", async () => {
+    const rows = [{ color_code: "C001", size: "M", retail_price: 6.39 }];
+    const lines = [1, 10, 100].map((qty) => ({ source: "ss", productId: "X", colorCode: "C001", size: "M", qty, unitPrice: 0 }));
+    const out = await fillMissingPrices(lines, async () => rows);
+    expect(out.map((l) => l.unitPrice)).toEqual([6.39, 6.39, 6.39]);
+  });
 });
