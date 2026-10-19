@@ -12,7 +12,7 @@
 - quote_events is append-only; insert trigger reuses email/latest PM, locked rotation advances for new clients only.
 - Normal email; burgundy worksheet links. Offers: admin-gated sendOffer/saved prices. Request bank fields: requestDetails/BILLING_FIELDS; staff email: print/files first.
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
-- Shared catalogPriceSelection defaults cards to the cheapest positive-priced colour and details to its cheapest size; explicit choices override, keeping prices aligned.
+- catalogPriceSelection binds card photo/price to cheapest allowed colour outside excluded groups, with fallback; explicit choices override, stock is irrelevant.
 - "Ir noliktavā" is a manual admin flag in `stock_flags` per colour (`item_id` = `${id}::${color_code}`; bare `${id}` rows are legacy model-wide flags), separate from supplier data so syncs never erase it; it shows only in the product view for the selected colour, never on catalog cards; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.
 - Shared worksheet/offer prints use scope="order" in existing item JSON; orderPrinting preserves offer-wide prints on deletion, preventing duplicate charges and extra storage.
 - Stock mutation controls render only after the authenticated admin role resolves, and every mutation revalidates the live user and role before writing; public users only see the outlined availability label.

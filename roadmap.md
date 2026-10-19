@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Izolēti priekšskatījumā: White/Natural sākuma izvēle, foto/krāsas/cenas saskaņošana un mērķētie testi; bez DB, formulām, sinhronizācijas vai publicēšanas.
 - [x] Katalogā rādīt meklēto modeļa kodu, ne krāsas/izmēra kodu (169, ne 1694412); abu meklētāju 169 secība, 167/1672/STTU169 un 18 testi pārbaudīti.
 - [x] Banka, IBAN un SWIFT/BIC rekvizītos; apdrukas/failu statusi un saites augšā. Pārbaudīts ceļš no īstas preces līdz formai, e-pasta izskats, 12 testi un bankas validācija datubāzē; reāls e-pasts netika nosūtīts.
 - [x] Vienādot galvenās izvēlnes un kataloga meklēšanu; 15 testi un abu meklētāju „167” rezultātu secība pārbaudīta pārlūkā.
