@@ -34,3 +34,13 @@ describe("individual offer discounts", () => {
     expect(itemDiscountNet({ ...item, qty: 5, discountPercent: 12.5 })).toBe(12.5);
   });
 });
+describe("admin summary arithmetic", () => {
+  it("goods before discount minus item discount equals goods after discount", () => {
+    const t = offerTotals([{ ...item, discountPercent: 15 }]);
+    expect(t.goods + t.itemDiscount).toBe(200);
+    expect(t.goods).toBe(170);
+  });
+  it("0% VAT stays 0%", () => {
+    expect(offerTotals([item], 0).gross).toBe(200);
+  });
+});

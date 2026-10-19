@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import DiscountField from "@/components/quote/DiscountField";
-import { money, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem } from "@/lib/offer";
+import { money, round2, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem } from "@/lib/offer";
 import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
 import { ArrowLeft, ChevronDown, Copy, ExternalLink, Mail, MessageCircle, Printer, Repeat, Save, Search, Send, Trash2, Plus } from "lucide-react";
 import { fillMissingPrices } from "@/lib/fillMissingPrices";
