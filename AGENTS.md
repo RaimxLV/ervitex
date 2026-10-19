@@ -30,3 +30,4 @@
 - Headwear shares facets; bump cache schema on changes.
 - ADMIN_HOME opens requests; supplier tools use /admin/overview.
 - Subdirectories have their own AGENTS.md; read it before changing files there. Unapplied price SQL lives in docs/pending-migrations for before/after review.
+- Catalog reads use AbortSignal timeouts and show error+retry (never endless skeletons or a partial catalog as complete); filter order falls back to default order on failure.
