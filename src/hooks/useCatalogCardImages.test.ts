@@ -17,8 +17,19 @@ describe("cardImageFrames (Russell bez krāsas kataloga bildes)", () => {
   it("two colours give different first photos", () => {
     expect(cardImageFrames(rows, "Black", model, false, "ru")[0]).not.toBe(cardImageFrames(rows, "Bottle Green", model, false, "ru")[0]);
   });
-  it("colour without photos keeps model photo, never another colour's", () => {
+  it("colour without photos shows no model or other-colour photo", () => {
     const f = cardImageFrames(rows, "Orange", model, false, "ru");
-    expect(f).toEqual([model]);
+    expect(f).toEqual([]);
+  });
+});
+
+describe("izvēlētā krāsa bez savām bildēm", () => {
+  it("nerāda modeļa melno vai bezkrāsas kadrus", () => {
+    expect(cardImageFrames([{ color: null, url: "https://x/model.jpg" } as never], "GREEN", "https://x/black.jpg", false)).toEqual([]);
+  });
+  it("savas zaļās bildes joprojām rāda", () => {
+    const out = cardImageFrames([{ color: "GREEN", url: "https://x/green.jpg" } as never], "GREEN", "https://x/black.jpg", false);
+    expect(out).toHaveLength(1);
+    expect(out[0]).toContain("green.jpg");
   });
 });

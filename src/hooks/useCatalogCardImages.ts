@@ -121,7 +121,8 @@ export function cardImageFrames(rows: ImageRow[], color: string | null, first: s
   const ssColor = source === "ss" ? color?.match(/C\d{3}/i)?.[0] : null;
   const candidates = colorCodeCandidates(ssColor || color).map(value => value.toLowerCase());
   const own = rows.filter(row => row.color && colorCodeCandidates(row.color).some(value => candidates.includes(value.toLowerCase())));
-  const selected = own.length ? own : rows.filter(row => !row.color);
-  const lead = firstIsColor || !own.length ? first : null;
+  // Izvēlēta krāsa: tikai tās pašas krāsas kadri (tukšs, ja nav); modeļa kadri tikai bez krāsas.
+  const selected = color ? own : rows.filter(row => !row.color);
+  const lead = firstIsColor || !color ? first : null;
   return [...new Set([lead, ...selected.map(row => thumbUrl(row.url || row.alternate || null))].filter((url): url is string => Boolean(url)))];
 }
