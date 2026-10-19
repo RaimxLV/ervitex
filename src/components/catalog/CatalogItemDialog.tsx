@@ -73,6 +73,8 @@ interface ProductDetail {
   skus?: Record<string, string>;
   /** Display size label -> raw supplier size code (used to match price rows). */
   sizeAliases?: Record<string, string>;
+  /** SKU -> displayed size label (NWG: duplicate supplier names carry the size code). */
+  skuSizes?: Record<string, string>;
 
 }
 
@@ -391,17 +393,23 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
       if (n < 1 || n > 12) return false;
       return !Number.isFinite(x.seq) || x.seq === n * 10 || x.seq === n;
     });
-  const sizeLabel = (s: string) => nameBySize.get(s) || (codeSized ? NWG_SIZE_CODES[s] || s : s);
+  const baseSizeLabel = (s: string) => nameBySize.get(s) || (codeSized ? NWG_SIZE_CODES[s] || s : s);
+  // NWG sometimes gives two size codes the same name (649066: 4 and 5 are both "S/M").
+  // Only for such duplicates the supplier size code is shown, so each SKU keeps its own size and price.
+  const dupLabels = nwgDuplicateSizeLabels(skus.map((sk: any) => ({ item: sk.item_number || "", code: sk.size, label: sk.size ? baseSizeLabel(sk.size) : "" })));
+  const sizeLabel = (s: string) => (dupLabels.has(baseSizeLabel(s)) ? `${baseSizeLabel(s)} (${s})` : baseSizeLabel(s));
 
 
   const sizesByItem = new Map<string, { s: string; seq: number }[]>();
   const skuMap: Record<string, string> = {};
+  const skuSizes: Record<string, string> = {};
   for (const sk of skus) {
     const it = (sk as any).item_number || "";
     if (!sizesByItem.has(it)) sizesByItem.set(it, []);
     const sz = (sk as any).size;
     if (sz) sizesByItem.get(it)!.push({ s: sizeLabel(sz), seq: Number((sk as any).size_sequence) || 0 });
     if ((sk as any).sku && it) skuMap[`${it}|${sz ? sizeLabel(sz) : ""}`] = (sk as any).sku;
+    if ((sk as any).sku && sz) skuSizes[(sk as any).sku] = sizeLabel(sz);
   }
 
   const seqBySize = new Map<string, number>();
@@ -475,6 +483,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
     sizes,
     colors,
     skus: skuMap,
+    skuSizes,
     sizeAliases: codeSized
       ? Object.fromEntries(rawSkuSizes.map((x) => [sizeLabel(x.s!), x.s!]))
       : undefined,
@@ -1119,6 +1128,7 @@ const translateLabel = (label: string, lang: "lv" | "en") => {
 import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
 import { StockRibbon, StockToggle } from "./StockBadge";
 import { useAuth } from "@/hooks/useAuth";
+import { nwgDuplicateSizeLabels } from "@/lib/nwgSizes";
 
 const CatalogItemDialog = ({
   open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback, inline,
@@ -1317,7 +1327,9 @@ const CatalogItemDialog = ({
       if (byColor.length || source === "pf") rows = byColor;
     }
     if (selectedSize) {
-      const bySize = rows.filter((r) => sizeKey(r.size) === norm(selectedSize));
+      // A SKU with its own size label (NWG duplicates) is matched by SKU, never by the shared name.
+      const skuSizes = displayDetail.skuSizes || {};
+      const bySize = rows.filter((r) => (r.sku && skuSizes[r.sku] ? norm(skuSizes[r.sku]) : sizeKey(r.size)) === norm(selectedSize));
       if (bySize.length || source === "pf") rows = bySize;
       // PF: izvēlētajai krāsai+izmēram jābūt tieši vienai SKU un cenai.
       if (source === "pf" && (new Set(rows.map((r) => r.sku).filter(Boolean)).size > 1 || new Set(rows.map((r) => Number(r.retail_price))).size > 1)) return null;
@@ -1329,7 +1341,7 @@ const CatalogItemDialog = ({
       max: Math.max(...values),
       currency: rows[0]?.currency || "EUR",
     };
-  }, [variantPrices, currentColor, selectedSize, rawToLabel, source]);
+  }, [variantPrices, currentColor, selectedSize, rawToLabel, source, displayDetail.skuSizes]);
 
   // Price per size (excl. VAT) for the currently selected colour
   const sizePriceMap = useMemo(() => {
@@ -1346,7 +1358,8 @@ const CatalogItemDialog = ({
     for (const r of rows) {
       const raw = (r.size ?? "").toString().trim();
       // Preces bez izmēra (somas, cepures) — cena zem "-", lai tā nonāk grozā.
-      const size = raw ? rawToLabel[raw.toLowerCase()] || raw : "-";
+      const own = r.sku ? displayDetail.skuSizes?.[r.sku] : undefined;
+      const size = own || (raw ? rawToLabel[raw.toLowerCase()] || raw : "-");
       const v = Number(r.retail_price);
       if (!Number.isFinite(v) || v <= 0) continue;
       // PF: atšķirīgas cenas vienā krāsā+izmērā → bez cenas, nevis lētākā.
@@ -1357,7 +1370,7 @@ const CatalogItemDialog = ({
     }
     for (const size of pfConflict) delete map[size];
     return map;
-  }, [variantPrices, currentColor, rawToLabel, source]);
+  }, [variantPrices, currentColor, rawToLabel, source, displayDetail.skuSizes]);
 
 
 
