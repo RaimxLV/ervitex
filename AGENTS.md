@@ -8,7 +8,7 @@
 - Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
 - Office contours/hotspots share cover-scene coordinates; halos use separate feGaussianBlur polygons with oversized regions to prevent clipping.
 - Team uses immutable photo_url/framing and current CDN fallbacks; admin-only writes. Manual uploads share WebP optimization to avoid heavy originals.
-- Worksheets autosave side-specific drafts; explicit confirmation alone updates the shared list and creates an immutable version, preventing client/staff overwrites.
+- Worksheets autosave side-specific drafts; explicit confirmation alone updates the shared list and creates an immutable version, preventing overwrites.
 - quote_events is append-only; insert trigger reuses email/latest PM, locked rotation advances for new clients only.
 - Normal email; burgundy worksheet links. Offers: admin-gated sendOffer/saved prices. Request bank fields: requestDetails/BILLING_FIELDS; staff email: print/files first.
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
@@ -28,5 +28,5 @@
 - ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
 - Headwear shares facets (bump cache schema on changes). ADMIN_HOME opens requests; supplier tools use /admin/overview.
-- Subdirectories have their own AGENTS.md; read it before changing files there. Unapplied price SQL lives in docs/pending-migrations for before/after review.
+- Read subdirectory AGENTS.md before changing files there. Unapplied price SQL lives in docs/pending-migrations for before/after review.
 - Catalog reads time out into error+retry, never endless skeletons or partial-as-complete; filter order falls back to default.
