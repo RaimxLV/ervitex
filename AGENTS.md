@@ -27,7 +27,6 @@
 - UTT uses `utt-sync` Data Export into `utt_*`; service-role-only `utt_prices`; images mirrored in `utt-images` because UTT blocks hotlinking.
 - ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
-- QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.
 - Headwear shares facets; bump cache schema on changes.
 - ADMIN_HOME opens requests; supplier tools use /admin/overview.
 - Subdirectories have their own AGENTS.md; read it before changing files there. Unapplied price SQL lives in docs/pending-migrations for before/after review.
