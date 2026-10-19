@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { requestBillingSchema, requestPrintStatus } from "@/lib/requestDetails";
 import { Link, useNavigate } from "@/lib/router-compat";
 import OfferWorkspace from "@/components/quote/OfferWorkspace";
 import { QuoteItemsTable } from "@/components/quote/QuoteItemsTable";
@@ -16,7 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Upload, Send } from "lucide-react";
+import { Trash2, Upload, Send, Printer, Paperclip } from "lucide-react";
 
 const MAX_FILES = 10;
 const MAX_FILE_MB = 15;
@@ -30,9 +31,15 @@ const RequestPage = () => {
 
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "" });
-  const [billing, setBilling] = useState({ company: "", regNo: "", vatNo: "", address: "", delivery: "" });
+  const [billing, setBilling] = useState({ company: "", regNo: "", vatNo: "", address: "", delivery: "", bank: "", iban: "", bic: "" });
   const [print, setPrint] = useState({ method: "", placement: "", colors: "", deadline: "", notes: "" });
   const [files, setFiles] = useState<File[]>([]);
+  const [fileLinks, setFileLinks] = useState<{ name: string; url: string }[]>([]);
+  useEffect(() => {
+    const links = files.map((file) => ({ name: file.name, url: URL.createObjectURL(file) }));
+    setFileLinks(links);
+    return () => links.forEach((file) => URL.revokeObjectURL(file.url));
+  }, [files]);
   const [sending, setSending] = useState(false);
   const { create: createOffer, busy: creatingOffer } = useCreateOffer();
   const { isAdmin } = useAuth();
@@ -53,11 +60,15 @@ const RequestPage = () => {
 
   const removeFile = (idx: number) => setFiles((prev) => prev.filter((_, i) => i !== idx));
 
-  const createFromForm = () => createOffer(true, {
+  const createFromForm = () => {
+    const checked = requestBillingSchema.safeParse(billing);
+    if (!checked.success) { toast({ title: t("Pārbaudi bankas rekvizītus", "Check bank details"), variant: "destructive" }); return; }
+    return createOffer(true, {
     client_name: form.name.trim(), client_email: form.email.trim() || null,
     client_phone: form.phone.trim() || null, client_company: form.company.trim() || null,
-    client_billing: billing, note: print.notes || null,
+    client_billing: checked.data, note: print.notes || null,
   }, print.method && print.method !== "none" ? [{ method: ({ silkscreen: "Sietspiede", dtf: "DTF", termodruka: "Termodruka", embroidery: "Izšūšana", sublimation: "Sublimācija", other: "Cita" } as Record<string, string>)[print.method] || print.method, placement: print.placement || null, price: null, mode: "unit" }] : []);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +84,11 @@ const RequestPage = () => {
       return;
     }
 
+    const checkedBilling = requestBillingSchema.safeParse(billing);
+    if (!checkedBilling.success) {
+      toast({ title: t("Pārbaudi bankas rekvizītus", "Check bank details"), variant: "destructive" });
+      return;
+    }
     setSending(true);
     try {
       const messageParts: string[] = [];
@@ -101,7 +117,7 @@ const RequestPage = () => {
           deadline: print.deadline || null,
           file_urls: [],
           billing: Object.values(billing).some((v) => v.trim())
-            ? Object.fromEntries(Object.entries(billing).map(([k, v]) => [k, v.trim().slice(0, 300)]).filter(([, v]) => v))
+            ? Object.fromEntries(Object.entries(checkedBilling.data).filter(([, v]) => v))
             : null,
         } as any);
       if (insErr) throw insErr;
@@ -173,6 +189,20 @@ const RequestPage = () => {
       
             <div className="min-w-0 space-y-6 sm:space-y-8">
 
+              <section aria-label={t("Apdruka un faili", "Decoration and files")} className="border-y-2 border-accent bg-accent/5 py-4">
+                <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                  <div className="flex items-center gap-2 text-sm font-bold uppercase text-accent"><Printer className="h-5 w-5 shrink-0" />
+                    {requestPrintStatus(print.method) === "required" ? t("Apdruka nepieciešama", "Decoration required") : requestPrintStatus(print.method) === "none" ? t("Bez apdrukas", "No decoration") : t("Apdruka nav norādīta", "Decoration not specified")}
+                  </div>
+                  <a href="#request-files" className="flex items-center gap-2 text-sm font-semibold underline underline-offset-4"><Paperclip className="h-5 w-5 shrink-0" />{t("Pievienoti faili", "Attached files")}: {files.length}</a>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button type="button" size="sm" variant={print.method && print.method !== "none" ? "default" : "outline"} onClick={() => setPrint({ ...print, method: print.method && print.method !== "none" ? print.method : "consult" })}>{t("Nepieciešama apdruka", "Decoration required")}</Button>
+                  <Button type="button" size="sm" variant={print.method === "none" ? "default" : "outline"} onClick={() => setPrint({ ...print, method: "none", placement: "", colors: "" })}>{t("Bez apdrukas", "No decoration")}</Button>
+                </div>
+                {fileLinks.length > 0 && <ul className="mt-3 space-y-2">{fileLinks.map((file) => <li key={file.url}><a href={file.url} target="_blank" rel="noopener noreferrer" className="block break-all text-sm font-medium text-accent underline underline-offset-4">{file.name} ↗</a></li>)}</ul>}
+              </section>
+
               {/* Items */}
               <section>
                 <div className="mb-5 flex items-end justify-between gap-3 border-b-2 border-foreground pb-3">
@@ -193,7 +223,7 @@ const RequestPage = () => {
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
-                    <Select value={print.method || "consult"} onValueChange={(value) => setPrint({ ...print, method: value === "consult" ? "" : value })}>
+                    <Select value={print.method || "consult"} onValueChange={(value) => setPrint({ ...print, method: value })}>
                       <SelectTrigger aria-label={t("Apdrukas metode visām precēm", "Print method for all items")}><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="consult">{t("Nezinu / konsultēties", "Not sure / consult")}</SelectItem>
@@ -222,7 +252,7 @@ const RequestPage = () => {
 
 
               {/* Files */}
-              <section className="border-t border-border py-6">
+              <section id="request-files" className="border-t border-border py-6">
                 <h2 className="mb-6 section-kicker font-heading text-xs font-bold uppercase text-accent">
                   {t("Faili (logo, dizains)", "Files (logo, artwork)")}
                 </h2>
@@ -316,10 +346,13 @@ const RequestPage = () => {
                         ["vatNo", t("PVN Nr.", "VAT No.")],
                         ["address", t("Juridiskā adrese", "Legal address")],
                         ["delivery", t("Piegādes adrese", "Delivery address")],
+                        ["bank", t("Banka", "Bank")],
+                        ["iban", t("Konta numurs (IBAN)", "Account number (IBAN)")],
+                        ["bic", "SWIFT/BIC"],
                       ] as const).map(([k, label]) => (
                         <div key={k} className="space-y-1.5">
                           <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</Label>
-                          <Input className="h-11 rounded-sm" maxLength={300} value={billing[k]} onChange={(e) => setBilling({ ...billing, [k]: e.target.value })} />
+                          <Input aria-label={label} className="h-11 rounded-sm" maxLength={k === "iban" ? 42 : k === "bic" ? 11 : 300} value={billing[k]} onChange={(e) => setBilling({ ...billing, [k]: e.target.value })} />
                         </div>
                       ))}
                     </div>

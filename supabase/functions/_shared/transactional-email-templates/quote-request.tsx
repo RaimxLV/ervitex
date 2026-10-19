@@ -24,6 +24,7 @@ interface Props {
   billing?: string[]
   message?: string
   files?: string[]
+  fileCount?: number
   print_method?: string
   print_placement?: string
   print_colors?: string
@@ -50,6 +51,8 @@ const worksheetLink = {
   textUnderlineOffset: '4px',
 }
 const noteBox = { whiteSpace: 'pre-line' as const, fontSize: '13px', background: '#f6f6f6', padding: '10px', borderRadius: '3px' }
+const requestSummary = { borderTop: '3px solid #991b2f', borderBottom: '1px solid #991b2f', backgroundColor: '#faf3f4', padding: '14px', marginBottom: '18px' }
+const statusText = { color: '#991b2f', fontSize: '15px', fontWeight: 'bold' as const, margin: '0 0 8px', lineHeight: '22px' }
 
 const QuoteRequestEmail = ({
   ref: _ref = '',
@@ -61,6 +64,7 @@ const QuoteRequestEmail = ({
   billing = [],
   message = '',
   files = [],
+  fileCount,
   print_method = '',
   print_placement = '',
   print_colors = '',
@@ -68,6 +72,9 @@ const QuoteRequestEmail = ({
   submittedAt = '',
 }: Props) => {
   const hasPrint = !!(print_method || print_placement || print_colors || deadline)
+  const printStatus = print_method === 'none' ? 'BEZ APDRUKAS' : print_method ? 'APDRUKA NEPIECIEŠAMA' : 'APDRUKA NAV NORĀDĪTA'
+  const methodName = ({ consult: 'Nezinu / konsultēties', silkscreen: 'Sietspiede', dtf: 'DTF', termodruka: 'Termodruka', embroidery: 'Izšūšana', sublimation: 'Sublimācija', other: 'Cita', none: 'Bez apdrukas' } as Record<string, string>)[print_method] || print_method
+  const attachedCount = fileCount ?? files.length
 
   return (
     <Html lang="lv">
@@ -78,6 +85,16 @@ const QuoteRequestEmail = ({
           <Section style={header}>
             <Heading style={h1}>JAUNS PIEPRASĪJUMS</Heading>
             {submittedAt ? <Text style={subtle}>{submittedAt}</Text> : null}
+          </Section>
+
+          <Section style={requestSummary}>
+            <Text style={statusText}>{printStatus}</Text>
+            <Text style={statusText}>PIEVIENOTI FAILI: {attachedCount}</Text>
+            {files.map((u, i) => (
+              <Text key={i} style={{ margin: '8px 0', fontSize: '14px', overflowWrap: 'anywhere' }}>
+                <Link href={u} style={worksheetLink}>{decodeURIComponent((u.split('?')[0] || u).split('/').pop() || `Fails ${i + 1}`).replace(/^[0-9a-f]{8}-[0-9a-f-]{27}-/i, '')} →</Link>
+              </Text>
+            ))}
           </Section>
 
           {worksheetUrl ? (
@@ -102,7 +119,7 @@ const QuoteRequestEmail = ({
               <Heading as="h3" style={h3}>Apdruka</Heading>
               <table style={{ fontSize: '13px' }}>
                 <tbody>
-                  {print_method ? <tr><td style={label}>Metode:</td><td style={value}>{print_method}</td></tr> : null}
+                  {print_method ? <tr><td style={label}>Metode:</td><td style={value}>{methodName}</td></tr> : null}
                   {print_placement ? <tr><td style={label}>Vieta:</td><td style={value}>{print_placement}</td></tr> : null}
                   {print_colors ? <tr><td style={label}>Krāsas:</td><td style={value}>{print_colors}</td></tr> : null}
                   {deadline ? <tr><td style={label}>Termiņš:</td><td style={value}>{deadline}</td></tr> : null}
@@ -115,17 +132,6 @@ const QuoteRequestEmail = ({
             <>
               <Heading as="h3" style={h3}>Piezīmes</Heading>
               <Text style={noteBox}>{message}</Text>
-            </>
-          ) : null}
-
-          {files.length > 0 ? (
-            <>
-              <Heading as="h3" style={h3}>Faili</Heading>
-              <ul style={{ paddingLeft: '18px', fontSize: '13px' }}>
-                {files.map((u, i) => (
-                  <li key={i}><Link href={u}>{(u.split('?')[0] || u).split('/').pop() || u}</Link></li>
-                ))}
-              </ul>
             </>
           ) : null}
 

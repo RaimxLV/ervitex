@@ -102,6 +102,9 @@ export interface Billing {
   vatNo?: string;
   address?: string;
   delivery?: string;
+  bank?: string;
+  iban?: string;
+  bic?: string;
 }
 
 export const BILLING_FIELDS: { key: keyof Billing; label: string }[] = [
@@ -110,6 +113,9 @@ export const BILLING_FIELDS: { key: keyof Billing; label: string }[] = [
   { key: "vatNo", label: "PVN Nr." },
   { key: "address", label: "Juridiskā adrese" },
   { key: "delivery", label: "Piegādes adrese" },
+  { key: "bank", label: "Banka" },
+  { key: "iban", label: "Konta numurs (IBAN)" },
+  { key: "bic", label: "SWIFT/BIC" },
 ];
 
 export const hasBilling = (b?: Billing | null) => !!b && BILLING_FIELDS.some((f) => (b[f.key] || "").trim());

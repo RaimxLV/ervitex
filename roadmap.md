@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Banka, IBAN un SWIFT/BIC rekvizītos; apdrukas/failu statusi un saites augšā. Pārbaudīts ceļš no īstas preces līdz formai, e-pasta izskats, 12 testi un bankas validācija datubāzē; reāls e-pasts netika nosūtīts.
 - [x] Vienādot galvenās izvēlnes un kataloga meklēšanu; 15 testi un abu meklētāju „167” rezultātu secība pārbaudīta pārlūkā.
 - [x] Atkārtotos klientus saglabāt pie līdzšinējās projektu vadītājas; jaunos sadalīt pa apli; pārbaudīta e-pasta normalizēšana, Laura → Ilona → Justīne → Santa un nodošana Evitai, bez testa ierakstu saglabāšanas vai e-pastiem.
 - [x] Sakārtot ciparu kodu meklēšanu: vienāds ciparu skaits, precīzie pirms tuvākajiem kodiem (±2); 28 testi un „167” pārbaudīts meklētājā/katalogā bez garākiem kodiem.
