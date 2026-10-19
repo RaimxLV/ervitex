@@ -62,3 +62,24 @@ describe("sizesForColor", () => {
     expect(sizesForColor("ss", rows, null).map((s) => s.price)).toEqual([null, null]);
   });
 });
+
+describe("Russell deklarētie izmēri", () => {
+  const sizes = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL"];
+  const rows = [{ color_code: null, size: null, retail_price: 12.5 }];
+  it("rāda 8 ru_styles izmērus ar vienu modeļa cenu", () => {
+    const out = sizesForColor("ru", rows, "0R013M0-36", sizes);
+    expect(out.map((r) => r.size)).toEqual(sizes);
+    expect(new Set(out.map((r) => r.price))).toEqual(new Set([12.5]));
+  });
+  it("tukšs saraksts neizdomā izmērus", () => {
+    expect(sizesForColor("ru", rows, null, []).map((r) => r.size)).toEqual(["-"]);
+  });
+  it("konfliktējošas cenas -> null", () => {
+    const out = sizesForColor("ru", [...rows, { color_code: null, size: null, retail_price: 14 }], null, sizes);
+    expect(out.every((r) => r.price === null)).toBe(true);
+  });
+  it("citi avoti ignorē deklarētos izmērus", () => {
+    const out = sizesForColor("ss", [{ color_code: "C001", size: "M", retail_price: 9 }], "C001", sizes);
+    expect(out.map((r) => r.size)).toEqual(["M"]);
+  });
+});

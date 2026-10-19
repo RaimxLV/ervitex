@@ -101,7 +101,22 @@ export const priceForVariant = (
 };
 
 /** Izmēri un cenas tikai izvēlētajai krāsai; bez citu krāsu rezerves. */
-export const sizesForColor = (source: string | null | undefined, prices: VariantPrice[], colorCode?: string | null) => {
+export const sizesForColor = (
+  source: string | null | undefined,
+  prices: VariantPrice[],
+  colorCode?: string | null,
+  declaredSizes?: string[] | null,
+) => {
+  // Russell: cena vienota visam modelim un bez izmēra; izmēri nāk no ru_styles.sizes.
+  const declared = [...new Set((declaredSizes || []).map((x) => (x || "").trim()).filter(Boolean))];
+  if (source === "ru" && declared.length) {
+    const pool = rowsForColor(source, prices, colorCode ?? null);
+    const sizeless = pool.every((r) => !(r.size || "").trim() || r.size?.trim() === "-");
+    const price = sizeless ? singlePrice(pool) : null;
+    return declared
+      .map((size) => ({ size, raw: size, price }))
+      .sort((a, b) => sizeIdx(a.size) - sizeIdx(b.size) || a.size.localeCompare(b.size));
+  }
   const label = sizeLabeller(source, prices);
   const pool = colorCode ? rowsForColor(source, prices, colorCode) : prices;
   const map = new Map<string, { raw: string; rows: VariantPrice[] }>();
@@ -144,17 +159,19 @@ export const useVariants = (source?: string | null, styleCode?: string | null) =
   const [item, setItem] = useState<CatalogHit | null>(null);
   const [prices, setPrices] = useState<VariantPrice[]>([]);
   const [loading, setLoading] = useState(false);
+  const [declaredSizes, setDeclaredSizes] = useState<string[] | null>(null);
 
   useEffect(() => {
     if (!source || !styleCode) {
       setItem(null);
       setPrices([]);
+      setDeclaredSizes(null);
       return;
     }
     let alive = true;
     setLoading(true);
     (async () => {
-      const [{ data }, rows] = await Promise.all([
+      const [{ data }, rows, ru] = await Promise.all([
         supabase
           .from("catalog_items" as never)
           .select("source,id,name,brand,image_url,colors")
@@ -162,8 +179,12 @@ export const useVariants = (source?: string | null, styleCode?: string | null) =
           .eq("id", styleCode)
           .maybeSingle(),
         fetchVariantPrices(source, styleCode),
+        source === "ru"
+          ? supabase.from("ru_styles").select("sizes").eq("style_code", styleCode).maybeSingle()
+          : Promise.resolve({ data: null }),
       ]);
       if (!alive) return;
+      setDeclaredSizes(((ru as { data: { sizes: string[] | null } | null }).data?.sizes) || null);
       setItem((data as unknown as CatalogHit) || null);
       setPrices(rows);
       setLoading(false);
@@ -175,7 +196,7 @@ export const useVariants = (source?: string | null, styleCode?: string | null) =
 
   const colors = useMemo(() => (item?.colors || []).filter((c) => c?.n || c?.c), [item]);
 
-  const sizesFor = (colorCode?: string | null) => sizesForColor(source, prices, colorCode);
+  const sizesFor = (colorCode?: string | null) => sizesForColor(source, prices, colorCode, declaredSizes);
 
   return { item, prices, colors, sizesFor, loading };
 };
