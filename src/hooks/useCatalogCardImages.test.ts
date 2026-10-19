@@ -22,3 +22,14 @@ describe("cardImageFrames (Russell bez krāsas kataloga bildes)", () => {
     expect(f).toEqual([model]);
   });
 });
+
+describe("izvēlētā krāsa bez savām bildēm", () => {
+  it("nerāda modeļa melno vai bezkrāsas kadrus", () => {
+    expect(cardImageFrames([{ color: null, url: "https://x/model.jpg" } as never], "GREEN", "https://x/black.jpg", false)).toEqual([]);
+  });
+  it("savas zaļās bildes joprojām rāda", () => {
+    const out = cardImageFrames([{ color: "GREEN", url: "https://x/green.jpg" } as never], "GREEN", "https://x/black.jpg", false);
+    expect(out).toHaveLength(1);
+    expect(out[0]).toContain("green.jpg");
+  });
+});
