@@ -14,5 +14,5 @@ export const teamSportswearPrices = [
 ] as const;
 
 export function sportswearGross(net: number): number {
-  return Math.round((net * 1.21 + Number.EPSILON) * 100) / 100;
+  return grossFromNet(net);
 }
