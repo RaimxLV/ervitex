@@ -8,7 +8,7 @@ import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import { bucketOf, getBucket, type ColorBucketKey } from "@/lib/colorBuckets";
 import { colorCodeCandidates } from "@/lib/colorCodeMatch";
-import { lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { ETX_CATEGORY, ETX_BRAND, sublimationProducts } from "@/lib/etxCatalog";
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
@@ -104,13 +104,7 @@ const RelatedCard = ({
   );
 
   const colorCode = (c: ColorEntry) => row.source === "pf" ? c.n : c.c || c.n;
-  const colorPrice = (c: ColorEntry) => {
-    for (const k of colorCodeCandidates(colorCode(c))) {
-      const hit = prices.get(`${row.source}:${row.id}:${k}`);
-      if (hit) return hit;
-    }
-    return undefined;
-  };
+  const colorPrice = (c: ColorEntry) => catalogColorPrice(prices, row.source, row.id, c);
   const cheapest = lowestPriceColorIndex(colors, (c) => colorPrice(c)?.price);
   const active = activeIdx !== null ? colors.find((c) => c.idx === activeIdx) ?? null : null;
   const displayed = active || (cheapest >= 0 ? colors[cheapest] : colors[0]) || null;

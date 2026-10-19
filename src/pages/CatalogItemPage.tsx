@@ -8,7 +8,7 @@ import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { colorCodeCandidates } from "@/lib/colorCodeMatch";
-import { lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { categoryFromName } from "@/lib/catalogCategory";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
@@ -171,13 +171,7 @@ const CatalogItemPage = () => {
               {related.map((r) => {
                 const cols = (r.colors || []).filter((c) => c && (c.h || c.n));
                 const colorCode = (c: ColorEntry) => r.source === "pf" ? c.n : c.c || c.n;
-                const colorPrice = (c: ColorEntry) => {
-                  for (const k of colorCodeCandidates(colorCode(c))) {
-                    const hit = prices.get(`${r.source}:${r.id}:${k}`);
-                    if (hit) return hit;
-                  }
-                  return undefined;
-                };
+                const colorPrice = (c: ColorEntry) => catalogColorPrice(prices, r.source, r.id, c);
                 const cheapest = lowestPriceColorIndex(cols, (c) => colorPrice(c)?.price);
                 const swatches = cols.slice(0, 8).map((c, index) => ({
                   hex: c.h ?? null,
