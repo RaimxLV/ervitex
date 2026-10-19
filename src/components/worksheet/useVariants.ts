@@ -62,8 +62,8 @@ export const rowsForColor = (source: string | null | undefined, rows: VariantPri
   const modelWide = MODEL_WIDE_PRICE_SOURCES.has(source || "");
   const colorless = rows.filter((r) => !(r.color_code || "").trim());
   if (!colorCode) {
-    // Bez krāsas izvēles der tikai rindas, kurām krāsas nav vispār.
-    return colorless.length === rows.length || modelWide ? rows : [];
+    // Bez krāsas izvēles der tikai patiesi bezkrāsas rindas; krāsainās nekad nejauc.
+    return colorless.length === rows.length || modelWide ? colorless : [];
   }
   const exact = rows.filter((r) => colorMatches(r.color_code, colorCode));
   if (exact.length) return exact;

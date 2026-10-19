@@ -35,6 +35,22 @@ describe("priceForVariant", () => {
   });
 });
 
+describe("model-wide sources with mixed rows", () => {
+  const mixed = [
+    { color_code: null, size: null, retail_price: 12 },
+    { color_code: "Black", size: null, retail_price: 15 },
+  ];
+  it("without colour uses only the colourless row, not coloured ones", () => {
+    expect(priceForVariant("ru", mixed, null, null).price).toBe(12);
+  });
+  it("exact colour row wins over the colourless one", () => {
+    expect(priceForVariant("ru", mixed, "Black", null).price).toBe(15);
+  });
+  it("unknown colour falls back only to the colourless row", () => {
+    expect(priceForVariant("etx", mixed, "Red", null).price).toBe(12);
+  });
+});
+
 describe("sizesForColor", () => {
   it("lists only sizes of the chosen colour", () => {
     expect(sizesForColor("ss", rows, "C089")).toEqual([{ size: "M", raw: "M", price: 6.91 }]);
