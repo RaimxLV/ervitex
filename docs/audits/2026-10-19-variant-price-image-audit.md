@@ -64,3 +64,7 @@ Visiem avotiem: viena vienības cena variantam neatkarīgi no daudzuma (tests 1/
 - **Pārlūka pārbaude — BLOĶĒTA:** 2 mēģinājumi (desktop+mobile) — `/catalog?source=ru&q=0R013M0` katalogs neielādējās novērotajās 8 s (ielādes kartītes, „0 rezultāti”); dīkstāve nav pierādīta. Kartītes Black /36/ → Bottle Green /38/ → Classic Red /CR/ un detaļu navigācija pēc labojuma NAV pārbaudīta pārlūkā.
 
 - **12:45:** `cardImageFrames` (`src/hooks/useCatalogCardImages.ts`) izvēlētai krāsai vairs neatgriež modeļa pirmo foto vai bezkrāsas rindas (ja `firstIsColor=false`); bez savām bildēm → []. Ieviests un notestēts, pārlūkā NAV pārbaudīts.
+
+## 12:56 kataloga ielāde
+- Pārlūka tīkls: visi REST pieprasījumi (`catalog_items` HEAD count, `catalog_filter_order`, `catalog_remnants`, `stock_flags`, `mega_menu_items`) 30 s laikā neatbildēja; curl ar `limit=1` 3 tabulām — 25 s timeout bez HTTP koda; cloud_status: auth→database probe deadline exceeded. Cēlonis — backend nereaģē, nevis smags vaicājums vai filtru secība.
+- Koda defekts: pieprasījumiem nebija laika limita, `useFilterOrder` kļūdā nekad nelika `ready`, un neizdevušās lapas tika klusi izlaistas. Labots: 20 s/8 s AbortSignal, kļūda+„Mēģināt vēlreiz”, filtru secība ar noklusējumu, daļējs katalogs → kļūda. Pārlūkā: „Mēģināt vēlreiz” parādās pēc ~21 s. Aizpildīts katalogs un Russell krāsas NAV pārbaudāmi, kamēr backend neatbild.

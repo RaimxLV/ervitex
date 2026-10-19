@@ -8,7 +8,7 @@
 - Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
 - Office contours/hotspots share cover-scene coordinates; halos use separate feGaussianBlur polygons with oversized regions to prevent clipping.
 - Team uses immutable photo_url/framing and current CDN fallbacks; admin-only writes. Manual uploads share WebP optimization to avoid heavy originals.
-- Worksheets autosave side-specific drafts; explicit confirmation alone updates the shared list and creates an immutable version, preventing client/staff overwrites.
+- Worksheets autosave side-specific drafts; explicit confirmation alone updates the shared list and creates an immutable version, preventing overwrites.
 - quote_events is append-only; insert trigger reuses email/latest PM, locked rotation advances for new clients only.
 - Normal email; burgundy worksheet links. Offers: admin-gated sendOffer/saved prices. Request bank fields: requestDetails/BILLING_FIELDS; staff email: print/files first.
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
@@ -19,14 +19,14 @@
 - Native scrolling; ScrollToTop uses resolvedLocation. WebGL follows scroll/eased pointers, renders on change, pauses off-screen.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - TanStack Start SSR on Lovable avoids browser globals; heads use lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap uses catalog_items minus remnants/footwear.
-- Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
+- sw.js/service-worker.js are self-unregistering kill-switches; never delete (404 leaves stale cached pages).
 - Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
-- Galleries decode before switching, retain frames on failure. Mobile colour photos load after primary images; controls stay outside links. Hover needs loaded photos; Malfini prefers fronts. Cloudinary uses native resizing to cut downloads.
+- Galleries decode before switching, retain frames on failure. Mobile colour photos load after primary images; controls stay outside links. Hover needs loaded photos; Malfini prefers fronts. Cloudinary uses native resizing.
 - BrandLogo serves cards; ETX shows Ervitex. Russell shares model/colour validation and supplier colorProductMap labels to avoid wrong photos.
 - tech_galleries stores stable order/membership refs (s:<tech>:<index> for built-ins, public URLs for uploads), applied over static data so rebuilds preserve order.
 - UTT uses `utt-sync` Data Export into `utt_*`; service-role-only `utt_prices`; images mirrored in `utt-images` because UTT blocks hotlinking.
 - ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
-- Headwear shares facets; bump cache schema on changes.
-- ADMIN_HOME opens requests; supplier tools use /admin/overview.
-- Subdirectories have their own AGENTS.md; read it before changing files there. Unapplied price SQL lives in docs/pending-migrations for before/after review.
+- Headwear shares facets (bump cache schema on changes). ADMIN_HOME opens requests; supplier tools use /admin/overview.
+- Read subdirectory AGENTS.md before changing files there. Unapplied price SQL lives in docs/pending-migrations for before/after review.
+- Catalog reads time out into error+retry, never endless skeletons or partial-as-complete; filter order falls back to default.
