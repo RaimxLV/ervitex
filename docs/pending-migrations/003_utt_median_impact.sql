@@ -2489,16 +2489,21 @@ WITH o(sku) AS (VALUES
 ('gi64000gar-xl')
 ), base AS (
   SELECT v.sku, v.style_code, v.size, p.purchase_price pp, s.brand,
-         lower(v.sku) IN (SELECT lower(sku) FROM o) AS outl
+         EXISTS (SELECT 1 FROM o WHERE lower(o.sku)=lower(v.sku)) AS outl
     FROM public.utt_prices p JOIN public.utt_variants v ON v.sku = p.sku JOIN public.utt_styles s ON s.style_code = v.style_code
    WHERE p.purchase_price > 0 AND v.active AND s.published AND NOT s.hidden_by_admin AND public.utt_markup(s.brand) IS NOT NULL
-), calc AS (
-  SELECT b.*,
-    (SELECT percentile_cont(.5) WITHIN GROUP (ORDER BY x.pp) FROM base x WHERE x.style_code=b.style_code AND x.size IS NOT DISTINCT FROM b.size) r_all,
-    (SELECT percentile_cont(.5) WITHIN GROUP (ORDER BY x.pp) FROM base x WHERE x.style_code=b.style_code) s_all,
-    (SELECT percentile_cont(.5) WITHIN GROUP (ORDER BY x.pp) FROM base x WHERE x.style_code=b.style_code AND x.size IS NOT DISTINCT FROM b.size AND NOT x.outl) r_no,
-    (SELECT percentile_cont(.5) WITHIN GROUP (ORDER BY x.pp) FROM base x WHERE x.style_code=b.style_code AND NOT x.outl) s_no
-  FROM base b WHERE NOT b.outl
+), rall AS (SELECT style_code, size, percentile_cont(.5) WITHIN GROUP (ORDER BY pp) m FROM base GROUP BY 1,2),
+sall AS (SELECT style_code, percentile_cont(.5) WITHIN GROUP (ORDER BY pp) m FROM base GROUP BY 1),
+rno AS (SELECT style_code, size, percentile_cont(.5) WITHIN GROUP (ORDER BY pp) m FROM base WHERE NOT outl GROUP BY 1,2),
+sno AS (SELECT style_code, percentile_cont(.5) WITHIN GROUP (ORDER BY pp) m FROM base WHERE NOT outl GROUP BY 1),
+calc AS (
+  SELECT b.*, ra.m r_all, sa.m s_all, rn.m r_no, sn.m s_no
+    FROM base b
+    JOIN rall ra ON ra.style_code=b.style_code AND ra.size IS NOT DISTINCT FROM b.size
+    JOIN sall sa ON sa.style_code=b.style_code
+    JOIN rno rn ON rn.style_code=b.style_code AND rn.size IS NOT DISTINCT FROM b.size
+    JOIN sno sn ON sn.style_code=b.style_code
+   WHERE NOT b.outl
 ), priced AS (
   SELECT sku, style_code,
     CASE WHEN regular_old >= 1 THEN ROUND((regular_old*public.utt_markup(brand))::numeric,2) END old_price,
