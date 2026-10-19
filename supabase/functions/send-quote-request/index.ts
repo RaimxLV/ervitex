@@ -72,7 +72,7 @@ Deno.serve(async (req) => {
       worksheetUrl,
       billing: (() => {
         const b = (quote.billing || {}) as Record<string, string>;
-        const L: Record<string, string> = { company: "Uzņēmums", regNo: "Reģ. Nr.", vatNo: "PVN Nr.", address: "Juridiskā adrese", delivery: "Piegādes adrese" };
+        const L: Record<string, string> = { company: "Uzņēmums", regNo: "Reģ. Nr.", vatNo: "PVN Nr.", address: "Juridiskā adrese", delivery: "Piegādes adrese", bank: "Banka", iban: "Konta numurs (IBAN)", bic: "SWIFT/BIC" };
         return Object.keys(L).filter((k) => b[k]).map((k) => `${L[k]}: ${b[k]}`);
       })(),
     };
@@ -125,6 +125,7 @@ Deno.serve(async (req) => {
           ...baseData,
           worksheetUrl: worksheetUrl ? `${worksheetUrl}?v=pm` : "",
           files: signedUrls,
+          fileCount: rawFiles.length,
         },
     });
     results.push({ to: notifyEmail, template: "quote-request", ok: officeRes.ok, error: officeRes.ok ? undefined : officeRes.error || officeRes.reason });
