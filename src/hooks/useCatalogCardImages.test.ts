@@ -17,9 +17,9 @@ describe("cardImageFrames (Russell bez krāsas kataloga bildes)", () => {
   it("two colours give different first photos", () => {
     expect(cardImageFrames(rows, "Black", model, false, "ru")[0]).not.toBe(cardImageFrames(rows, "Bottle Green", model, false, "ru")[0]);
   });
-  it("colour without photos keeps model photo, never another colour's", () => {
+  it("colour without photos shows no model or other-colour photo", () => {
     const f = cardImageFrames(rows, "Orange", model, false, "ru");
-    expect(f).toEqual([model]);
+    expect(f).toEqual([]);
   });
 });
 
