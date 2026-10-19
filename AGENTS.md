@@ -15,18 +15,19 @@
 - catalogPriceSelection binds card photo/price to cheapest allowed colour outside excluded groups, with fallback; explicit choices override, stock is irrelevant.
 - "Ir noliktavā" is a manual admin flag in `stock_flags` per colour (`item_id` = `${id}::${color_code}`; bare `${id}` rows are legacy model-wide flags), separate from supplier data so syncs never erase it; it shows only in the product view for the selected colour, never on catalog cards; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.
 - Shared worksheet/offer prints use scope="order" in existing item JSON; orderPrinting preserves offer-wide prints on deletion, preventing duplicate charges and extra storage.
-- Stock mutation controls render only after the authenticated admin role resolves, and every mutation revalidates the live user and role before writing; public users only see the outlined availability label.
-- Native scrolling; ScrollToTop uses resolvedLocation. WebGL follows scroll/eased pointers, renders on change, pauses off-screen.
+- Stock mutation controls render only after the admin role resolves; every mutation revalidates the live user and role before writing; public users see only the outlined availability label.
+- Native scrolling; ScrollToTop uses resolvedLocation. WebGL follows eased pointers, renders on change, pauses off-screen.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - SSR avoids browser globals; heads use lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap=catalog_items minus remnants/footwear; private routes noindex, no Disallow; Product schema: no stock.
-- sw.js/service-worker.js are self-unregistering kill-switches; never delete (404 leaves stale cached pages).
+- sw.js/service-worker.js are self-unregistering kill-switches; never delete them.
 - Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
 - Galleries decode before switching, retain frames on failure. Mobile colour photos load after primary images; controls stay outside links. Hover needs loaded photos; Malfini prefers fronts. Cloudinary uses native resizing.
 - BrandLogo serves cards; ETX shows Ervitex. Russell shares model/colour validation and supplier colorProductMap labels to avoid wrong photos.
 - tech_galleries stores stable order/membership refs (s:<tech>:<index> for built-ins, public URLs for uploads), applied over static data so rebuilds preserve order.
 - UTT uses `utt-sync` Data Export into `utt_*`; service-role-only `utt_prices`; images mirrored in `utt-images` because UTT blocks hotlinking.
 - ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
-- Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
+- Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs aren't manufacturer codes.
 - Headwear shares facets (bump cache schema on changes). ADMIN_HOME opens requests; supplier tools use /admin/overview.
-- Read subdirectory AGENTS.md first. Price SQL reviewed in docs/pending-migrations runs byte-exact via md5-checked public.migration_stage.
-- Catalog reads time out into error+retry, never endless skeletons; filter order falls back to default.
+- Read subdirectory AGENTS.md first. Price SQL in docs/pending-migrations runs byte-exact via md5-checked public.migration_stage.
+- Catalog reads time out into error+retry, no endless skeletons; filter order falls back to default.
+- Never present partial work as complete; name open tasks/blockers.

@@ -1,3 +1,5 @@
+import { grossFromNet } from "@/lib/vat";
+
 export const MANUAL_PRODUCT_ORDER_KEY = "__etx_products";
 
 export const teamSportswearPrices = [
@@ -14,5 +16,5 @@ export const teamSportswearPrices = [
 ] as const;
 
 export function sportswearGross(net: number): number {
-  return Math.round((net * 1.21 + Number.EPSILON) * 100) / 100;
+  return grossFromNet(net);
 }
