@@ -137,6 +137,12 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
       colorOptions[(current + step + colorOptions.length) % colorOptions.length].onSelect?.();
     };
     const showHover = gallery.index === 0 && !!hoverImage && !hoverFailed && hoverReady;
+    const currentFrame = frames[gallery.index] || shownImage || image;
+    // Iepriekšējā kadra kļūdas paslēpšana nepāriet uz nākamo derīgo krāsu.
+    useEffect(() => {
+      if (baseImageRef.current) baseImageRef.current.style.display = "";
+      triedFallback.current = false;
+    }, [currentFrame]);
     useEffect(() => {
       setReady(Boolean(baseImageRef.current?.complete && baseImageRef.current.naturalWidth > 0));
       setHoverReady(false);
@@ -196,8 +202,6 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
             <>
               {!ready && <div className="absolute inset-0 animate-pulse bg-neutral-100" />}
               <img
-                // Jauns kadrs = jauns elements: iepriekšējās kļūdas paslēpšana nepāriet uz derīgu krāsu.
-                key={frames[gallery.index] || shownImage || image}
                 ref={baseImageRef}
                 src={frames[gallery.index] || shownImage || image}
                 alt={imageAlt}
