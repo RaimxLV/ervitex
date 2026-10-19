@@ -1128,7 +1128,7 @@ const translateLabel = (label: string, lang: "lv" | "en") => {
 import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
 import { StockRibbon, StockToggle } from "./StockBadge";
 import { useAuth } from "@/hooks/useAuth";
-import { nwgDuplicateSizeLabels } from "@/lib/nwgSizes";
+import { nwgDuplicateSizeLabels, withSkuSizes } from "@/lib/nwgSizes";
 
 const CatalogItemDialog = ({
   open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback, inline,
@@ -1235,7 +1235,7 @@ const CatalogItemDialog = ({
         from += 1000;
       }
       if (cancelled) return;
-      const selection = lowestPriceVariant(rows, d?.colors || [], (d && "sizeAliases" in d ? d.sizeAliases : undefined) || {}, wanted ? picked : null, initialSize);
+      const selection = lowestPriceVariant(withSkuSizes(rows, d && "skuSizes" in d ? d.skuSizes : undefined), d?.colors || [], (d && "sizeAliases" in d ? d.sizeAliases : undefined) || {}, wanted ? picked : null, initialSize);
       pendingSizeRef.current = selection.size;
       setSelectedSize(selection.size);
       setActiveColor(selection.color || picked);

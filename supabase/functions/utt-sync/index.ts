@@ -199,8 +199,9 @@ async function syncData(sb: SupabaseClient) {
     await sb.from("utt_styles").update({ published: false }).in("style_code", retireStyles.slice(i, i + 200));
   }
 
-  const { error: refreshError } = await sb.rpc("refresh_catalog_prices");
-  if (refreshError) throw new Error(`refresh_catalog_prices: ${refreshError.message}`);
+  // UTT-only refresh: the global refresh_catalog_prices timed out over the API; the nightly cron still runs it.
+  const { error: refreshError } = await sb.rpc("refresh_utt_catalog_prices");
+  if (refreshError) throw new Error(`refresh_utt_catalog_prices: ${refreshError.message}`);
 
   return {
     styles: styleRows.size,
@@ -298,7 +299,7 @@ Deno.serve(async (req) => {
     if (mode === "images") {
       const result = await mirrorImages(sb);
       if (result.remaining > 0 && result.mirrored + result.failed > 0) continueImages();
-      else await sb.rpc("refresh_catalog_prices");
+      else await sb.rpc("refresh_utt_catalog_prices");
       await finish({ status: "success", message: `Bildes: +${result.mirrored}, atlikušas ${result.remaining}`, products_updated: result.mirrored, products_failed: result.failed, details: result });
       return json({ ok: true, mode, result });
     }

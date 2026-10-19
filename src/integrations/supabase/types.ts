@@ -3372,6 +3372,7 @@ export type Database = {
       refresh_mf_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
+      refresh_utt_catalog_prices: { Args: never; Returns: number }
       restore_quote_worksheet_version: {
         Args: { _by?: string; _token: string; _version_id: string }
         Returns: boolean
