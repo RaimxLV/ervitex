@@ -57,3 +57,8 @@ Visiem avotiem: viena vienības cena variantam neatkarīgi no daudzuma (tests 1/
 ## Bloķēts
 - DB dīkstāve bloķē pašreizējās DB un pārlūka pārbaudes (kartīte, UTT/FR, publicētā vs priekšskatījuma salīdzinājums).
 - Pilns svaigu piegādātāju feed audits nav veikts; DB dīkstāve pati to neaizliedz — neatkarīga read-only piekļuve piegādātājiem iespējama atsevišķi.
+
+## Papildinājums 12:41–12:50 UTC
+- **RU izmēri — izlabots kodā:** `sizesForColor` (`src/components/worksheet/useVariants.ts`) Russell gadījumā lieto `ru_styles.sizes` (0R013M0: XS–4XL, 8 izmēri) ar vienu model-wide cenu; tukšs saraksts → izmēri netiek izdomāti; konfliktējošas cenas → null; citi avoti paliek pie precīzām krāsa+izmērs rindām. Patērētājs: `RowVariantControls.tsx`. 4 jauni testi, 199/199 izgāja.
+- **Attēli — izlabots kodā:** `UnifiedCatalog.tsx` izvēlētai krāsai bez savas bildes rāda tukšu lauku/ielādi, nevis modeļa foto; `CatalogItemDialog.tsx` galerija vairs neņem citas krāsas foto nevienam avotam; modeļa foto tikai, ja krāsu nav. Detaļu galerijai atsevišķa regresijas testa nav.
+- **Pārlūka pārbaude — BLOĶĒTA:** 2 mēģinājumi (desktop+mobile) — `/catalog?source=ru&q=0R013M0` pēc 8 s joprojām rādīja ielādes kartītes un „0 rezultāti”; backend neatbildēja. Kartītes Black /36/ → Bottle Green /38/ → Classic Red /CR/ un detaļu navigācija pēc labojuma NAV pārbaudīta pārlūkā.

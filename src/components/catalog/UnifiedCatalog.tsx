@@ -1537,7 +1537,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const colorQuery = navigationColor ? `?color=${encodeURIComponent(navigationColor)}` : "";
   const cardRef = useRef<HTMLElement | null>(null);
   const cardImages = useCatalogCardImages(cardRef, item.source, item.id, active?.c || active?.n || null, img, !!matchedImg || !active);
-  const cardImage = matchedImg ? img : cardImages[0] || img;
+  // Izvēlēta krāsa bez savas bildes: tukšs lauks/ielāde, nevis modeļa citas krāsas foto.
+  const cardImage = matchedImg ? img : cardImages[0] || (active ? "" : img);
 
   return (
     <CatalogModelCard

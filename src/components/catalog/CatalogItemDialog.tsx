@@ -1257,13 +1257,11 @@ const CatalogItemDialog = ({
 
   const gallery = useMemo(() => {
     if (!currentColor) return displayDetail.images?.length ? displayDetail.images : image ? [image] : [];
-    if (currentColor.images.length) return currentColor.images;
-    if (source === "ru") return [];
-    for (const c of displayDetail.colors || []) if (c.images.length) return c.images.slice(0, 1);
-    return image ? [image] : [];
-  }, [currentColor, displayDetail, image, source]);
+    // Izvēlētai krāsai tikai tās pašas krāsas foto; citādi tukšs lauks, nekad citas krāsas bilde.
+    return currentColor.images;
+  }, [currentColor, displayDetail, image]);
 
-  const mainImg = gallery[imgIndex] || gallery[0] || (source === "ru" && currentColor ? null : image);
+  const mainImg = gallery[imgIndex] || gallery[0] || (currentColor ? null : image);
 
   // Dalīšanas saite uz produkta lapu (www.ervitex.lv) ar izvēlēto krāsu.
   const shareUrl = useMemo(() => {
