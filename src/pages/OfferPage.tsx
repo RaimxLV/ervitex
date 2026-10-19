@@ -206,7 +206,9 @@ const OfferPage = () => {
                       {i.size && <span>{t("Izmērs", "Size")}: {i.size}</span>}
                       <span>{t("Skaits", "Qty")}: {i.qty}</span>
                     </div>
-                    <dl className="mt-3 grid grid-cols-4 gap-2 border-t border-border pt-3 text-xs tabular-nums">
+                  </div>
+                </Link>
+                    <dl className="mt-3 grid grid-cols-4 gap-3 border-t border-border pt-3 text-xs tabular-nums">
                       <div><dt className="text-muted-foreground">{t("Cena/gab.", "Unit")}</dt><dd className="mt-1 break-words">{i.unitPrice ? money(i.unitPrice) : "—"}</dd></div>
                       <div><dt className="text-muted-foreground">{t("Atlaide %", "Discount %")}</dt><dd className="mt-1">{itemDiscountPercent(i)}%</dd></div>
                       <div><dt className="text-muted-foreground">{t("Atlaide €", "Discount €")}</dt><dd className="mt-1 break-words text-accent">{money(itemDiscountNet(i))}</dd></div>
@@ -217,19 +219,11 @@ const OfferPage = () => {
                         {t("Skatīt preci", "View product")} <ArrowUpRight className="h-3 w-3" />
                       </span>
                       <span className="text-right">
-                        <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">
-                          {i.unitPrice ? `${money(i.unitPrice)} / ${t("gab.", "pc")}` : t("pēc pieprasījuma", "on request")}
-                        </span>
                         {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
                           <span key={k} className="block text-[10px] text-muted-foreground">+ {p.method} {money(Number(p.price))}{p.mode === "total" ? "" : ` / ${t("gab.", "pc")}`}</span>
                         ))}
-                        {(i.unitPrice || itemPrintNet(i)) ? (
-                          <span className="block font-heading text-sm font-black text-foreground">{money(itemTotalNet(i))}</span>
-                        ) : null}
                       </span>
                     </div>
-                  </div>
-                </Link>
               </li>
             ))}
           </ul>
