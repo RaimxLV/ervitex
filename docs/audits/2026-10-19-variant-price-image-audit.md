@@ -113,3 +113,4 @@ Avots: `https://www.pfconcept.com/portal/datafeed/productfeed_en_v3.json` (HTTP 
 
 ## PF variantu identitāte — sagatavots labojums 005 (2026-10-19, nav piemērots)
 Skat. `docs/pending-migrations/005_pf_variant_identity/README.md`. Pilns feed (v3, 2026-10-18T13:40:28Z, sha256 d082a185…): 19674 SKU sakrīt, 994 atvecojušas (121 modelis pilnībā), 2259 SKU maina krāsas atslēgu uz divkrāsu. Dublēti krāsa+izmērs: 555 → 1; cenu konflikti 29 → 0; cenu izmaiņas saglabātām SKU 0; dzēšanas avota tabulās 0. Priekšskatījumā jau labots: saliktās atslēgas tikai precīzi; PF kartītes foto tikai precīzai SKU.
+- 2026-10-19 13:50: 005 pārbāzēts uz 003 (definīcijas tiek lasītas izpildes laikā, aizsargi ar md5 kontrolkodiem), secība 003→004→005 un atcelšana 005→004→003. Pievienots piedāvājuma izvēles un preces loga labojums (`frontend.patch`): izolētajā kopijā tipu pārbaude un 225 testi izgāja. Nekas nav izpildīts datubāzē.
