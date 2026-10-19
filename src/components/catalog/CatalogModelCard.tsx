@@ -1,3 +1,4 @@
+import { unproxyUrl } from "@/lib/imageProxy";
 import ervitexWhiteLogo from "@/assets/ervitex-logo-2.svg";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -205,7 +206,14 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
                 onLoad={() => setReady(true)}
                 onError={(e) => {
                   const el = e.currentTarget as HTMLImageElement;
-                  if (fallbackImage && !triedFallback.current && fallbackImage !== image) {
+                  // Starpniekserveris nepieejams: rādām TĀ PAŠA kadra oriģinālu, nevis
+                  // modeļa vispārīgo bildi (citādi krāsas maiņa „iesaldē” citas krāsas foto).
+                  const direct = unproxyUrl(el.src);
+                  if (direct && direct !== el.src) {
+                    el.src = direct;
+                    return;
+                  }
+                  if (fallbackImage && !triedFallback.current && fallbackImage !== image && !el.src.includes("://") === false && frames.length <= 1) {
                     triedFallback.current = true;
                     el.src = fallbackImage;
                     return;
