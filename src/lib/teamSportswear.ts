@@ -1,3 +1,5 @@
+import { grossFromNet } from "@/lib/vat";
+
 export const MANUAL_PRODUCT_ORDER_KEY = "__etx_products";
 
 export const teamSportswearPrices = [
