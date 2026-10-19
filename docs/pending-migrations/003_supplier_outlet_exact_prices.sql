@@ -2647,7 +2647,8 @@ CREATE OR REPLACE VIEW public.catalog_items WITH (security_invoker = true) AS
            FROM private.catalog_items_mv m
           WHERE ((m.source <> 'nwg'::text) OR (m.id IN ( SELECT r.style_code
                    FROM catalog_price_ranges r
-                  WHERE ((r.source = 'nwg'::text) AND (r.min_price > (0)::numeric)))) AND NOT ((m.source = 'mf'::text) AND (m.id IN ( SELECT ms.style_code FROM mf_styles ms WHERE ms.is_outlet))))
+                  WHERE ((r.source = 'nwg'::text) AND (r.min_price > (0)::numeric)))))
+            AND NOT ((m.source = 'mf'::text) AND (m.id IN ( SELECT ms.style_code FROM mf_styles ms WHERE ms.is_outlet)))
         UNION ALL
          SELECT 'ru'::text AS source,
             s.style_code,
