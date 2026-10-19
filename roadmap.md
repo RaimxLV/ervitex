@@ -1,6 +1,6 @@
 # Roadmap
-- [ ] Vienādot galvenās izvēlnes un kataloga meklēšanu.
-- [ ] Atkārtotos klientus saglabāt pie līdzšinējās projektu vadītājas; jaunos sadalīt pa apli.
+- [x] Vienādot galvenās izvēlnes un kataloga meklēšanu; 15 testi un abu meklētāju „167” rezultātu secība pārbaudīta pārlūkā.
+- [x] Atkārtotos klientus saglabāt pie līdzšinējās projektu vadītājas; jaunos sadalīt pa apli; pārbaudīta e-pasta normalizēšana, Laura → Ilona → Justīne → Santa un nodošana Evitai, bez testa ierakstu saglabāšanas vai e-pastiem.
 - [x] Sakārtot ciparu kodu meklēšanu: vienāds ciparu skaits, precīzie pirms tuvākajiem kodiem (±2); 28 testi un „167” pārbaudīts meklētājā/katalogā bez garākiem kodiem.
 - [x] Piedāvājumos katras preces atlaide procentos; klienta un e-pasta tabulā Atlaide % / Atlaide € pirms summas; 18 testi un divu atlaižu saglabāšana/pārlāde/klienta summas pārbaudītas. E-pasta piegāde netika veikta.
 - [x] Novērst piedāvājuma pazušanu pēc dīkstāves; automātiska saglabāšana un pārlūka rezerves kopija; 7 testi, īsts piedāvājums ar 25 precēm saglabājās pēc pārlādes un interneta pārtraukuma.
