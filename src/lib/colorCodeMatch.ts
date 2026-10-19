@@ -16,8 +16,9 @@ export function colorCodeCandidates(code?: string | null): string[] {
   const out: string[] = [c];
   const dash = c.lastIndexOf("-");
   if (dash > 0 && dash < c.length - 1) out.push(c.slice(dash + 1)); // NWG sufikss
-  const m = c.match(/c(\d{3,4})/i); // SS SKU -> C002
-  if (m) out.push(`c${m[1].toLowerCase()}`);
+  // SS SKU "STTU169C0891L" = stils + C089 + izmērs "1L" -> C089 (krāsa vienmēr 3 cipari)
+  const m = c.match(/c(\d{3})\d?[a-z]*$/i);
+  if (m) out.push(`c${m[1]}`);
   if (/^\d{3}/.test(c) && c.length >= 5) out.push(c.slice(3, 5)); // MF vidējā daļa
   return [...new Set(out)];
 }

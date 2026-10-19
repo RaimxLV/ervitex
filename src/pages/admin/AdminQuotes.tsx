@@ -19,6 +19,7 @@ import {
   History,
   Trash2,
   Phone, Search, X, Package, UserRound, Forward, MoreHorizontal,
+  Printer,
 } from "lucide-react";
 
 interface QuoteItem {
@@ -324,6 +325,22 @@ const AdminQuotes = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
+                {(!!row.file_urls?.length || (row.print_method && row.print_method !== "none")) && (
+                  <div className="border-t border-accent/40 bg-accent/10 px-4 py-3 sm:px-5">
+                    <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold uppercase tracking-wider text-accent">
+                      {row.print_method && row.print_method !== "none" && <span className="flex items-center gap-1.5"><Printer className="h-4 w-4" />Apdruka nepieciešama</span>}
+                      {!!row.file_urls?.length && <span className="flex items-center gap-1.5"><Paperclip className="h-4 w-4" />Pievienoti {row.file_urls.length} faili</span>}
+                    </p>
+                    {!!row.file_urls?.length && <div className="mt-2 flex flex-wrap gap-2">
+                      {row.file_urls.map((u, i) => (
+                        <Button key={i} variant="outline" size="sm" className="h-auto min-h-9 max-w-full justify-start whitespace-normal break-all bg-background py-2 text-left text-xs" onClick={() => openAttachment(u)}>
+                          <Paperclip className="mr-1.5 h-3.5 w-3.5" />
+                          {decodeURIComponent(u.split("/").pop() || `Fails ${i + 1}`)}
+                        </Button>
+                      ))}
+                    </div>}
+                  </div>
+                )}
                 {isOpen && (
                   <div id={`quote-${row.id}`} className="space-y-3 border-t border-border p-4 sm:p-5">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

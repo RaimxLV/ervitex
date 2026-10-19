@@ -30,3 +30,12 @@ describe("white colour excluded from starting price", () => {
     expect(lowestPriceVariant(rows, colors, { S: "4", M: "5" })).toEqual({ color: "020-99", size: "S", price: 12 });
   });
 });
+
+import { colorCodeMatches } from "@/lib/colorCodeMatch";
+describe("SS colour codes", () => {
+  it("Aloe STTU169C0891L matches price colour C089, not White C001", () => {
+    expect(colorCodeMatches("STTU169C0891L", "C089")).toBe(true);
+    expect(colorCodeMatches("STTU169C0891L", "C001")).toBe(false);
+    expect(colorCodeMatches("STTU169C0021L", "C002")).toBe(true);
+  });
+});

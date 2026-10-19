@@ -130,17 +130,7 @@ Deno.serve(async (req) => {
     });
     results.push({ to: notifyEmail, template: "quote-request", ok: officeRes.ok, error: officeRes.ok ? undefined : officeRes.error || officeRes.reason });
 
-    // 2) Auto-confirmation to the customer (no attachments/staff-only notes)
-    if (quote.email) {
-      const custRes = await sendAppEmail("quote-confirmation", quote.email, {
-          replyTo: pm.email,
-          fromEmail: pm.email,
-          fromName: pm.name,
-          idempotencyKey: `quote-${quote.id}-customer`,
-          templateData: baseData,
-      });
-      results.push({ to: quote.email, template: "quote-confirmation", ok: custRes.ok, error: custRes.ok ? undefined : custRes.error || custRes.reason });
-    }
+    // Klientam e-pastu nesūta — pieprasījumu saņem tikai projektu vadītāja.
 
     const delivered = results.some(r => r.ok);
     return new Response(
