@@ -1530,7 +1530,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   // Cenu tabulas krāsu kodi ir īsāki nekā kataloga kodi (SS SKU, NWG prefikss,
   // MF ietvertais kods) — meklējam visus iespējamos atslēgu variantus.
   const explicitColor = activeIdx !== null || filterMatchIdx >= 0;
-  const effectivePrice = explicitColor && active ? colorPrice(active) || priceInfo : priceInfo;
+  // Model minima can belong to another colour; only colourless items use them.
+  const effectivePrice = active ? colorPrice(active) : priceInfo;
   // Until colour prices arrive, let the detail resolve the cheapest variant.
   const navigationColor = explicitColor || cheapestIdx >= 0 ? selectedColor : null;
   const colorQuery = navigationColor ? `?color=${encodeURIComponent(navigationColor)}` : "";

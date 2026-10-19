@@ -170,20 +170,22 @@ const CatalogItemPage = () => {
             <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {related.map((r) => {
                 const cols = (r.colors || []).filter((c) => c && (c.h || c.n));
-                const swatches = cols.slice(0, 8).map((c) => ({
-                  hex: c.h ?? null,
-                  name: c.n || "",
-                }));
                 const colorCode = (c: ColorEntry) => r.source === "pf" ? c.n : c.c || c.n;
-                const cheapest = lowestPriceColorIndex(cols, (c) => {
+                const colorPrice = (c: ColorEntry) => {
                   for (const k of colorCodeCandidates(colorCode(c))) {
                     const hit = prices.get(`${r.source}:${r.id}:${k}`);
-                    if (hit) return hit.price;
+                    if (hit) return hit;
                   }
                   return undefined;
-                });
+                };
+                const cheapest = lowestPriceColorIndex(cols, (c) => colorPrice(c)?.price);
+                const swatches = cols.slice(0, 8).map((c, index) => ({
+                  hex: c.h ?? null,
+                  name: c.n || "",
+                  active: index === cheapest,
+                }));
                 const initialColor = cheapest >= 0 ? colorCode(cols[cheapest]) : null;
-                const p = prices.get(`${r.source}:${r.id}`);
+                const p = cheapest >= 0 ? colorPrice(cols[cheapest]) : cols.length ? undefined : prices.get(`${r.source}:${r.id}`);
                 const rawImage = (cheapest >= 0 ? cols[cheapest]?.u : null) || r.image_url;
                 return (
                   <CatalogModelCard

@@ -6,6 +6,10 @@ const norm = (value?: string | null) => (value || "").trim().toLowerCase();
 
 /** White is priced below other colours, so it never sets the default starting price. */
 export const isWhiteColor = (name?: string | null) => /^(white|balt[sa]?)$/.test(norm(name));
+// Exact catalogue names, including supplier white shades and Natural Raw.
+// Mixed colours and distinct shades such as Natural Stone remain eligible.
+export const isExcludedStartingColor = (name?: string | null) =>
+  isWhiteColor(name) || /^(off white|soft white|vintage white|natural|natural raw)$/.test(norm(name));
 const colorName = (c: unknown) => {
   const o = c as { n?: string | null; name?: string | null } | null;
   return o?.n ?? o?.name ?? null;
@@ -38,11 +42,11 @@ export function lowestPriceVariant(
 }
 
 export function lowestPriceColorIndex<T>(colors: T[], priceFor: (color: T) => number | undefined): number {
-  const pick = (skipWhite: boolean) => {
+  const pick = (skipExcluded: boolean) => {
     let index = -1;
     let minimum = Infinity;
     colors.forEach((color, i) => {
-      if (skipWhite && isWhiteColor(colorName(color))) return;
+      if (skipExcluded && isExcludedStartingColor(colorName(color))) return;
       const price = priceFor(color);
       if (price !== undefined && Number.isFinite(price) && price > 0 && price < minimum) {
         minimum = price;

@@ -115,7 +115,7 @@ const RelatedCard = ({
   const active = activeIdx !== null ? colors.find((c) => c.idx === activeIdx) ?? null : null;
   const displayed = active || (cheapest >= 0 ? colors[cheapest] : colors[0]) || null;
   const rawImg = displayed?.u || row.image_url;
-  const price = active ? colorPrice(active) : prices.get(`${row.source}:${row.id}`);
+  const price = displayed ? colorPrice(displayed) : prices.get(`${row.source}:${row.id}`);
 
   const swatches = colors.slice(0, 8).map((c) => ({
     hex: c.hex,
@@ -129,7 +129,7 @@ const RelatedCard = ({
       onClick={() => onNavigate(displayed && (active || cheapest >= 0) ? colorCode(displayed) : null)}
       image={thumbUrl(rawImg)}
       fallbackImage={rawImg}
-      hoverImage={active ? null : thumbUrl(row.hover_image_url)}
+      hoverImage={displayed?.u ? null : thumbUrl(row.hover_image_url)}
       imageAlt={row.name || row.id}
       code={row.source === "etx" ? null : row.id}
       brandBadge={
