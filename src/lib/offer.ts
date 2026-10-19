@@ -14,6 +14,8 @@ export interface OfferItem {
   qty: number;
   /** Unit price, VAT excluded */
   unitPrice: number | null;
+  /** Per-line goods discount percentage; decoration is not discounted. */
+  discountPercent?: number | null;
   note?: string | null;
   /** Apdrukas / izšūšanas rindas */
   prints?: { method: string; placement?: string | null; price: number | null; mode?: "unit" | "total"; scope?: "item" | "order" }[];
@@ -50,12 +52,25 @@ export const money = (v: number, currency = "EUR") =>
 
 export const round2 = (v: number) => Math.round(v * 100) / 100;
 
+export const itemDiscountPercent = (i: OfferItem) => {
+  const value = Number(i.discountPercent);
+  return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
+};
+/** Discount amount for all units in this line, excluding VAT. */
+export const itemDiscountNet = (i: OfferItem) =>
+  round2((i.unitPrice || 0) * i.qty * itemDiscountPercent(i) / 100);
+export const itemGoodsNet = (i: OfferItem) =>
+  round2((i.unitPrice || 0) * i.qty - itemDiscountNet(i));
+
 /** Apdruka šai precei kopā, bez PVN. */
 export const itemPrintNet = (i: OfferItem) =>
   round2((i.prints || []).filter((p) => p.scope !== "order").reduce((s, p) => s + (Number(p.price) || 0) * (p.mode === "total" ? 1 : Number(i.qty) || 0), 0));
 
+export const itemTotalNet = (i: OfferItem) => round2(itemGoodsNet(i) + itemPrintNet(i));
+
 export const offerTotals = (items: OfferItem[], vatRate = VAT_DEFAULT, discount?: OfferDiscount | null) => {
-  const goods = round2(items.reduce((s, i) => s + (i.unitPrice || 0) * i.qty, 0));
+  const goods = round2(items.reduce((s, i) => s + itemGoodsNet(i), 0));
+  const itemDiscount = round2(items.reduce((s, i) => s + itemDiscountNet(i), 0));
   const print = round2(items.reduce((s, i) => s + itemPrintNet(i), 0) + orderPrintingNet(items));
   const subtotal = round2(goods + print);
   const dv = Number(discount?.value) || 0;
@@ -63,7 +78,7 @@ export const offerTotals = (items: OfferItem[], vatRate = VAT_DEFAULT, discount?
   const disc = dv > 0 && discount ? round2(Math.min(goods, discount.type === "percent" ? (goods * Math.min(dv, 100)) / 100 : dv)) : 0;
   const net = round2(subtotal - disc);
   const vat = round2((net * vatRate) / 100);
-  return { goods, print, subtotal, discount: disc, net, vat, gross: round2(net + vat), qty: items.reduce((s, i) => s + i.qty, 0) };
+  return { goods, print, subtotal, itemDiscount, discount: disc, net, vat, gross: round2(net + vat), qty: items.reduce((s, i) => s + i.qty, 0) };
 };
 
 /** Publiskā lapas adrese. */
@@ -86,7 +101,8 @@ export const offerPlainText = (offer: Offer, lang: "lv" | "en" = "lv") => {
   const { net, vat, gross, discount: disc } = offerTotals(offer.items, offer.vat_rate, offer.discount);
   const lines = offer.items.map((i) => {
     const bits = [i.name, i.code, i.colorName, i.size].filter(Boolean).join(" · ");
-    const price = i.unitPrice ? ` — ${i.qty} gab. × ${money(i.unitPrice)} = ${money(i.unitPrice * i.qty)}` : ` — ${i.qty} gab.`;
+    const reduction = itemDiscountPercent(i) > 0 ? ` · ${lang === "lv" ? "Atlaide" : "Discount"} ${itemDiscountPercent(i)}% (−${money(itemDiscountNet(i))})` : "";
+    const price = i.unitPrice ? ` — ${i.qty} gab. × ${money(i.unitPrice)}${reduction} = ${money(itemGoodsNet(i))}` : ` — ${i.qty} gab.`;
     const prints = (i.prints || []).filter((p) => p.scope !== "order").map((p) =>
       `   + ${p.method}${p.placement ? ` (${p.placement})` : ""}: ${money(Number(p.price))}${p.mode === "total" ? "" : ` × ${i.qty}`}`);
     return [`• ${bits}${price}`, ...prints].join("\n");
