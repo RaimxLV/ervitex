@@ -1,0 +1,1 @@
+- QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.

@@ -49,6 +49,33 @@ export const sizeLabeller = (source: string | null | undefined, rows: VariantPri
   return (s: string) => (coded ? NWG_SIZE_CODES[s] || s : s);
 };
 
+/** Avoti, kuru cena patiesi ir vienota visam modelim (rindas bez krāsas). */
+export const MODEL_WIDE_PRICE_SOURCES = new Set(["ru", "etx"]);
+
+const positive = (v: unknown) => {
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n : null;
+};
+
+/** Rindas, kas attiecas uz konkrēto krāsu; bez krāsas — tikai vienotas cenas avotiem. */
+export const rowsForColor = (source: string | null | undefined, rows: VariantPrice[], colorCode: string | null | undefined) => {
+  const modelWide = MODEL_WIDE_PRICE_SOURCES.has(source || "");
+  const colorless = rows.filter((r) => !(r.color_code || "").trim());
+  if (!colorCode) {
+    // Bez krāsas izvēles der tikai rindas, kurām krāsas nav vispār.
+    return colorless.length === rows.length || modelWide ? rows : [];
+  }
+  const exact = rows.filter((r) => colorMatches(r.color_code, colorCode));
+  if (exact.length) return exact;
+  return modelWide ? colorless : [];
+};
+
+/** Viena cena vai null, ja rindām ir atšķirīgas cenas (nekāda min/mediāna). */
+const singlePrice = (rows: VariantPrice[]) => {
+  const values = [...new Set(rows.map((r) => positive(r.retail_price)).filter((n): n is number => n !== null))];
+  return values.length === 1 ? values[0] : null;
+};
+
 /** Cena precīzam izmēram un krāsai; atgriež arī izmēra nosaukumu. */
 export const priceForVariant = (
   source: string,
@@ -57,24 +84,42 @@ export const priceForVariant = (
   size: string | null | undefined,
 ) => {
   const label = sizeLabeller(source, rows);
+  const pool = rowsForColor(source, rows, colorCode);
   const want = norm(size) || "-";
-  const bySize = rows.filter((r) => {
+  const bySize = pool.filter((r) => {
     const raw = (r.size || "-").trim() || "-";
     return norm(raw) === want || norm(label(raw)) === want;
   });
-  // Modelim bez izmēriem (somas, cepures) der jebkura rinda.
-  const sizeless = rows.length > 0 && rows.every((r) => !(r.size || "").trim());
-  const pool = bySize.length ? bySize : sizeless ? rows : [];
-  const byColor = colorCode ? pool.filter((r) => colorMatches(r.color_code, colorCode)) : [];
-  const chosen = byColor.length ? byColor : pool;
-  const values = chosen.map((r) => Number(r.retail_price)).filter((n) => Number.isFinite(n) && n > 0);
+  // Modelim bez izmēriem (somas, cepures) der jebkura šīs krāsas rinda.
+  const sizeless = pool.length > 0 && pool.every((r) => !(r.size || "").trim() || r.size?.trim() === "-");
+  const chosen = bySize.length ? bySize : sizeless ? pool : [];
   const raw = chosen[0]?.size || null;
   return {
-    price: values.length ? Math.min(...values) : null,
+    price: singlePrice(chosen),
     size: raw ? label((raw || "").trim()) : size ?? null,
   };
 };
 
+/** Izmēri un cenas tikai izvēlētajai krāsai; bez citu krāsu rezerves. */
+export const sizesForColor = (source: string | null | undefined, prices: VariantPrice[], colorCode?: string | null) => {
+  const label = sizeLabeller(source, prices);
+  const pool = colorCode ? rowsForColor(source, prices, colorCode) : prices;
+  const map = new Map<string, { raw: string; rows: VariantPrice[] }>();
+  for (const p of pool) {
+    const raw = (p.size || "-").trim() || "-";
+    const key = label(raw);
+    const cur = map.get(key);
+    if (cur) cur.rows.push(p);
+    else map.set(key, { raw, rows: [p] });
+  }
+  return [...map.entries()]
+    .map(([size, v]) => ({
+      size,
+      raw: v.raw,
+      price: colorCode || rowsForColor(source, v.rows, null).length ? singlePrice(v.rows) : null,
+    }))
+    .sort((a, b) => sizeIdx(a.size) - sizeIdx(b.size) || a.size.localeCompare(b.size));
+};
 
 export const fetchVariantPrices = async (source: string, styleCode: string) => {
   const rows: VariantPrice[] = [];
@@ -130,26 +175,7 @@ export const useVariants = (source?: string | null, styleCode?: string | null) =
 
   const colors = useMemo(() => (item?.colors || []).filter((c) => c?.n || c?.c), [item]);
 
-  const sizesFor = (colorCode?: string | null) => {
-    const label = sizeLabeller(source, prices);
-    const forColor = prices.filter(
-      (p) => !colorCode || !p.color_code || colorMatches(p.color_code, colorCode),
-    );
-    const map = new Map<string, { raw: string; price: number | null }>();
-    for (const p of forColor.length ? forColor : prices) {
-      const raw = (p.size || "-").trim() || "-";
-      const key = label(raw);
-      const n = Number(p.retail_price);
-      const price = Number.isFinite(n) && n > 0 ? n : null;
-      const cur = map.get(key);
-      if (!cur) map.set(key, { raw, price });
-      else if (price !== null && (cur.price === null || price < cur.price)) map.set(key, { raw, price });
-    }
-    return [...map.entries()]
-      .map(([size, v]) => ({ size, raw: v.raw, price: v.price }))
-      .sort((a, b) => sizeIdx(a.size) - sizeIdx(b.size) || a.size.localeCompare(b.size));
-  };
-
+  const sizesFor = (colorCode?: string | null) => sizesForColor(source, prices, colorCode);
 
   return { item, prices, colors, sizesFor, loading };
 };
