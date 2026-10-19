@@ -353,6 +353,19 @@ export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuer
   return hits.size ? hits : null;
 };
 
+/** Vienota atlase un stabila secība galvenās izvēlnes un kataloga meklētājiem. */
+export const rankedSearchResults = <T extends Searchable>(items: T[], pq: PreparedQuery | null): T[] => {
+  if (!pq) return items;
+  const exact = exactCodeHits(items, pq);
+  return items
+    .map((item) => ({ item, score: searchScore(item, pq) }))
+    .filter(({ item, score }) => exact ? exact.has(item) : score > 0)
+    .sort((a, b) => b.score - a.score ||
+      a.item.id.localeCompare(b.item.id, "en", { numeric: true, sensitivity: "base" }) ||
+      (a.item.source || "").localeCompare(b.item.source || "", "en"))
+    .map(({ item }) => item);
+};
+
 /** Filtru meklēšana: LV/EN atslēgvārdi ("priekšauts" → Aprons, "T-krekls" → T-shirts). */
 export const keywordMatch = (text: string, query: string): boolean => {
   const pq = prepareQuery(query);

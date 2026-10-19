@@ -1,5 +1,20 @@
 import { expect, it } from "vitest";
-import { keywordMatch, exactCodeHits, prepareQuery, searchScore } from "./catalogSearch";
+import { keywordMatch, exactCodeHits, prepareQuery, rankedSearchResults, searchScore } from "./catalogSearch";
+it("menu and catalog rank 167 identically regardless of candidate input order", () => {
+  const items = ["STTU169", "STTU168", "STTU167", "134167", "16724", "AB168"].map(id => ({ id, source: id.startsWith("STTU") ? "ss" : "other" }));
+  const menu = rankedSearchResults(items, prepareQuery("167"));
+  const catalog = rankedSearchResults([...items].reverse(), prepareQuery("167"));
+  expect(menu.map(i => i.id)).toEqual(["STTU167", "STTU168", "STTU169", "AB168"]);
+  expect(catalog).toEqual(menu);
+});
+it("both search surfaces keep only the exact full STTU167 code", () => {
+  const items = ["STTU169", "STTU167", "STTU1670"].map(id => ({ id }));
+  expect(rankedSearchResults(items, prepareQuery("STTU167")).map(i => i.id)).toEqual(["STTU167"]);
+});
+it("shared results for four digits exclude longer codes", () => {
+  const items = ["AB1672", "AB1673", "AB167200", "AB131672"].map(id => ({ id }));
+  expect(rankedSearchResults(items, prepareQuery("1672")).map(i => i.id)).toEqual(["AB1672", "AB1673"]);
+});
 it("167 finds complete three-digit codes 167, 168 and 169 in relevance order", () => {
   const q = prepareQuery("167");
   const scores = ["STTU167", "STTU168", "STTU169"].map(id => searchScore({ id, source: "ss" }, q));
