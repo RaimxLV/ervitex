@@ -402,7 +402,7 @@ const WorksheetPage = () => {
                   <div className="col-span-3 border-t border-border pt-3 text-right md:col-span-1 md:border-0 md:pt-0 print:col-span-1 print:border-0 print:pt-0">
                     <span className="block font-heading text-base font-bold tabular-nums">{lineNet(i) ? money(lineNet(i)) : "—"}</span>
                     <span className="block text-xs text-muted-foreground">bez PVN</span>
-                    <span className="mt-1 block text-xs text-muted-foreground tabular-nums">{lineNet(i) ? money(lineNet(i) * (1 + (sheet.vat_rate || 21) / 100)) : "—"} ar PVN</span>
+                    <span className="mt-1 block text-xs text-muted-foreground tabular-nums">{lineNet(i) ? money(lineNet(i) * (1 + (sheet.vat_rate ?? 21) / 100)) : "—"} ar PVN</span>
                   </div>
                 </div>
                 {!readOnly && <div className="flex justify-end gap-2 border-t border-border px-4 py-2 print:hidden">
@@ -446,7 +446,7 @@ const WorksheetPage = () => {
                           <span className="block text-[10px] uppercase tracking-wider text-muted-foreground">Rinda bez PVN</span>
                           <span className="font-heading text-sm font-black">{money(lineNet(i))}</span>
                           <span className="block text-[11px] text-muted-foreground">
-                            ar PVN {money(lineNet(i) * (1 + (sheet.vat_rate || 21) / 100))}
+                            ar PVN {money(lineNet(i) * (1 + (sheet.vat_rate ?? 21) / 100))}
                           </span>
                         </div>
                         {!readOnly && (

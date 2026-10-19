@@ -488,7 +488,7 @@ const AdminOfferEdit = () => {
           <div className="border-t border-border pt-5">
             <h3 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Kopsavilkums</h3>
             <dl className="mt-4 space-y-3 text-sm tabular-nums">
-              <div className="flex justify-between"><dt className="text-muted-foreground">Preces</dt><dd>{money(totals.goods)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted-foreground">Preces</dt><dd>{money(round2(totals.goods + totals.itemDiscount))}</dd></div>
               {totals.itemDiscount > 0 && <div className="flex justify-between"><dt className="text-muted-foreground">Preču atlaides</dt><dd className="text-accent">−{money(totals.itemDiscount)}</dd></div>}
               <div className="flex justify-between"><dt className="text-muted-foreground">Apdruka</dt><dd>{money(totals.print)}</dd></div>
               <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">Atlaide</dt><dd><DiscountField value={offer.discount ?? null} onChange={(d) => setOffer((o) => ({ ...o, discount: d }))} /></dd></div>
