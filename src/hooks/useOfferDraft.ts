@@ -41,7 +41,7 @@ export function useOfferDraft(userId: string | undefined, id: string | undefined
     try {
       const stored = key ? localStorage.getItem(key) : null;
       const draft = stored ? JSON.parse(stored) as Draft : null;
-      if (draft?.userId === userId && draft.offer?.id === remote.id && Array.isArray(draft.offer.items)) {
+      if (draft && draft.userId === userId && draft.offer?.id === remote.id && Array.isArray(draft.offer.items)) {
         recovered = { ...remote, ...draft.offer, token: remote.token };
         conflict = draft.base !== remote.updated_at && JSON.stringify(offerDraftPayload(recovered)) !== acknowledged.current;
         if (conflict) base.current = draft.base;
