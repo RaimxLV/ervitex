@@ -15,7 +15,7 @@ import { lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { HEADWEAR_TYPES, headwearType, isHeadwearCategory, matchesHeadwearType, type HeadwearType } from "@/lib/headwearTypes";
-import { exactCodeHits, prepareQuery, searchScore } from "@/lib/catalogSearch";
+import { exactCodeHits, prepareQuery, rankedSearchResults, searchScore } from "@/lib/catalogSearch";
 
 const SCROLL_KEY = "catalog-scroll";
 
@@ -969,10 +969,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       };
     }
     if (pq) {
-      // Meklējot — atbilstošākās preces vienmēr pirmās.
-      const scores = new Map<EnrichedItem, number>();
-      for (const it of base) scores.set(it, searchScore(it, pq));
-      return [...base].sort((a, b) => ((scores.get(b) ?? 0) - (scores.get(a) ?? 0)) || (cmp ? cmp(a, b) : 0));
+      // Tā pati precīzo kodu atlase un secība kā galvenās izvēlnes meklētājā.
+      return rankedSearchResults(base, pq);
     }
     return cmp ? [...base].sort(cmp) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1781,6 +1781,21 @@ export type Database = {
           },
         ]
       }
+      quote_assignment_rotation: {
+        Row: {
+          id: number
+          next_position: number
+        }
+        Insert: {
+          id?: number
+          next_position?: number
+        }
+        Update: {
+          id?: number
+          next_position?: number
+        }
+        Relationships: []
+      }
       quote_events: {
         Row: {
           actor_name: string | null

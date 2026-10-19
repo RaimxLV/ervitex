@@ -99,6 +99,13 @@
       "when": 1792156274834,
       "tag": "0013_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792394411684,
+      "tag": "0014_assign_repeat_quote_clients_atomically",
+      "breakpoints": true
     }
   ]
 }
