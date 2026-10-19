@@ -21,6 +21,8 @@ interface OfferLine {
   size?: string
   qty?: number | string
   unitPrice?: number | string | null
+  discountPercent?: number | string
+  discountAmount?: string
   lineTotal?: string
   prints?: string[]
 }
@@ -103,7 +105,9 @@ const PmOfferEmail = ({
               <tr>
                 <th style={th}>Prece</th>
                 <th style={th}>Gab.</th>
-                <th style={th}>Cena</th>
+                <th style={th}>Cena/gab.</th>
+                <th style={th}>Atlaide %</th>
+                <th style={th}>Atlaide €</th>
                 <th style={th}>Summa</th>
               </tr>
             </thead>
@@ -122,6 +126,8 @@ const PmOfferEmail = ({
                   </td>
                   <td style={rowCell}>{it.qty ?? ''}</td>
                   <td style={rowCell}>{it.unitPrice ? String(it.unitPrice) : 'pēc pieprasījuma'}</td>
+                  <td style={rowCell}>{it.discountPercent ?? 0}%</td>
+                  <td style={rowCell}>{it.discountAmount || '0,00 €'}</td>
                   <td style={rowCell}>{it.lineTotal || ''}</td>
                 </tr>
               ))}
