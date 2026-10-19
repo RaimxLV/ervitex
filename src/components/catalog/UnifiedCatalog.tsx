@@ -1535,7 +1535,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const navigationColor = explicitColor || cheapestIdx >= 0 ? selectedColor : null;
   const colorQuery = navigationColor ? `?color=${encodeURIComponent(navigationColor)}` : "";
   const cardRef = useRef<HTMLElement | null>(null);
-  const cardImages = useCatalogCardImages(cardRef, item.source, item.id, active?.c || active?.n || null, img);
+  const cardImages = useCatalogCardImages(cardRef, item.source, item.id, active?.c || active?.n || null, img, !!matchedImg || !active);
+  const cardImage = matchedImg ? img : cardImages[0] || img;
 
   return (
     <CatalogModelCard
@@ -1544,7 +1545,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       as="a"
       href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/catalog/item/${item.source}/${encodeURIComponent(item.id)}${colorQuery}`}
       onClick={() => onNavigate(navigationColor)}
-      image={img}
+      image={cardImage}
       fallbackImage={rawImg}
       priority={priority}
       hoverImage={hover}

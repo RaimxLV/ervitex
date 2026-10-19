@@ -63,8 +63,12 @@ async function fetchImages(source: string, id: string): Promise<ImageRow[]> {
 }
 
 const requests = new Map<string, Promise<ImageRow[]>>();
-export function useCatalogCardImages(ref: RefObject<HTMLElement | null>, source: string, id: string, color: string | null, first: string | null) {
+export function useCatalogCardImages(ref: RefObject<HTMLElement | null>, source: string, id: string, color: string | null, first: string | null, firstIsColor = true) {
   const [near, setNear] = useState(false);
+  // Krāsa bez savas kataloga bildes (Russell): ielādē tās foto arī datorā pēc krāsas maiņas.
+  useEffect(() => {
+    if (!firstIsColor) setNear(true);
+  }, [firstIsColor]);
   const [rows, setRows] = useState<ImageRow[]>([]);
   useEffect(() => {
     const element = ref.current;
@@ -109,9 +113,15 @@ export function useCatalogCardImages(ref: RefObject<HTMLElement | null>, source:
     pending.then(data => { if (alive) setRows(data); }).catch(() => { requests.delete(key); });
     return () => { alive = false; };
   }, [near, source, id]);
+  return cardImageFrames(rows, color, first, firstIsColor, source);
+}
+
+/** Kartītes kadri: krāsas foto; modeļa vispārīgā bilde nekad nepārraksta citas krāsas foto. */
+export function cardImageFrames(rows: ImageRow[], color: string | null, first: string | null, firstIsColor: boolean, source = "") {
   const ssColor = source === "ss" ? color?.match(/C\d{3}/i)?.[0] : null;
   const candidates = colorCodeCandidates(ssColor || color).map(value => value.toLowerCase());
   const own = rows.filter(row => row.color && colorCodeCandidates(row.color).some(value => candidates.includes(value.toLowerCase())));
   const selected = own.length ? own : rows.filter(row => !row.color);
-  return [...new Set([first, ...selected.map(row => thumbUrl(row.url || row.alternate || null))].filter((url): url is string => Boolean(url)))];
+  const lead = firstIsColor || !own.length ? first : null;
+  return [...new Set([lead, ...selected.map(row => thumbUrl(row.url || row.alternate || null))].filter((url): url is string => Boolean(url)))];
 }
