@@ -2529,7 +2529,7 @@ SELECT v.sku, v.style_code, v.color_code, v.size_code,
    ;
 $function$;
 
--- 3. Price refresh excludes outlet (median clearance guard for UTT is kept).
+-- 3. Price refresh excludes outlet; UTT median only withholds suspicious prices (never substitutes).
 CREATE OR REPLACE FUNCTION public.refresh_catalog_prices()
  RETURNS void
  LANGUAGE plpgsql
@@ -2553,8 +2553,9 @@ BEGIN
   INSERT INTO public.catalog_variant_prices (source, sku, style_code, retail_price, currency)
   SELECT 'ru', p.style_code, p.style_code, ROUND((p.retail_price * 1.65)::numeric, 2), COALESCE(p.currency, 'EUR')
     FROM public.ru_prices p WHERE p.retail_price > 0 ON CONFLICT DO NOTHING;
-  -- UTT sends clearance prices for leftovers. Reference = higher of the size median and the style median;
-  -- prices >25% below it use the reference, and anything still under 1 EUR purchase (all-clearance styles) gets no price.
+  -- UTT failsafe: outlet SKUs excluded; the size/style median is ONLY a suspicious-outlier signal.
+  -- A SKU >25% below GREATEST(size median, style median), or under 1 EUR purchase, gets NO price
+  -- (price on request). Every other SKU uses its own non-outlet price x existing brand markup. Never a substitute price.
   INSERT INTO public.catalog_variant_prices (source, sku, style_code, color_code, size, retail_price, currency)
   WITH base AS (
     SELECT v.sku, v.style_code, v.color_name, v.size, p.purchase_price, p.currency, s.brand
@@ -2569,15 +2570,14 @@ BEGIN
   ), sty AS (
     SELECT style_code, percentile_cont(0.5) WITHIN GROUP (ORDER BY purchase_price) AS med
       FROM base GROUP BY style_code
-  ), priced AS (
-    SELECT b.*, CASE WHEN b.purchase_price < GREATEST(r.med, s.med) * 0.75 THEN GREATEST(r.med, s.med) ELSE b.purchase_price END AS regular
-      FROM base b
-      JOIN reg r ON r.style_code = b.style_code AND r.size IS NOT DISTINCT FROM b.size
-      JOIN sty s ON s.style_code = b.style_code
   )
-  SELECT 'utt', sku, style_code, color_name, size,
-         ROUND((regular * public.utt_markup(brand))::numeric, 2), COALESCE(currency, 'EUR')
-    FROM priced WHERE regular >= 1.0
+  SELECT 'utt', b.sku, b.style_code, b.color_name, b.size,
+         ROUND((b.purchase_price * public.utt_markup(b.brand))::numeric, 2), COALESCE(b.currency, 'EUR')
+    FROM base b
+    JOIN reg r ON r.style_code = b.style_code AND r.size IS NOT DISTINCT FROM b.size
+    JOIN sty st ON st.style_code = b.style_code
+   WHERE b.purchase_price >= 1.0
+     AND b.purchase_price >= GREATEST(r.med, st.med) * 0.75
   ON CONFLICT DO NOTHING;
   -- Falk&Ross (Build Your Brand / Flexfit): partner price x 1.55, no clearance rows in the feed.
   INSERT INTO public.catalog_variant_prices (source, sku, style_code, color_code, size, retail_price, currency)
@@ -2707,8 +2707,8 @@ CREATE OR REPLACE VIEW public.catalog_items WITH (security_invoker = true) AS
                           ORDER BY v.color_name) c), '[]'::jsonb) AS "coalesce"
            FROM utt_styles s
           WHERE (s.published AND (NOT s.hidden_by_admin) AND (EXISTS ( SELECT 1
-                   FROM catalog_price_ranges r
-                  WHERE ((r.source = 'utt'::text) AND (r.style_code = s.style_code) AND (r.min_price > (0)::numeric)))) AND (EXISTS ( SELECT 1
+                   FROM utt_variants v
+                  WHERE ((v.style_code = s.style_code) AND v.active AND (NOT v.outlet)))) AND (EXISTS ( SELECT 1
                    FROM utt_images i
                   WHERE ((i.style_code = s.style_code) AND (i.url IS NOT NULL)))))
         UNION ALL
