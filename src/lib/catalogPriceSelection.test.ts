@@ -74,3 +74,24 @@ describe("SS colour codes", () => {
     expect(colorCodeMatches("STTU169C0021L", "C002")).toBe(true);
   });
 });
+
+import { catalogColorPrice } from "./catalogPriceSelection";
+describe("catalogColorPrice", () => {
+  const p = (e: [string, number][]) => new Map(e);
+  it("RU model-wide colourless price applies to named colours", () => {
+    expect(catalogColorPrice(p([["ru:0R013M0:", 12]]), "ru", "0R013M0", { c: null, n: "Black" })).toBe(12);
+  });
+  it("colourless price is not borrowed by non-model-wide sources", () => {
+    expect(catalogColorPrice(p([["ss:STTU169:", 6]]), "ss", "STTU169", { c: "C999" })).toBeUndefined();
+  });
+  it("MF exact colour incl. leading zero and letter codes", () => {
+    const m = p([["mf:174:21", 5], ["mf:174:00", 4], ["mf:S30:b5", 9], ["mf:T21:tc", 7]]);
+    expect(catalogColorPrice(m, "mf", "174", { c: "1742112" })).toBe(5);
+    expect(catalogColorPrice(m, "mf", "174", { c: "1740012" })).toBe(4);
+    expect(catalogColorPrice(m, "mf", "S30", { c: "S30B539" })).toBe(9);
+    expect(catalogColorPrice(m, "mf", "T21", { c: "T21TC37" })).toBe(7);
+  });
+  it("MF unknown colour never takes another colour's price", () => {
+    expect(catalogColorPrice(p([["mf:174:21", 5]]), "mf", "174", { c: "1749912" })).toBeUndefined();
+  });
+});

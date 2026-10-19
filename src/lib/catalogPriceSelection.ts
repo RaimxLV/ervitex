@@ -1,4 +1,4 @@
-import { colorCodeMatches } from "@/lib/colorCodeMatch";
+import { colorCodeCandidates, colorCodeMatches } from "@/lib/colorCodeMatch";
 
 interface PriceRow { color_code: string | null; size: string | null; retail_price: number }
 interface Color { code: string; name: string }
@@ -57,4 +57,32 @@ export function lowestPriceColorIndex<T>(colors: T[], priceFor: (color: T) => nu
   };
   const index = pick(true);
   return index >= 0 ? index : pick(false);
+}
+
+/** Avoti, kuru cena ir vienota visam modelim (rindas bez krāsas). */
+export const MODEL_WIDE_CATALOG_SOURCES = new Set(["ru", "etx"]);
+
+/** Malfini katalogs: stils + 2 zīmju krāsa + izmērs (1742112 -> 21, S30B539 -> B5). */
+const malfiniColorKey = (styleId: string, code: string) => {
+  const c = code.trim().toLowerCase();
+  const s = styleId.trim().toLowerCase();
+  return s && c.startsWith(s) && c.length >= s.length + 2 ? c.slice(s.length, s.length + 2) : null;
+};
+
+/**
+ * Krāsas cena no kartītes cenu kartes (atslēga `${source}:${id}:${color}`).
+ * Precīza krāsa; bezkrāsas modeļa cena tikai MODEL_WIDE avotiem; citas krāsas nekad.
+ */
+export function catalogColorPrice<T>(
+  prices: Map<string, T>, source: string, id: string,
+  color: { c?: string | null; n?: string | null } | null | undefined,
+): T | undefined {
+  const base = `${source}:${id}:`;
+  const code = color ? (source === "pf" ? color.n : color.c || color.n) : null;
+  if (code) {
+    const keys = [...colorCodeCandidates(code)];
+    if (source === "mf") { const k = malfiniColorKey(id, code); if (k) keys.unshift(k); }
+    for (const k of keys) { const hit = prices.get(base + k); if (hit) return hit; }
+  }
+  return MODEL_WIDE_CATALOG_SOURCES.has(source) ? prices.get(base) : undefined;
 }

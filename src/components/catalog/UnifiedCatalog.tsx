@@ -10,8 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
-import { colorCodeCandidates } from "@/lib/colorCodeMatch";
-import { lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { HEADWEAR_TYPES, headwearType, isHeadwearCategory, matchesHeadwearType, type HeadwearType } from "@/lib/headwearTypes";
@@ -352,6 +351,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [visibleVariantPrices, setVisibleVariantPrices] = useState<
     Map<string, { price: number; max: number; currency: string }>
   >(new Map());
+  // Modeļi, kuru variantu cenas ielādētas bez kļūdas (citādi nerādām „pēc pieprasījuma”).
+  const [pricedIds, setPricedIds] = useState<Set<string>>(new Set());
 
 
   const [q, setQ] = useState(searchParams.get("q") || "");
@@ -1004,6 +1005,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   useEffect(() => {
     if (!paginated.length) {
       setVisibleVariantPrices(new Map());
+      setPricedIds(new Set());
       return;
     }
     let cancelled = false;
@@ -1016,6 +1018,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         currency: string | null;
       };
       const rows: VariantPriceRow[] = [];
+      const failed = new Set<string>();
       const bySource = new Map<CatalogSource, string[]>();
       for (const item of paginated) {
         const ids = bySource.get(item.source) || [];
@@ -1033,7 +1036,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               .in("style_code", ids)
               .gt("retail_price", 0)
               .range(from, from + 999);
-            if (error || !data) break;
+            if (error || !data) { failed.add(source); break; }
             rows.push(...((data as unknown) as VariantPriceRow[]));
             if (data.length < 1000) break;
             from += 1000;
@@ -1054,6 +1057,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         });
       }
       setVisibleVariantPrices(grouped);
+      setPricedIds(new Set(paginated.filter((i) => !failed.has(i.source)).map((i) => `${i.source}:${i.id}`)));
     })();
     return () => { cancelled = true; };
   }, [paginated]);
@@ -1367,6 +1371,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                       noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
                       priceInfo={priceRanges.get(`${it.source}:${it.id}`)}
                       variantPrices={visibleVariantPrices}
+                      pricesReady={pricedIds.has(`${it.source}:${it.id}`)}
 
                       fromLabel={lang === "lv" ? "no" : "from"}
                       onNavigate={(color) => {
@@ -1471,11 +1476,12 @@ interface CardProps {
   onNavigate: (color: string | null) => void;
   priceInfo?: { price: number; max: number; currency: string };
   variantPrices: Map<string, { price: number; max: number; currency: string }>;
+  pricesReady: boolean;
   fromLabel?: string;
   priority?: boolean;
 }
 
-const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, fromLabel, priority }: CardProps) => {
+const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, pricesReady, fromLabel, priority }: CardProps) => {
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const [, setEtxNamesTick] = useState(0);
   useEffect(() => {
@@ -1490,14 +1496,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   if (selectedBuckets.size > 0) {
     filterMatchIdx = item.colors.findIndex((c) => c.bucket && selectedBuckets.has(c.bucket));
   }
-  const colorPrice = (c: EnrichedColor) => {
-    const code = item.source === "pf" ? c.n : c.c || c.n;
-    for (const k of colorCodeCandidates(code)) {
-      const hit = variantPrices.get(`${item.source}:${item.id}:${k}`);
-      if (hit) return hit;
-    }
-    return undefined;
-  };
+  const colorPrice = (c: EnrichedColor) => catalogColorPrice(variantPrices, item.source, item.id, c);
   const cheapestIdx = lowestPriceColorIndex(item.colors, (c) => colorPrice(c)?.price);
   const effectiveIdx = activeIdx ?? (filterMatchIdx >= 0 ? filterMatchIdx : cheapestIdx >= 0 ? cheapestIdx : (item.colors.length ? 0 : null));
   const active = effectiveIdx !== null ? item.colors[effectiveIdx] : null;
@@ -1575,6 +1574,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
               €{effectivePrice.price.toFixed(2)} {lang === "lv" ? "bez PVN" : "excl. VAT"}
             </p>
           </div>
+        ) : active && !pricesReady ? (
+          <p aria-busy="true" className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">…</p>
         ) : (
           <p className="font-heading text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {requestLabel}
