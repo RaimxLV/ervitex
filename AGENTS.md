@@ -21,7 +21,7 @@
 - TanStack Start SSR on Lovable avoids browser globals; heads use lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap uses catalog_items minus remnants/footwear.
 - sw.js/service-worker.js are self-unregistering kill-switches; never delete (404 leaves stale cached pages).
 - Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
-- Galleries decode before switching, retain frames on failure. Mobile colour photos load after primary images; controls stay outside links. Hover needs loaded photos; Malfini prefers fronts. Cloudinary uses native resizing to cut downloads.
+- Galleries decode before switching, retain frames on failure. Mobile colour photos load after primary images; controls stay outside links. Hover needs loaded photos; Malfini prefers fronts. Cloudinary uses native resizing.
 - BrandLogo serves cards; ETX shows Ervitex. Russell shares model/colour validation and supplier colorProductMap labels to avoid wrong photos.
 - tech_galleries stores stable order/membership refs (s:<tech>:<index> for built-ins, public URLs for uploads), applied over static data so rebuilds preserve order.
 - UTT uses `utt-sync` Data Export into `utt_*`; service-role-only `utt_prices`; images mirrored in `utt-images` because UTT blocks hotlinking.
