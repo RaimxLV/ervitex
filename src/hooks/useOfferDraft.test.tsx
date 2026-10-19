@@ -25,6 +25,16 @@ describe("offer draft recovery", () => {
     await waitFor(() => expect(mocks.update).toHaveBeenCalledWith(expect.objectContaining({ items: [item], status: "draft" })), { timeout: 2500 });
     await waitFor(() => expect(result.current.saveState).toBe("saved"));
   });
+  it("persists and restores the chosen per-item discount", async () => {
+    const first = setup();
+    const discounted = { ...item, discountPercent: 12.5 };
+    act(() => first.result.current.setOffer((o) => ({ ...o, items: [discounted] })));
+    first.unmount();
+    const second = setup();
+    expect(second.result.current.offer.items[0].discountPercent).toBe(12.5);
+    await act(async () => { expect(await second.result.current.persist()).toBe(true); });
+    expect(mocks.update).toHaveBeenCalledWith(expect.objectContaining({ items: [discounted] }));
+  });
   it("restores unsaved items and client fields after remount", () => {
     const first = setup();
     act(() => first.result.current.setOffer((o) => ({ ...o, items: [item], client_name: "Edīte", note: "DTF" })));

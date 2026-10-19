@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Piedāvājumos katras preces atlaide procentos; klienta un e-pasta tabulā Atlaide % / Atlaide € pirms summas; 18 testi un divu atlaižu saglabāšana/pārlāde/klienta summas pārbaudītas. E-pasta piegāde netika veikta.
 - [x] Novērst piedāvājuma pazušanu pēc dīkstāves; automātiska saglabāšana un pārlūka rezerves kopija; 7 testi, īsts piedāvājums ar 25 precēm saglabājās pēc pārlādes un interneta pārtraukuma.
 - [x] Admina sākumlapā atvērt pieprasījumus; uzlabot kartītes, preču pārskatu un ātrās darbības; pārbaudīt ar īstajiem datiem.
 - [x] Salīdzināt vecā servera sitemap 500 URL ar saišu karti — iztrūkstošu ceļu nav; pārbaudīt 45 jaunās publiskās lapas/preces un 9 aktuālos SEO pamatkritērijus.

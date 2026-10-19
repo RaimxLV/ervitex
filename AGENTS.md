@@ -2,7 +2,7 @@
 
 - Search shares searchScore/exactCodeHits; legacy redirects preserve catalog facets/audience for relevance.
 - productContent separates care/specs; translation caches use fingerprints.
-- Offers use CreateOfferButton, /offers and OfferWorkspace; sharing activates drafts. useOfferDraft serializes version-checked autosaves with user/offer recovery to prevent loss; token refresh preserves editors.
+- Offers use CreateOfferButton, /offers, OfferWorkspace and shared offer item pricing helpers for consistent discounts; sharing activates drafts. useOfferDraft serializes version-checked autosaves with recovery; token refresh preserves editors.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
 - Icons share AccentIcon tones and Lucide-compatible print-icons for consistency.
 - Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
@@ -10,7 +10,7 @@
 - Team uses immutable photo_url/framing and current CDN fallbacks; admin-only writes. Manual uploads share WebP optimization to avoid heavy originals.
 - Worksheets autosave side-specific drafts; explicit confirmation alone updates the shared list and creates an immutable version, preventing client/staff overwrites.
 - `quote_events` is append-only; assignment/status history survives quote row changes.
-- Communication stays in normal email; worksheets edit/confirm products and copy an HTML/plain-text burgundy list link for mail-client and dark-mode compatibility.
+- Normal email only; worksheets copy HTML/plain-text burgundy links. Offer emails use admin-gated sendOffer and saved row pricing, never browser totals.
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
 - Shared catalogPriceSelection defaults cards to the cheapest positive-priced colour and details to its cheapest size; explicit choices override, keeping prices aligned.
 - "Ir noliktavā" is a manual admin flag in `stock_flags` per colour (`item_id` = `${id}::${color_code}`; bare `${id}` rows are legacy model-wide flags), separate from supplier data so syncs never erase it; it shows only in the product view for the selected colour, never on catalog cards; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.

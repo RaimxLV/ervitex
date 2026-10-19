@@ -1,8 +1,10 @@
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
+import { supabase } from "./integrations/supabase/client";
 
-const errorMiddleware = createMiddleware().server(async ({ next }) => {
+const errorMiddleware = createMiddleware().server(async ({ next, request }) => {
+  if (new URL(request.url).pathname.startsWith("/lovable/")) return next();
   try {
     return await next();
   } catch (error) {
@@ -24,6 +26,12 @@ const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) => ctx.handlerType === "serverFn",
 });
 
+const offerAuth = createMiddleware({ type: "function" }).client(async ({ next }) => {
+  const { data } = await supabase.auth.getSession();
+  return next({ headers: data.session ? { Authorization: `Bearer ${data.session.access_token}` } : {} });
+});
+
 export const startInstance = createStart(() => ({
   requestMiddleware: [errorMiddleware, csrfMiddleware],
+  functionMiddleware: [offerAuth],
 }));
