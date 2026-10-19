@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
-import { thumbUrl } from "@/lib/imageProxy";
+import { thumbUrl, unproxyUrl } from "@/lib/imageProxy";
 import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
@@ -1506,7 +1506,8 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const matchedImg = active?.u || null;
   const rawImg = resolveImgUrl(item.source, matchedImg ?? item.image_url);
   const img = thumbUrl(rawImg);
-  const hover = matchedImg ? null : thumbUrl(resolveImgUrl(item.source, item.hover_image_url));
+  // Modeļa hover foto var būt citas krāsas — rādām tikai, ja krāsa nav izvēlēta.
+  const hover = matchedImg || active ? null : thumbUrl(resolveImgUrl(item.source, item.hover_image_url));
 
   const withHex = item.colors
     .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c.h, c.bucket, c.n) }))
@@ -1546,7 +1547,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
       href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/catalog/item/${item.source}/${encodeURIComponent(item.id)}${colorQuery}`}
       onClick={() => onNavigate(navigationColor)}
       image={cardImage}
-      fallbackImage={rawImg}
+      fallbackImage={unproxyUrl(cardImage) || rawImg}
       priority={priority}
       hoverImage={hover}
       imageAlt={displayTitle}

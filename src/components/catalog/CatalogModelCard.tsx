@@ -137,6 +137,12 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
       colorOptions[(current + step + colorOptions.length) % colorOptions.length].onSelect?.();
     };
     const showHover = gallery.index === 0 && !!hoverImage && !hoverFailed && hoverReady;
+    const currentFrame = frames[gallery.index] || shownImage || image;
+    // Iepriekšējā kadra kļūdas paslēpšana nepāriet uz nākamo derīgo krāsu.
+    useEffect(() => {
+      if (baseImageRef.current) baseImageRef.current.style.display = "";
+      triedFallback.current = false;
+    }, [currentFrame]);
     useEffect(() => {
       setReady(Boolean(baseImageRef.current?.complete && baseImageRef.current.naturalWidth > 0));
       setHoverReady(false);
@@ -212,7 +218,9 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
                     el.src = direct;
                     return;
                   }
-                  if (fallbackImage && !triedFallback.current && fallbackImage !== image) {
+                  // Rezerve tikai tad, ja tā ir tas pats kadrs; citādi tukšs lauks, nekad citas krāsas foto.
+                  const frame = unproxyUrl(frames[gallery.index] || shownImage || image);
+                  if (fallbackImage && !triedFallback.current && fallbackImage !== el.src && unproxyUrl(fallbackImage) === frame) {
                     triedFallback.current = true;
                     el.src = fallbackImage;
                     return;
