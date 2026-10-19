@@ -44,6 +44,7 @@
 
     --accent: 0 85% 50%;
     --accent-foreground: 0 0% 100%;
+    --quote-recent: 42 85% 36%;
     --success: 145 63% 32%;
     --success-foreground: 0 0% 100%;
 
@@ -97,6 +98,7 @@
   }
 
   .dark {
+    --quote-recent: 42 90% 64%;
     --background: 0 0% 4%;
     --foreground: 0 0% 95%;
     --card: 0 0% 7%;
@@ -611,3 +613,9 @@
 @utility animate-promo-pulse { animation: promo-pulse 3s ease-in-out infinite; }
 
 @utility animate-glitch-spark { animation: glitch-spark 3s steps(1, end) infinite; }
+
+/* Request age is informational, not an order status. */
+.quote-age-recent {
+  color: hsl(var(--quote-recent));
+  background-color: hsl(var(--quote-recent) / 0.15);
+}

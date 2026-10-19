@@ -87,9 +87,9 @@ const PM_TABS = [
 /** Krāsu indikators pēc pieprasījuma vecuma: šodiena — zaļš, 1–2 d. — dzeltens, 3+ d. — sarkans. */
 const ageBadgeClass = (age: number) =>
   age === 0
-    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+    ? "bg-success/15 text-success"
     : age <= 2
-      ? "bg-secondary text-foreground"
+      ? "quote-age-recent"
       : "bg-destructive/15 text-destructive";
 
 const ageLabel = (age: number) => (age === 0 ? "Šodien" : age === 1 ? "Vakar" : `${age} d.`);
@@ -338,60 +338,7 @@ const AdminQuotes = () => {
                           {new Date(row.created_at).toLocaleString("lv")}
                         </p>
                       </div>
-                      <div className="flex flex-col gap-2 sm:w-52">
-                        <Button asChild variant="outline" size="sm" className="w-full">
-                          <a
-                            href={`mailto:${row.email}?subject=${encodeURIComponent(
-                              "Cenu pieprasījums",
-                            )}`}
-                          >
-                            <Mail className="mr-2 h-4 w-4" /> Rakstīt klientam
-                          </a>
-                        </Button>
-                        {row.action_token && (
-                          <>
-                            <Button asChild size="sm" className="w-full">
-                              <a href={worksheetPath(row.action_token)} target="_blank" rel="noreferrer">
-                                <ClipboardList className="mr-2 h-4 w-4" /> Preču saraksts
-                              </a>
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="w-full text-xs"
-                              onClick={() => { if (row.action_token) void copyText(worksheetUrl(row.action_token), "Saraksta saite nokopēta"); }}
-                            >
-                              <Copy className="mr-1.5 h-3.5 w-3.5" /> Kopēt saraksta saiti
-                            </Button>
-                          </>
-                        )}
-                        <div className="flex gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="flex-1 text-xs"
-                            onClick={() =>
-                              copyText(
-                                [row.name, row.email, row.phone, row.company]
-                                  .filter(Boolean)
-                                  .join(" · "),
-                                "Klienta dati nokopēti",
-                              )
-                            }
-                          >
-                            <Copy className="mr-1.5 h-3.5 w-3.5" /> Kopēt
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="flex-1 text-xs text-destructive"
-                            disabled={busy === row.id}
-                            onClick={() => setDeleteTarget(row)}
-                          >
-                            <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Dzēst
-                          </Button>
-                        </div>
-                      </div>
+
                     </div>
 
                     {items.length > 0 && <div className="border-t border-border pt-3">
@@ -413,7 +360,7 @@ const AdminQuotes = () => {
                         <p className="mb-2 text-[11px] uppercase tracking-wider text-muted-foreground">Pielikumi</p>
                         <div className="flex flex-wrap gap-2">
                           {row.file_urls.map((u, i) => (
-                            <Button key={i} variant="outline" size="sm" className="text-xs" onClick={() => openAttachment(u)}>
+                            <Button key={i} variant="outline" size="sm" className="h-auto min-h-9 max-w-full justify-start whitespace-normal break-all py-2 text-left text-xs" onClick={() => openAttachment(u)}>
                               <Paperclip className="mr-1.5 h-3.5 w-3.5" />
                               {decodeURIComponent(u.split("/").pop() || `Fails ${i + 1}`)}
                             </Button>
