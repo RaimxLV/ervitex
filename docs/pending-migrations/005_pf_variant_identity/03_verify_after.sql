@@ -3,7 +3,7 @@ SELECT count(*) FILTER (WHERE color_key IS NOT NULL) keyed, count(*) FILTER (WHE
 SELECT count(*) FROM public.pf_styles WHERE NOT feed_active; -- expect 121
 SELECT style_code, color_code, size, count(DISTINCT retail_price) FROM public.catalog_variant_prices
  WHERE source = 'pf' GROUP BY 1,2,3 HAVING count(DISTINCT retail_price) > 1; -- expect 0 rows
-SELECT count(*) FROM public.catalog_variant_prices c JOIN public.pf005_backup_cvp b USING (source, sku)
+SELECT count(*) FROM public.catalog_variant_prices c JOIN private.pf005_backup_cvp b USING (source, sku)
  WHERE c.retail_price <> b.retail_price; -- expect 0
 SELECT sku, color_code, size, retail_price FROM public.catalog_variant_prices
  WHERE source = 'pf' AND style_code IN ('K1058','106505') ORDER BY 1;
