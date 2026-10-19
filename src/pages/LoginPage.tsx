@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Lock, Mail, ArrowLeft } from "lucide-react";
 
+import { ADMIN_HOME } from "@/lib/adminNavigation";
+
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +26,7 @@ const LoginPage = () => {
     if (error) {
       toast({ title: "Ielogošanās neizdevās", description: error.message, variant: "destructive" });
     } else {
-      navigate("/admin");
+      navigate(ADMIN_HOME);
     }
   };
 

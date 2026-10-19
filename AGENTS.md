@@ -1,7 +1,7 @@
 # Architecture rules
 
 - Search shares searchScore/exactCodeHits; legacy redirects preserve catalog facets/audience for relevance.
-- productContent separates supplier care/specs; fingerprint translation caches.
+- productContent separates care/specs; translation caches use fingerprints.
 - Offers use CreateOfferButton and protected /offers with OfferWorkspace; sharing activates drafts automatically, without manual statuses.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
 - Public icons share AccentIcon framed/inline variants and semantic tones; print-icons holds Lucide-compatible print symbols for consistent strokes and sizes.
@@ -16,7 +16,7 @@
 - "Ir noliktavā" is a manual admin flag in `stock_flags` per colour (`item_id` = `${id}::${color_code}`; bare `${id}` rows are legacy model-wide flags), separate from supplier data so syncs never erase it; it shows only in the product view for the selected colour, never on catalog cards; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.
 - Shared worksheet/offer prints use scope="order" in existing item JSON; orderPrinting preserves offer-wide prints on deletion, preventing duplicate charges and extra storage.
 - Stock mutation controls render only after the authenticated admin role resolves, and every mutation revalidates the live user and role before writing; public users only see the outlined availability label.
-- Native scrolling; ScrollToTop uses resolvedLocation so pending pages do not jump. WebGL follows scroll/eased pointers, renders on change, pauses off-screen.
+- Native scrolling; ScrollToTop uses resolvedLocation. WebGL follows scroll/eased pointers, renders on change, pauses off-screen.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - TanStack Start SSR on Lovable avoids browser globals; heads use lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap uses catalog_items minus remnants/footwear.
 - Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
@@ -29,4 +29,5 @@
 - ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
 - QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.
-- Headwear shares name/description classification and a category-only URL facet; bump cache schema on field changes to prevent stale types.
+- Headwear shares classification/category facets; bump cache schema on changes.
+- Admin uses ADMIN_HOME for requests-first entry; supplier tools stay at /admin/overview.
