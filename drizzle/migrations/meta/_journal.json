@@ -113,6 +113,34 @@
       "when": 1792397772431,
       "tag": "0015_validate_request_bank_details",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792418248315,
+      "tag": "0016_migration_stage",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792418279392,
+      "tag": "0017_apply_003_supplier_outlet_exact_prices",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792418290650,
+      "tag": "0018_apply_004_utt_exact_price_recompute",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792418297688,
+      "tag": "0019_apply_005_pf_variant_identity",
+      "breakpoints": true
     }
   ]
 }

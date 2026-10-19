@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { colorCodeMatches } from "@/lib/colorCodeMatch";
+import { pfSkuMap } from "@/lib/pfVariantIdentity";
 import { lowestPriceVariant } from "@/lib/catalogPriceSelection";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
@@ -485,12 +486,13 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
 async function loadPF(modelCode: string): Promise<ProductDetail | null> {
   const [styleRes, variantsRes, imagesRes] = await Promise.all([
     supabase.from("pf_styles").select("model_code,description,ext_desc,brand,category,category_group,gender,material,simple_material,main_image,keywords,product_comments,country_of_origin,attributes").eq("model_code", modelCode).maybeSingle(),
-    supabase.from("pf_variants").select("item_code,color_code,color_desc,hex_color,size,material,weight_gr,qty_per_carton").eq("model_code", modelCode),
+    supabase.from("pf_variants").select("item_code,color_code,color_desc,color_key,color_label,feed_active,hex_color,size,material,weight_gr,qty_per_carton").eq("model_code", modelCode),
     supabase.from("pf_images").select("item_code,kind,url_1600,url_500,sort_order").eq("model_code", modelCode).order("sort_order", { ascending: true }),
   ]);
   const style = styleRes.data;
   if (!style) return null;
-  const variants = variantsRes.data || [];
+  // 005: SKU, kas vairs nav pilnā PF failā (feed_active=false), netiek rādītas.
+  const variants = ((variantsRes.data || []) as any[]).filter((v) => v.feed_active !== false);
   const images = imagesRes.data || [];
   const attrs = ((style as any).attributes || {}) as Record<string, any>;
 
@@ -512,11 +514,12 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
   const sizesByColor = new Map<string, Set<string>>();
   const sizeSet = new Set<string>();
   let sampleVariant: any = null;
-  const skuMap: Record<string, string> = {};
+  const pfKey = (v: any) => v.color_key || v.color_code || v.color_desc || v.item_code;
+  const { skus: skuMap } = pfSkuMap((variants as any[]).filter((v) => v.item_code).map((v) => ({ item_code: v.item_code, key: pfKey(v), size: v.size ?? null })));
   for (const v of variants as any[]) {
     if (!sampleVariant) sampleVariant = v;
     if (v.size) sizeSet.add(v.size);
-    const key = v.color_code || v.color_desc || v.item_code;
+    const key = pfKey(v);
     if (v.size) {
       if (!sizesByColor.has(key)) sizesByColor.set(key, new Set());
       sizesByColor.get(key)!.add(v.size);
@@ -524,13 +527,12 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
     if (!colorMap.has(key)) {
       colorMap.set(key, {
         code: key,
-        name: v.color_desc || v.color_code || key,
+        name: v.color_label || v.color_desc || v.color_code || key,
         hex: cleanHex(v.hex_color),
         itemCodes: new Set<string>(),
       });
     }
     colorMap.get(key)!.itemCodes.add(v.item_code);
-    if (v.item_code) skuMap[`${key}|${v.size ?? ""}`] = v.item_code;
   }
 
   const colors: ColorDetail[] = [...colorMap.values()].map((c) => {
@@ -882,7 +884,7 @@ async function loadUTT(styleCode: string): Promise<ProductDetail | null> {
       .select("style_code,brand,name,description,category,gender,fabric,weight,cut,details,care")
       .eq("style_code", styleCode)
       .maybeSingle(),
-    supabase.from("utt_variants").select("sku,color_name,color_hex,size,size_order").eq("style_code", styleCode).eq("active", true).order("size_order", { ascending: true }),
+    supabase.from("utt_variants").select("sku,color_name,color_hex,size,size_order").eq("style_code", styleCode).eq("active", true).eq("outlet", false).order("size_order", { ascending: true }),
     supabase.from("utt_images").select("color_name,url,sort_order").eq("style_code", styleCode).not("url", "is", null).order("sort_order", { ascending: true }),
   ]);
   const style: any = styleRes.data;
@@ -1132,7 +1134,7 @@ const CatalogItemDialog = ({
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [imgIndex, setImgIndex] = useState(0);
   const [variantPrices, setVariantPrices] = useState<
-    { color_code: string | null; size: string | null; retail_price: number; currency: string | null }[]
+    { sku?: string | null; color_code: string | null; size: string | null; retail_price: number; currency: string | null }[]
   >([]);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -1213,7 +1215,7 @@ const CatalogItemDialog = ({
       while (true) {
         const { data, error } = await supabase
           .from("catalog_variant_prices" as any)
-          .select("color_code,size,retail_price,currency")
+          .select("sku,color_code,size,retail_price,currency")
           .eq("source", source)
           .eq("style_code", id)
           .range(from, from + 999);
@@ -1311,11 +1313,14 @@ const CatalogItemDialog = ({
     let rows = variantPrices;
     if (currentColor) {
       const byColor = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code));
-      if (byColor.length) rows = byColor;
+      // PF: bez savas krāsas cenas nekad neņem citu krāsu.
+      if (byColor.length || source === "pf") rows = byColor;
     }
     if (selectedSize) {
       const bySize = rows.filter((r) => sizeKey(r.size) === norm(selectedSize));
-      if (bySize.length) rows = bySize;
+      if (bySize.length || source === "pf") rows = bySize;
+      // PF: izvēlētajai krāsai+izmēram jābūt tieši vienai SKU un cenai.
+      if (source === "pf" && (new Set(rows.map((r) => r.sku).filter(Boolean)).size > 1 || new Set(rows.map((r) => Number(r.retail_price))).size > 1)) return null;
     }
     const values = rows.map((r) => Number(r.retail_price)).filter((n) => Number.isFinite(n) && n > 0);
     if (!values.length) return null;
@@ -1324,7 +1329,7 @@ const CatalogItemDialog = ({
       max: Math.max(...values),
       currency: rows[0]?.currency || "EUR",
     };
-  }, [variantPrices, currentColor, selectedSize, rawToLabel]);
+  }, [variantPrices, currentColor, selectedSize, rawToLabel, source]);
 
   // Price per size (excl. VAT) for the currently selected colour
   const sizePriceMap = useMemo(() => {
@@ -1333,19 +1338,26 @@ const CatalogItemDialog = ({
     let rows = variantPrices;
     if (currentColor) {
       const byColor = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code));
-      if (byColor.length) rows = byColor;
+      if (byColor.length || source === "pf") rows = byColor;
     }
     const map: Record<string, number> = {};
+    const pfConflict = new Set<string>();
+    const pfSku: Record<string, string> = {};
     for (const r of rows) {
       const raw = (r.size ?? "").toString().trim();
       // Preces bez izmēra (somas, cepures) — cena zem "-", lai tā nonāk grozā.
       const size = raw ? rawToLabel[raw.toLowerCase()] || raw : "-";
       const v = Number(r.retail_price);
       if (!Number.isFinite(v) || v <= 0) continue;
+      // PF: atšķirīgas cenas vienā krāsā+izmērā → bez cenas, nevis lētākā.
+      if (source === "pf" && map[size] !== undefined && map[size] !== v) pfConflict.add(size);
+      // PF: divas SKU vienā krāsā+izmērā (220200) netiek sapludinātas pat ar vienādu cenu.
+      if (source === "pf" && r.sku) { if (pfSku[size] && pfSku[size] !== r.sku) pfConflict.add(size); pfSku[size] = pfSku[size] || r.sku; }
       if (map[size] === undefined || v < map[size]) map[size] = v;
     }
+    for (const size of pfConflict) delete map[size];
     return map;
-  }, [variantPrices, currentColor, rawToLabel]);
+  }, [variantPrices, currentColor, rawToLabel, source]);
 
 
 

@@ -1,6 +1,7 @@
 // Malfini B2B API sync — imports styles, variants, images, prices and stock.
 // Retail price = wholesale × 1.65 (same formula as Beechfield / PF Concept).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { isMalfiniOutlet, malfiniUnitPrices } from "../_shared/supplierFlags.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -51,13 +52,8 @@ Deno.serve(async (req) => {
 
     log("Fetching wholesale prices…");
     const wholesale = await api<any[]>(token, "/product/prices");
-    const wMap = new Map<string, { price: number; currency: string }>();
-    for (const p of wholesale) {
-      const cur = wMap.get(p.productSizeCode);
-      if (!cur || Number(p.price) < cur.price) {
-        wMap.set(p.productSizeCode, { price: Number(p.price), currency: p.currency || "EUR" });
-      }
-    }
+    // One standard unit price per SKU (limit = 1); quantity tiers are never imported.
+    const wMap = malfiniUnitPrices(wholesale);
     log(`Wholesale prices: ${wMap.size}`);
 
     log("Fetching recommended prices…");
@@ -79,7 +75,7 @@ Deno.serve(async (req) => {
     const stockRows: any[] = [];
 
     // Remap Malfini's "OUTLET" category to the real product type based on subtitle,
-    // since we don't run sale/outlet campaigns — prices are standard supplier prices.
+    // for navigation only; the OUTLET flag itself is stored in is_outlet/source_category_name.
     const remapOutletCategory = (categoryName: string | null, subtitle: string | null): string | null => {
       if (!categoryName || categoryName.toUpperCase() !== "OUTLET") return categoryName;
       const s = (subtitle || "").toLowerCase();
@@ -100,6 +96,9 @@ Deno.serve(async (req) => {
         name: p.name || null,
         category_code: p.categoryCode || null,
         category_name: remapOutletCategory(p.categoryName || null, p.subtitle || null),
+        // Supplier category kept; OUTLET = reduced-price clearance, excluded from the catalog.
+        source_category_name: p.categoryName || null,
+        is_outlet: isMalfiniOutlet(p),
         gender: p.gender || null,
         gender_code: p.genderCode || null,
         trademark: p.trademark || null,

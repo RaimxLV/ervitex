@@ -2,6 +2,7 @@
 // mode=data   : styles, variants, stock, buying prices → refresh catalog prices, then starts image mirroring
 // mode=images : mirrors pending product images into our own storage (UTT forbids hotlinking), resumable
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { parseUttOutlet } from "../_shared/supplierFlags.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -106,7 +107,7 @@ async function selectAll(sb: SupabaseClient, table: string, columns: string, fil
 async function syncData(sb: SupabaseClient) {
   const [styles, products, stock] = await Promise.all([
     uttExport("style", ["style", "brand", "shortdesc_en", "longdesc_en", "gsmweight", "gender_en", "category_en", "fabric_en", "cut_en", "details_en", "carelabels_en", "sizes", "isnew"]),
-    uttExport("product", ["sku", "style", "brand", "colorname", "colorhex", "size", "modelimageurl", "colorimageurl", "packshotimageurl"]),
+    uttExport("product", ["sku", "style", "brand", "colorname", "colorhex", "size", "modelimageurl", "colorimageurl", "packshotimageurl", "outlet"]),
     uttExport("stock", ["sku", "style", "price", "specialprice", "currency", "uttstock", "suppstock"]),
   ]);
   const now = new Date().toISOString();
@@ -157,6 +158,7 @@ async function syncData(sb: SupabaseClient) {
       size_order: Math.round(sizeRank(str(p.size)) * 10),
       stock: Math.max(0, Math.trunc(num(st?.uttstock) ?? 0)) + Math.max(0, Math.trunc(num(st?.suppstock) ?? 0)),
       active: true,
+      outlet: parseUttOutlet(p.outlet, sku), // UTT outlet = clearance; unknown value aborts sync
       updated_at: now,
     });
     const price = num(st?.price);

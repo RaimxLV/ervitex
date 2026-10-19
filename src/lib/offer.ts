@@ -10,6 +10,9 @@ export interface OfferItem {
   image: string | null;
   colorName: string | null;
   colorHex: string | null;
+  /** PF (005): pilnā krāsas atslēga un precīza SKU; vecās rindas tos nesatur un paliek nemainītas. */
+  colorKey?: string | null;
+  sku?: string | null;
   size: string | null;
   qty: number;
   /** Unit price, VAT excluded */

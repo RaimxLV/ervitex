@@ -820,11 +820,13 @@ export type Database = {
           gender: string | null
           gender_code: string | null
           hidden_by_admin: boolean
+          is_outlet: boolean
           name: string | null
           product_card_pdf: string | null
           published: boolean
           raw: Json | null
           size_chart_pdf: string | null
+          source_category_name: string | null
           specification: string | null
           style_code: string
           subtitle: string | null
@@ -841,11 +843,13 @@ export type Database = {
           gender?: string | null
           gender_code?: string | null
           hidden_by_admin?: boolean
+          is_outlet?: boolean
           name?: string | null
           product_card_pdf?: string | null
           published?: boolean
           raw?: Json | null
           size_chart_pdf?: string | null
+          source_category_name?: string | null
           specification?: string | null
           style_code: string
           subtitle?: string | null
@@ -862,11 +866,13 @@ export type Database = {
           gender?: string | null
           gender_code?: string | null
           hidden_by_admin?: boolean
+          is_outlet?: boolean
           name?: string | null
           product_card_pdf?: string | null
           published?: boolean
           raw?: Json | null
           size_chart_pdf?: string | null
+          source_category_name?: string | null
           specification?: string | null
           style_code?: string
           subtitle?: string | null
@@ -928,6 +934,27 @@ export type Database = {
             referencedColumns: ["style_code"]
           },
         ]
+      }
+      migration_stage: {
+        Row: {
+          body: string
+          body_md5: string | null
+          name: string
+          staged_at: string
+        }
+        Insert: {
+          body: string
+          body_md5?: string | null
+          name: string
+          staged_at?: string
+        }
+        Update: {
+          body?: string
+          body_md5?: string | null
+          name?: string
+          staged_at?: string
+        }
+        Relationships: []
       }
       nwg_assortments: {
         Row: {
@@ -1374,6 +1401,8 @@ export type Database = {
           created_at: string | null
           description: string | null
           ext_desc: string | null
+          feed_active: boolean
+          feed_seen_at: string | null
           gender: string | null
           item_count: number | null
           keywords: string | null
@@ -1395,6 +1424,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           ext_desc?: string | null
+          feed_active?: boolean
+          feed_seen_at?: string | null
           gender?: string | null
           item_count?: number | null
           keywords?: string | null
@@ -1416,6 +1447,8 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           ext_desc?: string | null
+          feed_active?: boolean
+          feed_seen_at?: string | null
           gender?: string | null
           item_count?: number | null
           keywords?: string | null
@@ -1434,8 +1467,12 @@ export type Database = {
           base_color: string | null
           color_code: string | null
           color_desc: string | null
+          color_key: string | null
+          color_label: string | null
           created_at: string | null
           ean_code: string | null
+          feed_active: boolean
+          feed_seen_at: string | null
           gender: string | null
           hex_color: string | null
           item_code: string
@@ -1452,8 +1489,12 @@ export type Database = {
           base_color?: string | null
           color_code?: string | null
           color_desc?: string | null
+          color_key?: string | null
+          color_label?: string | null
           created_at?: string | null
           ean_code?: string | null
+          feed_active?: boolean
+          feed_seen_at?: string | null
           gender?: string | null
           hex_color?: string | null
           item_code: string
@@ -1470,8 +1511,12 @@ export type Database = {
           base_color?: string | null
           color_code?: string | null
           color_desc?: string | null
+          color_key?: string | null
+          color_label?: string | null
           created_at?: string | null
           ean_code?: string | null
+          feed_active?: boolean
+          feed_seen_at?: string | null
           gender?: string | null
           hex_color?: string | null
           item_code?: string
@@ -2864,6 +2909,7 @@ export type Database = {
           active: boolean
           color_hex: string | null
           color_name: string | null
+          outlet: boolean
           size: string | null
           size_order: number
           sku: string
@@ -2875,6 +2921,7 @@ export type Database = {
           active?: boolean
           color_hex?: string | null
           color_name?: string | null
+          outlet?: boolean
           size?: string | null
           size_order?: number
           sku: string
@@ -2886,6 +2933,7 @@ export type Database = {
           active?: boolean
           color_hex?: string | null
           color_name?: string | null
+          outlet?: boolean
           size?: string | null
           size_order?: number
           sku?: string
