@@ -110,3 +110,6 @@ Avots: `https://www.pfconcept.com/portal/datafeed/productfeed_en_v3.json` (HTTP 
 
 **Sagatavots (nav ieviests sync):** `src/lib/pfColors.ts` `pfVariantColor` (kompozīta atslēga `H_GREY+ROYAL`, apraksts „Heather grey / Royal blue”, primārais hex) + 4 testi.
 **Pilnam labojumam vajag (nav izdarīts, prasa DB/sync apstiprinājumu):** (1) sync izmanto `pfVariantColor`; (2) vienreizējs `pf_variants.color_code` pārrēķins no feed + rollback snapshot; (3) feed-trūkstošo SKU deaktivēšana (nevis dzēšana); (4) `catalog_items.colors`/`catalog_variant_prices` PF krāsu atslēgas un `pf_images` krāsu sasaiste jāpārbauda ar jauno atslēgu, lai kartīte/foto/cena/piedāvājums lieto to pašu SKU; ×1,65 un bāzes cenas nemainās.
+
+## PF variantu identitāte — sagatavots labojums 005 (2026-10-19, nav piemērots)
+Skat. `docs/pending-migrations/005_pf_variant_identity/README.md`. Pilns feed (v3, 2026-10-18T13:40:28Z, sha256 d082a185…): 19674 SKU sakrīt, 994 atvecojušas (121 modelis pilnībā), 2259 SKU maina krāsas atslēgu uz divkrāsu. Dublēti krāsa+izmērs: 555 → 1; cenu konflikti 29 → 0; cenu izmaiņas saglabātām SKU 0; dzēšanas avota tabulās 0. Priekšskatījumā jau labots: saliktās atslēgas tikai precīzi; PF kartītes foto tikai precīzai SKU.
