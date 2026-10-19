@@ -12,10 +12,14 @@ declare global {
 }
 
 let initialized = false;
+// The gtag("config") hit already counts the initial page view; remember the
+// path so the router subscription never sends the same page twice.
+let lastTrackedPath = "";
 
 export function initAnalytics() {
   if (initialized || typeof window === "undefined" || !measurementId) return;
   initialized = true;
+  lastTrackedPath = window.location.pathname + window.location.search;
 
   const script = document.createElement("script");
   script.async = true;
@@ -35,5 +39,7 @@ export function initAnalytics() {
 
 export function trackPageView(path: string) {
   if (!measurementId || typeof window === "undefined" || !window.gtag) return;
+  if (path === lastTrackedPath) return;
+  lastTrackedPath = path;
   window.gtag("event", "page_view", { page_path: path });
 }

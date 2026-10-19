@@ -85,21 +85,39 @@ export function catalogItemHead(seo: CatalogItemSeo | null | undefined) {
       priceCurrency: "EUR",
       lowPrice: seo.lowPrice.toFixed(2),
       highPrice: seo.highPrice.toFixed(2),
-      availability: "https://schema.org/InStock",
       seller: { "@type": "Organization", name: "SIA Ervitex" },
     };
   }
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Sākums", item: "https://www.ervitex.lv/" },
+      { "@type": "ListItem", position: 2, name: "Katalogs", item: "https://www.ervitex.lv/catalog" },
+      { "@type": "ListItem", position: 3, name: seo.name, item: url },
+    ],
+  };
   return {
     meta: [
       { title },
       { name: "description", content: description },
+      { name: "robots", content: "index, follow" },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
       { property: "og:type", content: "product" },
+      { property: "og:url", content: url },
       ...(seo.image ? [{ property: "og:image", content: seo.image }, { name: "twitter:image", content: seo.image }] : []),
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
     ],
-    scripts: [{ type: "application/ld+json", children: JSON.stringify(product) }],
+    links: [
+      { rel: "canonical", href: url },
+      { rel: "alternate", hrefLang: "lv", href: url },
+      { rel: "alternate", hrefLang: "x-default", href: url },
+    ],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(product) },
+      { type: "application/ld+json", children: JSON.stringify(breadcrumb) },
+    ],
   };
 }

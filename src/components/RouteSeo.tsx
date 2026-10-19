@@ -19,12 +19,13 @@ const STATIC: Record<string, Meta> = {
   "/pf-concept": { title: "PF Concept — reklāmas preces un apģērbi | Ervitex", desc: "PF Concept apģērbi, somas un reklāmas preces ar logo apdruku." },
   "/beechfield-brands": { title: "Beechfield, Bagbase, Quadra — cepures un somas | Ervitex", desc: "Cepures, somas un aksesuāri ar izšuvumu vai apdruku." },
   "/malfini": { title: "Malfini — darba un reklāmas apģērbi | Ervitex", desc: "Malfini T-krekli, polo un darba apģērbi apdrukai vairumā." },
+  "/services": { title: "Apdrukas pakalpojumi | Ervitex", desc: DEFAULT_DESC },
   "/privacy": { title: "Privātuma politika | Ervitex", desc: "SIA Ervitex privātuma politika." },
   "/terms": { title: "Lietošanas noteikumi | Ervitex", desc: "SIA Ervitex lietošanas noteikumi." },
   "/login": { title: "Ieiet | Ervitex", desc: DEFAULT_DESC, noindex: true },
 };
 
-const PRIVATE = [/^\/admin/, /^\/offers(?:\/|$)/, /^\/saraksts\//, /^\/piedavajums\//, /^\/assign/];
+const PRIVATE = [/^\/admin/, /^\/offers(?:\/|$)/, /^\/saraksts\//, /^\/piedavajums\//, /^\/nodot\//, /^\/assign/];
 
 function setMeta(attr: "name" | "property", key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
