@@ -120,7 +120,10 @@ export function useCatalogCardImages(ref: RefObject<HTMLElement | null>, source:
 export function cardImageFrames(rows: ImageRow[], color: string | null, first: string | null, firstIsColor: boolean, source = "") {
   const ssColor = source === "ss" ? color?.match(/C\d{3}/i)?.[0] : null;
   const candidates = colorCodeCandidates(ssColor || color).map(value => value.toLowerCase());
-  const own = rows.filter(row => row.color && colorCodeCandidates(row.color).some(value => candidates.includes(value.toLowerCase())));
+  // PF attēli ir piesaistīti konkrētai SKU (10650504); citu formātu atvasinājumi (MF "50") sajauktu krāsas.
+  const own = source === "pf"
+    ? rows.filter(row => !!row.color && !!color && row.color.trim().toLowerCase() === color.trim().toLowerCase())
+    : rows.filter(row => row.color && colorCodeCandidates(row.color).some(value => candidates.includes(value.toLowerCase())));
   // Izvēlēta krāsa: tikai tās pašas krāsas kadri (tukšs, ja nav); modeļa kadri tikai bez krāsas.
   const selected = color ? own : rows.filter(row => !row.color);
   const lead = firstIsColor || !color ? first : null;

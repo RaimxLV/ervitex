@@ -1,0 +1,84 @@
+--- a/supabase/functions/pf-concept-sync/index.ts
++++ b/supabase/functions/pf-concept-sync/index.ts
+@@ -81,7 +81,18 @@
+ 
+ interface Batches { styles: any[]; variants: any[]; images: any[]; }
+ 
+-function mapModel(model: any, batches: Batches) {
++// Same rule as src/lib/pfColors.ts pfVariantColor (edge functions cannot import src/): every
++// colors.color entry forms the variant identity, so two-tone SKUs never collapse onto their first colour.
++function pfColorIdentity(colorArr: any[]) {
++  const list = colorArr.filter((c) => toStr(c?.colorCode));
++  if (!list.length) return { color_key: null, color_label: null };
++  return {
++    color_key: list.map((c) => toStr(c.colorCode)).join("+"),
++    color_label: list.map((c) => toStr(c.colorDesc) || toStr(c.colorCode)).join(" / "),
++  };
++}
++
++function mapModel(model: any, batches: Batches, seenAt: string | null = null) {
+   const modelCode = toStr(model?.modelCode);
+   if (!modelCode) return;
+ 
+@@ -136,6 +147,8 @@
+       base_color: toStr(primary?.baseColor),
+       hex_color: toStr(primary?.hexColor),
+       pms_color: toStr(primary?.pmsColorReference),
++      ...pfColorIdentity(colorArr),
++      ...(seenAt ? { feed_seen_at: seenAt, feed_active: true } : {}),
+       material: toStr(it?.material),
+       ean_code: toStr(it?.eanCode),
+       weight_gr: toNum(it?.measurements?.weightGr),
+@@ -189,6 +202,7 @@
+     attributes: attrs,
+     raw: null,
+     last_synced_at: new Date().toISOString(),
++    ...(seenAt ? { feed_seen_at: seenAt, feed_active: true } : {}),
+   });
+ }
+ 
+@@ -368,8 +382,10 @@
+   const { data, error } = await sb.storage.from(BUCKET).download(path);
+   if (error) throw new Error(`download ${path}: ${error.message}`);
+   const models: any[] = JSON.parse(await data.text());
++  // Feed generation stamp: rows seen in this cache generation share it, which lets mark_stale prove completeness.
++  const seenAt = String((await readManifest(sb, lang)).created_at || "") || null;
+   const batches: Batches = { styles: [], variants: [], images: [] };
+-  for (const m of models) mapModel(m, batches);
++  for (const m of models) mapModel(m, batches, seenAt);
+   const s = batches.styles.length, v = batches.variants.length, i = batches.images.length;
+   await flushBatches(sb, batches);
+   return { chunk: chunkIdx, models: models.length, styles: s, variants: v, images: i };
+@@ -529,6 +545,23 @@
+ // Full product refresh: cache the feed into chunks, then walk the chunks.
+ const CHUNK_SPAN = 15;
+ 
++// Explicit, separate step: deactivates (never deletes) PF rows absent from a feed generation, but only
++// after proving every manifest model was written with that generation's stamp. Hidden/outlet/price data untouched.
++async function markStale(sb: SupabaseClient, lang: string) {
++  const manifest = await readManifest(sb, lang);
++  const stamp = String(manifest.created_at || "");
++  const expected = Number(manifest.total_models || 0);
++  if (!stamp || expected <= 0) throw new Error("mark_stale: manifest has no generation stamp/model count");
++  const { count, error } = await sb.from("pf_styles").select("model_code", { count: "exact", head: true }).eq("feed_seen_at", stamp);
++  if (error) throw new Error(`mark_stale count: ${error.message}`);
++  if (count !== expected) throw new Error(`mark_stale: feed incomplete (${count}/${expected} models seen); nothing deactivated`);
++  const v = await sb.from("pf_variants").update({ feed_active: false }).or(`feed_seen_at.is.null,feed_seen_at.neq.${stamp}`).eq("feed_active", true).select("item_code");
++  if (v.error) throw new Error(`mark_stale variants: ${v.error.message}`);
++  const st = await sb.from("pf_styles").update({ feed_active: false }).or(`feed_seen_at.is.null,feed_seen_at.neq.${stamp}`).eq("feed_active", true).select("model_code");
++  if (st.error) throw new Error(`mark_stale styles: ${st.error.message}`);
++  return { stamp, models_seen: count, variants_deactivated: v.data?.length ?? 0, styles_deactivated: st.data?.length ?? 0 };
++}
++
+ async function refreshProducts(sb: SupabaseClient, lang: string, chunkSize: number) {
+   void chunkSize;
+   return await resumableProductCache(sb, lang, 0);
+@@ -553,6 +586,8 @@
+       result = await refreshProducts(sb, lang, chunkSize);
+     } else if (mode === "cache_slice") {
+       result = await resumableProductCache(sb, lang, Number(url.searchParams.get("start") || "0"));
++    } else if (mode === "mark_stale") {
++      result = await markStale(sb, lang);
+     } else if (mode === "manifest") {
+       result = await readManifest(sb, lang);
+     } else if (mode === "process") {

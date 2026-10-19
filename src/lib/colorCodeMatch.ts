@@ -14,6 +14,8 @@ export function colorCodeCandidates(code?: string | null): string[] {
   const c = norm(code);
   if (!c) return [];
   const out: string[] = [c];
+  // PF salikta krāsas atslēga (H_GREY+ROYAL): tikai precīza sakritība, nekādu sufiksu minēšanu.
+  if (c.includes("+")) return out;
   const dash = c.lastIndexOf("-");
   if (dash > 0 && dash < c.length - 1) out.push(c.slice(dash + 1)); // NWG sufikss
   // SS SKU "STTU169C0891L" = stils + C089 + izmērs "1L" -> C089 (krāsa vienmēr 3 cipari)
