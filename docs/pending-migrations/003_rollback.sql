@@ -299,3 +299,7 @@ SELECT DISTINCT ON (source, style_code) source, style_code, min_price, max_price
   FROM private.range_rollback_20261019 ORDER BY source, style_code, saved_at ON CONFLICT DO NOTHING;
 UPDATE public.utt_variants SET outlet = false WHERE outlet;
 UPDATE public.mf_styles SET is_outlet = false WHERE is_outlet;
+REVOKE SELECT (outlet) ON public.utt_variants FROM anon, authenticated;
+REVOKE SELECT (source_category_name, is_outlet) ON public.mf_styles FROM anon, authenticated;
+-- Columns mf_styles.is_outlet/source_category_name and utt_variants.outlet remain (non-breaking, unused after rollback).
+-- Backup tables private.*_rollback_20261019 remain until manually dropped after sign-off.

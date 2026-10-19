@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS private.price_rollback_20261019 AS
   SELECT now() AS saved_at, c.* FROM public.catalog_variant_prices c WHERE false;
 CREATE TABLE IF NOT EXISTS private.range_rollback_20261019 AS
   SELECT now() AS saved_at, r.* FROM public.catalog_price_ranges r WHERE false;
+-- private schema has USAGE for anon/authenticated, so lock the backups explicitly.
+REVOKE ALL ON private.price_rollback_20261019, private.range_rollback_20261019 FROM PUBLIC, anon, authenticated;
+GRANT ALL ON private.price_rollback_20261019, private.range_rollback_20261019 TO service_role;
 
 -- 1. Source flags (raw category stays in mf_styles.raw; is_outlet is not the manual hidden flag).
 ALTER TABLE public.mf_styles ADD COLUMN IF NOT EXISTS source_category_name text;
