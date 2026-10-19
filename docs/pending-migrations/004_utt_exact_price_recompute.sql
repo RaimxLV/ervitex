@@ -7,8 +7,9 @@ CREATE TABLE IF NOT EXISTS private.utt_price_rollback_20261019 AS
   SELECT now() AS saved_at, c.* FROM public.catalog_variant_prices c WHERE false;
 CREATE TABLE IF NOT EXISTS private.utt_range_rollback_20261019 AS
   SELECT now() AS saved_at, r.* FROM public.catalog_price_ranges r WHERE false;
-REVOKE ALL ON private.utt_price_rollback_20261019, private.utt_range_rollback_20261019 FROM PUBLIC, anon, authenticated;
-GRANT ALL ON private.utt_price_rollback_20261019, private.utt_range_rollback_20261019 TO service_role;
+CREATE TABLE IF NOT EXISTS private.utt_touched_20261019 (saved_at timestamptz NOT NULL DEFAULT now(), sku text NOT NULL);
+REVOKE ALL ON private.utt_price_rollback_20261019, private.utt_range_rollback_20261019, private.utt_touched_20261019 FROM PUBLIC, anon, authenticated;
+GRANT ALL ON private.utt_price_rollback_20261019, private.utt_range_rollback_20261019, private.utt_touched_20261019 TO service_role;
 
 CREATE TEMP TABLE _utt_cand ON COMMIT DROP AS
 WITH base AS (
@@ -39,6 +40,7 @@ SELECT k.sku, k.style_code FROM _utt_cand k
   LEFT JOIN public.catalog_variant_prices c ON c.source = 'utt' AND c.sku = k.sku
  WHERE c.sku IS NULL;
 
+INSERT INTO private.utt_touched_20261019 (sku) SELECT sku FROM _utt_touch;
 INSERT INTO private.utt_price_rollback_20261019
   SELECT now(), c.* FROM public.catalog_variant_prices c
    WHERE c.source = 'utt' AND c.sku IN (SELECT sku FROM _utt_touch);
