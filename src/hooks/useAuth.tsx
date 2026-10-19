@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const identity = useRef<string | null>(null);
 
   const checkAdmin = useCallback(async (userId: string) => {
     try {
@@ -41,6 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!mounted) return;
       setSession(session);
       setUser(session?.user ?? null);
+      identity.current = session?.user.id ?? null;
       if (session?.user) {
         await checkAdmin(session.user.id);
       }
@@ -53,6 +55,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (!mounted) return;
         setSession(session);
         setUser(session?.user ?? null);
+
+        // Token renewal/tab focus is not a new identity: never unmount an active editor.
+        const nextIdentity = session?.user.id ?? null;
+        if (nextIdentity === identity.current) return;
+        identity.current = nextIdentity;
 
         if (session?.user) {
           // Keep loading until the role check resolves, otherwise protected

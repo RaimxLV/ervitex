@@ -22,6 +22,7 @@ import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
 import { ArrowLeft, ChevronDown, Copy, ExternalLink, Mail, MessageCircle, Printer, Repeat, Save, Search, Send, Trash2, Plus } from "lucide-react";
 import { fillMissingPrices } from "@/lib/fillMissingPrices";
 import { colorMatches } from "@/components/worksheet/useVariants";
+import { useOfferDraft } from "@/hooks/useOfferDraft";
 
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
@@ -53,7 +54,7 @@ const AdminOfferEdit = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const { user } = useAuth();
-  const [offer, setOffer] = useState<Offer>(emptyOffer);
+  const { offer, setOffer, initialize, persist, saveState, saveError } = useOfferDraft(user?.id, id, emptyOffer);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [sendingEmail, setSendingEmail] = useState<"client" | null>(null);
@@ -74,6 +75,9 @@ const AdminOfferEdit = () => {
   const debounce = useRef<number | undefined>(undefined);
 
   useEffect(() => {
+    if (!user?.id || !id) return;
+    let cancelled = false;
+    setLoading(true);
     (async () => {
       const { data, error } = await supabase.from("pm_offers").select("*").eq("id", id || "").maybeSingle();
       if (error) toast({ title: "Kļūda", description: error.message, variant: "destructive" });
@@ -82,16 +86,18 @@ const AdminOfferEdit = () => {
         const me = PROJECT_MANAGERS.find((p) => p.email.toLowerCase() === (user?.email || "").toLowerCase());
         // Rindām bez cenas cenu ņemam no piegādātāja kataloga.
         const items = await fillMissingPrices((row.items || []) as OfferItem[]);
-        setOffer({
+        if (cancelled) return;
+        initialize({
           ...row,
           items,
           pm_email: row.pm_email || me?.email || user?.email || OFFICE_EMAIL,
           pm_name: row.pm_name || me?.name || "",
         });
       }
-      setLoading(false);
+      if (!cancelled) setLoading(false);
     })();
-  }, [id, user?.email]);
+    return () => { cancelled = true; };
+  }, [id, user?.id, initialize]);
 
 
   useEffect(() => {
@@ -265,29 +271,14 @@ const AdminOfferEdit = () => {
 
   const save = async (status?: string) => {
     setSaving(true);
-    const next = { ...offer, status: status || offer.status };
-    const { error } = await supabase
-      .from("pm_offers")
-      .update({
-        title: next.title,
-        client_name: next.client_name,
-        client_company: next.client_company,
-        client_email: next.client_email,
-        client_phone: next.client_phone,
-        note: next.note,
-        client_billing: next.client_billing || null,
-        status: next.status,
-        vat_rate: next.vat_rate,
-        pm_name: next.pm_name || null,
-        pm_email: next.pm_email || null,
-        items: next.items as any,
-        discount: next.discount && next.discount.value > 0 ? next.discount : null,
-      } as any)
-      .eq("id", offer.id);
+    const success = await persist(status);
     setSaving(false);
-    if (error) return toast({ title: "Kļūda", description: error.message, variant: "destructive" });
-    setOffer(next);
+    if (!success) {
+      toast({ title: "Neizdevās saglabāt", variant: "destructive" });
+      return false;
+    }
     toast({ title: status === "sent" ? "Saglabāts un gatavs sūtīšanai" : "Saglabāts" });
+    return true;
   };
 
 
@@ -295,7 +286,7 @@ const AdminOfferEdit = () => {
 
   // Any client-facing share must publish the link first (draft links do not work)
   const publish = async () => {
-    if (offer.status === "draft") await save("sent");
+    return save(offer.status === "draft" ? "sent" : undefined);
   };
 
   const copy = async (text: string, label: string) => {
@@ -308,14 +299,14 @@ const AdminOfferEdit = () => {
   };
 
   const whatsapp = async () => {
-    await publish();
+    if (!await publish()) return;
     const text = `${offer.client_name ? `Sveiki, ${offer.client_name}!\n\n` : ""}${offerPlainText(offer, "lv")}`;
     const phone = (offer.client_phone || "").replace(/[^\d]/g, "");
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   const mail = async () => {
-    await publish();
+    if (!await publish()) return;
     const subject = offer.title || "Ervitex piedāvājums";
     const body = `${offer.client_name ? `Sveiki, ${offer.client_name}!\n\n` : ""}${offerPlainText(offer, "lv")}`;
     window.location.href = `mailto:${offer.client_email || ""}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -340,7 +331,7 @@ const AdminOfferEdit = () => {
 
     setSendingEmail("client");
     // Publish the link first so the client can open it
-    await save("sent");
+    if (!await save("sent")) { setSendingEmail(null); return; }
 
     const t = offerTotals(offer.items, offer.vat_rate, offer.discount);
     const pmEmail = (offer.pm_email || user?.email || OFFICE_EMAIL).trim();
@@ -409,7 +400,8 @@ const AdminOfferEdit = () => {
           </Button>
 
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span role="status" className="text-xs text-muted-foreground">{saveState === "saved" ? "Saglabāts" : saveState === "saving" ? "Saglabā…" : saveState === "pending" ? "Nesaglabātas izmaiņas" : "Nav saglabāts tiešsaistē"}</span>
           <Button size="sm" onClick={() => save()} disabled={saving}>
             <Save className="mr-2 h-4 w-4" /> Saglabāt
           </Button>
@@ -417,6 +409,7 @@ const AdminOfferEdit = () => {
       </header>
 
       <h1 className="mb-7 font-heading text-2xl font-black uppercase sm:text-3xl">Mans piedāvājums</h1>
+      {saveError && <p role="alert" className="mb-5 text-sm text-destructive">{saveError}</p>}
       <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-6">
           {/* Picker */}
@@ -614,7 +607,7 @@ const AdminOfferEdit = () => {
               disabled={!offer.token || saving}
               onClick={async () => {
                 const w = window.open("", "_blank");
-                await save();
+                if (!await save()) { w?.close(); return; }
                 if (offer.token) { if (w) w.location.href = offerPath(offer.token); else window.open(offerPath(offer.token), "_blank"); }
               }}
             >
@@ -632,7 +625,7 @@ const AdminOfferEdit = () => {
 
             <div className="grid grid-cols-2 gap-2">
 
-              <Button size="sm" variant="outline" onClick={async () => { await publish(); copy(link, "Links"); }}><Copy className="mr-2 h-3 w-3" /> Saite</Button>
+              <Button size="sm" variant="outline" onClick={async () => { if (await publish()) copy(link, "Links"); }}><Copy className="mr-2 h-3 w-3" /> Saite</Button>
               <Button size="sm" variant="outline" onClick={() => copy(offerPlainText(offer, "lv"), "Teksts")}><Copy className="mr-2 h-3 w-3" /> Teksts</Button>
               <Button size="sm" variant="outline" onClick={whatsapp}><MessageCircle className="mr-2 h-3 w-3" /> WhatsApp</Button>
               <Button size="sm" variant="outline" onClick={mail}><Mail className="mr-2 h-3 w-3" /> E-pasts</Button>
