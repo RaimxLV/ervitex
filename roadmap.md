@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Admina sākumlapā atvērt pieprasījumus; uzlabot kartītes, preču pārskatu un ātrās darbības; pārbaudīt ar īstajiem datiem.
 - [x] Salīdzināt vecā servera sitemap 500 URL ar saišu karti — iztrūkstošu ceļu nav; pārbaudīt 45 jaunās publiskās lapas/preces un 9 aktuālos SEO pamatkritērijus.
 - [x] Lēnā publiskā pārbaudē visi 363 unikālie vecā sitemap ceļi (500 ieraksti) pārbaudīti: sākumlapa 200, pārējie 362 dod 301, bez 429/404/5xx.
 - [ ] Ervitex Google Search Console dati — Raimonda pieejamajā kontā nav verificētas Ervitex vietnes; faktiskā indeksācija/Latvijas klikšķi nav pārbaudāmi.
