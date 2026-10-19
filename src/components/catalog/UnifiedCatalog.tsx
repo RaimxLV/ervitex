@@ -1537,6 +1537,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   const cardRef = useRef<HTMLElement | null>(null);
   const cardImages = useCatalogCardImages(cardRef, item.source, item.id, active?.c || active?.n || null, img, !!matchedImg || !active);
   const cardImage = matchedImg ? img : cardImages[0] || img;
+  if (item.id === "0R013M0") console.warn("DBG2", active?.n, cardImage, cardImages.length);
 
   return (
     <CatalogModelCard
