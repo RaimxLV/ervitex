@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import DiscountField from "@/components/quote/DiscountField";
-import { money, itemPrintNet, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
+import { money, itemPrintNet, itemDiscountNet, itemDiscountPercent, itemTotalNet, offerTotals, offerPlainText, offerUrl, offerPath, type Offer, type OfferItem, PRINT_DISCLAIMER_LV } from "@/lib/offer";
 import { PROJECT_MANAGERS, OFFICE_EMAIL } from "@/data/projectManagers";
 import { ArrowLeft, ChevronDown, Copy, ExternalLink, Mail, MessageCircle, Printer, Repeat, Save, Search, Send, Trash2, Plus } from "lucide-react";
 import { fillMissingPrices } from "@/lib/fillMissingPrices";
@@ -356,7 +356,9 @@ const AdminOfferEdit = () => {
             size: i.size,
             qty: i.qty,
             unitPrice: i.unitPrice ? money(i.unitPrice) : null,
-            lineTotal: i.unitPrice || itemPrintNet(i) ? money((i.unitPrice || 0) * i.qty + itemPrintNet(i)) : "",
+            discountPercent: itemDiscountPercent(i),
+            discountAmount: money(itemDiscountNet(i)),
+            lineTotal: i.unitPrice || itemPrintNet(i) ? money(itemTotalNet(i)) : "",
             prints: (i.prints || []).filter((p) => p.scope !== "order").map((p) => `${p.method}${p.placement ? ` (${p.placement})` : ""}: ${money(Number(p.price))}${p.mode === "total" ? " kopā" : " / gab."}`),
           })),
           discount: t.discount > 0 ? `−${money(t.discount)}${offer.discount?.type === "percent" ? ` (${offer.discount.value}%)` : ""}` : "",
@@ -502,7 +504,7 @@ const AdminOfferEdit = () => {
                     if (data && pickerRef.current) { await pick(data as unknown as CatalogHit); setActiveColor((data as unknown as CatalogHit).colors?.find((c) => c.n === item.colorName)?.c || null); }
                   })();
                   document.getElementById("preces-izvele")?.scrollIntoView({ block: "start" });
-                }} onQuantity={(id, qty) => patchItem(id, { qty })} onPrice={(id, unitPrice) => patchItem(id, { unitPrice })} onRemove={removeItem}
+                }} onQuantity={(id, qty) => patchItem(id, { qty })} onPrice={(id, unitPrice) => patchItem(id, { unitPrice })} onDiscount={(id, discountPercent) => patchItem(id, { discountPercent })} onRemove={removeItem}
                 groupAction={(i) => <Button type="button" size="sm" variant="ghost" className="mt-1 px-0 text-accent" onClick={() => { setSwapKey(groupKey(i)); setPicked(null); setQ(""); document.getElementById("preces-izvele")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><Repeat className="h-4 w-4" />Cits modelis</Button>}
                 itemDetails={(i) => <PrintRows value={(i.prints || []).filter((p) => p.scope !== "order")} onChange={(prints) => patchItem(i.id, { prints: [...prints, ...(i.prints || []).filter((p) => p.scope === "order")] })} addLabel="Apdruka" />}
               /></div>
@@ -521,6 +523,7 @@ const AdminOfferEdit = () => {
             <h3 className="section-kicker font-heading text-xs font-bold uppercase text-accent">Kopsavilkums</h3>
             <dl className="mt-4 space-y-3 text-sm tabular-nums">
               <div className="flex justify-between"><dt className="text-muted-foreground">Preces</dt><dd>{money(totals.goods)}</dd></div>
+              {totals.itemDiscount > 0 && <div className="flex justify-between"><dt className="text-muted-foreground">Preču atlaides</dt><dd className="text-accent">−{money(totals.itemDiscount)}</dd></div>}
               <div className="flex justify-between"><dt className="text-muted-foreground">Apdruka</dt><dd>{money(totals.print)}</dd></div>
               <div className="flex items-center justify-between gap-2"><dt className="text-muted-foreground">Atlaide</dt><dd><DiscountField value={offer.discount ?? null} onChange={(d) => setOffer((o) => ({ ...o, discount: d }))} /></dd></div>
               {totals.discount > 0 && <div className="flex justify-between"><dt className="text-muted-foreground">Atlaides summa</dt><dd className="text-accent">−{money(totals.discount)}</dd></div>}
