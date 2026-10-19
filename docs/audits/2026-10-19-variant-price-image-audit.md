@@ -87,3 +87,26 @@ Secinājums (RISKS, nav pierādīts): kodi 4/5/6/7 = S/M/L/XL, bet avots abus p�
 - 106505 BLACK: `10650500` (EAN 3501170951705, price 53,99, list 69,21) un `10650504` (EAN 3501170951804, price 79,44, bez list) — divi atsevišķi produkti ar atšķirīgu EAN, size nav.
 - K1058 H_GREY: 35 SKU — 7 prefiksi (`K10588J*`, `K1058B2*`…`B7*`) × 5 izmēri (C=3/4, E=5/6, G=7/8, J=9/10, L=11/12), katram unikāls EAN; izmēri kartēti pareizi. Visiem saglabāts viens `color_code` H_GREY.
 - Cēlonis (stipra hipotēze, nav pierādīta): `pf-concept-sync/index.ts:121-136` saglabā tikai `colors.color[0]` (primāro krāsu); vairākkrāsu/kontrastkrāsu varianti sakļaujas zem vienas krāsas. Pierādīšanai vajag PF produktu feed ierakstus šiem item code — nav ielādēts (190 MB feed, netika palaists). Koda labojums nav veikts, līdz semantika apstiprināta.
+
+## 13:26 — PF oficiālā feed pārbaude (read-only)
+Avots: `https://www.pfconcept.com/portal/datafeed/productfeed_en_v3.json` (HTTP 200, 200 834 809 B, lejupielādēts /tmp, nekas nerakstīts DB). Cenu feed (`PF_FEED_TOKEN`) šoreiz netika lasīts.
+
+**PIERĀDĪTS — divkrāsu identitāte zaudēta.** Feed `colors.color` satur 2 krāsas; `pf-concept-sync/index.ts:121-136` saglabā tikai `[0]`:
+| SKU | feed krāsas | DB color_code |
+|---|---|---|
+| K10588JC | H_GREY+BLACK (Heather grey / Black) | H_GREY |
+| K1058B2C | H_GREY+ROYAL | H_GREY |
+| K1058B3C | H_GREY+L_PINK | H_GREY |
+| K1058B4C | H_GREY+BOTTLE | H_GREY |
+| K1058B5C | H_GREY+GARNET | H_GREY |
+| K1058B6C | H_GREY+RED | H_GREY |
+| K1058B7E/G/J | H_GREY+PURPLE | H_GREY |
+| 10650504 | BLACK+SILVER | BLACK |
+| 10650503 | Steel+GOLD | (nav pārbaudīts DB) |
+
+**PIERĀDĪTS — novecojuši SKU DB:** `K1058B7C` un `10650500` pašreizējā feed NAV; DB tie palikuši, jo sync tikai upsert pēc `item_code`, nekad nedeaktivē. Tātad 106505 BLACK konflikts = novecojis 10650500 + 10650504 (BLACK+SILVER).
+
+**Cenu posmi (nejaukt):** PF bāzes cena `pf_prices.price`: 10650500 = 53,99 (list 69,21), 10650504 = 79,44; K1058 = 8,74 / 9,17. Normalizētā neto = ×1,65 (53,99→89,08; 79,44→131,08; 8,74→14,42; 9,17→15,13); publiski +21% PVN. Iepriekšējā ziņojumā 89,08/131,08 un 53,99/79,44 bija dažādi posmi.
+
+**Sagatavots (nav ieviests sync):** `src/lib/pfColors.ts` `pfVariantColor` (kompozīta atslēga `H_GREY+ROYAL`, apraksts „Heather grey / Royal blue”, primārais hex) + 4 testi.
+**Pilnam labojumam vajag (nav izdarīts, prasa DB/sync apstiprinājumu):** (1) sync izmanto `pfVariantColor`; (2) vienreizējs `pf_variants.color_code` pārrēķins no feed + rollback snapshot; (3) feed-trūkstošo SKU deaktivēšana (nevis dzēšana); (4) `catalog_items.colors`/`catalog_variant_prices` PF krāsu atslēgas un `pf_images` krāsu sasaiste jāpārbauda ar jauno atslēgu, lai kartīte/foto/cena/piedāvājums lieto to pašu SKU; ×1,65 un bāzes cenas nemainās.
