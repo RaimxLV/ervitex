@@ -10,3 +10,8 @@ Nekas šeit NAV pielietots datubāzei vai sinhronizācijām.
 | `003_sync_code.patch` | Malfini (tikai `limit<=1` cena, OUTLET pazīme), UTT (`outlet` lauks), preces loga UTT variantu filtrs. Pielietot TIKAI pēc migrācijas. |
 
 Secība: preview → migrācija → patch → preview (jābūt 0 rindām) → kataloga pārbaude. Uzcenojumi (SS ×1,75, MF ×1,65, UTT zīmolu, PF ×1,65 u.c.) netiek mainīti; manuālie `hidden_by_admin` netiek aiztikti.
+
+## Pārbaudes statuss (2026-10-19 11:45)
+- Ielāps piemērots tikai izolētā kopijā /tmp: pielīp tīri; Deno tipu pārbaude abām sinhronizācijām OK; 12 helper testi iziet.
+- `CatalogItemDialog` daļa kompilējas tikai pēc migrācijas (kolonna `outlet` jāparādās ģenerētajos tipos).
+- `003_utt_median_impact.sql`: 18 281 ne-outlet variantiem nākamais pilnais refresh mainītu 7 cenas (5 modeļi), max Δ 11,43 € — jāizlemj pirms izpildes.
