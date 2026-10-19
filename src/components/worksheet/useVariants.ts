@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { colorCodeMatches } from "@/lib/colorCodeMatch";
+import { pfResolveVariant } from "@/lib/pfVariantIdentity";
 
 export interface CatalogHit {
   source: string;
@@ -8,10 +9,11 @@ export interface CatalogHit {
   name: string;
   brand: string | null;
   image_url: string | null;
-  colors: { c?: string; n?: string; h?: string; u?: string }[] | null;
+  colors: { c?: string; n?: string; h?: string; u?: string; k?: string }[] | null;
 }
 
 export interface VariantPrice {
+  sku?: string | null;
   color_code: string | null;
   size: string | null;
   retail_price: number;
@@ -83,6 +85,11 @@ export const priceForVariant = (
   colorCode: string | null | undefined,
   size: string | null | undefined,
 ) => {
+  if (source === "pf") {
+    // PF: precīza pilnā krāsas atslēga + izmērs → viena SKU; vairākas SKU → bez cenas (nekad patvaļīga).
+    const hit = pfResolveVariant(rows, colorCode, size);
+    return { price: hit.price, size: size ?? null, sku: hit.status === "ok" ? hit.sku : null, ambiguous: hit.status === "ambiguous" };
+  }
   const label = sizeLabeller(source, rows);
   const pool = rowsForColor(source, rows, colorCode);
   const want = norm(size) || "-";
@@ -97,6 +104,8 @@ export const priceForVariant = (
   return {
     price: singlePrice(chosen),
     size: raw ? label((raw || "").trim()) : size ?? null,
+    sku: null as string | null,
+    ambiguous: false,
   };
 };
 
@@ -115,6 +124,16 @@ export const sizesForColor = (
     const price = sizeless ? singlePrice(pool) : null;
     return declared
       .map((size) => ({ size, raw: size, price }))
+      .sort((a, b) => sizeIdx(a.size) - sizeIdx(b.size) || a.size.localeCompare(b.size));
+  }
+  if (source === "pf") {
+    if (!colorCode) return [];
+    const own = prices.filter((p) => norm(p.color_code) === norm(colorCode));
+    return [...new Set(own.map((p) => (p.size || "-").trim() || "-"))]
+      .map((size) => {
+        const hit = pfResolveVariant(prices, colorCode, size === "-" ? null : size);
+        return { size, raw: size, price: hit.price, sku: hit.status === "ok" ? hit.sku : null, ambiguous: hit.status === "ambiguous" };
+      })
       .sort((a, b) => sizeIdx(a.size) - sizeIdx(b.size) || a.size.localeCompare(b.size));
   }
   const label = sizeLabeller(source, prices);
@@ -142,7 +161,7 @@ export const fetchVariantPrices = async (source: string, styleCode: string) => {
   for (;;) {
     const { data, error } = await supabase
       .from("catalog_variant_prices" as never)
-      .select("color_code,size,retail_price")
+      .select("sku,color_code,size,retail_price")
       .eq("source", source)
       .eq("style_code", styleCode)
       .range(from, from + 999);

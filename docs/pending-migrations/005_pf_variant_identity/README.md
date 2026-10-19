@@ -1,4 +1,4 @@
-# 005 — PF variant identity (NOT APPLIED)
+# 005 — PF variant identity (APPLIED 2026-10-19, migration 0019)
 
 Status: review package. No DB writes, no trial DDL, no sync, no deploy. SQL validated offline only (pglast SQL + PL/pgSQL parser); guards use hashes read with SELECT.
 

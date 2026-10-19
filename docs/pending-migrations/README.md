@@ -24,3 +24,9 @@ Secība: preview → migrācija → patch → preview (jābūt 0 rindām) → ka
 - Outlet cenu rindas izņemtas: 2248. Pozitīvas cenas mainās: 3 (max Δ 5,08 €), nemainās 18 240.
 - Modeļi: 129 pilnībā izslēgti (tikai outlet); 11 paliek ar cenu pēc pieprasījuma; 409 UTT modeļi pēc tam.
 - Manuāli slēptie UTT: 0, netiek aiztikti; apavu filtri nemainīti.
+
+## PIEMĒROTS 2026-10-19 ~14:00 UTC
+- Bāzes pārbaude pirms: refresh_catalog_prices md5 31de0b3b…, catalog_items 31491aa5…, catalog_items_mv 7dc17b02… (sakrita).
+- Pārskatītie faili ievietoti `public.migration_stage` (md5: 003 dd5e4a4d…, 004 b7e1c6d7… bez BEGIN/COMMIT, 005 d8c319c2… = 01+02_feed_values+02_data) un izpildīti katrs savā transakcijā (lock_timeout 5s): migrācijas 0017 (003), 0018 (004), 0019 (005).
+- Rezerves kopijas (tikai postgres/service_role): private.price_rollback_20261019 (2342), range_rollback_20261019 (221), utt_price_rollback_20261019 (34), utt_range_rollback_20261019, utt_touched_20261019 (34), pf005_backup_variants/styles/cvp (20557)/ranges, pf005_saved_defs (3).
+- Koda patchi uzlikti (003_sync_code, 005 frontend, 005 sync); malfini-sync, utt-sync, pf-concept-sync izvietotas. Frontend NAV publicēts.

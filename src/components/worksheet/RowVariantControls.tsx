@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { money } from "@/lib/offer";
 import type { WorksheetItem } from "@/lib/worksheet";
 import { useVariants } from "./useVariants";
+import { pfFindColor } from "@/lib/pfVariantIdentity";
 
 interface Props {
   item: WorksheetItem;
@@ -15,11 +16,15 @@ interface Props {
 /** Krāsas un izmēra maiņa vienam modelim, ar cenu no kataloga. */
 const RowVariantControls = ({ item, disabled, onChange }: Props) => {
   const { colors, sizesFor, loading } = useVariants(item.source, item.productId);
+  const isPf = item.source === "pf";
+  // PF cenas atslēga ir pilnā krāsa (k); swatch kods c ir SKU attēlam.
+  const priceKey = (c?: { c?: string; k?: string } | null) => (isPf ? c?.k : c?.c) ?? null;
   const activeColor = useMemo(
-    () => colors.find((c) => (c.n || "") === (item.colorName || ""))?.c ?? null,
-    [colors, item.colorName],
+    () => (isPf ? colors[pfFindColor(colors, item)]?.c : colors.find((c) => (c.n || "") === (item.colorName || ""))?.c) ?? null,
+    [colors, item, isPf],
   );
-  const sizes = useMemo(() => sizesFor(activeColor), [activeColor, sizesFor]);
+  const activeKey = priceKey(colors.find((c) => c.c === activeColor));
+  const sizes = useMemo(() => sizesFor(activeKey), [activeKey, sizesFor]);
 
   // Auto-labojums: ja prece saglabāta ar cenu 0 bet katalogā ir cena, pievieno to automātiski.
   const autofixed = useRef(false);
@@ -41,8 +46,9 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
   const pickColor = (code?: string | null) => {
     const c = colors.find((x) => x.c === code);
     if (!c) return;
-    const match = sizesFor(c.c ?? null).find((s) => isCurrent(s));
+    const match = sizesFor(priceKey(c)).find((s) => isCurrent(s));
     onChange({
+      ...(isPf ? { colorKey: c.k || null, sku: (match as { sku?: string | null } | undefined)?.sku ?? null } : {}),
       colorName: c.n || null,
       colorHex: c.h || null,
       image: c.u || item.image,
@@ -52,8 +58,9 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
   };
 
   const pickSize = (size: string) => {
-    const price = sizes.find((s) => s.size === size)?.price;
-    onChange({ size: size === "-" ? null : size, unitPrice: price ?? item.unitPrice });
+    const hit = sizes.find((s) => s.size === size) as { price: number | null; sku?: string | null } | undefined;
+    const price = hit?.price;
+    onChange({ ...(isPf ? { sku: hit?.sku ?? null } : {}), size: size === "-" ? null : size, unitPrice: price ?? item.unitPrice });
   };
 
 

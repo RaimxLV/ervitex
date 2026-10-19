@@ -75,9 +75,11 @@ const malfiniColorKey = (styleId: string, code: string) => {
  */
 export function catalogColorPrice<T>(
   prices: Map<string, T>, source: string, id: string,
-  color: { c?: string | null; n?: string | null } | null | undefined,
+  color: { c?: string | null; n?: string | null; k?: string | null } | null | undefined,
 ): T | undefined {
   const base = `${source}:${id}:`;
+  // PF: pilnā krāsas atslēga (005), precīza sakritība bez kandidātu atvasināšanas.
+  if (source === "pf" && color?.k) return prices.get(base + color.k.trim().toLowerCase());
   const code = color ? (source === "pf" ? color.n : color.c || color.n) : null;
   if (code) {
     const keys = [...colorCodeCandidates(code)];
