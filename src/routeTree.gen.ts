@@ -28,6 +28,7 @@ import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminFiltersRouteImport } from './routes/admin.filters'
 import { Route as AdminGalleriesRouteImport } from './routes/admin.galleries'
 import { Route as AdminMegaMenuRouteImport } from './routes/admin.mega-menu'
+import { Route as AdminOverviewRouteImport } from './routes/admin.overview'
 import { Route as AdminPriceAuditRouteImport } from './routes/admin.price-audit'
 import { Route as AdminQuotesRouteImport } from './routes/admin.quotes'
 import { Route as AdminTeamPhotosRouteImport } from './routes/admin.team-photos'
@@ -141,6 +142,11 @@ const AdminMegaMenuRoute = AdminMegaMenuRouteImport.update({
   path: '/admin/mega-menu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminOverviewRoute = AdminOverviewRouteImport.update({
+  id: '/admin/overview',
+  path: '/admin/overview',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminPriceAuditRoute = AdminPriceAuditRouteImport.update({
   id: '/admin/price-audit',
   path: '/admin/price-audit',
@@ -246,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/admin/filters': typeof AdminFiltersRoute
   '/admin/galleries': typeof AdminGalleriesRoute
   '/admin/mega-menu': typeof AdminMegaMenuRoute
+  '/admin/overview': typeof AdminOverviewRoute
   '/admin/price-audit': typeof AdminPriceAuditRoute
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/team-photos': typeof AdminTeamPhotosRoute
@@ -284,6 +291,7 @@ export interface FileRoutesByTo {
   '/admin/filters': typeof AdminFiltersRoute
   '/admin/galleries': typeof AdminGalleriesRoute
   '/admin/mega-menu': typeof AdminMegaMenuRoute
+  '/admin/overview': typeof AdminOverviewRoute
   '/admin/price-audit': typeof AdminPriceAuditRoute
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/team-photos': typeof AdminTeamPhotosRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/admin/filters': typeof AdminFiltersRoute
   '/admin/galleries': typeof AdminGalleriesRoute
   '/admin/mega-menu': typeof AdminMegaMenuRoute
+  '/admin/overview': typeof AdminOverviewRoute
   '/admin/price-audit': typeof AdminPriceAuditRoute
   '/admin/quotes': typeof AdminQuotesRoute
   '/admin/team-photos': typeof AdminTeamPhotosRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/admin/filters'
     | '/admin/galleries'
     | '/admin/mega-menu'
+    | '/admin/overview'
     | '/admin/price-audit'
     | '/admin/quotes'
     | '/admin/team-photos'
@@ -401,6 +411,7 @@ export interface FileRouteTypes {
     | '/admin/filters'
     | '/admin/galleries'
     | '/admin/mega-menu'
+    | '/admin/overview'
     | '/admin/price-audit'
     | '/admin/quotes'
     | '/admin/team-photos'
@@ -439,6 +450,7 @@ export interface FileRouteTypes {
     | '/admin/filters'
     | '/admin/galleries'
     | '/admin/mega-menu'
+    | '/admin/overview'
     | '/admin/price-audit'
     | '/admin/quotes'
     | '/admin/team-photos'
@@ -478,6 +490,7 @@ export interface RootRouteChildren {
   AdminFiltersRoute: typeof AdminFiltersRoute
   AdminGalleriesRoute: typeof AdminGalleriesRoute
   AdminMegaMenuRoute: typeof AdminMegaMenuRoute
+  AdminOverviewRoute: typeof AdminOverviewRoute
   AdminPriceAuditRoute: typeof AdminPriceAuditRoute
   AdminQuotesRoute: typeof AdminQuotesRoute
   AdminTeamPhotosRoute: typeof AdminTeamPhotosRoute
@@ -633,6 +646,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMegaMenuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/overview': {
+      id: '/admin/overview'
+      path: '/admin/overview'
+      fullPath: '/admin/overview'
+      preLoaderRoute: typeof AdminOverviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/price-audit': {
       id: '/admin/price-audit'
       path: '/admin/price-audit'
@@ -774,6 +794,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminFiltersRoute: AdminFiltersRoute,
   AdminGalleriesRoute: AdminGalleriesRoute,
   AdminMegaMenuRoute: AdminMegaMenuRoute,
+  AdminOverviewRoute: AdminOverviewRoute,
   AdminPriceAuditRoute: AdminPriceAuditRoute,
   AdminQuotesRoute: AdminQuotesRoute,
   AdminTeamPhotosRoute: AdminTeamPhotosRoute,
