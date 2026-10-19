@@ -2,9 +2,9 @@
 
 - Search shares searchScore/exactCodeHits; legacy redirects preserve catalog facets/audience for relevance.
 - productContent separates care/specs; translation caches use fingerprints.
-- Offers use CreateOfferButton and protected /offers with OfferWorkspace; sharing activates drafts automatically, without manual statuses.
+- Offers use CreateOfferButton, /offers and OfferWorkspace; sharing activates drafts. useOfferDraft serializes version-checked autosaves with user/offer recovery to prevent loss; token refresh preserves editors.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
-- Public icons share AccentIcon framed/inline variants and semantic tones; print-icons holds Lucide-compatible print symbols for consistent strokes and sizes.
+- Icons share AccentIcon tones and Lucide-compatible print-icons for consistency.
 - Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
 - Office contours/hotspots share cover-scene coordinates; halos use separate feGaussianBlur polygons with oversized regions to prevent clipping.
 - Team uses immutable photo_url/framing and current CDN fallbacks; admin-only writes. Manual uploads share WebP optimization to avoid heavy originals.
@@ -30,4 +30,4 @@
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
 - QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.
 - Headwear shares classification/category facets; bump cache schema on changes.
-- Admin uses ADMIN_HOME for requests-first entry; supplier tools stay at /admin/overview.
+- ADMIN_HOME opens requests; supplier tools use /admin/overview.
