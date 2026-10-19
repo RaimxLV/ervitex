@@ -28,9 +28,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .eq("user_id", userId)
         .eq("role", "admin")
         .maybeSingle();
-      setIsAdmin(!!data);
+      if (identity.current === userId) setIsAdmin(!!data);
     } catch {
-      setIsAdmin(false);
+      if (identity.current === userId) setIsAdmin(false);
     }
   }, []);
 
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // routes briefly see "logged in but not admin" and redirect to /login.
           setLoading(true);
           checkAdmin(session.user.id).finally(() => {
-            if (mounted) setLoading(false);
+            if (mounted && identity.current === nextIdentity) setLoading(false);
           });
         } else {
           setIsAdmin(false);

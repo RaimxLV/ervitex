@@ -44,6 +44,7 @@ export function useOfferDraft(userId: string | undefined, id: string | undefined
       if (draft?.userId === userId && draft.offer?.id === remote.id && Array.isArray(draft.offer.items)) {
         recovered = { ...remote, ...draft.offer, token: remote.token };
         conflict = draft.base !== remote.updated_at && JSON.stringify(offerDraftPayload(recovered)) !== acknowledged.current;
+        if (conflict) base.current = draft.base;
       }
     } catch { /* A corrupt backup must not prevent opening the saved offer. */ }
     current.current = recovered;
