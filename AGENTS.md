@@ -31,3 +31,4 @@
 - QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.
 - Headwear shares facets; bump cache schema on changes.
 - ADMIN_HOME opens requests; supplier tools use /admin/overview.
+- Worksheet/offer prices come only from the exact colour+size row (colourless rows only for model-wide sources ru/etx); unknown or conflicting combinations stay null, never min/median of other variants. Unapplied price SQL lives in docs/pending-migrations for before/after review.
