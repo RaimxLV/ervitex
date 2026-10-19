@@ -116,8 +116,8 @@ const BentoCategories = () => {
               </h3>
               <p className="mb-5 max-w-xs text-sm text-primary-foreground/60 md:mb-10 md:text-lg">
                 {t(
-                  "Izvēlieties no vairāk nekā 10 000 premium kvalitātes tekstila un prezentmateriālu vienībām.",
-                  "Choose from 10,000+ premium textile and promo products.",
+                  "Izvēlieties no vairāk nekā 7000 premium kvalitātes tekstila un prezentmateriālu vienībām.",
+                  "Choose from 7,000+ premium textile and promo products.",
                 )}
               </p>
               <Link
