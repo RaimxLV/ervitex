@@ -1,5 +1,18 @@
 import { expect, it } from "vitest";
 import { keywordMatch, exactCodeHits, prepareQuery, rankedSearchResults, searchScore } from "./catalogSearch";
+it("169 searches model identities, not Malfini colour/size SKUs", () => {
+  const items = [
+    { id: "169", source: "mf", name: "Fit-T LS", colors: [{ c: "1694412" }] },
+    { id: "STTU169", source: "ss", name: "Creator 2.0", colors: [{ c: "STTU169C0891L" }] },
+    { id: "STSU168", source: "ss", name: "Drummer 2.0", colors: [] },
+    { id: "1694412", source: "other", name: "Unrelated model", colors: [] },
+    { id: "134169", source: "other", name: "Unrelated model", colors: [] },
+  ];
+  expect(rankedSearchResults(items, prepareQuery("169")).map(item => item.id))
+    .toEqual(["STTU169", "169", "STSU168"]);
+  expect(rankedSearchResults(items, prepareQuery("1694412")).map(item => item.id))
+    .toEqual(["1694412"]);
+});
 it("menu and catalog rank 167 identically regardless of candidate input order", () => {
   const items = ["STTU169", "STTU168", "STTU167", "134167", "16724", "AB168"].map(id => ({ id, source: id.startsWith("STTU") ? "ss" : "other" }));
   const menu = rankedSearchResults(items, prepareQuery("167"));
