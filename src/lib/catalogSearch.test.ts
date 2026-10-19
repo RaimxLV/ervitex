@@ -1,11 +1,32 @@
 import { expect, it } from "vitest";
 import { keywordMatch, exactCodeHits, prepareQuery, searchScore } from "./catalogSearch";
-it("digits", () => {
-  const q = prepareQuery("169");
-  const a = searchScore({ id: "STTU169", name: "Creator" }, q);
-  const b = searchScore({ id: "STTU1690", name: "X" }, q);
-  const c = searchScore({ id: "AB2169", name: "Y" }, q);
-  expect(a > b && b > c && c > 0).toBe(true);
+it("167 finds complete three-digit codes 167, 168 and 169 in relevance order", () => {
+  const q = prepareQuery("167");
+  const scores = ["STTU167", "STTU168", "STTU169"].map(id => searchScore({ id, source: "ss" }, q));
+  expect(scores[0]).toBeGreaterThan(scores[1]);
+  expect(scores[1]).toBeGreaterThan(scores[2]);
+  expect(scores[2]).toBeGreaterThan(0);
+});
+it("167 excludes 134167 and 16724 even when names contain 167", () => {
+  for (const id of ["134167", "16724", "STTU1670", "AB2167", "abc-167-24"]) {
+    expect(searchScore({ id, name: "167", source: "ss" }, prepareQuery("167"))).toBe(0);
+  }
+});
+it("four-digit queries exclude six-digit codes", () => {
+  const q = prepareQuery("1672");
+  expect(searchScore({ id: "AB1672" }, q)).toBeGreaterThan(0);
+  expect(searchScore({ id: "AB1673" }, q)).toBeGreaterThan(0);
+  expect(searchScore({ id: "167200" }, q)).toBe(0);
+  expect(searchScore({ id: "131672" }, q)).toBe(0);
+});
+it("exact numeric codes precede nearby Stanley/Stella codes", () => {
+  const q = prepareQuery("167");
+  expect(searchScore({ id: "167", source: "malfini" }, q)).toBeGreaterThan(searchScore({ id: "STTU168", source: "ss" }, q));
+});
+it("numeric neighbours are limited to two and preserve leading-zero length", () => {
+  expect(searchScore({ id: "STTU170" }, prepareQuery("167"))).toBe(0);
+  expect(searchScore({ id: "AB0167" }, prepareQuery("167"))).toBe(0);
+  expect(searchScore({ id: "AB0167" }, prepareQuery("0167"))).toBeGreaterThan(0);
 });
 
 it("169 ranks STTU169 ahead of Malfini 169", () => {

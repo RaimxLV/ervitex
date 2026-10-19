@@ -301,19 +301,22 @@ export const prepareQuery = (q: string): PreparedQuery | null => {
 export const searchScore = (it: Searchable, pq: PreparedQuery | null): number => {
   if (!pq) return 1;
   const p = prepare(it);
+  const isStella = it.source === "ss" || normalizeSearch(it.brand).replace(/ /g, "") === "stanleystella";
+  if (/^\d+$/.test(pq.raw)) {
+    // Match the whole model number, never a substring or product name.
+    const groups = p.id.match(/\d+/g) ?? [];
+    const digits = groups[0];
+    if (groups.length !== 1 || !digits || digits.length !== pq.raw.length) return 0;
+    if (digits === pq.raw) return 10000 + (isStella ? 3000 : 0);
+    const distance = Math.abs(Number(digits) - Number(pq.raw));
+    if (pq.raw.length < 3 || distance > 2) return 0;
+    return 1000 - distance * 100 + (isStella ? 3000 : 0);
+  }
   let score = 0;
 
   const idCompact = p.id.replace(/ /g, "");
-  const digitsOnly = /^\d{2,}$/.test(pq.compact);
-  if (idCompact === pq.compact) score += digitsOnly ? 1500 : 2000;
+  if (idCompact === pq.compact) score += 2000;
   else if (idCompact.startsWith(pq.compact) && pq.compact.length >= 3) score += 800;
-  else if (digitsOnly) {
-    // Tikai cipari: "169" → STTU169 (precīza ciparu grupa augstāk par daļēju)
-    const groups: string[] = idCompact.match(/\d+/g) ?? [];
-    if (groups.includes(pq.compact)) score += 1500;
-    else if (groups.some((g) => g.startsWith(pq.compact))) score += 700;
-    else if (idCompact.includes(pq.compact)) score += 400;
-  }
 
   if (p.name === pq.raw) score += 1000;
   else if (p.name.startsWith(pq.raw)) score += 500;
@@ -338,7 +341,6 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
     if (!best) return 0;
     score += best;
   }
-  const isStella = it.source === "ss" || normalizeSearch(it.brand).replace(/ /g, "") === "stanleystella";
   return score > 0 && isStella ? score + 3000 : score;
 };
 
