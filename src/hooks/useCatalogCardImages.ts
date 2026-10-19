@@ -66,10 +66,9 @@ const requests = new Map<string, Promise<ImageRow[]>>();
 export function useCatalogCardImages(ref: RefObject<HTMLElement | null>, source: string, id: string, color: string | null, first: string | null, firstIsColor = true) {
   const [near, setNear] = useState(false);
   // Krāsa bez savas kataloga bildes (Russell): ielādē tās foto arī datorā pēc krāsas maiņas.
-  const [initialColor] = useState(color);
   useEffect(() => {
-    if (!firstIsColor && color !== initialColor) setNear(true);
-  }, [color, initialColor, firstIsColor]);
+    if (!firstIsColor) setNear(true);
+  }, [firstIsColor]);
   const [rows, setRows] = useState<ImageRow[]>([]);
   useEffect(() => {
     const element = ref.current;
