@@ -1,0 +1,65 @@
+--- a/supabase/functions/malfini-sync/index.ts
++++ b/supabase/functions/malfini-sync/index.ts
+@@ -52,9 +52,11 @@
+     log("Fetching wholesale prices…");
+     const wholesale = await api<any[]>(token, "/product/prices");
+     const wMap = new Map<string, { price: number; currency: string }>();
++    // Official API: `limit` = minimum pieces for the price. Use only the single-piece tier (limit <= 1);
++    // never MIN over quantity tiers. SKUs without a single-piece tier stay unpriced.
+     for (const p of wholesale) {
+-      const cur = wMap.get(p.productSizeCode);
+-      if (!cur || Number(p.price) < cur.price) {
++      if (Number(p.limit ?? 1) > 1 || !(Number(p.price) > 0)) continue;
++      if (!wMap.has(p.productSizeCode)) {
+         wMap.set(p.productSizeCode, { price: Number(p.price), currency: p.currency || "EUR" });
+       }
+     }
+@@ -79,7 +81,7 @@
+     const stockRows: any[] = [];
+ 
+     // Remap Malfini's "OUTLET" category to the real product type based on subtitle,
+-    // since we don't run sale/outlet campaigns — prices are standard supplier prices.
++    // for navigation only; the OUTLET flag itself is stored in is_outlet/source_category_name.
+     const remapOutletCategory = (categoryName: string | null, subtitle: string | null): string | null => {
+       if (!categoryName || categoryName.toUpperCase() !== "OUTLET") return categoryName;
+       const s = (subtitle || "").toLowerCase();
+@@ -100,6 +102,9 @@
+         name: p.name || null,
+         category_code: p.categoryCode || null,
+         category_name: remapOutletCategory(p.categoryName || null, p.subtitle || null),
++        // Supplier category kept: OUTLET models are reduced-price clearance and are excluded from the catalog.
++        source_category_name: p.categoryName || null,
++        is_outlet: String(p.categoryName || "").toUpperCase() === "OUTLET",
+         gender: p.gender || null,
+         gender_code: p.genderCode || null,
+         trademark: p.trademark || null,
+--- a/supabase/functions/utt-sync/index.ts
++++ b/supabase/functions/utt-sync/index.ts
+@@ -106,7 +106,7 @@
+ async function syncData(sb: SupabaseClient) {
+   const [styles, products, stock] = await Promise.all([
+     uttExport("style", ["style", "brand", "shortdesc_en", "longdesc_en", "gsmweight", "gender_en", "category_en", "fabric_en", "cut_en", "details_en", "carelabels_en", "sizes", "isnew"]),
+-    uttExport("product", ["sku", "style", "brand", "colorname", "colorhex", "size", "modelimageurl", "colorimageurl", "packshotimageurl"]),
++    uttExport("product", ["sku", "style", "brand", "colorname", "colorhex", "size", "modelimageurl", "colorimageurl", "packshotimageurl", "outlet"]),
+     uttExport("stock", ["sku", "style", "price", "specialprice", "currency", "uttstock", "suppstock"]),
+   ]);
+   const now = new Date().toISOString();
+@@ -157,6 +157,7 @@
+       size_order: Math.round(sizeRank(str(p.size)) * 10),
+       stock: Math.max(0, Math.trunc(num(st?.uttstock) ?? 0)) + Math.max(0, Math.trunc(num(st?.suppstock) ?? 0)),
+       active: true,
++      outlet: String(p.outlet ?? "").trim() === "1", // UTT Data Export outlet flag = clearance
+       updated_at: now,
+     });
+     const price = num(st?.price);
+--- a/src/components/catalog/CatalogItemDialog.tsx
++++ b/src/components/catalog/CatalogItemDialog.tsx
+@@ -882,7 +882,7 @@
+       .select("style_code,brand,name,description,category,gender,fabric,weight,cut,details,care")
+       .eq("style_code", styleCode)
+       .maybeSingle(),
+-    supabase.from("utt_variants").select("sku,color_name,color_hex,size,size_order").eq("style_code", styleCode).eq("active", true).order("size_order", { ascending: true }),
++    supabase.from("utt_variants").select("sku,color_name,color_hex,size,size_order").eq("style_code", styleCode).eq("active", true).eq("outlet", false).order("size_order", { ascending: true }),
+     supabase.from("utt_images").select("color_name,url,sort_order").eq("style_code", styleCode).not("url", "is", null).order("sort_order", { ascending: true }),
+   ]);
+   const style: any = styleRes.data;
