@@ -19,6 +19,7 @@ import {
   History,
   Trash2,
   Phone, Search, X, Package, UserRound, Forward, MoreHorizontal,
+  Printer,
 } from "lucide-react";
 
 interface QuoteItem {
