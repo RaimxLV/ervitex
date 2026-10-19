@@ -1,4 +1,3 @@
-import { unproxyUrl } from "@/lib/imageProxy";
 import ervitexWhiteLogo from "@/assets/ervitex-logo-2.svg";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
