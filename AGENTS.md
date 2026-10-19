@@ -19,7 +19,7 @@
 - Native scrolling; ScrollToTop uses resolvedLocation. WebGL follows scroll/eased pointers, renders on change, pauses off-screen.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - TanStack Start SSR on Lovable avoids browser globals; heads use lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap uses catalog_items minus remnants/footwear.
-- Old phone/home-screen installs: sw.js and service-worker.js are self-unregistering kill-switches; never delete them, because a 404 leaves stale service workers serving broken cached pages.
+- sw.js/service-worker.js are self-unregistering kill-switches; never delete (404 leaves stale cached pages).
 - Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
 - Galleries decode before switching, retain frames on failure. Mobile colour photos load after primary images; controls stay outside links. Hover needs loaded photos; Malfini prefers fronts. Cloudinary uses native resizing to cut downloads.
 - BrandLogo serves cards; ETX shows Ervitex. Russell shares model/colour validation and supplier colorProductMap labels to avoid wrong photos.
@@ -30,4 +30,4 @@
 - Headwear shares facets; bump cache schema on changes.
 - ADMIN_HOME opens requests; supplier tools use /admin/overview.
 - Subdirectories have their own AGENTS.md; read it before changing files there. Unapplied price SQL lives in docs/pending-migrations for before/after review.
-- Catalog reads use AbortSignal timeouts and show error+retry (never endless skeletons or a partial catalog as complete); filter order falls back to default order on failure.
+- Catalog reads time out into error+retry, never endless skeletons or partial-as-complete; filter order falls back to default.
