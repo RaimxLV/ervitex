@@ -49,11 +49,11 @@ describe("card starting colour excludes White and Natural only", () => {
   it("ignores unpriced excluded variants in fallback", () => {
     expect(lowestPriceColorIndex([{ n: "White", p: 0 }, { n: "Natural", p: 3 }], (c) => c.p)).toBe(1);
   });
-  it.each(["White", " white ", "balts", "balta", "Natural", "natural", "Natural Raw"])("excludes the exact starting-colour equivalent %s", (name) => {
+  it.each(["White", " white ", "balts", "balta", "Off White", "Soft White", "Vintage White", "Natural", "natural", "Natural Raw"])("excludes the exact starting-colour equivalent %s", (name) => {
     expect(isExcludedStartingColor(name)).toBe(true);
     expect(lowestPriceColorIndex([{ name, p: 3 }, { name: "Black", p: 7 }], (c) => c.p)).toBe(1);
   });
-  it.each(["Black/White", "Natural/Black", "Natural Stone", "Off White", "White Sand"])("does not broadly exclude %s", (name) => {
+  it.each(["Black/White", "Natural/Black", "Natural Stone", "White Sand"])("does not broadly exclude %s", (name) => {
     expect(isExcludedStartingColor(name)).toBe(false);
     expect(lowestPriceColorIndex([{ name, p: 3 }, { name: "Black", p: 7 }], (c) => c.p)).toBe(0);
   });

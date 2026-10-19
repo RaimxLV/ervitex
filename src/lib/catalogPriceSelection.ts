@@ -6,10 +6,10 @@ const norm = (value?: string | null) => (value || "").trim().toLowerCase();
 
 /** White is priced below other colours, so it never sets the default starting price. */
 export const isWhiteColor = (name?: string | null) => /^(white|balt[sa]?)$/.test(norm(name));
-// Exact catalogue names: Natural Raw is the Stanley/Stella equivalent.
+// Exact catalogue names, including supplier white shades and Natural Raw.
 // Mixed colours and distinct shades such as Natural Stone remain eligible.
 export const isExcludedStartingColor = (name?: string | null) =>
-  isWhiteColor(name) || /^(natural|natural raw)$/.test(norm(name));
+  isWhiteColor(name) || /^(off white|soft white|vintage white|natural|natural raw)$/.test(norm(name));
 const colorName = (c: unknown) => {
   const o = c as { n?: string | null; name?: string | null } | null;
   return o?.n ?? o?.name ?? null;
