@@ -12,13 +12,14 @@ export function useFilterOrder() {
     const load = () => { supabase
       .from("catalog_filter_order")
       .select("key, order_values")
+      .abortSignal(AbortSignal.timeout(8000))
       .then(({ data }) => {
         if (cancelled) return;
         const map: FilterOrderMap = {};
         for (const r of data || []) map[r.key] = r.order_values || [];
         setOrder(map);
         setReady(true);
-      });
+      }, () => { if (!cancelled) setReady(true); });
     };
     load();
     window.addEventListener("catalog-order-updated", load);

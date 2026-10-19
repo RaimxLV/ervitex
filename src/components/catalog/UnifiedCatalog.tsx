@@ -472,7 +472,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
         .from(table as any)
         .select(columns, withCount ? { count: "exact" } : undefined)
         .order(order, { ascending: true })
-        .range(from, from + STEP - 1);
+        .range(from, from + STEP - 1)
+        // Nereaģējošs backend nedrīkst atstāt skeletus mūžīgi: pēc 20 s pieprasījums kļūst par kļūdu.
+        .abortSignal(AbortSignal.timeout(20000));
       if (lockedSource) q = q.eq("source", lockedSource);
       return q;
     };
@@ -563,11 +565,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       const [persisted, liveCount, remnantRows] = await Promise.all([
         readCatalogCache(cacheKey),
         (() => {
-          let q = supabase.from("catalog_items" as any).select("id", { count: "exact", head: true });
+          let q = supabase.from("catalog_items" as any).select("id", { count: "exact", head: true }).abortSignal(AbortSignal.timeout(8000));
           if (lockedSource) q = q.eq("source", lockedSource);
           return q.then((r) => (r.error ? null : r.count ?? null));
         })(),
-        supabase.from("catalog_remnants" as any).select("source,style_code").range(0, 4999).then((r) => (r.error ? [] : ((r.data as any[]) || []))),
+        supabase.from("catalog_remnants" as any).select("source,style_code").range(0, 4999).abortSignal(AbortSignal.timeout(20000)).then((r) => (r.error ? [] : ((r.data as any[]) || []))),
       ]);
       if (cancelled) return;
       for (const r of remnantRows) remnants.add(`${r.source}:${r.style_code}`);
@@ -632,6 +634,14 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       if (cancelled) return;
 
       const extra: CatalogItem[] = [];
+      // Daļējs katalogs nav „pilns”: ja kāda lapa neatnāca, rādām kļūdu ar „Mēģināt vēlreiz”.
+      if ([...restItems, ...restPrices].some((p) => p.error)) {
+        if (!servedFromCache) {
+          setLoadError(true);
+          setLoaded(true);
+        }
+        return;
+      }
       for (const p of restItems) if (!p.error && p.data) extra.push(...((p.data as unknown) as CatalogItem[]));
       for (const p of restPrices) if (!p.error && p.data) priceRows = priceRows.concat(p.data as any[]);
 
