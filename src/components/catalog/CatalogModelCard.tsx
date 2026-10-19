@@ -205,6 +205,13 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
                 onLoad={() => setReady(true)}
                 onError={(e) => {
                   const el = e.currentTarget as HTMLImageElement;
+                  // Starpniekserveris nepieejams: rādām TĀ PAŠA kadra oriģinālu, nevis
+                  // modeļa vispārīgo bildi (citādi krāsas maiņa „iesaldē” citas krāsas foto).
+                  const direct = unproxyUrl(el.src);
+                  if (direct && direct !== el.src) {
+                    el.src = direct;
+                    return;
+                  }
                   if (fallbackImage && !triedFallback.current && fallbackImage !== image) {
                     triedFallback.current = true;
                     el.src = fallbackImage;
