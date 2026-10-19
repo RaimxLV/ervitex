@@ -1128,7 +1128,7 @@ const translateLabel = (label: string, lang: "lv" | "en") => {
 import { useStockFlags, stockKey } from "@/hooks/useStockFlags";
 import { StockRibbon, StockToggle } from "./StockBadge";
 import { useAuth } from "@/hooks/useAuth";
-import { nwgDuplicateSizeLabels } from "@/lib/nwgSizes";
+import { nwgDuplicateSizeLabels, withSkuSizes } from "@/lib/nwgSizes";
 
 const CatalogItemDialog = ({
   open, onOpenChange, source, id, name, brand, category, image, swatches, descriptionFallback, inline,
