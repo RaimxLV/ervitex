@@ -1,11 +1,8 @@
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /login
-Disallow: /request
-Disallow: /offers
-Disallow: /piedavajums/
-Disallow: /saraksts/
-Disallow: /nodot/
+
+# Privātās lapas (login, request, offers, piedavajums, saraksts, nodot, admin)
+# nesatur noindex meta tagu — tās nedrīkst būt Disallow, lai Google varētu
+# nolasīt noindex. Tāpēc šeit nav Disallow rindu.
 
 Sitemap: https://www.ervitex.lv/sitemap.xml

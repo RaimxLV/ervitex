@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE, TECH_NAMES } from "@/lib/seo";
 
-const STATIC_PATHS = ["/", "/catalog", "/about", "/contact", "/stanley-stella", "/nwg", "/pf-concept", "/beechfield-brands", "/malfini", "/privacy", "/terms"];
+const STATIC_PATHS = ["/", "/catalog", "/about", "/contact", "/services", "/stanley-stella", "/nwg", "/pf-concept", "/beechfield-brands", "/malfini", "/privacy", "/terms"];
 const FOOTWEAR = /apav|footwear|shoe|boot|sandal|slipper/i;
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
