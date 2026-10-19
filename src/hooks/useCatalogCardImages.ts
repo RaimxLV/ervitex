@@ -113,7 +113,6 @@ export function useCatalogCardImages(ref: RefObject<HTMLElement | null>, source:
     pending.then(data => { if (alive) setRows(data); }).catch(() => { requests.delete(key); });
     return () => { alive = false; };
   }, [near, source, id]);
-  if (source === "ru") console.warn("DBG", near, rows.length, color, firstIsColor);
   return cardImageFrames(rows, color, first, firstIsColor, source);
 }
 
