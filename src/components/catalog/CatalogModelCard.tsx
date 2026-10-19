@@ -196,6 +196,8 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
             <>
               {!ready && <div className="absolute inset-0 animate-pulse bg-neutral-100" />}
               <img
+                // Jauns kadrs = jauns elements: iepriekšējās kļūdas paslēpšana nepāriet uz derīgu krāsu.
+                key={frames[gallery.index] || shownImage || image}
                 ref={baseImageRef}
                 src={frames[gallery.index] || shownImage || image}
                 alt={imageAlt}
@@ -212,7 +214,9 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
                     el.src = direct;
                     return;
                   }
-                  if (fallbackImage && !triedFallback.current && fallbackImage !== image) {
+                  // Rezerve tikai tad, ja tā ir tas pats kadrs; citādi tukšs lauks, nekad citas krāsas foto.
+                  const frame = unproxyUrl(frames[gallery.index] || shownImage || image);
+                  if (fallbackImage && !triedFallback.current && fallbackImage !== el.src && unproxyUrl(fallbackImage) === frame) {
                     triedFallback.current = true;
                     el.src = fallbackImage;
                     return;

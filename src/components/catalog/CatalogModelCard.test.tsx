@@ -35,6 +35,11 @@ describe("catalog card photo navigation", () => {
     fireEvent.error(photo);
     expect(photo.src).toBe(green);
     fireEvent.error(photo);
-    expect(photo.src).toBe(black);
+    expect(photo.src).not.toBe(black);
+    expect(photo.style.display).toBe("none");
+    // Nākamā derīgā krāsa vairs nav paslēpta.
+    view.rerender(<CatalogModelCard image="https://example.com/red.jpg" fallbackImage={black} imageAlt="Krekls" title="Krekls" noImageLabel="" />);
+    await waitFor(() => expect((view.getByAltText("Krekls") as HTMLImageElement).src).toBe("https://example.com/red.jpg"));
+    expect((view.getByAltText("Krekls") as HTMLImageElement).style.display).toBe("");
   });
 });
