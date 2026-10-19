@@ -1,7 +1,7 @@
 # Architecture rules
 
 - Search shares searchScore/exactCodeHits; legacy redirects preserve catalog facets/audience for relevance.
-- productContent separates supplier care/specs; fingerprint translation caches.
+- productContent separates care/specs; translation caches use fingerprints.
 - Offers use CreateOfferButton and protected /offers with OfferWorkspace; sharing activates drafts automatically, without manual statuses.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
 - Public icons share AccentIcon framed/inline variants and semantic tones; print-icons holds Lucide-compatible print symbols for consistent strokes and sizes.
@@ -30,4 +30,4 @@
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
 - QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.
 - Headwear shares classification/category facets; bump cache schema on changes.
-- Admin entry points share ADMIN_HOME; supplier tools stay at /admin/overview, making requests the default.
+- Admin uses ADMIN_HOME for requests-first entry; supplier tools stay at /admin/overview.
