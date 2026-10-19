@@ -213,7 +213,7 @@ const CatalogModelCard = forwardRef<HTMLElement, CatalogModelCardProps>(
                     el.src = direct;
                     return;
                   }
-                  if (fallbackImage && !triedFallback.current && fallbackImage !== image && !el.src.includes("://") === false && frames.length <= 1) {
+                  if (fallbackImage && !triedFallback.current && fallbackImage !== image) {
                     triedFallback.current = true;
                     el.src = fallbackImage;
                     return;

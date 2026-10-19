@@ -26,4 +26,15 @@ describe("catalog card photo navigation", () => {
     fireEvent.touchEnd(photo, { changedTouches: [{ clientX: 130, clientY: 180 }] });
     expect(photo.getAttribute("src")).toBe("front.jpg");
   });
+  it("proxy failure shows the same colour's original, not the model fallback photo", async () => {
+    const green = "https://cdn.fruitoftheloom.eu/resources/images/product/0R013M/38/large/28261.jpg";
+    const black = "https://cdn.fruitoftheloom.eu/resources/images/product/0R013M/36/large/65636.jpg";
+    const proxied = `https://wsrv.nl/?url=${encodeURIComponent(green.replace("https://", ""))}&w=500`;
+    const view = render(<CatalogModelCard image={proxied} fallbackImage={black} imageAlt="Krekls" title="Krekls" noImageLabel="" />);
+    const photo = view.getByAltText("Krekls") as HTMLImageElement;
+    fireEvent.error(photo);
+    expect(photo.src).toBe(green);
+    fireEvent.error(photo);
+    expect(photo.src).toBe(black);
+  });
 });
