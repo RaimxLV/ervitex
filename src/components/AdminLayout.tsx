@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from "@/lib/router-compat";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { CreateOfferButton } from "@/components/quote/CreateOfferButton";
+import { ADMIN_HOME } from "@/lib/adminNavigation";
 import logo from "@/assets/ervitex-logo-dark.svg";
 import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -17,12 +18,12 @@ type NavItem = { to: string; icon: typeof FileText; label: string; short?: strin
 const primary: NavItem[] = [
   { to: "/admin/quotes", icon: MessageSquare, label: "Pieprasījumi", short: "Pieprs." },
   { to: "/admin/offers", icon: FileText, label: "Piedāvājumi", short: "Piedāv." },
-  { to: "/admin", icon: LayoutDashboard, label: "Panelis", short: "Panelis" },
   { to: "/admin/products", icon: Package, label: "Mūsu produkti", short: "Produkti" },
 ];
 
 /** Secondary items — desktop strip + mobile "Vairāk" sheet. */
 const secondary: NavItem[] = [
+  { to: "/admin/overview", icon: LayoutDashboard, label: "Katalogu pārskats" },
   { to: "/admin/price-audit", icon: BadgeEuro, label: "Cenu audits" },
   { to: "/admin/categories", icon: FolderTree, label: "Kategorijas" },
   { to: "/admin/mega-menu", icon: LayoutGrid, label: "Mega izvēlne" },
@@ -58,7 +59,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
             <Button variant="ghost" size="icon" onClick={() => navigate("/")} aria-label="Uz veikalu">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <Link to="/admin" className="shrink-0" aria-label="Ervitex administrācija">
+            <Link to={ADMIN_HOME} className="shrink-0" aria-label="Ervitex administrācija">
               <img src={logo} alt="Ervitex" className="h-8 w-auto sm:h-10" />
             </Link>
           </div>
@@ -98,7 +99,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card sm:hidden"
         style={{ paddingBottom: "max(0.375rem, env(safe-area-inset-bottom))" }}
       >
-        <div className="grid grid-cols-5 items-stretch px-1 pt-1.5">
+        <div className="grid grid-cols-4 items-stretch px-1 pt-1.5">
           {primary.map((item) => (
             <Link
               key={item.to}
