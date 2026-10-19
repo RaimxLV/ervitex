@@ -1,6 +1,6 @@
 # Architecture rules
 
-- Menu/catalog share rankedSearchResults; redirects preserve catalog facets/audience.
+- Menu/catalog share rankedSearchResults and display model IDs, not variant SKUs, to match search; redirects preserve facets.
 - productContent separates care/specs; translation caches use fingerprints.
 - Offers use CreateOfferButton, /offers, OfferWorkspace and shared offer item pricing helpers for consistent discounts; sharing activates drafts. useOfferDraft serializes version-checked autosaves with recovery; token refresh preserves editors.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
@@ -25,9 +25,9 @@
 - BrandLogo serves cards; ETX shows Ervitex. Russell shares model/colour validation and supplier colorProductMap labels to avoid wrong photos.
 - tech_galleries stores stable order/membership refs (s:<tech>:<index> for built-ins, public URLs for uploads), applied over static data so rebuilds preserve order.
 - UTT uses `utt-sync` Data Export into `utt_*`; service-role-only `utt_prices`; images mirrored in `utt-images` because UTT blocks hotlinking.
-- `.hero-ultra` uses -webkit-text-stroke for weight; repeat leading per breakpoint.
+- `.hero-ultra`: -webkit-text-stroke weight; leading per breakpoint.
 - ManualProductOrder is shared by catalog/admin; catalog_filter_order persists order. Render after batch/cache checks; informational cards aren't purchasable.
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs are not manufacturer codes.
 - QuoteCartButton owns mobile dock visibility/safe-area clearance; desktop CTA floats.
-- Headwear shares classification/category facets; bump cache schema on changes.
+- Headwear shares facets; bump cache schema on changes.
 - ADMIN_HOME opens requests; supplier tools use /admin/overview.

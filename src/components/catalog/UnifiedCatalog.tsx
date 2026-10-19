@@ -1520,15 +1520,9 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
   }));
   const extra = Math.max(0, withHex.length - 8);
 
-  // Strip trailing size code from Stanley/Stella per-color SKU
-  // (e.g. STBU274C0021L → STBU274-C002)
-  const formatCode = (raw: string): string => {
-    if (item.source !== "ss") return raw;
-    const m = raw.match(/^([A-Z]+\d+)C(\d{3,4})/i);
-    return m ? `${m[1]}-C${m[2]}` : raw;
-  };
-  // UTT krāsas `c` ir krāsas nosaukums, nevis kods — rādām modeļa kodu.
-  const displayCode = formatCode((item.source === "utt" || item.source === "fr") ? item.id : active?.c || item.id);
+  // Match the visible code to search identity, not colour/size SKUs (1694412).
+  // The selected colour remains in the swatches and navigation query.
+  const displayCode = item.id;
 
   // PF's catalog colour `c` is an item/article number, while variant prices
   // and the detail loader use the supplier colour code/name (BLACK, NAVY...).
