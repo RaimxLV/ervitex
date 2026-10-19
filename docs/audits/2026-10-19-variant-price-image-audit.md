@@ -68,3 +68,22 @@ Visiem avotiem: viena vienības cena variantam neatkarīgi no daudzuma (tests 1/
 ## 12:56 kataloga ielāde
 - Pārlūka tīkls: visi REST pieprasījumi (`catalog_items` HEAD count, `catalog_filter_order`, `catalog_remnants`, `stock_flags`, `mega_menu_items`) 30 s laikā neatbildēja; curl ar `limit=1` 3 tabulām — 25 s timeout bez HTTP koda; cloud_status: auth→database probe deadline exceeded. Cēlonis — backend nereaģē, nevis smags vaicājums vai filtru secība.
 - Koda defekts: pieprasījumiem nebija laika limita, `useFilterOrder` kļūdā nekad nelika `ready`, un neizdevušās lapas tika klusi izlaistas. Labots: 20 s/8 s AbortSignal, kļūda+„Mēģināt vēlreiz”, filtru secība ar noklusējumu, daļējs katalogs → kļūda. Pārlūkā: „Mēģināt vēlreiz” parādās pēc ~21 s. Aizpildīts katalogs un Russell krāsas NAV pārbaudāmi, kamēr backend neatbild.
+
+## 13:21 — pārbaude pēc backend atjaunošanas
+**PĀRBAUDĪTS pārlūkā:** Russell 0R013M0 kartīte (1280 px un 390 px): Black `/36/` → Bottle Green `/38/` → Classic Red `/CR/` → Black `/36/` → Bottle Green `/38/`; katram kadram `complete && naturalWidth>0`, nav paslēpts; vizuāli sarkanais krekls pie Classic Red. Klikšķis atver `/catalog/item/ru/0R013M0?color=Bottle+Green` ar `/38/` galeriju.
+**PĀRBAUDĪTS:** MF 174 kartīte — krāsa blue atoll (44), foto `174_44`, cena 8,84 € bez PVN = DB `catalog_variant_prices` 174/44 (8,84). MF S30 kartīte meklēšanā 60 s laikā netika atrasta (iespējams cits ID) — nepārbaudīts.
+**NAV pārbaudīts pārlūkā:** RU piedāvājuma izmēru izvēle (vajag admina sesiju); segts ar unit testiem (8 izmēri, viena cena).
+
+### NWG 649066-99 (DB, read-only)
+| SKU | size kods | size_name | EAN | retail_price | rec_price |
+|---|---|---|---|---|---|
+| -4 | 4 | S/M | nav | 17,00 | nav |
+| -5 | 5 | S/M | 7316220617205 | 18,70 | nav |
+| -6 | 6 | L/XL | nav | 17,00 | nav |
+| -7 | 7 | L/XL | 7316220617212 | 18,70 | nav |
+Secinājums (RISKS, nav pierādīts): kodi 4/5/6/7 = S/M/L/XL, bet avots abus pārus sauc „S/M”/„L/XL”; -4/-6 bez EAN un ar citu cenu izskatās pēc novecojušiem/dublētiem SKU. Bez NWG API apstiprinājuma nevar droši izvēlēties; pašreizējā loģika konfliktā atgriež null (pareizi). Koda labojums nav veikts.
+
+### PF (DB, read-only)
+- 106505 BLACK: `10650500` (EAN 3501170951705, price 53,99, list 69,21) un `10650504` (EAN 3501170951804, price 79,44, bez list) — divi atsevišķi produkti ar atšķirīgu EAN, size nav.
+- K1058 H_GREY: 35 SKU — 7 prefiksi (`K10588J*`, `K1058B2*`…`B7*`) × 5 izmēri (C=3/4, E=5/6, G=7/8, J=9/10, L=11/12), katram unikāls EAN; izmēri kartēti pareizi. Visiem saglabāts viens `color_code` H_GREY.
+- Cēlonis (stipra hipotēze, nav pierādīta): `pf-concept-sync/index.ts:121-136` saglabā tikai `colors.color[0]` (primāro krāsu); vairākkrāsu/kontrastkrāsu varianti sakļaujas zem vienas krāsas. Pierādīšanai vajag PF produktu feed ierakstus šiem item code — nav ielādēts (190 MB feed, netika palaists). Koda labojums nav veikts, līdz semantika apstiprināta.
