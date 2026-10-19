@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { colorCodeMatches } from "@/lib/colorCodeMatch";
 
 export interface CatalogHit {
   source: string;
@@ -37,7 +38,7 @@ export const colorMatches = (priceColor?: string | null, pickColor?: string | nu
   const a = norm(priceColor);
   const b = norm(pickColor);
   if (!a || !b) return false;
-  return a === b || b.endsWith(`-${a}`) || a.endsWith(`-${b}`);
+  return a === b || b.endsWith(`-${a}`) || a.endsWith(`-${b}`) || colorCodeMatches(a, b);
 };
 
 /** Size label mapper for one model's price rows. */
