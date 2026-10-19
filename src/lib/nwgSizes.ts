@@ -11,3 +11,9 @@ export function nwgDuplicateSizeLabels(rows: { item: string; code: string | null
   for (const [k, set] of codes) if (set.size > 1) out.add(k.split("\u0000")[1]);
   return out;
 }
+
+/** Price rows keyed by their own SKU size label, so a shared supplier name never picks another SKU's size. */
+export function withSkuSizes<T extends { sku?: string | null; size?: string | null }>(rows: T[], skuSizes?: Record<string, string>): T[] {
+  if (!skuSizes) return rows;
+  return rows.map((r) => (r.sku && skuSizes[r.sku] ? { ...r, size: skuSizes[r.sku] } : r));
+}

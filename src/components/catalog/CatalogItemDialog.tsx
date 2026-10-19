@@ -1235,7 +1235,7 @@ const CatalogItemDialog = ({
         from += 1000;
       }
       if (cancelled) return;
-      const selection = lowestPriceVariant(rows, d?.colors || [], (d && "sizeAliases" in d ? d.sizeAliases : undefined) || {}, wanted ? picked : null, initialSize);
+      const selection = lowestPriceVariant(withSkuSizes(rows, d && "skuSizes" in d ? d.skuSizes : undefined), d?.colors || [], (d && "sizeAliases" in d ? d.sizeAliases : undefined) || {}, wanted ? picked : null, initialSize);
       pendingSizeRef.current = selection.size;
       setSelectedSize(selection.size);
       setActiveColor(selection.color || picked);
