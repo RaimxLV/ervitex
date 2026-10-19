@@ -29,4 +29,5 @@
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs aren't manufacturer codes.
 - Headwear shares facets (bump cache schema on changes). ADMIN_HOME opens requests; supplier tools use /admin/overview.
 - Read subdirectory AGENTS.md first. Price SQL in docs/pending-migrations runs byte-exact via md5-checked public.migration_stage.
-- Catalog reads time out into error+retry, never endless skeletons; filter order falls back to default.
+- Catalog reads time out into error+retry, no endless skeletons; filter order falls back to default.
+- Never present partial work as complete; name open tasks/blockers.
