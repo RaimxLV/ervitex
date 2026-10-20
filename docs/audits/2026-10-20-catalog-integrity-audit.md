@@ -75,7 +75,8 @@ Anomālijas: PF 104 item_code bez modeļa prefiksa (PF item kodi ir neatkarīgi 
 ## 4. kārta — PF 237 cenas
 - Pilna PF cenu plūsma (izveidota 2026-10-17, 19 604 preces) nolasīta tikai lasīšanai. Visām 237: `clearance:"C"` + `promotion` bloks (startDate 2026-10-16). Zemākā cena ir izpārdošanas/akcijas cena, NE standarta. Klasifikācija: standarta 0, akcija/izpārdošana 237. Cenas NEMAINĪTAS.
 - 160/237 mūsu esošā bāzes cena = plūsmas 1. līmeņa `standardPrice`; 77 atšķiras (nenoteikts, nemainīts).
-- Sistēmiska kļūda: sinhronizācija ņēma `nettPrice`, tātad nākamā sinhronizācija ierakstītu izpārdošanas cenas (plūsmā 1 535 clearance, 2 220 promotion preces). Labots: `_shared/pfPrice.ts` — priekšroka 1. līmeņa `standardPrice`; tests `src/lib/pfPrice.test.ts`; `pf-concept-sync` izvietota, NEpalaista.
+- Sistēmiska kļūda: sinhronizācija ņēma `nettPrice`, tātad nākamā sinhronizācija ierakstītu izpārdošanas cenas (plūsmā 1 535 clearance, 2 220 promotion preces). Labots: `_shared/pfPrice.ts` — clearance/promotion precēm tikai 1. līmeņa `standardPrice`; ja tās nav → null, rinda izlaista, iepriekšējā cena saglabāta (nekad samazinātā `nettPrice`); parastām precēm 1. līmeņa `nettPrice`. Pieļauj atstarpes un lauku secību. 5 testi `src/lib/pfPrice.test.ts`. `pf-concept-sync` izvietota, NEpalaista.
+- Frontend publicēts (root, f7c8a97). NWG `nwg:all` (sākta 07:40:32) 07:50 pārbaudē joprojām `running`, nav pabeigta; atjaunoto 0, kļūdu 0; cenu pēcpārbaude nav veikta.
 - Sekas: PF paraugs (cenu plūsmas pirmie 1,5 MB, plūsma 17.10.): 2 733 preces, 237 bāzes cenas DB augstākas par plūsmu (piem. 1,69 → 1,39), visas atjaunotas 14.10. → `2026-10-20-pf-sample-price-diffs.csv`. NELABOTS (nav autorizēts; risinājums — salabot sinhronizāciju).
 
 ### Piegādātāju paraugi
