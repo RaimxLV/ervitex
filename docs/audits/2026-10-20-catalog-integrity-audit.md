@@ -57,3 +57,29 @@ Anomālijas: PF 104 item_code bez modeļa prefiksa (PF item kodi ir neatkarīgi 
 - BB 26 koda neatbilstības (`2026-10-20-bb-code-mismatch-images.csv`): visas 26 ir piegādātāja paša modeļa lapā kā šīs krāsas attēls → piegādātāja piešķirtas; vizuālā atbilstība (piem., B640B junior ar b640 failu, W710 ar w701) NEPĀRBAUDĪTA, nav apgalvots kā defekts.
 - UTT Regatta 40: UTT Data Export (brand Regatta, 2 720 rindas) — visi 40 faili piešķirti tieši tam modelim/krāsai → piegādātāja eksplicīta piesaiste (`2026-10-20-utt-regatta-40-source-check.csv`).
 - Nav veikts šajā kārtā: SS, NWG, PF, F&R tiešsaistes paraugi (piekļuves ir, bet nav salīdzināts); katras bildes vizuālā pārbaude.
+
+## 3. kārta (2026-10-20 07:40–08:00 UTC)
+
+### Labots
+- Kataloga kartītes (BB): modeļa foto krāsu piešķir tas pats `bbAssignImageColor` ar modeļa aktīvo krāsu sarakstu; BB/UTT/F&R kartītes salīdzina veselus krāsu nosaukumus (agrāk "Off-White" → sufikss "white" varēja parādīties pie White). Izvēlētai krāsai bezkrāsas kadri netiek rādīti. Tests `useCatalogCardImages.test.ts`.
+- 36 BB krāsas bez pierādīta foto (`2026-10-20-bb-colours-without-proven-image.csv`) rāda "Bez attēla" — apzināti konservatīvi.
+- DROŠĪBA: `stanley-stella-sync`, `nwg-sync`, `nwg-price-sync`, `nwg-size-names`, `beechfield-sync` nebija nekādas piekļuves pārbaudes — ar publisko atslēgu varēja palaist pilnu sinhronizāciju. Pievienots `isSyncCallerAllowed` (servisa atslēga vai admins), izvietots; pēcpārbaude: publiskā atslēga → 401 visām 5.
+  - Atklāšanas brīdī mana pārbaude ar publisko atslēgu NEJAUŠI palaida `stanley-stella:all` (07:39, success, parasts upsert) un `nwg:all` (07:40). Tas nebija plānots.
+- Malfini 19 cenas: API `/product/prices` limit=1 vienības cena (viena vērtība katram SKU) → `wholesale_price`, `retail_price = ×1.65` (esošā formula), publiskā cena un modeļa diapazons; rezerves kopija `2026-10-20-mf-19-before.csv`. Pēcpārbaude: 15 584/15 584 sakrīt ar API; publiskās MF cenas 0 neatbilstību.
+- ETX trigeris: migrācija PIEMĒROTA (`pg_get_functiondef` satur `/1.21`). Atceltā testa transakcijā preces atjaunošana deva stored=16.4463 = 19.90/1.21; viss atcelts. 12/12 ETX cenas neto.
+
+### Sinhronizāciju apstāšanās (kopš 14.10.)
+- Cron 19.10. visām darbībām "succeeded", bet tas nozīmē tikai, ka `invoke_sync_function` izpildījās. `stanley-stella-sync` tobrīd NEPRASĪJA autorizāciju, tomēr ieraksta žurnālā nav → pieprasījums funkciju nesasniedza. Tas izslēdz 401 kā cēloni un norāda uz `invoke_sync_function` agrīnu atgriešanos: vault noslēpums `email_queue_service_role_key` atgriež NULL (funkcija tad tikai `RAISE WARNING` un atgriežas). Funkcijas pašas ir izvietotas un strādā (SS 07:39 izpilde).
+- Nevar pārbaudīt: vault lasīšana bloķēta (`blocked_query: vault.decrypted_secrets`), `net._http_response` tukšs (TTL), edge žurnāli bez ierakstiem par 19.10. Nepieciešams: Lovable Cloud pusē atjaunot vault noslēpumu `email_queue_service_role_key` ar projekta servisa atslēgu (to var izdarīt tikai Lovable Cloud atbalsts / platformas e-pasta infrastruktūras atkārtota iestatīšana; servisa atslēga nav pieejama ne man, ne root).
+- Sekas: PF paraugs (cenu plūsmas pirmie 1,5 MB, plūsma 17.10.): 2 733 preces, 237 bāzes cenas DB augstākas par plūsmu (piem. 1,69 → 1,39), visas atjaunotas 14.10. → `2026-10-20-pf-sample-price-diffs.csv`. NELABOTS (nav autorizēts; risinājums — salabot sinhronizāciju).
+
+### Piegādātāju paraugi
+- Malfini: pilns (15 584 SKU) — skat. augstāk.
+- PF: 2 733 preces paraugs — 237 novecojušas, 0 trūkst.
+- UTT Regatta: 40/40 eksplicīta piesaiste.
+- SS: avota dati atjaunoti nejaušajā 07:39 sinhronizācijā; neatkarīgs paraugs NAV veikts.
+- NWG: `nwg:all` palaists 07:40; paraugs NAV veikts.
+- F&R: NAV pārbaudīts (avots ir vietnes pieteikšanās sesija, nevis API).
+
+### Audita vaicājumi
+`docs/audits/sql/2026-10-20-price-recompute.sql`, `docs/audits/sql/2026-10-20-relational-checks.sql`.
