@@ -27,7 +27,10 @@ export function pfIsReducedPriceItem(seg: string): boolean {
   return /"promotion"\s*:\s*\[\s*\{/.test(seg);
 }
 
+// Clearance/promotion items: deliberate hold -> null (caller keeps last known
+// regular base; new items stay without price). promotion.standardPrice is NOT a
+// verified regular contract price, so it is never used.
 export function pfFirstBarStandardPrice(seg: string): number | null {
-  if (pfIsReducedPriceItem(seg)) return firstBar(seg, "standardPrice");
+  if (pfIsReducedPriceItem(seg)) return null;
   return firstBar(seg, "nettPrice");
 }
