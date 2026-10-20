@@ -19,6 +19,9 @@ interface Row {
   image_url?: string | null;
 }
 
+/** Galvenās izvēlnes meklētāja rezultātu skaits (bija 8). */
+export const MENU_RESULT_LIMIT = 7;
+
 let loadPromise: Promise<Row[]> | null = null;
 
 const loadRows = (): Promise<Row[]> => {
@@ -109,8 +112,8 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
     const pq = prepareQuery(value);
     if (!pq || !rows.length) return { results: [] as Row[], firstRelated: -1 };
     const m = searchMatches(rows, pq);
-    const exact = m.exact.slice(0, 8);
-    const related = m.related.slice(0, Math.max(0, 8 - exact.length));
+    const exact = m.exact.slice(0, MENU_RESULT_LIMIT);
+    const related = m.related.slice(0, Math.max(0, MENU_RESULT_LIMIT - exact.length));
     return { results: [...exact, ...related], firstRelated: related.length ? exact.length : -1 };
   }, [value, rows]);
 
@@ -178,14 +181,14 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
 
       {open && value.trim() && (
         <div
-          className={`overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-xl ${
+          className={`flex max-h-[min(70vh,calc(100dvh-6rem))] flex-col overflow-hidden rounded-sm border border-border bg-background text-foreground shadow-xl ${
             inline ? "mt-2" : "absolute left-0 right-0 top-full z-50 mt-1"
           }`}
         >
           {!rows.length ? (
             <p className="px-4 py-3 text-sm text-muted-foreground">{lang === "lv" ? "Ielādē…" : "Loading…"}</p>
           ) : results.length ? (
-            <ul role="listbox">
+            <ul role="listbox" className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
               {results.map((r, i) => (
                 <li key={`${r.source}:${r.id}`}>
                   {i === firstRelated && (
@@ -230,7 +233,7 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
               if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
               finish();
             }}
-            className="flex w-full items-center justify-between border-t border-border px-4 py-2.5 text-sm font-bold text-accent hover:bg-muted"
+            className="flex w-full shrink-0 items-center justify-between border-t border-border px-4 py-2.5 text-sm font-bold text-accent hover:bg-muted"
           >
             {lang === "lv" ? "Visi rezultāti katalogā" : "All results in catalog"}
             <ArrowRight className="h-4 w-4" />
