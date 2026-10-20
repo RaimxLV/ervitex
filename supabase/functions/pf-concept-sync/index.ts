@@ -21,6 +21,7 @@
 // Storage bucket `pf-feeds` is PRIVATE. Only the service role (this function)
 // reads/writes it. No public exposure.
 
+import { pfFirstBarStandardPrice } from "../_shared/pfPrice.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
 const corsHeaders: Record<string, string> = {
@@ -468,15 +469,7 @@ async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: bool
     const item_code = seg.slice(0, codeEnd);
     if (!/^[A-Za-z0-9-]+$/.test(item_code)) continue;
     const cur = seg.match(/"currency":"([A-Z]{3})"/);
-    let price: number | null = null;
-    let lowestBar = Number.MAX_SAFE_INTEGER;
-    const re = /"priceBar":(\d+),"nettPrice":([\d.]+)/g;
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(seg)) !== null) {
-      const bar = Number(m[1]);
-      const val = Number(m[2]);
-      if (Number.isFinite(val) && bar < lowestBar) { lowestBar = bar; price = val; }
-    }
+    const price = pfFirstBarStandardPrice(seg);
     if (price === null) continue;
     rows.push({ item_code, price, list_price: null, currency: cur?.[1] || "EUR", updated_at: now });
   }
