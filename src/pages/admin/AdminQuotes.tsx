@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { worksheetPath, worksheetUrl } from "@/lib/worksheet";
 import { ASSIGNEES } from "@/data/assignees";
+import RequestPrintStatus from "@/components/quote/RequestPrintStatus";
+import ExpandableMessage from "@/components/quote/ExpandableMessage";
+import { attachmentName } from "@/lib/requestPresentation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from "@/components/ui/alert-dialog";
@@ -278,6 +281,7 @@ const AdminQuotes = () => {
                         <span className="truncate text-xs text-muted-foreground">{row.name}</span>
                       )}
                     </span>
+                    <span className="mt-2 block"><RequestPrintStatus method={row.print_method} /></span>
                     <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><UserRound className="h-3.5 w-3.5" />{row.assigned_pm_name || "Nav piešķirts"}</span>
                       {!!row.file_urls?.length && <span className="flex items-center gap-1"><Paperclip className="h-3.5 w-3.5" />{row.file_urls.length}</span>}
@@ -335,7 +339,7 @@ const AdminQuotes = () => {
                       {row.file_urls.map((u, i) => (
                         <Button key={i} variant="outline" size="sm" className="h-auto min-h-9 max-w-full justify-start whitespace-normal break-all bg-background py-2 text-left text-xs" onClick={() => openAttachment(u)}>
                           <Paperclip className="mr-1.5 h-3.5 w-3.5" />
-                          {decodeURIComponent(u.split("/").pop() || `Fails ${i + 1}`)}
+                          {attachmentName(u)}
                         </Button>
                       ))}
                     </div>}
@@ -379,7 +383,7 @@ const AdminQuotes = () => {
                           {row.file_urls.map((u, i) => (
                             <Button key={i} variant="outline" size="sm" className="h-auto min-h-9 max-w-full justify-start whitespace-normal break-all py-2 text-left text-xs" onClick={() => openAttachment(u)}>
                               <Paperclip className="mr-1.5 h-3.5 w-3.5" />
-                              {decodeURIComponent(u.split("/").pop() || `Fails ${i + 1}`)}
+                              {attachmentName(u)}
                             </Button>
                           ))}
                         </div>
@@ -387,9 +391,7 @@ const AdminQuotes = () => {
                     )}
 
                     {row.message && (
-                      <p className="whitespace-pre-wrap border-t border-border pt-3 text-sm text-muted-foreground">
-                        {row.message}
-                      </p>
+                      <div className="border-t border-border pt-3"><ExpandableMessage message={row.message} /></div>
                     )}
                     {events.some((event) => event.quote_id === row.id) && (
                       <div className="border-t border-border pt-3">

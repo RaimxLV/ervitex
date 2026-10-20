@@ -20,7 +20,7 @@ export function useCreateOffer() {
     setBusy(true);
     try {
       const priced = fromCart ? await fillMissingPrices(items) : [];
-      const lines = priced.map(({ id, source, productId, name, code, brand, image, colorName, colorHex, size, qty, unitPrice }) => ({ id, source, productId, name, code, brand, image, colorName, colorHex, size, qty, unitPrice: unitPrice ?? null }));
+      const lines = priced.map((item) => ({ ...item, unitPrice: item.unitPrice ?? null }));
       const { data, error } = await supabase.from("pm_offers")
         .insert({ title: "Piedāvājums", ...details, items: setOrderPrints(lines, prints) as any }).select("id").single();
       if (error || !data) throw error || new Error("Neizdevās izveidot");

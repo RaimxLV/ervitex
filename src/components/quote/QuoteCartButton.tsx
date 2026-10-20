@@ -7,6 +7,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useWorksheetPick } from "@/lib/worksheetPick";
 import { useAuth } from "@/hooks/useAuth";
 import { useCreateOffer } from "@/components/quote/CreateOfferButton";
+import { consumerCartAllowed } from "@/lib/requestPresentation";
 
 const QuoteCartButton = () => {
   const { items, totalQty } = useQuoteCart();
@@ -18,7 +19,7 @@ const QuoteCartButton = () => {
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
 
   const visible = !pick && totalQty > 0 &&
-    !["/request", "/offers", "/admin"].some((path) => location.pathname.startsWith(path));
+    consumerCartAllowed(location.pathname);
 
   useEffect(() => {
     document.body.classList.toggle("has-quote-dock", visible);

@@ -5,6 +5,7 @@ import { DecimalInput } from "@/components/ui/decimal-input";
 import { QtyStepper } from "@/components/quote/QtyStepper";
 import { money, itemPrintNet, itemDiscountNet, itemDiscountPercent, itemTotalNet, type OfferItem } from "@/lib/offer";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { offerGroupKey } from "@/lib/requestPresentation";
 
 export function QuoteItemsTable({ items, onQuantity, onRemove, onPrice, onDiscount, groupAction, itemDetails, onGroupSelect }: {
   items: OfferItem[]; onQuantity: (id: string, qty: number) => void; onRemove: (id: string) => void;
@@ -19,7 +20,7 @@ export function QuoteItemsTable({ items, onQuantity, onRemove, onPrice, onDiscou
     ? "grid grid-cols-[50px_64px_minmax(85px,1fr)_70px_85px_minmax(90px,1fr)_36px] items-center gap-2 sm:gap-3"
     : "grid grid-cols-[50px_64px_minmax(0,1fr)_minmax(0,1fr)_36px] items-center gap-2 sm:grid-cols-[70px_80px_minmax(0,1fr)_minmax(0,1fr)_40px] sm:gap-3";
   const groups = new Map<string, OfferItem[]>();
-  for (const i of items) { const key = `${i.source}|${i.productId}|${i.colorName || ""}`; groups.set(key, [...(groups.get(key) || []), i]); }
+  for (const i of items) { const key = offerGroupKey(i); groups.set(key, [...(groups.get(key) || []), i]); }
   return <div className="divide-y divide-border border-t border-border">{[...groups.entries()].map(([key, group]) => {
     const head = group[0];
     return <article key={key} className="py-5 sm:py-6">
