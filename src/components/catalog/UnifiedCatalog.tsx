@@ -14,7 +14,7 @@ import { catalogColorParam, catalogColorPrice, lowestPriceColorIndex } from "@/l
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { HEADWEAR_TYPES, headwearType, isHeadwearCategory, matchesHeadwearType, type HeadwearType } from "@/lib/headwearTypes";
-import { prepareQuery, rankedSearchResults, searchMatches } from "@/lib/catalogSearch";
+import { normalizeCatalogSort, prepareQuery, rankedSearchResults, searchMatches } from "@/lib/catalogSearch";
 
 const SCROLL_KEY = "catalog-scroll";
 
@@ -390,7 +390,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [colors, setColors] = useState<Set<string>>(
     new Set((searchParams.get("color") || "").split(",").filter(Boolean))
   );
-  const [sort, setSort] = useState<string>(searchParams.get("sort") || "newest");
+  const [sort, setSort] = useState<string>(normalizeCatalogSort(searchParams.get("sort")));
   const [stockOnly, setStockOnly] = useState(searchParams.get("stock") === "1");
   const stockFlags = useStockFlags();
   const { isAdmin, loading: authLoading } = useAuth();
@@ -448,7 +448,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     setHeadwearTypes(new Set((searchParams.get("headwear") || "").split(",").filter((key) => HEADWEAR_TYPES.some((t) => t.key === key))));
     setGenders(new Set((searchParams.get("gender") || "").split(",").filter(Boolean)));
     setColors(new Set((searchParams.get("color") || "").split(",").filter(Boolean)));
-    setSort(searchParams.get("sort") || "newest");
+    setSort(normalizeCatalogSort(searchParams.get("sort")));
     setPage(parseInt(searchParams.get("page") || "1", 10));
   }, [searchParams, lockedSource]);
 
@@ -981,7 +981,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     if (pq) {
       // Tā pati precīzo kodu atlase un secība kā galvenās izvēlnes meklētājā.
-      return rankedSearchResults(base, pq);
+      // Default featured/newest keeps relevance; explicit sorts order each group.
+      return rankedSearchResults(base, pq, sort === "newest" || sort === "featured" ? null : cmp);
     }
     return cmp ? [...base].sort(cmp) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps

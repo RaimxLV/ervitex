@@ -437,10 +437,23 @@ export const searchMatches = <T extends Searchable>(items: T[], pq: PreparedQuer
   return { exact, related, all: new Set([...exact, ...related]) };
 };
 
-export const rankedSearchResults = <T extends Searchable>(items: T[], pq: PreparedQuery | null): T[] => {
+export const rankedSearchResults = <T extends Searchable>(
+  items: T[], pq: PreparedQuery | null, cmp?: ((a: T, b: T) => number) | null,
+): T[] => {
   if (!pq) return items;
   const { exact, related } = searchMatches(items, pq);
+  // Explicit sort orders each group after anchor selection; exact stays before related.
+  if (cmp) return [...[...exact].sort(cmp), ...[...related].sort(cmp)];
   return [...exact, ...related];
+};
+
+export const CATALOG_SORTS = ["featured", "newest", "az", "za", "price_asc", "price_desc"] as const;
+const LEGACY_SORTS: Record<string, string> = { "name-asc": "az", "name-desc": "za", "price-asc": "price_asc", "price-desc": "price_desc" };
+/** URL sort -> supported value; legacy aliases mapped, unknown values default to newest. */
+export const normalizeCatalogSort = (value?: string | null): string => {
+  const v = (value || "").trim();
+  const mapped = LEGACY_SORTS[v] || v;
+  return (CATALOG_SORTS as readonly string[]).includes(mapped) ? mapped : "newest";
 };
 
 /** Filtru meklēšana: LV/EN atslēgvārdi ("priekšauts" → Aprons, "T-krekls" → T-shirts). */
