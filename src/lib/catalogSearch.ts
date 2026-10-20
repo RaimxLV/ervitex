@@ -351,15 +351,20 @@ export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuer
 };
 
 /**
- * Ciparu vaicājuma atbilstība koda ciparu daļai: precīzs vai saīsinājums,
- * kur koda atlikušie cipari ir paši nulles (6400 → 64000, bet ne 64001/16400).
- * Sākuma nulles saglabājas: "167" neatbilst "0167".
+ * Dokumentēts saīsinājums: pārdevēji Gildan Softstyle 64000 saimi (UTT) pazīst kā "6400".
+ * Attiecas TIKAI uz vaicājumu "6400" un šiem apstiprinātajiem kodiem; nekāda vispārīga
+ * nuļļu papildināšana citiem kodiem nav atļauta (169 ↛ 1690, 5 ↛ 500, 640 ↛ 64000).
  */
-export const digitsMatch = (codeDigits: string, queryDigits: string): boolean =>
+const SHORTHAND_6400 = new Set(["gi64000", "gib64000", "gil64000", "gil64000-ex"]);
+
+/**
+ * Ciparu vaicājuma atbilstība koda ciparu daļai: tikai precīza sakritība
+ * (169 → STTU169) vai dokumentētais 6400 saīsinājums. Sākuma nulles saglabājas:
+ * "167" neatbilst "0167".
+ */
+export const digitsMatch = (id: string, codeDigits: string, queryDigits: string): boolean =>
   codeDigits === queryDigits ||
-  (codeDigits.length > queryDigits.length &&
-    codeDigits.startsWith(queryDigits) &&
-    /^0+$/.test(codeDigits.slice(queryDigits.length)));
+  (queryDigits === "6400" && SHORTHAND_6400.has(normalizeSearch(id).replace(/[ -]/g, "")));
 
 /** Koda daļas: burtu prefikss + viena ciparu grupa + burtu sufikss (STTU169 → sttu/169/""). */
 export const codeParts = (id?: string | null): { prefix: string; digits: string; suffix: string } | null => {
