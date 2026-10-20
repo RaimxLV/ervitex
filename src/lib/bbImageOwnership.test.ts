@@ -18,10 +18,20 @@ for (const [label, m] of [["lapa", web], ["sinhronizācija", sync]] as const) {
       expect(m.bbImageBelongsToStyle(`${H}webimage-b673-contrast-peak-cap-product-shot-01`, "B67")).toBe(false);
       expect(m.bbImageBelongsToStyle(`${H}webimage-bagbase_bg542_black_black`, "BG5")).toBe(false);
     });
-    it("krāsa jāsakrīt veseliem vārdiem", () => {
-      expect(m.bbImageMentionsColor(`${H}webimage-beechfield_b15_classic-red_lifestyle_3246`, "Red")).toBe(false);
-      expect(m.bbImageMentionsColor(`${H}webimage-beechfield_b15_classic-red_lifestyle_3246`, "Classic Red")).toBe(true);
-      expect(m.bbImageMentionsColor(`${H}webimage-beechfield_b15_olive-green_rear`, "Green")).toBe(false);
+    it("krāsa = garākā pilnā modeļa krāsa tieši aiz koda; nekādu minējumu", () => {
+      const cols = ["Black", "Black/White", "Bottle Green", "Classic Red", "White"];
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15_black-white_front`, "B15", cols)).toBe("Black/White");
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15_black_front`, "B15", cols)).toBe("Black");
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15_bottle-green`, "B15", cols)).toBe("Bottle Green");
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15_classic-red_lifestyle_3246`, "B15", cols)).toBe("Classic Red");
+      // Modelim nav "Black/White" → divkrāsu fails nav "Black"
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15_black-white_front`, "B15", ["Black", "White"])).toBeNull();
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15_bottle-green-white`, "B15", ["Bottle Green"])).toBeNull();
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15_bottlegreenwhite`, "B15", ["Bottle Green"])).toBeNull();
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15_bottlegreen`, "B15", ["Bottle Green"])).toBe("Bottle Green");
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15_classic-red`, "B15", ["Red"])).toBeNull();
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15_lifestyle_black`, "B15", cols)).toBeNull();
+      expect(m.bbAssignImageColor(`${H}webimage-beechfield_b15c_black`, "B15", cols)).toBeNull();
     });
   });
 }
