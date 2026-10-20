@@ -93,7 +93,8 @@ function containsAligned(leaf: string, part: string): boolean {
  * invented word combinations are rejected.
  */
 export function isKnownText(text: string, known: string[]): boolean {
-  const parts = text.split(/;\s*/).map((p) => normalizeForMatch(p.replace(/^\s*[-*]\s*/, ""))).filter(Boolean);
+  // "; " joins care segments; ": " joins a stored label with its stored value (e.g. "Brand: ProJob").
+  const parts = text.split(/;\s*|:\s+/).map((p) => normalizeForMatch(p.replace(/^\s*[-*]\s*/, ""))).filter(Boolean);
   if (!parts.length) return false;
   return parts.every((p) => known.some((leaf) => containsAligned(leaf, p)));
 }
