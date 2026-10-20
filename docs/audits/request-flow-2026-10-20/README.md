@@ -4,6 +4,15 @@
 
 Sadales migrācija pielietota; zemāk uzskaitītie labojumi pārbaudīti izolēti un ar sintētiskiem pārlūka datiem. Tas NAV apgalvojums, ka jaunā plūsma jau izvietota un pārbaudīta produkcijā. Nav nosūtīti īsti e-pasti, veidoti īsti klientu pieprasījumi/piedāvājumi, palaistas piegādātāju sinhronizācijas vai publicēta lietotne. Meklēšanas/kataloga loģika šajā darbā nav mainīta.
 
+### Atkārtotā pārbaude pēc 09:22 drošības precizējuma
+
+- Izolētais `requestFlowIsolated.py` atkārtoti PASS: stingra secība, 12 jauni + 12 atkārtoti vienlaikus, viena ID 17 mēģinājumi, nepareizas atslēgas atteikums, 12 viena normalizēta e-pasta iesniegumi, manuālā atbildīgā saglabāšana, 44 viltotas vadītājas ignorētas. Testa datubāze pēc tīrīšanas: 6 sākotnējās rindas nemainītas, pozīcija 1.
+- 9 fokusētie Vitest faili / 36 testi PASS; pielikumu/atslēgas Deno testi 3/3 PASS. Šajā kārtā nav atkārtots viss 296 testu komplekts.
+- `/tmp/browser/request-audit/recheck-0924.log`: admina pieprasījums → sintētisks piedāvājums → pārlāde saglabā Ilonu, 50 gab., Black/M un DTF; kontaktu un groza formām viena saglabāšana / divi paziņojuma mēģinājumi. Visi ieraksti un sūtījumi aizstāti ar mock, 0 JS kļūdu; 5 bezsaistes e-pasti 390px bez pārplūdes. Piedāvājuma un EN e-pasta ekrānattēli vizuāli pārbaudīti. Sesija atjaunota paša lietotāja kontam, ne izdomātam adminam.
+- Tikai-lasāms produkcijas stāvoklis: 6 rindas, nākamā pozīcija 1. Jaunā īpašnieka projekcijas kontrolsumma `41881c23c5dcc0d454aa90b2da154dc8` lieto citādu projekcijas formātu nekā iepriekšējā; tās nedrīkst tieši salīdzināt kā izmaiņu pierādījumu.
+- Jaunākais automātiskais signāls 09:23:16 UTC: build OK. Nav lietotnes/funkciju izvietošanas vai produkcijas rakstījumu.
+- Zemāk minētie izlaiduma, pārlādes idempotences, tukšā apstiprinātā saraksta un īstā servera/Safari ierobežojumi paliek atvērti; pašreizējā kārta tos neuzdod par atrisinātiem.
+
 ## Pārbaudītie labojumi
 
 - `docs/audits/sql/2026-10-20-request-flow.sql` pielietots kā `drizzle/migrations/0022_request_assignment_capability.sql`. Saglabāta rotācijas pozīcija **1 = nākamā Ilona** un sešas vēsturiskās rindas. Jauno klientu cikls Laura → Ilona → Justīne → Santa; esošā pozīcija netiek atiestatīta.
