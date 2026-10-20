@@ -54,9 +54,9 @@ it("hidden products (not in visible list) are never anchors or neighbours", () =
 it("menu and catalog order is identical regardless of input order", () => {
   expect(rankedSearchResults([...catalog].reverse(), prepareQuery("169"))).toEqual(rankedSearchResults(catalog, prepareQuery("169")));
 });
-it("four-digit query excludes longer codes and keeps same family neighbour", () => {
+it("four-digit query excludes substring codes, allows trailing-zero extension, keeps same family neighbour", () => {
   const items = ["AB1672", "AB1673", "AB167200", "AB131672"].map((id) => ({ id }));
-  expect(ids(rankedSearchResults(items, prepareQuery("1672")))).toEqual(["AB1672", "AB1673"]);
+  expect(ids(rankedSearchResults(items, prepareQuery("1672")))).toEqual(["AB1672", "AB167200", "AB1673"]);
 });
 it("leading zeros must match length", () => {
   expect(searchScore({ id: "AB0167" }, prepareQuery("167"))).toBe(0);

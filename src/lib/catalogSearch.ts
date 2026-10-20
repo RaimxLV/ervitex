@@ -399,7 +399,9 @@ export const searchMatches = <T extends Searchable>(items: T[], pq: PreparedQuer
   const related: T[] = [];
   const anchor = exact[0];
   const ac = anchor && codeParts(anchor.id);
-  const isCodeQuery = ac && (/^\d+$/.test(pq.raw) ? pq.raw.length >= 3 : pq.compact === `${ac.prefix}${ac.digits}${ac.suffix}`);
+  // Līdzīgos kodus rāda tikai tad, ja vaicājuma cipari precīzi sakrīt ar enkura koda cipariem
+  // (169 → STTU169 kaimiņi; saīsinājumam 6400 → GI64000 kaimiņu nav).
+  const isCodeQuery = ac && (/^\d+$/.test(pq.raw) ? pq.raw.length >= 3 && ac.digits === pq.raw : pq.compact === `${ac.prefix}${ac.digits}${ac.suffix}`);
   if (anchor && ac && isCodeQuery) {
     // Tikai pirmās precīzās preces piegādātājs + prefikss nosaka līdzīgos kodus.
     const family = familyKey(anchor, ac);
