@@ -1,4 +1,5 @@
 // deno-lint-ignore-file no-explicit-any
+import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { bbImageBelongsToStyle } from "../_shared/bbImageOwnership.ts";
@@ -139,6 +140,7 @@ function parseProduct(url: string, html: string): Parsed | null {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (!(await isSyncCallerAllowed(req))) return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,

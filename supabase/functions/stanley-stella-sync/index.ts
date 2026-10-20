@@ -1,3 +1,4 @@
+import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
 // Stanley/Stella unified sync — strict mapping per official API (productsV2,
 // v2/stock, products/get_prices, products_imagesV2, color, size, combostyles).
 // Field names match the live API response exactly (verified via /inspect).
@@ -379,6 +380,7 @@ async function inspectApi() {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (!(await isSyncCallerAllowed(req))) return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
   const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const url = new URL(req.url);

@@ -1,3 +1,4 @@
+import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
 // NWG size names. The GraphQL catalog returns numeric size codes ("5"), while
 // the human size label lives in skuSize.webtext ("M"). This function fills
 // nwg_skus.size_name for products that are still missing it and refreshes the
@@ -32,6 +33,7 @@ async function gql<T>(query: string, variables: Record<string, unknown>): Promis
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (!(await isSyncCallerAllowed(req))) return new Response(JSON.stringify({ ok: false, error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   const started = Date.now();
   const budgetMs = 50_000;
 

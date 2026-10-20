@@ -33,3 +33,14 @@ describe("izvēlētā krāsa bez savām bildēm", () => {
     expect(out[0]).toContain("green.jpg");
   });
 });
+
+describe("cardImageFrames nosaukuma krāsas (BB/UTT/F&R)", () => {
+  it("Off-White kadrs neparādās izvēlētai White; bezkrāsas kadri neparādās izvēlētai krāsai", () => {
+    const rows = [{ color: "Off-White", url: "https://x/ow.jpg" }, { color: null, url: "https://x/model.jpg" }, { color: "White", url: "https://x/w.jpg" }];
+    for (const src of ["bb", "utt", "fr"]) {
+      const f = cardImageFrames(rows, "White", null, true, src);
+      expect(f.some(u => u.includes("w.jpg"))).toBe(true);
+      expect(f.some(u => u.includes("ow.jpg") || u.includes("model.jpg"))).toBe(false);
+    }
+  });
+});
