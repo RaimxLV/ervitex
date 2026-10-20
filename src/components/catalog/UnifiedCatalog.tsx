@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "@/lib/router-compat";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, SlidersHorizontal, ListOrdered, X } from "lucide-react";
 import { useCatalogCardImages } from "@/hooks/useCatalogCardImages";
@@ -1373,7 +1373,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                   {paginated.map((it, idx) => (
                     <Fragment key={`${it.source}-${it.id}`}>
-                    {relatedHits?.has(it) && !relatedHits.has(paginated[idx - 1]) && (
+                    {relatedHits?.has(it) && !(idx > 0 && relatedHits.has(paginated[idx - 1])) && (
                       <p className="col-span-full border-t border-border pt-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                         {lang === "lv" ? "Līdzīgi kodi" : "Similar codes"}
                       </p>
