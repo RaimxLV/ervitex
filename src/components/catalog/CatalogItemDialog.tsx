@@ -1212,7 +1212,10 @@ const CatalogItemDialog = ({
       if (cancelled) return;
       setDetail(d);
       // Preselect the colour the client was quoted (match by supplier code, then by name)
-      const wanted = (initialColor || "").trim();
+      const rawWanted = (initialColor || "").trim();
+      // BB kartītes vecais sintētiskais kods "W952-SOFTWHITE/BOTTLEGREEN" -> precīzs nosaukums pēc canonName.
+      const bbPrefix = `${id}-`.toLowerCase();
+      const wanted = source === "bb" && rawWanted.toLowerCase().startsWith(bbPrefix) ? rawWanted.slice(bbPrefix.length) : rawWanted;
       let picked = d?.colors[0]?.code ?? null;
       if (wanted && d?.colors?.length) {
         const wc = wanted.toLowerCase();
@@ -1585,6 +1588,8 @@ const CatalogItemDialog = ({
                     key={u + i}
                     type="button"
                     onClick={() => setImgIndex(i)}
+                    aria-label={lang === "lv" ? `Attēls ${i + 1} no ${Math.min(gallery.length, 15)}` : `Image ${i + 1} of ${Math.min(gallery.length, 15)}`}
+                    aria-pressed={i === imgIndex}
                     className={`aspect-square overflow-hidden border-2 ${i === imgIndex ? "border-accent" : "border-transparent hover:border-border"} bg-white flex items-center justify-center`}
                   >
                     <img
