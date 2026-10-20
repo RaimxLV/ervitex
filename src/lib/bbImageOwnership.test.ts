@@ -35,3 +35,10 @@ for (const [label, m] of [["lapa", web], ["sinhronizācija", sync]] as const) {
     });
   });
 }
+
+describe("bezkrāsas modeļa foto", () => {
+  it("rāda tikai vienkrāsas modelim, citādi godīgi tukšs", () => {
+    expect(web.neutralFallback(["a.jpg"], 1)).toEqual(["a.jpg"]);
+    expect(web.neutralFallback(["a.jpg"], 2)).toEqual([]);
+  });
+});
