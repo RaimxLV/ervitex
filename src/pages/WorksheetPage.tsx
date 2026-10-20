@@ -18,6 +18,8 @@ import { fillMissingPrices } from "@/lib/fillMissingPrices";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import DiscountField from "@/components/quote/DiscountField";
 import { AccentIcon } from "@/components/ui/accent-icon";
+import RequestPrintStatus from "@/components/quote/RequestPrintStatus";
+import { printMethodName } from "@/lib/requestPresentation";
 
 const num = (v: string) => {
   const n = Number(String(v).replace(",", "."));
@@ -39,6 +41,7 @@ const WorksheetPage = () => {
   const saveSequence = useRef(0);
   const [discount, setDiscount] = useState<Discount | null>(null);
   const [billing, setBilling] = useState<Billing | null>(null);
+  const [printDetails, setPrintDetails] = useState<{ print_method: string | null; print_placement: string | null; print_colors: string | null; deadline: string | null } | null>(null);
   const savedDiscount = useRef<string>("null");
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -73,6 +76,8 @@ const WorksheetPage = () => {
     const { data } = await supabase.rpc("get_quote_worksheet" as any, { _token: token });
     const row = (Array.isArray(data) ? data[0] : data) as Worksheet | undefined;
     if (!row) return null;
+    const { data: details } = await supabase.rpc("get_quote_request_print_details", { _token: token });
+    setPrintDetails(details?.[0] ?? null);
     setSheet(row);
     if (withItems) {
       const activeItems = Array.isArray(row.draft_items) ? row.draft_items : row.items;
@@ -322,6 +327,9 @@ const WorksheetPage = () => {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <h1 className="font-heading text-xl font-black uppercase leading-tight sm:text-3xl">{isStaff ? "Preču saraksts" : "Jūsu preces"}</h1>
+                {printDetails && <div className="mt-3"><RequestPrintStatus method={printDetails.print_method} />
+                  <p className="mt-1 break-words text-xs text-muted-foreground">{[printDetails.print_method !== "none" ? printMethodName(printDetails.print_method) : null, printDetails.print_placement, printDetails.print_colors, printDetails.deadline].filter(Boolean).join(" · ")}</p>
+                </div>}
                 <div className="mt-4 grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
                   {sheet.company && <div><span className="block text-xs text-muted-foreground">Uzņēmums</span><span className="break-words font-medium">{sheet.company}</span></div>}
                   {sheet.name && <div><span className="block text-xs text-muted-foreground">Kontaktpersona</span><span className="break-words font-medium">{sheet.name}</span></div>}

@@ -1,0 +1,2 @@
+export const sameCartVariant = (a: { source: string; productId: string; colorCode: string | null; size: string | null }, b: { source: string; productId: string; colorCode: string | null; size: string | null }) =>
+  a.source === b.source && a.productId === b.productId && a.colorCode === b.colorCode && a.size === b.size;

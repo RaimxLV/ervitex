@@ -1919,6 +1919,7 @@ export type Database = {
           product_id: string | null
           ref: string | null
           status: string
+          submission_key: string | null
           updated_at: string
           worksheet_client_draft: Json | null
           worksheet_client_draft_at: string | null
@@ -1960,6 +1961,7 @@ export type Database = {
           product_id?: string | null
           ref?: string | null
           status?: string
+          submission_key?: string | null
           updated_at?: string
           worksheet_client_draft?: Json | null
           worksheet_client_draft_at?: string | null
@@ -2001,6 +2003,7 @@ export type Database = {
           product_id?: string | null
           ref?: string | null
           status?: string
+          submission_key?: string | null
           updated_at?: string
           worksheet_client_draft?: Json | null
           worksheet_client_draft_at?: string | null
@@ -3263,6 +3266,15 @@ export type Database = {
           wholesale_price: number
         }[]
       }
+      get_quote_request_print_details: {
+        Args: { _token: string }
+        Returns: {
+          deadline: string
+          print_colors: string
+          print_method: string
+          print_placement: string
+        }[]
+      }
       get_quote_worksheet: {
         Args: { _token: string }
         Returns: {
@@ -3400,6 +3412,10 @@ export type Database = {
           sku: string
           style_code: string
         }[]
+      }
+      submit_quote_request: {
+        Args: { _id: string; _key: string; _payload: Json }
+        Returns: boolean
       }
       supplier_price_health: {
         Args: never

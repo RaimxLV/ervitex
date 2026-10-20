@@ -13,6 +13,7 @@ import {
   Text,
 } from 'npm:@react-email/components@0.0.22'
 import type { TemplateEntry } from './registry.ts'
+import { safeAttachmentName } from '../request-safety.ts'
 
 interface Props {
   ref?: string
@@ -30,6 +31,8 @@ interface Props {
   print_colors?: string
   deadline?: string
   submittedAt?: string
+  pmName?: string
+  pmEmail?: string
 }
 
 const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif', color: '#111' }
@@ -70,6 +73,8 @@ const QuoteRequestEmail = ({
   print_colors = '',
   deadline = '',
   submittedAt = '',
+  pmName = '',
+  pmEmail = '',
 }: Props) => {
   const hasPrint = !!(print_method || print_placement || print_colors || deadline)
   const printStatus = print_method === 'none' ? 'BEZ APDRUKAS' : print_method ? 'APDRUKA NEPIECIEŠAMA' : 'APDRUKA NAV NORĀDĪTA'
@@ -92,10 +97,12 @@ const QuoteRequestEmail = ({
             <Text style={statusText}>PIEVIENOTI FAILI: {attachedCount}</Text>
             {files.map((u, i) => (
               <Text key={i} style={{ margin: '8px 0', fontSize: '14px', overflowWrap: 'anywhere' }}>
-                <Link href={u} style={worksheetLink}>{decodeURIComponent((u.split('?')[0] || u).split('/').pop() || `Fails ${i + 1}`).replace(/^[0-9a-f]{8}-[0-9a-f-]{27}-/i, '')} →</Link>
+                <Link href={u} style={worksheetLink}>{safeAttachmentName(u, `Fails ${i + 1}`)} →</Link>
               </Text>
             ))}
           </Section>
+
+          {pmName ? <Text style={subtle}>Projekta vadītāja: {pmName}{pmEmail ? ` · ${pmEmail}` : ''}</Text> : null}
 
           {worksheetUrl ? (
             <Section>
