@@ -80,7 +80,8 @@ const EVENT_LABELS: Record<string, string> = {
   reopened: "Atvērts atkārtoti",
 };
 
-const daysSince = (iso: string) => Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000);
+import { rigaCalendarDaysSince } from "@/lib/rigaDays";
+
 
 const PM_TABS = [
   { slug: "all", label: "Visi" },
@@ -103,6 +104,9 @@ const ageLabel = (age: number) => (age === 0 ? "Šodien" : age === 1 ? "Vakar" :
 const AdminQuotes = () => {
   const [quotes, setQuotes] = useState<QuoteRow[]>([]);
   const [loading, setLoading] = useState(true);
+  // Pārrēķina "Šodien/Vakar" arī ilgi atvērtā lapā (pēc pusnakts).
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => { const t = window.setInterval(() => setNow(new Date()), 60_000); return () => window.clearInterval(t); }, []);
   const [busy, setBusy] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [tab, setTab] = useState("all");
@@ -262,7 +266,7 @@ const AdminQuotes = () => {
           visible.map((row) => {
             const items = Array.isArray(row.items) ? row.items : [];
             const totalQty = qtyOf(row);
-            const age = daysSince(row.created_at);
+            const age = rigaCalendarDaysSince(row.created_at, now);
             const isOpen = expanded === row.id;
             return (
               <article key={row.id} className={`overflow-hidden rounded-md border bg-card transition-colors ${isOpen ? "border-accent/50" : "border-border"}`}>
