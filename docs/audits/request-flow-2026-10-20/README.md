@@ -48,7 +48,15 @@ Sadales migrācija pielietota; zemāk uzskaitītie labojumi pārbaudīti izolēt
 ## Izlaiduma kārta 2026-10-20 09:35 UTC (tikai admina plūsma)
 
 Atrisināts (vienībtesti, bez īstiem rakstījumiem/e-pastiem):
-- **Pārlāde**: kontaktu, produkta un groza formas glabā neapziņoto pieprasījumu (id, iesnieguma atslēga, nemainīgs saturs, augšupielādētie ceļi, failu nosaukumi) cilnes `sessionStorage`; pēc pārlādes forma bloķēta ar oriģinālajiem datiem, atkārtojums tikai paziņo to pašu pieprasījumu (nekāda otrā saglabāšana/rotācija). Notīra pēc piegādes vai 403/404 atteikuma. Bojāts/svešu ceļu stāvoklis tiek izmests. Failu saturu pēc pārlādes nevar atjaunot — augšupielādētie ceļi paliek, neaugšupielādētie faili tiek nosaukti ar lūgumu sūtīt uz birojs@ervitex.lv.
+- **Pārlāde**: kontaktu, produkta un groza formas glabā neapziņoto pieprasījumu (id, iesnieguma atslēga, nemainīgs saturs, augšupielādētie ceļi, failu nosaukumi) cilnes `sessionStorage`; pēc pārlādes forma bloķēta ar oriģinālajiem datiem, atkārtojums tikai paziņo to pašu pieprasījumu (nekāda otrā saglabāšana/rotācija). Notīra tikai pēc veiksmīgas piegādes. 403/404 atteikums saglabājas kā termināls `rejected` stāvoklis ar to pašu id arī pēc pārlādes: pastāvīgs "saglabāts, bet paziņojums nav apstiprināts" paziņojums, sūtīšana bloķēta; notīrīt var tikai apzināti ar "Sākt jaunu pieprasījumu". Groza lapa gaidošā pieprasījuma laikā rāda/skaita tā nemainīgo saturu, nepārrakstot pašreizējo grozu. Nepieejama `sessionStorage` (SecurityError) nesalauž lapu. Bojāts/svešu ceļu stāvoklis tiek izmests. Failu saturu pēc pārlādes nevar atjaunot — augšupielādētie ceļi paliek, neaugšupielādētie faili tiek nosaukti ar lūgumu sūtīt uz birojs@ervitex.lv.
+
+## Izlaišana 2026-10-20 (pierādījumi)
+
+- Frontend: commit `fa95c3d6`, root deploy `b5729edd-…`. Apstiprināts tiešsaistē www.ervitex.lv/request: ielādētie bundles satur jauno kodu (`submitRequest-CKDW-Tc3.js` — "Sākt jaunu pieprasījumu", `submission_key`; `index-CMlKG_24.js` — `confirmed_empty`).
+- Tikai pēc tam izvietots `send-quote-request` (ar `_shared/request-safety.ts`, `_shared/send-app-email.ts`), source SHA-256 `ca39b644a42de2b75cf6559d57d189815eb057388638a69456bb87ef21bc6047`.
+- Nemainošas pārbaudes: OPTIONS → 200; POST ar bojātu `request_id` → 400 `request_id required` (atgriežas pirms jebkura DB vaicājuma/e-pasta). Reāli id netika izmantoti; nekādu ierakstu vai e-pastu.
+- Root izvēlējās neveikt reālu kontroles pieprasījumu; paļaujamies uz izolētajiem testiem (306 Vitest, Deno `request-safety_test.ts`, izolētā DB rotācija).
+- Nepārbaudīts: reāla e-pasta piegāde vadītājam un klientam produkcijā; Safari jaunās cilnes sesijas problēma (izpētīta, nav salabota).
 - **Tukšs apstiprināts saraksts**: `requestConversionSource` = worksheet / confirmed_empty (`worksheet_updated_at` + tukšs saraksts) / original. confirmed_empty bloķē konversiju ar redzamu paskaidrojumu; dzēstās preces netiek atjaunotas. Vēsturiski aizpildīta `worksheet_revision=1` bez apstiprināšanas laika paliek "original". Produkcijā šobrīd 0 šādu rindu (tikai lasīts).
 - **noindex**: `/offers`, `/offers/$id`, `/saraksts/$token`, `/piedavajums/$token` — tests apstiprina `noindex, nofollow` un bez canonical.
 
