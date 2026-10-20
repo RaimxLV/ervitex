@@ -54,9 +54,9 @@ it("hidden products (not in visible list) are never anchors or neighbours", () =
 it("menu and catalog order is identical regardless of input order", () => {
   expect(rankedSearchResults([...catalog].reverse(), prepareQuery("169"))).toEqual(rankedSearchResults(catalog, prepareQuery("169")));
 });
-it("four-digit query excludes longer codes and keeps same family neighbour", () => {
+it("four-digit query excludes substring codes, allows trailing-zero extension, keeps same family neighbour", () => {
   const items = ["AB1672", "AB1673", "AB167200", "AB131672"].map((id) => ({ id }));
-  expect(ids(rankedSearchResults(items, prepareQuery("1672")))).toEqual(["AB1672", "AB1673"]);
+  expect(ids(rankedSearchResults(items, prepareQuery("1672")))).toEqual(["AB1672", "AB167200", "AB1673"]);
 });
 it("leading zeros must match length", () => {
   expect(searchScore({ id: "AB0167" }, prepareQuery("167"))).toBe(0);
@@ -89,6 +89,32 @@ it("full letter code narrows to that product", () => {
 it("an exact other-brand code still excludes Stella products", () => {
   const item = { id: "GI5000", brand: "Gildan" };
   expect([...exactCodeHits([item, { id: "STTU169", source: "ss" }], prepareQuery("GI5000")) ?? []]).toEqual([item]);
+});
+it("6400 finds real Gildan 64000 codes, never 64001/16400 substrings", () => {
+  const items = [
+    { id: "GI64000", source: "utt", name: "Softstyle Adult T-Shirt" },
+    { id: "GIB64000", source: "utt", name: "Softstyle Youth T-Shirt" },
+    { id: "GIL64000", source: "utt", name: "Softstyle Ladies T-Shirt" },
+    { id: "GIL64000-EX", source: "utt", name: "Softstyle Ladies T-Shirt" },
+    { id: "GI64001", source: "utt", name: "Other" },
+    { id: "GI16400", source: "utt", name: "Other" },
+    { id: "126400", source: "pf", name: "Glass cups" },
+  ];
+  const m = searchMatches(items, prepareQuery("6400"));
+  expect(ids(m.exact)).toEqual(["GI64000", "GIB64000", "GIL64000", "GIL64000-EX"]);
+  expect(m.related).toEqual([]);
+});
+it("trailing-zero shorthand works for other lengths, leading zeros still strict", () => {
+  expect(searchScore({ id: "GI64000" }, prepareQuery("640"))).toBeGreaterThan(0);
+  expect(searchScore({ id: "B500" }, prepareQuery("5"))).toBeGreaterThan(0);
+  expect(searchScore({ id: "AB0167" }, prepareQuery("167"))).toBe(0);
+  expect(searchScore({ id: "AB0167" }, prepareQuery("0167"))).toBeGreaterThan(0);
+  expect(searchScore({ id: "GI64200" }, prepareQuery("6400"))).toBe(0);
+});
+it("169 behavior preserved: exact STTU169 first, same-family related only", () => {
+  const m = searchMatches(catalog, prepareQuery("169"));
+  expect(ids(m.exact)).toEqual(["STTU169", "169"]);
+  expect(ids(m.related)).toEqual(["STTU168", "STTU170", "STTU171", "STTU172"]);
 });
 it("filter keywords: priekšauts finds Aprons, T-krekls finds T-shirts", () => {
   expect(keywordMatch("Aprons", "Priekšauts")).toBe(true);

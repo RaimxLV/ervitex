@@ -303,9 +303,11 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
   const p = prepare(it);
   const isStella = it.source === "ss" || normalizeSearch(it.brand).replace(/ /g, "") === "stanleystella";
   if (/^\d+$/.test(pq.raw)) {
-    // Tikai precīza visa koda ciparu daļa (169 → STTU169, 169), nekad apakšvirkne (14169) vai nosaukums.
+    // Precīza visa koda ciparu daļa (169 → STTU169), nekad apakšvirkne (14169) vai nosaukums.
+    // Īsāks saīsinājums atbilst tikai tad, ja koda ciparu daļas beigas ir pašas nulles
+    // (6400 → GI64000), nevis jebkurš cipars (64001, 16400 neatbilst).
     const code = codeParts(it.id);
-    if (!code || code.digits !== pq.raw) return 0;
+    if (!code || !digitsMatch(code.digits, pq.raw)) return 0;
     return 10000 + (isStella ? 3000 : 0);
   }
   let score = 0;
@@ -349,6 +351,17 @@ export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuer
   return hits.size ? hits : null;
 };
 
+/**
+ * Ciparu vaicājuma atbilstība koda ciparu daļai: precīzs vai saīsinājums,
+ * kur koda atlikušie cipari ir paši nulles (6400 → 64000, bet ne 64001/16400).
+ * Sākuma nulles saglabājas: "167" neatbilst "0167".
+ */
+export const digitsMatch = (codeDigits: string, queryDigits: string): boolean =>
+  codeDigits === queryDigits ||
+  (codeDigits.length > queryDigits.length &&
+    codeDigits.startsWith(queryDigits) &&
+    /^0+$/.test(codeDigits.slice(queryDigits.length)));
+
 /** Koda daļas: burtu prefikss + viena ciparu grupa + burtu sufikss (STTU169 → sttu/169/""). */
 export const codeParts = (id?: string | null): { prefix: string; digits: string; suffix: string } | null => {
   const m = normalizeSearch(id).replace(/ /g, "").match(/^([a-z]*)(\d+)([a-z]*)$/);
@@ -386,7 +399,9 @@ export const searchMatches = <T extends Searchable>(items: T[], pq: PreparedQuer
   const related: T[] = [];
   const anchor = exact[0];
   const ac = anchor && codeParts(anchor.id);
-  const isCodeQuery = ac && (/^\d+$/.test(pq.raw) ? pq.raw.length >= 3 : pq.compact === `${ac.prefix}${ac.digits}${ac.suffix}`);
+  // Līdzīgos kodus rāda tikai tad, ja vaicājuma cipari precīzi sakrīt ar enkura koda cipariem
+  // (169 → STTU169 kaimiņi; saīsinājumam 6400 → GI64000 kaimiņu nav).
+  const isCodeQuery = ac && (/^\d+$/.test(pq.raw) ? pq.raw.length >= 3 && ac.digits === pq.raw : pq.compact === `${ac.prefix}${ac.digits}${ac.suffix}`);
   if (anchor && ac && isCodeQuery) {
     // Tikai pirmās precīzās preces piegādātājs + prefikss nosaka līdzīgos kodus.
     const family = familyKey(anchor, ac);
