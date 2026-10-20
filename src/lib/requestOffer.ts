@@ -2,7 +2,7 @@ import type { OfferItem } from "./offer";
 import { printMethodName, printStatusLabel } from "./requestPresentation";
 import { setOrderPrints } from "./orderPrinting";
 
-type ConversionSource = { worksheet_items?: unknown; worksheet_revision?: number | null; worksheet_updated_at?: string | null };
+export type ConversionSource = { worksheet_items?: unknown; worksheet_revision?: number | null; worksheet_updated_at?: string | null };
 /**
  * "worksheet": a confirmed list with items; "confirmed_empty": staff/client explicitly confirmed an
  * empty list (items were deleted on purpose); "original": no list was ever confirmed.

@@ -9,7 +9,7 @@ import { ASSIGNEES } from "@/data/assignees";
 import RequestPrintStatus from "@/components/quote/RequestPrintStatus";
 import ExpandableMessage from "@/components/quote/ExpandableMessage";
 import { CreateOfferButton } from "@/components/quote/CreateOfferButton";
-import { requestConversionSource, CONFIRMED_EMPTY_MESSAGE } from "@/lib/requestOffer";
+import { requestConversionSource, CONFIRMED_EMPTY_MESSAGE, type ConversionSource } from "@/lib/requestOffer";
 import { attachmentName } from "@/lib/requestPresentation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
@@ -318,7 +318,7 @@ const AdminQuotes = () => {
                 </Button>
                 <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-2.5 sm:px-5">
                   {row.action_token && <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90"><a href={worksheetPath(row.action_token)} target="_blank" rel="noreferrer"><ClipboardList />Preču saraksts</a></Button>}
-                  <CreateOfferButton requestId={row.id} compact blockedReason={requestConversionSource(row) === "confirmed_empty" ? CONFIRMED_EMPTY_MESSAGE : undefined} />
+                  <CreateOfferButton requestId={row.id} compact blockedReason={requestConversionSource(row as unknown as ConversionSource) === "confirmed_empty" ? CONFIRMED_EMPTY_MESSAGE : undefined} />
                   <Button asChild variant="outline" size="sm"><a href={`mailto:${row.email}?subject=${encodeURIComponent("Cenu pieprasījums")}`}><Mail />Rakstīt</a></Button>
                   {row.phone && <Button asChild variant="ghost" size="icon"><a href={`tel:${row.phone.replace(/[^+\d]/g, "")}`} title="Zvanīt klientam" aria-label="Zvanīt klientam"><Phone /></a></Button>}
                   <DropdownMenu>
