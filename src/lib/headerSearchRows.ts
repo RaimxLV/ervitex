@@ -3,6 +3,7 @@ import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 export interface HeaderSearchRow {
   source: string; id: string; name: string | null; brand: string | null;
   category: string | null; group_name: string | null; image_url?: string | null;
+  hover_image_url?: string | null;
 }
 type Page = { data: unknown[] | null; error: unknown; count?: number | null };
 export interface RowsLoaderDeps {
@@ -37,7 +38,7 @@ export function createRowsLoader(deps: RowsLoaderDeps) {
     if (cached) { items = cached.items as any[]; prices = cached.prices as any[]; }
     else {
       [items, prices] = await Promise.all([
-        fetchAll("catalog_items", "source,id,name,brand,category,group_name,image_url", "id"),
+        fetchAll("catalog_items", "source,id,name,brand,category,group_name,image_url,hover_image_url", "id"),
         fetchAll("catalog_price_ranges", "source,style_code,min_price", "style_code"),
       ]);
     }

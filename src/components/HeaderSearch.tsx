@@ -31,15 +31,25 @@ const rowsLoader = createRowsLoader({
   },
 });
 
-/** Sīktēls: vispirms mazais proxy, tad oriģināls, tad neitrāls lauks. */
-function SearchThumb({ src }: { src: string }) {
-  const proxied = thumbUrl(src, 120) || src;
+/** Sīktēlu kandidāti: katram tā paša ieraksta attēlam proxy, tad oriģināls; bez dublikātiem. */
+export function thumbCandidates(srcs: (string | null | undefined)[]): string[] {
+  const out: string[] = [];
+  for (const src of srcs) {
+    if (!src) continue;
+    for (const u of [thumbUrl(src, 120) || src, src]) if (!out.includes(u)) out.push(u);
+  }
+  return out;
+}
+
+/** Sīktēls: galvenais attēls (proxy → oriģināls), tad tā paša modeļa otrais attēls, tad neitrāls lauks. */
+function SearchThumb({ srcs }: { srcs: (string | null | undefined)[] }) {
+  const list = useMemo(() => thumbCandidates(srcs), [srcs.join("|")]);
   const [stage, setStage] = useState(0);
-  useEffect(() => setStage(0), [src]);
-  const current = stage === 0 ? proxied : stage === 1 && proxied !== src ? src : null;
+  useEffect(() => setStage(0), [list]);
+  const current = list[stage];
   if (!current) return null;
   return <img src={current} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain"
-    onError={() => setStage((s) => (s === 0 && proxied !== src ? 1 : 2))} />;
+    onError={() => setStage((s) => s + 1)} />;
 }
 
 interface Props {
@@ -190,7 +200,7 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
                     }`}
                   >
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-muted">
-                      {r.image_url && <SearchThumb src={r.image_url} />}
+                      {(r.image_url || r.hover_image_url) && <SearchThumb srcs={[r.image_url, r.hover_image_url]} />}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium">{r.name}</span>
