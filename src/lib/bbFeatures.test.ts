@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { stripBbFooterLinks } from "./bbFeatures.ts";
+import { stripBbFooterLinks } from "../../supabase/functions/_shared/bbFeatures";
 
 describe("stripBbFooterLinks", () => {
   it("removes BG858 footer links, keeps real features", () => {
