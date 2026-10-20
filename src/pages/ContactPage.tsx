@@ -244,7 +244,7 @@ const ContactPage = () => {
                   <label htmlFor="c-message" className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{t("contact.message")}</label>
                   <Textarea disabled={sending || locked} id="c-message" required rows={7} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={t("contact.messagePlaceholder")} className="resize-none rounded-none bg-background px-4 py-3 focus-visible:ring-accent" />
                 </div>
-                <Button type="submit" size="lg" disabled={sending} className="h-12 w-full rounded-none bg-accent px-8 font-heading text-sm uppercase text-accent-foreground hover:bg-accent/90 sm:w-auto">
+                <Button type="submit" size="lg" disabled={sending || rejected} className="h-12 w-full rounded-none bg-accent px-8 font-heading text-sm uppercase text-accent-foreground hover:bg-accent/90 sm:w-auto">
                   {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" strokeWidth={1.5} />}
                   {sending ? (lang === "lv" ? "Sūta..." : "Sending...") : t("contact.send")}
                 </Button>
