@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
 import { SizeQuantityTable } from "./SizeQuantityTable";
+import { supplierSizeLabel, supplierSizeNote } from "@/lib/supplierSizeLabels";
 import { Check, ClipboardList, Trash2, Plus as PlusIcon } from "lucide-react";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -188,7 +189,7 @@ const AddToQuoteBlock = ({
       </div>
 
       {!isAdmin && <OrderMinimumNotice source={source} category={category} name={classificationName || name} className={minimumNoticeClassName} />}
-      <SizeQuantityTable rows={(sizes.length ? sizes : ["-"]).map((size) => ({ size, price: priceOf(size) }))} quantities={qtyBySize} onChange={setSize} />
+      <SizeQuantityTable rows={(sizes.length ? sizes : ["-"]).map((size) => ({ size, price: priceOf(size) }))} quantities={qtyBySize} onChange={setSize} formatSize={(s) => supplierSizeLabel(source, code || productId, s, lang)} note={supplierSizeNote(source, code || productId, lang)} />
 
       {/* Summary of other colors already in cart for this product */}
       {otherGrouped.length > 0 && (
@@ -226,7 +227,7 @@ const AddToQuoteBlock = ({
                       <span className="break-words">{g.name}</span>
                     </span>
                   </td>
-                  <td className="py-2 font-semibold">{line.size || "—"}</td>
+                  <td className="py-2 font-semibold">{line.size ? supplierSizeLabel(line.source, line.code, line.size, lang) : "—"}</td>
                   <td className="py-2 text-right font-semibold tabular-nums">{line.qty} <span className="font-normal text-muted-foreground">{t("gab.", "pcs")}</span></td>
                   <td className="py-2 text-right">
                     <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-accent"

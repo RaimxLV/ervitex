@@ -6,6 +6,7 @@ import { QtyStepper } from "@/components/quote/QtyStepper";
 import { money, itemPrintNet, itemDiscountNet, itemDiscountPercent, itemTotalNet, type OfferItem } from "@/lib/offer";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { offerGroupKey } from "@/lib/requestPresentation";
+import { supplierSizeLabel } from "@/lib/supplierSizeLabels";
 
 export function QuoteItemsTable({ items, onQuantity, onRemove, onPrice, onDiscount, groupAction, itemDetails, onGroupSelect, disabled = false }: {
   items: OfferItem[]; onQuantity: (id: string, qty: number) => void; onRemove: (id: string) => void;
@@ -32,7 +33,7 @@ export function QuoteItemsTable({ items, onQuantity, onRemove, onPrice, onDiscou
       <div className="max-w-full overflow-x-auto"><div className={showDiscounts ? "min-w-[560px]" : ""}>
       <div className={`${grid} bg-muted/50 px-2 py-3 text-[11px] font-semibold text-muted-foreground sm:px-3`}><span>{t("Izmērs", "Size")}</span><span className="text-center">{t("Skaits", "Qty")}</span><span>{t("Cena bez PVN", "Price excl. VAT")}</span>{showDiscounts && <><span>{t("Atlaide %", "Discount %")}</span><span className="text-right">{t("Atlaide €", "Discount €")}</span></>}<span className="text-right">{t("Summa bez PVN", "Total excl. VAT")}</span><span /></div>
       {group.map((i) => <div key={i.id}><div className={`${grid} border-t border-border bg-card px-2 py-3 text-sm tabular-nums sm:px-3`}>
-        <span className="break-words font-semibold">{i.size || "—"}</span><QtyStepper disabled={disabled} ariaLabel={`Skaits ${i.code} ${i.size || ""}`} value={i.qty} min={1} className="w-16 justify-self-center" onChange={(qty) => onQuantity(i.id, Math.max(1, qty))} />
+        <span className="break-words font-semibold">{i.size ? supplierSizeLabel(i.source, i.code, i.size, lang) : "—"}</span><QtyStepper disabled={disabled} ariaLabel={`Skaits ${i.code} ${i.size || ""}`} value={i.qty} min={1} className="w-16 justify-self-center" onChange={(qty) => onQuantity(i.id, Math.max(1, qty))} />
         {onPrice ? <DecimalInput aria-label={`Cena ${i.code} ${i.size || ""}`} value={i.unitPrice} onValueChange={(v) => onPrice(i.id, v)} className="min-w-0 px-2" /> : <span className="break-words">{i.unitPrice ? money(i.unitPrice) : "—"}</span>}
         {showDiscounts && <>{onDiscount ? <DecimalInput aria-label={`Atlaide % ${i.code} ${i.size || ""}`} value={i.discountPercent ?? null} placeholder="0" onValueChange={(v) => onDiscount(i.id, v === null ? null : Math.min(100, Math.max(0, v)))} className="min-w-0 px-2 text-right" /> : <span>{itemDiscountPercent(i)}%</span>}<span className="break-words text-right text-accent">{money(itemDiscountNet(i))}</span></>}
         <span className="break-words text-right font-semibold">{i.unitPrice || itemPrintNet(i) ? money(itemTotalNet(i)) : "—"}</span><Button disabled={disabled} type="button" variant="ghost" size="icon" aria-label={`Dzēst ${i.code} ${i.size || ""}`} onClick={() => onRemove(i.id)} className="h-9 w-9 text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
