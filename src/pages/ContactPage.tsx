@@ -226,6 +226,7 @@ const ContactPage = () => {
             <div className="border border-border bg-card p-5 lg:col-span-7 md:p-8">
               <h3 className="mb-6 font-heading text-lg font-bold uppercase text-foreground">{lang === "lv" ? "Sazinieties ar mums" : "Contact us"}</h3>
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
+                {locked && <p role="status" className="text-sm text-muted-foreground">{pendingText(lang)}</p>}
                 <div className="grid gap-5 sm:grid-cols-2">
                   {([
                     ["name", t("contact.name"), "text", true],
