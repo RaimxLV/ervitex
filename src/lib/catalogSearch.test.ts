@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { keywordMatch, exactCodeHits, prepareQuery, rankedSearchResults, searchMatches, searchScore } from "./catalogSearch";
+import { keywordMatch, exactCodeHits, prepareQuery, rankedSearchResults, searchMatches, searchScore, codeParts } from "./catalogSearch";
 const ids = (xs: { id: string }[]) => xs.map((x) => x.id);
 const catalog = [
   { id: "STTU169", source: "ss", name: "Creator 2.0" },
@@ -119,6 +119,28 @@ it("exact 64000 still finds the Gildan family directly", () => {
     { id: "GI64001", source: "utt", name: "Other" },
   ];
   expect(ids(searchMatches(items, prepareQuery("64000")).exact)).toEqual(["GI64000", "GIL64000-EX"]);
+});
+it("shorthand requires normalized UTT source and exact GI/GIB/GIL prefix", () => {
+  for (const source of [undefined, "ss", "pf", "other", "utt-extra"]) expect(searchScore({ id: "GI64000", source }, prepareQuery("6400"))).toBe(0);
+  for (const id of ["XGI64000", "GIX64000", "GIBA64000", "GILL64000", "AB64000"]) expect(searchScore({ id, source: "utt" }, prepareQuery("6400"))).toBe(0);
+  expect(searchScore({ id: " gil64000-ex ", source: " UTT " }, prepareQuery(" 6400 "))).toBeGreaterThan(0);
+});
+it("uses token metadata, not four hardcoded IDs; leading zeros remain strict", () => {
+  expect(searchScore({ id: "GI12340", source: "utt" }, prepareQuery("1234"))).toBeGreaterThan(0);
+  expect(searchScore({ id: "GIB12340-EX", source: "utt" }, prepareQuery("1234"))).toBeGreaterThan(0);
+  expect(searchScore({ id: "GI12341", source: "utt" }, prepareQuery("1234"))).toBe(0);
+  expect(searchScore({ id: "GI123400", source: "utt" }, prepareQuery("1234"))).toBe(0);
+  expect(searchScore({ id: "GI01230", source: "utt" }, prepareQuery("0123"))).toBeGreaterThan(0);
+  expect(searchScore({ id: "GI01230", source: "utt" }, prepareQuery("123"))).toBe(0);
+});
+it("rejects extra numeric tokens and prohibited expansions even for UTT", () => {
+  for (const id of ["GI64001", "GI16400", "GI640001", "GI64000-1", "GI64000-EX2", "GI6400-0", "GI64000.0"]) expect(searchScore({ id, source: "utt" }, prepareQuery("6400"))).toBe(0);
+  expect(codeParts("GIL64000-EX")).toEqual({ prefix: "gil", digits: "64000", suffix: "ex" });
+  for (const [id, query] of [["GI64000", "640"], ["GI00500", "5"], ["GI1690", "169"]]) expect(searchScore({ id, source: "utt" }, prepareQuery(query))).toBe(0);
+});
+it("shorthand never drives related-code suggestions", () => {
+  const items = ["GI64000", "GI64001", "GI64002"].map((id) => ({ id, source: "utt" }));
+  expect(searchMatches(items, prepareQuery("6400")).related).toEqual([]);
 });
 it("169 behavior preserved: exact STTU169 first, same-family related only", () => {
   const m = searchMatches(catalog, prepareQuery("169"));

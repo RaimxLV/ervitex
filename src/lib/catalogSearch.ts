@@ -304,9 +304,9 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
   const isStella = it.source === "ss" || normalizeSearch(it.brand).replace(/ /g, "") === "stanleystella";
   if (/^\d+$/.test(pq.raw)) {
     // Precīza visa koda ciparu daļa (169 → STTU169), nekad apakšvirkne (14169) vai nosaukums.
-    // Vienīgais saīsinājums: pārdevēju ierastais "6400" = Gildan Softstyle 64000 saime (UTT).
+    // Saīsinājums tikai UTT GI/GIB/GIL četru/piecu ciparu tokeniem ar nulles atlikumu.
     const code = codeParts(it.id);
-    if (!code || !digitsMatch(it.id, code.digits, pq.raw)) return 0;
+    if (!code || !digitsMatch(it, code, pq.raw)) return 0;
     return 10000 + (isStella ? 3000 : 0);
   }
   let score = 0;
@@ -351,25 +351,27 @@ export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuer
 };
 
 /**
- * Dokumentēts saīsinājums: pārdevēji Gildan Softstyle 64000 saimi (UTT) pazīst kā "6400".
- * Attiecas TIKAI uz vaicājumu "6400" un šiem apstiprinātajiem kodiem; nekāda vispārīga
- * nuļļu papildināšana citiem kodiem nav atļauta (169 ↛ 1690, 5 ↛ 500, 640 ↛ 64000).
+ * Saīsinājums pēc avota/prefiksa/tokena metadatiem, ne konkrētu preču ID saraksta.
+ * Tikai UTT GI/GIB/GIL: četru ciparu vaicājums, piecu ciparu tokens, nulles atlikums.
  */
-const SHORTHAND_6400 = new Set(["gi64000", "gib64000", "gil64000", "gil64000ex"]);
+const NUMERIC_SHORTHAND_RULE = { source: "utt", prefixes: new Set(["gi", "gib", "gil"]), queryLength: 4, tokenLength: 5 };
 
 /**
  * Ciparu vaicājuma atbilstība koda ciparu daļai: tikai precīza sakritība
  * (169 → STTU169) vai dokumentētais 6400 saīsinājums. Sākuma nulles saglabājas:
  * "167" neatbilst "0167".
  */
-export const digitsMatch = (id: string, codeDigits: string, queryDigits: string): boolean =>
-  codeDigits === queryDigits ||
-  (queryDigits === "6400" && SHORTHAND_6400.has(normalizeSearch(id).replace(/[ -]/g, "")));
+export const digitsMatch = (item: Searchable, code: { prefix: string; digits: string; suffix: string }, queryDigits: string): boolean =>
+  code.digits === queryDigits ||
+  (typeof item.source === "string" && item.source.trim().toLowerCase() === NUMERIC_SHORTHAND_RULE.source &&
+    NUMERIC_SHORTHAND_RULE.prefixes.has(code.prefix) &&
+    queryDigits.length === NUMERIC_SHORTHAND_RULE.queryLength && code.digits.length === NUMERIC_SHORTHAND_RULE.tokenLength &&
+    code.digits.startsWith(queryDigits) && /^0+$/.test(code.digits.slice(queryDigits.length)));
 
 /** Koda daļas: burtu prefikss + viena ciparu grupa + burtu sufikss (STTU169 → sttu/169/""). */
 export const codeParts = (id?: string | null): { prefix: string; digits: string; suffix: string } | null => {
-  const m = normalizeSearch(id).replace(/ /g, "").match(/^([a-z]*)(\d+)([a-z-]*)$/);
-  return m ? { prefix: m[1], digits: m[2], suffix: m[3] } : null;
+  const m = normalizeSearch(id).match(/^([a-z]*) ?(\d+)(?: ?([a-z]+))?$/);
+  return m ? { prefix: m[1], digits: m[2], suffix: m[3] || "" } : null;
 };
 
 const familyKey = (it: Searchable, c: { prefix: string; digits: string; suffix: string }) =>

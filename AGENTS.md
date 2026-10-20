@@ -1,6 +1,6 @@
 # Architecture rules
 
-- Menu/catalog share searchMatches on model IDs: digit queries match whole numeric parts; similar codes only from exact hits' source+prefix, labelled; redirects keep facets
+- Menu/catalog share searchMatches: shorthand uses source/prefix/token metadata, not ID lists; related codes need exact-token anchors; redirects keep facets.
 - productContent separates care/specs; translation caches use fingerprints.
 - Offers use CreateOfferButton, /offers, OfferWorkspace and shared offer item pricing helpers for consistent discounts; sharing activates drafts. useOfferDraft serializes version-checked autosaves with recovery; token refresh preserves editors.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
