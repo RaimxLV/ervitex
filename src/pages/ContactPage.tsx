@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { usePendingRequest, pendingText, rejectedText } from "@/hooks/usePendingRequest";
+import { usePendingRequest, rejectedText } from "@/hooks/usePendingRequest";
+import { PendingRequestNotice } from "@/components/quote/PendingRequestNotice";
 import { saveRequest, notifyRequest } from "@/lib/submitRequest";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, Clock3, Mail, MapPin, Phone, Send, X, Loader2, ReceiptText, Navigation, Calculator } from "lucide-react";
@@ -50,7 +51,7 @@ const ContactPage = () => {
   const [photoSettings, setPhotoSettings] = useState<Record<string, PhotoSettings>>({});
 
   const [sending, setSending] = useState(false);
-  const { submission, locked, sync } = usePendingRequest("contact", ({ payload: p }) =>
+  const { submission, locked, sync, rejected, discard } = usePendingRequest("contact", ({ payload: p }) =>
     setForm({ name: String(p.name ?? ""), email: String(p.email ?? ""), company: String(p.company ?? ""), phone: String(p.phone ?? ""), message: String(p.message ?? "") }));
 
   useEffect(() => {
@@ -90,7 +91,6 @@ const ContactPage = () => {
       if (result.state === "busy") return;
       if (result.state === "rejected") {
         toast({ title: rejectedText(lang), variant: "destructive" });
-        setForm({ name: "", email: "", company: "", phone: "", message: "" });
       } else if (result.state === "delivered") {
         toast({ title: t("contact.sent"), description: t("contact.sentDesc") });
         setForm({ name: "", email: "", company: "", phone: "", message: "" });
@@ -226,7 +226,7 @@ const ContactPage = () => {
             <div className="border border-border bg-card p-5 lg:col-span-7 md:p-8">
               <h3 className="mb-6 font-heading text-lg font-bold uppercase text-foreground">{lang === "lv" ? "Sazinieties ar mums" : "Contact us"}</h3>
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
-                {locked && <p role="status" className="text-sm text-muted-foreground">{pendingText(lang)}</p>}
+                <PendingRequestNotice locked={locked} rejected={rejected} lang={lang} onNew={() => { discard(); setForm({ name: "", email: "", company: "", phone: "", message: "" }); }} />
                 <div className="grid gap-5 sm:grid-cols-2">
                   {([
                     ["name", t("contact.name"), "text", true],
