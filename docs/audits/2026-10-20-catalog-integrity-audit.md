@@ -32,3 +32,28 @@ Visas `catalog_variant_prices` cenas > 0.
 - Cenu formulu pārrēķins pret iepirkuma cenām šajā auditā netika palaists (psql nevar izsaukt `price_audit_*`); izmantot admin „Cenu audits”.
 - Salīdzinājums ar piegādātāju tiešsaistes datiem (izņemot B15 lapas struktūru, kas redzama importētāja HTML filtrā) — netika veikts.
 - Izmēru piederība krāsai ārpus BB (BB variantiem izmērs = null).
+
+## Papildinājums 2026-10-20 (2. kārta)
+
+### Laboti sistēmiski (kods)
+- `loadBB`: vairs NEpievieno visus modeļa foto, ja krāsai nav atbilstoša faila. Modeļa foto piešķir krāsai tikai `bbAssignImageColor`: krāsas segmentam jāsākas tieši aiz precīzā modeļa koda tokena, jāsakrīt ar garāko PILNO krāsu no modeļa oficiālā variantu saraksta; ja aiz tās seko cits krāsas vārds (black_white bez krāsas "Black/White"), fails netiek piešķirts. Vecais `bbImageMentionsColor` dzēsts.
+- Tā pati kategorija (krāsa bez sava foto → visi bezkrāsas modeļa foto) labota MF, UTT, F&R un PF galerijās: `neutralFallback` — bezkrāsas foto tikai vienkrāsas modelim, citādi "Bez attēla".
+- BB simulācija ar reāliem datiem: 672 modeļi, 2 963 krāsas; 4 473 modeļa foto piešķirti, 1 177 nepiešķirti (vairs netiek rādīti krāsām); 36 krāsām nav pierādīta foto → `2026-10-20-bb-colours-without-proven-image.csv`.
+- ETX trigeris `refresh_etx_catalog_prices` glabāja bruto cenu (pilnā atjaunošana glabā neto /1.21) → pēc jebkuras preces labošanas būtu dubults PVN. Trigeris izlabots (migrācija 0021); esošie 12 ETX ieraksti jau bija neto, dati netika pārrakstīti.
+
+### Cenu pārrēķins (visi redzamie varianti, LEFT JOIN)
+- `price_audit_*` RPC prasa `has_role(auth.uid(),'admin')`; `private` shēma sandbox lomai nav pieejama (`permission denied for schema private`), tāpēc nevar nolasīt pat definīciju; tā arī mainīta caur dinamisku `replace` migrācijā. Tādēļ formula pārrēķināta neatkarīgi no `refresh_catalog_prices()`/`refresh_utt_catalog_prices()` pašreizējās definīcijas: `sql/2026-10-20-price-recompute.sql`.
+- Rezultāts `2026-10-20-price-recompute-summary.csv`: 134 583 redzami varianti; 0 neatbilstību, 0 nulles cenu, 0 trūkstošu cenu, kur bāze ir. Bez bāzes cenas (godīgi bez cenas): BB 32, F&R 308, PF 116, SS 6, UTT 44 (t.sk. outlier-aizsardzība pēc politikas) → `2026-10-20-price-nonok-variants.csv`. Bāreņu cenu rindas: PF 37, ETX 12 (ETX = produkts, nav varianta tabulas — PASS).
+- Malfini pret oficiālo API (`/product/prices`, limit=1, tikai lasīšana): 15 565/15 584 sakrīt; 19 atšķiras (DB cena 1–4 % augstāka) → `2026-10-20-mf-source-price-diffs.csv`. Cēlonis: kopš 14.10. neviena piegādātāja sinhronizācija nav ierakstījusi žurnālu, lai gan cron 19.10. izpildījās "succeeded" (invoke_sync_function atgriežas bez kļūdas, ja trūkst vault atslēgas; HTTP atbildes jau dzēstas — cēlonis NEPIERĀDĪTS). Cenas netika rakstītas.
+
+### Skaiti (raw / modeļi / redzami)
+NWG: 70 602 SKU, 14 323 krāsu varianti, 14 191 `nwg_styles` rindas, 3 434 produkti ar SKU, redzami 2 858 modeļi / 64 419 SKU (iepriekšējais "14 191 modeļi" bija rindu skaits, nesalīdzināms). Redzami modeļi/varianti: BB 672/2 963, F&R 255/2 925, MF 418/15 521, PF 2 156/19 723, RU 93/93, SS 159/10 657, UTT 405/18 282.
+
+### Relāciju pārbaudes (`2026-10-20-relational-checks.tsv`)
+PASS (0): cenas modelis = varianta modelis (visi); cenas krāsa/izmērs = varianta (visi izņemot PF, kur atslēga ir item_code); SKU vairākos modeļos; NWG/MF/SS SKU prefikss; dublēti krāsa+izmērs BB/MF/SS/UTT/F&R; foto krāsa ∉ modelis MF/BB/UTT/F&R/PF/NWG.
+Anomālijas: PF 104 item_code bez modeļa prefiksa (PF item kodi ir neatkarīgi numuri, piem. 100165→19549863 — informatīvi); PF 1 dublikāts = 22020095/22020099 (zināms, apzināti); NWG 3 = 649066 ×2 un 024165-949 XS/S (SKU-specifiski, kā paredzēts); SS 11 459 foto nepublicētām krāsām (galerijā netiek rādīti); RU 993 foto krāsām, kas nav `ru_variants` (filtrē `russellImagesForColor`); krāsas bez sava foto: BB 36, MF 12, UTT 47, F&R 3, NWG 52.
+
+### Avota pārbaudes
+- BB 26 koda neatbilstības (`2026-10-20-bb-code-mismatch-images.csv`): visas 26 ir piegādātāja paša modeļa lapā kā šīs krāsas attēls → piegādātāja piešķirtas; vizuālā atbilstība (piem., B640B junior ar b640 failu, W710 ar w701) NEPĀRBAUDĪTA, nav apgalvots kā defekts.
+- UTT Regatta 40: UTT Data Export (brand Regatta, 2 720 rindas) — visi 40 faili piešķirti tieši tam modelim/krāsai → piegādātāja eksplicīta piesaiste (`2026-10-20-utt-regatta-40-source-check.csv`).
+- Nav veikts šajā kārtā: SS, NWG, PF, F&R tiešsaistes paraugi (piekļuves ir, bet nav salīdzināts); katras bildes vizuālā pārbaude.

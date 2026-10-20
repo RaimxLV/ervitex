@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { bbImageBelongsToStyle, bbImageMentionsColor } from "@/lib/bbImageOwnership";
+import { bbImageBelongsToStyle, bbAssignImageColor, neutralFallback } from "@/lib/bbImageOwnership";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -548,7 +548,7 @@ async function loadPF(modelCode: string): Promise<ProductDetail | null> {
   const colors: ColorDetail[] = [...colorMap.values()].map((c) => {
     const imgs: string[] = [];
     for (const ic of c.itemCodes) for (const u of imgByItem.get(ic) || []) if (!imgs.includes(u)) imgs.push(u);
-    return { code: c.code, name: c.name, hex: c.hex, images: imgs.length ? imgs : modelImgs, sizes: uniqueSortedSizes(sizesByColor.get(c.code) || []) };
+    return { code: c.code, name: c.name, hex: c.hex, images: imgs.length ? imgs : neutralFallback(modelImgs, colorMap.size), sizes: uniqueSortedSizes(sizesByColor.get(c.code) || []) };
   });
 
   const sizeOrder = ["XXS","XS","S","M","L","XL","XXL","XXXL","3XL","4XL","5XL"];
@@ -669,18 +669,22 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
     if (v.sku && name) skuMap[`${name}|${v.size ?? ""}`] = v.sku;
   }
 
+  // Model shots join a colour only when the filename names exactly that authoritative colour
+  // right after the model code. Unassigned shots are shown only for single-colour models.
+  const modelColours = colorOrder.map((k) => colorInfo.get(k)!.name);
+  const assigned = new Map<string, string[]>();
+  for (const u of shared) {
+    const c = bbAssignImageColor(u, styleCode, modelColours);
+    if (c) assigned.set(c.toLowerCase(), [...(assigned.get(c.toLowerCase()) || []), u]);
+  }
   const colors: ColorDetail[] = colorOrder.map((key) => {
     const info = colorInfo.get(key)!;
-    const colourImgs = imgByColor.get(key) || [];
-    // Gallery = colour swatch shots + all style shots that mention this colour,
-    // falling back to every shared shot when the colour isn't in the filename.
-    const matching = shared.filter((u) => bbImageMentionsColor(u, key));
-    const merged = [...new Set([...colourImgs, ...(matching.length ? matching : shared)])];
+    const merged = [...new Set([...(imgByColor.get(key) || []), ...(assigned.get(key) || [])])];
     return {
       code: info.name,
       name: info.name,
       hex: info.hex,
-      images: merged.length ? merged : shared,
+      images: merged.length ? merged : neutralFallback(shared, colorOrder.length),
       sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes),
     };
   });
@@ -776,7 +780,7 @@ async function loadMF(styleCode: string): Promise<ProductDetail | null> {
       code: key,
       name: info.name,
       hex: null,
-      images: imgs.length ? imgs : shared,
+      images: imgs.length ? imgs : neutralFallback(shared, colorOrder.length),
       sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes),
     };
   });
@@ -939,8 +943,8 @@ async function loadUTT(styleCode: string): Promise<ProductDetail | null> {
   const colors: ColorDetail[] = colorOrder.map((key) => {
     const info = colorInfo.get(key)!;
     const own = imgByColor.get(key) || [];
-    // Model photos without a colour often show another colour; use them only when the colour has none of its own.
-    const merged = own.length ? [...new Set(own)] : [...new Set(shared)];
+    // Colourless model photos may show another colour: only single-colour models may use them.
+    const merged = own.length ? [...new Set(own)] : neutralFallback([...new Set(shared)], colorOrder.length);
     return { code: info.name, name: info.name, hex: info.hex, images: merged, sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes) };
   });
   if (colors.length === 0 && shared.length) {
@@ -1027,7 +1031,7 @@ async function loadFR(styleCode: string): Promise<ProductDetail | null> {
     const info = colorInfo.get(key)!;
     const own = imgByColor.get(key) || [];
     // Model photos without a colour often show another colour; use them only when the colour has none of its own.
-    const merged = own.length ? [...new Set(own)] : [...new Set(shared)];
+    const merged = own.length ? [...new Set(own)] : neutralFallback([...new Set(shared)], colorOrder.length);
     return { code: info.name, name: info.name, hex: info.hex, images: merged, sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes) };
   });
   if (colors.length === 0 && shared.length) {

@@ -148,6 +148,13 @@
       "when": 1792420243324,
       "tag": "0020_utt_targeted_refresh",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792481757102,
+      "tag": "0021_etx_trigger_net_price",
+      "breakpoints": true
     }
   ]
 }

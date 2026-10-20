@@ -1,0 +1,507 @@
+src,sku,style_code,expected,actual,status
+ss,STJW190C176XS,STJW190,,,no_price_expected_and_none
+ss,STJW190C1761M,STJW190,,,no_price_expected_and_none
+bb,QS287-BLACK,QS287,,,no_price_expected_and_none
+bb,QS287-RED/BLACK,QS287,,,no_price_expected_and_none
+bb,QS287-ROYAL/BLACK,QS287,,,no_price_expected_and_none
+bb,QS75-BLACK/GREY,QS75,,,no_price_expected_and_none
+bb,QS65-BOTTLEGREEN/BLACK/WHITE,QS65,,,no_price_expected_and_none
+bb,QS65-ROYAL/BLACK/WHITE,QS65,,,no_price_expected_and_none
+bb,T105-CLEAR,T105,,,no_price_expected_and_none
+pf,10715409,107154,,,no_price_expected_and_none
+pf,10717400,107174,,,no_price_expected_and_none
+pf,21046222,210462,,,no_price_expected_and_none
+pf,21074562,210745,,,no_price_expected_and_none
+pf,21074690,210746,,,no_price_expected_and_none
+pf,10715300,107153,,,no_price_expected_and_none
+pf,10775453,107754,,,no_price_expected_and_none
+pf,10715103,107151,,,no_price_expected_and_none
+pf,10715110,107151,,,no_price_expected_and_none
+pf,10718000,107180,,,no_price_expected_and_none
+pf,10719225,107192,,,no_price_expected_and_none
+pf,10735000,107350,,,no_price_expected_and_none
+pf,10775364,107753,,,no_price_expected_and_none
+pf,10793252,107932,,,no_price_expected_and_none
+pf,12433301,124333,,,no_price_expected_and_none
+pf,21046201,210462,,,no_price_expected_and_none
+pf,21074552,210745,,,no_price_expected_and_none
+pf,21074852,210748,,,no_price_expected_and_none
+pf,22020098,220200,,,no_price_expected_and_none
+utt,gi18500dh-4xl,GI18500,,,no_price_expected_and_none
+utt,gi18500hsdnv-m,GI18500,,,no_price_expected_and_none
+utt,gib3000wh-m,GIB3000,,,no_price_expected_and_none
+utt,giB5000na-m,GIB5000,,,no_price_expected_and_none
+utt,giB5000na-xs,GIB5000,,,no_price_expected_and_none
+utt,ka3031olc-xs,KA3031,,,no_price_expected_and_none
+utt,ka545mstgr-3xl,KA545,,,no_price_expected_and_none
+utt,ka545br-6xl,KA545,,,no_price_expected_and_none
+fr,BY191::Union Beige::4XL,BY191,,,no_price_expected_and_none
+fr,BY011::White Sand::4XL,BY011,,,no_price_expected_and_none
+fr,BY004::Magnet::5XL,BY004,,,no_price_expected_and_none
+fr,BY004::Charcoal::5XL,BY004,,,no_price_expected_and_none
+fr,BY407::Pale Olive::XS,BY407,,,no_price_expected_and_none
+fr,BY407::Pale Olive::3XL,BY407,,,no_price_expected_and_none
+fr,BY004::Light Navy::4XL,BY004,,,no_price_expected_and_none
+fr,BY004::Light Navy::5XL,BY004,,,no_price_expected_and_none
+fr,BY004::Dusty Blue::5XL,BY004,,,no_price_expected_and_none
+fr,BY004::Ocean Blue::4XL,BY004,,,no_price_expected_and_none
+fr,BY190::Asphalt::5XL,BY190,,,no_price_expected_and_none
+fr,BY004::Paradise Orange::5XL,BY004,,,no_price_expected_and_none
+fr,6511::Cranberry::One Size,6511,,,no_price_expected_and_none
+fr,BY004::Light Asphalt::4XL,BY004,,,no_price_expected_and_none
+fr,BY004::Hibiskus Pink::4XL,BY004,,,no_price_expected_and_none
+fr,6511::Silver::One Size,6511,,,no_price_expected_and_none
+fr,BY004::Heather Grey::5XL,BY004,,,no_price_expected_and_none
+fr,BY162::White::4XL,BY162,,,no_price_expected_and_none
+fr,BY004::Burgundy::4XL,BY004,,,no_price_expected_and_none
+fr,BY296::Magnet::5XL,BY296,,,no_price_expected_and_none
+fr,6511::Moos Green::S/M,6511,,,no_price_expected_and_none
+fr,BY004::Sand::4XL,BY004,,,no_price_expected_and_none
+fr,6511::Royal::One Size,6511,,,no_price_expected_and_none
+fr,BY162::Grey::4XL,BY162,,,no_price_expected_and_none
+fr,6572::White::S/M,6572,,,no_price_expected_and_none
+fr,BY021::White Sand::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::White Sand::5XL,BY021,,,no_price_expected_and_none
+fr,BY162::Retro Green::4XL,BY162,,,no_price_expected_and_none
+fr,BY162::Retro Green::5XL,BY162,,,no_price_expected_and_none
+fr,BY162::Union Beige::4XL,BY162,,,no_price_expected_and_none
+fr,BY192::Heather Grey::5XL,BY192,,,no_price_expected_and_none
+fr,BY192::Olive::4XL,BY192,,,no_price_expected_and_none
+fr,BY016::Darkshadow/Darkshadow::4XL,BY016,,,no_price_expected_and_none
+fr,BY102::Dark Grey::4XL,BY102,,,no_price_expected_and_none
+fr,6778::Navy::L/XL,6778,,,no_price_expected_and_none
+fr,BY102::Light Grey::5XL,BY102,,,no_price_expected_and_none
+fr,BY270::Asphalt::5XL,BY270,,,no_price_expected_and_none
+fr,6277 FV::Heather::L/XL,6277 FV,,,no_price_expected_and_none
+fr,BY075::Light Asphalt::4XL,BY075,,,no_price_expected_and_none
+fr,BY075::Light Asphalt::5XL,BY075,,,no_price_expected_and_none
+fr,BY102::Beryl Blue::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Powder Blue::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Lilac::5XL,BY102,,,no_price_expected_and_none
+fr,BY163::Magnet::4XL,BY163,,,no_price_expected_and_none
+fr,BY004::Lilac::5XL,BY004,,,no_price_expected_and_none
+fr,BY004::City Red::4XL,BY004,,,no_price_expected_and_none
+fr,6277::Curry::L/XL (57-61cm),6277,,,no_price_expected_and_none
+fr,BY163::Olive::4XL,BY163,,,no_price_expected_and_none
+fr,BY251::Heather Grey::5XL,BY251,,,no_price_expected_and_none
+fr,BY021::Paradise Orange::5XL,BY021,,,no_price_expected_and_none
+fr,BY189::Asphalt::4XL,BY189,,,no_price_expected_and_none
+fr,BY307::Magnet::5XL,BY307,,,no_price_expected_and_none
+fr,BY021::Burgundy::4XL,BY021,,,no_price_expected_and_none
+fr,BY189::Union Beige::4XL,BY189,,,no_price_expected_and_none
+fr,BY021::Teal::4XL,BY021,,,no_price_expected_and_none
+fr,BY189::Dark Khaki::5XL,BY189,,,no_price_expected_and_none
+fr,BY163::White::5XL,BY163,,,no_price_expected_and_none
+fr,BY011::Cobalt Blue::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::Olive::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Chocolate Brown::3XL,BY011,,,no_price_expected_and_none
+fr,BY011::Chocolate Brown::5XL,BY011,,,no_price_expected_and_none
+fr,BY102::Blancwhite::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Forgotten Orange::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Olive::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Bottle Green::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Sand::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Wet Sand::5XL,BY102,,,no_price_expected_and_none
+fr,BY211::Pale Olive::4XL,BY211,,,no_price_expected_and_none
+fr,BY021::Dusk Rose::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Dusk Rose::5XL,BY021,,,no_price_expected_and_none
+fr,BY021::Ready For Dye::4XL,BY021,,,no_price_expected_and_none
+fr,6511::Blue::S/M,6511,,,no_price_expected_and_none
+ss,STJW190C1762X,STJW190,,,no_price_expected_and_none
+bb,QS87-BLACK/GREY,QS87,,,no_price_expected_and_none
+bb,QS275-RED/BLACK,QS275,,,no_price_expected_and_none
+bb,QS65-NAVY/WHITE,QS65,,,no_price_expected_and_none
+bb,QS65-RED/BLACK/WHITE,QS65,,,no_price_expected_and_none
+bb,QS76-NAVY/WHITE,QS76,,,no_price_expected_and_none
+bb,T103-CLEAR,T103,,,no_price_expected_and_none
+bb,T108-CLEAR,T108,,,no_price_expected_and_none
+pf,10715415,107154,,,no_price_expected_and_none
+pf,21046262,210462,,,no_price_expected_and_none
+pf,21046290,210462,,,no_price_expected_and_none
+pf,21074664,210746,,,no_price_expected_and_none
+pf,10715122,107151,,,no_price_expected_and_none
+pf,10715900,107159,,,no_price_expected_and_none
+pf,10716900,107169,,,no_price_expected_and_none
+pf,10718109,107181,,,no_price_expected_and_none
+pf,10718115,107181,,,no_price_expected_and_none
+pf,10719200,107192,,,no_price_expected_and_none
+pf,10734201,107342,,,no_price_expected_and_none
+pf,10735055,107350,,,no_price_expected_and_none
+pf,10793790,107937,,,no_price_expected_and_none
+pf,10795090,107950,,,no_price_expected_and_none
+pf,10795290,107952,,,no_price_expected_and_none
+pf,10795352,107953,,,no_price_expected_and_none
+pf,10795590,107955,,,no_price_expected_and_none
+pf,K66811ZC,K6681,,,no_price_expected_and_none
+pf,10775353,107753,,,no_price_expected_and_none
+pf,21046206,210462,,,no_price_expected_and_none
+pf,21074501,210745,,,no_price_expected_and_none
+pf,21074506,210745,,,no_price_expected_and_none
+pf,21074590,210745,,,no_price_expected_and_none
+pf,21074801,210748,,,no_price_expected_and_none
+pf,10735021,107350,,,no_price_expected_and_none
+utt,gib3000wh-xs,GIB3000,,,no_price_expected_and_none
+utt,gib3000wh-s,GIB3000,,,no_price_expected_and_none
+utt,gib3000wh-l,GIB3000,,,no_price_expected_and_none
+utt,gib3000wh-xl,GIB3000,,,no_price_expected_and_none
+utt,giB5000wh-m,GIB5000,,,no_price_expected_and_none
+utt,giB5000wh-l,GIB5000,,,no_price_expected_and_none
+utt,giB5000wh-s,GIB5000,,,no_price_expected_and_none
+utt,giB5000wh-xl,GIB5000,,,no_price_expected_and_none
+utt,gil64000-exwh-l,GIL64000-EX,,,no_price_expected_and_none
+utt,ka101wh-u,KA101,,,no_price_expected_and_none
+utt,ka4008nv-4xl,KA4008,,,no_price_expected_and_none
+utt,ka4009sg-xxs,KA4009,,,no_price_expected_and_none
+utt,retrj389bl-33,RETRJ389,,,no_price_expected_and_none
+utt,retrs250fgr-7/8,RETRS250,,,no_price_expected_and_none
+fr,BY191::Union Beige::5XL,BY191,,,no_price_expected_and_none
+fr,BY406::Pale Olive::2XS,BY406,,,no_price_expected_and_none
+fr,BY284::Powder Blue::5XL,BY284,,,no_price_expected_and_none
+fr,BY011::White Sand::5XL,BY011,,,no_price_expected_and_none
+fr,BY285::Magnet::5XL,BY285,,,no_price_expected_and_none
+fr,BY004::Navy::5XL,BY004,,,no_price_expected_and_none
+fr,BY004::Dusty Blue::4XL,BY004,,,no_price_expected_and_none
+fr,BY004::Heaven Blue::4XL,BY004,,,no_price_expected_and_none
+fr,BY191::Asphalt::5XL,BY191,,,no_price_expected_and_none
+fr,BY011::Light Navy::5XL,BY011,,,no_price_expected_and_none
+fr,BY190::Asphalt::4XL,BY190,,,no_price_expected_and_none
+fr,6511::Red::One Size,6511,,,no_price_expected_and_none
+fr,BY364::Cloud::4XL,BY364,,,no_price_expected_and_none
+fr,BY015::Black/Red::3XL,BY015,,,no_price_expected_and_none
+fr,BY075::Grey::5XL,BY075,,,no_price_expected_and_none
+fr,BY075::Union Beige::4XL,BY075,,,no_price_expected_and_none
+fr,BY004::Heather Grey::4XL,BY004,,,no_price_expected_and_none
+fr,BY004::Cobalt Blue::4XL,BY004,,,no_price_expected_and_none
+fr,BY004::Cobalt Blue::5XL,BY004,,,no_price_expected_and_none
+fr,BY162::White::5XL,BY162,,,no_price_expected_and_none
+fr,6511::Moos Green::L/XL,6511,,,no_price_expected_and_none
+fr,BY004::Frozen Yellow::5XL,BY004,,,no_price_expected_and_none
+fr,BY004::Bark::5XL,BY004,,,no_price_expected_and_none
+fr,BY193::Light Asphalt::5XL,BY193,,,no_price_expected_and_none
+fr,BY042::Pink::M,BY042,,,no_price_expected_and_none
+fr,6511::Navy::One Size,6511,,,no_price_expected_and_none
+fr,BY162::Olive::4XL,BY162,,,no_price_expected_and_none
+fr,BY162::Olive::5XL,BY162,,,no_price_expected_and_none
+fr,BY162::Sand::4XL,BY162,,,no_price_expected_and_none
+fr,BY251::Sand::5XL,BY251,,,no_price_expected_and_none
+fr,BY192::Heather Grey::4XL,BY192,,,no_price_expected_and_none
+fr,BY192::Olive::3XL,BY192,,,no_price_expected_and_none
+fr,6778::Royal::S/M,6778,,,no_price_expected_and_none
+fr,BY102::Charcoal::4XL,BY102,,,no_price_expected_and_none
+fr,BY270::Asphalt::4XL,BY270,,,no_price_expected_and_none
+fr,BY102::Light Navy::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Light Navy::5XL,BY102,,,no_price_expected_and_none
+fr,180::Maroon::L/XL,180,,,no_price_expected_and_none
+fr,BY102::Powder Blue::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::City Red::5XL,BY102,,,no_price_expected_and_none
+fr,BY305::Magnet::4XL,BY305,,,no_price_expected_and_none
+fr,BY301::Magnet::4XL,BY301,,,no_price_expected_and_none
+fr,BY163::Magnet::5XL,BY163,,,no_price_expected_and_none
+fr,BY163::Navy::5XL,BY163,,,no_price_expected_and_none
+fr,6277::Dark Grey::2XL (59-64cm),6277,,,no_price_expected_and_none
+fr,BY012::City Red::4XL,BY012,,,no_price_expected_and_none
+fr,BY042::Ocean Blue::S,BY042,,,no_price_expected_and_none
+fr,BY004::Bottle Green::5XL,BY004,,,no_price_expected_and_none
+fr,BY021::Blue Mint::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Blue Mint::5XL,BY021,,,no_price_expected_and_none
+fr,BY021::Paradise Orange::4XL,BY021,,,no_price_expected_and_none
+fr,BY189::Asphalt::5XL,BY189,,,no_price_expected_and_none
+fr,BY297::Magnet::4XL,BY297,,,no_price_expected_and_none
+fr,BY021::Burgundy::5XL,BY021,,,no_price_expected_and_none
+fr,BY189::Vintage Blue::5XL,BY189,,,no_price_expected_and_none
+fr,BY021::Teal::5XL,BY021,,,no_price_expected_and_none
+fr,BY190::Dark Khaki::4XL,BY190,,,no_price_expected_and_none
+fr,BY407::Pale Olive::4XL,BY407,,,no_price_expected_and_none
+fr,BY011::City Red::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::City Red::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Burgundy::5XL,BY011,,,no_price_expected_and_none
+fr,BY102::Dark Blue::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Forgotten Orange::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Chocolate Brown::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Wet Sand::4XL,BY102,,,no_price_expected_and_none
+fr,BY012::Olive::5XL,BY012,,,no_price_expected_and_none
+fr,BY211::White Sand::5XL,BY211,,,no_price_expected_and_none
+fr,BY021::White::5XL,BY021,,,no_price_expected_and_none
+fr,BY021::Charcoal::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Navy::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Navy::5XL,BY021,,,no_price_expected_and_none
+fr,BY021::Hibiskus Pink::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Hibiskus Pink::5XL,BY021,,,no_price_expected_and_none
+fr,BY021::Pink::5XL,BY021,,,no_price_expected_and_none
+fr,6277VC::Wideland::L/XL,6277VC,,,no_price_expected_and_none
+fr,6210::Red::L/XL,6210,,,no_price_expected_and_none
+fr,6210::Brown::L/XL,6210,,,no_price_expected_and_none
+bb,QS275-BLACK,QS275,,,no_price_expected_and_none
+bb,QS275-ROYAL/BLACK,QS275,,,no_price_expected_and_none
+bb,QS287-NAVY/BLACK,QS287,,,no_price_expected_and_none
+bb,QS75-RED/BLACK/WHITE,QS75,,,no_price_expected_and_none
+bb,QS65-BLACK/GREY,QS65,,,no_price_expected_and_none
+bb,QS76-RED/BLACK/WHITE,QS76,,,no_price_expected_and_none
+bb,QS76-BLACK/GREY,QS76,,,no_price_expected_and_none
+bb,QS76-BOTTLEGREEN/BLACK/WHITE,QS76,,,no_price_expected_and_none
+bb,T106-CLEAR,T106,,,no_price_expected_and_none
+bb,T107-CLEAR,T107,,,no_price_expected_and_none
+bb,T104-CLEAR,T104,,,no_price_expected_and_none
+pf,10715302,107153,,,no_price_expected_and_none
+pf,10715321,107153,,,no_price_expected_and_none
+pf,21046240,210462,,,no_price_expected_and_none
+pf,21074564,210745,,,no_price_expected_and_none
+pf,21074622,210746,,,no_price_expected_and_none
+pf,21074640,210746,,,no_price_expected_and_none
+pf,21074652,210746,,,no_price_expected_and_none
+pf,21074662,210746,,,no_price_expected_and_none
+pf,21074862,210748,,,no_price_expected_and_none
+pf,21074864,210748,,,no_price_expected_and_none
+pf,10715200,107152,,,no_price_expected_and_none
+pf,10716800,107168,,,no_price_expected_and_none
+pf,10715102,107151,,,no_price_expected_and_none
+pf,10715109,107151,,,no_price_expected_and_none
+pf,10715115,107151,,,no_price_expected_and_none
+pf,10715825,107158,,,no_price_expected_and_none
+pf,10716000,107160,,,no_price_expected_and_none
+pf,10716709,107167,,,no_price_expected_and_none
+pf,10733900,107339,,,no_price_expected_and_none
+pf,10734200,107342,,,no_price_expected_and_none
+pf,10735082,107350,,,no_price_expected_and_none
+pf,10775553,107755,,,no_price_expected_and_none
+pf,10775590,107755,,,no_price_expected_and_none
+pf,10793231,107932,,,no_price_expected_and_none
+pf,10795390,107953,,,no_price_expected_and_none
+pf,10795490,107954,,,no_price_expected_and_none
+pf,10795690,107956,,,no_price_expected_and_none
+pf,10715600,107156,,,no_price_expected_and_none
+pf,10715609,107156,,,no_price_expected_and_none
+pf,13006790,130067,,,no_price_expected_and_none
+pf,13007090,130070,,,no_price_expected_and_none
+pf,13007290,130072,,,no_price_expected_and_none
+pf,13007490,130074,,,no_price_expected_and_none
+pf,10775321,107753,,,no_price_expected_and_none
+pf,21074806,210748,,,no_price_expected_and_none
+pf,10715400,107154,,,no_price_expected_and_none
+utt,gi4100he-l,GI4100,,,no_price_expected_and_none
+utt,gi64400wh-xl,GI64400,,,no_price_expected_and_none
+utt,gi64400wh-l,GI64400,,,no_price_expected_and_none
+utt,gi64400wh-m,GI64400,,,no_price_expected_and_none
+utt,gi64400wh-s,GI64400,,,no_price_expected_and_none
+utt,giB5000na-l,GIB5000,,,no_price_expected_and_none
+utt,giB5000na-xl,GIB5000,,,no_price_expected_and_none
+utt,giB5000wh-xs,GIB5000,,,no_price_expected_and_none
+utt,ka259re/bl-l,KA259,,,no_price_expected_and_none
+utt,ka548si-s,KA548,,,no_price_expected_and_none
+utt,ka906for-2xl,KA906,,,no_price_expected_and_none
+utt,ka907fye-m,KA907,,,no_price_expected_and_none
+utt,retrfre532bg-5xl,RETRF532,,,no_price_expected_and_none
+utt,retrj389nv-33,RETRJ389,,,no_price_expected_and_none
+utt,retrs223nv-m,RETRS223,,,no_price_expected_and_none
+fr,BY406::Pale Olive::XS,BY406,,,no_price_expected_and_none
+fr,BY364::Magnet::4XL,BY364,,,no_price_expected_and_none
+fr,BY406::Pale Olive::4XL,BY406,,,no_price_expected_and_none
+fr,BY406::Pale Olive::5XL,BY406,,,no_price_expected_and_none
+fr,BY004::Magnet::4XL,BY004,,,no_price_expected_and_none
+fr,BY004::Charcoal::4XL,BY004,,,no_price_expected_and_none
+fr,BY285::Chocolate Brown::4XL,BY285,,,no_price_expected_and_none
+fr,BY004::Navy::4XL,BY004,,,no_price_expected_and_none
+fr,BY191::Asphalt::4XL,BY191,,,no_price_expected_and_none
+fr,BY011::Navy::5XL,BY011,,,no_price_expected_and_none
+fr,BY004::Ocean Blue::5XL,BY004,,,no_price_expected_and_none
+fr,BY004::Paradise Orange::4XL,BY004,,,no_price_expected_and_none
+fr,BY011::Light Asphalt::4XL,BY011,,,no_price_expected_and_none
+fr,BY075::Grey::4XL,BY075,,,no_price_expected_and_none
+fr,BY004::Light Asphalt::5XL,BY004,,,no_price_expected_and_none
+fr,6277::Spicy Orange::L/XL (57-61cm),6277,,,no_price_expected_and_none
+fr,6277::Curry::S/M (54-58cm),6277,,,no_price_expected_and_none
+fr,BY004::Olive::5XL,BY004,,,no_price_expected_and_none
+fr,BY296::Magnet::4XL,BY296,,,no_price_expected_and_none
+fr,BY193::Light Asphalt::4XL,BY193,,,no_price_expected_and_none
+fr,BY004::Sand::5XL,BY004,,,no_price_expected_and_none
+fr,BY162::Grey::5XL,BY162,,,no_price_expected_and_none
+fr,BY162::Dark Grey::5XL,BY162,,,no_price_expected_and_none
+fr,BY162::Sand::5XL,BY162,,,no_price_expected_and_none
+fr,BY192::Olive::XS,BY192,,,no_price_expected_and_none
+fr,BY102::Grey::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Grey::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Lilac::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::City Red::4XL,BY102,,,no_price_expected_and_none
+fr,BY305::Magnet::5XL,BY305,,,no_price_expected_and_none
+fr,BY301::Magnet::5XL,BY301,,,no_price_expected_and_none
+fr,BY102::Soft Salvia::4XL,BY102,,,no_price_expected_and_none
+fr,6277::Dark Navy::2XL (59-64cm),6277,,,no_price_expected_and_none
+fr,BY012::City Red::5XL,BY012,,,no_price_expected_and_none
+fr,BY042::Ocean Blue::XS,BY042,,,no_price_expected_and_none
+fr,BY004::City Red::5XL,BY004,,,no_price_expected_and_none
+fr,BY015::Black/Red::2XL,BY015,,,no_price_expected_and_none
+fr,BY163::Olive::5XL,BY163,,,no_price_expected_and_none
+fr,BY163::Union Beige::4XL,BY163,,,no_price_expected_and_none
+fr,BY163::Union Beige::5XL,BY163,,,no_price_expected_and_none
+fr,BY163::Sand::4XL,BY163,,,no_price_expected_and_none
+fr,BY251::Heather Grey::4XL,BY251,,,no_price_expected_and_none
+fr,BY021::Ocean Blue::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Ocean Blue::5XL,BY021,,,no_price_expected_and_none
+fr,BY189::Soft Lilac::4XL,BY189,,,no_price_expected_and_none
+fr,BY189::Soft Lilac::5XL,BY189,,,no_price_expected_and_none
+fr,BY011::White::4XL,BY011,,,no_price_expected_and_none
+fr,BY021::Pale Leaf::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Pale Leaf::5XL,BY021,,,no_price_expected_and_none
+fr,BY407::Pale Olive::5XL,BY407,,,no_price_expected_and_none
+fr,BY011::Light Asphalt::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Charcoal::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Navy::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::Ocean Blue::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Cobalt Blue::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Lilac::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::Olive::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::Bottle Green::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::Sand::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Chocolate Brown::XS,BY011,,,no_price_expected_and_none
+fr,BY102::Navy::5XL,BY102,,,no_price_expected_and_none
+fr,6277KR::Typhon::L/XL,6277KR,,,no_price_expected_and_none
+fr,BY102::Chocolate Brown::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Union Beige::5XL,BY102,,,no_price_expected_and_none
+fr,BY012::Olive::4XL,BY012,,,no_price_expected_and_none
+fr,BY211::White Sand::4XL,BY211,,,no_price_expected_and_none
+fr,BY211::Pale Olive::5XL,BY211,,,no_price_expected_and_none
+fr,BY211::Chocolate Brown::4XL,BY211,,,no_price_expected_and_none
+fr,BY211::Chocolate Brown::5XL,BY211,,,no_price_expected_and_none
+fr,BY021::White::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Soft Yellow::5XL,BY021,,,no_price_expected_and_none
+fr,BY021::Ready For Dye::5XL,BY021,,,no_price_expected_and_none
+fr,6277T::Black/Red::L/XL,6277T,,,no_price_expected_and_none
+fr,6210::Royal::L/XL,6210,,,no_price_expected_and_none
+fr,6511T::Navy/White::One Size,6511T,,,no_price_expected_and_none
+fr,6511T::Royal/White::One Size,6511T,,,no_price_expected_and_none
+fr,6308::Navy::J (Ages 2-6),6308,,,no_price_expected_and_none
+ss,STJW190C1761S,STJW190,,,no_price_expected_and_none
+ss,STJW190C1761L,STJW190,,,no_price_expected_and_none
+ss,STJW190C1761X,STJW190,,,no_price_expected_and_none
+bb,QS275-NAVY/BLACK,QS275,,,no_price_expected_and_none
+bb,QS75-BOTTLEGREEN/BLACK/WHITE,QS75,,,no_price_expected_and_none
+bb,QS75-NAVY/WHITE,QS75,,,no_price_expected_and_none
+bb,QS75-ROYAL/BLACK/WHITE,QS75,,,no_price_expected_and_none
+bb,QS76-ROYAL/BLACK/WHITE,QS76,,,no_price_expected_and_none
+bb,T101-CLEAR,T101,,,no_price_expected_and_none
+bb,T102-CLEAR,T102,,,no_price_expected_and_none
+pf,10715301,107153,,,no_price_expected_and_none
+pf,10715353,107153,,,no_price_expected_and_none
+pf,10716809,107168,,,no_price_expected_and_none
+pf,10716815,107168,,,no_price_expected_and_none
+pf,21046264,210462,,,no_price_expected_and_none
+pf,21074522,210745,,,no_price_expected_and_none
+pf,21074540,210745,,,no_price_expected_and_none
+pf,21074822,210748,,,no_price_expected_and_none
+pf,21074840,210748,,,no_price_expected_and_none
+pf,10716700,107167,,,no_price_expected_and_none
+pf,10775421,107754,,,no_price_expected_and_none
+pf,10715100,107151,,,no_price_expected_and_none
+pf,10715101,107151,,,no_price_expected_and_none
+pf,10715500,107155,,,no_price_expected_and_none
+pf,10716715,107167,,,no_price_expected_and_none
+pf,10717000,107170,,,no_price_expected_and_none
+pf,10717700,107177,,,no_price_expected_and_none
+pf,10718100,107181,,,no_price_expected_and_none
+pf,10735001,107350,,,no_price_expected_and_none
+pf,10775390,107753,,,no_price_expected_and_none
+pf,10775464,107754,,,no_price_expected_and_none
+pf,10775490,107754,,,no_price_expected_and_none
+pf,10793161,107931,,,no_price_expected_and_none
+pf,10793190,107931,,,no_price_expected_and_none
+pf,10794190,107941,,,no_price_expected_and_none
+pf,10794690,107946,,,no_price_expected_and_none
+pf,10794990,107949,,,no_price_expected_and_none
+pf,10795790,107957,,,no_price_expected_and_none
+pf,10715615,107156,,,no_price_expected_and_none
+pf,10715700,107157,,,no_price_expected_and_none
+pf,10715800,107158,,,no_price_expected_and_none
+pf,21046252,210462,,,no_price_expected_and_none
+pf,21074601,210746,,,no_price_expected_and_none
+pf,21074606,210746,,,no_price_expected_and_none
+pf,21074890,210748,,,no_price_expected_and_none
+pf,22020099,220200,,,no_price_expected_and_none
+utt,gi64400wh-2xl,GI64400,,,no_price_expected_and_none
+utt,gi64400wh-3xl,GI64400,,,no_price_expected_and_none
+utt,giB5000na-s,GIB5000,,,no_price_expected_and_none
+utt,ka473pu-m,KA473,,,no_price_expected_and_none
+utt,ka586bl-xs,KA586,,,no_price_expected_and_none
+utt,ka586wh-xs,KA586,,,no_price_expected_and_none
+utt,retra688brye/bl-l,RETRA688,,,no_price_expected_and_none
+fr,BY406::Pale Olive::3XL,BY406,,,no_price_expected_and_none
+fr,BY284::Powder Blue::4XL,BY284,,,no_price_expected_and_none
+fr,BY256::Sand::4XL,BY256,,,no_price_expected_and_none
+fr,BY256::Sand::5XL,BY256,,,no_price_expected_and_none
+fr,BY285::Magnet::4XL,BY285,,,no_price_expected_and_none
+fr,BY407::Pale Olive::2XS,BY407,,,no_price_expected_and_none
+fr,BY285::Chocolate Brown::5XL,BY285,,,no_price_expected_and_none
+fr,BY011::Heather Grey::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::Heather Grey::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Light Navy::4XL,BY011,,,no_price_expected_and_none
+fr,BY004::Heaven Blue::5XL,BY004,,,no_price_expected_and_none
+fr,6511::Buck::One Size,6511,,,no_price_expected_and_none
+fr,BY075::Union Beige::5XL,BY075,,,no_price_expected_and_none
+fr,BY004::Hibiskus Pink::5XL,BY004,,,no_price_expected_and_none
+fr,BY004::Lilac::4XL,BY004,,,no_price_expected_and_none
+fr,BY004::Burgundy::5XL,BY004,,,no_price_expected_and_none
+fr,BY004::Olive::4XL,BY004,,,no_price_expected_and_none
+fr,6511::Dark Grey::One Size,6511,,,no_price_expected_and_none
+fr,BY004::Frozen Yellow::4XL,BY004,,,no_price_expected_and_none
+fr,BY004::Bark::4XL,BY004,,,no_price_expected_and_none
+fr,BY004::Union Beige::4XL,BY004,,,no_price_expected_and_none
+fr,BY004::Union Beige::5XL,BY004,,,no_price_expected_and_none
+fr,BY042::Light Navy::S,BY042,,,no_price_expected_and_none
+fr,BY162::Dark Grey::4XL,BY162,,,no_price_expected_and_none
+fr,BY162::Union Beige::5XL,BY162,,,no_price_expected_and_none
+fr,BY163::Sand::5XL,BY163,,,no_price_expected_and_none
+fr,BY251::Sand::4XL,BY251,,,no_price_expected_and_none
+fr,BY192::Olive::5XL,BY192,,,no_price_expected_and_none
+fr,BY016::Darkshadow/Darkshadow::5XL,BY016,,,no_price_expected_and_none
+fr,BY016::Navy/Navy::4XL,BY016,,,no_price_expected_and_none
+fr,BY016::Navy/Navy::5XL,BY016,,,no_price_expected_and_none
+fr,BY102::Dark Grey::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Charcoal::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Light Grey::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Beryl Blue::5XL,BY102,,,no_price_expected_and_none
+fr,BY163::Navy::4XL,BY163,,,no_price_expected_and_none
+fr,BY102::Soft Salvia::5XL,BY102,,,no_price_expected_and_none
+fr,BY004::Bottle Green::4XL,BY004,,,no_price_expected_and_none
+fr,BY307::Magnet::4XL,BY307,,,no_price_expected_and_none
+fr,BY297::Magnet::5XL,BY297,,,no_price_expected_and_none
+fr,BY021::Pale Leaf::M,BY021,,,no_price_expected_and_none
+fr,BY189::Vintage Blue::4XL,BY189,,,no_price_expected_and_none
+fr,BY011::White::5XL,BY011,,,no_price_expected_and_none
+fr,BY189::Union Beige::5XL,BY189,,,no_price_expected_and_none
+fr,BY021::Olive::5XL,BY021,,,no_price_expected_and_none
+fr,BY189::Dark Khaki::4XL,BY189,,,no_price_expected_and_none
+fr,BY190::Dark Khaki::5XL,BY190,,,no_price_expected_and_none
+fr,BY163::White::4XL,BY163,,,no_price_expected_and_none
+fr,BY011::Charcoal::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::Ocean Blue::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::Lilac::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Burgundy::4XL,BY011,,,no_price_expected_and_none
+fr,BY369::Cloud::4XL,BY369,,,no_price_expected_and_none
+fr,BY369::Magnet::4XL,BY369,,,no_price_expected_and_none
+fr,BY011::Pale Leaf::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::Pale Leaf::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Bottle Green::5XL,BY011,,,no_price_expected_and_none
+fr,BY011::Sand::4XL,BY011,,,no_price_expected_and_none
+fr,BY011::Chocolate Brown::4XL,BY011,,,no_price_expected_and_none
+fr,BY102::Blancwhite::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Light Asphalt::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Light Asphalt::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Navy::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Dark Blue::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Cobalt Blue::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Cobalt Blue::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Hibiskus Pink::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Hibiskus Pink::5XL,BY102,,,no_price_expected_and_none
+fr,BY102::Olive::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Bottle Green::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Union Beige::4XL,BY102,,,no_price_expected_and_none
+fr,BY102::Sand::4XL,BY102,,,no_price_expected_and_none
+fr,BY021::Heather Grey::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Heather Grey::5XL,BY021,,,no_price_expected_and_none
+fr,BY021::Charcoal::5XL,BY021,,,no_price_expected_and_none
+fr,BY021::Light Navy::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Light Navy::5XL,BY021,,,no_price_expected_and_none
+fr,BY021::Pink::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Olive::4XL,BY021,,,no_price_expected_and_none
+fr,BY021::Soft Yellow::4XL,BY021,,,no_price_expected_and_none
+fr,6533T::Navy/White::L/XL,6533T,,,no_price_expected_and_none
+fr,6511::Blue::L/XL,6511,,,no_price_expected_and_none

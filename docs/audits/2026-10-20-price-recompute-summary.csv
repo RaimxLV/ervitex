@@ -1,0 +1,14 @@
+src,status,variants,styles
+bb,no_price_expected_and_none,32,14
+bb,ok,2931,658
+fr,no_price_expected_and_none,308,44
+fr,ok,2617,255
+mf,ok,15521,418
+nwg,ok,64419,2858
+pf,no_price_expected_and_none,116,49
+pf,ok,19607,2110
+ru,ok,93,93
+ss,no_price_expected_and_none,6,1
+ss,ok,10651,159
+utt,no_price_expected_and_none,44,22
+utt,ok,18238,399
