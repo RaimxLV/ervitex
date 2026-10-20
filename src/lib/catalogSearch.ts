@@ -368,7 +368,7 @@ export const digitsMatch = (id: string, codeDigits: string, queryDigits: string)
 
 /** Koda daļas: burtu prefikss + viena ciparu grupa + burtu sufikss (STTU169 → sttu/169/""). */
 export const codeParts = (id?: string | null): { prefix: string; digits: string; suffix: string } | null => {
-  const m = normalizeSearch(id).replace(/ /g, "").match(/^([a-z]*)(\d+)([a-z]*)$/);
+  const m = normalizeSearch(id).replace(/ /g, "").match(/^([a-z]*)(\d+)([a-z-]*)$/);
   return m ? { prefix: m[1], digits: m[2], suffix: m[3] } : null;
 };
 
