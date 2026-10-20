@@ -18,6 +18,7 @@ interface QuoteFormProps {
 const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
   const { lang } = useLanguage();
   const { toast } = useToast();
+  const fieldId = useId();
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
   const { submission, locked, sync, rejected, discard } = usePendingRequest(`quote:${productId || "general"}`, ({ payload: p }) =>
