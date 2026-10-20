@@ -2753,6 +2753,99 @@ export type Database = {
         }
         Relationships: []
       }
+      translation_cache: {
+        Row: {
+          created_at: string
+          key: string
+          lease_token: string | null
+          lease_until: string | null
+          manual: boolean
+          model: string | null
+          source_text: string | null
+          status: string
+          target: string
+          translated: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          lease_token?: string | null
+          lease_until?: string | null
+          manual?: boolean
+          model?: string | null
+          source_text?: string | null
+          status?: string
+          target: string
+          translated?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          lease_token?: string | null
+          lease_until?: string | null
+          manual?: boolean
+          model?: string | null
+          source_text?: string | null
+          status?: string
+          target?: string
+          translated?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      translation_rate: {
+        Row: {
+          bucket: string
+          count: number
+          window_start: string
+        }
+        Insert: {
+          bucket: string
+          count?: number
+          window_start: string
+        }
+        Update: {
+          bucket?: string
+          count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
+      translation_stats: {
+        Row: {
+          ai_calls: number
+          ai_failures: number
+          day: string
+          hits: number
+          limited: number
+          misses: number
+          rejected: number
+          requests: number
+        }
+        Insert: {
+          ai_calls?: number
+          ai_failures?: number
+          day: string
+          hits?: number
+          limited?: number
+          misses?: number
+          rejected?: number
+          requests?: number
+        }
+        Update: {
+          ai_calls?: number
+          ai_failures?: number
+          day?: string
+          hits?: number
+          limited?: number
+          misses?: number
+          rejected?: number
+          requests?: number
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -3426,6 +3519,42 @@ export type Database = {
           source: string
           total_variants: number
         }[]
+      }
+      translation_claim: {
+        Args: {
+          _keys: string[]
+          _lease_seconds: number
+          _target: string
+          _token: string
+        }
+        Returns: string[]
+      }
+      translation_complete: {
+        Args: { _model: string; _rows: Json; _token: string }
+        Returns: number
+      }
+      translation_rate_take: {
+        Args: { _bucket: string; _cap: number; _n: number; _window: string }
+        Returns: boolean
+      }
+      translation_record_stats: {
+        Args: {
+          _ai_calls: number
+          _ai_failures: number
+          _hits: number
+          _limited: number
+          _misses: number
+          _rejected: number
+        }
+        Returns: undefined
+      }
+      translation_release: {
+        Args: { _keys: string[]; _token: string }
+        Returns: undefined
+      }
+      translation_take_budget: {
+        Args: { _ai_calls: number; _ip_hash: string; _requests: number }
+        Returns: string
       }
       utt_markup: { Args: { _brand: string }; Returns: number }
       validate_discount: { Args: { _d: Json }; Returns: undefined }
