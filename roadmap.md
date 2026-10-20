@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] 09:22 drošības precizējums: pabeigt admina pašreizējās pārbaudes, tad avotos pierādīt MF standarta/akciju izņēmumus un Russell iepirkuma bāzi; neatkārtot root noraidīto plašo SQL, nepublicēt. Iepriekšējais cenu pabeigtības ieraksts nav aktuālā stāvokļa pierādījums.
 - [x] Malfini ×1,75 un Russell ×1,70: MF autorizētas 15584 cenas sakrīt; mērķēts pārrēķins, privāta kopija, DB/importa/audita formulas un MF funkcija izvietotas; 0 neatbilstību MF15521/RU93 publiskajās cenās, bez pilnas sinhronizācijas/frontend izlaiduma.
 - [ ] Russell aktuālā ārējā iepirkuma avota pārbaude — projektā nav atrasts autorizēts avots/importētājs; esošo 93 modeļu cenas un ×1,70 pārbaudītas datubāzē, ne pie piegādātāja.
 - [x] 6400 meklēšana: UTT+GI/GIB/GIL četru/piecu ciparu tokenu noteikums; testi un abi meklētāji; bez DB/sinhronizācijas/publicēšanas.
