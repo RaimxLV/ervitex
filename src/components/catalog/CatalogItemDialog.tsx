@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { bbImageBelongsToStyle, bbAssignImageColor, neutralFallback } from "@/lib/bbImageOwnership";
+import { stripBbFooterLinks } from "../../../supabase/functions/_shared/bbFeatures";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
