@@ -12,6 +12,9 @@ export const LIMITS = {
   pollAttempts: 4,
   pollDelayMs: 1500,
   aiAttempts: 2,
+  /** AI fetch timeout; 2 attempts + backoff (~51 s) stay well inside the DB lease. */
+  aiTimeoutMs: 25000,
+  leaseSeconds: 90,
 };
 
 /** Catalog sources whose product text may be translated, mapped to their style table/key. */
@@ -47,28 +50,53 @@ export async function cacheKey(text: string, target: Target): Promise<string> {
   return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-export function tokens(s: string): string[] {
-  return (s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().match(/[a-z0-9]{3,}/g) || []);
+/** UI-compatible normalisation used only for matching (never for cache keys). */
+export function normalizeForMatch(s: string): string {
+  return s
+    .replace(/<br\s*\/?\s*>/gi, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'")
+    .replace(/[•▪✓·|]/g, " ")
+    .normalize("NFC")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
 }
 
-/** Collect every word token from all string leaves of server-known product rows. */
-export function buildKnownTokens(values: unknown): Set<string> {
-  const out = new Set<string>();
+/** Every string leaf (and object key) of the server-loaded product rows, normalised. */
+export function buildKnownContent(values: unknown): string[] {
+  const out: string[] = [];
   const walk = (v: unknown, depth: number) => {
     if (depth > 8 || v == null) return;
-    if (typeof v === "string") { for (const t of tokens(v)) out.add(t); return; }
+    if (typeof v === "string") { const n = normalizeForMatch(v); if (n) out.push(n); return; }
     if (Array.isArray(v)) { for (const x of v) walk(x, depth + 1); return; }
-    if (typeof v === "object") { for (const x of Object.values(v as Record<string, unknown>)) walk(x, depth + 1); }
+    if (typeof v === "object") {
+      for (const [k, x] of Object.entries(v as Record<string, unknown>)) { out.push(normalizeForMatch(k)); walk(x, depth + 1); }
+    }
   };
   walk(values, 0);
   return out;
 }
 
-/** A text is server-known only if every word of it occurs in the product's stored content. */
-export function isKnownText(text: string, known: Set<string>): boolean {
-  const toks = tokens(text);
-  if (toks.length === 0) return text.trim().length <= 24; // e.g. "XL", "S-M"
-  return toks.every((t) => known.has(t));
+const WORD = /[\p{L}\p{N}]/u;
+function containsAligned(leaf: string, part: string): boolean {
+  for (let i = leaf.indexOf(part); i !== -1; i = leaf.indexOf(part, i + 1)) {
+    const end = i + part.length;
+    if ((i === 0 || !WORD.test(leaf[i - 1])) && (end === leaf.length || !WORD.test(leaf[end]))) return true;
+  }
+  return false;
+}
+
+/**
+ * A text is server-known only if it is a contiguous, word-aligned segment of one stored
+ * field, or whole such segments joined with "; " (as the care block does). Reordered or
+ * invented word combinations are rejected.
+ */
+export function isKnownText(text: string, known: string[]): boolean {
+  // "; " joins care segments; ": " joins a stored label with its stored value (e.g. "Brand: ProJob").
+  const parts = text.split(/;\s*|:\s+/).map((p) => normalizeForMatch(p.replace(/^\s*[-*]\s*/, ""))).filter(Boolean);
+  if (!parts.length) return false;
+  return parts.every((p) => known.some((leaf) => containsAligned(leaf, p)));
 }
 
 export type ValidRequest = { ok: true; source: string; id: string; target: Target; texts: string[] };
@@ -112,11 +140,12 @@ export function parseAiArray(content: string, n: number): string[] | null {
 
 export interface TranslationStore {
   lookup(keys: string[]): Promise<Map<string, string>>;
-  /** Atomically claim keys nobody is translating (or whose lease expired). */
+  /** Atomically claim keys nobody is translating (or whose lease expired); fenced by this request's lease token. */
   claim(keys: string[], target: Target): Promise<Set<string>>;
+  /** Writes only rows still owned by this request's lease token; never overwrites manual rows. */
   complete(rows: { key: string; target: Target; source: string; translated: string }[]): Promise<void>;
   release(keys: string[]): Promise<void>;
-  /** Returns true when an AI call is allowed for this caller and globally. */
+  /** Atomically reserves one AI call for this caller and globally; false when a cap is reached. */
   takeAiBudget(): Promise<boolean>;
 }
 
@@ -126,8 +155,8 @@ export async function translateBatch(opts: {
   texts: string[];
   target: Target;
   store: TranslationStore;
-  /** Loads server-known product content tokens; called only when there are cache misses. */
-  loadKnown: () => Promise<Set<string> | null>;
+  /** Loads server-known product content; called only when there are cache misses. */
+  loadKnown: () => Promise<string[] | null>;
   ai: (texts: string[], target: Target) => Promise<string[] | null>;
   sleep?: (ms: number) => Promise<void>;
 }): Promise<{ translations: string[]; complete: boolean; counts: Counts }> {
@@ -163,25 +192,23 @@ export async function translateBatch(opts: {
     const mine = missing.filter((k) => claimed.has(k));
     const others = missing.filter((k) => !claimed.has(k));
     if (mine.length) {
-      if (!(await store.takeAiBudget())) {
-        counts.limited = mine.length;
+      let result: string[] | null = null;
+      let limited = false;
+      for (let attempt = 0; attempt < LIMITS.aiAttempts && !result; attempt++) {
+        // Every attempt, including retries, consumes budget.
+        if (!(await store.takeAiBudget())) { limited = true; break; }
+        counts.aiCalls++;
+        try { result = await ai(mine.map((k) => canon.get(k)!), target); } catch { result = null; }
+        if (!result) { counts.aiFailures++; if (attempt + 1 < LIMITS.aiAttempts) await sleep(1000); }
+      }
+      if (result) {
+        const rows = mine.map((k, i) => ({ key: k, target, source: canon.get(k)!, translated: result![i] }));
+        await store.complete(rows);
+        rows.forEach((r) => found.set(r.key, r.translated));
+      } else {
+        if (limited) counts.limited = mine.length;
         await store.release(mine);
         mine.forEach((k) => unresolved.add(k));
-      } else {
-        let result: string[] | null = null;
-        for (let attempt = 0; attempt < LIMITS.aiAttempts && !result; attempt++) {
-          counts.aiCalls++;
-          try { result = await ai(mine.map((k) => canon.get(k)!), target); } catch { result = null; }
-          if (!result) { counts.aiFailures++; if (attempt + 1 < LIMITS.aiAttempts) await sleep(1000); }
-        }
-        if (result) {
-          const rows = mine.map((k, i) => ({ key: k, target, source: canon.get(k)!, translated: result![i] }));
-          await store.complete(rows);
-          rows.forEach((r) => found.set(r.key, r.translated));
-        } else {
-          await store.release(mine);
-          mine.forEach((k) => unresolved.add(k));
-        }
       }
     }
     // Another request is translating these right now: wait briefly for its result instead of paying twice.
@@ -199,6 +226,6 @@ export async function translateBatch(opts: {
     const k = keyOf[i];
     if (k && found.has(k)) out[i] = found.get(k)!;
   });
-  // Rejected texts are deterministic (never translatable), so they don't make the result incomplete.
-  return { translations: out, complete: unresolved.size === 0, counts };
+  // Rejected texts stay untranslated and mark the result incomplete so the browser never pins them.
+  return { translations: out, complete: unresolved.size === 0 && counts.rejected === 0, counts };
 }

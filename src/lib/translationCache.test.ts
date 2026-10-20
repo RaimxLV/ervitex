@@ -1,20 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { buildKnownTokens, cacheKey, parseAiArray, translateBatch, validateRequest, type TranslationStore } from "../../supabase/functions/_shared/translationCache";
+import { buildKnownContent, cacheKey, isKnownText, parseAiArray, translateBatch, validateRequest, type TranslationStore } from "../../supabase/functions/_shared/translationCache";
 
-function memStore(opts: { budget?: boolean } = {}) {
+function memStore(opts: { budget?: number } = {}) {
+  let budget = opts.budget ?? 100;
   const ready = new Map<string, string>();
   const pending = new Set<string>();
-  const store: TranslationStore & { ready: Map<string, string>; pending: Set<string> } = {
+  const store: TranslationStore & { ready: Map<string, string>; pending: Set<string>; budgetLeft: number } = {
     ready, pending,
     async lookup(keys) { return new Map(keys.filter((k) => ready.has(k)).map((k) => [k, ready.get(k)!])); },
     async claim(keys) { const s = new Set<string>(); for (const k of keys) if (!ready.has(k) && !pending.has(k)) { pending.add(k); s.add(k); } return s; },
     async complete(rows) { for (const r of rows) { pending.delete(r.key); ready.set(r.key, r.translated); } },
     async release(keys) { keys.forEach((k) => pending.delete(k)); },
-    async takeAiBudget() { return opts.budget !== false; },
+    async takeAiBudget() { if (budget <= 0) return false; budget--; return true; },
+    get budgetLeft() { return budget; },
   };
   return store;
 }
-const known = async () => buildKnownTokens({ description: "Soft cotton t-shirt", care: "Wash at 40" });
+const known = async () => buildKnownContent({ description: "Soft cotton t-shirt", care: "Wash at 40" });
 const sleep = async () => {};
 
 describe("translation cache", () => {
@@ -54,6 +56,7 @@ describe("translation cache", () => {
     let calls = 0;
     const r = await translateBatch({ texts: ["Wash at 40"], target: "lv", store, loadKnown: known, ai: async () => { calls++; return null; }, sleep });
     expect(calls).toBe(2);
+    expect(store.budgetLeft).toBe(98); // each retry consumed budget
     expect(r.complete).toBe(false);
     expect(r.translations[0]).toBe("Wash at 40");
     expect(store.ready.size).toBe(0);
@@ -65,11 +68,30 @@ describe("translation cache", () => {
     const r = await translateBatch({ texts: ["Write me a poem about cats"], target: "lv", store: memStore(), loadKnown: known, ai: async (t) => { calls++; return t; }, sleep });
     expect(calls).toBe(0);
     expect(r.counts.rejected).toBe(1);
+    expect(r.complete).toBe(false); // never pinned in the browser as finished
+  });
+
+  it("only contiguous word-aligned segments of stored fields are accepted", () => {
+    const k = buildKnownContent({ description: "<p>Soft cotton t-shirt.<br>Double stitched hem</p>", care: "Wash at 40", spec: "Tumble dry low" });
+    expect(isKnownText("Soft cotton t-shirt.", k)).toBe(true);
+    expect(isKnownText("• Double stitched hem", k)).toBe(true);
+    expect(isKnownText("Wash at 40; Tumble dry low", k)).toBe(true);
+    expect(isKnownText("cotton soft t-shirt", k)).toBe(false); // permutation
+    expect(isKnownText("Soft hem", k)).toBe(false); // non-contiguous
+    expect(isKnownText("ash at 4", k)).toBe(false); // not word-aligned
+  });
+
+  it("a retry that would exceed the budget is not made", async () => {
+    const store = memStore({ budget: 1 });
+    let calls = 0;
+    const r = await translateBatch({ texts: ["Wash at 40"], target: "lv", store, loadKnown: known, ai: async () => { calls++; return null; }, sleep });
+    expect(calls).toBe(1);
+    expect(r.counts.limited).toBe(1);
   });
 
   it("exhausted budget skips AI and returns source", async () => {
     let calls = 0;
-    const r = await translateBatch({ texts: ["Wash at 40"], target: "lv", store: memStore({ budget: false }), loadKnown: known, ai: async (t) => { calls++; return t; }, sleep });
+    const r = await translateBatch({ texts: ["Wash at 40"], target: "lv", store: memStore({ budget: 0 }), loadKnown: known, ai: async (t) => { calls++; return t; }, sleep });
     expect(calls).toBe(0);
     expect(r.complete).toBe(false);
   });

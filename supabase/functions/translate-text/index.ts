@@ -2,7 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   LIMITS,
   SOURCE_TABLES,
-  buildKnownTokens,
+  buildKnownContent,
   parseAiArray,
   translateBatch,
   validateRequest,
@@ -51,6 +51,7 @@ Deno.serve(async (req) => {
     return json({ translations: texts, complete: false }, gate.error ? 200 : 429);
   }
 
+  const leaseToken = crypto.randomUUID();
   const store: TranslationStore = {
     async lookup(keys) {
       const { data, error } = await db.from("translation_cache").select("key,translated").in("key", keys).eq("status", "ready");
@@ -58,16 +59,16 @@ Deno.serve(async (req) => {
       return new Map((data || []).map((r: any) => [r.key, r.translated]));
     },
     async claim(keys, tgt) {
-      const { data, error } = await db.rpc("translation_claim", { _keys: keys, _target: tgt });
+      const { data, error } = await db.rpc("translation_claim", { _keys: keys, _target: tgt, _token: leaseToken, _lease_seconds: LIMITS.leaseSeconds });
       if (error) throw error;
       return new Set((data || []) as string[]);
     },
     async complete(rows) {
-      const { error } = await db.rpc("translation_complete", { _rows: rows, _model: MODEL });
+      const { error } = await db.rpc("translation_complete", { _rows: rows, _model: MODEL, _token: leaseToken });
       if (error) throw error;
     },
     async release(keys) {
-      await db.rpc("translation_release", { _keys: keys });
+      await db.rpc("translation_release", { _keys: keys, _token: leaseToken });
     },
     async takeAiBudget() {
       const { data, error } = await db.rpc("translation_take_budget", { _ip_hash: ipHash, _requests: 0, _ai_calls: 1 });
@@ -83,7 +84,7 @@ Deno.serve(async (req) => {
       source === "pf" ? db.from("pf_variants").select("material").eq("model_code", id).limit(200) : Promise.resolve({ data: null }),
     ]);
     if (!style.data) return null;
-    return buildKnownTokens([style.data, override.data, pfVariants.data]);
+    return buildKnownContent([style.data, override.data, pfVariants.data]);
   };
 
   const ai = async (items: string[], tgt: Target) => {
@@ -94,6 +95,7 @@ INPUT: ${JSON.stringify(items)}
 OUTPUT:`;
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
+      signal: AbortSignal.timeout(LIMITS.aiTimeoutMs),
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${lovableKey}` },
       body: JSON.stringify({ model: MODEL, messages: [{ role: "user", content: prompt }], temperature: 0.2 }),
     });
@@ -116,4 +118,3 @@ OUTPUT:`;
   }
 });
 
-export { LIMITS };

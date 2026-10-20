@@ -1407,7 +1407,13 @@ const CatalogItemDialog = ({
     push(rawMaterial);
     push(rawCare);
     const specsStart = items.length;
-    for (const spec of normalizedContent.specs) { push(translateLabel(spec.label, "lv")); push(translateValue(spec.value, "lv")); }
+    // Labels/values already localised by the built-in dictionary are not sent for AI translation.
+    const lvSpecs = normalizedContent.specs.map((spec) => ({ label: translateLabel(spec.label, "lv"), value: translateValue(spec.value, "lv") }));
+    lvSpecs.forEach((spec, index) => {
+      const orig = normalizedContent.specs[index];
+      push(spec.label !== orig.label ? "" : spec.label);
+      push(spec.value !== orig.value ? "" : spec.value);
+    });
     const nonEmpty = items.some((x) => x && /[a-zA-Z]/.test(x));
     if (!nonEmpty) return;
     const fingerprint = JSON.stringify(items).split("").reduce((hash, c) => Math.imul(hash, 31) + c.charCodeAt(0) | 0, 0);
@@ -1437,7 +1443,7 @@ const CatalogItemDialog = ({
           lines: out.slice(linesStart, linesEnd).filter(Boolean),
           material: out[linesEnd] || null,
           care: out[linesEnd + 1] || null,
-          specs: normalizedContent.specs.map((spec, index) => ({ label: out[specsStart + index * 2] || spec.label, value: out[specsStart + index * 2 + 1] || spec.value })),
+          specs: lvSpecs.map((spec, index) => ({ label: out[specsStart + index * 2] || spec.label, value: out[specsStart + index * 2 + 1] || spec.value })),
         };
         setTranslated(result);
         // Partial results (busy/limited) are shown but not pinned, so a later visit can fill them in.

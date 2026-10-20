@@ -1,5 +1,5 @@
--- 007 translation cache + abuse budget for translate-text (additive only).
--- Tables/functions are service_role only: no anon/authenticated read or write.
+-- 007 translation cache + abuse budget for translate-text (additive only, no data changes).
+-- Tables/functions are service_role only: no anon/authenticated read, write or execute.
 
 CREATE TABLE IF NOT EXISTS public.translation_cache (
   key text PRIMARY KEY,
@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS public.translation_cache (
   status text NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','ready')),
   manual boolean NOT NULL DEFAULT false,
   model text,
+  lease_token uuid,
   lease_until timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now()
@@ -41,31 +42,53 @@ REVOKE ALL ON public.translation_stats FROM PUBLIC, anon, authenticated;
 GRANT ALL ON public.translation_stats TO service_role;
 ALTER TABLE public.translation_stats ENABLE ROW LEVEL SECURITY;
 
--- Claim keys for translation: new keys, or pending keys whose lease expired. Ready rows are never claimed.
-CREATE OR REPLACE FUNCTION public.translation_claim(_keys text[], _target text)
+-- Claim keys: new keys, or pending keys whose lease expired. Ready rows are never claimed.
+-- The caller's random token fences later complete/release calls.
+CREATE OR REPLACE FUNCTION public.translation_claim(_keys text[], _target text, _token uuid, _lease_seconds integer)
 RETURNS SETOF text LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
-  INSERT INTO public.translation_cache AS c (key, target, status, lease_until)
-  SELECT DISTINCT k, _target, 'pending', now() + interval '90 seconds' FROM unnest(_keys) AS k
-  ON CONFLICT (key) DO UPDATE SET lease_until = now() + interval '90 seconds', updated_at = now()
-    WHERE c.status = 'pending' AND c.lease_until < now()
+  INSERT INTO public.translation_cache AS c (key, target, status, lease_token, lease_until)
+  SELECT DISTINCT k, _target, 'pending', _token, now() + make_interval(secs => least(greatest(_lease_seconds, 30), 300))
+  FROM unnest(_keys) AS k
+  ON CONFLICT (key) DO UPDATE SET lease_token = EXCLUDED.lease_token, lease_until = EXCLUDED.lease_until, updated_at = now()
+    WHERE c.status = 'pending' AND c.manual = false AND c.lease_until < now()
   RETURNING c.key;
 $$;
 
--- Store results; manual (approved) rows are never overwritten.
-CREATE OR REPLACE FUNCTION public.translation_complete(_rows jsonb, _model text)
-RETURNS void LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
-  INSERT INTO public.translation_cache AS c (key, target, source_text, translated, status, model, lease_until)
-  SELECT r->>'key', r->>'target', r->>'source', r->>'translated', 'ready', _model, NULL
-  FROM jsonb_array_elements(_rows) AS r
-  WHERE coalesce(r->>'translated','') <> ''
-  ON CONFLICT (key) DO UPDATE SET source_text = EXCLUDED.source_text, translated = EXCLUDED.translated,
-    status = 'ready', model = EXCLUDED.model, lease_until = NULL, updated_at = now()
-    WHERE c.manual = false;
+-- Store results only for rows this token still owns; manual (approved) rows are never touched.
+CREATE OR REPLACE FUNCTION public.translation_complete(_rows jsonb, _model text, _token uuid)
+RETURNS integer LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE _n integer;
+BEGIN
+  UPDATE public.translation_cache c
+     SET source_text = r->>'source', translated = r->>'translated', status = 'ready',
+         model = _model, lease_token = NULL, lease_until = NULL, updated_at = now()
+    FROM jsonb_array_elements(_rows) AS r
+   WHERE c.key = r->>'key' AND c.status = 'pending' AND c.manual = false
+     AND c.lease_token = _token AND coalesce(r->>'translated', '') <> '';
+  GET DIAGNOSTICS _n = ROW_COUNT;
+  RETURN _n;
+END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.translation_release(_keys text[])
+CREATE OR REPLACE FUNCTION public.translation_release(_keys text[], _token uuid)
 RETURNS void LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
-  DELETE FROM public.translation_cache WHERE key = ANY(_keys) AND status = 'pending' AND manual = false;
+  DELETE FROM public.translation_cache
+   WHERE key = ANY(_keys) AND status = 'pending' AND manual = false AND lease_token = _token;
+$$;
+
+-- Capped increment: returns true only if the counter stayed within the cap. A single
+-- INSERT .. ON CONFLICT DO UPDATE .. WHERE is atomic under concurrent callers (row lock).
+CREATE OR REPLACE FUNCTION public.translation_rate_take(_bucket text, _window timestamptz, _n integer, _cap integer)
+RETURNS boolean LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE _hit integer;
+BEGIN
+  IF _n > _cap THEN RETURN false; END IF;
+  INSERT INTO public.translation_rate AS r (bucket, window_start, count) VALUES (_bucket, _window, _n)
+  ON CONFLICT (bucket, window_start) DO UPDATE SET count = r.count + EXCLUDED.count
+    WHERE r.count + EXCLUDED.count <= _cap
+  RETURNING 1 INTO _hit;
+  RETURN _hit IS NOT NULL;
+END;
 $$;
 
 -- Hourly per-caller limits (hashed IP, never raw) and a daily global AI budget.
@@ -74,25 +97,19 @@ RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
   _hour timestamptz := date_trunc('hour', now());
   _day timestamptz := date_trunc('day', now());
-  _n integer;
 BEGIN
   IF _requests > 0 THEN
-    INSERT INTO public.translation_rate (bucket, window_start, count) VALUES ('req:' || _ip_hash, _hour, _requests)
-    ON CONFLICT (bucket, window_start) DO UPDATE SET count = translation_rate.count + EXCLUDED.count
-    RETURNING count INTO _n;
-    INSERT INTO public.translation_stats (day, requests) VALUES (current_date, 1)
-    ON CONFLICT (day) DO UPDATE SET requests = translation_stats.requests + 1;
-    IF _n > 600 THEN RETURN 'ip_requests'; END IF;
+    INSERT INTO public.translation_stats AS s (day, requests) VALUES (current_date, 1)
+    ON CONFLICT (day) DO UPDATE SET requests = s.requests + 1;
+    IF NOT public.translation_rate_take('req:' || _ip_hash, _hour, _requests, 600) THEN RETURN 'ip_requests'; END IF;
   END IF;
   IF _ai_calls > 0 THEN
-    SELECT count INTO _n FROM public.translation_rate WHERE bucket = 'ai:global' AND window_start = _day;
-    IF coalesce(_n, 0) + _ai_calls > 400 THEN RETURN 'global_ai'; END IF;
-    SELECT count INTO _n FROM public.translation_rate WHERE bucket = 'ai:' || _ip_hash AND window_start = _hour;
-    IF coalesce(_n, 0) + _ai_calls > 40 THEN RETURN 'ip_ai'; END IF;
-    INSERT INTO public.translation_rate (bucket, window_start, count) VALUES ('ai:global', _day, _ai_calls)
-    ON CONFLICT (bucket, window_start) DO UPDATE SET count = translation_rate.count + EXCLUDED.count;
-    INSERT INTO public.translation_rate (bucket, window_start, count) VALUES ('ai:' || _ip_hash, _hour, _ai_calls)
-    ON CONFLICT (bucket, window_start) DO UPDATE SET count = translation_rate.count + EXCLUDED.count;
+    IF NOT public.translation_rate_take('ai:global', _day, _ai_calls, 400) THEN RETURN 'global_ai'; END IF;
+    IF NOT public.translation_rate_take('ai:' || _ip_hash, _hour, _ai_calls, 40) THEN
+      -- Refund the global reservation taken above (same transaction, row already locked by us).
+      UPDATE public.translation_rate SET count = count - _ai_calls WHERE bucket = 'ai:global' AND window_start = _day;
+      RETURN 'ip_ai';
+    END IF;
   END IF;
   IF random() < 0.01 THEN
     DELETE FROM public.translation_rate WHERE window_start < now() - interval '2 days';
@@ -110,13 +127,15 @@ RETURNS void LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
     rejected = s.rejected + EXCLUDED.rejected, limited = s.limited + EXCLUDED.limited;
 $$;
 
-REVOKE ALL ON FUNCTION public.translation_claim(text[], text) FROM PUBLIC, anon, authenticated;
-REVOKE ALL ON FUNCTION public.translation_complete(jsonb, text) FROM PUBLIC, anon, authenticated;
-REVOKE ALL ON FUNCTION public.translation_release(text[]) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.translation_claim(text[], text, uuid, integer) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.translation_complete(jsonb, text, uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.translation_release(text[], uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.translation_rate_take(text, timestamptz, integer, integer) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.translation_take_budget(text, integer, integer) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.translation_record_stats(integer, integer, integer, integer, integer, integer) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.translation_claim(text[], text) TO service_role;
-GRANT EXECUTE ON FUNCTION public.translation_complete(jsonb, text) TO service_role;
-GRANT EXECUTE ON FUNCTION public.translation_release(text[]) TO service_role;
+GRANT EXECUTE ON FUNCTION public.translation_claim(text[], text, uuid, integer) TO service_role;
+GRANT EXECUTE ON FUNCTION public.translation_complete(jsonb, text, uuid) TO service_role;
+GRANT EXECUTE ON FUNCTION public.translation_release(text[], uuid) TO service_role;
+GRANT EXECUTE ON FUNCTION public.translation_rate_take(text, timestamptz, integer, integer) TO service_role;
 GRANT EXECUTE ON FUNCTION public.translation_take_budget(text, integer, integer) TO service_role;
 GRANT EXECUTE ON FUNCTION public.translation_record_stats(integer, integer, integer, integer, integer, integer) TO service_role;
