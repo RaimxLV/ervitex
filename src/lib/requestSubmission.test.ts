@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { RequestSubmission, requestContactSchema, missingAttachmentNames } from "./requestSubmission";
+import { RequestSubmission, requestContactSchema, missingAttachmentNames, pendingDisplayItems, sessionSlot } from "./requestSubmission";
 const payload = { name: "Synthetic", email: " CLIENT@example.invalid ", message: "DTF" };
 describe("request retry lifecycle", () => {
   it("retains the saved request id and original data on returned notification failure", async () => {
@@ -50,10 +50,28 @@ describe("reload-safe pending request", () => {
     const restored = new RequestSubmission(slot).restore()!;
     expect(restored.paths).toHaveLength(1); expect(missingAttachmentNames(restored)).toEqual(["brief.docx"]);
   });
-  it("endpoint rejection clears pending state without resubmitting", async () => {
-    const store = memoryStore(); const save = vi.fn().mockResolvedValue(undefined);
-    expect((await new RequestSubmission({ store, key: "s" }).run(payload, save, async () => "rejected")).state).toBe("rejected");
-    expect(store.m.size).toBe(0); expect(save).toHaveBeenCalledTimes(1);
+  it("rejection is terminal across reload: next click creates no new id, save or notify", async () => {
+    const store = memoryStore(); const slot = { store, key: "s" }; const save = vi.fn().mockResolvedValue(undefined); const notify = vi.fn().mockResolvedValue("rejected");
+    const flow = new RequestSubmission(slot);
+    const first = await flow.run(payload, save, notify);
+    expect(first.state).toBe("rejected");
+    expect((await flow.run({ ...payload, message: "again" }, save, notify))).toEqual({ state: "rejected", id: first.id });
+    const reloaded = new RequestSubmission(slot); expect(reloaded.restore()?.rejected).toBe(true); expect(reloaded.isRejected).toBe(true);
+    expect((await reloaded.run(payload, save, notify)).id).toBe(first.id);
+    expect(save).toHaveBeenCalledTimes(1); expect(notify).toHaveBeenCalledTimes(1);
+    reloaded.discard(); expect(store.m.size).toBe(0);
+    expect((await reloaded.run(payload, save, async () => true)).id).not.toBe(first.id);
+  });
+  it("pending payload items are displayed instead of a changed or cleared cart", () => {
+    const pending = { payload: { items: [{ id: "a", qty: 50 }] } };
+    expect(pendingDisplayItems(pending, [])).toEqual([{ id: "a", qty: 50 }]);
+    expect(pendingDisplayItems(pending, [{ id: "other", qty: 1 }])).toEqual([{ id: "a", qty: 50 }]);
+    expect(pendingDisplayItems(null, [{ id: "cart", qty: 1 }])).toEqual([{ id: "cart", qty: 1 }]);
+  });
+  it("sessionSlot survives a throwing sessionStorage getter", () => {
+    const desc = Object.getOwnPropertyDescriptor(window, "sessionStorage");
+    Object.defineProperty(window, "sessionStorage", { configurable: true, get() { throw new DOMException("denied", "SecurityError"); } });
+    try { expect(sessionSlot("x")).toBeUndefined(); } finally { if (desc) Object.defineProperty(window, "sessionStorage", desc); }
   });
   it("discards tampered stored state with out-of-scope paths", () => {
     const store = memoryStore(); const id = "11111111-1111-4111-8111-111111111111";
