@@ -30,3 +30,9 @@ Secība: preview → migrācija → patch → preview (jābūt 0 rindām) → ka
 - Pārskatītie faili ievietoti `public.migration_stage` (md5: 003 dd5e4a4d…, 004 b7e1c6d7… bez BEGIN/COMMIT, 005 d8c319c2… = 01+02_feed_values+02_data) un izpildīti katrs savā transakcijā (lock_timeout 5s): migrācijas 0017 (003), 0018 (004), 0019 (005).
 - Rezerves kopijas (tikai postgres/service_role): private.price_rollback_20261019 (2342), range_rollback_20261019 (221), utt_price_rollback_20261019 (34), utt_range_rollback_20261019, utt_touched_20261019 (34), pf005_backup_variants/styles/cvp (20557)/ranges, pf005_saved_defs (3).
 - Koda patchi uzlikti (003_sync_code, 005 frontend, 005 sync); malfini-sync, utt-sync, pf-concept-sync izvietotas. Frontend NAV publicēts.
+
+## 007_translation_cache — PIEMĒROTS 2026-10-20 ~11:49 UTC
+- Root piemēroja `007_translation_cache/01_apply.sql` (MD5 cf4f062ba6be93587604ecd1d7748921) caur `migration_stage`; 3 tabulas ar RLS, anon/authenticated piekļuves nav.
+- Frontend (deploy 140f52a0) sūta source/id; `translate-text` izvietota (source sha256 adc1bec4…).
+- Smoke 11:51 UTC: BG858 viens teksts — 1. pieprasījums miss + 1 AI izsaukums (log 01a15926…, 0,004671 kr.), 2. — cache hit bez AI; patvaļīgs teksts noraidīts bez AI; pieprasījums bez source → 400.
+- Vēlākai šaurai sakopšanai: UI atvasinātas vērtības netiek atpazītas un paliek netulkotas — SS "180 GSM", NWG "Material: 100% polyester", PF "275 g".
