@@ -3,7 +3,7 @@ import { catalogColorParam, catalogColorPrice } from "./catalogPriceSelection";
 import { normalizeCatalogSort, prepareQuery, rankedSearchResults, searchMatches } from "./catalogSearch";
 import { supplierSizeLabel } from "./supplierSizeLabels";
 import { createRowsLoader } from "./headerSearchRows";
-import { quoteCartLineKey } from "./quoteCartIdentity";
+import { sameCartVariant } from "./quoteCartIdentity";
 
 describe("A02 BB card colour prices", () => {
   const prices = new Map<string, number>([
@@ -69,9 +69,8 @@ describe("A01 Russell 0R957M0 collar sizes", () => {
     expect(supplierSizeLabel("ru", "0R957F0", "S1", "en")).toBe("S1");
     expect(supplierSizeLabel("mf", "0R957M0", "S1", "en")).toBe("S1");
     const base = { source: "ru", productId: "0R957M0", colorCode: "Black" };
-    const k1 = quoteCartLineKey({ ...base, size: "S1" } as any);
-    const k2 = quoteCartLineKey({ ...base, size: "S2" } as any);
-    expect(k1).not.toBe(k2);
+    expect(sameCartVariant({ ...base, size: "S1" }, { ...base, size: "S2" })).toBe(false);
+    expect(sameCartVariant({ ...base, size: "S1" }, JSON.parse(JSON.stringify({ ...base, size: "S1" })))).toBe(true);
     expect(JSON.parse(JSON.stringify({ size: "S1" })).size).toBe("S1");
   });
 });
