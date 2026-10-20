@@ -188,7 +188,7 @@ const AdminQuotes = () => {
   const visible = quotes
     .filter(matches)
     .filter((row) => tab === "all" || row.assigned_pm_slug === tab)
-    .filter((row) => period === "all" || daysSince(row.created_at) < Number(period))
+    .filter((row) => period === "all" || rigaCalendarDaysSince(row.created_at, now) < Number(period))
     .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
 
   return (
