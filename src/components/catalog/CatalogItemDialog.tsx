@@ -1428,7 +1428,7 @@ const CatalogItemDialog = ({
     (async () => {
       try {
         const { data, error } = await supabase.functions.invoke("translate-text", {
-          body: { texts: items, target: "lv" },
+          body: { source, id, texts: items, target: "lv" },
         });
         if (cancelled || error || !Array.isArray(data?.translations) || data.translations.length !== items.length) return;
         const out = data.translations as string[];
@@ -1440,7 +1440,10 @@ const CatalogItemDialog = ({
           specs: normalizedContent.specs.map((spec, index) => ({ label: out[specsStart + index * 2] || spec.label, value: out[specsStart + index * 2 + 1] || spec.value })),
         };
         setTranslated(result);
-        try { sessionStorage.setItem(cacheKey, JSON.stringify(result)); } catch { /* ignore */ }
+        // Partial results (busy/limited) are shown but not pinned, so a later visit can fill them in.
+        if (data.complete !== false) {
+          try { sessionStorage.setItem(cacheKey, JSON.stringify(result)); } catch { /* ignore */ }
+        }
       } catch { /* ignore */ }
     })();
     return () => { cancelled = true; };
