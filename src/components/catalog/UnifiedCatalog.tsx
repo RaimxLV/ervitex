@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl, unproxyUrl } from "@/lib/imageProxy";
-import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { catalogColorParam, catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { HEADWEAR_TYPES, headwearType, isHeadwearCategory, matchesHeadwearType, type HeadwearType } from "@/lib/headwearTypes";
@@ -1544,7 +1544,7 @@ const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, 
 
   // PF's catalog colour `c` is an item/article number, while variant prices
   // and the detail loader use the supplier colour code/name (BLACK, NAVY...).
-  const selectedColor = active ? (item.source === "pf" ? active.n : active.c || active.n) : null;
+  const selectedColor = catalogColorParam(item.source, active);
   // Cenu tabulas krāsu kodi ir īsāki nekā kataloga kodi (SS SKU, NWG prefikss,
   // MF ietvertais kods) — meklējam visus iespējamos atslēgu variantus.
   const explicitColor = activeIdx !== null || filterMatchIdx >= 0;

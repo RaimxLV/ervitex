@@ -7,7 +7,7 @@ import CatalogItemDialog from "@/components/catalog/CatalogItemDialog";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
-import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { catalogColorParam, catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { categoryFromName } from "@/lib/catalogCategory";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
@@ -169,7 +169,7 @@ const CatalogItemPage = () => {
             <div className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {related.map((r) => {
                 const cols = (r.colors || []).filter((c) => c && (c.h || c.n));
-                const colorCode = (c: ColorEntry) => r.source === "pf" ? c.n : c.c || c.n;
+                const colorCode = (c: ColorEntry) => catalogColorParam(r.source, c);
                 const colorPrice = (c: ColorEntry) => catalogColorPrice(prices, r.source, r.id, c);
                 const cheapest = lowestPriceColorIndex(cols, (c) => colorPrice(c)?.price);
                 const swatches = cols.slice(0, 8).map((c, index) => ({
