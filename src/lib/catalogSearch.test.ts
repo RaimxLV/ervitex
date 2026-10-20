@@ -1,62 +1,66 @@
 import { expect, it } from "vitest";
-import { keywordMatch, exactCodeHits, prepareQuery, rankedSearchResults, searchScore } from "./catalogSearch";
-it("169 searches model identities, not Malfini colour/size SKUs", () => {
-  const items = [
-    { id: "169", source: "mf", name: "Fit-T LS", colors: [{ c: "1694412" }] },
-    { id: "STTU169", source: "ss", name: "Creator 2.0", colors: [{ c: "STTU169C0891L" }] },
-    { id: "STSU168", source: "ss", name: "Drummer 2.0", colors: [] },
-    { id: "1694412", source: "other", name: "Unrelated model", colors: [] },
-    { id: "134169", source: "other", name: "Unrelated model", colors: [] },
-  ];
-  expect(rankedSearchResults(items, prepareQuery("169")).map(item => item.id))
-    .toEqual(["STTU169", "169", "STSU168"]);
-  expect(rankedSearchResults(items, prepareQuery("1694412")).map(item => item.id))
-    .toEqual(["1694412"]);
+import { keywordMatch, exactCodeHits, prepareQuery, rankedSearchResults, searchMatches, searchScore } from "./catalogSearch";
+const ids = (xs: { id: string }[]) => xs.map((x) => x.id);
+const catalog = [
+  { id: "STTU169", source: "ss", name: "Creator 2.0" },
+  { id: "STTU168", source: "ss", name: "Creator 2.0 Kids" },
+  { id: "STTU170", source: "ss", name: "Sparker" },
+  { id: "STTU171", source: "ss", name: "Far" },
+  { id: "STTU172", source: "ss", name: "Too far" },
+  { id: "STSU168", source: "ss", name: "Drummer 2.0" },
+  { id: "169", source: "mf", name: "Fit-T LS", colors: [{ c: "1694412" }] },
+  { id: "170", source: "mf", name: "Malfini 170" },
+  { id: "14169", source: "utt", name: "Regatta 14169" },
+  { id: "RG168", source: "utt", name: "Regatta 168" },
+  { id: "1694412", source: "other", name: "Unrelated" },
+];
+it("169 finds exact numeric component, never substring 14169 or 1694412", () => {
+  const m = searchMatches(catalog, prepareQuery("169"));
+  expect(ids(m.exact)).toEqual(["STTU169", "169"]);
+  expect(ids(m.related)).not.toContain("14169");
+  expect(ids(m.related)).not.toContain("1694412");
 });
-it("menu and catalog rank 167 identically regardless of candidate input order", () => {
-  const items = ["STTU169", "STTU168", "STTU167", "134167", "16724", "AB168"].map(id => ({ id, source: id.startsWith("STTU") ? "ss" : "other" }));
-  const menu = rankedSearchResults(items, prepareQuery("167"));
-  const catalog = rankedSearchResults([...items].reverse(), prepareQuery("167"));
-  expect(menu.map(i => i.id)).toEqual(["STTU167", "STTU168", "STTU169", "AB168"]);
-  expect(catalog).toEqual(menu);
+it("lowercase and spaced full code sttu 169 returns only STTU169", () => {
+  expect(ids(rankedSearchResults(catalog, prepareQuery("sttu169")))).toEqual(["STTU169"]);
+  expect(ids(rankedSearchResults(catalog, prepareQuery(" STTU-169 ")))).toEqual(["STTU169"]);
 });
-it("both search surfaces keep only the exact full STTU167 code", () => {
-  const items = ["STTU169", "STTU167", "STTU1670"].map(id => ({ id }));
-  expect(rankedSearchResults(items, prepareQuery("STTU167")).map(i => i.id)).toEqual(["STTU167"]);
+it("related codes come only from each exact item's own supplier and prefix, within ±2", () => {
+  const m = searchMatches(catalog, prepareQuery("169"));
+  expect(ids(m.related)).toEqual(["STTU168", "STTU170", "STTU171", "170"]);
+  expect(ids(m.related)).not.toContain("STSU168");
+  expect(ids(m.related)).not.toContain("RG168");
+  expect(ids(m.related)).not.toContain("STTU172");
 });
-it("shared results for four digits exclude longer codes", () => {
-  const items = ["AB1672", "AB1673", "AB167200", "AB131672"].map(id => ({ id }));
-  expect(rankedSearchResults(items, prepareQuery("1672")).map(i => i.id)).toEqual(["AB1672", "AB1673"]);
+it("only Stanley/Stella anchor → no Malfini/Regatta neighbours", () => {
+  const items = catalog.filter((i) => i.id !== "169");
+  expect(ids(searchMatches(items, prepareQuery("169")).related)).toEqual(["STTU168", "STTU170", "STTU171"]);
 });
-it("167 finds complete three-digit codes 167, 168 and 169 in relevance order", () => {
-  const q = prepareQuery("167");
-  const scores = ["STTU167", "STTU168", "STTU169"].map(id => searchScore({ id, source: "ss" }, q));
-  expect(scores[0]).toBeGreaterThan(scores[1]);
-  expect(scores[1]).toBeGreaterThan(scores[2]);
-  expect(scores[2]).toBeGreaterThan(0);
+it("no exact anchor → no numeric neighbours at all", () => {
+  const items = catalog.filter((i) => !["STTU169", "169"].includes(i.id));
+  const m = searchMatches(items, prepareQuery("169"));
+  expect(m.exact).toEqual([]);
+  expect(m.related).toEqual([]);
 });
-it("167 excludes 134167 and 16724 even when names contain 167", () => {
-  for (const id of ["134167", "16724", "STTU1670", "AB2167", "abc-167-24"]) {
-    expect(searchScore({ id, name: "167", source: "ss" }, prepareQuery("167"))).toBe(0);
-  }
+it("hidden products (not in visible list) are never anchors or neighbours", () => {
+  const visible = catalog.filter((i) => i.id !== "STTU168");
+  expect(ids(rankedSearchResults(visible, prepareQuery("169")))).not.toContain("STTU168");
 });
-it("four-digit queries exclude six-digit codes", () => {
-  const q = prepareQuery("1672");
-  expect(searchScore({ id: "AB1672" }, q)).toBeGreaterThan(0);
-  expect(searchScore({ id: "AB1673" }, q)).toBeGreaterThan(0);
-  expect(searchScore({ id: "167200" }, q)).toBe(0);
-  expect(searchScore({ id: "131672" }, q)).toBe(0);
+it("menu and catalog order is identical regardless of input order", () => {
+  expect(rankedSearchResults([...catalog].reverse(), prepareQuery("169"))).toEqual(rankedSearchResults(catalog, prepareQuery("169")));
 });
-it("exact numeric codes precede nearby Stanley/Stella codes", () => {
-  const q = prepareQuery("167");
-  expect(searchScore({ id: "167", source: "malfini" }, q)).toBeGreaterThan(searchScore({ id: "STTU168", source: "ss" }, q));
+it("four-digit query excludes longer codes and keeps same family neighbour", () => {
+  const items = ["AB1672", "AB1673", "AB167200", "AB131672"].map((id) => ({ id }));
+  expect(ids(rankedSearchResults(items, prepareQuery("1672")))).toEqual(["AB1672", "AB1673"]);
 });
-it("numeric neighbours are limited to two and preserve leading-zero length", () => {
-  expect(searchScore({ id: "STTU170" }, prepareQuery("167"))).toBe(0);
+it("leading zeros must match length", () => {
   expect(searchScore({ id: "AB0167" }, prepareQuery("167"))).toBe(0);
   expect(searchScore({ id: "AB0167" }, prepareQuery("0167"))).toBeGreaterThan(0);
 });
-
+it("ordinary text search still works", () => {
+  const items = [{ id: "X1", name: "Hooded sweatshirt" }, { id: "X2", name: "Apron" }];
+  expect(ids(rankedSearchResults(items, prepareQuery("hudijs")))).toEqual(["X1"]);
+  expect(ids(rankedSearchResults(items, prepareQuery("priekšauts")))).toEqual(["X2"]);
+});
 it("169 ranks STTU169 ahead of Malfini 169", () => {
   const q = prepareQuery("169");
   expect(searchScore({ id: "STTU169", source: "ss", name: "Creator 2.0" }, q))

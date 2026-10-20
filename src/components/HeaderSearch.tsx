@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { readCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
-import { prepareQuery, rankedSearchResults } from "@/lib/catalogSearch";
+import { prepareQuery, searchMatches } from "@/lib/catalogSearch";
 import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
 
@@ -105,10 +105,13 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const results = useMemo(() => {
+  const { results, firstRelated } = useMemo(() => {
     const pq = prepareQuery(value);
-    if (!pq || !rows.length) return [];
-    return rankedSearchResults(rows, pq).slice(0, 8);
+    if (!pq || !rows.length) return { results: [] as Row[], firstRelated: -1 };
+    const m = searchMatches(rows, pq);
+    const exact = m.exact.slice(0, 8);
+    const related = m.related.slice(0, Math.max(0, 8 - exact.length));
+    return { results: [...exact, ...related], firstRelated: related.length ? exact.length : -1 };
   }, [value, rows]);
 
   const finish = () => {
@@ -185,6 +188,11 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
             <ul role="listbox">
               {results.map((r, i) => (
                 <li key={`${r.source}:${r.id}`}>
+                  {i === firstRelated && (
+                    <p className="border-t border-border px-3 pb-1 pt-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      {lang === "lv" ? "Līdzīgi kodi" : "Similar codes"}
+                    </p>
+                  )}
                   <Link
                     to={`/catalog/item/${r.source}/${encodeURIComponent(r.id)}`}
                     onMouseDown={(e) => e.preventDefault()}

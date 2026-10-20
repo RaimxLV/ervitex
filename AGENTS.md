@@ -1,10 +1,10 @@
 # Architecture rules
 
-- Menu/catalog share rankedSearchResults and display model IDs, not variant SKUs, to match search; redirects preserve facets.
+- Menu/catalog share searchMatches on model IDs: digit queries match whole numeric parts; similar codes only from exact hits' source+prefix, labelled; redirects keep facets
 - productContent separates care/specs; translation caches use fingerprints.
 - Offers use CreateOfferButton, /offers, OfferWorkspace and shared offer item pricing helpers for consistent discounts; sharing activates drafts. useOfferDraft serializes version-checked autosaves with recovery; token refresh preserves editors.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
-- Icons share AccentIcon tones and Lucide-compatible print-icons.
+- Icons share AccentIcon tones, Lucide-style print-icons.
 - Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
 - Office contours/hotspots share cover-scene coordinates; halos use separate feGaussianBlur polygons with oversized regions to prevent clipping.
 - Team uses immutable photo_url/framing and current CDN fallbacks; admin-only writes. Manual uploads share WebP optimization to avoid heavy originals.
@@ -16,7 +16,7 @@
 - "Ir noliktavā" is a manual admin flag in `stock_flags` per colour (`item_id` = `${id}::${color_code}`; bare `${id}` rows are legacy model-wide flags), separate from supplier data so syncs never erase it; it shows only in the product view for the selected colour, never on catalog cards; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.
 - Shared worksheet/offer prints use scope="order" in existing item JSON; orderPrinting preserves offer-wide prints on deletion, preventing duplicate charges and extra storage.
 - Stock mutation controls render only after the admin role resolves; every mutation revalidates the live user and role before writing; public users see only the outlined availability label.
-- Native scrolling; ScrollToTop uses resolvedLocation. WebGL follows eased pointers, renders on change, pauses off-screen.
+- Native scroll, ScrollToTop uses resolvedLocation. WebGL eases pointers, renders on change, pauses off-screen.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - SSR avoids browser globals; heads use lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap=catalog_items minus remnants/footwear; private routes noindex, no Disallow; Product schema: no stock.
 - sw.js/service-worker.js are self-unregistering kill-switches; never delete them.
@@ -29,5 +29,5 @@
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs aren't manufacturer codes.
 - Headwear shares facets (bump cache schema on changes). ADMIN_HOME opens requests; supplier tools use /admin/overview.
 - Read subdirectory AGENTS.md first. Price SQL in docs/pending-migrations runs byte-exact via md5-checked public.migration_stage.
-- Catalog reads time out into error+retry, no endless skeletons; filter order falls back to default.
-- Never present partial work as complete; name open tasks/blockers.
+- Catalog reads time out to error+retry; filter order defaults.
+- Never present partial work as complete; name open tasks and blockers.

@@ -303,14 +303,10 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
   const p = prepare(it);
   const isStella = it.source === "ss" || normalizeSearch(it.brand).replace(/ /g, "") === "stanleystella";
   if (/^\d+$/.test(pq.raw)) {
-    // Match the whole model number, never a substring or product name.
-    const groups = p.id.match(/\d+/g) ?? [];
-    const digits = groups[0];
-    if (groups.length !== 1 || !digits || digits.length !== pq.raw.length) return 0;
-    if (digits === pq.raw) return 10000 + (isStella ? 3000 : 0);
-    const distance = Math.abs(Number(digits) - Number(pq.raw));
-    if (pq.raw.length < 3 || distance > 2) return 0;
-    return 1000 - distance * 100 + (isStella ? 3000 : 0);
+    // Tikai precīza visa koda ciparu daļa (169 → STTU169, 169), nekad apakšvirkne (14169) vai nosaukums.
+    const code = codeParts(it.id);
+    if (!code || code.digits !== pq.raw) return 0;
+    return 10000 + (isStella ? 3000 : 0);
   }
   let score = 0;
 
@@ -353,17 +349,80 @@ export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuer
   return hits.size ? hits : null;
 };
 
+/** Koda daļas: burtu prefikss + viena ciparu grupa + burtu sufikss (STTU169 → sttu/169/""). */
+export const codeParts = (id?: string | null): { prefix: string; digits: string; suffix: string } | null => {
+  const m = normalizeSearch(id).replace(/ /g, "").match(/^([a-z]*)(\d+)([a-z]*)$/);
+  return m ? { prefix: m[1], digits: m[2], suffix: m[3] } : null;
+};
+
+const familyKey = (it: Searchable, c: { prefix: string; digits: string; suffix: string }) =>
+  `${it.source || ""}|${c.prefix}|${c.suffix}|${c.digits.length}`;
+
+/** Maksimālais blakus kodu attālums un skaits uz vienu precīzo preci. */
+export const NEIGHBOR_DISTANCE = 2;
+export const NEIGHBOR_LIMIT = 4;
+
+export interface SearchMatches<T> {
+  exact: T[];
+  /** Līdzīgi kodi: tikai tā paša piegādātāja un prefiksa saime kā kāda precīzā prece. */
+  related: T[];
+  all: Set<T>;
+}
+
+const cmpScored = <T extends Searchable>(a: { item: T; score: number }, b: { item: T; score: number }) =>
+  b.score - a.score ||
+  a.item.id.localeCompare(b.item.id, "en", { numeric: true, sensitivity: "base" }) ||
+  (a.item.source || "").localeCompare(b.item.source || "", "en");
+
 /** Vienota atlase un stabila secība galvenās izvēlnes un kataloga meklētājiem. */
+export const searchMatches = <T extends Searchable>(items: T[], pq: PreparedQuery | null): SearchMatches<T> => {
+  if (!pq) return { exact: items, related: [], all: new Set(items) };
+  const hits = exactCodeHits(items, pq);
+  const exact = items
+    .map((item) => ({ item, score: searchScore(item, pq) }))
+    .filter(({ item, score }) => (hits ? hits.has(item) : score > 0))
+    .sort(cmpScored)
+    .map(({ item }) => item);
+  const related: T[] = [];
+  if (/^\d+$/.test(pq.raw) && pq.raw.length >= 3 && exact.length) {
+    const target = Number(pq.raw);
+    const families = new Set<string>();
+    for (const it of exact) {
+      const c = codeParts(it.id);
+      if (c) families.add(familyKey(it, c));
+    }
+    const exactSet = new Set(exact);
+    const byFamily = new Map<string, { item: T; d: number }[]>();
+    for (const it of items) {
+      if (exactSet.has(it)) continue;
+      const c = codeParts(it.id);
+      if (!c) continue;
+      const key = familyKey(it, c);
+      if (!families.has(key)) continue;
+      const d = Math.abs(Number(c.digits) - target);
+      if (d === 0 || d > NEIGHBOR_DISTANCE) continue;
+      const list = byFamily.get(key) ?? [];
+      list.push({ item: it, d });
+      byFamily.set(key, list);
+    }
+    for (const it of exact) {
+      const c = codeParts(it.id);
+      const list = c && byFamily.get(familyKey(it, c));
+      if (!list) continue;
+      byFamily.delete(familyKey(it, c!));
+      list
+        .sort((a, b) => a.d - b.d || a.item.id.localeCompare(b.item.id, "en", { numeric: true }))
+        .slice(0, NEIGHBOR_LIMIT)
+        .forEach(({ item }) => related.push(item));
+    }
+  }
+  return { exact, related, all: new Set([...exact, ...related]) };
+};
+
 export const rankedSearchResults = <T extends Searchable>(items: T[], pq: PreparedQuery | null): T[] => {
   if (!pq) return items;
-  const exact = exactCodeHits(items, pq);
-  return items
-    .map((item) => ({ item, score: searchScore(item, pq) }))
-    .filter(({ item, score }) => exact ? exact.has(item) : score > 0)
-    .sort((a, b) => b.score - a.score ||
-      a.item.id.localeCompare(b.item.id, "en", { numeric: true, sensitivity: "base" }) ||
-      (a.item.source || "").localeCompare(b.item.source || "", "en"))
-    .map(({ item }) => item);
+  const { exact, related } = searchMatches(items, pq);
+  return [...exact, ...related];
 };
 
 /** Filtru meklēšana: LV/EN atslēgvārdi ("priekšauts" → Aprons, "T-krekls" → T-shirts). */
