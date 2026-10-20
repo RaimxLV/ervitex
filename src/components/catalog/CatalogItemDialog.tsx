@@ -695,7 +695,7 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
     colors.push({ code: "default", name: style.name, hex: null, images: shared, sizes: uniqueSortedSizes(allSizes) });
   }
 
-  const featureArr = Array.isArray((style as any).features) ? ((style as any).features as string[]) : [];
+  const featureArr = Array.isArray((style as any).features) ? stripBbFooterLinks((style as any).features as string[]) : [];
 
   const specs: { label: string; value: string }[] = [];
   addSpec(specs, "Brand", style.brand);

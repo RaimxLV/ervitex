@@ -3,6 +3,7 @@ import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { bbImageBelongsToStyle } from "../_shared/bbImageOwnership.ts";
+import { stripBbFooterLinks } from "../_shared/bbFeatures.ts";
 
 const BRANDS: Record<string, { host: string; brand: string }> = {
   beechfield: { host: "beechfield.com", brand: "Beechfield" },
@@ -77,7 +78,7 @@ function parseProduct(url: string, html: string): Parsed | null {
   const features: string[] = [];
   const uls = [...html.matchAll(/<div class="content"><ul>([\s\S]*?)<\/ul>/g)];
   for (const u of uls) {
-    const items = [...u[1].matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => decode(stripTags(m[1])));
+    const items = stripBbFooterLinks([...u[1].matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => decode(stripTags(m[1]))));
     if (items.length >= 2 && items.length <= 20 && items.every((i) => i.length < 200)) {
       features.push(...items);
       break;
