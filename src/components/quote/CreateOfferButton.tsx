@@ -2,7 +2,7 @@ import { setOrderPrints, type OfferPrint } from "@/lib/orderPrinting";
 import type { Offer } from "@/lib/offer";
 import { offerEditorPath } from "@/lib/offerNavigation";
 import { useRef, useState } from "react";
-import { requestOfferData } from "@/lib/requestOffer";
+import { requestOfferData, requestConversionSource, CONFIRMED_EMPTY_MESSAGE } from "@/lib/requestOffer";
 import { useNavigate } from "@/lib/router-compat";
 import { Plus, Loader2, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,7 @@ export function useCreateOffer() {
     try {
       const { data: request, error: readError } = await supabase.from("quote_requests").select("*").eq("id", requestId).single();
       if (readError || !request) throw readError || new Error("Pieprasījums nav atrasts");
+      if (requestConversionSource(request) === "confirmed_empty") { toast({ title: CONFIRMED_EMPTY_MESSAGE, variant: "destructive" }); return; }
       const payload = requestOfferData(request);
       const { data, error } = await supabase.from("pm_offers").insert(payload as any).select("id").single();
       if (error || !data) throw error || new Error("Neizdevās izveidot");
@@ -50,13 +51,15 @@ export function useCreateOffer() {
   return { create, createFromRequest, busy };
 }
 
-export function CreateOfferButton({ fromCart = false, compact = false, iconOnly = false, requestId }: { fromCart?: boolean; compact?: boolean; iconOnly?: boolean; requestId?: string }) {
+export function CreateOfferButton({ fromCart = false, compact = false, iconOnly = false, requestId, blockedReason }: { fromCart?: boolean; compact?: boolean; iconOnly?: boolean; requestId?: string; blockedReason?: string }) {
   const { items } = useQuoteCart();
   const { create, createFromRequest, busy } = useCreateOffer();
-  return <Button onClick={() => requestId ? createFromRequest(requestId) : create(fromCart || items.length > 0)} disabled={busy} variant={fromCart ? "outline" : "default"}
+  const button = <Button onClick={() => requestId ? createFromRequest(requestId) : create(fromCart || items.length > 0)} disabled={busy || !!blockedReason} variant={fromCart ? "outline" : "default"}
     aria-label={iconOnly ? "Izveidot piedāvājumu" : undefined} title={iconOnly ? "Izveidot piedāvājumu" : undefined}
     size={iconOnly ? "icon" : compact ? "sm" : "default"} className={fromCart ? "" : "bg-accent text-accent-foreground hover:bg-accent/90"}>
     {busy ? <Loader2 className={`${iconOnly ? "" : "mr-2"} h-4 w-4 animate-spin`} /> : fromCart ? <ClipboardList className="mr-2 h-4 w-4" /> : <Plus className={`${iconOnly ? "" : "mr-2"} h-4 w-4`} />}
     {!iconOnly && (fromCart ? `No groza (${items.length})` : "Izveidot piedāvājumu")}
   </Button>;
+  if (!blockedReason) return button;
+  return <span className="inline-flex flex-wrap items-center gap-2" title={blockedReason}>{button}<span role="note" className="text-xs text-muted-foreground">{blockedReason}</span></span>;
 }

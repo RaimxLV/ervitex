@@ -44,3 +44,22 @@ Sadales migrācija pielietota; zemāk uzskaitītie labojumi pārbaudīti izolēt
 3. **Apzināti iztukšots apstiprināts saraksts:** pašreizējā konversija izvēlas netukšu `worksheet_items`, citādi sākotnējos `items`. Ja atļauts piedāvājumā pārvērst apstiprinātu tukšu sarakstu, šis robežgadījums jāprecizē pirms plašākas konversijas lietošanas.
 4. **Autentificētais reālā servera gala ceļš: UNVERIFIED.** Datu rakstījumi/sūtījumi apzināti nenotika; pārbaudītas lokālās SQL tiesības, servera validācija un autentificēta sintētiskā UI, ne produkcijas ieraksts vai e-pasta piegāde. Safari jaunās cilnes sesijas regresija šajā auditā nav izmeklēta/labota.
 5. Root pārskats pirms publicēšanas; nav nepieciešams vēlreiz pielietot identisko jau pielietoto SQL. Katalogs/cenas/sinhronizācijas nav šī izlaiduma darbs.
+
+## Izlaiduma kārta 2026-10-20 09:35 UTC (tikai admina plūsma)
+
+Atrisināts (vienībtesti, bez īstiem rakstījumiem/e-pastiem):
+- **Pārlāde**: kontaktu, produkta un groza formas glabā neapziņoto pieprasījumu (id, iesnieguma atslēga, nemainīgs saturs, augšupielādētie ceļi, failu nosaukumi) cilnes `sessionStorage`; pēc pārlādes forma bloķēta ar oriģinālajiem datiem, atkārtojums tikai paziņo to pašu pieprasījumu (nekāda otrā saglabāšana/rotācija). Notīra pēc piegādes vai 403/404 atteikuma. Bojāts/svešu ceļu stāvoklis tiek izmests. Failu saturu pēc pārlādes nevar atjaunot — augšupielādētie ceļi paliek, neaugšupielādētie faili tiek nosaukti ar lūgumu sūtīt uz birojs@ervitex.lv.
+- **Tukšs apstiprināts saraksts**: `requestConversionSource` = worksheet / confirmed_empty (`worksheet_updated_at` + tukšs saraksts) / original. confirmed_empty bloķē konversiju ar redzamu paskaidrojumu; dzēstās preces netiek atjaunotas. Vēsturiski aizpildīta `worksheet_revision=1` bez apstiprināšanas laika paliek "original". Produkcijā šobrīd 0 šādu rindu (tikai lasīts).
+- **noindex**: `/offers`, `/offers/$id`, `/saraksts/$token`, `/piedavajums/$token` — tests apstiprina `noindex, nofollow` un bez canonical.
+
+Testi: 49 faili / 304 testi PASS; tipu pārbaude OK.
+
+### Izlaišanas secība (root)
+1. Publicē frontendu. Jaunais klients izmanto `submit_quote_request` (jau ir DB) un padod `submission_key`; pašreiz izvietotais `send-quote-request` lieko lauku ignorē, tātad saderīgs.
+2. Pārbaudi produkcijā vienu kontroles pieprasījumu (root lēmums) un ka atbildīgais piešķirts.
+3. Tikai tad izvieto `send-quote-request` (+ `_shared/request-safety.ts`). Tas pieprasa atslēgu vai admina lomu; atļaujas nav vājinātas, atslēga netiek atgriezta.
+4. Vecās, pirms publicēšanas atvērtās cilnes: to tiešais INSERT joprojām saglabā pieprasījumu (atbildīgo nosaka trigeris), bet paziņojums saņems 403 — pieprasījums redzams adminā, e-pasts nenāk. Veco kodu labot nevar; risks = tikai paziņojums šīm cilnēm. Jaunais klients 403/404 rāda "saglabāts — atjauno vai raksti", nevis sūta vēlreiz.
+
+### Gaida ārēju validāciju
+- Īsts servera ceļš (RPC + paziņotājs) produkcijā pēc 1.–3. soļa.
+- Safari jaunās cilnes sesijas regresija (tikai izpētīta).

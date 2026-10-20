@@ -8,21 +8,92 @@ export const requestContactSchema = z.object({
   message: z.string().max(10000).optional(),
 }).passthrough();
 
-/** Retain one immutable payload and capability until delivery succeeds. */
+/** Notification outcome: true = delivered, false = retryable, "rejected" = endpoint refused this capability. */
+export type NotifyResult = boolean | "rejected";
+
+export type PendingRequest = {
+  id: string; key: string; payload: Record<string, unknown>; saved: boolean;
+  /** Storage paths already uploaded for this request (never re-uploaded). */
+  paths: string[];
+  /** Names of attachments chosen for this request; used to report files lost on reload. */
+  fileNames: string[];
+};
+
+type Store = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isPending(v: unknown): v is PendingRequest {
+  const p = v as PendingRequest;
+  return !!p && typeof p === "object" && uuid.test(p.id) && uuid.test(p.key) && typeof p.payload === "object" && p.payload !== null
+    && typeof p.saved === "boolean" && Array.isArray(p.paths) && p.paths.every((x) => typeof x === "string" && x.startsWith(`${p.id}/`))
+    && Array.isArray(p.fileNames) && p.fileNames.every((x) => typeof x === "string");
+}
+
+/**
+ * Retain one immutable payload and capability until delivery succeeds.
+ * With a storage slot (per-tab sessionStorage), the pending request survives reloads so a
+ * retry re-notifies the same saved request instead of inserting a new one.
+ */
 export class RequestSubmission {
-  private pending: { id: string; key: string; payload: Record<string, unknown>; saved: boolean } | null = null;
+  private pending: PendingRequest | null = null;
   private busy = false;
+  constructor(private slot?: { store: Store; key: string }) {}
   get hasPending() { return this.pending !== null; }
-  async run(payload: Record<string, unknown>, save: (id: string, key: string, payload: Record<string, unknown>) => Promise<void>, notify: (id: string, key: string) => Promise<boolean>) {
+  get current(): Readonly<PendingRequest> | null { return this.pending; }
+  /** Load a pending request left by an earlier page load (call after hydration). */
+  restore() {
+    if (!this.slot || this.pending) return this.pending;
+    try {
+      const raw = this.slot.store.getItem(this.slot.key);
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (isPending(parsed)) this.pending = parsed; else if (raw) this.slot.store.removeItem(this.slot.key);
+    } catch { /* storage unavailable or corrupt: behave as in-memory */ }
+    return this.pending;
+  }
+  private persist() {
+    if (!this.slot) return;
+    try {
+      if (this.pending) this.slot.store.setItem(this.slot.key, JSON.stringify(this.pending));
+      else this.slot.store.removeItem(this.slot.key);
+    } catch { /* in-memory retry still works */ }
+  }
+  addPath(path: string) {
+    if (!this.pending || this.pending.paths.includes(path)) return;
+    this.pending.paths.push(path); this.persist();
+  }
+  /** Drop the pending request (delivered, or endpoint refused it). Never deletes the saved row. */
+  clear() { this.pending = null; this.persist(); }
+  async run(
+    payload: Record<string, unknown>,
+    save: (id: string, key: string, payload: Record<string, unknown>) => Promise<void>,
+    notify: (id: string, key: string, pending: PendingRequest) => Promise<NotifyResult>,
+    fileNames: string[] = [],
+  ) {
     if (this.busy) return { state: "busy" as const };
     this.busy = true;
     try {
-      const pending = this.pending ?? { id: crypto.randomUUID(), key: crypto.randomUUID(), payload: structuredClone(requestContactSchema.parse(payload)), saved: false };
-      this.pending = pending;
-      if (!pending.saved) { await save(pending.id, pending.key, pending.payload); pending.saved = true; }
-      const delivered = await notify(pending.id, pending.key);
-      if (delivered) this.pending = null;
-      return { state: delivered ? "delivered" as const : "saved" as const, id: pending.id };
+      const pending = this.pending ?? { id: crypto.randomUUID(), key: crypto.randomUUID(), payload: structuredClone(requestContactSchema.parse(payload)), saved: false, paths: [], fileNames: [...fileNames] };
+      this.pending = pending; this.persist();
+      // Uncertain saves retry with the same id/key; submit_quote_request is idempotent for them.
+      if (!pending.saved) { await save(pending.id, pending.key, pending.payload); pending.saved = true; this.persist(); }
+      const result = await notify(pending.id, pending.key, pending);
+      if (result === true) { this.clear(); return { state: "delivered" as const, id: pending.id }; }
+      if (result === "rejected") { this.clear(); return { state: "rejected" as const, id: pending.id }; }
+      return { state: "saved" as const, id: pending.id };
     } finally { this.busy = false; }
   }
+}
+
+export const sessionSlot = (key: string) =>
+  typeof window !== "undefined" && window.sessionStorage ? { store: window.sessionStorage, key } : undefined;
+
+/** Attachment names chosen for a pending request that have no uploaded path (lost on reload). */
+export function missingAttachmentNames(p: Pick<PendingRequest, "id" | "paths" | "fileNames">) {
+  const uploaded = p.paths.map((path) => path.slice(p.id.length + 1).replace(/^[0-9a-f-]{36}-/i, ""));
+  const left = [...uploaded];
+  return p.fileNames.filter((name) => {
+    const i = left.indexOf(name.replace(/[^a-zA-Z0-9._-]/g, "_"));
+    if (i >= 0) { left.splice(i, 1); return false; }
+    return true;
+  });
 }
