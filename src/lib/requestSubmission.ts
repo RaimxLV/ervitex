@@ -17,6 +17,8 @@ export type PendingRequest = {
   paths: string[];
   /** Names of attachments chosen for this request; used to report files lost on reload. */
   fileNames: string[];
+  /** Terminal: saved, but the notifier refused it. Never resent; cleared only by explicit discard(). */
+  rejected?: boolean;
 };
 
 type Store = Pick<Storage, "getItem" | "setItem" | "removeItem">;
@@ -26,7 +28,8 @@ function isPending(v: unknown): v is PendingRequest {
   const p = v as PendingRequest;
   return !!p && typeof p === "object" && uuid.test(p.id) && uuid.test(p.key) && typeof p.payload === "object" && p.payload !== null
     && typeof p.saved === "boolean" && Array.isArray(p.paths) && p.paths.every((x) => typeof x === "string" && x.startsWith(`${p.id}/`))
-    && Array.isArray(p.fileNames) && p.fileNames.every((x) => typeof x === "string");
+    && Array.isArray(p.fileNames) && p.fileNames.every((x) => typeof x === "string")
+    && (p.rejected === undefined || typeof p.rejected === "boolean");
 }
 
 /**
@@ -61,8 +64,10 @@ export class RequestSubmission {
     if (!this.pending || this.pending.paths.includes(path)) return;
     this.pending.paths.push(path); this.persist();
   }
-  /** Drop the pending request (delivered, or endpoint refused it). Never deletes the saved row. */
-  clear() { this.pending = null; this.persist(); }
+  get isRejected() { return this.pending?.rejected === true; }
+  private clear() { this.pending = null; this.persist(); }
+  /** Explicit user action only ("new request"); never called automatically. Never deletes the saved row. */
+  discard() { if (!this.busy) this.clear(); }
   async run(
     payload: Record<string, unknown>,
     save: (id: string, key: string, payload: Record<string, unknown>) => Promise<void>,
@@ -73,19 +78,26 @@ export class RequestSubmission {
     this.busy = true;
     try {
       const pending = this.pending ?? { id: crypto.randomUUID(), key: crypto.randomUUID(), payload: structuredClone(requestContactSchema.parse(payload)), saved: false, paths: [], fileNames: [...fileNames] };
-      this.pending = pending; this.persist();
+      this.pending = pending;
+      if (pending.rejected) return { state: "rejected" as const, id: pending.id };
+      this.persist();
       // Uncertain saves retry with the same id/key; submit_quote_request is idempotent for them.
       if (!pending.saved) { await save(pending.id, pending.key, pending.payload); pending.saved = true; this.persist(); }
       const result = await notify(pending.id, pending.key, pending);
       if (result === true) { this.clear(); return { state: "delivered" as const, id: pending.id }; }
-      if (result === "rejected") { this.clear(); return { state: "rejected" as const, id: pending.id }; }
+      if (result === "rejected") { pending.rejected = true; this.persist(); return { state: "rejected" as const, id: pending.id }; }
       return { state: "saved" as const, id: pending.id };
     } finally { this.busy = false; }
   }
 }
 
-export const sessionSlot = (key: string) =>
-  typeof window !== "undefined" && window.sessionStorage ? { store: window.sessionStorage, key } : undefined;
+/** The sessionStorage getter itself can throw (SecurityError) — fall back to in-memory retries. */
+export const sessionSlot = (key: string) => {
+  try {
+    const store = typeof window !== "undefined" ? window.sessionStorage : undefined;
+    return store ? { store, key } : undefined;
+  } catch { return undefined; }
+};
 
 /** Attachment names chosen for a pending request that have no uploaded path (lost on reload). */
 export function missingAttachmentNames(p: Pick<PendingRequest, "id" | "paths" | "fileNames">) {
