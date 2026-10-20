@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { thumbUrl } from "@/lib/imageProxy";
 import { russellImageColor } from "@/lib/russellImages";
+import { bbImageBelongsToStyle } from "@/lib/bbImageOwnership";
 
 type ImageRow = { color?: string | null; url?: string | null; alternate?: string | null; view?: string | null };
 
@@ -33,7 +34,7 @@ async function fetchImages(source: string, id: string): Promise<ImageRow[]> {
     case "bb": {
       const { data, error } = await supabase.from("bb_images").select("color_name,url").eq("style_code", id).order("sort_order");
       if (error) throw error;
-      return (data || []).map(r => ({ color: r.color_name, url: r.url }));
+      return (data || []).filter(r => r.color_name || bbImageBelongsToStyle(r.url, id)).map(r => ({ color: r.color_name, url: r.url }));
     }
     case "ru": {
       const { data, error } = await supabase.from("ru_images").select("color_name,url").eq("style_code", id).order("sort_order");

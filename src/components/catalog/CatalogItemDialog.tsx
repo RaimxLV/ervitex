@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { bbImageBelongsToStyle, bbImageMentionsColor } from "@/lib/bbImageOwnership";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -639,7 +640,8 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
     if (key) {
       if (!imgByColor.has(key)) imgByColor.set(key, []);
       imgByColor.get(key)!.push(im.url);
-    } else {
+    } else if (bbImageBelongsToStyle(im.url, styleCode)) {
+      // Model shots must name this exact code; B15C files never enter B15.
       shared.push(im.url);
     }
   }
@@ -672,8 +674,7 @@ async function loadBB(styleCode: string): Promise<ProductDetail | null> {
     const colourImgs = imgByColor.get(key) || [];
     // Gallery = colour swatch shots + all style shots that mention this colour,
     // falling back to every shared shot when the colour isn't in the filename.
-    const slug = key.replace(/[^a-z0-9]/g, "");
-    const matching = shared.filter((u) => u.toLowerCase().replace(/[^a-z0-9]/g, "").includes(slug));
+    const matching = shared.filter((u) => bbImageMentionsColor(u, key));
     const merged = [...new Set([...colourImgs, ...(matching.length ? matching : shared)])];
     return {
       code: info.name,
