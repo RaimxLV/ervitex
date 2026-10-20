@@ -60,4 +60,6 @@ export function CreateOfferButton({ fromCart = false, compact = false, iconOnly 
     {busy ? <Loader2 className={`${iconOnly ? "" : "mr-2"} h-4 w-4 animate-spin`} /> : fromCart ? <ClipboardList className="mr-2 h-4 w-4" /> : <Plus className={`${iconOnly ? "" : "mr-2"} h-4 w-4`} />}
     {!iconOnly && (fromCart ? `No groza (${items.length})` : "Izveidot piedāvājumu")}
   </Button>;
+  if (!blockedReason) return button;
+  return <span className="inline-flex flex-wrap items-center gap-2" title={blockedReason}>{button}<span role="note" className="text-xs text-muted-foreground">{blockedReason}</span></span>;
 }
