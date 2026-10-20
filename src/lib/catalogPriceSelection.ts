@@ -86,5 +86,14 @@ export function catalogColorPrice<T>(
     if (source === "mf") { const k = malfiniColorKey(id, code); if (k) keys.unshift(k); }
     for (const k of keys) { const hit = prices.get(base + k); if (hit) return hit; }
   }
+  // BB: kataloga `c` ir sintētisks (W952-SOFTWHITE/BOTTLEGREEN), cenas glabā pilno krāsas nosaukumu.
+  if (source === "bb" && color?.n?.trim()) {
+    const hit = prices.get(base + color.n.trim().toLowerCase());
+    if (hit) return hit;
+  }
   return MODEL_WIDE_CATALOG_SOURCES.has(source) ? prices.get(base) : undefined;
 }
+
+/** Krāsas vērtība navigācijai uz preces lapu (detalizētie ielādētāji izmanto šo kodu). */
+export const catalogColorParam = (source: string, c: { c?: string | null; n?: string | null } | null | undefined) =>
+  !c ? null : source === "pf" || source === "bb" ? c.n || c.c || null : c.c || c.n || null;

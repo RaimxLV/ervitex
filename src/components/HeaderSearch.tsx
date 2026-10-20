@@ -4,72 +4,43 @@ import { Search, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { readCatalogCache } from "@/lib/catalogCache";
-import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
+import { createRowsLoader, type HeaderSearchRow } from "@/lib/headerSearchRows";
 import { prepareQuery, searchMatches } from "@/lib/catalogSearch";
 import { thumbUrl } from "@/lib/imageProxy";
 import { useLanguage } from "@/i18n/LanguageContext";
 
-interface Row {
-  source: string;
-  id: string;
-  name: string | null;
-  brand: string | null;
-  category: string | null;
-  group_name: string | null;
-  image_url?: string | null;
-}
+type Row = HeaderSearchRow;
 
 /** Galvenās izvēlnes meklētāja rezultātu skaits (bija 8). */
 export const MENU_RESULT_LIMIT = 7;
 
-let loadPromise: Promise<Row[]> | null = null;
-
-const loadRows = (): Promise<Row[]> => {
-  if (loadPromise) return loadPromise;
-  loadPromise = (async () => {
-    let items: Row[] = [];
-    let prices: any[] = [];
+const READ_TIMEOUT_MS = 20000;
+const rowsLoader = createRowsLoader({
+  readCache: async () => {
     const cached = await readCatalogCache("all");
-    if (cached && !cached.stale) {
-      items = cached.entry.items as Row[];
-      prices = cached.entry.prices as any[];
-    } else {
-      const STEP = 1000;
-      const fetchAll = async (table: string, cols: string, order: string) => {
-        const first = await supabase.from(table as any).select(cols, { count: "exact" }).order(order).range(0, STEP - 1);
-        let rows = (first.data || []) as any[];
-        const total = first.count ?? rows.length;
-        const offs: number[] = [];
-        for (let f = STEP; f < total; f += STEP) offs.push(f);
-        const rest = await Promise.all(
-          offs.map((f) => supabase.from(table as any).select(cols).order(order).range(f, f + STEP - 1)),
-        );
-        for (const r of rest) rows = rows.concat((r.data || []) as any[]);
-        return rows;
-      };
-      [items, prices] = await Promise.all([
-        fetchAll("catalog_items", "source,id,name,brand,category,group_name,image_url", "id"),
-        fetchAll("catalog_price_ranges", "source,style_code,min_price", "style_code"),
-      ]);
-    }
-    const priced = new Set(
-      prices.filter((p) => Number(p.min_price) > 0).map((p) => `${p.source}:${p.style_code}`),
-    );
-    const { data: rem } = await supabase.from("catalog_remnants" as any).select("source,style_code").range(0, 4999);
-    const remnants = new Set(((rem || []) as any[]).map((r) => `${r.source}:${r.style_code}`));
-    return items
-      .filter((it) => it?.id && it.name && !remnants.has(`${it.source}:${it.id}`) && (it.source === "etx" || priced.has(`${it.source}:${it.id}`)))
-      .map((it) => ({
-        ...it,
-        category:
-          !it.category || isCoarseCategory(it.category) ? categoryFromName(it.name) || it.category : it.category,
-      }));
-  })().catch(() => {
-    loadPromise = null;
-    return [];
-  });
-  return loadPromise;
-};
+    return cached && !cached.stale ? { items: cached.entry.items as unknown[], prices: cached.entry.prices as unknown[] } : null;
+  },
+  fetchPage: async (table, cols, order, from, to, withCount) => {
+    const r = await supabase.from(table as any).select(cols, withCount ? { count: "exact" } : undefined)
+      .order(order).range(from, to).abortSignal(AbortSignal.timeout(READ_TIMEOUT_MS));
+    return { data: r.data as unknown[] | null, error: r.error, count: r.count };
+  },
+  fetchRemnants: async () => {
+    const r = await supabase.from("catalog_remnants" as any).select("source,style_code").range(0, 4999).abortSignal(AbortSignal.timeout(READ_TIMEOUT_MS));
+    return { data: r.data as unknown[] | null, error: r.error };
+  },
+});
+
+/** Sīktēls: vispirms mazais proxy, tad oriģināls, tad neitrāls lauks. */
+function SearchThumb({ src }: { src: string }) {
+  const proxied = thumbUrl(src, 120) || src;
+  const [stage, setStage] = useState(0);
+  useEffect(() => setStage(0), [src]);
+  const current = stage === 0 ? proxied : stage === 1 && proxied !== src ? src : null;
+  if (!current) return null;
+  return <img src={current} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain"
+    onError={() => setStage((s) => (s === 0 && proxied !== src ? 1 : 2))} />;
+}
 
 interface Props {
   onDone?: () => void;
@@ -87,12 +58,16 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
   const navigate = useNavigate();
   const [value, setValue] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const boxRef = useRef<HTMLDivElement>(null);
 
-  const ensureLoaded = () => {
-    if (!rows.length) void loadRows().then(setRows);
+  const ensureLoaded = (force = false) => {
+    // Failed loads retry only via the Retry button, never on every focus.
+    if (status === "loading" || status === "ready" || (status === "error" && !force)) return;
+    setStatus("loading");
+    rowsLoader.load().then((r) => { setRows(r); setStatus("ready"); }, () => setStatus("error"));
   };
 
   useEffect(() => {
@@ -185,7 +160,13 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
             inline ? "mt-2" : "absolute left-0 right-0 top-full z-50 mt-1"
           }`}
         >
-          {!rows.length ? (
+          {status === "error" ? (
+            <div className="flex items-center justify-between gap-3 px-4 py-3 text-sm text-muted-foreground" role="alert">
+              <span>{lang === "lv" ? "Neizdevās ielādēt preces" : "Could not load products"}</span>
+              <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => ensureLoaded(true)}
+                className="shrink-0 font-bold text-accent hover:underline">{lang === "lv" ? "Mēģināt vēlreiz" : "Retry"}</button>
+            </div>
+          ) : status !== "ready" ? (
             <p className="px-4 py-3 text-sm text-muted-foreground">{lang === "lv" ? "Ielādē…" : "Loading…"}</p>
           ) : results.length ? (
             <ul role="listbox" className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -209,9 +190,7 @@ export default function HeaderSearch({ onDone, autoFocus, className, inputClassN
                     }`}
                   >
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-muted">
-                      {r.image_url && (
-                        <img src={thumbUrl(r.image_url, 120) || r.image_url} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
-                      )}
+                      {r.image_url && <SearchThumb src={r.image_url} />}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium">{r.name}</span>

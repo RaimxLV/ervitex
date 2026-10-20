@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { usePendingRequest, rejectedText } from "@/hooks/usePendingRequest";
 import { PendingRequestNotice } from "@/components/quote/PendingRequestNotice";
 import { saveRequest, notifyRequest } from "@/lib/submitRequest";
@@ -18,6 +18,7 @@ interface QuoteFormProps {
 const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
   const { lang } = useLanguage();
   const { toast } = useToast();
+  const fieldId = useId();
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
   const { submission, locked, sync, rejected, discard } = usePendingRequest(`quote:${productId || "general"}`, ({ payload: p }) =>
@@ -68,27 +69,27 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
       <PendingRequestNotice locked={locked} rejected={rejected} lang={lang} onNew={() => { discard(); setForm({ name: "", email: "", phone: "", company: "", message: "" }); }} />
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <Label className="text-xs uppercase tracking-wider">{lang === "lv" ? "Vārds *" : "Name *"}</Label>
-          <Input disabled={sending || locked} value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+          <Label htmlFor={`${fieldId}-0`} className="text-xs uppercase tracking-wider">{lang === "lv" ? "Vārds *" : "Name *"}</Label>
+          <Input id={`${fieldId}-0`} name="name" autoComplete="name" disabled={sending || locked} value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
         </div>
         <div>
-          <Label className="text-xs uppercase tracking-wider">{lang === "lv" ? "E-pasts *" : "Email *"}</Label>
-          <Input disabled={sending || locked} type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} required />
+          <Label htmlFor={`${fieldId}-1`} className="text-xs uppercase tracking-wider">{lang === "lv" ? "E-pasts *" : "Email *"}</Label>
+          <Input id={`${fieldId}-1`} name="email" autoComplete="email" disabled={sending || locked} type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} required />
         </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <Label className="text-xs uppercase tracking-wider">{lang === "lv" ? "Tālrunis" : "Phone"}</Label>
-          <Input disabled={sending || locked} value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
+          <Label htmlFor={`${fieldId}-2`} className="text-xs uppercase tracking-wider">{lang === "lv" ? "Tālrunis" : "Phone"}</Label>
+          <Input id={`${fieldId}-2`} name="phone" type="tel" autoComplete="tel" disabled={sending || locked} value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
         </div>
         <div>
-          <Label className="text-xs uppercase tracking-wider">{lang === "lv" ? "Uzņēmums" : "Company"}</Label>
-          <Input disabled={sending || locked} value={form.company} onChange={e => setForm({...form, company: e.target.value})} />
+          <Label htmlFor={`${fieldId}-3`} className="text-xs uppercase tracking-wider">{lang === "lv" ? "Uzņēmums" : "Company"}</Label>
+          <Input id={`${fieldId}-3`} name="company" autoComplete="organization" disabled={sending || locked} value={form.company} onChange={e => setForm({...form, company: e.target.value})} />
         </div>
       </div>
       <div>
-        <Label className="text-xs uppercase tracking-wider">{lang === "lv" ? "Ziņojums" : "Message"}</Label>
-        <Textarea disabled={sending || locked} value={form.message} onChange={e => setForm({...form, message: e.target.value})} rows={4} />
+        <Label htmlFor={`${fieldId}-4`} className="text-xs uppercase tracking-wider">{lang === "lv" ? "Ziņojums" : "Message"}</Label>
+        <Textarea id={`${fieldId}-4`} name="message" disabled={sending || locked} value={form.message} onChange={e => setForm({...form, message: e.target.value})} rows={4} />
       </div>
       <Button type="submit" disabled={sending || rejected} className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest">
         <Send className="mr-2 h-4 w-4" />

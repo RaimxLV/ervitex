@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { usePendingRequest, rejectedText } from "@/hooks/usePendingRequest";
 import { PendingRequestNotice } from "@/components/quote/PendingRequestNotice";
 import { pendingDisplayItems } from "@/lib/requestSubmission";
@@ -29,6 +29,7 @@ const MAX_FILES = 10;
 const MAX_FILE_MB = 15;
 
 const RequestPage = () => {
+  const fieldId = useId();
   const { items: cartItems, remove, updateQty, clear } = useQuoteCart();
   const { lang } = useLanguage();
   const { toast } = useToast();
@@ -241,9 +242,9 @@ const RequestPage = () => {
                 </h2>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
+                    <Label htmlFor={`${fieldId}-method`} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
                     <Select disabled={sending || locked} value={print.method || "consult"} onValueChange={(value) => setPrint({ ...print, method: value })}>
-                      <SelectTrigger aria-label={t("Apdrukas metode visām precēm", "Print method for all items")}><SelectValue /></SelectTrigger>
+                      <SelectTrigger id={`${fieldId}-method`} aria-label={t("Apdrukas metode visām precēm", "Print method for all items")}><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="consult">{t("Nezinu / konsultēties", "Not sure / consult")}</SelectItem>
                         <SelectItem value="silkscreen">{t("Sietspiede", "Screen print")}</SelectItem>
@@ -254,8 +255,8 @@ const RequestPage = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vēlamais termiņš", "Deadline")}</Label>
-                    <Input disabled={sending || locked} className="h-11 rounded-sm" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
+                    <Label htmlFor={`${fieldId}-0`} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vēlamais termiņš", "Deadline")}</Label>
+                    <Input id={`${fieldId}-0`} disabled={sending || locked} className="h-11 rounded-sm" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
                   </div>
                 </div>
 
@@ -264,8 +265,8 @@ const RequestPage = () => {
                   <label className="space-y-2"><span className="quote-label">{t("Krāsu skaits", "Number of colours")}</span><Input disabled={sending || locked} value={print.colors} onChange={(e) => setPrint({ ...print, colors: e.target.value })} /></label>
                 </div>
                 <div className="mt-5 space-y-2">
-                  <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
-                  <Textarea disabled={sending || locked} rows={4} className="resize-none rounded-sm" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
+                  <Label htmlFor={`${fieldId}-1`} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
+                  <Textarea id={`${fieldId}-1`} disabled={sending || locked} rows={4} className="resize-none rounded-sm" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
                 </div>
               </section>
 
@@ -339,20 +340,20 @@ const RequestPage = () => {
                 </h2>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vārds", "Name")} *</Label>
-                    <Input disabled={sending || locked} className="h-11 rounded-sm" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                    <Label htmlFor={`${fieldId}-2`} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vārds", "Name")} *</Label>
+                    <Input id={`${fieldId}-2`} name="name" autoComplete="name" disabled={sending || locked} className="h-11 rounded-sm" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("E-pasts", "Email")} *</Label>
-                    <Input disabled={sending || locked} type="email" className="h-11 rounded-sm" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                    <Label htmlFor={`${fieldId}-3`} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("E-pasts", "Email")} *</Label>
+                    <Input id={`${fieldId}-3`} name="email" autoComplete="email" disabled={sending || locked} type="email" className="h-11 rounded-sm" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Tālrunis", "Phone")}</Label>
-                    <Input disabled={sending || locked} className="h-11 rounded-sm" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                    <Label htmlFor={`${fieldId}-4`} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Tālrunis", "Phone")}</Label>
+                    <Input id={`${fieldId}-4`} name="phone" type="tel" autoComplete="tel" disabled={sending || locked} className="h-11 rounded-sm" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Uzņēmums", "Company")}</Label>
-                    <Input disabled={sending || locked} className="h-11 rounded-sm" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                    <Label htmlFor={`${fieldId}-5`} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Uzņēmums", "Company")}</Label>
+                    <Input id={`${fieldId}-5`} name="company" autoComplete="organization" disabled={sending || locked} className="h-11 rounded-sm" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
                   </div>
                   <details className="group rounded-sm border border-border">
                     <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs font-semibold uppercase tracking-wider text-foreground">
@@ -371,8 +372,8 @@ const RequestPage = () => {
                         ["bic", "SWIFT/BIC"],
                       ] as const).map(([k, label]) => (
                         <div key={k} className="space-y-1.5">
-                          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</Label>
-                          <Input disabled={sending || locked} aria-label={label} className="h-11 rounded-sm" maxLength={k === "iban" ? 42 : k === "bic" ? 11 : 300} value={billing[k]} onChange={(e) => setBilling({ ...billing, [k]: e.target.value })} />
+                          <Label htmlFor={`${fieldId}-billing-${k}`} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</Label>
+                          <Input id={`${fieldId}-billing-${k}`} disabled={sending || locked} aria-label={label} className="h-11 rounded-sm" maxLength={k === "iban" ? 42 : k === "bic" ? 11 : 300} value={billing[k]} onChange={(e) => setBilling({ ...billing, [k]: e.target.value })} />
                         </div>
                       ))}
                     </div>

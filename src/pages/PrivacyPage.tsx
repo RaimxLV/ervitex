@@ -5,7 +5,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 type Section = {
   title: string;
   paragraphs?: string[];
-  bullets?: { lead?: string; text: string }[];
+  bullets?: { id?: string; lead?: string; text: string }[];
   afterBullets?: string[];
 };
 
@@ -19,7 +19,7 @@ const SECTIONS_LV: Section[] = [
     bullets: [
       { lead: "Kontaktinformācija", text: "vārds, e-pasts, tālrunis, uzņēmums, ko jūs norādāt saziņas vai cenu pieprasījumu formās." },
       { lead: "Tehniskie dati", text: "IP adrese, pārlūkprogrammas tips, apmeklējuma laiks (tīmekļa servera žurnāli)." },
-      { lead: "Sīkdatnes", text: "tikai tehniski nepieciešamās sīkdatnes sesijas uzturēšanai." },
+      { id: "cookies", lead: "Sīkdatnes", text: "tikai tehniski nepieciešamās sīkdatnes sesijas uzturēšanai." },
     ],
   },
   {
@@ -70,7 +70,7 @@ const SECTIONS_EN: Section[] = [
     bullets: [
       { lead: "Contact information", text: "name, email, phone, company provided through contact or quote request forms." },
       { lead: "Technical data", text: "IP address, browser type, visit time (web server logs)." },
-      { lead: "Cookies", text: "only technically necessary cookies for session management." },
+      { id: "cookies", lead: "Cookies", text: "only technically necessary cookies for session management." },
     ],
   },
   {
@@ -160,7 +160,7 @@ const PrivacyPage = () => {
                 {section.bullets && (
                   <ul className="mt-3 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground marker:text-accent">
                     {section.bullets.map((b) => (
-                      <li key={b.text.slice(0, 32)}>
+                      <li key={b.text.slice(0, 32)} id={b.id} className={b.id ? "scroll-mt-28" : undefined}>
                         {b.lead && <strong className="text-foreground">{b.lead}</strong>}
                         {b.lead ? " — " : ""}
                         {b.text}

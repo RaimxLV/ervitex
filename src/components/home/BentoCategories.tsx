@@ -69,7 +69,7 @@ const TILES: Tile[] = [
     link: cat(["Notebooks", "Ballpoint Pens", "Umbrellas", "Gift Sets"]),
   },
   { id: "new", lv: "Jaunumi", en: "New arrivals", image: newArrivalsImg, link: "/catalog?sort=newest", highlight: true },
-  { id: "best", lv: "Populārākie", en: "Best sellers", image: bestsellersImg, link: "/catalog?sort=name-asc" },
+  { id: "best", lv: "Populārākie", en: "Best sellers", image: bestsellersImg, link: "/catalog?sort=featured" },
 ];
 
 const BentoCategories = () => {
