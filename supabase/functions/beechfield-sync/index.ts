@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
+import { bbImageBelongsToStyle } from "../_shared/bbImageOwnership.ts";
 
 const BRANDS: Record<string, { host: string; brand: string }> = {
   beechfield: { host: "beechfield.com", brand: "Beechfield" },
@@ -107,9 +108,8 @@ function parseProduct(url: string, html: string): Parsed | null {
   const images: string[] = [];
   for (const u of rawUrls) {
     if (/\/mp4\/|\.mp4$|\/original\//i.test(u)) continue;
-    const fname = u.split("/").pop() || "";
-    // Only keep media that belongs to THIS style (pages also link related products)
-    if (!fname.toLowerCase().includes(code.toLowerCase())) continue;
+    // Only keep media that belongs to THIS style: whole code token (B15 page also links B15C).
+    if (!bbImageBelongsToStyle(u, code)) continue;
     if (!images.includes(u)) images.push(u);
   }
   // Prefer the "Product-Shot-01" / primary shot first
