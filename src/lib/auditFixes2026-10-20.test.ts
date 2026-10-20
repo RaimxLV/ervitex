@@ -98,3 +98,17 @@ describe("A08 header search loader", () => {
     expect(await empty.load()).toEqual([]);
   });
 });
+
+import { thumbCandidates } from "@/components/HeaderSearch";
+describe("A03 header thumbnail same-row fallback", () => {
+  it("tries main proxy, main, then same-model hover; bounded and deduped", () => {
+    const main = "https://cdn.fruitoftheloom.eu/resources/images/product/0R957M/36/large/64070.jpg";
+    const hover = "https://cdn.fruitoftheloom.eu/resources/images/product/0R957M/BZ/large/64037.jpg";
+    const list = thumbCandidates([main, hover]);
+    expect(list.length).toBe(4);
+    expect(list[1]).toBe(main);
+    expect(list[3]).toBe(hover);
+    expect(thumbCandidates([main, main]).length).toBe(2);
+    expect(thumbCandidates([null, undefined])).toEqual([]);
+  });
+});
