@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { usePendingRequest, rejectedText } from "@/hooks/usePendingRequest";
 import { PendingRequestNotice } from "@/components/quote/PendingRequestNotice";
 import { pendingDisplayItems } from "@/lib/requestSubmission";
@@ -29,6 +29,7 @@ const MAX_FILES = 10;
 const MAX_FILE_MB = 15;
 
 const RequestPage = () => {
+  const fieldId = useId();
   const { items: cartItems, remove, updateQty, clear } = useQuoteCart();
   const { lang } = useLanguage();
   const { toast } = useToast();
@@ -241,9 +242,9 @@ const RequestPage = () => {
                 </h2>
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
+                    <Label htmlFor={`${fieldId}-method`} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
                     <Select disabled={sending || locked} value={print.method || "consult"} onValueChange={(value) => setPrint({ ...print, method: value })}>
-                      <SelectTrigger aria-label={t("Apdrukas metode visām precēm", "Print method for all items")}><SelectValue /></SelectTrigger>
+                      <SelectTrigger id={`${fieldId}-method`} aria-label={t("Apdrukas metode visām precēm", "Print method for all items")}><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="consult">{t("Nezinu / konsultēties", "Not sure / consult")}</SelectItem>
                         <SelectItem value="silkscreen">{t("Sietspiede", "Screen print")}</SelectItem>
