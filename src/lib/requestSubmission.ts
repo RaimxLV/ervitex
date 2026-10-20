@@ -109,3 +109,9 @@ export function missingAttachmentNames(p: Pick<PendingRequest, "id" | "paths" | 
     return true;
   });
 }
+
+/** Items to render: a pending request's immutable payload items win over the live cart. */
+export function pendingDisplayItems<T>(pending: Pick<PendingRequest, "payload"> | null, cart: T[]): T[] {
+  const items = pending?.payload.items;
+  return pending && Array.isArray(items) ? (items as T[]) : cart;
+}
