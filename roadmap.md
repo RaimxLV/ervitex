@@ -1,5 +1,6 @@
 # Roadmap
-- [ ] Steidzami Malfini ×1,75 un Russell ×1,70: pārbaudīt A203 faktiskās standarta iepirkuma cenas, privāta rezerves kopija, visas autoritatīvās formulas un mērķēta pārcenošana bez sinhronizācijas; admina izlaidums apturēts līdz pārskatam.
+- [x] Malfini ×1,75 un Russell ×1,70: MF autorizētas 15584 cenas sakrīt; mērķēts pārrēķins, privāta kopija, DB/importa/audita formulas un MF funkcija izvietotas; 0 neatbilstību MF15521/RU93 publiskajās cenās, bez pilnas sinhronizācijas/frontend izlaiduma.
+- [ ] Russell aktuālā ārējā iepirkuma avota pārbaude — projektā nav atrasts autorizēts avots/importētājs; esošo 93 modeļu cenas un ×1,70 pārbaudītas datubāzē, ne pie piegādātāja.
 - [x] 6400 meklēšana: UTT+GI/GIB/GIL četru/piecu ciparu tokenu noteikums; testi un abi meklētāji; bez DB/sinhronizācijas/publicēšanas.
 - [x] Pieprasījumu/piedāvājumu audits: sadales migrācija pielietota, pozīcija 1 un 6 vēsturiskās rindas saglabātas; izolētie DB, 294 regresijas un 3 pielikumu testi izturēti; sintētiskā UI/bezsaistes e-pasti. Pārskats: docs/audits/request-flow-2026-10-20/README.md.
 - [ ] Pieprasījumu izlaidums — gaida root pārskatu un saderīgu klienta/paziņotāja izvietošanu; īsta sūtīšana aizliegta. Ziņojumā norādīti pārlādes atkārtojuma un tukšā saraksta robežgadījumi, reālais servera/Safari ceļš nav pārbaudīts.
