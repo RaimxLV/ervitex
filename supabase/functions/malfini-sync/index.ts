@@ -1,5 +1,5 @@
 // Malfini B2B API sync — imports styles, variants, images, prices and stock.
-// Retail price = wholesale × 1.65 (same formula as Beechfield / PF Concept).
+// Retail NET price = the supplier's normal single-unit wholesale price × markup.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { isMalfiniOutlet, malfiniUnitPrices } from "../_shared/supplierFlags.ts";
 import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
@@ -11,7 +11,7 @@ const corsHeaders = {
 };
 
 const API = "https://api.malfini.com/api/v4";
-const MARKUP = 1.65;
+const MARKUP = 1.75;
 
 async function login(): Promise<string> {
   const res = await fetch(`${API}/api-auth/login`, {

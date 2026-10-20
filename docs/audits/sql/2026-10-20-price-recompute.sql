@@ -24,7 +24,7 @@ with exp as (
     from pf_variants v join pf_styles s using(model_code) left join pf_public_retail_prices p on p.item_code=v.item_code
    where v.feed_active and s.feed_active
   union all
-  select 'ru', s.style_code, s.style_code, case when p.retail_price>0 then round(p.retail_price*1.65,2) end
+  select 'ru', s.style_code, s.style_code, case when p.retail_price>0 then round(p.retail_price*1.70,2) end
     from ru_styles s left join ru_prices p using(style_code)
    where s.published and not s.hidden_by_admin
   union all
