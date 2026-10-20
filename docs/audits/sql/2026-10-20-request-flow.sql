@@ -58,8 +58,8 @@ BEGIN
 END $$;
 REVOKE ALL ON FUNCTION public.submit_quote_request(uuid,uuid,jsonb) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.submit_quote_request(uuid,uuid,jsonb) TO anon,authenticated,service_role;
--- Public clients submit only through the whitelisted capability RPC, never arbitrary rows.
-DROP POLICY IF EXISTS "Anyone can submit a quote" ON public.quote_requests;
+-- Keep the existing INSERT policy during rollout: the trigger owns assignment
+-- for old clients too. The new RPC supplies an unguessable retry/send capability.
 
 CREATE OR REPLACE FUNCTION public.get_quote_request_print_details(_token text)
 RETURNS TABLE(print_method text, print_placement text, print_colors text, deadline text)

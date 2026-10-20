@@ -1,6 +1,6 @@
 # Roadmap
 - [x] 6400 meklēšana: UTT+GI/GIB/GIL četru/piecu ciparu tokenu noteikums; testi un abi meklētāji; bez DB/sinhronizācijas/publicēšanas.
-- [ ] Pieprasījumu/piedāvājumu audits: droša atomāra sadale un atkārtojumi; apdruka augšdaļā, garie komentāri, kopīgā saraksta pogas; finanšu/atļauju/e-pasta testi bez īstiem sūtījumiem.
+- [ ] Pieprasījumu/piedāvājumu audits: pabeigt atomāras sadales migrāciju (saglabāt pozīciju 1 un 6 vēsturiskās rindas), idempotentu iesniegšanu visās formās, pielikumu/e-pasta drošību, apdrukas un variantu/cenu regresijas; izolēta DB un sintētiski e-pasti, bez īstiem sūtījumiem; root pārskats pirms publicēšanas.
 - [x] Izolēti priekšskatījumā: White/Natural sākuma izvēle un foto/krāsas/cenas saskaņošana visos trīs kartīšu ceļos; 33 testi, STTU169 Aloe un manuāla White/Natural Raw izvēle pārbaudīta; DB/formulas/sinhronizācija/publicējums neskarti.
 - [x] Katalogā rādīt meklēto modeļa kodu, ne krāsas/izmēra kodu (169, ne 1694412); abu meklētāju 169 secība, 167/1672/STTU169 un 18 testi pārbaudīti.
 - [x] Banka, IBAN un SWIFT/BIC rekvizītos; apdrukas/failu statusi un saites augšā. Pārbaudīts ceļš no īstas preces līdz formai, e-pasta izskats, 12 testi un bankas validācija datubāzē; reāls e-pasts netika nosūtīts.

@@ -1,6 +1,7 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendAppEmail } from "../_shared/send-app-email.ts";
+import { uuidPattern, scopedAttachmentPaths, canNotifyRequest } from "../_shared/request-safety.ts";
 
 const OFFICE_EMAIL = "birojs@ervitex.lv";
 
@@ -8,25 +9,18 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { request_id, file_urls: uploadedPaths } = await req.json();
-    if (!request_id) {
+    const { request_id, submission_key, file_urls: uploadedPaths = [] } = await req.json();
+    if (typeof request_id !== "string" || !uuidPattern.test(request_id)) {
       return new Response(JSON.stringify({ error: "request_id required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
-
-    if (Array.isArray(uploadedPaths) && uploadedPaths.length > 0) {
-      const clean = uploadedPaths.filter((p: unknown): p is string => typeof p === "string" && !!p).slice(0, 20);
-      if (clean.length > 0) {
-        await supabase.from("quote_requests").update({ file_urls: clean }).eq("id", request_id);
-      }
-    }
+    const backendUrl = Deno.env.get("SUPABASE_URL");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!backendUrl || !serviceKey) throw new Error("Service unavailable");
+    const supabase = createClient(backendUrl, serviceKey);
 
     const { data: quote, error } = await supabase
       .from("quote_requests")
@@ -41,12 +35,34 @@ Deno.serve(async (req) => {
       });
     }
 
+    // A UUID alone is not permission to patch attachments or trigger mail.
+    let admin = false;
+    const bearer = req.headers.get("Authorization")?.replace(/^Bearer\s+/i, "");
+    if (bearer && bearer !== Deno.env.get("SUPABASE_ANON_KEY")) {
+      const { data: auth, error: authError } = await supabase.auth.getUser(bearer);
+      if (!authError && auth.user) {
+        const { data: role, error: roleError } = await supabase.rpc("has_role", { _user_id: auth.user.id, _role: "admin" });
+        admin = !roleError && role === true;
+      }
+    }
+    if (!canNotifyRequest(quote, submission_key, admin)) return new Response(JSON.stringify({ error: "Not allowed" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    const clean = scopedAttachmentPaths(request_id, uploadedPaths);
+    if (clean.length) {
+      const paths = [...new Set([...(quote.file_urls || []), ...clean])];
+      if (paths.length > 20) throw new Error("Too many attachments");
+      const { error: updateError } = await supabase.from("quote_requests").update({ file_urls: paths }).eq("id", request_id);
+      if (updateError) throw updateError;
+      quote.file_urls = paths;
+    }
+    if (!quote.assigned_pm_slug || !quote.assigned_pm_name || !quote.assigned_pm_email) {
+      return new Response(JSON.stringify({ error: "Assigned manager missing" }), { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
     // Convert stored paths -> 30-day signed URLs
     const rawFiles: string[] = Array.isArray(quote.file_urls) ? quote.file_urls : [];
     const signedUrls: string[] = [];
     for (const entry of rawFiles) {
       if (typeof entry !== "string" || !entry) continue;
-      if (/^https?:\/\//i.test(entry)) { signedUrls.push(entry); continue; }
+      try { scopedAttachmentPaths(request_id, [entry]); } catch { continue; }
       const { data: signed } = await supabase.storage
         .from("quote-attachments")
         .createSignedUrl(entry, 60 * 60 * 24 * 30);
@@ -68,7 +84,9 @@ Deno.serve(async (req) => {
       print_placement: quote.print_placement || "",
       print_colors: quote.print_colors || "",
       deadline: quote.deadline || "",
-      submittedAt: new Date().toLocaleString("lv-LV"),
+      submittedAt: new Date(quote.created_at).toLocaleString("lv-LV"),
+      pmName: quote.assigned_pm_name,
+      pmEmail: quote.assigned_pm_email,
       worksheetUrl,
       billing: (() => {
         const b = (quote.billing || {}) as Record<string, string>;
@@ -77,49 +95,15 @@ Deno.serve(async (req) => {
       })(),
     };
 
-    // Jaunie pieprasījumi automātiski tiek sadalīti pa apli starp projektu vadītājām.
-    const ROTATION = [
-      { slug: "laura", name: "Laura", email: "birojs@ervitex.lv" },
-      { slug: "ilona", name: "Ilona", email: "ilona@ervitex.lv" },
-      { slug: "justine", name: "Justīne", email: "justine@ervitex.lv" },
-      { slug: "santa", name: "Santa", email: "santa.k@ervitex.lv" },
-    ];
-    if (!quote.assigned_pm_slug) {
-      const { count } = await supabase
-        .from("quote_requests")
-        .select("id", { count: "exact", head: true })
-        .in("assigned_pm_slug", ROTATION.map((p) => p.slug));
-      const next = ROTATION[(count ?? 0) % ROTATION.length];
-      await supabase
-        .from("quote_requests")
-        .update({
-          assigned_pm_slug: next.slug,
-          assigned_pm_name: next.name,
-          assigned_pm_email: next.email,
-          assigned_at: new Date().toISOString(),
-        })
-        .eq("id", quote.id)
-        .is("assigned_pm_slug", null);
-      quote.assigned_pm_slug = next.slug;
-      quote.assigned_pm_name = next.name;
-      quote.assigned_pm_email = next.email;
-    }
-
-    // Klients saņem vēstuli no konkrētās projektu vadītājas (līdz nodošanai — Laura).
-    const pm = {
-      email: quote.assigned_pm_email || "birojs@ervitex.lv",
-      name: quote.assigned_pm_name || "Laura",
-    };
-
     const results: Array<{ to: string; template: string; ok: boolean; error?: string }> = [];
 
     // 1) Internal notification to the assigned project manager — with Reply-To
     //    set to the customer so staff can just hit "Reply" in their inbox.
-    const notifyEmail = quote.assigned_pm_email || OFFICE_EMAIL;
+    const notifyEmail = quote.assigned_pm_email;
     const officeRes = await sendAppEmail("quote-request", notifyEmail, {
         replyTo: quote.email,
         fromEmail: OFFICE_EMAIL,
-        fromName: quote.name,
+        fromName: "Ervitex",
         idempotencyKey: `quote-${quote.id}-office`,
         templateData: {
           ...baseData,
@@ -134,11 +118,11 @@ Deno.serve(async (req) => {
 
     const delivered = results.some(r => r.ok);
     return new Response(
-      JSON.stringify({ ok: true, delivered, recipients: results }),
+      JSON.stringify({ ok: true, delivered }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    return new Response(JSON.stringify({ error: String(e) }), {
+    return new Response(JSON.stringify({ error: "Paziņojumu neizdevās nosūtīt" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

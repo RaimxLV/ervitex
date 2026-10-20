@@ -4,6 +4,7 @@ import { getOrderPrints, setOrderPrints, removeOfferItem } from "@/lib/orderPrin
 import logo from "@/assets/ervitex-logo-dark.svg";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { offerGroupKey, replacedOfferItem } from "@/lib/requestPresentation";
 import { Link, useParams } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import OfferWorkspace from "@/components/quote/OfferWorkspace";
@@ -25,6 +26,8 @@ import { colorMatches } from "@/components/worksheet/useVariants";
 import { useOfferDraft } from "@/hooks/useOfferDraft";
 import { useServerFn } from "@tanstack/react-start";
 import { sendOffer } from "@/lib/sendOffer.functions";
+import { useLanguage } from "@/i18n/LanguageContext";
+import { validateOfferForSend } from "@/lib/offerValidation";
 
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
@@ -56,11 +59,13 @@ const AdminOfferEdit = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { lang } = useLanguage();
   const sendSavedOffer = useServerFn(sendOffer);
   const { offer, setOffer, initialize, persist, saveState, saveError } = useOfferDraft(user?.id, id, emptyOffer);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [sendingEmail, setSendingEmail] = useState<"client" | null>(null);
+  const sendBusy = useRef(false);
 
   // --- product picker state
   const [q, setQ] = useState("");
@@ -221,7 +226,7 @@ const AdminOfferEdit = () => {
   };
 
   /** Viena modeļa + krāsas grupa piedāvājumā */
-  const groupKey = (i: OfferItem) => `${i.source}|${i.productId}|${i.colorName || ""}`;
+  const groupKey = offerGroupKey;
   const swapTarget = useMemo(
     () => (swapKey ? offer.items.find((i) => groupKey(i) === swapKey) || null : null),
     [swapKey, offer.items],
@@ -239,8 +244,7 @@ const AdminOfferEdit = () => {
         const s = i.size || "-";
         const has = priceBySize.has(s);
         if (!has) missing += 1;
-        return {
-          ...i,
+        return replacedOfferItem(i, {
           source: picked.source,
           productId: picked.id,
           name: picked.name,
@@ -249,8 +253,9 @@ const AdminOfferEdit = () => {
           image: color?.u || picked.image_url || null,
           colorName: color?.n || null,
           colorHex: color?.h || null,
-          unitPrice: has ? (priceBySize.get(s) ?? null) : i.unitPrice,
-        };
+          colorCode: color?.c || null,
+          unitPrice: priceBySize.get(s) ?? null,
+        });
       }),
     }));
     setSwapKey(null);
@@ -318,6 +323,7 @@ const AdminOfferEdit = () => {
 
   // Real send through the platform email system
   const sendEmail = async () => {
+    if (sendBusy.current) return;
     const to = (offer.client_email || "").trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
       toast({
@@ -332,12 +338,14 @@ const AdminOfferEdit = () => {
       return;
     }
 
+    try { validateOfferForSend(offer); }
+    catch { toast({ title: "Pārbaudi preču daudzumus, cenas un apdruku", variant: "destructive" }); return; }
+    sendBusy.current = true;
     setSendingEmail("client");
-    // Publish the link first so the client can open it
-    if (!await save("sent")) { setSendingEmail(null); return; }
-
     try {
-      const result = await sendSavedOffer({ data: { offerId: offer.id } });
+      // Activate only a validated, saved offer; server validates again.
+      if (!await save("sent")) return;
+      const result = await sendSavedOffer({ data: { offerId: offer.id, lang } });
       if (!result.sent) {
         toast({ title: "Šai adresei e-pasta piegāde ir bloķēta", variant: "destructive" });
         return;
@@ -346,6 +354,7 @@ const AdminOfferEdit = () => {
       toast({ title: "Neizdevās nosūtīt", variant: "destructive" });
       return;
     } finally {
+      sendBusy.current = false;
       setSendingEmail(null);
     }
     toast({ title: `Piedāvājums nosūtīts: ${to}` });

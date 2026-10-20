@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { RequestSubmission } from "@/lib/requestSubmission";
+import { saveRequest, notifyRequest } from "@/lib/submitRequest";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, Clock3, Mail, MapPin, Phone, Send, X, Loader2, ReceiptText, Navigation, Calculator } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +50,8 @@ const ContactPage = () => {
   const [photoSettings, setPhotoSettings] = useState<Record<string, PhotoSettings>>({});
 
   const [sending, setSending] = useState(false);
+  const submission = useRef(new RequestSubmission());
+  const [locked, setLocked] = useState(false);
 
   useEffect(() => {
     supabase.from("team_photo_settings").select("slug, zoom, position_x, position_y, photo_url").then(({ data }) => {
@@ -82,21 +86,17 @@ const ContactPage = () => {
 
     setSending(true);
     try {
-      const { error } = await supabase.from("quote_requests").insert({
-        name,
-        email,
-        company: company || null,
-        phone: phone || null,
-        message,
-        status: "new",
-      });
-      if (error) throw error;
-      toast({ title: t("contact.sent"), description: t("contact.sentDesc") });
-      setForm({ name: "", email: "", company: "", phone: "", message: "" });
+      const result = await submission.current.run({ name, email, company: company || null, phone: phone || null, message }, saveRequest, notifyRequest);
+      if (result.state === "busy") return;
+      if (result.state === "delivered") {
+        toast({ title: t("contact.sent"), description: t("contact.sentDesc") });
+        setForm({ name: "", email: "", company: "", phone: "", message: "" });
+      } else toast({ title: lang === "lv" ? "Pieprasījums saglabāts; paziņojums nav nosūtīts. Mēģini vēlreiz." : "Request saved; notification not sent. Retry." });
     } catch {
       toast({ title: lang === "lv" ? "Kļūda" : "Error", description: lang === "lv" ? "Neizdevās nosūtīt ziņu. Mēģiniet vēlreiz." : "Failed to send message. Please try again.", variant: "destructive" });
     } finally {
       setSending(false);
+      setLocked(submission.current.hasPending);
     }
   };
 
@@ -232,13 +232,13 @@ const ContactPage = () => {
                   ] as const).map(([key, label, type, req]) => (
                      <div key={key} className="space-y-1.5 md:space-y-2">
                       <label htmlFor={`c-${key}`} className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{label}</label>
-                       <Input id={`c-${key}`} required={req} type={type} value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} className="h-11 rounded-none bg-background px-3 focus-visible:ring-accent md:h-12 md:px-4" />
+                       <Input disabled={sending || locked} id={`c-${key}`} required={req} type={type} value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} className="h-11 rounded-none bg-background px-3 focus-visible:ring-accent md:h-12 md:px-4" />
                     </div>
                   ))}
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="c-message" className="font-heading text-xs font-bold uppercase tracking-wider text-foreground">{t("contact.message")}</label>
-                  <Textarea id="c-message" required rows={7} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={t("contact.messagePlaceholder")} className="resize-none rounded-none bg-background px-4 py-3 focus-visible:ring-accent" />
+                  <Textarea disabled={sending || locked} id="c-message" required rows={7} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder={t("contact.messagePlaceholder")} className="resize-none rounded-none bg-background px-4 py-3 focus-visible:ring-accent" />
                 </div>
                 <Button type="submit" size="lg" disabled={sending} className="h-12 w-full rounded-none bg-accent px-8 font-heading text-sm uppercase text-accent-foreground hover:bg-accent/90 sm:w-auto">
                   {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" strokeWidth={1.5} />}

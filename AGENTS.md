@@ -2,14 +2,14 @@
 
 - Menu/catalog share searchMatches: shorthand uses source/prefix/token metadata, not ID lists; related codes need exact-token anchors; redirects keep facets.
 - productContent separates care/specs; translation caches use fingerprints.
-- Offers use CreateOfferButton, /offers, OfferWorkspace and shared offer item pricing helpers for consistent discounts; sharing activates drafts. useOfferDraft serializes version-checked autosaves with recovery; token refresh preserves editors.
+- CreateOfferButton/requestOfferData preserves inquiry manager/items/prints/pricing. Cart identity includes supplier/model/color/size. Sharing activates drafts; useOfferDraft serializes autosaves/recovery; token refresh preserves editors.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
-- Icons share AccentIcon tones, Lucide-style print-icons.
-- Public eyebrows share red line-labels; other tones are icon-only; technology use cases use centered light panels.
-- Office contours/hotspots share cover-scene coordinates; halos use separate feGaussianBlur polygons with oversized regions to prevent clipping.
+- Icons share AccentIcon and Lucide-style print-icons.
+- Public eyebrows use red line-labels; other tones are icon-only; technology use cases use centered light panels.
+- Office contours/hotspots share cover-scene coordinates; halos use feGaussianBlur polygons with oversized regions to avoid clipping.
 - Team uses immutable photo_url/framing and current CDN fallbacks; admin-only writes. Manual uploads share WebP optimization to avoid heavy originals.
-- Worksheets autosave side-specific drafts; explicit confirmation alone updates the shared list and creates an immutable version, preventing overwrites.
-- quote_events is append-only; insert trigger reuses email/latest PM, locked rotation advances for new clients only.
+- Worksheets autosave side-specific drafts; explicit confirmation alone updates the shared list with immutable versions.
+- quote_events is append-only; submit_quote_request owns immutable retries; its insert trigger owns email-sticky locked rotation. Notifications verify capability/admin and request-scoped attachments.
 - Normal email; burgundy worksheet links. Offers: admin-gated sendOffer/saved prices. Request bank fields: requestDetails/BILLING_FIELDS; staff email: print/files first.
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
 - catalogPriceSelection binds card photo/price to cheapest allowed colour outside excluded groups, with fallback; explicit choices override, stock is irrelevant.

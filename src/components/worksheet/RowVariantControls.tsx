@@ -29,16 +29,16 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
   // Auto-labojums: ja prece saglabāta ar cenu 0 bet katalogā ir cena, pievieno to automātiski.
   const autofixed = useRef(false);
   useEffect(() => {
-    if (autofixed.current || loading || item.unitPrice) return;
+    if (disabled || autofixed.current || loading || item.unitPrice) return;
     const match = sizes.find((s) => {
       const want = (item.size || "-").trim().toLowerCase();
       return s.size.toLowerCase() === want || s.raw.toLowerCase() === want;
-    }) ?? sizes[0];
+    });
     if (match?.price) {
       autofixed.current = true;
       onChange({ unitPrice: match.price });
     }
-  }, [loading, sizes, item.unitPrice, item.size, onChange]);
+  }, [disabled, loading, sizes, item.unitPrice, item.size, onChange]);
   const isCurrent = (s: { size: string; raw: string }) =>
     (item.size || "-").trim().toLowerCase() === s.size.toLowerCase() ||
     (item.size || "-").trim().toLowerCase() === s.raw.toLowerCase();
@@ -51,16 +51,17 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
       ...(isPf ? { colorKey: c.k || null, sku: (match as { sku?: string | null } | undefined)?.sku ?? null } : {}),
       colorName: c.n || null,
       colorHex: c.h || null,
-      image: c.u || item.image,
+      colorCode: c.c || null,
+      image: c.u || null,
       size: match ? (match.size === "-" ? null : match.size) : item.size,
-      unitPrice: match?.price ?? item.unitPrice,
+      unitPrice: match?.price ?? null,
     });
   };
 
   const pickSize = (size: string) => {
     const hit = sizes.find((s) => s.size === size) as { price: number | null; sku?: string | null } | undefined;
     const price = hit?.price;
-    onChange({ ...(isPf ? { sku: hit?.sku ?? null } : {}), size: size === "-" ? null : size, unitPrice: price ?? item.unitPrice });
+    onChange({ ...(isPf ? { sku: hit?.sku ?? null } : {}), size: size === "-" ? null : size, unitPrice: price ?? null });
   };
 
 

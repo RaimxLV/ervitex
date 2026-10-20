@@ -27,7 +27,7 @@ BEGIN
   INSERT INTO public.quote_requests (name, email, items)
   VALUES ('Assignment test', 'fourth-' || client_email, '[]') RETURNING assigned_pm_slug INTO slug;
   IF slug <> 'santa' THEN RAISE EXCEPTION 'Fourth new client must go to Santa'; END IF;
-  UPDATE public.quote_requests SET assigned_pm_slug = 'evita', assigned_at = clock_timestamp() WHERE id = request_id;
+  UPDATE public.quote_requests SET assigned_pm_slug = 'evita', assigned_pm_name = 'Evita', assigned_pm_email = 'info@t-bode.lv', assigned_at = clock_timestamp() WHERE id = request_id;
   INSERT INTO public.quote_requests (name, email, items)
   VALUES ('Assignment test', client_email, '[]') RETURNING assigned_pm_slug INTO slug;
   IF slug <> 'evita' THEN RAISE EXCEPTION 'Repeat must follow latest handoff to Evita'; END IF;

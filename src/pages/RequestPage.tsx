@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { RequestSubmission } from "@/lib/requestSubmission";
+import { saveRequest, notifyRequest } from "@/lib/submitRequest";
+import { printStatusLabel } from "@/lib/requestPresentation";
 import { requestBillingSchema, requestPrintStatus } from "@/lib/requestDetails";
 import { Link, useNavigate } from "@/lib/router-compat";
 import OfferWorkspace from "@/components/quote/OfferWorkspace";
@@ -41,6 +44,10 @@ const RequestPage = () => {
     return () => links.forEach((file) => URL.revokeObjectURL(file.url));
   }, [files]);
   const [sending, setSending] = useState(false);
+  const submission = useRef(new RequestSubmission());
+  const [locked, setLocked] = useState(false);
+  const pendingFiles = useRef<File[] | null>(null);
+  const uploaded = useRef(new Map<File, string>());
   const { create: createOffer, busy: creatingOffer } = useCreateOffer();
   const { isAdmin } = useAuth();
 
@@ -66,7 +73,7 @@ const RequestPage = () => {
     return createOffer(true, {
     client_name: form.name.trim(), client_email: form.email.trim() || null,
     client_phone: form.phone.trim() || null, client_company: form.company.trim() || null,
-    client_billing: checked.data, note: print.notes || null,
+    client_billing: checked.data, note: [printStatusLabel(print.method), print.placement, print.colors, print.deadline, print.notes].filter(Boolean).join("\n"),
   }, print.method && print.method !== "none" ? [{ method: ({ silkscreen: "Sietspiede", dtf: "DTF", termodruka: "Termodruka", embroidery: "Izšūšana", sublimation: "Sublimācija", other: "Cita" } as Record<string, string>)[print.method] || print.method, placement: print.placement || null, price: null, mode: "unit" }] : []);
   };
 
@@ -95,16 +102,7 @@ const RequestPage = () => {
       if (print.notes) messageParts.push(print.notes);
       const message = messageParts.join("\n\n").slice(0, 9800);
 
-      // Generate the request id client-side so anonymous users don't need public read access
-      // to quote_requests just to get the saved row id back.
-      const requestId = crypto.randomUUID();
-
-      // Insert the quote request FIRST so storage uploads can be tied back to it
-      // (RLS on quote-attachments requires the object path to reference an existing request).
-      const { error: insErr } = await supabase
-        .from("quote_requests")
-        .insert({
-          id: requestId,
+      const result = await submission.current.run({
           name: form.name.trim(),
           email: form.email.trim(),
           phone: form.phone.trim() || null,
@@ -115,16 +113,15 @@ const RequestPage = () => {
           print_placement: print.placement || null,
           print_colors: print.colors || null,
           deadline: print.deadline || null,
-          file_urls: [],
           billing: Object.values(billing).some((v) => v.trim())
             ? Object.fromEntries(Object.entries(checkedBilling.data).filter(([, v]) => v))
             : null,
-        } as any);
-      if (insErr) throw insErr;
-
-      // Upload attachments under "<requestId>/<filename>" so RLS binds them to this request
-      const uploadedPaths: string[] = [];
-      for (const f of files) {
+        }, async (id, key, payload) => {
+          pendingFiles.current ??= [...files];
+          await saveRequest(id, key, payload);
+        }, async (requestId, key) => {
+      for (const f of pendingFiles.current || []) {
+        if (uploaded.current.has(f)) continue;
         const safeName = f.name.replace(/[^a-zA-Z0-9._-]/g, "_");
         const path = `${requestId}/${crypto.randomUUID()}-${safeName}`;
         const { error: upErr } = await supabase.storage.from("quote-attachments").upload(path, f, {
@@ -132,36 +129,32 @@ const RequestPage = () => {
           upsert: false,
         });
         if (upErr) throw upErr;
-        uploadedPaths.push(path);
+        uploaded.current.set(f, path);
       }
-
-      // Trigger email send (non-blocking on failure — DB row is safety net).
-      // The edge function (service role) will patch file_urls onto the request.
-      let delivered = false;
-      try {
-        const { data: mailOut, error: mailErr } = await supabase.functions.invoke("send-quote-request", {
-          body: { request_id: requestId, file_urls: uploadedPaths },
-        });
-        delivered = !mailErr && (mailOut as { delivered?: boolean } | null)?.delivered === true;
-      } catch (mailErr) {
-        console.warn("Email send failed, but request stored", mailErr);
-      }
-
+      return notifyRequest(requestId, key, [...uploaded.current.values()]);
+      });
+      if (result.state === "busy") return;
+      const delivered = result.state === "delivered";
       toast({
-        title: t("Pieprasījums nosūtīts!", "Request sent!"),
+        title: delivered ? t("Pieprasījums nosūtīts!", "Request sent!") : t("Pieprasījums saglabāts", "Request saved"),
         description: delivered
           ? t("Mēs sazināsimies ar Tevi tuvākajā laikā.", "We will contact you shortly.")
           : t(
-              `Pieprasījums saglabāts. Ja neredzi apstiprinājumu e-pastā, zvani mums.`,
-              `Request saved. If you don't see a confirmation e-mail, please call us.`,
+              `Paziņojums vēl nav nosūtīts. Mēģini vēlreiz.`,
+              `Notification not sent yet. Retry.`,
             ),
       });
-      clear();
-      navigate("/");
+      if (delivered) {
+        pendingFiles.current = null;
+        uploaded.current.clear();
+        clear();
+        navigate("/");
+      }
     } catch (err: any) {
       toast({ title: t("Kļūda", "Error"), description: /rate_limited/.test(err?.message || "") ? t("Pārāk daudz pieprasījumu. Mēģini pēc minūtes.", "Too many requests. Try again in a minute.") : err.message, variant: "destructive" });
     } finally {
       setSending(false);
+      setLocked(submission.current.hasPending);
     }
   };
 
@@ -197,8 +190,8 @@ const RequestPage = () => {
                   <a href="#request-files" className="flex items-center gap-2 text-sm font-semibold underline underline-offset-4"><Paperclip className="h-5 w-5 shrink-0" />{t("Pievienoti faili", "Attached files")}: {files.length}</a>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button type="button" size="sm" variant={print.method && print.method !== "none" ? "default" : "outline"} onClick={() => setPrint({ ...print, method: print.method && print.method !== "none" ? print.method : "consult" })}>{t("Nepieciešama apdruka", "Decoration required")}</Button>
-                  <Button type="button" size="sm" variant={print.method === "none" ? "default" : "outline"} onClick={() => setPrint({ ...print, method: "none", placement: "", colors: "" })}>{t("Bez apdrukas", "No decoration")}</Button>
+                  <Button type="button" size="sm" variant={print.method && print.method !== "none" ? "default" : "outline"} disabled={sending || locked} onClick={() => setPrint({ ...print, method: print.method && print.method !== "none" ? print.method : "consult" })}>{t("Nepieciešama apdruka", "Decoration required")}</Button>
+                  <Button type="button" size="sm" variant={print.method === "none" ? "default" : "outline"} disabled={sending || locked} onClick={() => setPrint({ ...print, method: "none", placement: "", colors: "" })}>{t("Bez apdrukas", "No decoration")}</Button>
                 </div>
                 {fileLinks.length > 0 && <ul className="mt-3 space-y-2">{fileLinks.map((file) => <li key={file.url}><a href={file.url} target="_blank" rel="noopener noreferrer" className="block break-all text-sm font-medium text-accent underline underline-offset-4">{file.name} ↗</a></li>)}</ul>}
               </section>
@@ -210,9 +203,9 @@ const RequestPage = () => {
                     {t("Preces", "Items")}
                     <span className="ml-2 align-middle font-heading text-sm font-bold text-muted-foreground">{totalQty} {t("gab.", "pcs")}</span>
                   </h2>
-                  <Button type="button" variant="ghost" size="sm" onClick={clear} className="text-muted-foreground"><Trash2 className="h-4 w-4" />{t("Notīrīt visu", "Clear all")}</Button>
+                  <Button type="button" variant="ghost" size="sm" disabled={sending || locked} onClick={clear} className="text-muted-foreground"><Trash2 className="h-4 w-4" />{t("Notīrīt visu", "Clear all")}</Button>
                 </div>
-                <QuoteItemsTable items={items.map((i) => ({ ...i, unitPrice: i.unitPrice ?? null }))} onQuantity={updateQty} onRemove={remove} />
+                <QuoteItemsTable disabled={sending || locked} items={items.map((i) => ({ ...i, unitPrice: i.unitPrice ?? null }))} onQuantity={updateQty} onRemove={remove} />
               </section>
 
               {/* Print details */}
@@ -223,7 +216,7 @@ const RequestPage = () => {
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Apdrukas metode", "Print method")}</Label>
-                    <Select value={print.method || "consult"} onValueChange={(value) => setPrint({ ...print, method: value })}>
+                    <Select disabled={sending || locked} value={print.method || "consult"} onValueChange={(value) => setPrint({ ...print, method: value })}>
                       <SelectTrigger aria-label={t("Apdrukas metode visām precēm", "Print method for all items")}><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="consult">{t("Nezinu / konsultēties", "Not sure / consult")}</SelectItem>
@@ -236,17 +229,17 @@ const RequestPage = () => {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vēlamais termiņš", "Deadline")}</Label>
-                    <Input className="h-11 rounded-sm" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
+                    <Input disabled={sending || locked} className="h-11 rounded-sm" value={print.deadline} onChange={(e) => setPrint({ ...print, deadline: e.target.value })} placeholder={t("piem. 2 nedēļas", "e.g. 2 weeks")} />
                   </div>
                 </div>
 
                 <div className="mt-5 grid gap-5 sm:grid-cols-2">
-                  <label className="space-y-2"><span className="quote-label">{t("Apdrukas vieta", "Print placement")}</span><Input value={print.placement} onChange={(e) => setPrint({ ...print, placement: e.target.value })} /></label>
-                  <label className="space-y-2"><span className="quote-label">{t("Krāsu skaits", "Number of colours")}</span><Input value={print.colors} onChange={(e) => setPrint({ ...print, colors: e.target.value })} /></label>
+                  <label className="space-y-2"><span className="quote-label">{t("Apdrukas vieta", "Print placement")}</span><Input disabled={sending || locked} value={print.placement} onChange={(e) => setPrint({ ...print, placement: e.target.value })} /></label>
+                  <label className="space-y-2"><span className="quote-label">{t("Krāsu skaits", "Number of colours")}</span><Input disabled={sending || locked} value={print.colors} onChange={(e) => setPrint({ ...print, colors: e.target.value })} /></label>
                 </div>
                 <div className="mt-5 space-y-2">
                   <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Piezīmes projektu vadītājam", "Notes to project manager")}</Label>
-                  <Textarea rows={4} className="resize-none rounded-sm" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
+                  <Textarea disabled={sending || locked} rows={4} className="resize-none rounded-sm" value={print.notes} onChange={(e) => setPrint({ ...print, notes: e.target.value })} placeholder={t("Papildu informācija, jautājumi...", "Additional info, questions...")} />
                 </div>
               </section>
 
@@ -266,6 +259,7 @@ const RequestPage = () => {
                     type="file"
                     multiple
                     className="hidden"
+                    disabled={sending || locked}
                     onChange={(e) => handleFiles(e.target.files)}
                     accept="image/*,.pdf,.ai,.eps,.svg,.psd,.zip"
                   />
@@ -277,7 +271,7 @@ const RequestPage = () => {
                         <span className="min-w-0 flex-1 truncate font-medium">
                           {f.name} <span className="text-xs font-normal text-muted-foreground">({(f.size / 1024 / 1024).toFixed(2)}MB)</span>
                         </span>
-                        <Button type="button" size="icon" variant="ghost" className="h-8 w-8 shrink-0 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive" onClick={() => removeFile(i)}>
+                        <Button type="button" size="icon" variant="ghost" className="h-8 w-8 shrink-0 rounded-full text-muted-foreground hover:bg-destructive/10 hover:text-destructive" disabled={sending || locked} onClick={() => removeFile(i)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </li>
@@ -320,19 +314,19 @@ const RequestPage = () => {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Vārds", "Name")} *</Label>
-                    <Input className="h-11 rounded-sm" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                    <Input disabled={sending || locked} className="h-11 rounded-sm" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("E-pasts", "Email")} *</Label>
-                    <Input type="email" className="h-11 rounded-sm" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                    <Input disabled={sending || locked} type="email" className="h-11 rounded-sm" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Tālrunis", "Phone")}</Label>
-                    <Input className="h-11 rounded-sm" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                    <Input disabled={sending || locked} className="h-11 rounded-sm" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("Uzņēmums", "Company")}</Label>
-                    <Input className="h-11 rounded-sm" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                    <Input disabled={sending || locked} className="h-11 rounded-sm" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
                   </div>
                   <details className="group rounded-sm border border-border">
                     <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs font-semibold uppercase tracking-wider text-foreground">
@@ -352,7 +346,7 @@ const RequestPage = () => {
                       ] as const).map(([k, label]) => (
                         <div key={k} className="space-y-1.5">
                           <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</Label>
-                          <Input aria-label={label} className="h-11 rounded-sm" maxLength={k === "iban" ? 42 : k === "bic" ? 11 : 300} value={billing[k]} onChange={(e) => setBilling({ ...billing, [k]: e.target.value })} />
+                          <Input disabled={sending || locked} aria-label={label} className="h-11 rounded-sm" maxLength={k === "iban" ? 42 : k === "bic" ? 11 : 300} value={billing[k]} onChange={(e) => setBilling({ ...billing, [k]: e.target.value })} />
                         </div>
                       ))}
                     </div>

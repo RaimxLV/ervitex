@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useMemo } from "react";
+import { sameCartVariant } from "@/lib/quoteCartIdentity";
 
 export interface QuoteCartItem {
   id: string; // unique per line (product + color + size)
@@ -32,24 +33,27 @@ const STORAGE_KEY = "ervitex:quote-cart:v1";
 
 export const QuoteCartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<QuoteCartItem[]>([]);
+  const [restored, setRestored] = useState(false);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) setItems(JSON.parse(raw));
     } catch { /* ignore */ }
+    setRestored(true);
   }, []);
 
   useEffect(() => {
+    if (!restored) return;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch { /* ignore */ }
-  }, [items]);
+  }, [items, restored]);
 
   const add: Ctx["add"] = (item) => {
     const id = item.id || `${item.source}-${item.productId}-${item.colorCode || "x"}-${item.size || "x"}-${Date.now()}`;
     setItems((prev) => {
       // merge if same product/color/size already exists
       const match = prev.find(
-        (p) => p.productId === item.productId && p.colorCode === item.colorCode && p.size === item.size,
+        (p) => sameCartVariant(p, item),
       );
       if (match) {
         return prev.map((p) => (p.id === match.id ? { ...p, qty: p.qty + item.qty } : p));

@@ -1,0 +1,34 @@
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, expect, it, vi } from "vitest";
+import QuoteRequestForm from "./QuoteRequestForm";
+const mocks = vi.hoisted(() => ({ save: vi.fn(), notify: vi.fn(), toast: vi.fn() }));
+vi.mock("@/lib/submitRequest", () => ({ saveRequest: mocks.save, notifyRequest: mocks.notify }));
+vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: mocks.toast }) }));
+vi.mock("@/i18n/LanguageContext", () => ({ useLanguage: () => ({ lang: "lv" }) }));
+beforeEach(() => { mocks.save.mockReset().mockResolvedValue(undefined); mocks.notify.mockReset(); mocks.toast.mockReset(); });
+it("legacy product form retains id and data after notification failure and clears only after success", async () => {
+  mocks.notify.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+  const view = render(<QuoteRequestForm productName="Synthetic" />);
+  const fields = view.container.querySelectorAll("input:not([name=website])");
+  fireEvent.change(fields[0], { target: { value: "Synthetic" } }); fireEvent.change(fields[1], { target: { value: "synthetic@example.invalid" } });
+  const button = screen.getByRole("button", { name: "Pieprasīt piedāvājumu" });
+  fireEvent.click(button);
+  await waitFor(() => expect(mocks.notify).toHaveBeenCalledTimes(1));
+  await waitFor(() => expect(fields[0]).toBeDisabled());
+  expect(fields[0]).toHaveValue("Synthetic");
+  fireEvent.click(button);
+  await waitFor(() => expect(fields[0]).toHaveValue(""));
+  expect(mocks.save).toHaveBeenCalledTimes(1); expect(mocks.notify.mock.calls[1]).toEqual(mocks.notify.mock.calls[0]);
+  view.unmount();
+});
+it("save rejection restores sending controls and retries with the same request capability", async () => {
+  mocks.save.mockRejectedValueOnce(new Error("network")).mockResolvedValueOnce(undefined); mocks.notify.mockResolvedValue(true);
+  const view = render(<QuoteRequestForm />);
+  const fields = view.container.querySelectorAll("input:not([name=website])");
+  fireEvent.change(fields[0], { target: { value: "Synthetic" } }); fireEvent.change(fields[1], { target: { value: "synthetic@example.invalid" } });
+  fireEvent.click(screen.getByRole("button", { name: "Pieprasīt piedāvājumu" }));
+  await waitFor(() => expect(mocks.toast).toHaveBeenCalled());
+  const retry = screen.getByRole("button", { name: "Pieprasīt piedāvājumu" }); expect(retry).not.toBeDisabled();
+  fireEvent.click(retry); await waitFor(() => expect(mocks.notify).toHaveBeenCalledTimes(1));
+  expect(mocks.save.mock.calls[1][0]).toBe(mocks.save.mock.calls[0][0]); expect(mocks.save.mock.calls[1][1]).toBe(mocks.save.mock.calls[0][1]); view.unmount();
+});
