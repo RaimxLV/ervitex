@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { RequestSubmission } from "@/lib/requestSubmission";
+import { usePendingRequest, pendingText, rejectedText } from "@/hooks/usePendingRequest";
 import { saveRequest, notifyRequest } from "@/lib/submitRequest";
 import { motion, AnimatePresence } from "framer-motion";
 import { Building2, Clock3, Mail, MapPin, Phone, Send, X, Loader2, ReceiptText, Navigation, Calculator } from "lucide-react";
@@ -50,8 +50,8 @@ const ContactPage = () => {
   const [photoSettings, setPhotoSettings] = useState<Record<string, PhotoSettings>>({});
 
   const [sending, setSending] = useState(false);
-  const submission = useRef(new RequestSubmission());
-  const [locked, setLocked] = useState(false);
+  const { submission, locked, sync } = usePendingRequest("contact", ({ payload: p }) =>
+    setForm({ name: String(p.name ?? ""), email: String(p.email ?? ""), company: String(p.company ?? ""), phone: String(p.phone ?? ""), message: String(p.message ?? "") }));
 
   useEffect(() => {
     supabase.from("team_photo_settings").select("slug, zoom, position_x, position_y, photo_url").then(({ data }) => {
@@ -86,9 +86,12 @@ const ContactPage = () => {
 
     setSending(true);
     try {
-      const result = await submission.current.run({ name, email, company: company || null, phone: phone || null, message }, saveRequest, notifyRequest);
+      const result = await submission.current.run({ name, email, company: company || null, phone: phone || null, message }, saveRequest, (id, key) => notifyRequest(id, key));
       if (result.state === "busy") return;
-      if (result.state === "delivered") {
+      if (result.state === "rejected") {
+        toast({ title: rejectedText(lang), variant: "destructive" });
+        setForm({ name: "", email: "", company: "", phone: "", message: "" });
+      } else if (result.state === "delivered") {
         toast({ title: t("contact.sent"), description: t("contact.sentDesc") });
         setForm({ name: "", email: "", company: "", phone: "", message: "" });
       } else toast({ title: lang === "lv" ? "Pieprasījums saglabāts; paziņojums nav nosūtīts. Mēģini vēlreiz." : "Request saved; notification not sent. Retry." });
@@ -96,7 +99,7 @@ const ContactPage = () => {
       toast({ title: lang === "lv" ? "Kļūda" : "Error", description: lang === "lv" ? "Neizdevās nosūtīt ziņu. Mēģiniet vēlreiz." : "Failed to send message. Please try again.", variant: "destructive" });
     } finally {
       setSending(false);
-      setLocked(submission.current.hasPending);
+      sync();
     }
   };
 

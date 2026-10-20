@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { RequestSubmission } from "@/lib/requestSubmission";
+import { useState } from "react";
+import { usePendingRequest, pendingText, rejectedText } from "@/hooks/usePendingRequest";
 import { saveRequest, notifyRequest } from "@/lib/submitRequest";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,9 +18,9 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
   const { lang } = useLanguage();
   const { toast } = useToast();
   const [sending, setSending] = useState(false);
-  const submission = useRef(new RequestSubmission());
-  const [locked, setLocked] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
+  const { submission, locked, sync } = usePendingRequest(`quote:${productId || "general"}`, ({ payload: p }) =>
+    setForm({ name: String(p.name ?? ""), email: String(p.email ?? ""), phone: String(p.phone ?? ""), company: String(p.company ?? ""), message: String(p.message ?? "") }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,14 +47,15 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
     }
     setSending(true);
     try {
-      const result = await submission.current.run({ name, email, phone, company, message: productName ? `[${productName}] ${message}` : message, product_id: productId || null }, saveRequest, notifyRequest);
+      const result = await submission.current.run({ name, email, phone, company, message: productName ? `[${productName}] ${message}` : message, product_id: productId || null }, saveRequest, (id, key) => notifyRequest(id, key));
       if (result.state === "busy") return;
+      if (result.state === "rejected") { toast({ title: rejectedText(lang), variant: "destructive" }); setForm({ name: "", email: "", phone: "", company: "", message: "" }); return; }
       toast({ title: result.state === "delivered" ? (lang === "lv" ? "Pieprasījums nosūtīts!" : "Quote request sent!") : (lang === "lv" ? "Pieprasījums saglabāts; paziņojums vēl nav nosūtīts. Mēģini vēlreiz." : "Request saved; notification not sent yet. Retry.") });
       if (result.state === "delivered") setForm({ name: "", email: "", phone: "", company: "", message: "" });
     } catch (error) {
       const limited = error instanceof Error && /rate_limited/.test(error.message);
       toast({ title: lang === "lv" ? "Neizdevās nosūtīt" : "Could not send", description: limited ? (lang === "lv" ? "Mēģini pēc minūtes." : "Try again in a minute.") : undefined, variant: "destructive" });
-    } finally { setSending(false); setLocked(submission.current.hasPending); }
+    } finally { setSending(false); sync(); }
   };
 
   return (
@@ -63,6 +64,7 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
         <label>Website<input type="text" name="website" tabIndex={-1} autoComplete="off" defaultValue="" /></label>
       </div>
       
+      {locked && <p role="status" className="text-sm text-muted-foreground">{pendingText(lang)}</p>}
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label className="text-xs uppercase tracking-wider">{lang === "lv" ? "Vārds *" : "Name *"}</Label>
