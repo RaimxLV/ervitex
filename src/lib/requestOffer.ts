@@ -10,7 +10,8 @@ type ConversionSource = { worksheet_items?: unknown; worksheet_revision?: number
 export function requestConversionSource(r: ConversionSource): "worksheet" | "confirmed_empty" | "original" {
   const list = Array.isArray(r.worksheet_items) ? r.worksheet_items : [];
   if (list.length > 0) return "worksheet";
-  return (r.worksheet_revision ?? 0) > 0 || !!r.worksheet_updated_at ? "confirmed_empty" : "original";
+  // confirm_quote_worksheet always stamps worksheet_updated_at; a backfilled revision alone is not a confirmation.
+  return !!r.worksheet_updated_at && Array.isArray(r.worksheet_items) ? "confirmed_empty" : "original";
 }
 export const CONFIRMED_EMPTY_MESSAGE = "Apstiprinātais preču saraksts ir tukšs — piedāvājumu nevar izveidot, kamēr sarakstā nav preču.";
 

@@ -12,4 +12,7 @@ it("does not mistake an invoke error or incomplete response for delivery", async
 it("propagates save rejection", async () => {
   mock.rpc.mockResolvedValueOnce({ error: new Error("save rejected") });
   await expect(saveRequest("synthetic", "capability", { name: "Synthetic" })).rejects.toThrow("save rejected");
+});it("403/404 from the notifier is a rejection, other errors stay retryable", async () => {
+  mock.invoke.mockResolvedValueOnce({ data: null, error: Object.assign(new Error("x"), { context: { status: 403 } }) }); expect(await notifyRequest("s", "k")).toBe("rejected");
+  mock.invoke.mockResolvedValueOnce({ data: null, error: Object.assign(new Error("x"), { context: { status: 500 } }) }); expect(await notifyRequest("s", "k")).toBe(false);
 });
