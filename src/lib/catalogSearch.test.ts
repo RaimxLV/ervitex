@@ -152,3 +152,23 @@ it("filter keywords: priekšauts finds Aprons, T-krekls finds T-shirts", () => {
   expect(keywordMatch("T-shirts", "T-krekls")).toBe(true);
   expect(keywordMatch("Aprons", "T-krekls")).toBe(false);
 });
+it("Russell 957 / R957 finds 0R957M0 and 0R957F0 by exact numeric core only", () => {
+  const items = [
+    { id: "0R957M0", source: "ru", name: "Men's Shirt" },
+    { id: "0R957F0", source: "ru", name: "Ladies' Shirt" },
+    { id: "0R9570M0", source: "ru", name: "Other" },
+    { id: "0R1957M0", source: "ru", name: "Other" },
+    { id: "R957", source: "pf", name: "Not Russell" },
+    { id: "957", source: "mf", name: "Malfini 957" },
+  ];
+  for (const q of ["957", "R957", "r 957"]) {
+    const ex = ids(searchMatches(items, prepareQuery(q)).exact);
+    expect(ex).toContain("0R957M0");
+    expect(ex).toContain("0R957F0");
+    expect(ex).not.toContain("0R9570M0");
+    expect(ex).not.toContain("0R1957M0");
+  }
+  expect(ids(searchMatches(items, prepareQuery("95")).exact)).toEqual([]);
+  expect(codeParts("0R957M0")).toBeNull();
+  expect(codeParts("0R957M0", "ru")).toEqual({ prefix: "r", digits: "957", suffix: "m" });
+});

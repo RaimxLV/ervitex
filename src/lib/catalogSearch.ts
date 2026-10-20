@@ -305,14 +305,15 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
   if (/^\d+$/.test(pq.raw)) {
     // Precīza visa koda ciparu daļa (169 → STTU169), nekad apakšvirkne (14169) vai nosaukums.
     // Saīsinājums tikai UTT GI/GIB/GIL četru/piecu ciparu tokeniem ar nulles atlikumu.
-    const code = codeParts(it.id);
+    const code = codeParts(it.id, it.source);
     if (!code || !digitsMatch(it, code, pq.raw)) return 0;
     return 10000 + (isStella ? 3000 : 0);
   }
   let score = 0;
 
   const idCompact = p.id.replace(/ /g, "");
-  if (idCompact === pq.compact) score += 2000;
+  const rc = it.source?.trim().toLowerCase() === "ru" ? codeParts(it.id, it.source) : null;
+  if (idCompact === pq.compact || (rc && pq.compact === `${rc.prefix}${rc.digits}`)) score += 2000;
   else if (idCompact.startsWith(pq.compact) && pq.compact.length >= 3) score += 800;
 
   if (p.name === pq.raw) score += 1000;
@@ -346,7 +347,10 @@ export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuer
   // Tikai cipari ("169") var būt vairāku ražotāju kodos — rāda visus līdzīgos.
   if (!pq || pq.compact.length < 3 || /^\d+$/.test(pq.compact)) return null;
   const hits = new Set<T>();
-  for (const it of items) if (prepare(it).id.replace(/ /g, "") === pq.compact) hits.add(it);
+  for (const it of items) {
+    const rc = it.source?.trim().toLowerCase() === "ru" ? codeParts(it.id, it.source) : null;
+    if (prepare(it).id.replace(/ /g, "") === pq.compact || (rc && pq.compact === `${rc.prefix}${rc.digits}`)) hits.add(it);
+  }
   return hits.size ? hits : null;
 };
 
@@ -369,7 +373,12 @@ export const digitsMatch = (item: Searchable, code: { prefix: string; digits: st
     code.digits.startsWith(queryDigits) && /^0+$/.test(code.digits.slice(queryDigits.length)));
 
 /** Koda daļas: burtu prefikss + viena ciparu grupa + burtu sufikss (STTU169 → sttu/169/""). */
-export const codeParts = (id?: string | null): { prefix: string; digits: string; suffix: string } | null => {
+export const codeParts = (id?: string | null, source?: string | null): { prefix: string; digits: string; suffix: string } | null => {
+  // Russell kanoniskais kods 0R<cipari><dzimums>0 (0R957M0 → r/957/m), lai "957" un "R957" atrastu modeli.
+  if (typeof source === "string" && source.trim().toLowerCase() === "ru") {
+    const r = normalizeSearch(id).replace(/ /g, "").match(/^0r(\d+)([a-z])0$/);
+    if (r) return { prefix: "r", digits: r[1], suffix: r[2] };
+  }
   const m = normalizeSearch(id).match(/^([a-z]*) ?(\d+)(?: ?([a-z]+))?$/);
   return m ? { prefix: m[1], digits: m[2], suffix: m[3] || "" } : null;
 };
@@ -404,10 +413,10 @@ export const searchMatches = <T extends Searchable>(items: T[], pq: PreparedQuer
     .map(({ item }) => item);
   const related: T[] = [];
   const anchor = exact[0];
-  const ac = anchor && codeParts(anchor.id);
+  const ac = anchor && codeParts(anchor.id, anchor.source);
   // Līdzīgos kodus rāda tikai tad, ja vaicājuma cipari precīzi sakrīt ar enkura koda cipariem
   // (169 → STTU169 kaimiņi; saīsinājumam 6400 → GI64000 kaimiņu nav).
-  const isCodeQuery = ac && (/^\d+$/.test(pq.raw) ? pq.raw.length >= 3 && ac.digits === pq.raw : pq.compact === `${ac.prefix}${ac.digits}${ac.suffix}`);
+  const isCodeQuery = ac && (/^\d+$/.test(pq.raw) ? pq.raw.length >= 3 && ac.digits === pq.raw : (pq.compact === `${ac.prefix}${ac.digits}${ac.suffix}` || (anchor.source === "ru" && pq.compact === `${ac.prefix}${ac.digits}`)));
   if (anchor && ac && isCodeQuery) {
     // Tikai pirmās precīzās preces piegādātājs + prefikss nosaka līdzīgos kodus.
     const family = familyKey(anchor, ac);
@@ -416,7 +425,7 @@ export const searchMatches = <T extends Searchable>(items: T[], pq: PreparedQuer
     items
       .flatMap((item) => {
         if (exactSet.has(item)) return [];
-        const c = codeParts(item.id);
+        const c = codeParts(item.id, item.source);
         if (!c || familyKey(item, c) !== family) return [];
         const d = Math.abs(Number(c.digits) - target);
         return d > 0 && d <= NEIGHBOR_DISTANCE ? [{ item, d }] : [];
