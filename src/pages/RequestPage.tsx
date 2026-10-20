@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { RequestSubmission } from "@/lib/requestSubmission";
+import { usePendingRequest, pendingText, rejectedText } from "@/hooks/usePendingRequest";
+import { missingAttachmentNames } from "@/lib/requestSubmission";
 import { saveRequest, notifyRequest } from "@/lib/submitRequest";
 import { printStatusLabel } from "@/lib/requestPresentation";
 import { requestBillingSchema, requestPrintStatus } from "@/lib/requestDetails";
@@ -44,8 +45,15 @@ const RequestPage = () => {
     return () => links.forEach((file) => URL.revokeObjectURL(file.url));
   }, [files]);
   const [sending, setSending] = useState(false);
-  const submission = useRef(new RequestSubmission());
-  const [locked, setLocked] = useState(false);
+  const [lostFiles, setLostFiles] = useState<string[]>([]);
+  const { submission, locked, sync } = usePendingRequest("cart", (pending) => {
+    const p = pending.payload as Record<string, any>;
+    setForm({ name: String(p.name ?? ""), email: String(p.email ?? ""), phone: String(p.phone ?? ""), company: String(p.company ?? "") });
+    setPrint({ method: p.print_method || "", placement: p.print_placement || "", colors: p.print_colors || "", deadline: p.deadline || "", notes: p.message || "" });
+    if (p.billing && typeof p.billing === "object") setBilling((b) => ({ ...b, ...p.billing }));
+    // File blobs cannot survive a reload; already uploaded paths are kept, the rest are reported.
+    setLostFiles(missingAttachmentNames(pending));
+  });
   const pendingFiles = useRef<File[] | null>(null);
   const uploaded = useRef(new Map<File, string>());
   const { create: createOffer, busy: creatingOffer } = useCreateOffer();
@@ -119,7 +127,7 @@ const RequestPage = () => {
         }, async (id, key, payload) => {
           pendingFiles.current ??= [...files];
           await saveRequest(id, key, payload);
-        }, async (requestId, key) => {
+        }, async (requestId, key, pending) => {
       for (const f of pendingFiles.current || []) {
         if (uploaded.current.has(f)) continue;
         const safeName = f.name.replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -130,10 +138,16 @@ const RequestPage = () => {
         });
         if (upErr) throw upErr;
         uploaded.current.set(f, path);
+        submission.current.addPath(path);
       }
-      return notifyRequest(requestId, key, [...uploaded.current.values()]);
-      });
+      return notifyRequest(requestId, key, [...pending.paths]);
+      }, files.map((f) => f.name));
       if (result.state === "busy") return;
+      if (result.state === "rejected") {
+        toast({ title: rejectedText(lang), variant: "destructive" });
+        pendingFiles.current = null; uploaded.current.clear(); setLostFiles([]);
+        return;
+      }
       const delivered = result.state === "delivered";
       toast({
         title: delivered ? t("Pieprasījums nosūtīts!", "Request sent!") : t("Pieprasījums saglabāts", "Request saved"),
@@ -147,6 +161,7 @@ const RequestPage = () => {
       if (delivered) {
         pendingFiles.current = null;
         uploaded.current.clear();
+        setLostFiles([]);
         clear();
         navigate("/");
       }
@@ -154,7 +169,7 @@ const RequestPage = () => {
       toast({ title: t("Kļūda", "Error"), description: /rate_limited/.test(err?.message || "") ? t("Pārāk daudz pieprasījumu. Mēģini pēc minūtes.", "Too many requests. Try again in a minute.") : err.message, variant: "destructive" });
     } finally {
       setSending(false);
-      setLocked(submission.current.hasPending);
+      sync();
     }
   };
 
@@ -176,6 +191,10 @@ const RequestPage = () => {
           </div>
         ) : (
           <form onSubmit={submit} className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
+            {locked && <div role="status" className="space-y-1 text-sm text-muted-foreground lg:col-span-2">
+              <p>{pendingText(lang)}</p>
+              {lostFiles.length > 0 && <p>{t(`Šie faili netika augšupielādēti pirms lapas pārlādes — nosūti tos uz birojs@ervitex.lv: ${lostFiles.join(", ")}`, `These files were not uploaded before the page reloaded — email them to birojs@ervitex.lv: ${lostFiles.join(", ")}`)}</p>}
+            </div>}
       <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
         <label>Website<input type="text" name="website" tabIndex={-1} autoComplete="off" defaultValue="" /></label>
       </div>

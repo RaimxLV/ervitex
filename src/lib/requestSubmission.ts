@@ -86,3 +86,14 @@ export class RequestSubmission {
 
 export const sessionSlot = (key: string) =>
   typeof window !== "undefined" && window.sessionStorage ? { store: window.sessionStorage, key } : undefined;
+
+/** Attachment names chosen for a pending request that have no uploaded path (lost on reload). */
+export function missingAttachmentNames(p: Pick<PendingRequest, "id" | "paths" | "fileNames">) {
+  const uploaded = p.paths.map((path) => path.slice(p.id.length + 1).replace(/^[0-9a-f-]{36}-/i, ""));
+  const left = [...uploaded];
+  return p.fileNames.filter((name) => {
+    const i = left.indexOf(name.replace(/[^a-zA-Z0-9._-]/g, "_"));
+    if (i >= 0) { left.splice(i, 1); return false; }
+    return true;
+  });
+}
