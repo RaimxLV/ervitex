@@ -16,3 +16,6 @@ it("unpriced size clears the prior priced size instead of borrowing", () => {
 it("an unavailable size never auto-fills another size price", () => {
   const change = vi.fn(); const view = render(<RowVariantControls item={{ ...item, size: "XXL", unitPrice: null }} onChange={change} />); expect(change).not.toHaveBeenCalled(); view.unmount();
 });
+it("preserves an intentional staff-entered zero price", () => {
+  const change = vi.fn(); const view = render(<RowVariantControls item={{ ...item, unitPrice: 0 }} onChange={change} />); expect(change).not.toHaveBeenCalled(); view.unmount();
+});

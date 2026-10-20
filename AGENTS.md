@@ -2,7 +2,7 @@
 
 - Menu/catalog share searchMatches: shorthand uses source/prefix/token metadata, not ID lists; related codes need exact-token anchors; redirects keep facets.
 - productContent separates care/specs; translation caches use fingerprints.
-- CreateOfferButton/requestOfferData preserves inquiry manager/items/prints/pricing. Cart identity includes supplier/model/color/size. Sharing activates drafts; useOfferDraft serializes autosaves/recovery; token refresh preserves editors.
+- requestOfferData preserves manager/items/prints/pricing. Cart identity includes supplier/model/color/size; restore before persisting. Sharing activates drafts; useOfferDraft serializes recovery; token refresh preserves editors.
 - Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
 - Icons share AccentIcon and Lucide-style print-icons.
 - Public eyebrows use red line-labels; other tones are icon-only; technology use cases use centered light panels.

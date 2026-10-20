@@ -26,10 +26,10 @@ const RowVariantControls = ({ item, disabled, onChange }: Props) => {
   const activeKey = priceKey(colors.find((c) => c.c === activeColor));
   const sizes = useMemo(() => sizesFor(activeKey), [activeKey, sizesFor]);
 
-  // Auto-labojums: ja prece saglabāta ar cenu 0 bet katalogā ir cena, pievieno to automātiski.
+  // Fill only unresolved prices; a staff-entered zero is intentional.
   const autofixed = useRef(false);
   useEffect(() => {
-    if (disabled || autofixed.current || loading || item.unitPrice) return;
+    if (disabled || autofixed.current || loading || item.unitPrice !== null) return;
     const match = sizes.find((s) => {
       const want = (item.size || "-").trim().toLowerCase();
       return s.size.toLowerCase() === want || s.raw.toLowerCase() === want;
