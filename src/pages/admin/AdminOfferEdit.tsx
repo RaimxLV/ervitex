@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import OfferWorkspace from "@/components/quote/OfferWorkspace";
 import { ColorSelector } from "@/components/quote/ColorSelector";
 import { SizeQuantityTable } from "@/components/quote/SizeQuantityTable";
+import { supplierSizeLabel, supplierSizeNote } from "@/lib/supplierSizeLabels";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -448,7 +449,7 @@ const AdminOfferEdit = () => {
                   </div>
                 )}
 
-                {loadingVariants ? <p className="py-4 text-sm text-muted-foreground">Ielādē…</p> : <div className="mt-4"><SizeQuantityTable rows={sizeRows} quantities={qtyBySize} readOnly={!!swapTarget} onChange={(size, qty) => setQtyBySize((previous) => ({ ...previous, [size]: qty }))} /></div>}
+                {loadingVariants ? <p className="py-4 text-sm text-muted-foreground">Ielādē…</p> : <div className="mt-4"><SizeQuantityTable rows={sizeRows} quantities={qtyBySize} readOnly={!!swapTarget} onChange={(size, qty) => setQtyBySize((previous) => ({ ...previous, [size]: qty }))} formatSize={(s) => supplierSizeLabel(picked.source, picked.id, s, lang)} note={supplierSizeNote(picked.source, picked.id, lang)} /></div>}
 
                 {swapTarget ? (
                   <Button size="sm" className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants} onClick={swapPicked}>
