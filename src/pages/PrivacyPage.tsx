@@ -5,7 +5,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 type Section = {
   title: string;
   paragraphs?: string[];
-  bullets?: { lead?: string; text: string }[];
+  bullets?: { id?: string; lead?: string; text: string }[];
   afterBullets?: string[];
 };
 
@@ -160,7 +160,7 @@ const PrivacyPage = () => {
                 {section.bullets && (
                   <ul className="mt-3 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground marker:text-accent">
                     {section.bullets.map((b) => (
-                      <li key={b.text.slice(0, 32)}>
+                      <li key={b.text.slice(0, 32)} id={b.id} className={b.id ? "scroll-mt-28" : undefined}>
                         {b.lead && <strong className="text-foreground">{b.lead}</strong>}
                         {b.lead ? " — " : ""}
                         {b.text}
