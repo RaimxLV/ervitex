@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { privateHead } from "@/lib/seo";
+import { pageHead } from "@/lib/seo";
 import WorksheetPage from "@/pages/WorksheetPage";
 
 export const Route = createFileRoute("/saraksts/$token")({
-  head: () => privateHead(),
+  head: () => pageHead("/saraksts", { title: "Preču saraksts | Ervitex", desc: "Ervitex pieprasījuma preces, apdruka un apstiprinātās saraksta versijas.", noindex: true }),
   component: WorksheetPage,
 });
