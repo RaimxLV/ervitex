@@ -21,6 +21,7 @@
 // Storage bucket `pf-feeds` is PRIVATE. Only the service role (this function)
 // reads/writes it. No public exposure.
 
+import { pfFirstBarStandardPrice } from "../_shared/pfPrice.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
 const corsHeaders: Record<string, string> = {
