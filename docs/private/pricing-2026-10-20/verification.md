@@ -1,5 +1,17 @@
 # MF/RU — 2026-10-20 09:21 UTC
 
+## 09:22 drošības precizējums — jaunākā pārbaude 09:24 UTC
+
+Šī sadaļa ir prioritāra pār agrākajiem pabeigtības/standarta cenas apgalvojumiem zemāk. Root plašā transakcija tika noraidīta, un root izmaiņas netika pielietotas; šajā atkārtotajā kārtā nav izpildīta neviena cenu transakcija, sinhronizācija vai izvietošana. Iepriekš saglabātie izpildes apgalvojumi ir vēsturiski un nav pamats atkārtot noraidīto SQL.
+
+- Pašreizējā DB tikai-lasāmais rezultāts jau rāda ×1,75: MF203 M/L melns un sarkans iepirkumā 4,95, `mf_prices.retail_price=8,6625`, katalogā neto 8,66 (ar PVN 10,48); balts 4,57 → 7,9975 → 8,00 (9,68 ar PVN). Tas nesakrīt ar root agrāko 8,1675 novērojumu; novērojumu laiki jānodala, ne jāpieņem, ka root noraidītā transakcija notikusi.
+- MF203 M/L krāsas 20 un 96, M krāsa D3: iepirkumā 4,46, atvasināta neto cena 7,8050/katalogā 7,81. Privātais iepriekš nolasītais `/product/prices` artefakts satur 4,46 visiem šiem precīzajiem SKU, bet tas **nepierāda, ka cena nav akcijas cena**.
+- Artefakta 18 238 rindās ir tikai `productSizeCode`, `limit`, `price`, `currency`; nav normal/discount/promotion karodziņa. `limit=1` pierāda daudzuma līmeni, ne akcijas neesamību. Tādēļ agrākais apgalvojums, ka 4,46 ir pierādīta parastā cena, ir atsaukts līdz papildu piegādātāja pierādījumam.
+- Importētājs glabā MF `wholesale_price` no `/product/prices`, `retail_price=wholesale×1,75`, ieteikto cenu atsevišķi `suggested_retail_price`; OUTLET identificē pēc sākotnējās kategorijas. Pašreizējo 15 584 cenu rindās: 63 outlet, 0 hidden, 0 unpublished; 0 formulu neatbilstību redzamajos ne-outlet variantos. Tas ir formulas, ne standarta avota apstiprinājums. Pilnīga promociju izslēgšana nav pierādīta ar pieejamajiem laukiem.
+- RU 93/93 `wholesale_price=retail_price` šobrīd. Vienādība nepierāda kolonnas nozīmi; vietējais importētājs/originalsource un aktuālā autorizētā parastā iepirkuma cena nav atrasti. RU pārrēķins bloķēts.
+- Drošas šauras transakcijas nosacījumi: tieši konkrētu SKU svaigi autorizēts un nepārprotami parasts pirmais vienības līmenis; publicēts/ne-hidden/ne-outlet modelis; pārbaudīts pašreizējais iepirkums un vecā cena; UPDATE tikai atšķirīgām šī allowlist cenām ar vecās vērtības priekšnosacījumu, tad tikai attiecīgie varianti/diapazoni. Pašreiz nav identificēts SKU ar pilnu pierādījumu kopu un nepieciešamu labojumu, tādēļ SQL nav iesniegts.
+- Rezerves kopijas paliek šajā privātajā projekta mapē, nav public/Files/importos. Piedāvājumu/pasūtījumu vēsture neskarta.
+
 - Privāta pirmsizmaiņu rezerves kopija `before.json`: MF 15584, RU 93, kataloga varianti 15614, diapazoni 511, MF publiskie modeļi 424. SHA256 `9efec58f2b068d16325fdce7fa244dd9b131701bdb3b2382a27922e77567be3d`. Nav importēta lietotnē vai ievietota public/Files.
 - Autorizēta Malfini `/product/prices` nolasīšana HTTP 200, 18238 rindas; **15584/15584** esošās iepirkuma cenas sakrīt ar `limit=1` avotu. Iepirkuma cenas nebija jālabo; cenas nav izlīdzinātas.
 - Modelis A203 ir MF `style_code=203`, Pique Polo. M izmērā melns `2030114` un sarkans `2030714`: avots 4.95 €, pirms 8.17 € neto / 9.89 € ar PVN; pēc 8.66 € neto / **10.48 € ar PVN**. Balts `2030014`: avots 4.57 €, pirms 7.54/9.12 €, pēc 8.00/**9.68 €**. Anthracite melange `2032014`: autorizētais avots pats dod 4.46 €, pēc 7.81/9.45 €; tātad apgalvojums “visas krāsas izņemot baltu vienādas” avotā nav universāli patiess.
