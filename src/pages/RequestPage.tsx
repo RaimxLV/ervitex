@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { usePendingRequest, pendingText, rejectedText } from "@/hooks/usePendingRequest";
+import { usePendingRequest, rejectedText } from "@/hooks/usePendingRequest";
+import { PendingRequestNotice } from "@/components/quote/PendingRequestNotice";
+import { pendingDisplayItems } from "@/lib/requestSubmission";
 import { missingAttachmentNames } from "@/lib/requestSubmission";
 import { saveRequest, notifyRequest } from "@/lib/submitRequest";
 import { printStatusLabel } from "@/lib/requestPresentation";
@@ -27,11 +29,10 @@ const MAX_FILES = 10;
 const MAX_FILE_MB = 15;
 
 const RequestPage = () => {
-  const { items, remove, updateQty, clear, totalQty } = useQuoteCart();
+  const { items: cartItems, remove, updateQty, clear } = useQuoteCart();
   const { lang } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const cartNet = items.reduce((s, i) => s + (i.unitPrice || 0) * i.qty, 0);
 
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "" });
@@ -46,7 +47,9 @@ const RequestPage = () => {
   }, [files]);
   const [sending, setSending] = useState(false);
   const [lostFiles, setLostFiles] = useState<string[]>([]);
-  const { submission, locked, sync } = usePendingRequest("cart", (pending) => {
+  const restoredRef = useRef(false);
+  const { submission, locked, sync, pending, rejected, discard } = usePendingRequest("cart", (pending) => {
+    restoredRef.current = true;
     const p = pending.payload as Record<string, any>;
     setForm({ name: String(p.name ?? ""), email: String(p.email ?? ""), phone: String(p.phone ?? ""), company: String(p.company ?? "") });
     setPrint({ method: p.print_method || "", placement: p.print_placement || "", colors: p.print_colors || "", deadline: p.deadline || "", notes: p.message || "" });
@@ -54,6 +57,10 @@ const RequestPage = () => {
     // File blobs cannot survive a reload; already uploaded paths are kept, the rest are reported.
     setLostFiles(missingAttachmentNames(pending));
   });
+  // A pending request shows its own immutable items; the live cart (maybe changed in another tab) is untouched.
+  const items = pendingDisplayItems(pending, cartItems) as typeof cartItems;
+  const totalQty = items.reduce((s, i) => s + (Number(i.qty) || 0), 0);
+  const cartNet = items.reduce((s, i) => s + (i.unitPrice || 0) * i.qty, 0);
   const pendingFiles = useRef<File[] | null>(null);
   const uploaded = useRef(new Map<File, string>());
   const { create: createOffer, busy: creatingOffer } = useCreateOffer();
@@ -145,7 +152,6 @@ const RequestPage = () => {
       if (result.state === "busy") return;
       if (result.state === "rejected") {
         toast({ title: rejectedText(lang), variant: "destructive" });
-        pendingFiles.current = null; uploaded.current.clear(); setLostFiles([]);
         return;
       }
       const delivered = result.state === "delivered";
@@ -162,7 +168,9 @@ const RequestPage = () => {
         pendingFiles.current = null;
         uploaded.current.clear();
         setLostFiles([]);
-        clear();
+        // Only empty the cart it was submitted from; a restored request never wipes a different cart.
+        if (!restoredRef.current) clear();
+        restoredRef.current = false;
         navigate("/");
       }
     } catch (err: any) {
@@ -191,10 +199,9 @@ const RequestPage = () => {
           </div>
         ) : (
           <form onSubmit={submit} className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
-            {locked && <div role="status" className="space-y-1 text-sm text-muted-foreground lg:col-span-2">
-              <p>{pendingText(lang)}</p>
+            <PendingRequestNotice className="lg:col-span-2" locked={locked} rejected={rejected} lang={lang} onNew={() => { discard(); restoredRef.current = false; pendingFiles.current = null; uploaded.current.clear(); setLostFiles([]); }}>
               {lostFiles.length > 0 && <p>{t(`Šie faili netika augšupielādēti pirms lapas pārlādes — nosūti tos uz birojs@ervitex.lv: ${lostFiles.join(", ")}`, `These files were not uploaded before the page reloaded — email them to birojs@ervitex.lv: ${lostFiles.join(", ")}`)}</p>}
-            </div>}
+            </PendingRequestNotice>
       <div aria-hidden="true" style={{ position: "absolute", left: "-10000px", width: 1, height: 1, overflow: "hidden" }}>
         <label>Website<input type="text" name="website" tabIndex={-1} autoComplete="off" defaultValue="" /></label>
       </div>
@@ -376,7 +383,7 @@ const RequestPage = () => {
               <Button
                 type={isAdmin ? "button" : "submit"}
                 onClick={isAdmin ? createFromForm : undefined}
-                disabled={sending || creatingOffer || items.length === 0}
+                disabled={sending || creatingOffer || rejected || items.length === 0}
                 className="h-14 w-full rounded-sm bg-accent font-heading text-sm font-black uppercase tracking-widest text-accent-foreground shadow-lg transition-transform hover:bg-accent/90 active:scale-[0.99]"
               >
                 <Send className="mr-2 h-4 w-4" />

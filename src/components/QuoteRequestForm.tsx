@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { usePendingRequest, pendingText, rejectedText } from "@/hooks/usePendingRequest";
+import { usePendingRequest, rejectedText } from "@/hooks/usePendingRequest";
+import { PendingRequestNotice } from "@/components/quote/PendingRequestNotice";
 import { saveRequest, notifyRequest } from "@/lib/submitRequest";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
   const { toast } = useToast();
   const [sending, setSending] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
-  const { submission, locked, sync } = usePendingRequest(`quote:${productId || "general"}`, ({ payload: p }) =>
+  const { submission, locked, sync, rejected, discard } = usePendingRequest(`quote:${productId || "general"}`, ({ payload: p }) =>
     setForm({ name: String(p.name ?? ""), email: String(p.email ?? ""), phone: String(p.phone ?? ""), company: String(p.company ?? ""), message: String(p.message ?? "") }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,7 +50,7 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
     try {
       const result = await submission.current.run({ name, email, phone, company, message: productName ? `[${productName}] ${message}` : message, product_id: productId || null }, saveRequest, (id, key) => notifyRequest(id, key));
       if (result.state === "busy") return;
-      if (result.state === "rejected") { toast({ title: rejectedText(lang), variant: "destructive" }); setForm({ name: "", email: "", phone: "", company: "", message: "" }); return; }
+      if (result.state === "rejected") { toast({ title: rejectedText(lang), variant: "destructive" }); return; }
       toast({ title: result.state === "delivered" ? (lang === "lv" ? "Pieprasījums nosūtīts!" : "Quote request sent!") : (lang === "lv" ? "Pieprasījums saglabāts; paziņojums vēl nav nosūtīts. Mēģini vēlreiz." : "Request saved; notification not sent yet. Retry.") });
       if (result.state === "delivered") setForm({ name: "", email: "", phone: "", company: "", message: "" });
     } catch (error) {
@@ -64,7 +65,7 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
         <label>Website<input type="text" name="website" tabIndex={-1} autoComplete="off" defaultValue="" /></label>
       </div>
       
-      {locked && <p role="status" className="text-sm text-muted-foreground">{pendingText(lang)}</p>}
+      <PendingRequestNotice locked={locked} rejected={rejected} lang={lang} onNew={() => { discard(); setForm({ name: "", email: "", phone: "", company: "", message: "" }); }} />
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <Label className="text-xs uppercase tracking-wider">{lang === "lv" ? "Vārds *" : "Name *"}</Label>
@@ -89,7 +90,7 @@ const QuoteRequestForm = ({ productId, productName }: QuoteFormProps) => {
         <Label className="text-xs uppercase tracking-wider">{lang === "lv" ? "Ziņojums" : "Message"}</Label>
         <Textarea disabled={sending || locked} value={form.message} onChange={e => setForm({...form, message: e.target.value})} rows={4} />
       </div>
-      <Button type="submit" disabled={sending} className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest">
+      <Button type="submit" disabled={sending || rejected} className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-heading text-xs uppercase tracking-widest">
         <Send className="mr-2 h-4 w-4" />
         {sending ? (lang === "lv" ? "Sūta..." : "Sending...") : (lang === "lv" ? "Pieprasīt piedāvājumu" : "Request Quote")}
       </Button>
