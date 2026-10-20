@@ -1,0 +1,13 @@
+# MF/RU — 2026-10-20 09:21 UTC
+
+- Privāta pirmsizmaiņu rezerves kopija `before.json`: MF 15584, RU 93, kataloga varianti 15614, diapazoni 511, MF publiskie modeļi 424. SHA256 `9efec58f2b068d16325fdce7fa244dd9b131701bdb3b2382a27922e77567be3d`. Nav importēta lietotnē vai ievietota public/Files.
+- Autorizēta Malfini `/product/prices` nolasīšana HTTP 200, 18238 rindas; **15584/15584** esošās iepirkuma cenas sakrīt ar `limit=1` avotu. Iepirkuma cenas nebija jālabo; cenas nav izlīdzinātas.
+- Modelis A203 ir MF `style_code=203`, Pique Polo. M izmērā melns `2030114` un sarkans `2030714`: avots 4.95 €, pirms 8.17 € neto / 9.89 € ar PVN; pēc 8.66 € neto / **10.48 € ar PVN**. Balts `2030014`: avots 4.57 €, pirms 7.54/9.12 €, pēc 8.00/**9.68 €**. Anthracite melange `2032014`: autorizētais avots pats dod 4.46 €, pēc 7.81/9.45 €; tātad apgalvojums “visas krāsas izņemot baltu vienādas” avotā nav universāli patiess.
+- M melnajam un sarkanajam pirms labojuma starpības nebija. Veca kļūdaina rinda nav atrasta; abas jau sakrita ar šodienas parasto vienības cenas API. Vecā atšķirība UI vēl nav reproducēta; promo/keša cēloni nevar apgalvot.
+- MF ×1.75 ieviests importā, DB publikācijā un privātajā auditā. `0023_mf_ru_durable_markup.sql` pielietots. Tiešs mērķēts datu pārrēķins vienā transakcijā; citu piegādātāju formulas/rindas un piedāvājumi netika aiztikti.
+- RU publikācijā ×1.70 **jau bija izvietots**; 93/93 cenas sakrita, izmaiņu datu pārrēķinā nebija. Labots novecojis privātais audits (×1.65 → ×1.70) un UI/recompute norādes. Abas RU iepirkuma kolonnu vērtības sakrīt 93/93. RU ir modeļa, ne krāsas/izmēra cenu modelis.
+- Russell ārējs autorizēts cenu avots/importētājs projektā nav atrasts; jaunā tiešsaistes Russell iepirkuma cenu pārbaude **UNVERIFIED**. Esošie 93 modeļa avoti nav mainīti. Nav pamata apgalvot, ka tie šodien pārbaudīti pie Russell.
+- Pēcizmaiņu SQL: MF 15584/15584 pamatcenas, 15521/15521 publiskie varianti un RU 93/93 publiskie modeļi — **0 neatbilstību**. Abi aktīvie DB formulu avoti apstiprina MF ×1.75 un RU ×1.70. 63 MF outlet varianti publiskajā cenu tabulā nav, izslēgšana saglabāta.
+- `malfini-sync` izvietots, neizsaukts. Izvietošanas rīka avota SHA256 `011884943c96ecd27df61b6dcb8bdb6d94a53296806c6088276a80f395a096e5`; atsevišķa lejupielādētā live avota pārbaude nav veikta.
+- 48 Vitest faili / 296 testi PASS; build OK. Nav pilnas sinhronizācijas, e-pastu, klientu pieprasījumu/piedāvājumu rakstījumu vai frontend publicēšanas.
+- Admina checkpoint: `docs/audits/request-flow-2026-10-20/README.md`; neizvietot admina klientu/paziņotāju bez root pārskata. Paliek pārlādes idempotences, apstiprināta tukša saraksta un autentificētā reālā servera/Safari pārbaudes ierobežojumi.
