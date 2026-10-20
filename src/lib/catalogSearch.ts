@@ -355,7 +355,7 @@ export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuer
  * Attiecas TIKAI uz vaicājumu "6400" un šiem apstiprinātajiem kodiem; nekāda vispārīga
  * nuļļu papildināšana citiem kodiem nav atļauta (169 ↛ 1690, 5 ↛ 500, 640 ↛ 64000).
  */
-const SHORTHAND_6400 = new Set(["gi64000", "gib64000", "gil64000", "gil64000-ex"]);
+const SHORTHAND_6400 = new Set(["gi64000", "gib64000", "gil64000", "gil64000ex"]);
 
 /**
  * Ciparu vaicājuma atbilstība koda ciparu daļai: tikai precīza sakritība
