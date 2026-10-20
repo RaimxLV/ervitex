@@ -1681,7 +1681,7 @@ const CatalogItemDialog = ({
                       className="font-semibold text-foreground hover:text-accent"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {source === "etx" ? "Ervitex" : SOURCE_META[source].label}
+                      {source === "etx" ? "Ervitex" : source === "utt" && displayBrand ? displayBrand : SOURCE_META[source].label}
                     </Link>
                   </span>
                 </div>
