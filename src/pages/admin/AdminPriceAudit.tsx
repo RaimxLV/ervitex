@@ -13,10 +13,10 @@ const SOURCES: { code: string; label: string; formula: string }[] = [
     formula: "cenrādis −63% Clique / −50% Craft / −40% ProJob un Cutter & Buck; pēc tam ×1,75",
   },
   { code: "ss", label: "Stanley/Stella", formula: "SS26 cenu lapas cena (jau ar uzcenojumu)" },
-  { code: "mf", label: "Malfini", formula: "piegādātāja cena × 1,65" },
+  { code: "mf", label: "Malfini", formula: "piegādātāja cena × 1,75" },
   { code: "pf", label: "PF Concept (prezentmateriāli)", formula: "piegādātāja cena × 1,65" },
   { code: "bb", label: "Beechfield / Bagbase", formula: "cenu lapas cena" },
-  { code: "ru", label: "Russell Europe", formula: "piegādātāja cena × 1,65" },
+  { code: "ru", label: "Russell Europe", formula: "piegādātāja cena × 1,70" },
   { code: "utt", label: "UTT (Gildan / Kariban / Regatta)", formula: "UTT cena × 2 / 1,8 / 1,75" },
 ];
 
