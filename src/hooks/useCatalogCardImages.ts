@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { colorCodeCandidates } from "@/lib/colorCodeMatch";
 import { thumbUrl } from "@/lib/imageProxy";
 import { russellImageColor } from "@/lib/russellImages";
-import { bbImageBelongsToStyle } from "@/lib/bbImageOwnership";
+import { bbImageBelongsToStyle, bbAssignImageColor } from "@/lib/bbImageOwnership";
 
 type ImageRow = { color?: string | null; url?: string | null; alternate?: string | null; view?: string | null };
 
@@ -32,9 +32,16 @@ async function fetchImages(source: string, id: string): Promise<ImageRow[]> {
       return (data || []).filter(r => r.view_code?.toLowerCase() !== "d").map(r => ({ color: r.color_code, url: r.url }));
     }
     case "bb": {
-      const { data, error } = await supabase.from("bb_images").select("color_name,url").eq("style_code", id).order("sort_order");
+      const [{ data, error }, vars] = await Promise.all([
+        supabase.from("bb_images").select("color_name,url").eq("style_code", id).order("sort_order"),
+        supabase.from("bb_variants").select("color_name").eq("style_code", id).eq("active", true),
+      ]);
       if (error) throw error;
-      return (data || []).filter(r => r.color_name || bbImageBelongsToStyle(r.url, id)).map(r => ({ color: r.color_name, url: r.url }));
+      if (vars.error) throw vars.error;
+      const colours = [...new Set((vars.data || []).map(v => v.color_name).filter((c): c is string => !!c))];
+      // Same proven mapping as the product dialog: model shots get a colour only by exact full colour after the code.
+      return (data || []).filter(r => r.color_name || bbImageBelongsToStyle(r.url, id))
+        .map(r => ({ color: r.color_name || bbAssignImageColor(r.url, id, colours), url: r.url }));
     }
     case "ru": {
       const { data, error } = await supabase.from("ru_images").select("color_name,url").eq("style_code", id).order("sort_order");
@@ -122,7 +129,8 @@ export function cardImageFrames(rows: ImageRow[], color: string | null, first: s
   const ssColor = source === "ss" ? color?.match(/C\d{3}/i)?.[0] : null;
   const candidates = colorCodeCandidates(ssColor || color).map(value => value.toLowerCase());
   // PF attēli ir piesaistīti konkrētai SKU (10650504); citu formātu atvasinājumi (MF "50") sajauktu krāsas.
-  const own = source === "pf"
+  // Name-keyed sources compare whole colour names; suffix candidates ("Off-White" → "white") would mix colours.
+  const own = ["pf", "bb", "utt", "fr"].includes(source)
     ? rows.filter(row => !!row.color && !!color && row.color.trim().toLowerCase() === color.trim().toLowerCase())
     : rows.filter(row => row.color && colorCodeCandidates(row.color).some(value => candidates.includes(value.toLowerCase())));
   // Izvēlēta krāsa: tikai tās pašas krāsas kadri (tukšs, ja nav); modeļa kadri tikai bez krāsas.
