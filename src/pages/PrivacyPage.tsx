@@ -19,7 +19,7 @@ const SECTIONS_LV: Section[] = [
     bullets: [
       { lead: "Kontaktinformācija", text: "vārds, e-pasts, tālrunis, uzņēmums, ko jūs norādāt saziņas vai cenu pieprasījumu formās." },
       { lead: "Tehniskie dati", text: "IP adrese, pārlūkprogrammas tips, apmeklējuma laiks (tīmekļa servera žurnāli)." },
-      { lead: "Sīkdatnes", text: "tikai tehniski nepieciešamās sīkdatnes sesijas uzturēšanai." },
+      { id: "cookies", lead: "Sīkdatnes", text: "tikai tehniski nepieciešamās sīkdatnes sesijas uzturēšanai." },
     ],
   },
   {
@@ -70,7 +70,7 @@ const SECTIONS_EN: Section[] = [
     bullets: [
       { lead: "Contact information", text: "name, email, phone, company provided through contact or quote request forms." },
       { lead: "Technical data", text: "IP address, browser type, visit time (web server logs)." },
-      { lead: "Cookies", text: "only technically necessary cookies for session management." },
+      { id: "cookies", lead: "Cookies", text: "only technically necessary cookies for session management." },
     ],
   },
   {
