@@ -20,20 +20,26 @@ it("169 finds exact numeric component, never substring 14169 or 1694412", () => 
   expect(ids(m.related)).not.toContain("14169");
   expect(ids(m.related)).not.toContain("1694412");
 });
-it("lowercase and spaced full code sttu 169 returns only STTU169", () => {
-  expect(ids(rankedSearchResults(catalog, prepareQuery("sttu169")))).toEqual(["STTU169"]);
-  expect(ids(rankedSearchResults(catalog, prepareQuery(" STTU-169 ")))).toEqual(["STTU169"]);
+it("lowercase and spaced full code returns STTU169 as only exact, with same-family related", () => {
+  for (const q of ["sttu169", " STTU-169 "]) {
+    const m = searchMatches(catalog, prepareQuery(q));
+    expect(ids(m.exact)).toEqual(["STTU169"]);
+    expect(ids(m.related)).toEqual(["STTU168", "STTU170", "STTU171", "STTU172"]);
+  }
 });
-it("related codes come only from each exact item's own supplier and prefix, within ±2", () => {
-  const m = searchMatches(catalog, prepareQuery("169"));
-  expect(ids(m.related)).toEqual(["STTU168", "STTU170", "STTU171", "170"]);
+it("169: only the top anchor STTU169 drives related codes; Malfini 169 stays exact, Malfini 171 excluded", () => {
+  const items = [...catalog, { id: "171", source: "mf", name: "Origin" }];
+  const m = searchMatches(items, prepareQuery("169"));
+  expect(ids(m.exact)).toEqual(["STTU169", "169"]);
+  expect(ids(m.related)).toEqual(["STTU168", "STTU170", "STTU171", "STTU172"]);
+  expect(ids(m.related)).not.toContain("171");
+  expect(ids(m.related)).not.toContain("170");
   expect(ids(m.related)).not.toContain("STSU168");
   expect(ids(m.related)).not.toContain("RG168");
-  expect(ids(m.related)).not.toContain("STTU172");
 });
-it("only Stanley/Stella anchor → no Malfini/Regatta neighbours", () => {
-  const items = catalog.filter((i) => i.id !== "169");
-  expect(ids(searchMatches(items, prepareQuery("169")).related)).toEqual(["STTU168", "STTU170", "STTU171"]);
+it("±5 window includes visible STTU165, nearest four by distance then code", () => {
+  const items = ["STTU169", "STTU165", "STTU170", "STTU175", "STTU163"].map((id) => ({ id, source: "ss" }));
+  expect(ids(searchMatches(items, prepareQuery("169")).related)).toEqual(["STTU170", "STTU165"]);
 });
 it("no exact anchor → no numeric neighbours at all", () => {
   const items = catalog.filter((i) => !["STTU169", "169"].includes(i.id));
