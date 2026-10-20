@@ -14,7 +14,7 @@ import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSele
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { HEADWEAR_TYPES, headwearType, isHeadwearCategory, matchesHeadwearType, type HeadwearType } from "@/lib/headwearTypes";
-import { exactCodeHits, prepareQuery, rankedSearchResults, searchScore } from "@/lib/catalogSearch";
+import { prepareQuery, rankedSearchResults, searchMatches } from "@/lib/catalogSearch";
 
 const SCROLL_KEY = "catalog-scroll";
 
@@ -685,7 +685,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   }, [filterSig]);
 
   const pq = useMemo(() => prepareQuery(q), [q]);
-  const exactHits = useMemo(() => exactCodeHits(items, pq), [items, pq]);
+  const searchHits = useMemo(() => (pq ? searchMatches(items, pq).all : null), [items, pq]);
 
   const toggle = (set: Set<string>, setter: (s: Set<string>) => void) => (v: string) => {
     const next = new Set(set);
@@ -721,7 +721,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   );
 
   const passesExcept = (it: EnrichedItem, except: string) => {
-    if (exactHits ? !exactHits.has(it) : pq && searchScore(it, pq) === 0) return false;
+    if (searchHits && !searchHits.has(it)) return false;
     if (stockOnly && !hasAnyStock(stockFlags, it.source, it.id)) return false;
     if (except !== "source" && sources.size && !sources.has(it.manufacturer)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
@@ -985,8 +985,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     return cmp ? [...base].sort(cmp) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, pq, exactHits, sources, brands, categories, headwearTypes, headwearActive, groups, genders, colors, stockOnly, stockFlags, sort, priceOf, priceRanges, lang, filterOrder]);
+  }, [items, pq, searchHits, sources, brands, categories, headwearTypes, headwearActive, groups, genders, colors, stockOnly, stockFlags, sort, priceOf, priceRanges, lang, filterOrder]);
 
+  const relatedHits = useMemo(() => (pq ? new Set(searchMatches(filtered, pq).related) : null), [filtered, pq]);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Number.isFinite(page) ? Math.min(Math.max(page, 1), totalPages) : 1;
   const [pageInput, setPageInput] = useState(String(safePage));
@@ -1371,6 +1372,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
               <>
                 <div className="grid grid-cols-2 gap-3 sm:gap-5 xl:grid-cols-3">
                   {paginated.map((it, idx) => (
+                    <Fragment key={`${it.source}-${it.id}`}>
+                    {relatedHits?.has(it) && !relatedHits.has(paginated[idx - 1]) && (
+                      <p className="col-span-full border-t border-border pt-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                        {lang === "lv" ? "Līdzīgi kodi" : "Similar codes"}
+                      </p>
+                    )}
                     <CatalogCard
                       key={`${it.source}-${it.id}`}
                       item={it}
@@ -1395,6 +1402,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                         navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}${colorQuery}`);
                       }}
                     />
+                    </Fragment>
                   ))}
                   {isSublimationCatalog && safePage === totalPages && !q.trim() && !stockOnly && colors.size === 0 && <TeamSportswearCard lang={lang} />}
                 </div>
