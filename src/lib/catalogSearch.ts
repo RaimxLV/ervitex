@@ -359,12 +359,12 @@ const familyKey = (it: Searchable, c: { prefix: string; digits: string; suffix: 
   `${it.source || ""}|${c.prefix}|${c.suffix}|${c.digits.length}`;
 
 /** Maksimālais blakus kodu attālums un skaits uz vienu precīzo preci. */
-export const NEIGHBOR_DISTANCE = 2;
+export const NEIGHBOR_DISTANCE = 5;
 export const NEIGHBOR_LIMIT = 4;
 
 export interface SearchMatches<T> {
   exact: T[];
-  /** Līdzīgi kodi: tikai tā paša piegādātāja un prefiksa saime kā kāda precīzā prece. */
+  /** Līdzīgi kodi: tikai pirmās precīzās preces piegādātāja un prefiksa saime. */
   related: T[];
   all: Set<T>;
 }
@@ -384,37 +384,25 @@ export const searchMatches = <T extends Searchable>(items: T[], pq: PreparedQuer
     .sort(cmpScored)
     .map(({ item }) => item);
   const related: T[] = [];
-  if (/^\d+$/.test(pq.raw) && pq.raw.length >= 3 && exact.length) {
-    const target = Number(pq.raw);
-    const families = new Set<string>();
-    for (const it of exact) {
-      const c = codeParts(it.id);
-      if (c) families.add(familyKey(it, c));
-    }
+  const anchor = exact[0];
+  const ac = anchor && codeParts(anchor.id);
+  const isCodeQuery = ac && (/^\d+$/.test(pq.raw) ? pq.raw.length >= 3 : pq.compact === `${ac.prefix}${ac.digits}${ac.suffix}`);
+  if (anchor && ac && isCodeQuery) {
+    // Tikai pirmās precīzās preces piegādātājs + prefikss nosaka līdzīgos kodus.
+    const family = familyKey(anchor, ac);
     const exactSet = new Set(exact);
-    const byFamily = new Map<string, { item: T; d: number }[]>();
-    for (const it of items) {
-      if (exactSet.has(it)) continue;
-      const c = codeParts(it.id);
-      if (!c) continue;
-      const key = familyKey(it, c);
-      if (!families.has(key)) continue;
-      const d = Math.abs(Number(c.digits) - target);
-      if (d === 0 || d > NEIGHBOR_DISTANCE) continue;
-      const list = byFamily.get(key) ?? [];
-      list.push({ item: it, d });
-      byFamily.set(key, list);
-    }
-    for (const it of exact) {
-      const c = codeParts(it.id);
-      const list = c && byFamily.get(familyKey(it, c));
-      if (!list) continue;
-      byFamily.delete(familyKey(it, c!));
-      list
-        .sort((a, b) => a.d - b.d || a.item.id.localeCompare(b.item.id, "en", { numeric: true }))
-        .slice(0, NEIGHBOR_LIMIT)
-        .forEach(({ item }) => related.push(item));
-    }
+    const target = Number(ac.digits);
+    items
+      .flatMap((item) => {
+        if (exactSet.has(item)) return [];
+        const c = codeParts(item.id);
+        if (!c || familyKey(item, c) !== family) return [];
+        const d = Math.abs(Number(c.digits) - target);
+        return d > 0 && d <= NEIGHBOR_DISTANCE ? [{ item, d }] : [];
+      })
+      .sort((x, y) => x.d - y.d || x.item.id.localeCompare(y.item.id, "en", { numeric: true, sensitivity: "base" }))
+      .slice(0, NEIGHBOR_LIMIT)
+      .forEach(({ item }) => related.push(item));
   }
   return { exact, related, all: new Set([...exact, ...related]) };
 };
