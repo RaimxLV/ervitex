@@ -304,10 +304,9 @@ export const searchScore = (it: Searchable, pq: PreparedQuery | null): number =>
   const isStella = it.source === "ss" || normalizeSearch(it.brand).replace(/ /g, "") === "stanleystella";
   if (/^\d+$/.test(pq.raw)) {
     // Precīza visa koda ciparu daļa (169 → STTU169), nekad apakšvirkne (14169) vai nosaukums.
-    // Īsāks saīsinājums atbilst tikai tad, ja koda ciparu daļas beigas ir pašas nulles
-    // (6400 → GI64000), nevis jebkurš cipars (64001, 16400 neatbilst).
+    // Vienīgais saīsinājums: pārdevēju ierastais "6400" = Gildan Softstyle 64000 saime (UTT).
     const code = codeParts(it.id);
-    if (!code || !digitsMatch(code.digits, pq.raw)) return 0;
+    if (!code || !digitsMatch(it.id, code.digits, pq.raw)) return 0;
     return 10000 + (isStella ? 3000 : 0);
   }
   let score = 0;
