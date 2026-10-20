@@ -351,6 +351,17 @@ export const exactCodeHits = <T extends Searchable>(items: T[], pq: PreparedQuer
   return hits.size ? hits : null;
 };
 
+/**
+ * Ciparu vaicājuma atbilstība koda ciparu daļai: precīzs vai saīsinājums,
+ * kur koda atlikušie cipari ir paši nulles (6400 → 64000, bet ne 64001/16400).
+ * Sākuma nulles saglabājas: "167" neatbilst "0167".
+ */
+export const digitsMatch = (codeDigits: string, queryDigits: string): boolean =>
+  codeDigits === queryDigits ||
+  (codeDigits.length > queryDigits.length &&
+    codeDigits.startsWith(queryDigits) &&
+    /^0+$/.test(codeDigits.slice(queryDigits.length)));
+
 /** Koda daļas: burtu prefikss + viena ciparu grupa + burtu sufikss (STTU169 → sttu/169/""). */
 export const codeParts = (id?: string | null): { prefix: string; digits: string; suffix: string } | null => {
   const m = normalizeSearch(id).replace(/ /g, "").match(/^([a-z]*)(\d+)([a-z]*)$/);
