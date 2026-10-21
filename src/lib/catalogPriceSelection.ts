@@ -4,6 +4,9 @@ interface PriceRow { color_code: string | null; size: string | null; retail_pric
 interface Color { code: string; name: string }
 const norm = (value?: string | null) => (value || "").trim().toLowerCase();
 
+/** MF colour comparison must keep the chosen size; other supplier selection behaviour is unchanged. */
+export const sizeAfterColorChange = (source: string, selected: string | null): string | null => source === "mf" ? selected : null;
+
 /** White is priced below other colours, so it never sets the default starting price. */
 export const isWhiteColor = (name?: string | null) => /^(white|balt[sa]?)$/.test(norm(name));
 // Exact catalogue names, including supplier white shades and Natural Raw.

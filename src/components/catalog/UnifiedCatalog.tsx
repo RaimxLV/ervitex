@@ -13,6 +13,7 @@ import { thumbUrl, unproxyUrl } from "@/lib/imageProxy";
 import { catalogColorParam, catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
+import { catalogCategories } from "@/lib/etxCatalog";
 import { HEADWEAR_TYPES, headwearType, isHeadwearCategory, matchesHeadwearType, type HeadwearType } from "@/lib/headwearTypes";
 import { normalizeCatalogSort, prepareQuery, rankedSearchResults, searchMatches } from "@/lib/catalogSearch";
 
@@ -725,7 +726,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     if (stockOnly && !hasAnyStock(stockFlags, it.source, it.id)) return false;
     if (except !== "source" && sources.size && !sources.has(it.manufacturer)) return false;
     if (except !== "brand" && brands.size && (!it.brand || !brands.has(it.brand))) return false;
-    if (except !== "category" && categories.size && (!it.category || !categories.has(it.category))) return false;
+    if (except !== "category" && categories.size && !catalogCategories(it).some(category => categories.has(category))) return false;
     if (except !== "headwear" && except !== "category" && !matchesHeadwearType(it.category, it.headwearType, headwearTypes, headwearActive)) return false;
     if (except !== "group" && groups.size && (!it.group_name || !groups.has(it.group_name))) return false;
     if (except !== "gender" && genders.size && (!it.gender || !genders.has(it.gender))) return false;
@@ -738,13 +739,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   };
 
   const facet = useCallback(
-    (key: string, pick: (it: EnrichedItem) => string | null | undefined) => {
+    (key: string, pick: (it: EnrichedItem) => string | string[] | null | undefined) => {
       const counts = new Map<string, number>();
       for (const it of items) {
         if (!passesExcept(it, key)) continue;
         const v = pick(it);
         if (!v) continue;
-        counts.set(v, (counts.get(v) || 0) + 1);
+        for (const label of new Set(Array.isArray(v) ? v : [v])) counts.set(label, (counts.get(label) || 0) + 1);
       }
       return Array.from(counts.entries())
         .map(([label, count]) => ({ label, count }))
@@ -905,7 +906,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const grpLoc = localize(GROUP_LV);
 
   const categoryItems = useMemo(
-    () => facet("category", (it) => it.category).map((x) => ({ value: x.label, label: catLoc(x.label), count: x.count })),
+    () => facet("category", catalogCategories).map((x) => ({ value: x.label, label: catLoc(x.label), count: x.count })),
     [facet, lang]
   );
   const groupItems = useMemo(

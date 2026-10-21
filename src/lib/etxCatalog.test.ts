@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { catalogBrandForCategory, ETX_BRAND, publicCatalogBrand, sublimationProducts } from "./etxCatalog";
+import { catalogCategories, catalogBrandForCategory, ETX_BRAND, publicCatalogBrand, sublimationProducts } from "./etxCatalog";
+
+it("sublimation towels retain both categories with one row when both are selected", () => {
+  const rows = ["Dvielis 30 x 50 CM", "Dvielis 50 x 100 CM", "Dvielis 70 x 140 CM"].map(name => ({ source: "etx", category: "Sporta formas sublimācija", name }));
+  expect(rows.every(row => catalogCategories(row).includes("Towels"))).toBe(true);
+  expect(rows.every(row => catalogCategories(row).includes("Sporta formas sublimācija"))).toBe(true);
+  const selected = new Set(["Towels", "Sporta formas sublimācija"]);
+  expect(rows.filter(row => catalogCategories(row).some(category => selected.has(category)))).toHaveLength(3);
+  expect(catalogCategories({ source: "etx", category: "Sporta formas sublimācija", name: "Sporta krekls" })).toEqual(["Sporta formas sublimācija"]);
+});
 
 describe("Sporta formu ražotājs", () => {
   it("visām sporta formām rāda Ervitex, nevis veco piegādātāja nosaukumu", () => {

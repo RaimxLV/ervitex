@@ -27,6 +27,10 @@ export const isMalfiniOutlet = (p: { categoryName?: unknown; categoryCode?: unkn
   String(p.categoryName ?? "").trim().toUpperCase() === "OUTLET" ||
   String(p.categoryCode ?? "").trim().toUpperCase() === "OUTLET";
 
+/** Supplier nomenclature outlet marker: absent/zero is regular; marked SKUs must not carry a sale price. */
+export const isMalfiniNomenclatureOutlet = (n: { outlet?: unknown }) =>
+  n.outlet != null && String(n.outlet).trim() !== "" && String(n.outlet).trim() !== "0";
+
 /** UTT Data Export `outlet`: integer 0/1 (observed). Anything else aborts the sync instead of silently publishing. */
 export function parseUttOutlet(v: unknown, sku: string): boolean {
   if (v === 1 || v === "1") return true;

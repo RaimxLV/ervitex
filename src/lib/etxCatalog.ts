@@ -2,6 +2,15 @@ export const ETX_BRAND = "ETX Latvia";
 export const ETX_CATEGORY = "Sporta formas sublimācija";
 export const ETX_PUBLIC_BRAND = "Ervitex";
 
+/** Secondary membership only: never duplicate catalog rows or replace their source category. */
+export function catalogCategories(row: { source: string; category: string | null; name?: string | null }): string[] {
+  const categories = row.category ? [row.category] : [];
+  if (row.source === "etx" && row.category === ETX_CATEGORY && /\b(?:dvielis|dvieļi|towels?)\b/i.test(row.name || "")) {
+    categories.push("Towels");
+  }
+  return [...new Set(categories)];
+}
+
 /** Legacy supplier keys stay internal; manufacturer labels use the public brand. */
 export const publicCatalogBrand = (brand: string | null | undefined, source?: string): string | null =>
   source === "etx" || brand === ETX_BRAND ? ETX_PUBLIC_BRAND : brand ?? null;
