@@ -1195,7 +1195,7 @@ const CatalogItemDialog = ({
     setActiveColor(null);
     setImgIndex(0);
     setVariantPrices([]);
-    // Keep the same size across colour changes; a missing own variant remains unpriced.
+    setSelectedSize(null);
 
     (async () => {
       const loader =
@@ -1262,7 +1262,7 @@ const CatalogItemDialog = ({
       pendingSizeRef.current = null;
       return;
     }
-    setSelectedSize(null);
+    // Keep the same size across colour changes; a missing own MF variant stays unpriced.
   }, [activeColor]);
 
 
