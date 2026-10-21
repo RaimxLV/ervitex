@@ -27,7 +27,7 @@ export const isMalfiniOutlet = (p: { categoryName?: unknown; categoryCode?: unkn
   String(p.categoryName ?? "").trim().toUpperCase() === "OUTLET" ||
   String(p.categoryCode ?? "").trim().toUpperCase() === "OUTLET";
 
-/** Supplier nomenclature outlet marker: absent/zero is regular; marked SKUs must not carry a sale price. */
+/** Supplier outlet marker is promotion metadata, never a reason to hide a listed SKU. */
 export const isMalfiniNomenclatureOutlet = (n: { outlet?: unknown }) =>
   n.outlet != null && String(n.outlet).trim() !== "" && String(n.outlet).trim() !== "0";
 

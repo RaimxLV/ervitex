@@ -902,7 +902,7 @@ async function loadUTT(styleCode: string): Promise<ProductDetail | null> {
       .select("style_code,brand,name,description,category,gender,fabric,weight,cut,details,care")
       .eq("style_code", styleCode)
       .maybeSingle(),
-    supabase.from("utt_variants").select("sku,color_name,color_hex,size,size_order").eq("style_code", styleCode).eq("active", true).eq("outlet", false).order("size_order", { ascending: true }),
+    supabase.from("utt_variants").select("sku,color_name,color_hex,size,size_order").eq("style_code", styleCode).eq("active", true).order("size_order", { ascending: true }),
     supabase.from("utt_images").select("color_name,url,sort_order").eq("style_code", styleCode).not("url", "is", null).order("sort_order", { ascending: true }),
   ]);
   const style: any = styleRes.data;

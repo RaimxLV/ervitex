@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { isMalfiniOutlet, isMalfiniNomenclatureOutlet, malfiniUnitPrices, parseUttOutlet } from "./supplierFlags.ts";
 
-it("MF1394412 supplier outlet=10 excludes its sale price, not the regular S–2XL", () => {
+it("MF1394412 supplier outlet=10 is promotion metadata, not normal-price proof", () => {
   expect(isMalfiniNomenclatureOutlet({ outlet: 10 })).toBe(true);
   expect(isMalfiniNomenclatureOutlet({ outlet: null })).toBe(false);
   expect(isMalfiniNomenclatureOutlet({ outlet: 0 })).toBe(false);

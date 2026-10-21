@@ -1,4 +1,5 @@
 import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
+import { holdUnverifiedPriceRows } from "../_shared/regularPricePolicy.ts";
 // Stanley/Stella unified sync — strict mapping per official API (productsV2,
 // v2/stock, products/get_prices, products_imagesV2, color, size, combostyles).
 // Field names match the live API response exactly (verified via /inspect).
@@ -226,9 +227,8 @@ async function syncStyles(sb: SupabaseClient) {
       .from("ss_styles")
       .select("style_code")
       .eq("archived", false);
-    const toArchive = (existing ?? [])
-      .map((r: any) => r.style_code)
-      .filter((c: string) => !seenStyleCodes.has(c));
+    // Array success alone does not establish authoritative catalogue completeness.
+    const toArchive: string[] = [];
     for (let i = 0; i < toArchive.length; i += 200) {
       const slice = toArchive.slice(i, i + 200);
       const { error } = await sb
@@ -288,7 +288,7 @@ async function syncPrices(sb: SupabaseClient) {
       currency: "EUR",
     };
   }).filter(Boolean) as any[];
-  return chunkUpsert(sb, "ss_prices", data, "sku");
+  return chunkUpsert(sb, "ss_prices", await holdUnverifiedPriceRows(sb, "ss_prices", data, "sku"), "sku");
 }
 
 // COMBOS: /webrequest/combostyles/get_json

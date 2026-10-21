@@ -2,6 +2,7 @@
 // Retail NET price = the supplier's normal single-unit wholesale price × markup.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { isMalfiniOutlet, isMalfiniNomenclatureOutlet, malfiniUnitPrices } from "../_shared/supplierFlags.ts";
+import { holdUnverifiedPriceRows } from "../_shared/regularPricePolicy.ts";
 import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
 
 const corsHeaders = {
@@ -54,7 +55,7 @@ Deno.serve(async (req) => {
 
     log("Fetching wholesale prices…");
     const wholesale = await api<any[]>(token, "/product/prices");
-    // One standard unit price per SKU (limit = 1); quantity tiers are never imported.
+    // Quantity=1 is a unit tier, not proof that the price is non-promotional.
     const wMap = malfiniUnitPrices(wholesale);
     log(`Wholesale prices: ${wMap.size}`);
 
@@ -98,7 +99,7 @@ Deno.serve(async (req) => {
         name: p.name || null,
         category_code: p.categoryCode || null,
         category_name: remapOutletCategory(p.categoryName || null, p.subtitle || null),
-        // Supplier category kept; OUTLET = reduced-price clearance, excluded from the catalog.
+        // Supplier outlet is metadata only; listed products remain offered.
         source_category_name: p.categoryName || null,
         is_outlet: isMalfiniOutlet(p),
         gender: p.gender || null,
@@ -142,7 +143,9 @@ Deno.serve(async (req) => {
           });
           const w = isMalfiniNomenclatureOutlet(n) ? undefined : wMap.get(sku);
           const r = rMap.get(sku);
-          if (w || r || isMalfiniNomenclatureOutlet(n)) {
+          // A promotion never clears the existing exact-SKU regular/held price.
+          // Recommended retail is not evidence of our normal purchase base.
+          if (w) {
             const retail = w ? Number((w.price * MARKUP).toFixed(4)) : null;
             priceRows.push({
               sku,
@@ -188,7 +191,11 @@ Deno.serve(async (req) => {
       const { error } = await admin.from("mf_images").insert(slice);
       if (error) throw new Error(`mf_images insert: ${error.message}`);
     }
-    await upsertChunked("mf_prices", priceRows, "sku");
+    // Unit=1 and outlet=0 do not establish normal-price semantics. Promotions
+    // never clear or replace held exact-SKU values; unknown new prices stay unknown.
+    const heldPrices = await holdUnverifiedPriceRows(admin, "mf_prices", variantRows, "sku");
+    await upsertChunked("mf_prices", heldPrices, "sku");
+    log(`Regular-price evidence pending: held=${heldPrices.length}, candidates=${priceRows.length}; no candidate repricing`);
     const knownSkus = new Set(variantRows.map((v) => v.sku));
     const filteredStock = stockRows.filter((s) => knownSkus.has(s.sku));
     log(`Stock after FK filter: ${filteredStock.length} / ${stockRows.length}`);
