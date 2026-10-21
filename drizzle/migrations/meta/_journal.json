@@ -176,6 +176,20 @@
       "when": 1792589944088,
       "tag": "0024_mf_nomenclature_outlet_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792593530272,
+      "tag": "0025_mf_009_surgical_regular_price_retention",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792593575218,
+      "tag": "0026_mf_009_preserve_existing_view_security",
+      "breakpoints": true
     }
   ]
 }
