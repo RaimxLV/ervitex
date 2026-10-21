@@ -25,6 +25,8 @@ interface Props {
   colorCode: string | null;
   colorName: string | null;
   colorHex: string | null;
+  colorSwatchUrl?: string | null;
+  colorSwatches?: Record<string, string>;
   sizes: string[];
   /** Price per size, VAT excluded */
   sizePrices?: Record<string, number>;
@@ -32,7 +34,7 @@ interface Props {
 }
 
 const AddToQuoteBlock = ({
-  source, category, classificationName, minimumNoticeClassName, productId, name, code, brand, image, colorCode, colorName, colorHex, sizes, sizePrices, onClose,
+  source, category, classificationName, minimumNoticeClassName, productId, name, code, brand, image, colorCode, colorName, colorHex, colorSwatchUrl, colorSwatches, sizes, sizePrices, onClose,
 }: Props) => {
   const { items, add, updateQty, remove } = useQuoteCart();
   const { lang } = useLanguage();
@@ -163,7 +165,9 @@ const AddToQuoteBlock = ({
       {/* Current color header */}
       <div className="flex items-center justify-between gap-2 rounded border border-border bg-background px-3 py-2">
         <div className="flex items-center gap-2 min-w-0">
-          {colorHex && (
+          {colorSwatchUrl ? (
+            <img key={colorSwatchUrl} src={colorSwatchUrl} alt="" aria-hidden="true" className="h-5 w-5 shrink-0 rounded-sm border border-border object-cover" onError={(event) => { event.currentTarget.hidden = true; }} />
+          ) : colorHex && (
             <span className="inline-block h-5 w-5 rounded-sm border border-border" style={{ backgroundColor: colorHex }} />
           )}
           <div className="min-w-0">
@@ -223,7 +227,7 @@ const AddToQuoteBlock = ({
                 <tr key={line.id} className="border-b border-border last:border-0">
                   <td className="py-2 pr-2">
                     <span className="flex min-w-0 items-center gap-2">
-                      {g.hex && <span className="h-4 w-4 shrink-0 rounded-sm border border-border" style={{ backgroundColor: g.hex }} />}
+                      {colorSwatches?.[g.code] ? <img src={colorSwatches[g.code]} alt="" aria-hidden="true" className="h-4 w-4 shrink-0 rounded-sm border border-border object-cover" onError={(event) => { event.currentTarget.hidden = true; }} /> : source !== "mf" && g.hex && <span className="h-4 w-4 shrink-0 rounded-sm border border-border" style={{ backgroundColor: g.hex }} />}
                       <span className="break-words">{g.name}</span>
                     </span>
                   </td>

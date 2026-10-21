@@ -1827,7 +1827,9 @@ const CatalogItemDialog = ({
                   image={mainImg || null}
                   colorCode={currentColor?.code || null}
                   colorName={currentColor?.name || null}
-                  colorHex={currentColor ? resolveHex(currentColor.hex, currentColor.name) : null}
+                  colorHex={currentColor ? source === "mf" ? currentColor.hex : resolveHex(currentColor.hex, currentColor.name) : null}
+                  colorSwatchUrl={currentColor?.swatchUrl}
+                  colorSwatches={Object.fromEntries(displayDetail.colors.flatMap((c) => c.swatchUrl ? [[c.code, c.swatchUrl]] : []))}
                   sizes={visibleSizes}
                   onClose={() => onOpenChange(false)}
                 />
