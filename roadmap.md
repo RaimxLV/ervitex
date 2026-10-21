@@ -1,6 +1,6 @@
 # Roadmap
-- [ ] 14:24 root: aizstāt noraidīto plašo 009 ar šauru MF promo saglabāšanas SQL, precīzu diff un izolētu ROLLBACK pārbaudi; DB nepielietot, nepublicēt, pārējos piegādātājus neizvietot.
-- [x] Atcelti jaunākie spekulatīvie sešu citu piegādātāju cenu/izņemšanas bloķējumi; iepriekšējie nesaistītie labojumi saglabāti.
+- [x] 14:24 root: plašais 009 aizstāts ar šauru MF SQL (MD5 d32594cd2e0aecace6068a57f8f69272), precīzs diff, sintētiska ROLLBACK pārbaude; DB nepielietota, nepublicēts.
+- [x] Atcelti jaunākie spekulatīvie sešu citu piegādātāju un UTT frontend izmaiņas; izvietots tikai MF (SHA-256 d7dd1b57952e8b25a36860fa664858e77e7773c1ae177e90498a02b47e6c77d9).
 - [ ] MF139 24 cenu atjaunošana — bloķē exact-SKU verificētas parastās cenas pierādījums; 4,73/vecā 7,80 nav derīgs regular evidence, citas krāsas/izmēra cenu nepārņem.
 - [ ] 009 šaurais MF refresh/filtra labojums — gaida root precīzo SQL pārskatīšanu; bez DB piemērošanas/sync/refresh/pārcenošanas/publicēšanas.
 - [ ] Normal-price/promo lauku un autoritatīva pilna snapshot semantika pārējiem piegādātājiem — nav verificēta vai ieviesta; plūsmas nav globāli iesaldētas, citas izvietošanas aizliegtas.
