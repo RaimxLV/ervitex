@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
 
     log("Fetching wholesale prices…");
     const wholesale = await api<any[]>(token, "/product/prices");
-    // One standard unit price per SKU (limit = 1); quantity tiers are never imported.
+    // Quantity=1 is a unit tier, not proof that the price is non-promotional.
     const wMap = malfiniUnitPrices(wholesale);
     log(`Wholesale prices: ${wMap.size}`);
 
@@ -98,7 +98,7 @@ Deno.serve(async (req) => {
         name: p.name || null,
         category_code: p.categoryCode || null,
         category_name: remapOutletCategory(p.categoryName || null, p.subtitle || null),
-        // Supplier category kept; OUTLET = reduced-price clearance, excluded from the catalog.
+        // Supplier outlet is metadata only; listed products remain offered.
         source_category_name: p.categoryName || null,
         is_outlet: isMalfiniOutlet(p),
         gender: p.gender || null,
@@ -142,7 +142,9 @@ Deno.serve(async (req) => {
           });
           const w = isMalfiniNomenclatureOutlet(n) ? undefined : wMap.get(sku);
           const r = rMap.get(sku);
-          if (w || r || isMalfiniNomenclatureOutlet(n)) {
+          // A promotion never clears the existing exact-SKU regular/held price.
+          // Recommended retail is not evidence of our normal purchase base.
+          if (w) {
             const retail = w ? Number((w.price * MARKUP).toFixed(4)) : null;
             priceRows.push({
               sku,

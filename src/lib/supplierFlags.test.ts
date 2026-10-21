@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { isMalfiniNomenclatureOutlet, malfiniUnitPrices } from "../../supabase/functions/_shared/supplierFlags";
 import { lowestPriceVariant, sizeAfterColorChange } from "./catalogPriceSelection";
 
-it("MF139 outlet XS is excluded, not repriced from the regular sizes", () => {
+it("MF139 outlet XS is identified without inventing a regular price from other sizes", () => {
   expect(isMalfiniNomenclatureOutlet({ outlet: 10 })).toBe(true);
   expect(isMalfiniNomenclatureOutlet({ outlet: null })).toBe(false);
   expect(isMalfiniNomenclatureOutlet({ outlet: 0 })).toBe(false);
