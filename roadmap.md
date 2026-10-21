@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] 2026-10-21: sublimācijas dvieļu dubulta kategorijas piederība bez kartīšu dublikātiem; MF139 vienāda izmēra cenu avota pārbaude; R265B īsto krāsu atjaunošana. Bez pilnas sinhronizācijas/publicēšanas.
 - [x] 09:22 admina pašreizējā pārbaudes kārta: izolētais DB tests, 36 fokusētie Vitest, 3 Deno un sintētisks admina/forma/e-pasta pārlūka tests PASS; esošie izlaiduma ierobežojumi saglabāti, nekas nav publicēts.
 - [ ] 09:22 drošā cenu pārcenošana — bloķē MF parastās/ne-akcijas cenas pierādījums (limit=1 to nenosaka) un Russell originalsource/kolonnas nozīme. Root noraidītais plašais SQL nav atkārtots; šajā kārtā 0 cenu rakstījumu. Jaunākie pierādījumi privātajā verification.md; iepriekšējais pabeigtības ieraksts nav avota standarta cenas pierādījums.
 - [x] Malfini ×1,75 un Russell ×1,70: MF autorizētas 15584 cenas sakrīt; mērķēts pārrēķins, privāta kopija, DB/importa/audita formulas un MF funkcija izvietotas; 0 neatbilstību MF15521/RU93 publiskajās cenās, bez pilnas sinhronizācijas/frontend izlaiduma.
