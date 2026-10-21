@@ -1195,7 +1195,7 @@ const CatalogItemDialog = ({
     setActiveColor(null);
     setImgIndex(0);
     setVariantPrices([]);
-    setSelectedSize(null);
+    // Keep the same size across colour changes; a missing own variant remains unpriced.
 
     (async () => {
       const loader =
@@ -1339,7 +1339,7 @@ const CatalogItemDialog = ({
       // A SKU with its own size label (NWG duplicates) is matched by SKU, never by the shared name.
       const skuSizes = displayDetail.skuSizes || {};
       const bySize = rows.filter((r) => (r.sku && skuSizes[r.sku] ? norm(skuSizes[r.sku]) : sizeKey(r.size)) === norm(selectedSize));
-      if (bySize.length || source === "pf") rows = bySize;
+      if (bySize.length || source === "pf" || source === "mf") rows = bySize;
       // PF: izvēlētajai krāsai+izmēram jābūt tieši vienai SKU un cenai.
       if (source === "pf" && (new Set(rows.map((r) => r.sku).filter(Boolean)).size > 1 || new Set(rows.map((r) => Number(r.retail_price))).size > 1)) return null;
     }

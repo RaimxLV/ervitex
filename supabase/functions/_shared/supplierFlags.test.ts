@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { isMalfiniOutlet, malfiniUnitPrices, parseUttOutlet } from "./supplierFlags.ts";
+import { isMalfiniOutlet, isMalfiniNomenclatureOutlet, malfiniUnitPrices, parseUttOutlet } from "./supplierFlags.ts";
+
+it("MF1394412 supplier outlet=10 excludes its sale price, not the regular S–2XL", () => {
+  expect(isMalfiniNomenclatureOutlet({ outlet: 10 })).toBe(true);
+  expect(isMalfiniNomenclatureOutlet({ outlet: null })).toBe(false);
+  expect(isMalfiniNomenclatureOutlet({ outlet: 0 })).toBe(false);
+});
 
 describe("malfiniUnitPrices", () => {
   it("uses only the quantity=1 tier, never a cheaper bulk tier", () => {

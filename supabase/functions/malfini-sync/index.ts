@@ -1,7 +1,7 @@
 // Malfini B2B API sync — imports styles, variants, images, prices and stock.
 // Retail NET price = the supplier's normal single-unit wholesale price × markup.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import { isMalfiniOutlet, malfiniUnitPrices } from "../_shared/supplierFlags.ts";
+import { isMalfiniOutlet, isMalfiniNomenclatureOutlet, malfiniUnitPrices } from "../_shared/supplierFlags.ts";
 import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
 
 const corsHeaders = {
@@ -140,9 +140,9 @@ Deno.serve(async (req) => {
             ean: n.ean || null,
             attributes: v.attributes || null,
           });
-          const w = wMap.get(sku);
+          const w = isMalfiniNomenclatureOutlet(n) ? undefined : wMap.get(sku);
           const r = rMap.get(sku);
-          if (w || r) {
+          if (w || r || isMalfiniNomenclatureOutlet(n)) {
             const retail = w ? Number((w.price * MARKUP).toFixed(4)) : null;
             priceRows.push({
               sku,
