@@ -635,12 +635,12 @@ async function syncStyles(
       const visibility = new Map((existing ?? []).map((row: any) => [row.product_number, row]));
       styles = styles.map((style) => {
         const current = visibility.get(style.product_number);
-        if (!current) return style;
+        if (!current?.archived) return style;
         return {
           ...style,
-          published: current.published,
-          archived: current.archived,
-          archived_at: current.archived_at,
+          published: false,
+          archived: true,
+          archived_at: current.archived_at ?? new Date().toISOString(),
         };
       });
       await chunkUpsert(sb, "nwg_styles", styles, "product_number", 200);
@@ -747,9 +747,7 @@ async function archiveStaleStyles(sb: SupabaseClient, sinceIso: string) {
   // Safety net: a partial crawl must never wipe the catalog. If this pass did not
   // re-see most of the live styles, we leave everything visible and try again later.
   const coverage = rows.length ? (rows.length - stale.length) / rows.length : 0;
-  // Coverage heuristics (even 100%) cannot certify a complete authoritative snapshot.
-  const completeSnapshotVerified = false;
-  if (!completeSnapshotVerified || coverage < ARCHIVE_MIN_COVERAGE) {
+  if (coverage < ARCHIVE_MIN_COVERAGE) {
     return { archived: 0, skipped: true, coverage: Number(coverage.toFixed(3)), candidates: stale.length };
   }
 

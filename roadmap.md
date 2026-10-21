@@ -1,8 +1,9 @@
 # Roadmap
-- [x] 14:11 precizētā noteikuma izmeklēšana/sagatavošana: 357 testi, build OK; tikai malfini-sync saglabāšanas labojums izvietots, neizsaukts; DB/cenas neskartas. Pilns pārskats docs/audits/2026-10-21-regular-price-retention.md.
+- [ ] 14:24 root: aizstāt noraidīto plašo 009 ar šauru MF promo saglabāšanas SQL, precīzu diff un izolētu ROLLBACK pārbaudi; DB nepielietot, nepublicēt, pārējos piegādātājus neizvietot.
+- [x] Atcelti jaunākie spekulatīvie sešu citu piegādātāju cenu/izņemšanas bloķējumi; iepriekšējie nesaistītie labojumi saglabāti.
 - [ ] MF139 24 cenu atjaunošana — bloķē exact-SKU verificētas parastās cenas pierādījums; 4,73/vecā 7,80 nav derīgs regular evidence, citas krāsas/izmēra cenu nepārņem.
-- [ ] 009 DB cenu saglabāšanas/filtru labojums — sagatavots, gaida root byte-exact pārskatīšanu/pielietošanu; pēc tā jāizvieto pārējo importētāju aizsardzība. Nav sync/pārcenošanas/publicēšanas.
-- [ ] Normal-price lauku un autoritatīva pilna snapshot semantika pārējiem piegādātājiem — nepierādīti kandidāti droši aizturēti; automātiska izņemšana bez sertifikācijas bloķēta.
+- [ ] 009 šaurais MF refresh/filtra labojums — gaida root precīzo SQL pārskatīšanu; bez DB piemērošanas/sync/refresh/pārcenošanas/publicēšanas.
+- [ ] Normal-price/promo lauku un autoritatīva pilna snapshot semantika pārējiem piegādātājiem — nav verificēta vai ieviesta; plūsmas nav globāli iesaldētas, citas izvietošanas aizliegtas.
 - [x] MF139 krāsu paraugi: visi 15 piegādātāja attēli HTTP 200; 43/63/44/02 izvēle un atbilstošs foto pārbaudīti pārlūkā; 48 testi PASS. Bez cenu/DB/sync izmaiņām; frontend publicēšana gaida lietotāja apstiprinājumu.
 - [x] 2026-10-21: dvieļi abās kategorijās bez dublikātiem; MF139 izmēra saglabāšana un 24 outlet=10 cenu izņemšana tikai šim modelim; R265B piecas trūkstošās krāsas atjaunotas. 56 testi, build OK, pārlūka pārbaudes; bez pilnas sinhronizācijas/publicēšanas.
 - [x] 2026-10-21 malfini-sync outlet ielāps izvietots atsevišķi; deployment rīks apstiprināja panākumu, source SHA-256 91e088cac346527ca3f2337d6c179cfd5e72a9bced5dda7bda8a9639d50c55d9. Funkcija/refresh netika izsaukti. READ ONLY: MF139 24 outlet SKU publisko cenu nav; Navy/Atoll S–2XL 5.25 iepirkums/9.19 neto, diapazons 8.96–9.80; R265B sešas krāsas; refresh guard klātesošs.

@@ -22,7 +22,6 @@
 // reads/writes it. No public exposure.
 
 import { pfFirstBarStandardPrice } from "../_shared/pfPrice.ts";
-import { holdUnverifiedPriceRows, canRetireSupplierItem } from "../_shared/regularPricePolicy.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
 const corsHeaders: Record<string, string> = {
@@ -475,10 +474,16 @@ async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: bool
     rows.push({ item_code, price, list_price: null, currency: cur?.[1] || "EUR", updated_at: now });
   }
 
-  const heldRows = await holdUnverifiedPriceRows(sb, "pf_prices", rows, "item_code");
-  const upserted = await chunkUpsert(sb, "pf_prices", heldRows, "item_code", 500);
-  const pub = await holdUnverifiedPriceRows(sb, "pf_public_retail_prices", rows, "item_code");
-  // No current candidate is proven non-promotional; keep the exact published price.
+  const upserted = await chunkUpsert(sb, "pf_prices", rows, "item_code", 500);
+  const pub = rows
+    .filter((r) => r.price !== null && r.price > 0)
+    .map((r) => ({
+      item_code: r.item_code,
+      model_code: String(r.item_code).slice(0, 6),
+      retail_price: Number((Number(r.price) * 1.65).toFixed(2)),
+      currency: r.currency || "EUR",
+      updated_at: now,
+    }));
   if (pub.length) {
     const { error } = await sb.from("pf_public_retail_prices").upsert(pub, { onConflict: "item_code" });
     if (error) throw new Error(`pf_public_retail_prices upsert: ${error.message}`);
@@ -543,11 +548,7 @@ async function markStale(sb: SupabaseClient, lang: string) {
   if (!stamp || expected <= 0) throw new Error("mark_stale: manifest has no generation stamp/model count");
   const { count, error } = await sb.from("pf_styles").select("model_code", { count: "exact", head: true }).eq("feed_seen_at", stamp);
   if (error) throw new Error(`mark_stale count: ${error.message}`);
-  if (!canRetireSupplierItem({ authoritative: manifest.authoritative_complete === true,
-    successful: true, complete: manifest.authoritative_complete === true,
-    expected, received: count ?? 0, failed: 0 }, false, false)) {
-    throw new Error(`mark_stale: authoritative complete snapshot not certified (${count}/${expected}); nothing deactivated`);
-  }
+  if (count !== expected) throw new Error(`mark_stale: feed incomplete (${count}/${expected} models seen); nothing deactivated`);
   const v = await sb.from("pf_variants").update({ feed_active: false }).or(`feed_seen_at.is.null,feed_seen_at.neq.${stamp}`).eq("feed_active", true).select("item_code");
   if (v.error) throw new Error(`mark_stale variants: ${v.error.message}`);
   const st = await sb.from("pf_styles").update({ feed_active: false }).or(`feed_seen_at.is.null,feed_seen_at.neq.${stamp}`).eq("feed_active", true).select("model_code");
