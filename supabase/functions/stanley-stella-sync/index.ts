@@ -226,9 +226,8 @@ async function syncStyles(sb: SupabaseClient) {
       .from("ss_styles")
       .select("style_code")
       .eq("archived", false);
-    const toArchive = (existing ?? [])
-      .map((r: any) => r.style_code)
-      .filter((c: string) => !seenStyleCodes.has(c));
+    // Array success alone does not establish authoritative catalogue completeness.
+    const toArchive: string[] = [];
     for (let i = 0; i < toArchive.length; i += 200) {
       const slice = toArchive.slice(i, i + 200);
       const { error } = await sb

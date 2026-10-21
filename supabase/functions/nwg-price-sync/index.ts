@@ -91,9 +91,9 @@ async function validateWebsiteCatalog(sb: SupabaseClient) {
   const missing = productNumbers.filter((productNumber) => !found.has(productNumber));
   const now = new Date().toISOString();
 
-  // The website catalog is authoritative in both directions. Restore products
-  // confirmed there in case an earlier broad catalog cleanup archived them.
-  const confirmed = [...found];
+  // These are selected-product lookups, not a complete catalogue receipt.
+  // Never unhide manual/history exclusions or retire products from this response.
+  const confirmed: string[] = [];
   for (let i = 0; i < confirmed.length; i += 200) {
     const { error } = await sb
       .from("nwg_styles")
@@ -102,8 +102,9 @@ async function validateWebsiteCatalog(sb: SupabaseClient) {
     if (error) throw new Error(`Restore website-confirmed NWG products: ${error.message}`);
   }
 
-  for (let i = 0; i < missing.length; i += 200) {
-    const chunk = missing.slice(i, i + 200);
+  const certifiedMissing: string[] = [];
+  for (let i = 0; i < certifiedMissing.length; i += 200) {
+    const chunk = certifiedMissing.slice(i, i + 200);
     const { error: skuError } = await sb
       .from("nwg_skus")
       .update({ purchase_price: null, purchase_currency: null, purchase_updated_at: now })

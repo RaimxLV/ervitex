@@ -331,9 +331,9 @@ async function processProduct(sb: SupabaseClient, fr: FrSession, card: Card): Pr
     const raw = await fr.postForm(page.formAction!, { ...page.formFields, ...colorFields(color.name) }, true, card.url);
     let parsed: { errors: unknown[]; content: string } | null = null;
     try { parsed = JSON.parse(raw); } catch { /* non-JSON */ }
-    if (!parsed || (parsed.errors?.length ?? 0) > 0) continue;
+    if (!parsed || (parsed.errors?.length ?? 0) > 0) throw new Error(`incomplete colour matrix on ${card.url}`);
     const matrix = parseMatrix(parsed.content);
-    if (!matrix.lines.length) continue;
+    if (!matrix.lines.length) throw new Error(`empty colour matrix on ${card.url}`);
     for (const size of matrix.sizes) allSizes.add(size);
     if (!chipHexCache.has(color.chipUrl)) {
       chipHexCache.set(color.chipUrl, color.chipUrl ? await chipHex(color.chipUrl, cookieHeader) : null);
@@ -371,7 +371,8 @@ async function processProduct(sb: SupabaseClient, fr: FrSession, card: Card): Pr
   }
   // Retire variants of this style that no longer exist on the supplier page.
   const { data: existing } = await sb.from("falkross_variants").select("sku").eq("style_code", card.mpn).eq("active", true);
-  const stale = (existing ?? []).map((v: any) => v.sku).filter((s: string) => !freshSkus.has(s));
+  // A scraped model page is not a complete authoritative catalogue receipt.
+  const stale: string[] = [];
   for (let i = 0; i < stale.length; i += 200) {
     await sb.from("falkross_variants").update({ active: false }).in("sku", stale.slice(i, i + 200));
   }
@@ -449,7 +450,8 @@ async function syncData(sb: SupabaseClient): Promise<Record<string, unknown>> {
     const { data: queueRows } = await sb.from("falkross_queue").select("mpn");
     const codes = new Set((queueRows ?? []).map((r: any) => r.mpn));
     const { data: published } = await sb.from("falkross_styles").select("style_code").eq("published", true);
-    const retire = (published ?? []).map((s: any) => s.style_code).filter((c: string) => !codes.has(c));
+    // Queue exhaustion (including failed attempts) does not certify supplier absence.
+    const retire: string[] = [];
     for (let i = 0; i < retire.length; i += 200) {
       await sb.from("falkross_styles").update({ published: false }).in("style_code", retire.slice(i, i + 200));
     }

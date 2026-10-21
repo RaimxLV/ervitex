@@ -186,15 +186,16 @@ async function syncData(sb: SupabaseClient) {
     if (error) throw new Error(`utt_images: ${error.message}`);
   }
 
-  // Retire what UTT no longer sells.
+  // Data Export has no independently verified completeness receipt. Keep absent
+  // rows until a complete authoritative snapshot is certified; HTTP 200 is insufficient.
   const seenSkus = new Set(variantRows.map((v) => v.sku));
   const oldVariants = await selectAll(sb, "utt_variants", "sku", (q) => q.eq("active", true));
-  const retire = oldVariants.map((v) => v.sku).filter((s) => !seenSkus.has(s));
+  const retire: string[] = [];
   for (let i = 0; i < retire.length; i += 200) {
     await sb.from("utt_variants").update({ active: false }).in("sku", retire.slice(i, i + 200));
   }
   const oldStyles = await selectAll(sb, "utt_styles", "style_code", (q) => q.eq("published", true));
-  const retireStyles = oldStyles.map((s) => s.style_code).filter((c) => !styleRows.has(c));
+  const retireStyles: string[] = [];
   for (let i = 0; i < retireStyles.length; i += 200) {
     await sb.from("utt_styles").update({ published: false }).in("style_code", retireStyles.slice(i, i + 200));
   }
