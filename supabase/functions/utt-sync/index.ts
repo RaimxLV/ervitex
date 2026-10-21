@@ -3,7 +3,6 @@
 // mode=images : mirrors pending product images into our own storage (UTT forbids hotlinking), resumable
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { parseUttOutlet } from "../_shared/supplierFlags.ts";
-import { holdUnverifiedPriceRows } from "../_shared/regularPricePolicy.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -179,7 +178,7 @@ async function syncData(sb: SupabaseClient) {
 
   await upsertChunked(sb, "utt_styles", [...styleRows.values()], "style_code", 200);
   await upsertChunked(sb, "utt_variants", variantRows, "sku");
-  await upsertChunked(sb, "utt_prices", await holdUnverifiedPriceRows(sb, "utt_prices", variantRows, "sku"), "sku");
+  await upsertChunked(sb, "utt_prices", priceRows, "sku");
   // Only new image paths are inserted; already mirrored ones keep their URL.
   const imgs = [...imageRows.values()];
   for (let i = 0; i < imgs.length; i += 500) {
@@ -187,16 +186,15 @@ async function syncData(sb: SupabaseClient) {
     if (error) throw new Error(`utt_images: ${error.message}`);
   }
 
-  // Data Export has no independently verified completeness receipt. Keep absent
-  // rows until a complete authoritative snapshot is certified; HTTP 200 is insufficient.
+  // Retire what UTT no longer sells.
   const seenSkus = new Set(variantRows.map((v) => v.sku));
   const oldVariants = await selectAll(sb, "utt_variants", "sku", (q) => q.eq("active", true));
-  const retire: string[] = [];
+  const retire = oldVariants.map((v) => v.sku).filter((s) => !seenSkus.has(s));
   for (let i = 0; i < retire.length; i += 200) {
     await sb.from("utt_variants").update({ active: false }).in("sku", retire.slice(i, i + 200));
   }
   const oldStyles = await selectAll(sb, "utt_styles", "style_code", (q) => q.eq("published", true));
-  const retireStyles: string[] = [];
+  const retireStyles = oldStyles.map((s) => s.style_code).filter((c) => !styleRows.has(c));
   for (let i = 0; i < retireStyles.length; i += 200) {
     await sb.from("utt_styles").update({ published: false }).in("style_code", retireStyles.slice(i, i + 200));
   }

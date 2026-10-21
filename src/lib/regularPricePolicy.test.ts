@@ -1,50 +1,28 @@
 import { describe, expect, it } from "vitest";
-import { retainRegularPrice, canRetireSupplierItem, holdUnverifiedPriceRows } from "../../supabase/functions/_shared/regularPricePolicy";
-
-describe("regular supplier prices", () => {
-  it("sale begins: 4.73 cannot replace verified same-SKU 5.25", () => {
-    expect(retainRegularPrice({ previous: 5.25, candidate: 4.73, standardVerified: false, promotional: true })).toBe(5.25);
+import { malfiniPriceWrite } from "../../supabase/functions/_shared/regularPricePolicy";
+import { isMalfiniOutlet, isMalfiniNomenclatureOutlet } from "../../supabase/functions/_shared/supplierFlags";
+const normal = { price: 5.25, currency: "EUR" };
+describe("actual narrow MF importer write policy", () => {
+  it("normal new SKU writes 5.25 ×1.75, not a blanket freeze", () => {
+    expect(malfiniPriceWrite("1394413", false, normal, undefined)).toEqual({ sku: "1394413", wholesale_price: 5.25, retail_price: 9.1875, suggested_retail_price: null, currency: "EUR" });
   });
-  it("sale ends: verified regular 5.25 is accepted", () => {
-    expect(retainRegularPrice({ previous: 5.25, candidate: 5.25, standardVerified: true, promotional: false })).toBe(5.25);
+  it("sale begins: 4.73 never writes or nulls existing same-SKU price", () => {
+    expect(malfiniPriceWrite("1394412", isMalfiniNomenclatureOutlet({ outlet: 10 }), { price: 4.73, currency: "EUR" }, undefined)).toBeNull();
   });
-  it("missing standard field retains the previous regular value", () => {
-    expect(retainRegularPrice({ previous: 5.25, candidate: null, standardVerified: false, promotional: false })).toBe(5.25);
+  it("model OUTLET blocks prices even with nomenclature marker zero", () => {
+    expect(malfiniPriceWrite("1394412", isMalfiniOutlet({ categoryName: "OUTLET" }), normal, undefined)).toBeNull();
   });
-  it("unknown normal price is not invented from a discounted 4.73", () => {
-    expect(retainRegularPrice({ previous: null, candidate: 4.73, standardVerified: false, promotional: true })).toBeNull();
+  it("sale ends: non-promo unit flow resumes", () => {
+    expect(malfiniPriceWrite("1394413", false, normal, undefined)?.retail_price).toBe(9.1875);
   });
-});
-
-describe("supplier catalogue presence", () => {
-  const full = { authoritative: true, successful: true, complete: true, expected: 36, received: 36, failed: 0 };
-  it("zero stock or outlet cannot retire a listed variant", () => {
-    expect(canRetireSupplierItem(full, true, false)).toBe(false);
+  it("missing unit price skips write; recommended price cannot substitute", () => {
+    expect(malfiniPriceWrite("1394412", false, undefined, { price: 20, currency: "EUR" })).toBeNull();
   });
-  it("partial response cannot retire an absent variant", () => {
-    expect(canRetireSupplierItem({ ...full, complete: false, received: 1 }, false, false)).toBe(false);
+  it("unknown promo SKU cannot copy 5.25 from another size", () => {
+    expect(malfiniPriceWrite("1394412", true, normal, undefined)).toBeNull();
   });
-  it("failed sync cannot retire an absent variant", () => {
-    expect(canRetireSupplierItem({ ...full, successful: false, failed: 1 }, false, false)).toBe(false);
-  });
-  it("successful complete authoritative absence allows removal", () => {
-    expect(canRetireSupplierItem(full, false, false)).toBe(true);
-  });
-  it("manual business exclusions are not overridden", () => {
-    expect(canRetireSupplierItem(full, false, true)).toBe(false);
-  });
-});
-
-describe("actual importer held-price path", () => {
-  it("retains only the same SKU and its original payload through sale and sale end", async () => {
-    const saved = { sku: "1394413", wholesale_price: 5.25, retail_price: 9.19 };
-    const client = { from: () => ({ select: () => ({ in: (_key: string, keys: string[]) =>
-      Promise.resolve({ data: keys.includes(saved.sku) ? [saved] : [], error: null }) }) }) };
-    expect(await holdUnverifiedPriceRows(client, "mf_prices", [{ sku: "1394413", wholesale_price: 4.73 }, { sku: "1394412", wholesale_price: 4.73 }], "sku")).toEqual([saved]);
-    expect(await holdUnverifiedPriceRows(client, "mf_prices", [{ sku: "1394413", wholesale_price: 5.25 }], "sku")).toEqual([saved]);
-  });
-  it("read failures abort instead of overwriting prices", async () => {
-    const client = { from: () => ({ select: () => ({ in: () => Promise.resolve({ data: null, error: { message: "offline" } }) }) }) };
-    await expect(holdUnverifiedPriceRows(client, "mf_prices", [{ sku: "1394413" }], "sku")).rejects.toThrow("held-price read failed");
+  it("zero stock does not affect normal price write", () => {
+    const stock = { quantity: 0, sku: "1394413" };
+    expect(malfiniPriceWrite(stock.sku, false, normal, undefined)?.wholesale_price).toBe(5.25);
   });
 });

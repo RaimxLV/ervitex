@@ -1,0 +1,36 @@
+BEGIN
+DO
+DO
+INSERT 0 3
+INSERT 0 5
+INSERT 0 5
+INSERT 0 3
+INSERT 0 1
+SELECT 3
+ refresh_catalog_prices 
+------------------------
+ 
+(1 row)
+
+DO
+UPDATE 1
+ refresh_catalog_prices 
+------------------------
+ 
+(1 row)
+
+DO
+UPDATE 1
+UPDATE 1
+ refresh_catalog_prices 
+------------------------
+ 
+(1 row)
+
+DO
+ROLLBACK
+ refresh_rolled_back | view_rolled_back | rows_rolled_back 
+---------------------+------------------+------------------
+ t                   | t                | t
+(1 row)
+
