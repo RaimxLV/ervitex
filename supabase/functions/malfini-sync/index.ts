@@ -2,6 +2,7 @@
 // Retail NET price = the supplier's normal single-unit wholesale price × markup.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { isMalfiniOutlet, isMalfiniNomenclatureOutlet, malfiniUnitPrices } from "../_shared/supplierFlags.ts";
+import { holdUnverifiedPriceRows } from "../_shared/regularPricePolicy.ts";
 import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
 
 const corsHeaders = {
@@ -190,7 +191,11 @@ Deno.serve(async (req) => {
       const { error } = await admin.from("mf_images").insert(slice);
       if (error) throw new Error(`mf_images insert: ${error.message}`);
     }
-    await upsertChunked("mf_prices", priceRows, "sku");
+    // Unit=1 and outlet=0 do not establish normal-price semantics. Promotions
+    // never clear or replace held exact-SKU values; unknown new prices stay unknown.
+    const heldPrices = await holdUnverifiedPriceRows(admin, "mf_prices", variantRows, "sku");
+    await upsertChunked("mf_prices", heldPrices, "sku");
+    log(`Regular-price evidence pending: held=${heldPrices.length}, candidates=${priceRows.length}; no candidate repricing`);
     const knownSkus = new Set(variantRows.map((v) => v.sku));
     const filteredStock = stockRows.filter((s) => knownSkus.has(s.sku));
     log(`Stock after FK filter: ${filteredStock.length} / ${stockRows.length}`);

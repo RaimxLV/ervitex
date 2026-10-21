@@ -4,6 +4,7 @@
 // mode=images : mirrors pending product images into our own storage, resumable
 // Retail prices are derived in the DB (refresh_catalog_prices): partner price x 1.55.
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { holdUnverifiedPriceRows } from "../_shared/regularPricePolicy.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -364,7 +365,7 @@ async function processProduct(sb: SupabaseClient, fr: FrSession, card: Card): Pr
   styleRow.sizes = uniqueSortedSizes(allSizes);
   await sb.from("falkross_styles").upsert(styleRow, { onConflict: "style_code" });
   await upsertChunked(sb, "falkross_variants", variantRows, "sku", 500);
-  await upsertChunked(sb, "falkross_prices", priceRows, "sku", 500);
+  await upsertChunked(sb, "falkross_prices", await holdUnverifiedPriceRows(sb, "falkross_prices", variantRows, "sku"), "sku", 500);
   for (let i = 0; i < imageRows.length; i += 500) {
     const { error } = await sb.from("falkross_images").upsert(imageRows.slice(i, i + 500), { onConflict: "style_code,source_path", ignoreDuplicates: true });
     if (error) throw new Error(`falkross_images: ${error.message}`);

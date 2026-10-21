@@ -3,6 +3,7 @@
 // mode=images : mirrors pending product images into our own storage (UTT forbids hotlinking), resumable
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { parseUttOutlet } from "../_shared/supplierFlags.ts";
+import { holdUnverifiedPriceRows } from "../_shared/regularPricePolicy.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -178,7 +179,7 @@ async function syncData(sb: SupabaseClient) {
 
   await upsertChunked(sb, "utt_styles", [...styleRows.values()], "style_code", 200);
   await upsertChunked(sb, "utt_variants", variantRows, "sku");
-  await upsertChunked(sb, "utt_prices", priceRows, "sku");
+  await upsertChunked(sb, "utt_prices", await holdUnverifiedPriceRows(sb, "utt_prices", variantRows, "sku"), "sku");
   // Only new image paths are inserted; already mirrored ones keep their URL.
   const imgs = [...imageRows.values()];
   for (let i = 0; i < imgs.length; i += 500) {
