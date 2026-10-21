@@ -1,0 +1,34 @@
+--- /tmp/mf-surgical/refresh.before.sql	2026-10-21 14:31:07.319423587 +0000
++++ /tmp/mf-surgical/refresh.after.sql	2026-10-21 14:31:24.688424208 +0000
+@@ -5,14 +5,24 @@
+  SET search_path TO 'public'
+ AS $function$
+ BEGIN
+-  DELETE FROM public.catalog_variant_prices WHERE source IS NOT NULL;
++  -- mf_promo_hold: retain existing exact-SKU public values, without certifying them.
++  DELETE FROM public.catalog_variant_prices cp WHERE cp.source IS NOT NULL
++    AND NOT (cp.source = 'mf' AND EXISTS (
++      SELECT 1 FROM public.mf_variants v JOIN public.mf_styles ms ON ms.style_code = v.style_code
++      WHERE v.sku = cp.sku AND (ms.is_outlet OR EXISTS (
++        SELECT 1 FROM jsonb_array_elements(COALESCE(ms.raw->'variants','[]'::jsonb)) variant
++        CROSS JOIN LATERAL jsonb_array_elements(COALESCE(variant->'nomenclatures','[]'::jsonb)) nomenclature
++        WHERE nomenclature->>'productSizeCode' = cp.sku
++          AND COALESCE(NULLIF(btrim(nomenclature->>'outlet'),''),'0') <> '0'
++      ))
++    ));
+   INSERT INTO public.catalog_variant_prices (source, sku, style_code, color_code, size, retail_price, currency)
+   SELECT 'ss', r.sku, r.style_code, r.color_code, r.size_code, r.retail_price, 'EUR'
+     FROM public.ss_sku_retail_prices() r WHERE r.retail_price > 0 ON CONFLICT DO NOTHING;
+   INSERT INTO public.catalog_variant_prices (source, sku, style_code, color_code, size, retail_price, currency)
+   SELECT 'mf', p.sku, v.style_code, v.color_code, COALESCE(v.size_name, v.size), ROUND((p.wholesale_price * 1.75)::numeric, 2), COALESCE(p.currency, 'EUR')
+     FROM public.mf_prices p JOIN public.mf_variants v ON v.sku = p.sku JOIN public.mf_styles ms ON ms.style_code = v.style_code WHERE p.retail_price > 0 AND NOT ms.is_outlet
+-    -- nomenclature_outlet_guard: exact SKU only, no substitute prices.
++    -- mf_promo_candidate_guard: no discounted replacement or invented missing price.
+     AND NOT EXISTS (
+       SELECT 1 FROM jsonb_array_elements(COALESCE(ms.raw->'variants','[]'::jsonb)) variant
+       CROSS JOIN LATERAL jsonb_array_elements(COALESCE(variant->'nomenclatures','[]'::jsonb)) nomenclature
+@@ -106,3 +116,4 @@
+     FROM public.catalog_variant_prices GROUP BY source, style_code;
+ END;
+ $function$
++
