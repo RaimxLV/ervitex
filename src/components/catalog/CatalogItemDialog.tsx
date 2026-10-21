@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
 import { colorCodeMatches } from "@/lib/colorCodeMatch";
 import { pfSkuMap } from "@/lib/pfVariantIdentity";
-import { lowestPriceVariant } from "@/lib/catalogPriceSelection";
+import { lowestPriceVariant, sizeAfterColorChange } from "@/lib/catalogPriceSelection";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "@/lib/router-compat";
@@ -1262,7 +1262,7 @@ const CatalogItemDialog = ({
       pendingSizeRef.current = null;
       return;
     }
-    // Keep the same size across colour changes; a missing own MF variant stays unpriced.
+    setSelectedSize(previous => sizeAfterColorChange(source, previous));
   }, [activeColor]);
 
 
@@ -1333,7 +1333,7 @@ const CatalogItemDialog = ({
     if (currentColor) {
       const byColor = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code));
       // PF: bez savas krāsas cenas nekad neņem citu krāsu.
-      if (byColor.length || source === "pf") rows = byColor;
+      if (byColor.length || source === "pf" || source === "mf") rows = byColor;
     }
     if (selectedSize) {
       // A SKU with its own size label (NWG duplicates) is matched by SKU, never by the shared name.
@@ -1359,7 +1359,7 @@ const CatalogItemDialog = ({
     let rows = variantPrices;
     if (currentColor) {
       const byColor = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code));
-      if (byColor.length || source === "pf") rows = byColor;
+      if (byColor.length || source === "pf" || source === "mf") rows = byColor;
     }
     const map: Record<string, number> = {};
     const pfConflict = new Set<string>();

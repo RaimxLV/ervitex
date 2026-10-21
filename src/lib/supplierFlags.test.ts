@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { isMalfiniNomenclatureOutlet, malfiniUnitPrices } from "../../supabase/functions/_shared/supplierFlags";
-import { lowestPriceVariant } from "./catalogPriceSelection";
+import { lowestPriceVariant, sizeAfterColorChange } from "./catalogPriceSelection";
 
 it("MF139 outlet XS is excluded, not repriced from the regular sizes", () => {
   expect(isMalfiniNomenclatureOutlet({ outlet: 10 })).toBe(true);
@@ -19,4 +19,10 @@ it("MF139 Blue Atoll and Navy same size keep the exact 5.25 × 1.75 price", () =
   expect(lowestPriceVariant(rows, colors, {}, "44", "S").price).toBe(9.19);
   expect(lowestPriceVariant(rows, colors, {}, "02", "S").price).toBe(9.19);
   expect(lowestPriceVariant(rows, colors, {}, "02", "XS").price).toBeNull();
+});
+
+it("MF colour switches retain S/XS instead of comparing different sizes", () => {
+  expect(sizeAfterColorChange("mf", "S")).toBe("S");
+  expect(sizeAfterColorChange("mf", "XS")).toBe("XS");
+  expect(sizeAfterColorChange("ru", "S")).toBeNull();
 });
