@@ -2,7 +2,7 @@
 - [x] 14:24 root: plašais 009 aizstāts ar šauru MF SQL (MD5 d32594cd2e0aecace6068a57f8f69272), precīzs diff, sintētiska ROLLBACK pārbaude; DB nepielietota, nepublicēts.
 - [x] Atcelti jaunākie spekulatīvie sešu citu piegādātāju un UTT frontend izmaiņas; izvietots tikai MF (SHA-256 d7dd1b57952e8b25a36860fa664858e77e7773c1ae177e90498a02b47e6c77d9).
 - [ ] MF139 24 cenu atjaunošana — bloķē exact-SKU verificētas parastās cenas pierādījums; 4,73/vecā 7,80 nav derīgs regular evidence, citas krāsas/izmēra cenu nepārņem.
-- [ ] 009 šaurais MF refresh/filtra labojums — gaida root precīzo SQL pārskatīšanu; bez DB piemērošanas/sync/refresh/pārcenošanas/publicēšanas.
+- [x] 009 apstiprinātie precīzie baiti staged un piemēroti vienā transakcijā, MD5 d32594cd2e0aecace6068a57f8f69272; definīciju diff, ACL/manuālie filtri un cenu kontrolsummas pārbaudītas. Atsevišķi atjaunots CREATE OR REPLACE VIEW nomestais esošais security_invoker=true; bez sync/refresh/pārcenošanas/publicēšanas. Pierādījumi: docs/audits/mf-surgical-2026-10-21/applied.md.
 - [ ] Normal-price/promo lauku un autoritatīva pilna snapshot semantika pārējiem piegādātājiem — nav verificēta vai ieviesta; plūsmas nav globāli iesaldētas, citas izvietošanas aizliegtas.
 - [x] MF139 krāsu paraugi: visi 15 piegādātāja attēli HTTP 200; 43/63/44/02 izvēle un atbilstošs foto pārbaudīti pārlūkā; 48 testi PASS. Bez cenu/DB/sync izmaiņām; frontend publicēšana gaida lietotāja apstiprinājumu.
 - [x] 2026-10-21: dvieļi abās kategorijās bez dublikātiem; MF139 izmēra saglabāšana un 24 outlet=10 cenu izņemšana tikai šim modelim; R265B piecas trūkstošās krāsas atjaunotas. 56 testi, build OK, pārlūka pārbaudes; bez pilnas sinhronizācijas/publicēšanas.
