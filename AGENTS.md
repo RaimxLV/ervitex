@@ -3,7 +3,7 @@
 - Menu/catalog share searchMatches: shorthand uses source/prefix/token metadata, not ID lists; related codes need exact-token anchors; redirects keep facets.
 - productContent separates care/specs; translation caches use fingerprints.
 - requestOfferData preserves manager/items/prints/pricing. Cart identity includes supplier/model/color/size; restore before persisting. Sharing activates drafts; useOfferDraft serializes recovery; token refresh preserves editors.
-- Share ColorSelector, SizeQuantityTable, QuoteItemsTable, PrintRows, QuoteSteps; offer pickers collapse on add/outside/Escape, reopen from headers. OrderMinimumNotice uses original category/name via orderMinimums; never blocks requests. CatalogItemDialog shows desktop guidance below gallery, AddToQuoteBlock mobile/standalone only.
+- Share quote selectors/tables/steps; pickers close on add/outside/Escape, reopen from headers. orderMinimums uses original category/name, never blocks. Desktop guidance below gallery; AddToQuoteBlock guidance mobile/standalone only.
 - Icons share AccentIcon and Lucide-style print-icons.
 - Public eyebrows use red line-labels; other tones are icon-only; technology use cases use centered light panels.
 - Office contours/hotspots share cover-scene coordinates; halos use feGaussianBlur polygons with oversized regions to avoid clipping.
@@ -13,14 +13,14 @@
 - Normal email; burgundy worksheet links. Offers: admin-gated sendOffer/saved prices. Request bank fields: requestDetails/BILLING_FIELDS; staff email: print/files first.
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
 - catalogPriceSelection binds card photo/price to cheapest allowed colour outside excluded groups, with fallback; explicit choices override, stock is irrelevant.
-- "Ir noliktavā" is a manual admin flag in `stock_flags` per colour (`item_id` = `${id}::${color_code}`; bare `${id}` rows are legacy model-wide flags), separate from supplier data so syncs never erase it; it shows only in the product view for the selected colour, never on catalog cards; worksheet discount lives in `quote_requests.worksheet_discount` via admin-only RPC so it never enters client drafts.
+- stock_flags is manual per-colour `${id}::${color_code}` (bare id=legacy model-wide), never overwritten by sync; display only selected product colour, never cards. quote_requests.worksheet_discount uses admin-only RPC, never client drafts.
 - Shared worksheet/offer prints use scope="order" in existing item JSON; orderPrinting preserves offer-wide prints on deletion, preventing duplicate charges and extra storage.
 - Stock mutation controls render only after the admin role resolves; every mutation revalidates the live user and role before writing; public users see only the outlined availability label.
 - Native scroll, ScrollToTop uses resolvedLocation. WebGL eases pointers, renders on change, pauses off-screen.
 - Supplier purchase/wholesale price columns are excluded from anon/authenticated column GRANTs and internal SECURITY DEFINER helpers are service_role-only, so public catalog reads can never leak our buying prices or trigger syncs.
 - SSR avoids browser globals; heads use lib/seo pageHead/privateHead (canonical www.ervitex.lv); sitemap=catalog_items minus remnants/footwear; private routes noindex, no Disallow; Product schema: no stock.
 - sw.js/service-worker.js are self-unregistering kill-switches; never delete them.
-- Homepage mosaic uses all `techs` galleries; loads near viewport, decodes before fading, pauses off-screen/hidden, during pointer/keyboard interaction/dialogs and reduced motion; enlargement uses shared accessible Dialog.
+- Mosaic uses all techs galleries; lazy-load/decode before fading; pauses off-screen/hidden/interacting/dialogs/reduced motion; shared accessible Dialog.
 - Galleries decode before switching, retain frames on failure. Mobile colour photos load after primary images; controls stay outside links. Hover needs loaded photos; Malfini prefers fronts. Cloudinary uses native resizing.
 - BrandLogo serves cards; ETX shows Ervitex. Russell shares model/colour validation and supplier colorProductMap labels to avoid wrong photos.
 - tech_galleries stores stable order/membership refs (s:<tech>:<index> for built-ins, public URLs for uploads), applied over static data so rebuilds preserve order.
@@ -29,5 +29,6 @@
 - Manual products reuse products/images/sizes via catalog_items; refresh rebuilds retail prices. UUIDs aren't manufacturer codes.
 - Headwear shares facets (bump cache schema on changes). ADMIN_HOME opens requests; supplier tools use /admin/overview.
 - Read subdirectory AGENTS.md first. Price SQL in docs/pending-migrations runs byte-exact via md5-checked public.migration_stage.
-- Catalog reads time out to error+retry; filter order defaults.
+- Catalog reads time out to error+retry; filter order defaults. catalogCategories shares secondary memberships across facets/filtering without duplicate rows.
+- MF nomenclature outlet excludes exact SKU prices at import/refresh; colour switches preserve size, missing variants never borrow prices.
 - Never present partial work as complete; name open tasks and blockers.
