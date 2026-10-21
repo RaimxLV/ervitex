@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] 14:11 precizētais noteikums: same-SKU regulāro cenu pierādījumi un MF139 24 cenu atjaunošana tikai ar pierādījumiem; importer/refresh saglabāšana akcijas/nulles/daļēja avota laikā. Bez pilnas sync/pārcenošanas/frontend publicēšanas; skaidri nodalīt sagatavoto/pielietoto.
 - [x] MF139 krāsu paraugi: visi 15 piegādātāja attēli HTTP 200; 43/63/44/02 izvēle un atbilstošs foto pārbaudīti pārlūkā; 48 testi PASS. Bez cenu/DB/sync izmaiņām; frontend publicēšana gaida lietotāja apstiprinājumu.
 - [x] 2026-10-21: dvieļi abās kategorijās bez dublikātiem; MF139 izmēra saglabāšana un 24 outlet=10 cenu izņemšana tikai šim modelim; R265B piecas trūkstošās krāsas atjaunotas. 56 testi, build OK, pārlūka pārbaudes; bez pilnas sinhronizācijas/publicēšanas.
 - [x] 2026-10-21 malfini-sync outlet ielāps izvietots atsevišķi; deployment rīks apstiprināja panākumu, source SHA-256 91e088cac346527ca3f2337d6c179cfd5e72a9bced5dda7bda8a9639d50c55d9. Funkcija/refresh netika izsaukti. READ ONLY: MF139 24 outlet SKU publisko cenu nav; Navy/Atoll S–2XL 5.25 iepirkums/9.19 neto, diapazons 8.96–9.80; R265B sešas krāsas; refresh guard klātesošs.
