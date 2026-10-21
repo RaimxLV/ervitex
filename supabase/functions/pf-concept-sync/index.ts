@@ -478,17 +478,7 @@ async function syncPrices(sb: SupabaseClient, opts: { start: number; chain: bool
   const heldRows = await holdUnverifiedPriceRows(sb, "pf_prices", rows, "item_code");
   const upserted = await chunkUpsert(sb, "pf_prices", heldRows, "item_code", 500);
   const pub = await holdUnverifiedPriceRows(sb, "pf_public_retail_prices", rows, "item_code");
-  /* No current candidate is proven non-promotional. Preserve the published
-     exact-item price, not a newly recalculated possibly discounted value.
-  const candidatePub = rows
-    .filter((r) => r.price !== null && r.price > 0)
-    .map((r) => ({
-      item_code: r.item_code,
-      model_code: String(r.item_code).slice(0, 6),
-      retail_price: Number((Number(r.price) * 1.65).toFixed(2)),
-      currency: r.currency || "EUR",
-      updated_at: now,
-    })); */
+  // No current candidate is proven non-promotional; keep the exact published price.
   if (pub.length) {
     const { error } = await sb.from("pf_public_retail_prices").upsert(pub, { onConflict: "item_code" });
     if (error) throw new Error(`pf_public_retail_prices upsert: ${error.message}`);

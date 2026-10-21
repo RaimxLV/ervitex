@@ -89,5 +89,5 @@ BEGIN
   IF strpos(definition,'ms.is_outlet')>0 OR strpos(definition,'NOT v.outlet')>0 THEN
     RAISE EXCEPTION 'Outlet filter removal did not match; no changes applied';
   END IF;
-  EXECUTE 'CREATE OR REPLACE VIEW public.catalog_items WITH (security_invoker=true) AS ' || definition;
+  EXECUTE 'CREATE OR REPLACE VIEW public.catalog_items AS ' || definition;
 END $view$;
