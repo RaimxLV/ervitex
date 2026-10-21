@@ -12,7 +12,7 @@ const fallbackStyle = (color: ColorOption): CSSProperties | undefined => {
   return bucket && bucket !== "multi" ? { background: getBucket(bucket).hex } : undefined;
 };
 
-export interface ColorOption { code: string; name: string; hex?: string | null; inStock?: boolean; swatchStyle?: CSSProperties }
+export interface ColorOption { code: string; name: string; hex?: string | null; inStock?: boolean; swatchStyle?: CSSProperties; swatchUrl?: string | null }
 
 export function ColorSelector({ colors, value, onChange, disabled = false }: {
   colors: ColorOption[]; value: string | null; onChange: (code: string) => void; disabled?: boolean;
@@ -22,7 +22,9 @@ export function ColorSelector({ colors, value, onChange, disabled = false }: {
       aria-pressed={color.code === value} onClick={() => onChange(color.code)} title={`${color.name} · ${color.code}`}
       className={cn("h-auto min-h-12 min-w-0 justify-start gap-2 rounded-sm px-3 py-2 text-left hover:bg-muted hover:text-foreground",
         color.code === value && "border-accent bg-accent/5 ring-1 ring-accent text-foreground")}>
-      <span className="h-6 w-6 shrink-0 rounded-sm border border-border bg-muted" style={fallbackStyle(color)} />
+      <span className="relative h-6 w-6 shrink-0 overflow-hidden rounded-sm border border-border bg-muted" style={color.swatchUrl ? undefined : fallbackStyle(color)}>
+        {color.swatchUrl && <img key={color.swatchUrl} src={color.swatchUrl} alt="" aria-hidden="true" className="h-full w-full object-cover" onError={(event) => { event.currentTarget.hidden = true; }} />}
+      </span>
       <span className="min-w-0 flex-1 whitespace-normal break-words text-xs leading-snug font-medium">{color.name}
         <span className="mt-0.5 block text-[10px] font-normal text-muted-foreground">{color.code}</span>
       </span>

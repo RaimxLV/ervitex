@@ -26,6 +26,7 @@ import { separateProductSpecs, productTextLines, splitCareInstructions } from "@
 import { BrandLogo } from "@/components/BrandLogo";
 import { loadEtxProduct } from "@/lib/loadEtxProduct";
 import { russellImagesForColor } from "@/lib/russellImages";
+import { malfiniSwatchUrl } from "@/lib/malfiniSwatches";
 
 
 interface Props {
@@ -51,6 +52,7 @@ interface ColorDetail {
   code: string;
   name: string;
   hex: string | null;
+  swatchUrl?: string | null;
   images: string[];
   sizes: string[];
 }
@@ -775,12 +777,13 @@ async function loadMF(styleCode: string): Promise<ProductDetail | null> {
   }
 
   const colors: ColorDetail[] = colorOrder.map((key) => {
-    const info = colorInfo.get(key)!;
+    const info = colorInfo.get(key);
     const imgs = imgByColor.get(key) || [];
     return {
       code: key,
-      name: info.name,
+      name: info?.name || key,
       hex: null,
+      swatchUrl: malfiniSwatchUrl(key, info?.icon),
       images: imgs.length ? imgs : neutralFallback(shared, colorOrder.length),
       sizes: uniqueSortedSizes(sizesByColor.get(key) || allSizes),
     };
@@ -1790,7 +1793,7 @@ const CatalogItemDialog = ({
                       {currentColor ? source === "etx" ? currentColor.name : `${currentColor.name} - ${currentColor.code}` : label.allColors}
                     </span>
                   </div>
-                  <ColorSelector colors={displayDetail.colors.map((c) => ({ code: c.code, name: c.name, hex: resolveHex(c.hex, c.name), swatchStyle: swatchBackground(c.hex, c.name), inStock: stockFlags.has(stockKey(source, id, c.code)) }))} value={activeColor} onChange={(code) => { setActiveColor(code); setImgIndex(0); }} />
+                  <ColorSelector colors={displayDetail.colors.map((c) => ({ code: c.code, name: c.name, swatchUrl: c.swatchUrl, hex: source === "mf" ? c.hex : resolveHex(c.hex, c.name), swatchStyle: source === "mf" ? {} : swatchBackground(c.hex, c.name), inStock: stockFlags.has(stockKey(source, id, c.code)) }))} value={activeColor} onChange={(code) => { setActiveColor(code); setImgIndex(0); }} />
                 </div>
               )}
 
@@ -1824,7 +1827,9 @@ const CatalogItemDialog = ({
                   image={mainImg || null}
                   colorCode={currentColor?.code || null}
                   colorName={currentColor?.name || null}
-                  colorHex={currentColor ? resolveHex(currentColor.hex, currentColor.name) : null}
+                  colorHex={currentColor ? source === "mf" ? currentColor.hex : resolveHex(currentColor.hex, currentColor.name) : null}
+                  colorSwatchUrl={currentColor?.swatchUrl}
+                  colorSwatches={Object.fromEntries(displayDetail.colors.flatMap((c) => c.swatchUrl ? [[c.code, c.swatchUrl]] : []))}
                   sizes={visibleSizes}
                   onClose={() => onOpenChange(false)}
                 />
