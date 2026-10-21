@@ -1,4 +1,5 @@
 import { isSyncCallerAllowed } from "../_shared/syncAuth.ts";
+import { holdUnverifiedPriceRows } from "../_shared/regularPricePolicy.ts";
 // NWG contract (purchase) price sync.
 // Uses the NWG commerce API (commerce.gateway.nwg.se) with an OAuth refresh
 // token stored in public.nwg_auth. Access-token caching plus short database
@@ -464,7 +465,7 @@ Deno.serve(async (req) => {
               return;
             }
           }
-          const updates = rows
+          const candidates = rows
             .filter((r) => r.valid && typeof r.num === "number" && (r.num as number) > 0 && pnBySku.has(r.sku))
             .map((r) => ({
               sku: r.sku,
@@ -474,6 +475,7 @@ Deno.serve(async (req) => {
               purchase_currency: "EUR",
               purchase_updated_at: now,
             }));
+          const updates = await holdUnverifiedPriceRows(sb, "nwg_skus", candidates, "sku");
           const writeChunk = async (chunk: any[]): Promise<void> => {
             const { error } = await sb.from("nwg_skus").upsert(chunk, { onConflict: "sku" });
             if (!error) { updated += chunk.length; return; }
