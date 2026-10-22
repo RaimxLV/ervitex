@@ -40,3 +40,4 @@
 - Falk&Ross targeted discovery exceptions are exact supplier URLs/model identities, not whole-brand imports; Yupoong family search metadata never replaces the factual display brand.
 - Offer model swap (AdminOfferEdit) embeds UnifiedCatalog in selectionMode (no Layout/URL sync, card click returns the item); swap confirm is blocked whenever swapMissingCount > 0 so an incompatible size can never inherit a manual/old price.
 - Sublimation mugs are ETX manual products seeded from lib/sublimationMugs (goods price = unprinted net); the fixed print surcharge is only a PrintRows preset, never baked into goods, preventing double print charges.
+- Admin category ordering uses dnd-kit with pointer/touch/keyboard handles and an explicit save to existing categories.sort_order only; cancelling does not write and failed saves reload authoritative order.
