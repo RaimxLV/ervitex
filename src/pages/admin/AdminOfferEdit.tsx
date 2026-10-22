@@ -4,7 +4,7 @@ import { getOrderPrints, setOrderPrints, removeOfferItem } from "@/lib/orderPrin
 import logo from "@/assets/ervitex-logo-dark.svg";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { applyModelSwap, offerGroupKey } from "@/lib/requestPresentation";
+import { applyModelSwap, offerGroupKey, swapMissingCount } from "@/lib/requestPresentation";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link, useParams } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
@@ -245,7 +245,7 @@ const AdminOfferEdit = () => {
   /** Cik esošo rindu izmēriem jaunajam modelim nebūs precīzas krāsas+izmēra cenas. */
   const swapMissing = useMemo(() => {
     if (!swapKey || !picked) return 0;
-    return offer.items.filter((i) => groupKey(i) === swapKey && swapPriceBySize.get(i.size || "-") == null).length;
+    return swapMissingCount(offer.items, swapKey, swapPriceBySize);
   }, [swapKey, picked, offer.items, swapPriceBySize]);
 
   const closeSwap = () => { setSwapKey(null); setPicked(null); setQtyBySize({}); setQ(""); setHits([]); };
