@@ -41,3 +41,14 @@ describe("catalogBrandForCategory", () => {
     expect(catalogBrandForCategory("T-krekli", "t-krekli", "Ervitex")).toBe("Ervitex");
   });
 });
+import { catalogCategories as cc2, storedProductBrand, isEtxSublimationCategory } from "./etxCatalog";
+describe("admin ETX categories map to public facets", () => {
+  it("admin mug category 'Krūzes (sublimācija)' is in Mugs and sublimation", () => {
+    expect(cc2({ source: "etx", category: "Krūzes (sublimācija)", name: "Balta krūze" })).toContain("Mugs");
+    expect(isEtxSublimationCategory("Krūzes (sublimācija)")).toBe(true);
+  });
+  it("form brand Ervitex is stored as ETX Latvia", () => {
+    expect(storedProductBrand("Ervitex")).toBe("ETX Latvia");
+    expect(storedProductBrand("Clique")).toBe("Clique");
+  });
+});
