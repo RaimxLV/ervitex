@@ -37,3 +37,4 @@
 - Catalog sorting reuses Intl.Collator instances and starts initial pages alongside cache validation; this avoids comparator setup and serialized network waits without changing ordering, prices or visibility gates.
 - MF blocks confirmed promo writes only; held exact-SKU prices are not certified. Other suppliers await reviewed replacements, not freezes. MF colours preserve size/identity; swatches use verified supplier icons.
 - Never present partial work as complete; name open tasks and blockers.
+- Falk&Ross targeted discovery exceptions are exact supplier URLs/model identities, not whole-brand imports; Yupoong family search metadata never replaces the factual display brand.

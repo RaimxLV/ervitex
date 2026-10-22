@@ -274,7 +274,9 @@ const prepare = (it: Searchable): Prepared => {
   if (!p) {
     const id = normalizeSearch(it.id);
     const name = normalizeSearch(it.name);
-    const meta = normalizeSearch(`${it.brand || ""} ${it.category || ""} ${it.group_name || ""}`);
+    // Yupoong is the manufacturer's Flexfit brand family; keep the factual display brand.
+    const family = it.source === "fr" && /\byupoong\b/i.test(it.brand || "") ? "Flexfit" : "";
+    const meta = normalizeSearch(`${it.brand || ""} ${family} ${it.category || ""} ${it.group_name || ""}`);
     p = { id, name, meta, all: ` ${id} ${name} ${meta} ${id.replace(/ /g, "")}` };
     cache.set(it, p);
   }
