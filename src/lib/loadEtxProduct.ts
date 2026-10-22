@@ -10,18 +10,22 @@ export const etxMaterialEn = (m: string | null) =>
   m ? MATERIAL_EN[m.trim().toLowerCase()] ?? m : m;
 
 /** Unsynced products reuse the existing editable product records and galleries. */
-export async function loadEtxProduct(id: string, lang: "lv" | "en") {
+/** `allowHidden` is passed only for resolved admins (RLS already lets authenticated users read hidden rows; anon cannot). */
+export async function loadEtxProduct(id: string, lang: "lv" | "en", opts: { allowHidden?: boolean } = {}) {
   const [product, images, colors, sizes] = await Promise.all([
-    supabase.from("products").select("name_lv,name_en,description_lv,description_en,long_description_lv,long_description_en,material,brand,category_id,active,hidden_manual").eq("id", id).eq("brand", "ETX Latvia").maybeSingle(),
+    supabase.from("products").select("name_lv,name_en,description_lv,description_en,long_description_lv,long_description_en,material,brand,category_id,active,hidden_manual,retail_price").eq("id", id).eq("brand", "ETX Latvia").maybeSingle(),
     supabase.from("product_images").select("url").eq("product_id", id).order("sort_order"),
     supabase.from("product_colors").select("id,name,hex_code,image_url").eq("product_id", id).order("created_at"),
     supabase.from("product_sizes").select("size").eq("product_id", id).order("sort_order"),
   ]);
   const p = product.data;
-  if (!p || !p.active || p.hidden_manual) return null;
+  if (!p || !p.active || (p.hidden_manual && !opts.allowHidden)) return null;
   const gallery = (images.data || []).map(i => i.url);
   const availableSizes = (sizes.data || []).map(s => s.size);
   return {
+    /** Admin draft preview: hidden rows have no public catalogue prices yet, so the actual draft retail row is used. */
+    draft: !!p.hidden_manual,
+    draftRetail: p.hidden_manual && Number(p.retail_price) > 0 ? Number(p.retail_price) : null,
     title: lang === "lv" ? p.name_lv : p.name_en,
     code: "",
     brand: ETX_PUBLIC_BRAND,

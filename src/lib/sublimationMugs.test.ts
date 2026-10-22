@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SUBLIMATION_MUGS, isSublimationMug, mugPricePair, MUG_SUBLIMATION_PRINT_NET } from "./sublimationMugs";
+import { SUBLIMATION_MUGS, isSublimationMug, isApprovedMug, approvedMugSeed, mugPricePair, MUG_SUBLIMATION_PRINT_NET } from "./sublimationMugs";
 import { getOrderMinimum } from "./orderMinimums";
 import { catalogCategories, ETX_CATEGORY } from "./etxCatalog";
 import { offerTotals, type OfferItem } from "./offer";
@@ -33,6 +33,15 @@ describe("mug rules", () => {
     expect(metal[0].image).toContain("zelta-osa");
     expect(metal[1].image).toContain("sudraba-osa");
     expect(byName("DUO divkrāsu krūze").colors).toHaveLength(22);
+  });
+});
+
+describe("approved IDs only", () => {
+  it("print preset/prices bind to the four reviewed IDs, not names", () => {
+    for (const m of SUBLIMATION_MUGS) expect(isApprovedMug("etx", m.id)).toBe(true);
+    expect(isApprovedMug("etx", "00000000-0000-4000-8000-000000000001")).toBe(false);
+    expect(approvedMugSeed("etx", "some-future-mug")).toBeNull();
+    expect(isApprovedMug("ss", SUBLIMATION_MUGS[0].id)).toBe(false);
   });
 });
 

@@ -7,6 +7,13 @@ const MUG_RE = /\bkr[uū]z(?:e|es|ēm|ei)\b|\bmugs?\b/i;
 export const isSublimationMug = (source: string | null | undefined, name: string | null | undefined): boolean =>
   source === "etx" && MUG_RE.test(name || "");
 
+/** Only these reviewed products carry the owner-approved prices/print preset; a future ETX mug never inherits them. */
+export const APPROVED_MUG_IDS: ReadonlySet<string> = new Set([1, 2, 3, 4].map((n) => `7e1a0c00-0000-4000-8000-00000000000${n}`));
+export const isApprovedMug = (source: string | null | undefined, id: string | null | undefined): boolean =>
+  source === "etx" && !!id && APPROVED_MUG_IDS.has(id);
+export const approvedMugSeed = (source: string | null | undefined, id: string | null | undefined) =>
+  isApprovedMug(source, id) ? SUBLIMATION_MUGS.find((m) => m.id === id) ?? null : null;
+
 export interface MugPricePair { plainNet: number; plainGross: number; printedNet: number; printedGross: number }
 /** Goods price is the unprinted price; printed = goods + one surcharge. */
 export const mugPricePair = (plainNet: number): MugPricePair => {
