@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyModelSwap, offerGroupKey, type ModelSwapReplacement } from "./requestPresentation";
+import { applyModelSwap, offerGroupKey, swapMissingCount, type ModelSwapReplacement } from "./requestPresentation";
 import type { OfferItem } from "./offer";
 
 const item = (over: Partial<OfferItem>): OfferItem => ({
@@ -63,5 +63,28 @@ describe("applyModelSwap", () => {
     expect(items[2].productId).toBe("6606CT");
     expect(items[2].colorName).toBe("White");
     expect(items[2].qty).toBe(7);
+  });
+});
+
+describe("swapMissingCount", () => {
+  it("> 0, ja kādam grupas izmēram jaunajam modelim nav cenas — nomaiņu bloķējam", () => {
+    const s = item({ id: "s", size: "S" });
+    const m = item({ id: "m", size: "M" });
+    const other = item({ id: "o", productId: "STSW262", source: "ss", size: "S" });
+    const prices = new Map<string, number | null>([["S", 6.98]]);
+    expect(swapMissingCount([s, m, other], offerGroupKey(s), prices)).toBe(1);
+  });
+
+  it("izmērs bez izmēra (null) meklējas ar '-' atslēgu", () => {
+    const noSize = item({ id: "n", size: null });
+    expect(swapMissingCount([noSize], offerGroupKey(noSize), new Map([["One Size", 6.98]]))).toBe(1);
+    expect(swapMissingCount([noSize], offerGroupKey(noSize), new Map([["-", 6.98]]))).toBe(0);
+  });
+
+  it("0, kad visiem grupas izmēriem ir precīza cena — nomaiņu drīkst apstiprināt", () => {
+    const s = item({ id: "s", size: "S" });
+    const m = item({ id: "m", size: "M" });
+    const prices = new Map<string, number | null>([["S", 6.98], ["M", 6.98]]);
+    expect(swapMissingCount([s, m], offerGroupKey(s), prices)).toBe(0);
   });
 });
