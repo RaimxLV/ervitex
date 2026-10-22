@@ -2,6 +2,12 @@ import { describe, expect, it } from "vitest";
 import { getOrderMinimum } from "./orderMinimums";
 const rule = (category: string | null, name = "", source = "pf") => getOrderMinimum({ source, category, name });
 describe("category-specific informational order minimums", () => {
+  it.each(["Shorts", "Trousers", "Outerwear", "Fleece", "Knitwear", "Softshell", "Workwear", "Bodywarmers", "Sportswear", "Vests", "Jerseys", "Polos", "Sweatshirts", "Dresses", "Skirts", "Underwear", "Shirts", "Jackets", "Hoodies", "Caps", "Towels", "Aprons", "Bikses", "Virsjakas", "Krekli", "Šorti", "Kleitas", "Svārki", "Apakšveļa", "Trikotāža", "Flīss", "Adīti džemperi", "Sporta apģērbs"])("%s has textile 10 and recommended 5 per colour/size", (category) => {
+    expect(rule(category, "", "unknown")).toEqual({ kind: "textile", minimum: 10, recommended: { minimum: 5, sameSize: true } });
+  });
+  it("does not detect cap or vest inside unrelated words", () => {
+    for (const name of ["Capsule", "Capacity", "Invest", "Desktop organiser"]) expect(rule(null, name)?.kind).toBe("generic");
+  });
   it("textiles start at 10", () => {
     for (const category of ["T-shirts", "Caps & Hats", "Towels", "Aprons", "Terry", "Workwear", "Kitchen Linen"]) expect(rule(category)?.minimum).toBe(10);
   });

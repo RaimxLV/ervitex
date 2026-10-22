@@ -18,6 +18,8 @@ const rules: Record<OrderMinimumKind, OrderMinimum> = {
   generic: { kind: "generic", minimum: 10 },
 };
 const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+// Whole English garment tokens; Latvian inflections stay bounded to one word.
+const TEXTILE_TYPE = /\b(?:tshirts?|shirts?|tees?|tops?|bottoms?|polos?|hood(?:ie|ies|y|ies)?|hooded|sweats?|sweatshirts?|sweaters?|fleece|jackets?|vests?|bodywarmers?|trousers?|pants?|shorts?|clothing|textiles?|caps?|hats?|beanies?|headwear|towels?|terry|aprons?|gloves?|socks?|scarves|blankets?|raincoats?|ponchos?|coveralls?|overalls?|workwear|outerwear|knitwear|knitted|softshells?|sportswear|jerseys?|dresses?|skirts?|underwear|cardigans?|pullovers?|leggings?|tights?|bodysuits?|bod(?:y|ies)|bibs?|kitchen linen|training sets?)\b|\b(?:apgerb\w*|krekl\w*|cepur\w*|dviel\w*|prieksaut\w*|biks\w*|jaka\w*|jakas|virsjak\w*|sort\w*|cimd\w*|zek\w*|sall\w*|seg\w*|buf\w*|kleit\w*|svark\w*|apaksvel\w*|trikotaz\w*|flis\w*|dzemper\w*|adijum\w*|adit\w*|vest\w*|dzin\w*)\b/;
 /** Specific category wins over incidental words in a product name. */
 function categoryKind(value: string): OrderMinimumKind | null {
   const c = normalize(value);
@@ -27,7 +29,7 @@ function categoryKind(value: string): OrderMinimumKind | null {
   if (/notebooks?|notepads?|paper products|sticky notes|planners?|bloknot|blocin|piezimju gram|planot/.test(c)) return "promotional";
   if (/\b(pens?|pencils?|markers?|writing|colouring)\b|pildspalv|zimul|rakstam|rakstis|markier/.test(c)) return "writing";
   if (/gadgets?|electronics?|\btech\b|speakers?|headphones?|earbuds?|charg|power banks?|cables?|usb|smartwatch|computer|telephone|camera|lamps?|torches|flashlights|tumbin|austin|iekart|skalrun|ladet/.test(c)) return "gadgets";
-  if (/shirts?|tees|tops?|bottoms?|polos?|hood|sweat|fleece|jackets?|vests?|bodywarm|trousers?|pants?|shorts?|clothing|textiles?|caps?|hats?|beanies|headwear|towels?|terry|aprons?|gloves?|socks?|scarves|blankets?|raincoat|poncho|coverall|workwear|kitchen linen|training set|bod(y|ies)|\bbib\b|apgerb|krekl|cepur|dviel|prieksaut|biks|jakas?|sorti|cimdi|zekes|salles|segas|bufs/.test(c)) return "textile";
+  if (TEXTILE_TYPE.test(c)) return "textile";
   if (/bottles?|mugs?|cups?|drinkware|notebooks?|notepads?|paper products|sticky notes|planners?|boards?|kruz|pudel|delis|delisi|bloknot|blocin|planot/.test(c)) return "promotional";
   return null;
 }
