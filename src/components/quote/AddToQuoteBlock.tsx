@@ -17,6 +17,8 @@ interface Props {
   category?: string | null;
   classificationName?: string | null;
   minimumNoticeClassName?: string;
+  /** The product gallery owns the single notice on detail pages. */
+  showMinimumNotice?: boolean;
   productId: string;
   name: string;
   code: string;
@@ -34,7 +36,7 @@ interface Props {
 }
 
 const AddToQuoteBlock = ({
-  source, category, classificationName, minimumNoticeClassName, productId, name, code, brand, image, colorCode, colorName, colorHex, colorSwatchUrl, colorSwatches, sizes, sizePrices, onClose,
+  source, category, classificationName, minimumNoticeClassName, showMinimumNotice = true, productId, name, code, brand, image, colorCode, colorName, colorHex, colorSwatchUrl, colorSwatches, sizes, sizePrices, onClose,
 }: Props) => {
   const { items, add, updateQty, remove } = useQuoteCart();
   const { lang } = useLanguage();
@@ -192,7 +194,7 @@ const AddToQuoteBlock = ({
         )}
       </div>
 
-      {!isAdmin && <OrderMinimumNotice source={source} category={category} name={classificationName || name} className={minimumNoticeClassName} />}
+      {!isAdmin && showMinimumNotice && <OrderMinimumNotice source={source} category={category} name={classificationName || name} className={minimumNoticeClassName} />}
       <SizeQuantityTable rows={(sizes.length ? sizes : ["-"]).map((size) => ({ size, price: priceOf(size) }))} quantities={qtyBySize} onChange={setSize} formatSize={(s) => supplierSizeLabel(source, code || productId, s, lang)} note={supplierSizeNote(source, code || productId, lang)} />
 
       {/* Summary of other colors already in cart for this product */}
