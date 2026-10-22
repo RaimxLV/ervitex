@@ -1,4 +1,5 @@
 # Roadmap
+- [x] 2026-10-22 kataloga šaurā optimizācija: pirmās lapas paralēli keša pārbaudei, liekais HEAD skaits izņemts (izmanto pirmās lapas count), Intl.Collator atkārtoti lietots, clearAll uzreiz page=1. 65 regresijas PASS; reāla publiska kataloga/filter/clear/product/back plūsma abās versijās bez kļūdām un ar saglabātu secību. Sintētiski kārtošana 188→12 ms; kopējais live/dev ātruma pieaugums NAV pierādīts (aukstā ielāde ~3–4,5 s). Bez DB/publicēšanas.
 - [x] 2026-10-22 piedāvājums: atlaide €/gab., apdruka atsevišķā rindā zem preces ar atdalītām summām; 13 testi un izolēts datora/telefona/drukas paraugs PASS, kopsumma 117,67 € saglabāta; bez datu rakstīšanas/publicēšanas.
 - [x] 14:24 root: plašais 009 aizstāts ar šauru MF SQL (MD5 d32594cd2e0aecace6068a57f8f69272), precīzs diff, sintētiska ROLLBACK pārbaude; DB nepielietota, nepublicēts.
 - [x] Atcelti jaunākie spekulatīvie sešu citu piegādātāju un UTT frontend izmaiņas; izvietots tikai MF (SHA-256 d7dd1b57952e8b25a36860fa664858e77e7773c1ae177e90498a02b47e6c77d9).

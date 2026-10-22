@@ -16,6 +16,7 @@ import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { catalogCategories } from "@/lib/etxCatalog";
 import { HEADWEAR_TYPES, headwearType, isHeadwearCategory, matchesHeadwearType, type HeadwearType } from "@/lib/headwearTypes";
 import { normalizeCatalogSort, prepareQuery, rankedSearchResults, searchMatches } from "@/lib/catalogSearch";
+import { compareCatalogCodes, compareCatalogNames } from "@/lib/catalogCollation";
 
 const SCROLL_KEY = "catalog-scroll";
 
@@ -465,7 +466,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
     let cancelled = false;
     const STEP = 1000;
-    setLoaded(false);
+    setLoaded(Boolean(cached));
     setLoadError(false);
 
     const query = (table: string, columns: string, order: string, from: number, withCount: boolean) => {
@@ -559,17 +560,18 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     (async () => {
       // 0) Disk cache (IndexedDB): render immediately from the previous visit
       //    and revalidate in the background (stale-while-revalidate).
-      let servedFromCache = false;
+      let servedFromCache = Boolean(cached);
+      // Start the first pages alongside cache validation, not after its network round-trip.
+      const firstBatch = Promise.all([
+        queryWithRetry("catalog_items", ITEM_COLUMNS, "id", 0, true),
+        queryWithRetry("catalog_price_ranges", PRICE_COLUMNS, "style_code", 0, true),
+      ]);
       // Only trust the disk cache when it still has the same number of rows as
       // the live catalog; otherwise an old visit's supplier list flashes first
       // and newly connected catalogs pop into the filters a second later.
       const [persisted, liveCount, remnantRows] = await Promise.all([
         readCatalogCache(cacheKey),
-        (() => {
-          let q = supabase.from("catalog_items" as any).select("id", { count: "exact", head: true }).abortSignal(AbortSignal.timeout(8000));
-          if (lockedSource) q = q.eq("source", lockedSource);
-          return q.then((r) => (r.error ? null : r.count ?? null));
-        })(),
+        firstBatch.then(([r]) => (r.error ? null : r.count ?? null)),
         supabase.from("catalog_remnants" as any).select("source,style_code").range(0, 4999).abortSignal(AbortSignal.timeout(20000)).then((r) => (r.error ? [] : ((r.data as any[]) || []))),
       ]);
       if (cancelled) return;
@@ -590,10 +592,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       // 1) First batch of items + all prices: render as soon as these land so
       //    the grid appears in ~1 request instead of waiting for the whole
       //    catalog (~6 batches) to download.
-      const [firstItems, firstPrices] = await Promise.all([
-        queryWithRetry("catalog_items", ITEM_COLUMNS, "id", 0, true),
-        queryWithRetry("catalog_price_ranges", PRICE_COLUMNS, "style_code", 0, true),
-      ]);
+      const [firstItems, firstPrices] = await firstBatch;
       if (cancelled) return;
 
       const itemRows = ((firstItems.data || []) as unknown) as CatalogItem[];
@@ -954,7 +953,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       (it) => passesExcept(it, "__none__") && (!hasPrices || (priceRanges.get(`${it.source}:${it.id}`)?.price ?? 0) > 0)
     );
     const cmpName = (a: EnrichedItem, b: EnrichedItem) =>
-      (a.name || a.id).localeCompare(b.name || b.id, lang === "lv" ? "lv" : "en", { sensitivity: "base" });
+      compareCatalogNames(a.name || a.id, b.name || b.id, lang === "lv" ? "lv" : "en");
     let cmp: ((a: EnrichedItem, b: EnrichedItem) => number) | null = null;
     if (sort === "az") cmp = cmpName;
     else if (sort === "za") cmp = (a, b) => cmpName(b, a);
@@ -967,7 +966,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           if (ar !== br) return ar - br;
         }
         return Number(b.source === "ss") - Number(a.source === "ss") ||
-          (b.id || "").localeCompare(a.id || "", "en", { numeric: true, sensitivity: "base" });
+          compareCatalogCodes(b.id || "", a.id || "");
       };
     } else if (sort === "price_asc" || sort === "price_desc") {
       const dir = sort === "price_asc" ? 1 : -1;
@@ -1092,6 +1091,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   }, [loaded, paginated, page, safePage]);
 
   const clearAll = () => {
+    setPage(1);
     setQ("");
     setSources(new Set());
     setBrands(new Set());

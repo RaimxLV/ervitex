@@ -31,5 +31,6 @@
 - Headwear shares facets (bump cache schema on changes). ADMIN_HOME opens requests; supplier tools use /admin/overview.
 - Read subdirectory AGENTS.md first. Price SQL in docs/pending-migrations runs byte-exact via md5-checked public.migration_stage.
 - Catalog reads time out to error+retry; filter order defaults. catalogCategories shares secondary memberships across facets/filtering without duplicate rows.
+- Catalog sorting reuses Intl.Collator instances and starts initial pages alongside cache validation; this avoids comparator setup and serialized network waits without changing ordering, prices or visibility gates.
 - MF blocks confirmed promo writes only; held exact-SKU prices are not certified. Other suppliers await reviewed replacements, not freezes. MF colours preserve size/identity; swatches use verified supplier icons.
 - Never present partial work as complete; name open tasks and blockers.
