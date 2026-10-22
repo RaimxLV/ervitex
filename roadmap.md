@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] 2026-10-22 daudzumu norādes: vienota kategoriju politika, viens panelis zem galerijas datorā/telefonā, LV/EN, fokusēti testi un īstu preču pārbaudes; bez publicēšanas/DB.
 - [x] 2026-10-22 priekšskatījumā: auduma blīvuma normalizācija, SS bērnu/zīdaiņu kartīšu cenu identitāte, precīzās krāsas/izmēra detaļu robežas un 9 avotu agregēts audits; 128 testi PASS, datorā/telefonā STSK180 19,25/23,29 €, blīvums pēc pārlādes un īsta necenota PF107151 pārbaudīti. Bez DB rakstīšanas, izvietošanas vai publicēšanas; docs/audits/2026-10-22-catalog-density-prices.md.
 - [x] NWG1907087: priekšskatījumā kartītes identitāte no precīziem īstajiem SKU/variantiem, 82,50/99,83 €, kartīte/detaļa/vecā saite/telefons un 2 normāli varianti pārbaudīti; izolēts variants bez SKU nepieejams, atšķirīgi nulles kodi nesaplūst. Bez DB/izvietošanas. docs/audits/2026-10-22-nwg1907087.md.
 - [ ] Tulkošanas servera prompta precizējums no iepriekšējā audita joprojām gaida atsevišķu izvietošanas atļauju.
