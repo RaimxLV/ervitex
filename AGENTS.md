@@ -38,3 +38,4 @@
 - MF blocks confirmed promo writes only; held exact-SKU prices are not certified. Other suppliers await reviewed replacements, not freezes. MF colours preserve size/identity; swatches use verified supplier icons.
 - Never present partial work as complete; name open tasks and blockers.
 - Falk&Ross targeted discovery exceptions are exact supplier URLs/model identities, not whole-brand imports; Yupoong family search metadata never replaces the factual display brand.
+- Offer model swap (AdminOfferEdit) embeds UnifiedCatalog in selectionMode (no Layout/URL sync, card click returns the item); swap confirm is blocked whenever swapMissingCount > 0 so an incompatible size can never inherit a manual/old price.
