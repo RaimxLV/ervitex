@@ -1,5 +1,6 @@
 import { QuoteItemsTable } from "@/components/quote/QuoteItemsTable";
 import { PrintRows } from "@/components/quote/PrintRows";
+import { isSublimationMug, MUG_SUBLIMATION_PRINT_NET } from "@/lib/sublimationMugs";
 import { getOrderPrints, setOrderPrints, removeOfferItem } from "@/lib/orderPrinting";
 import logo from "@/assets/ervitex-logo-dark.svg";
 import { DecimalInput } from "@/components/ui/decimal-input";
@@ -534,7 +535,7 @@ const AdminOfferEdit = () => {
                   document.getElementById("preces-izvele")?.scrollIntoView({ block: "start" });
                 }} onQuantity={(id, qty) => patchItem(id, { qty })} onPrice={(id, unitPrice) => patchItem(id, { unitPrice })} onDiscount={(id, discountPercent) => patchItem(id, { discountPercent })} onRemove={removeItem}
                 groupAction={(i) => <Button type="button" size="sm" variant="outline" className="mt-2" onClick={() => openSwap(groupKey(i))}><Repeat className="mr-2 h-4 w-4" />Mainīt modeli</Button>}
-                itemDetails={(i) => <PrintRows value={(i.prints || []).filter((p) => p.scope !== "order")} onChange={(prints) => patchItem(i.id, { prints: [...prints, ...(i.prints || []).filter((p) => p.scope === "order")] })} addLabel="Apdruka" />}
+                itemDetails={(i) => <PrintRows value={(i.prints || []).filter((p) => p.scope !== "order")} onChange={(prints) => patchItem(i.id, { prints: [...prints, ...(i.prints || []).filter((p) => p.scope === "order")] })} addLabel="Apdruka" preset={isSublimationMug(i.source, i.name) ? { method: "Sublimācija", price: MUG_SUBLIMATION_PRINT_NET } : null} />}
               /></div>
 
             )}
