@@ -1245,6 +1245,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
     sources.size + brands.size + categories.size + groups.size + genders.size + colors.size + (headwearActive ? headwearTypes.size : 0) + (stockOnly ? 1 : 0);
   const isSublimationCatalog = !lockedSource && sources.size === 1 && sources.has("etx");
 
+  // Atlases režīmā (piedāvājuma redaktors) katalogs dzīvo dialogā bez Layout.
+  const ShellComponent = selectionMode ? SelectionShell : Layout;
 
   return (
     <ShellComponent>
@@ -1415,9 +1417,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
                         {lang === "lv" ? "Līdzīgi kodi" : "Similar codes"}
                       </p>
                     )}
+                    {(() => {
+                      const cardItem = it.source === "nwg" && nwgIdentities.has(it.id) ? { ...it, colors: (nwgIdentities.get(it.id) || []).map(c => ({ ...c, bucket: bucketOf(c.h, c.n) })) } : it;
+                      return (
                     <CatalogCard
                       key={`${it.source}-${it.id}`}
-                      item={it.source === "nwg" && nwgIdentities.has(it.id) ? { ...it, colors: (nwgIdentities.get(it.id) || []).map(c => ({ ...c, bucket: bucketOf(c.h, c.n) })) } : it}
+                      item={cardItem}
                       priority={idx < 4}
                       lang={lang}
                       selectedBuckets={colors as Set<ColorBucketKey>}
@@ -1429,6 +1434,18 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
 
                       fromLabel={lang === "lv" ? "no" : "from"}
                       onNavigate={(color) => {
+                        if (selectionMode) {
+                          // Atlases režīms: atdod preci redaktoram, nenavigē prom un nezaudē melnrakstu.
+                          selectionMode.onSelect({
+                            source: cardItem.source,
+                            id: cardItem.id,
+                            name: cardItem.name,
+                            brand: cardItem.brand,
+                            image_url: cardItem.image_url,
+                            colors: cardItem.colors,
+                          });
+                          return;
+                        }
                         try {
                           sessionStorage.setItem(
                             SCROLL_KEY,
@@ -1439,6 +1456,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
                         navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}${colorQuery}`);
                       }}
                     />
+                      );
+                    })()}
                     </Fragment>
                   ))}
                   {isSublimationCatalog && !selectionMode && safePage === totalPages && !q.trim() && !stockOnly && colors.size === 0 && <TeamSportswearCard lang={lang} />}
