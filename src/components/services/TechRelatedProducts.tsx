@@ -8,6 +8,7 @@ import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import { bucketOf, getBucket, type ColorBucketKey } from "@/lib/colorBuckets";
 import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { loadNwgCatalogIdentities } from "@/lib/nwgIdentity";
 import { ETX_CATEGORY, ETX_BRAND, sublimationProducts } from "@/lib/etxCatalog";
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
@@ -97,8 +98,7 @@ const RelatedCard = ({
   const colors = useMemo(
     () =>
       (row.colors || [])
-        .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c?.h, bucketOf(c?.h, c?.n), c?.n) }))
-        .filter((c) => !!c.hex),
+        .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c?.h, bucketOf(c?.h, c?.n), c?.n) })),
     [row.colors]
   );
 
@@ -108,10 +108,10 @@ const RelatedCard = ({
   const active = activeIdx !== null ? colors.find((c) => c.idx === activeIdx) ?? null : null;
   const displayed = active || (cheapest >= 0 ? colors[cheapest] : colors[0]) || null;
   const rawImg = displayed?.u || row.image_url;
-  const price = displayed ? colorPrice(displayed) : prices.get(`${row.source}:${row.id}`);
+  const price = displayed ? colorPrice(displayed) : row.source === "nwg" ? undefined : prices.get(`${row.source}:${row.id}`);
 
-  const swatches = colors.slice(0, 8).map((c) => ({
-    hex: c.hex,
+  const swatches = colors.filter(c => c.hex).slice(0, 8).map((c) => ({
+    hex: c.hex || "",
     name: c.n || "",
     active: displayed?.idx === c.idx,
     onSelect: () => setActiveIdx(activeIdx === c.idx ? null : c.idx),
@@ -209,6 +209,11 @@ const TechRelatedProducts = ({ techId }: { techId: string }) => {
       if (cancelled) return;
       const rows = ((data || []) as unknown as Row[]).filter((r) => r.name && r.image_url);
       const picked = techId === "sublimacija" ? sublimationProducts(rows) : pickRandom(rows, 4);
+      const nwg = picked.filter(r => r.source === "nwg");
+      if (nwg.length) {
+        const identities = await loadNwgCatalogIdentities(nwg.map(r => r.id)).catch(() => new Map());
+        for (const row of nwg) row.colors = identities.get(row.id) || [];
+      }
       setItems(picked);
 
       if (picked.length) {

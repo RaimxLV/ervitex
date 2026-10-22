@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/co
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl, unproxyUrl } from "@/lib/imageProxy";
 import { catalogColorParam, catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { loadNwgCatalogIdentities } from "@/lib/nwgIdentity";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { catalogCategories } from "@/lib/etxCatalog";
@@ -1014,6 +1015,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   );
 
   // Find the cheapest colour using only the current page's variant prices.
+  const [nwgIdentities, setNwgIdentities] = useState<Map<string, ColorEntry[]>>(new Map());
   useEffect(() => {
     if (!paginated.length) {
       setVisibleVariantPrices(new Map());
@@ -1022,6 +1024,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     }
     let cancelled = false;
     (async () => {
+      const identityTask = loadNwgCatalogIdentities(paginated.filter(i => i.source === "nwg").map(i => i.id))
+        .then(map => { if (!cancelled) setNwgIdentities(map); })
+        .catch(() => { if (!cancelled) setNwgIdentities(new Map()); });
       type VariantPriceRow = {
         source: string;
         style_code: string;
@@ -1055,6 +1060,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           }
         }),
       );
+      await identityTask;
       if (cancelled) return;
       const grouped = new Map<string, { price: number; max: number; currency: string }>();
       for (const row of rows) {
@@ -1382,13 +1388,13 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                     )}
                     <CatalogCard
                       key={`${it.source}-${it.id}`}
-                      item={it}
+                      item={it.source === "nwg" && nwgIdentities.has(it.id) ? { ...it, colors: (nwgIdentities.get(it.id) || []).map(c => ({ ...c, bucket: bucketOf(c.h, c.n) })) } : it}
                       priority={idx < 4}
                       lang={lang}
                       selectedBuckets={colors as Set<ColorBucketKey>}
                       requestLabel={t.request}
                       noImageLabel={lang === "lv" ? "Bez attēla" : "No image"}
-                      priceInfo={priceRanges.get(`${it.source}:${it.id}`)}
+                      priceInfo={it.source === "nwg" ? undefined : priceRanges.get(`${it.source}:${it.id}`)}
                       variantPrices={visibleVariantPrices}
                       pricesReady={pricedIds.has(`${it.source}:${it.id}`)}
 
