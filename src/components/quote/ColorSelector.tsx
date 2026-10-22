@@ -19,14 +19,15 @@ export function ColorSelector({ colors, value, onChange, disabled = false }: {
 }) {
   return <div className="grid max-h-80 grid-cols-2 gap-2 overflow-y-auto overscroll-contain p-1 sm:grid-cols-3" role="group" aria-label="Krāsa" data-lenis-prevent>
     {colors.map((color) => <Button key={color.code} type="button" variant="outline" disabled={disabled}
-      aria-pressed={color.code === value} onClick={() => onChange(color.code)} title={`${color.name} · ${color.code}`}
+      aria-pressed={color.code === value} onClick={() => onChange(color.code)} title={/^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(color.code) ? color.name : `${color.name} · ${color.code}`}
       className={cn("h-auto min-h-12 min-w-0 justify-start gap-2 rounded-sm px-3 py-2 text-left hover:bg-muted hover:text-foreground",
         color.code === value && "border-accent bg-accent/5 ring-1 ring-accent text-foreground")}>
       <span className="relative h-6 w-6 shrink-0 overflow-hidden rounded-sm border border-border bg-muted" style={color.swatchUrl ? undefined : fallbackStyle(color)}>
         {color.swatchUrl && <img key={color.swatchUrl} src={color.swatchUrl} alt="" aria-hidden="true" className="h-full w-full object-cover" onError={(event) => { event.currentTarget.hidden = true; }} />}
       </span>
       <span className="min-w-0 flex-1 whitespace-normal break-words text-xs leading-snug font-medium">{color.name}
-        <span className="mt-0.5 block text-[10px] font-normal text-muted-foreground">{color.code}</span>
+        {/* Internal UUIDs are not manufacturer codes — never show them. */}
+        {!/^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(color.code) && <span className="mt-0.5 block text-[10px] font-normal text-muted-foreground">{color.code}</span>}
       </span>
       {color.code === value && <Check className="h-4 w-4 text-accent" />}
       {color.inStock && <span className="h-2 w-2 shrink-0 rounded-full bg-success" aria-label="Ir noliktavā" />}
