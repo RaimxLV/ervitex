@@ -11,7 +11,8 @@ import { thumbUrl } from "@/lib/imageProxy";
 import { canonName, resolveHex, resolveHexParts } from "@/lib/colorNameHex";
 import { colorCodeMatches } from "@/lib/colorCodeMatch";
 import { pfSkuMap } from "@/lib/pfVariantIdentity";
-import { lowestPriceVariant, sizeAfterColorChange } from "@/lib/catalogPriceSelection";
+import { lowestPriceVariant, MODEL_WIDE_CATALOG_SOURCES, sizeAfterColorChange } from "@/lib/catalogPriceSelection";
+import { fabricSpecLabel, normalizeFabricText } from "@/lib/fabricDensity";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
 import { Link } from "@/lib/router-compat";
@@ -139,7 +140,7 @@ const careClauses = splitCareInstructions;
 
 const addSpec = (arr: { label: string; value: string }[], label: string, value?: unknown, suffix = "") => {
   const v = cleanText(value);
-  if (v) arr.push({ label, value: `${v}${suffix}` });
+  if (v) arr.push({ label: fabricSpecLabel(label, `${v}${suffix}`, "en"), value: `${v}${suffix}` });
 };
 
 const uniqueSortedSizes = (sizes: Iterable<string>) =>
@@ -1009,7 +1010,8 @@ async function loadFR(styleCode: string): Promise<ProductDetail | null> {
 
 const SPEC_LABEL_I18N: Record<string, { lv: string; en: string }> = {
   Fit: { lv: "Piegriezums", en: "Fit" },
-  Weight: { lv: "Blīvums", en: "Weight" },
+  Weight: { lv: "Svars", en: "Weight" },
+  "Fabric weight": { lv: "Blīvums", en: "Fabric weight" },
   Neckline: { lv: "Apkakle", en: "Neckline" },
   Sleeve: { lv: "Piedurknes", en: "Sleeve" },
   Category: { lv: "Kategorija", en: "Category" },
@@ -1061,7 +1063,9 @@ const translateValue = (value: string, lang: "lv" | "en") => {
   return VALUE_I18N_LV[key] || value;
 };
 
-const translateLabel = (label: string, lang: "lv" | "en") => {
+const translateLabel = (label: string, lang: "lv" | "en", value = "") => {
+  const density = fabricSpecLabel(label, value, lang);
+  if (density !== label) return density;
   const entry = SPEC_LABEL_I18N[label];
   if (entry) return entry[lang];
   return label;
@@ -1269,15 +1273,12 @@ const CatalogItemDialog = ({
     };
     let rows = variantPrices;
     if (currentColor) {
-      const byColor = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code));
-      // PF: bez savas krāsas cenas nekad neņem citu krāsu.
-      if (byColor.length || source === "pf" || source === "mf") rows = byColor;
+      rows = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code) || (!r.color_code && MODEL_WIDE_CATALOG_SOURCES.has(source)));
     }
     if (selectedSize) {
       // A SKU with its own size label (NWG duplicates) is matched by SKU, never by the shared name.
       const skuSizes = displayDetail.skuSizes || {};
-      const bySize = rows.filter((r) => (r.sku && skuSizes[r.sku] ? norm(skuSizes[r.sku]) : sizeKey(r.size)) === norm(selectedSize));
-      if (bySize.length || source === "pf" || source === "mf") rows = bySize;
+      rows = rows.filter((r) => (!r.size && MODEL_WIDE_CATALOG_SOURCES.has(source)) || (r.sku && skuSizes[r.sku] ? norm(skuSizes[r.sku]) : sizeKey(r.size)) === norm(selectedSize));
       // PF: izvēlētajai krāsai+izmēram jābūt tieši vienai SKU un cenai.
       if (source === "pf" && (new Set(rows.map((r) => r.sku).filter(Boolean)).size > 1 || new Set(rows.map((r) => Number(r.retail_price))).size > 1)) return null;
     }
@@ -1296,8 +1297,7 @@ const CatalogItemDialog = ({
     if (!variantPrices.length) return {} as Record<string, number>;
     let rows = variantPrices;
     if (currentColor) {
-      const byColor = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code));
-      if (byColor.length || source === "pf" || source === "mf") rows = byColor;
+      rows = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code) || (!r.color_code && MODEL_WIDE_CATALOG_SOURCES.has(source)));
     }
     const map: Record<string, number> = {};
     const pfConflict = new Set<string>();
@@ -1349,7 +1349,7 @@ const CatalogItemDialog = ({
     push(rawCare);
     const specsStart = items.length;
     // Labels/values already localised by the built-in dictionary are not sent for AI translation.
-    const lvSpecs = normalizedContent.specs.map((spec) => ({ label: translateLabel(spec.label, "lv"), value: translateValue(spec.value, "lv") }));
+    const lvSpecs = normalizedContent.specs.map((spec) => ({ label: translateLabel(spec.label, "lv", spec.value), value: translateValue(spec.value, "lv") }));
     lvSpecs.forEach((spec, index) => {
       const orig = normalizedContent.specs[index];
       push(spec.label !== orig.label ? "" : spec.label);
@@ -1396,8 +1396,8 @@ const CatalogItemDialog = ({
     return () => { cancelled = true; };
   }, [lang, detail, source, id]);
 
-  const shortDescription = translated?.short || rawShort;
-  const rawLines = translated?.lines.length ? productTextLines(translated.lines.join("\n")) : rawDescriptionLines;
+  const shortDescription = normalizeFabricText(translated?.short || rawShort || "", lang);
+  const rawLines = (translated?.lines.length ? productTextLines(translated.lines.join("\n")) : rawDescriptionLines).map((text) => normalizeFabricText(text, lang));
   // Avoid duplicating the intro paragraph inside the "Description" block
   const norm = (s: string) => s.replace(/\s+/g, " ").replace(/[•·✓\-–—]/g, "").trim().toLowerCase();
   const shortNorm = shortDescription ? norm(shortDescription) : "";
@@ -1408,7 +1408,7 @@ const CatalogItemDialog = ({
       })
     : rawLines;
 
-  const materialText = (translated?.material || rawMaterial)?.replace(/\s*\|\s*/g, " · ");
+  const materialText = normalizeFabricText(translated?.material || rawMaterial || "", lang).replace(/\s*\|\s*/g, " · ");
   const careText = translated?.care || rawCare;
   const careList = useMemo(() => (careText ? careClauses(careText) : []), [careText]);
   const careItems = useMemo(() => assignCareIcons(careList), [careList]);
@@ -1788,10 +1788,10 @@ const CatalogItemDialog = ({
                           {filteredSpecs.map((s) => (
                             <div key={`${s.label}-${s.value}`} className="flex flex-col">
                               <dt className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                                {translateLabel(s.label, lang)}
+                                {translateLabel(s.label, lang, s.value)}
                               </dt>
                               <dd className="mt-0.5 text-sm text-foreground">
-                                {translateValue(s.value, lang).replace(/\s*\|\s*/g, " · ")}
+                                {normalizeFabricText(translateValue(s.value, lang), lang).replace(/\s*\|\s*/g, " · ")}
                               </dd>
                             </div>
                           ))}
