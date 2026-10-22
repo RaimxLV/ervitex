@@ -1,11 +1,11 @@
 import { getOrderPrints } from "@/lib/orderPrinting";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import {
-   money, itemPrintNet, itemDiscountNet, itemDiscountPercent, itemTotalNet, offerTotals, offerPlainText, type Offer, type OfferItem,
+   money, itemUnitDiscountNet, itemDiscountPercent, itemGoodsNet, offerTotals, offerPlainText, type Offer, type OfferItem,
   
 } from "@/lib/offer";
 import { Printer, MessageCircle, Mail, ClipboardList, ArrowUpRight, Store } from "lucide-react";
@@ -130,13 +130,14 @@ const OfferPage = () => {
                   <th className="py-2.5 text-right font-semibold">{t("Skaits", "Qty")}</th>
                   <th className="py-2.5 text-right font-semibold">{t("Cena/gab.", "Unit")}</th>
                   <th className="py-2.5 text-right font-semibold">{t("Atlaide %", "Discount %")}</th>
-                  <th className="py-2.5 text-right font-semibold">{t("Atlaide €", "Discount €")}</th>
+                  <th className="py-2.5 text-right font-semibold">{t("Atlaide €/gab.", "Discount €/pc")}</th>
                   <th className="py-2.5 text-right font-semibold">{t("Summa", "Total")}</th>
                 </tr>
               </thead>
               <tbody>
                 {offer.items.map((i) => (
-                  <tr key={i.id} className="border-b border-border/60 align-top transition-colors hover:bg-muted/40 print:hover:bg-transparent">
+                  <Fragment key={i.id}>
+                  <tr className="border-b border-border/60 align-top transition-colors hover:bg-muted/40 print:hover:bg-transparent">
                     <td className="py-3 pr-3">
                       <Link to={itemLink(i)} className="group flex items-start gap-3">
                         {i.image && (
@@ -168,16 +169,22 @@ const OfferPage = () => {
                       {i.unitPrice ? money(i.unitPrice) : t("pēc pieprasījuma", "on request")}
                     </td>
                     <td className="py-3 text-right tabular-nums">{itemDiscountPercent(i)}%</td>
-                    <td className="py-3 text-right tabular-nums text-accent">{money(itemDiscountNet(i))}</td>
+                    <td className="py-3 text-right tabular-nums text-accent">{money(itemUnitDiscountNet(i))}</td>
                     <td className="py-3 text-right font-medium tabular-nums">
-                      {i.unitPrice || itemPrintNet(i) ? money(itemTotalNet(i)) : "—"}
-                      {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
-                        <span key={k} className="block text-[11px] font-normal text-muted-foreground">
-                          + {p.method}{p.placement ? ` (${p.placement})` : ""} {money(Number(p.price))}{p.mode === "total" ? "" : ` / ${t("gab.", "pc")}`}
-                        </span>
-                      ))}
+                      {i.unitPrice ? money(itemGoodsNet(i)) : "—"}
                     </td>
                   </tr>
+                  {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
+                    <tr key={k} className="border-b border-border/60 align-top text-muted-foreground">
+                      <td colSpan={3} className="py-2 pr-3">{p.method}{p.placement ? ` (${p.placement})` : ""}</td>
+                      <td className="py-2 text-right tabular-nums">{p.mode === "total" ? "—" : i.qty}</td>
+                      <td className="py-2 text-right tabular-nums">{p.mode === "total" ? "—" : money(Number(p.price))}</td>
+                      <td className="py-2 text-right">—</td>
+                      <td className="py-2 text-right">—</td>
+                      <td className="py-2 text-right font-medium tabular-nums text-foreground">{money((Number(p.price) || 0) * (p.mode === "total" ? 1 : i.qty))}</td>
+                    </tr>
+                  ))}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -211,19 +218,24 @@ const OfferPage = () => {
                     <dl className="mt-3 grid grid-cols-4 gap-3 border-t border-border pt-3 text-xs tabular-nums">
                       <div><dt className="text-muted-foreground">{t("Cena/gab.", "Unit")}</dt><dd className="mt-1 break-words">{i.unitPrice ? money(i.unitPrice) : "—"}</dd></div>
                       <div><dt className="text-muted-foreground">{t("Atlaide %", "Discount %")}</dt><dd className="mt-1">{itemDiscountPercent(i)}%</dd></div>
-                      <div><dt className="text-muted-foreground">{t("Atlaide €", "Discount €")}</dt><dd className="mt-1 break-words text-accent">{money(itemDiscountNet(i))}</dd></div>
-                      <div><dt className="text-muted-foreground">{t("Summa", "Total")}</dt><dd className="mt-1 break-words font-bold">{i.unitPrice || itemPrintNet(i) ? money(itemTotalNet(i)) : "—"}</dd></div>
+                      <div><dt className="text-muted-foreground">{t("Atlaide €/gab.", "Discount €/pc")}</dt><dd className="mt-1 break-words text-accent">{money(itemUnitDiscountNet(i))}</dd></div>
+                      <div><dt className="text-muted-foreground">{t("Summa", "Total")}</dt><dd className="mt-1 break-words font-bold">{i.unitPrice ? money(itemGoodsNet(i)) : "—"}</dd></div>
                     </dl>
                     <div className="mt-2 flex items-end justify-between gap-2">
                       <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-accent">
                         {t("Skatīt preci", "View product")} <ArrowUpRight className="h-3 w-3" />
                       </span>
-                      <span className="text-right">
-                        {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
-                          <span key={k} className="block text-[10px] text-muted-foreground">+ {p.method} {money(Number(p.price))}{p.mode === "total" ? "" : ` / ${t("gab.", "pc")}`}</span>
-                        ))}
-                      </span>
                     </div>
+                    {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
+                      <div key={k} className="mt-3 border-t border-border pt-3 text-xs">
+                        <p className="font-medium">{p.method}{p.placement ? ` (${p.placement})` : ""}</p>
+                        <dl className="mt-2 grid grid-cols-3 gap-3 tabular-nums">
+                          <div><dt className="text-muted-foreground">{t("Skaits", "Qty")}</dt><dd className="mt-1">{p.mode === "total" ? "—" : i.qty}</dd></div>
+                          <div><dt className="text-muted-foreground">{t("Cena/gab.", "Unit")}</dt><dd className="mt-1">{p.mode === "total" ? "—" : money(Number(p.price))}</dd></div>
+                          <div><dt className="text-muted-foreground">{t("Summa", "Total")}</dt><dd className="mt-1 font-bold">{money((Number(p.price) || 0) * (p.mode === "total" ? 1 : i.qty))}</dd></div>
+                        </dl>
+                      </div>
+                    ))}
               </li>
             ))}
           </ul>
