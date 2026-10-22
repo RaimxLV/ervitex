@@ -146,7 +146,7 @@ const OfferPage = () => {
                 </thead>
               </table>
             </div>
-            <div className="mt-4 space-y-4 print:mt-2 print:space-y-3">
+            <div className="mt-5 space-y-5 print:mt-2 print:space-y-3">
               {offer.items.map((i) => (
                 <article key={i.id} className="break-inside-avoid rounded-md border border-border bg-card p-4 print:border-0 print:bg-transparent print:p-0">
                   <table className="w-full table-fixed text-sm">
@@ -211,7 +211,7 @@ const OfferPage = () => {
             </div>
           </div>
 
-          <ul className="mt-6 space-y-4 sm:hidden print:hidden">
+          <ul className="mt-6 space-y-5 sm:hidden print:hidden">
             {offer.items.map((i) => (
               <li key={i.id} className="break-inside-avoid rounded-md border border-border bg-card p-4">
                 <Link to={itemLink(i)} className="group flex gap-3">
