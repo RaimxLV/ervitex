@@ -1090,6 +1090,7 @@ const CatalogItemDialog = ({
   const isOpen = inline ? true : open;
   const [detail, setDetail] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(false);
+  const [recoveredNwgColor, setRecoveredNwgColor] = useState(false);
   const [activeColor, setActiveColor] = useState<string | null>(null);
   const [imgIndex, setImgIndex] = useState(0);
   const [variantPrices, setVariantPrices] = useState<
@@ -1134,6 +1135,7 @@ const CatalogItemDialog = ({
     if (!isOpen) return;
     let cancelled = false;
     setLoading(true);
+    setRecoveredNwgColor(false);
     setDetail(null);
     setActiveColor(null);
     setImgIndex(0);
@@ -1170,6 +1172,7 @@ const CatalogItemDialog = ({
           d.colors.find((c) => canonName(c.name) === wn) ||
           (wn ? d.colors.find((c) => canonName(c.name).includes(wn) || wn.includes(canonName(c.name))) : undefined);
         if (hit) picked = hit.code;
+        else if (source === "nwg") setRecoveredNwgColor(true);
       }
       // Per-variant prices (colour/size aware, excl. VAT, markup already applied)
       const rows: any[] = [];
@@ -1267,6 +1270,7 @@ const CatalogItemDialog = ({
   // Colour/size aware price: prices differ per size and per colour in most catalogs.
   const priceInfo = useMemo(() => {
     if (!variantPrices.length) return null;
+    if (source === "nwg" && !currentColor) return null;
     const norm = (s: unknown) => (s ?? "").toString().trim().toLowerCase();
     const sizeKey = (s: unknown) => {
       const n = norm(s);
@@ -1748,7 +1752,15 @@ const CatalogItemDialog = ({
 
 
 
-              {!loading && (
+              {!loading && recoveredNwgColor && (
+                <p role="status" className="text-sm text-muted-foreground">
+                  {lang === "lv" ? "Iepriekš izvēlētā krāsa nav pieejama. Parādīts aktuālais variants." : "The previously selected colour is unavailable. Showing the current variant."}
+                </p>
+              )}
+              {!loading && source === "nwg" && !currentColor && (
+                <p role="status" className="text-sm text-muted-foreground">{lang === "lv" ? "Nav pieejama preces varianta." : "No product variant is available."}</p>
+              )}
+              {!loading && (source !== "nwg" || currentColor) && (
                 <AddToQuoteBlock
                   source={source}
                   category={category || detail?.category}

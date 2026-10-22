@@ -29,6 +29,7 @@ describe("NWG exact SKU identity", () => {
   it("does not manufacture a SKU for an orphan or remove zero-stock real SKUs", () => {
     const real = variant("1907087-000", "000");
     expect(nwgSkuVariants([real], [])).toEqual([]);
-    expect(nwgSkuVariants([real], [{ product_number: "1907087", item_number: real.item_number, sku: "1907087-000-110", availability: 0 }])).toEqual([real]);
+    const zeroStock = { product_number: "1907087", item_number: real.item_number, sku: "1907087-000-110", availability: 0 };
+    expect(nwgSkuVariants([real], [zeroStock])).toEqual([real]);
   });
 });

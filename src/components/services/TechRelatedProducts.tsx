@@ -109,7 +109,7 @@ const RelatedCard = ({
   const active = activeIdx !== null ? colors.find((c) => c.idx === activeIdx) ?? null : null;
   const displayed = active || (cheapest >= 0 ? colors[cheapest] : colors[0]) || null;
   const rawImg = displayed?.u || row.image_url;
-  const price = displayed ? colorPrice(displayed) : prices.get(`${row.source}:${row.id}`);
+  const price = displayed ? colorPrice(displayed) : row.source === "nwg" ? undefined : prices.get(`${row.source}:${row.id}`);
 
   const swatches = colors.slice(0, 8).map((c) => ({
     hex: c.hex,
