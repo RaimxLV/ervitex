@@ -8,7 +8,8 @@ import {
    money, itemUnitDiscountNet, itemUnitPriceNet, itemDiscountNet, itemDiscountPercent, itemGoodsNet, offerTotals, offerPlainText, type Offer, type OfferItem,
   
 } from "@/lib/offer";
-import { Printer, MessageCircle, Mail, ClipboardList, ArrowUpRight, Store } from "lucide-react";
+import { Printer, MessageCircle, Mail, ClipboardList, ArrowUpRight, Store, Pencil } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/ervitex-logo-dark.svg";
 
 const OfferPage = () => {
@@ -18,6 +19,7 @@ const OfferPage = () => {
   const t = (lv: string, en: string) => (lang === "lv" ? lv : en);
   const [offer, setOffer] = useState<Offer | null>(null);
   const [loading, setLoading] = useState(true);
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     (async () => {
