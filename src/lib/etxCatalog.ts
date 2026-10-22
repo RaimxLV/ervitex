@@ -5,6 +5,8 @@ export const ETX_PUBLIC_BRAND = "Ervitex";
 /** Secondary membership only: never duplicate catalog rows or replace their source category. */
 export function catalogCategories(row: { source: string; category: string | null; name?: string | null }): string[] {
   const categories = row.category ? [row.category] : [];
+  const facet = row.source === "etx" ? etxAdminCategoryFacet(row.category) : null;
+  if (facet) categories.push(facet);
   if (row.source === "etx" && isEtxSublimationCategory(row.category)) {
     const text = `${row.category || ""} ${row.name || ""}`;
     if (/\b(?:dvielis|dvieļi|towels?)\b/i.test(text)) categories.push("Towels");
@@ -12,6 +14,17 @@ export function catalogCategories(row: { source: string; category: string | null
   }
   return [...new Set(categories)];
 }
+
+/** Admin (LV) category names → existing public canonical facets; ETX only, supplier taxonomy untouched. */
+const ETX_ADMIN_FACETS: Record<string, string> = {
+  "t-krekli": "T-shirts", "polo krekli": "Polos", "džemperi": "Sweaters", "flīša jakas": "Sweaters",
+  "virsjakas": "Jackets", "vestes": "Vests", "bikses": "Trousers", "cepures": "Caps & Hats",
+  "somas": "Bags", "audumu maisiņi": "Tote Bags", "lietussargi": "Umbrellas", "krūzes": "Mugs",
+};
+export const etxAdminCategoryFacet = (category?: string | null): string | null => {
+  const key = (category || "").replace(/\(\s*sublim[^)]*\)/i, "").trim().toLocaleLowerCase("lv");
+  return ETX_ADMIN_FACETS[key] ?? null;
+};
 
 /** Legacy supplier keys stay internal; manufacturer labels use the public brand. */
 export const publicCatalogBrand = (brand: string | null | undefined, source?: string): string | null =>
