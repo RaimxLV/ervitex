@@ -172,7 +172,7 @@ const manufacturerOf = (source: CatalogSource, brand: string | null): string | n
     if (b.includes("regatta")) return "utt-regatta";
     return null;
   }
-  if ((source as string) === "fr") return b.includes("flexfit") ? "fr-flexfit" : "fr-build-your-brand";
+  if ((source as string) === "fr") return /\b(flexfit|yupoong)\b/.test(b) ? "fr-flexfit" : b.includes("build your brand") ? "fr-build-your-brand" : null;
   return source;
 };
 

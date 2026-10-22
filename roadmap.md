@@ -1,4 +1,6 @@
 # Roadmap
+- [x] FR306.73/6606 mērķēts imports: 21 reāls variants, 17 krāsas, 6,98/8,45 €, 16 korekti foto; live/preview pārbaudīts, 86 testi PASS. Precīzā atklāšana/brand-family sagatavota, nav izvietota. docs/audits/2026-10-22-fr6606-target-import.md.
+- [ ] 6606 Silver pareizais foto: piegādātāja Silver saite rāda Maroon; maldinošā foto saite nepublicēta, gaida korektu piegādātāja attēlu.
 - [x] Daudzumu norāžu precizējums: paneļa lomu slēpšana noņemta bez tiesību/noliktavas izmaiņām; apģērbu EN/LV tipi paplašināti ar vārdu robežām; 63 testi un 12 publiskas/admin-mock datora/telefona pārbaudes PASS. FLEXFIT6606 read-only secinājums saglabāts pārskatā; imports nav veikts.
 - [x] 2026-10-22 daudzumu norādes: vienota kategoriju politika, viens plakans tumši pelēks panelis zem galerijas datorā/telefonā, LV/EN, 25 testi PASS un 8 īstas preces abos ekrānos; bez publicēšanas/DB. docs/audits/2026-10-22-order-quantity-guidance.md.
 - [x] 2026-10-22 priekšskatījumā: auduma blīvuma normalizācija, SS bērnu/zīdaiņu kartīšu cenu identitāte, precīzās krāsas/izmēra detaļu robežas un 9 avotu agregēts audits; 128 testi PASS, datorā/telefonā STSK180 19,25/23,29 €, blīvums pēc pārlādes un īsta necenota PF107151 pārbaudīti. Bez DB rakstīšanas, izvietošanas vai publicēšanas; docs/audits/2026-10-22-catalog-density-prices.md.

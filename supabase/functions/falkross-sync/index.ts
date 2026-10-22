@@ -17,6 +17,8 @@ const BRANDS = [
   { slug: "Build-Your-Brand-", brand: "Build Your Brand" },
   { slug: "Flexfit-", brand: "Flexfit" },
 ];
+// User-approved exact exception, not permission to import the whole Classics range.
+const TARGET_DISCOVERY = [{ url: `${BASE}/en/Products/NEW-2026/Retro-Trucker.html`, brand: "Classics / Yupoong", mpn: "6606", title: "Retro Trucker" }];
 const DATA_BUDGET_MS = 100_000;
 const IMAGE_BUDGET_MS = 90_000;
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36";
@@ -385,6 +387,11 @@ function colorFields(colorName: string): Record<string, string> {
 
 async function buildQueue(sb: SupabaseClient, fr: FrSession): Promise<number> {
   let total = 0;
+  for (const card of TARGET_DISCOVERY) {
+    // A completed targeted import must not be reset into the broad pending batch.
+    const { error } = await sb.from("falkross_queue").upsert({ ...card, done: false, attempts: 0 }, { onConflict: "url", ignoreDuplicates: true });
+    if (error) throw new Error(`falkross_queue target: ${error.message}`);
+  }
   for (const { slug, brand } of BRANDS) {
     const seen = new Set<string>();
     for (let page = 0; page < 40; page++) {
