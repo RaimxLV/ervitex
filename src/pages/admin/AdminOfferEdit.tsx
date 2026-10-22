@@ -441,17 +441,11 @@ const AdminOfferEdit = () => {
                   </div>
                 )}
 
-                {loadingVariants ? <p className="py-4 text-sm text-muted-foreground">Ielādē…</p> : <div className="mt-4"><SizeQuantityTable rows={sizeRows} quantities={qtyBySize} readOnly={!!swapTarget} onChange={(size, qty) => setQtyBySize((previous) => ({ ...previous, [size]: qty }))} formatSize={(s) => supplierSizeLabel(picked.source, picked.id, s, lang)} note={supplierSizeNote(picked.source, picked.id, lang)} /></div>}
+                {loadingVariants ? <p className="py-4 text-sm text-muted-foreground">Ielādē…</p> : <div className="mt-4"><SizeQuantityTable rows={sizeRows} quantities={qtyBySize} readOnly={false} onChange={(size, qty) => setQtyBySize((previous) => ({ ...previous, [size]: qty }))} formatSize={(s) => supplierSizeLabel(picked.source, picked.id, s, lang)} note={supplierSizeNote(picked.source, picked.id, lang)} /></div>}
 
-                {swapTarget ? (
-                  <Button size="sm" className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants} onClick={swapPicked}>
-                    <Repeat className="mr-2 h-4 w-4" /> Nomainīt uz šo modeli
-                  </Button>
-                ) : (
-                  <Button size="sm" className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants || !Object.values(qtyBySize).some((qty) => qty > 0)} onClick={addPicked}>
-                    <Plus className="mr-2 h-4 w-4" /> Pievienot piedāvājumam
-                  </Button>
-                )}
+                <Button size="sm" className="mt-3 bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants || !Object.values(qtyBySize).some((qty) => qty > 0)} onClick={addPicked}>
+                  <Plus className="mr-2 h-4 w-4" /> Pievienot piedāvājumam
+                </Button>
                 </div>}
               </div>
             )}
@@ -460,7 +454,7 @@ const AdminOfferEdit = () => {
           {/* Items */}
           <section className="border-b border-border pb-6">
             <h2 className="section-kicker font-heading text-xs font-bold uppercase text-accent">
-              Preces ({totals.qty} gab.)
+              Preces ({groupCount} {groupCount === 1 ? "pozīcija" : "pozīcijas"} · {totals.qty} gab.)
             </h2>
             {offer.items.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">Vēl nav pievienota neviena prece.</p>
@@ -473,7 +467,7 @@ const AdminOfferEdit = () => {
                   })();
                   document.getElementById("preces-izvele")?.scrollIntoView({ block: "start" });
                 }} onQuantity={(id, qty) => patchItem(id, { qty })} onPrice={(id, unitPrice) => patchItem(id, { unitPrice })} onDiscount={(id, discountPercent) => patchItem(id, { discountPercent })} onRemove={removeItem}
-                groupAction={(i) => <Button type="button" size="sm" variant="ghost" className="mt-1 px-0 text-accent" onClick={() => { setSwapKey(groupKey(i)); setPicked(null); setQ(""); document.getElementById("preces-izvele")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}><Repeat className="h-4 w-4" />Cits modelis</Button>}
+                groupAction={(i) => <Button type="button" size="sm" variant="outline" className="mt-2" onClick={() => openSwap(groupKey(i))}><Repeat className="mr-2 h-4 w-4" />Mainīt modeli</Button>}
                 itemDetails={(i) => <PrintRows value={(i.prints || []).filter((p) => p.scope !== "order")} onChange={(prints) => patchItem(i.id, { prints: [...prints, ...(i.prints || []).filter((p) => p.scope === "order")] })} addLabel="Apdruka" />}
               /></div>
 
