@@ -1,5 +1,5 @@
 import { getOrderPrints } from "@/lib/orderPrinting";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -127,86 +127,93 @@ const OfferPage = () => {
             </p>
           )}
 
-          {/* Items — table on desktop / print, cards on mobile */}
+          {/* Items — one bordered card per product on desktop / print, cards on mobile */}
           <div className="mt-6 hidden sm:block print:block">
-            <table className="w-full table-fixed text-sm">
-              <colgroup><col className="w-[27%]" /><col className="w-[15%]" /><col className="w-[8%]" /><col className="w-[7%]" /><col className="w-[11%]" /><col className="w-[9%]" /><col className="w-[11%]" /><col className="w-[12%]" /></colgroup>
-              <thead>
-                <tr className="border-b border-border text-left text-xs uppercase text-muted-foreground">
-                  <th className="py-2.5 font-semibold">{t("Prece", "Item")}</th>
-                  <th className="py-2.5 font-semibold">{t("Krāsa", "Colour")}</th>
-                  <th className="py-2.5 font-semibold">{t("Izmērs", "Size")}</th>
-                  <th className="py-2.5 text-right font-semibold">{t("Skaits", "Qty")}</th>
-                  <th className="py-2.5 text-right font-semibold">{t("Cena/gab.", "Unit")}</th>
-                  <th className="py-2.5 text-right font-semibold">{t("Atlaide %", "Discount %")}</th>
-                  <th className="py-2.5 text-right font-semibold">{t("Cena ar atlaidi", "Unit w/ discount")}</th>
-                  <th className="py-2.5 text-right font-semibold">{t("Summa", "Total")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {offer.items.map((i) => (
-                  <Fragment key={i.id}>
-                  <tr className="border-b border-border/60 align-top transition-colors hover:bg-muted/40 print:hover:bg-transparent">
-                    <td className="py-3 pr-3">
-                      <Link to={itemLink(i)} className="group flex items-start gap-3">
-                        {i.image && (
-                          <img
-                            src={i.image}
-                            alt={i.name}
-                            loading="lazy"
-                            className="h-14 w-14 shrink-0 rounded-sm border border-border bg-background object-contain p-0.5 print:hidden"
-                          />
-                        )}
-                        <span className="min-w-0">
-                          <span className="block font-medium leading-snug text-foreground transition-colors group-hover:text-accent">{i.name}</span>
-                          <span className="mt-0.5 block text-xs text-muted-foreground">{i.code}{i.brand ? ` · ${i.brand}` : ""}</span>
-                          <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-accent print:hidden">
-                            {t("Skatīt preci", "View product")} <ArrowUpRight className="h-3 w-3" />
-                          </span>
-                        </span>
-                      </Link>
-                    </td>
-                    <td className="py-3 pr-3">
-                      <span className="inline-flex items-center gap-1.5 break-words">
-                        {i.colorHex && <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-border" style={{ background: i.colorHex }} />}
-                        {i.colorName || "—"}
-                      </span>
-                    </td>
-                    <td className="py-3 pr-3 whitespace-nowrap">{i.size || "—"}</td>
-                    <td className="py-3 text-right tabular-nums">{i.qty}</td>
-                    <td className="py-3 text-right tabular-nums whitespace-nowrap">
-                      {i.unitPrice ? money(i.unitPrice) : t("pēc pieprasījuma", "on request")}
-                    </td>
-                    <td className="py-3 text-right tabular-nums">{itemDiscountPercent(i)}%</td>
-                    <td className="py-3 text-right tabular-nums whitespace-nowrap">
-                      {i.unitPrice && itemDiscountPercent(i) > 0 ? money(itemUnitPriceNet(i)) : "—"}
-                    </td>
-                    <td className="py-3 text-right font-medium tabular-nums">
-                      {i.unitPrice ? money(itemGoodsNet(i)) : "—"}
-                      {itemDiscountNet(i) > 0 && <span className="block text-xs font-normal text-accent">−{money(itemDiscountNet(i))}</span>}
-                    </td>
+            <div className="px-4 print:px-0">
+              <table className="w-full table-fixed text-sm">
+                <colgroup><col className="w-[27%]" /><col className="w-[15%]" /><col className="w-[8%]" /><col className="w-[7%]" /><col className="w-[11%]" /><col className="w-[9%]" /><col className="w-[11%]" /><col className="w-[12%]" /></colgroup>
+                <thead>
+                  <tr className="border-b border-border text-left text-xs uppercase text-muted-foreground">
+                    <th className="py-2.5 font-semibold">{t("Prece", "Item")}</th>
+                    <th className="py-2.5 font-semibold">{t("Krāsa", "Colour")}</th>
+                    <th className="py-2.5 font-semibold">{t("Izmērs", "Size")}</th>
+                    <th className="py-2.5 text-right font-semibold">{t("Skaits", "Qty")}</th>
+                    <th className="py-2.5 text-right font-semibold">{t("Cena/gab.", "Unit")}</th>
+                    <th className="py-2.5 text-right font-semibold">{t("Atlaide %", "Discount %")}</th>
+                    <th className="py-2.5 text-right font-semibold">{t("Cena ar atlaidi", "Unit w/ discount")}</th>
+                    <th className="py-2.5 text-right font-semibold">{t("Summa", "Total")}</th>
                   </tr>
-                  {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
-                    <tr key={k} className="border-b border-border/60 bg-muted/60 align-top text-muted-foreground">
-                      <td className="py-2 pr-3">{p.method}</td>
-                      <td className="py-2 pr-3">{p.placement || ""}</td>
-                      <td className="py-2 pr-3" />
-                      <td className="py-2 text-right tabular-nums">{p.mode === "total" ? "—" : i.qty}</td>
-                      <td className="py-2 text-right tabular-nums">{p.mode === "total" ? "—" : money(Number(p.price))}</td>
-                      <td className="py-2 text-right">—</td>
-                      <td className="py-2 text-right">—</td>
-                      <td className="py-2 text-right font-medium tabular-nums text-foreground">{money((Number(p.price) || 0) * (p.mode === "total" ? 1 : i.qty))}</td>
-                    </tr>
-                  ))}
-                  </Fragment>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+              </table>
+            </div>
+            <div className="mt-4 space-y-4 print:mt-2 print:space-y-3">
+              {offer.items.map((i) => (
+                <article key={i.id} className="break-inside-avoid rounded-md border border-border bg-card p-4 print:border-0 print:bg-transparent print:p-0">
+                  <table className="w-full table-fixed text-sm">
+                    <colgroup><col className="w-[27%]" /><col className="w-[15%]" /><col className="w-[8%]" /><col className="w-[7%]" /><col className="w-[11%]" /><col className="w-[9%]" /><col className="w-[11%]" /><col className="w-[12%]" /></colgroup>
+                    <tbody>
+                      <tr className="align-top transition-colors hover:bg-muted/40 print:hover:bg-transparent">
+                        <td className="py-2 pr-3">
+                          <Link to={itemLink(i)} className="group flex items-start gap-3">
+                            {i.image && (
+                              <img
+                                src={i.image}
+                                alt={i.name}
+                                loading="lazy"
+                                className="h-14 w-14 shrink-0 rounded-sm border border-border bg-background object-contain p-0.5 print:hidden"
+                              />
+                            )}
+                            <span className="min-w-0">
+                              <span className="block font-medium leading-snug text-foreground transition-colors group-hover:text-accent">{i.name}</span>
+                              <span className="mt-0.5 block text-xs text-muted-foreground">{i.code}{i.brand ? ` · ${i.brand}` : ""}</span>
+                              <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-accent print:hidden">
+                                {t("Skatīt preci", "View product")} <ArrowUpRight className="h-3 w-3" />
+                              </span>
+                            </span>
+                          </Link>
+                        </td>
+                        <td className="py-2 pr-3">
+                          <span className="inline-flex items-center gap-1.5 break-words">
+                            {i.colorHex && <span className="h-3.5 w-3.5 shrink-0 rounded-full border border-border" style={{ background: i.colorHex }} />}
+                            {i.colorName || "—"}
+                          </span>
+                        </td>
+                        <td className="py-2 pr-3 whitespace-nowrap">{i.size || "—"}</td>
+                        <td className="py-2 text-right tabular-nums">{i.qty}</td>
+                        <td className="py-2 text-right tabular-nums whitespace-nowrap">
+                          {i.unitPrice ? money(i.unitPrice) : t("pēc pieprasījuma", "on request")}
+                        </td>
+                        <td className="py-2 text-right tabular-nums">{itemDiscountPercent(i)}%</td>
+                        <td className="py-2 text-right tabular-nums whitespace-nowrap">
+                          {i.unitPrice && itemDiscountPercent(i) > 0 ? money(itemUnitPriceNet(i)) : "—"}
+                        </td>
+                        <td className="py-2 text-right font-medium tabular-nums">
+                          {i.unitPrice ? money(itemGoodsNet(i)) : "—"}
+                          {itemDiscountNet(i) > 0 && <span className="block text-xs font-normal text-accent">−{money(itemDiscountNet(i))}</span>}
+                        </td>
+                      </tr>
+                      {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
+                        <tr key={k} className="border-t border-border/60 bg-muted/60 align-top text-muted-foreground print:bg-transparent">
+                          <td className="py-2 pr-3">{p.method}</td>
+                          <td className="py-2 pr-3">{p.placement || ""}</td>
+                          <td className="py-2 pr-3" />
+                          <td className="py-2 text-right tabular-nums">{p.mode === "total" ? "—" : i.qty}</td>
+                          <td className="py-2 text-right tabular-nums">{p.mode === "total" ? "—" : money(Number(p.price))}</td>
+                          <td className="py-2 text-right">—</td>
+                          <td className="py-2 text-right">—</td>
+                          <td className="py-2 text-right font-medium tabular-nums text-foreground">{money((Number(p.price) || 0) * (p.mode === "total" ? 1 : i.qty))}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </article>
+              ))}
+            </div>
           </div>
 
-          <ul className="mt-5 space-y-3 sm:hidden print:hidden">
+          <ul className="mt-6 space-y-4 sm:hidden print:hidden">
             {offer.items.map((i) => (
-              <li key={i.id} className="border-b border-border pb-5">
+              <li key={i.id} className="break-inside-avoid rounded-md border border-border bg-card p-4">
                 <Link to={itemLink(i)} className="group flex gap-3">
                   {i.image && (
                     <img
