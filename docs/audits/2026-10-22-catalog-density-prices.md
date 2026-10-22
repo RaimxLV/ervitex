@@ -48,4 +48,6 @@ Deployment needs separate authorization. Rendering protection is active now and 
 
 Production `/catalog?q=STSK180`: Aloe, CENA PĒC PIEPRASĪJUMA; no JS errors. Preview same card: Aloe, 19.25 net / 23.29 gross. Clicking it passes `color=STSK180C08903`; detail resolves Aloe with the same price. Explicit Black / 3-4/98-104cm shows 19.25. Desktop and 390px mobile card checked with screenshots. No request/email created.
 
+128 focused Vitest tests passed across price identity, actual mass/grammage, PF conflict, NWG sizes, supplier flags, catalogue search/sorting/SEO and existing pending offer/order-printing behaviour. Preview build OK. Additional browser check: STSK180 `BLĪVUMS / 300 GSM` persists after reload with translation endpoint mocked (no extra paid AI call); genuinely unpriced PF107151 has no product price and its quantity row is `—`, while actual mass `SVARS / 340 g` is correctly preserved. Related items have their own prices; those are not mistaken for this unpriced product.
+
 Preview: https://id-preview--720c1872-d106-476c-970d-190420757416.lovable.app
