@@ -380,34 +380,21 @@ const AdminOfferEdit = () => {
   return (
     <OfferWorkspace>
       <Dialog open={!!swapTarget} onOpenChange={(open) => { if (!open) closeSwap(); }}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+        <DialogContent className="flex max-h-[92vh] flex-col overflow-hidden sm:max-w-6xl">
           <DialogHeader>
             <DialogTitle>Mainīt modeli</DialogTitle>
             <DialogDescription>
               {swapTarget ? <>Nomaina: <span className="font-semibold text-foreground">{swapTarget.name}</span>{swapTarget.colorName ? ` · ${swapTarget.colorName}` : ""} — izmēri, skaiti, atlaides un apdruka paliek tie paši.</> : ""}
             </DialogDescription>
           </DialogHeader>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input autoFocus className="pl-9" value={q} onChange={(e) => { setQ(e.target.value); setPickerOpen(false); }} placeholder="Meklēt jauno modeli pēc nosaukuma vai koda…" aria-label="Meklēt jauno modeli" />
-          </div>
-          {searching && <p className="text-xs text-muted-foreground">Meklē…</p>}
-          {hits.length > 0 && (
-            <div className="max-h-64 divide-y divide-border overflow-y-auto rounded-sm border border-border">
-              {hits.map((h) => (
-                <Button variant="ghost" type="button"
-                  key={`${h.source}-${h.id}`}
-                  onClick={() => pick(h)}
-                  className={`flex h-auto w-full justify-start items-center gap-3 rounded-none p-3 text-left hover:bg-muted ${picked?.id === h.id && picked?.source === h.source ? "bg-muted" : ""}`}
-                >
-                  {h.image_url && <img src={h.image_url} alt="" loading="lazy" className="h-10 w-10 rounded-sm object-cover" />}
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm text-foreground">{h.name}</span>
-                    <span className="block truncate text-xs text-muted-foreground">{h.id} · {h.brand || h.source.toUpperCase()}</span>
-                  </span>
-                </Button>
-              ))}
-            </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+          {!picked && (
+            <UnifiedCatalog
+              selectionMode={{
+                initialCategory: swapInitialCategory,
+                onSelect: (hit) => { void pick(hit as CatalogHit); },
+              }}
+            />
           )}
           {picked && (
             <div className="space-y-4 border-t border-border pt-4">
