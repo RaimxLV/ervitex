@@ -1152,7 +1152,7 @@ const CatalogItemDialog = ({
         : source === "ru" ? loadRU
         : source === "utt" ? loadUTT
         : source === "fr" ? loadFR
-        : source === "etx" ? (productId: string) => loadEtxProduct(productId, lang)
+        : source === "etx" ? (productId: string) => loadEtxProduct(productId, lang, { allowHidden: canFlagStock })
         : loadPF;
       const d = await loader(id).catch(() => null);
       if (cancelled) return;
@@ -1190,6 +1190,8 @@ const CatalogItemDialog = ({
         if (data.length < 1000) break;
         from += 1000;
       }
+      // Admin draft preview of a hidden ETX product: no public price rows exist; use its actual draft retail (model-wide).
+      if (!rows.length && d && "draftRetail" in d && d.draftRetail) rows.push({ sku: id, color_code: null, size: null, retail_price: d.draftRetail, currency: "EUR" });
       if (cancelled) return;
       const selection = lowestPriceVariant(withSkuSizes(rows, d && "skuSizes" in d ? d.skuSizes : undefined), d?.colors || [], (d && "sizeAliases" in d ? d.sizeAliases : undefined) || {}, wanted ? picked : null, initialSize);
       pendingSizeRef.current = selection.size;
@@ -1201,7 +1203,7 @@ const CatalogItemDialog = ({
 
     })();
     return () => { cancelled = true; };
-  }, [isOpen, source, id, initialColor, initialSize, source === "etx" ? lang : null]);
+  }, [isOpen, source, id, initialColor, initialSize, source === "etx" ? lang : null, source === "etx" ? canFlagStock : null]);
 
   useEffect(() => {
     if (pendingSizeRef.current) {
@@ -1614,7 +1616,7 @@ const CatalogItemDialog = ({
               </Button>
             </div>
             {!loading && (detail || name || category) && <OrderMinimumNotice source={source} category={category || detail?.category} name={name || detail?.title} />}
-            {!loading && <MugPricePanel source={source} name={name || detail?.title} />}
+            {!loading && <MugPricePanel source={source} id={id} retail={priceInfo?.price ?? null} />}
           </div>
 
           <div className="space-y-6">
