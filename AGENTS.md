@@ -11,6 +11,7 @@
 - Worksheets autosave side-specific drafts; explicit confirmation alone updates the shared list with immutable versions.
 - quote_events is append-only; submit_quote_request owns immutable retries; its insert trigger owns email-sticky locked rotation. Notifications verify capability/admin and request-scoped attachments.
 - Normal email; burgundy worksheet links. Offers: admin-gated sendOffer/saved prices. Request bank fields: requestDetails/BILLING_FIELDS; staff email: print/files first.
+- OfferPage uses a separate per-unit discount helper for display and separate goods/print rows; retain existing line-total rounding so presentation changes never alter payable totals.
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
 - catalogPriceSelection binds card photo/price to cheapest allowed colour outside excluded groups, with fallback; explicit choices override, stock is irrelevant.
 - stock_flags is manual per-colour `${id}::${color_code}` (bare id=legacy model-wide), never overwritten by sync; display only selected product colour, never cards. quote_requests.worksheet_discount uses admin-only RPC, never client drafts.
