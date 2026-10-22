@@ -15,6 +15,12 @@ export function replacedOfferItem(original: OfferItem, replacement: Partial<Offe
   return { ...original, ...replacement, colorCode: replacement.colorCode ?? null, colorKey: replacement.colorKey ?? null, sku: replacement.sku ?? null, unitPrice: replacement.unitPrice ?? null };
 }
 
+/** Cik mērķa grupas rindu izmēriem jaunajam modelim nav precīzas krāsas+izmēra cenas.
+ *  Ja > 0, nomaiņu nedrīkst apstiprināt — vecā cena nekad netiek pārnesta kā manuāla. */
+export function swapMissingCount(items: OfferItem[], targetKey: string, priceBySize: ReadonlyMap<string, number | null>): number {
+  return items.filter((i) => offerGroupKey(i) === targetKey && priceBySize.get(i.size || "-") == null).length;
+}
+
 export interface ModelSwapReplacement {
   source: string; productId: string; name: string; code: string; brand: string | null;
   image: string | null; colorName: string | null; colorHex: string | null; colorCode: string | null;

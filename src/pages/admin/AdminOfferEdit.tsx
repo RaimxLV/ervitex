@@ -4,7 +4,7 @@ import { getOrderPrints, setOrderPrints, removeOfferItem } from "@/lib/orderPrin
 import logo from "@/assets/ervitex-logo-dark.svg";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { applyModelSwap, offerGroupKey } from "@/lib/requestPresentation";
+import { applyModelSwap, offerGroupKey, swapMissingCount } from "@/lib/requestPresentation";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link, useParams } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
@@ -30,6 +30,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { sendOffer } from "@/lib/sendOffer.functions";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { validateOfferForSend } from "@/lib/offerValidation";
+import UnifiedCatalog from "@/components/catalog/UnifiedCatalog";
+import { categoryFromName } from "@/lib/catalogCategory";
 
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
@@ -233,12 +235,17 @@ const AdminOfferEdit = () => {
     () => (swapKey ? offer.items.find((i) => groupKey(i) === swapKey) || null : null),
     [swapKey, offer.items],
   );
+  /** Kataloga pārlūks sākas no nomaināmās preces kategorijas (ja no nosaukuma nolasāma). */
+  const swapInitialCategory = useMemo(
+    () => (swapTarget ? categoryFromName(swapTarget.name) : null),
+    [swapTarget],
+  );
   const groupCount = useMemo(() => new Set(offer.items.map((i) => groupKey(i))).size, [offer.items]);
   const swapPriceBySize = useMemo(() => new Map(sizeRows.map((r) => [r.size, r.price])), [sizeRows]);
   /** Cik esošo rindu izmēriem jaunajam modelim nebūs precīzas krāsas+izmēra cenas. */
   const swapMissing = useMemo(() => {
     if (!swapKey || !picked) return 0;
-    return offer.items.filter((i) => groupKey(i) === swapKey && swapPriceBySize.get(i.size || "-") == null).length;
+    return swapMissingCount(offer.items, swapKey, swapPriceBySize);
   }, [swapKey, picked, offer.items, swapPriceBySize]);
 
   const closeSwap = () => { setSwapKey(null); setPicked(null); setQtyBySize({}); setQ(""); setHits([]); };
@@ -373,34 +380,21 @@ const AdminOfferEdit = () => {
   return (
     <OfferWorkspace>
       <Dialog open={!!swapTarget} onOpenChange={(open) => { if (!open) closeSwap(); }}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+        <DialogContent className="flex max-h-[92vh] flex-col overflow-hidden sm:max-w-6xl">
           <DialogHeader>
             <DialogTitle>Mainīt modeli</DialogTitle>
             <DialogDescription>
               {swapTarget ? <>Nomaina: <span className="font-semibold text-foreground">{swapTarget.name}</span>{swapTarget.colorName ? ` · ${swapTarget.colorName}` : ""} — izmēri, skaiti, atlaides un apdruka paliek tie paši.</> : ""}
             </DialogDescription>
           </DialogHeader>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input autoFocus className="pl-9" value={q} onChange={(e) => { setQ(e.target.value); setPickerOpen(false); }} placeholder="Meklēt jauno modeli pēc nosaukuma vai koda…" aria-label="Meklēt jauno modeli" />
-          </div>
-          {searching && <p className="text-xs text-muted-foreground">Meklē…</p>}
-          {hits.length > 0 && (
-            <div className="max-h-64 divide-y divide-border overflow-y-auto rounded-sm border border-border">
-              {hits.map((h) => (
-                <Button variant="ghost" type="button"
-                  key={`${h.source}-${h.id}`}
-                  onClick={() => pick(h)}
-                  className={`flex h-auto w-full justify-start items-center gap-3 rounded-none p-3 text-left hover:bg-muted ${picked?.id === h.id && picked?.source === h.source ? "bg-muted" : ""}`}
-                >
-                  {h.image_url && <img src={h.image_url} alt="" loading="lazy" className="h-10 w-10 rounded-sm object-cover" />}
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm text-foreground">{h.name}</span>
-                    <span className="block truncate text-xs text-muted-foreground">{h.id} · {h.brand || h.source.toUpperCase()}</span>
-                  </span>
-                </Button>
-              ))}
-            </div>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+          {!picked && (
+            <UnifiedCatalog
+              selectionMode={{
+                initialCategory: swapInitialCategory,
+                onSelect: (hit) => { void pick(hit as CatalogHit); },
+              }}
+            />
           )}
           {picked && (
             <div className="space-y-4 border-t border-border pt-4">
@@ -428,16 +422,20 @@ const AdminOfferEdit = () => {
                 </div>
               )}
               {swapMissing > 0 && !loadingVariants && (
-                <p role="alert" className="text-xs text-destructive">{swapMissing} esošo rindu izmēriem šim modelim nav cenas — tām cena būs jāievada manuāli.</p>
+                <p role="alert" className="text-xs text-destructive">{swapMissing} esošo rindu izmēriem šim modelim nav cenas — nomaiņu nevar apstiprināt. Izvēlies citu krāsu vai modeli, kuram visi esošie izmēri pastāv.</p>
               )}
               <div className="flex flex-wrap justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => { setPicked(null); setPrices([]); setQtyBySize({}); }}>
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Atpakaļ uz katalogu
+                </Button>
                 <Button type="button" variant="outline" onClick={closeSwap}>Atcelt</Button>
-                <Button type="button" className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants} onClick={swapPicked}>
+                <Button type="button" className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants || swapMissing > 0} onClick={swapPicked}>
                   <Repeat className="mr-2 h-4 w-4" /> Nomainīt uz šo modeli
                 </Button>
               </div>
             </div>
           )}
+          </div>
         </DialogContent>
       </Dialog>
       <div className="quote-form">

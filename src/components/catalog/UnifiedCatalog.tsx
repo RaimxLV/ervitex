@@ -339,9 +339,29 @@ interface Props {
   lockedSource?: CatalogSource;
   title?: string;
   subtitle?: string;
+  /**
+   * Atlases režīms (piem. piedāvājuma redaktora „Mainīt modeli”): katalogs
+   * renderējas bez Layout/URL sinhronizācijas, un kartītes klikšķis atdod
+   * preci izsaucējam, nevis navigē uz detaļu lapu.
+   */
+  selectionMode?: {
+    onSelect: (item: {
+      source: string;
+      id: string;
+      name: string | null;
+      brand: string | null;
+      image_url: string | null;
+      colors: { c?: string | null; n?: string | null; h?: string | null; u?: string | null }[] | null;
+    }) => void;
+    /** Sākuma kategorijas filtrs (normalizeCategory vērtība), piem. no nomaināmās preces. */
+    initialCategory?: string | null;
+  };
 }
 
-const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
+/** Atlases režīmā katalogs dzīvo dialogā — bez galvenes/kājenes un lapas meta. */
+const SelectionShell = ({ children }: { children: React.ReactNode }) => <div className="min-w-0">{children}</div>;
+
+const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props) => {
   const { lang } = useLanguage();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -372,14 +392,18 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [brands, setBrands] = useState<Set<string>>(
     new Set((searchParams.get("brand") || "").split(",").filter(Boolean))
   );
-  const [categories, setCategories] = useState<Set<string>>(
-    new Set(
+  const [categories, setCategories] = useState<Set<string>>(() => {
+    if (selectionMode) {
+      const initial = normalizeCategory(selectionMode.initialCategory);
+      return new Set(initial ? [initial] : []);
+    }
+    return new Set(
       (searchParams.get("category") || "")
         .split(",")
         .map((v) => normalizeCategory(v))
-        .filter((v): v is string => !!v),
-    ),
-  );
+         .filter((v): v is string => !!v),
+    );
+  });
   const [groups, setGroups] = useState<Set<string>>(
     new Set((searchParams.get("group") || "").split(",").filter(Boolean))
   );
@@ -410,6 +434,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const urlSyncing = useRef(false);
 
   useEffect(() => {
+    if (selectionMode) return; // Atlases režīms dialogā nekad nepārraksta lapas URL.
     const p = new URLSearchParams();
     if (q) p.set("q", q);
     if (sources.size) p.set("source", [...sources].join(","));
@@ -429,6 +454,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   // External URL changes (e.g. clicking another mega menu category while the
   // catalog is already mounted) must reset the filters to the incoming params.
   useEffect(() => {
+    if (selectionMode) return;
     const incoming = searchParams.toString();
     if (lastReadSearch.current === incoming) return;
     lastReadSearch.current = incoming;
@@ -1001,7 +1027,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const goToPage = (value: number) => {
     const nextPage = Math.min(Math.max(Math.round(value) || 1, 1), totalPages);
     setPage(nextPage);
-    window.scrollTo({ top: 0, behavior: window.matchMedia("(max-width: 767px), (prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    // Atlases režīmā katalogs ritinās dialoga iekšpusē, nevis logs aiz tā.
+    if (!selectionMode) window.scrollTo({ top: 0, behavior: window.matchMedia("(max-width: 767px), (prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
   };
 
   const submitPageInput = () => {
@@ -1218,9 +1245,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
     sources.size + brands.size + categories.size + groups.size + genders.size + colors.size + (headwearActive ? headwearTypes.size : 0) + (stockOnly ? 1 : 0);
   const isSublimationCatalog = !lockedSource && sources.size === 1 && sources.has("etx");
 
+  // Atlases režīmā (piedāvājuma redaktors) katalogs dzīvo dialogā bez Layout.
+  const ShellComponent = selectionMode ? SelectionShell : Layout;
 
   return (
-    <Layout>
+    <ShellComponent>
+      {!selectionMode && (
       <PageIntro
         title={isSublimationCatalog
           ? (lang === "lv" ? "Sporta formas" : "Sportswear")
@@ -1231,8 +1261,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           : (lang === "lv" ? "Produktu atlase" : "Product selection")}
         compact
       />
-      {isSublimationCatalog && <SublimationCatalogIntro lang={lang} />}
-      <div className="container px-4 py-5 md:py-10">
+      )}
+      {!selectionMode && isSublimationCatalog && <SublimationCatalogIntro lang={lang} />}
+      <div className={selectionMode ? "px-1 py-2" : "container px-4 py-5 md:py-10"}>
         <div className="mb-5 space-y-3 md:mb-6">
           <div className="relative w-full md:max-w-xl">
             <Input
@@ -1243,7 +1274,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            {isSublimationCatalog && !authLoading && isAdmin && <Button variant="outline" disabled={!loaded || !filterOrderReady} onClick={() => setOrderingProducts(true)} className="gap-2">
+            {isSublimationCatalog && !authLoading && isAdmin && !selectionMode && <Button variant="outline" disabled={!loaded || !filterOrderReady} onClick={() => setOrderingProducts(true)} className="gap-2">
               <ListOrdered className="h-4 w-4" />{lang === "lv" ? "Kartīšu secība" : "Card order"}
             </Button>}
             {/* Mobile filter trigger */}
@@ -1386,9 +1417,12 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                         {lang === "lv" ? "Līdzīgi kodi" : "Similar codes"}
                       </p>
                     )}
+                    {(() => {
+                      const cardItem = it.source === "nwg" && nwgIdentities.has(it.id) ? { ...it, colors: (nwgIdentities.get(it.id) || []).map(c => ({ ...c, bucket: bucketOf(c.h, c.n) })) } : it;
+                      return (
                     <CatalogCard
                       key={`${it.source}-${it.id}`}
-                      item={it.source === "nwg" && nwgIdentities.has(it.id) ? { ...it, colors: (nwgIdentities.get(it.id) || []).map(c => ({ ...c, bucket: bucketOf(c.h, c.n) })) } : it}
+                      item={cardItem}
                       priority={idx < 4}
                       lang={lang}
                       selectedBuckets={colors as Set<ColorBucketKey>}
@@ -1400,6 +1434,18 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
 
                       fromLabel={lang === "lv" ? "no" : "from"}
                       onNavigate={(color) => {
+                        if (selectionMode) {
+                          // Atlases režīms: atdod preci redaktoram, nenavigē prom un nezaudē melnrakstu.
+                          selectionMode.onSelect({
+                            source: cardItem.source,
+                            id: cardItem.id,
+                            name: cardItem.name,
+                            brand: cardItem.brand,
+                            image_url: cardItem.image_url,
+                            colors: cardItem.colors,
+                          });
+                          return;
+                        }
                         try {
                           sessionStorage.setItem(
                             SCROLL_KEY,
@@ -1410,9 +1456,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
                         navigate(`/catalog/item/${it.source}/${encodeURIComponent(it.id)}${colorQuery}`);
                       }}
                     />
+                      );
+                    })()}
                     </Fragment>
                   ))}
-                  {isSublimationCatalog && safePage === totalPages && !q.trim() && !stockOnly && colors.size === 0 && <TeamSportswearCard lang={lang} />}
+                  {isSublimationCatalog && !selectionMode && safePage === totalPages && !q.trim() && !stockOnly && colors.size === 0 && <TeamSportswearCard lang={lang} />}
                 </div>
 
                 {totalPages > 1 && (
@@ -1487,7 +1535,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
           </div>
         </div>
       </div>
-    </Layout>
+    </ShellComponent>
   );
 };
 
