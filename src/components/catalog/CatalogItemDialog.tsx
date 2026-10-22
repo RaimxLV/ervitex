@@ -1612,7 +1612,7 @@ const CatalogItemDialog = ({
                 {copied ? label.copied : label.copy}
               </Button>
             </div>
-            {!loading && !canFlagStock && <OrderMinimumNotice source={source} category={category || detail?.category} name={name || detail?.title} />}
+            {!loading && !canFlagStock && (detail || name || category) && <OrderMinimumNotice source={source} category={category || detail?.category} name={name || detail?.title} />}
           </div>
 
           <div className="space-y-6">
