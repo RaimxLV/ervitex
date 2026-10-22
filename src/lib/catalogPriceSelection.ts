@@ -30,8 +30,8 @@ export function lowestPriceVariant(
   if (colors.length) candidates = candidates.filter((r) => !r.color_code || colors.some((c) => colorCodeMatches(c.code, r.color_code)));
   if (color) candidates = candidates.filter((r) => !r.color_code || colorCodeMatches(r.color_code, color.code));
   else {
-    const isWhiteRow = (r: PriceRow) => isWhiteColor(r.color_code) ||
-      colors.some((c) => isWhiteColor(c.name) && colorCodeMatches(c.code, r.color_code));
+    const isWhiteRow = (r: PriceRow) => isExcludedStartingColor(r.color_code) ||
+      colors.some((c) => isExcludedStartingColor(c.name) && colorCodeMatches(c.code, r.color_code));
     const nonWhite = candidates.filter((r) => !isWhiteRow(r));
     if (nonWhite.length) candidates = nonWhite;
   }
