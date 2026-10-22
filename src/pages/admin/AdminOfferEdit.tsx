@@ -403,8 +403,8 @@ const AdminOfferEdit = () => {
               <Input className="pl-9" value={q} onChange={(e) => { setQ(e.target.value); setPickerOpen(false); }} placeholder="Meklēt pēc nosaukuma vai koda…" />
             </div>
 
-            {searching && <p className="mt-2 text-xs text-muted-foreground">Meklē…</p>}
-            {hits.length > 0 && (
+            {searching && !swapKey && <p className="mt-2 text-xs text-muted-foreground">Meklē…</p>}
+            {!swapKey && hits.length > 0 && (
               <div className="mt-3 max-h-64 divide-y divide-border overflow-y-auto rounded-sm border border-border">
                 {hits.map((h) => (
                   <Button variant="ghost"
@@ -422,7 +422,7 @@ const AdminOfferEdit = () => {
               </div>
             )}
 
-            {picked && (
+            {picked && !swapKey && (
               <div className="mt-4 border-t border-border pt-5">
                 <Button type="button" variant="ghost" aria-expanded={pickerOpen} aria-controls="offer-variant-picker" onClick={() => setPickerOpen((open) => !open)} className="h-auto w-full justify-start gap-4 px-0 py-2 text-left hover:bg-muted/50">
                   {picked.image_url && <img src={picked.image_url} alt="" className="h-16 w-16 shrink-0 border border-border bg-background object-contain" />}
