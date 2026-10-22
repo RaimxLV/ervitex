@@ -339,9 +339,29 @@ interface Props {
   lockedSource?: CatalogSource;
   title?: string;
   subtitle?: string;
+  /**
+   * Atlases režīms (piem. piedāvājuma redaktora „Mainīt modeli”): katalogs
+   * renderējas bez Layout/URL sinhronizācijas, un kartītes klikšķis atdod
+   * preci izsaucējam, nevis navigē uz detaļu lapu.
+   */
+  selectionMode?: {
+    onSelect: (item: {
+      source: string;
+      id: string;
+      name: string | null;
+      brand: string | null;
+      image_url: string | null;
+      colors: { c?: string | null; n?: string | null; h?: string | null; u?: string | null }[] | null;
+    }) => void;
+    /** Sākuma kategorijas filtrs (normalizeCategory vērtība), piem. no nomaināmās preces. */
+    initialCategory?: string | null;
+  };
 }
 
-const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
+/** Atlases režīmā katalogs dzīvo dialogā — bez galvenes/kājenes un lapas meta. */
+const SelectionShell = ({ children }: { children: React.ReactNode }) => <div className="min-w-0">{children}</div>;
+
+const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props) => {
   const { lang } = useLanguage();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -372,14 +392,18 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
   const [brands, setBrands] = useState<Set<string>>(
     new Set((searchParams.get("brand") || "").split(",").filter(Boolean))
   );
-  const [categories, setCategories] = useState<Set<string>>(
-    new Set(
+  const [categories, setCategories] = useState<Set<string>>(() => {
+    if (selectionMode) {
+      const initial = normalizeCategory(selectionMode.initialCategory);
+      return new Set(initial ? [initial] : []);
+    }
+    return new Set(
       (searchParams.get("category") || "")
         .split(",")
         .map((v) => normalizeCategory(v))
-        .filter((v): v is string => !!v),
-    ),
-  );
+         .filter((v): v is string => !!v),
+    );
+  });
   const [groups, setGroups] = useState<Set<string>>(
     new Set((searchParams.get("group") || "").split(",").filter(Boolean))
   );
