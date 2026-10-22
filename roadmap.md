@@ -42,3 +42,4 @@
 
 - [ ] Pieslēgt www.ervitex.lv (DNS Datateks panelī) — gaida DNS ierakstus
 - [ ] Saglabāt Datateks paneļa un FTP piekļuves drošā formā
+- [x] Piedāvājuma lapā katrs produkts kā atsevišķa kartīte ar apmali un lielāku atstarpi; kolonnu izlīdzināšana un kopsummas pārbaudītas datorā un telefonā.
