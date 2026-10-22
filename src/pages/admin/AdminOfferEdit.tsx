@@ -372,6 +372,74 @@ const AdminOfferEdit = () => {
 
   return (
     <OfferWorkspace>
+      <Dialog open={!!swapTarget} onOpenChange={(open) => { if (!open) closeSwap(); }}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Mainīt modeli</DialogTitle>
+            <DialogDescription>
+              {swapTarget ? <>Nomaina: <span className="font-semibold text-foreground">{swapTarget.name}</span>{swapTarget.colorName ? ` · ${swapTarget.colorName}` : ""} — izmēri, skaiti, atlaides un apdruka paliek tie paši.</> : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input autoFocus className="pl-9" value={q} onChange={(e) => { setQ(e.target.value); setPickerOpen(false); }} placeholder="Meklēt jauno modeli pēc nosaukuma vai koda…" aria-label="Meklēt jauno modeli" />
+          </div>
+          {searching && <p className="text-xs text-muted-foreground">Meklē…</p>}
+          {hits.length > 0 && (
+            <div className="max-h-64 divide-y divide-border overflow-y-auto rounded-sm border border-border">
+              {hits.map((h) => (
+                <Button variant="ghost" type="button"
+                  key={`${h.source}-${h.id}`}
+                  onClick={() => pick(h)}
+                  className={`flex h-auto w-full justify-start items-center gap-3 rounded-none p-3 text-left hover:bg-muted ${picked?.id === h.id && picked?.source === h.source ? "bg-muted" : ""}`}
+                >
+                  {h.image_url && <img src={h.image_url} alt="" loading="lazy" className="h-10 w-10 rounded-sm object-cover" />}
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm text-foreground">{h.name}</span>
+                    <span className="block truncate text-xs text-muted-foreground">{h.id} · {h.brand || h.source.toUpperCase()}</span>
+                  </span>
+                </Button>
+              ))}
+            </div>
+          )}
+          {picked && (
+            <div className="space-y-4 border-t border-border pt-4">
+              <div className="flex items-center gap-4">
+                {picked.image_url && <img src={picked.image_url} alt="" className="h-16 w-16 shrink-0 border border-border bg-background object-contain" />}
+                <div className="min-w-0">
+                  <p className="text-base font-semibold">{picked.name}</p>
+                  <p className="mt-1 font-mono text-sm text-muted-foreground">{picked.source === "etx" ? "Sporta formas (Sublimācija)" : picked.id}</p>
+                </div>
+              </div>
+              {colorRows.length > 0 && (
+                <div>
+                  <Label className="text-xs">Krāsa</Label>
+                  <div className="mt-2"><ColorSelector colors={colorRows.map((c, index) => ({ code: c.c || String(index), name: c.n || c.c || "—", hex: c.h }))} value={activeColor} onChange={(code) => { setActiveColor(code); setQtyBySize({}); }} /></div>
+                </div>
+              )}
+              {loadingVariants ? <p className="py-2 text-sm text-muted-foreground">Ielādē cenas…</p> : (
+                <div className="max-h-48 overflow-y-auto rounded-sm border border-border">
+                  <table className="w-full text-sm tabular-nums">
+                    <thead><tr className="bg-muted/50 text-left text-[11px] font-semibold text-muted-foreground"><th className="px-3 py-2">Izmērs</th><th className="px-3 py-2 text-right">Cena bez PVN</th></tr></thead>
+                    <tbody>
+                      {sizeRows.map((r) => <tr key={r.size} className="border-t border-border"><td className="px-3 py-1.5">{supplierSizeLabel(picked.source, picked.id, r.size, lang)}</td><td className="px-3 py-1.5 text-right">{r.price ? money(r.price) : "—"}</td></tr>)}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {swapMissing > 0 && !loadingVariants && (
+                <p role="alert" className="text-xs text-destructive">{swapMissing} esošo rindu izmēriem šim modelim nav cenas — tām cena būs jāievada manuāli.</p>
+              )}
+              <div className="flex flex-wrap justify-end gap-2">
+                <Button type="button" variant="outline" onClick={closeSwap}>Atcelt</Button>
+                <Button type="button" className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants} onClick={swapPicked}>
+                  <Repeat className="mr-2 h-4 w-4" /> Nomainīt uz šo modeli
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
       <div className="quote-form">
       <header className="mb-7 flex flex-wrap items-center justify-between gap-3 border-b border-border pb-6">
         <div className="flex flex-wrap items-center gap-3">
