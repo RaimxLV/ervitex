@@ -434,6 +434,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
   const urlSyncing = useRef(false);
 
   useEffect(() => {
+    if (selectionMode) return; // Atlases režīms dialogā nekad nepārraksta lapas URL.
     const p = new URLSearchParams();
     if (q) p.set("q", q);
     if (sources.size) p.set("source", [...sources].join(","));
@@ -453,6 +454,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
   // External URL changes (e.g. clicking another mega menu category while the
   // catalog is already mounted) must reset the filters to the incoming params.
   useEffect(() => {
+    if (selectionMode) return;
     const incoming = searchParams.toString();
     if (lastReadSearch.current === incoming) return;
     lastReadSearch.current = incoming;
