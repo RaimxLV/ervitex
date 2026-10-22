@@ -571,11 +571,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle }: Props) => {
       // and newly connected catalogs pop into the filters a second later.
       const [persisted, liveCount, remnantRows] = await Promise.all([
         readCatalogCache(cacheKey),
-        (() => {
-          let q = supabase.from("catalog_items" as any).select("id", { count: "exact", head: true }).abortSignal(AbortSignal.timeout(8000));
-          if (lockedSource) q = q.eq("source", lockedSource);
-          return q.then((r) => (r.error ? null : r.count ?? null));
-        })(),
+        firstBatch.then(([r]) => (r.error ? null : r.count ?? null)),
         supabase.from("catalog_remnants" as any).select("source,style_code").range(0, 4999).abortSignal(AbortSignal.timeout(20000)).then((r) => (r.error ? [] : ((r.data as any[]) || []))),
       ]);
       if (cancelled) return;
