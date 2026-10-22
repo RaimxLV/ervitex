@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
-import { resolveHexParts } from "@/lib/colorNameHex";
+import { canonName, resolveHex, resolveHexParts } from "@/lib/colorNameHex";
 import { colorCodeMatches } from "@/lib/colorCodeMatch";
 import { pfSkuMap } from "@/lib/pfVariantIdentity";
 import { lowestPriceVariant, sizeAfterColorChange } from "@/lib/catalogPriceSelection";
