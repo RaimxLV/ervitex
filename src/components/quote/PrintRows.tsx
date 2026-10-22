@@ -7,7 +7,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import type { OfferPrint } from "@/lib/orderPrinting";
 
 const METHODS = ["Sietspiede", "DTF", "Termodruka", "Izšūšana", "Sublimācija", "Cita"];
-export function PrintRows({ value, onChange, priced = true, addLabel, disabled = false }: { value: OfferPrint[]; onChange: (value: OfferPrint[]) => void; priced?: boolean; addLabel?: string; disabled?: boolean }) {
+/** `preset` (e.g. sublimation mugs) seeds new rows with a known method/price; existing rows are never repriced. */
+export function PrintRows({ value, onChange, priced = true, addLabel, disabled = false, preset }: { value: OfferPrint[]; onChange: (value: OfferPrint[]) => void; priced?: boolean; addLabel?: string; disabled?: boolean; preset?: { method: string; price: number } | null }) {
   const { lang } = useLanguage();
   const t = (lv: string, en: string) => lang === "lv" ? lv : en;
   return <div className="space-y-3">
@@ -20,6 +21,6 @@ export function PrintRows({ value, onChange, priced = true, addLabel, disabled =
         <Button type="button" variant="ghost" size="icon" aria-label={t("Dzēst apdruku", "Remove print")} onClick={() => onChange(value.filter((_, n) => n !== index))} className="text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
       </div>;
     })}
-    <Button type="button" size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={disabled} onClick={() => onChange([...value, { method: "Sietspiede", placement: "", price: null, mode: "unit" }])}><Plus className="h-4 w-4" />{addLabel || t("Pievienot apdruku", "Add decoration")}</Button>
+    <Button type="button" size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={disabled} onClick={() => onChange([...value, preset ? { method: preset.method, placement: "", price: preset.price, mode: "unit" } : { method: "Sietspiede", placement: "", price: null, mode: "unit" }])}><Plus className="h-4 w-4" />{addLabel || t("Pievienot apdruku", "Add decoration")}</Button>
   </div>;
 }
