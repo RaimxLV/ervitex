@@ -2,6 +2,7 @@
 
 - Menu/catalog share searchMatches: shorthand uses source/prefix/token metadata, not ID lists; related codes need exact-token anchors; redirects keep facets.
 - productContent separates care/specs; translation caches use fingerprints.
+- Fabric grammage labels and cached descriptions normalize through fabricDensity only with areal units; actual product/parcel mass retains its label and units.
 - requestOfferData preserves manager/items/prints/pricing. Cart identity includes supplier/model/color/size; restore before persisting. Sharing activates drafts; useOfferDraft serializes recovery; token refresh preserves editors.
 - Share quote selectors/tables/steps; pickers close on add/outside/Escape, reopen from headers. orderMinimums uses original category/name, never blocks. Desktop guidance below gallery; AddToQuoteBlock guidance mobile/standalone only.
 - Icons share AccentIcon and Lucide-style print-icons.
@@ -14,6 +15,7 @@
 - OfferPage uses a separate per-unit discount helper for display and separate goods/print rows; each product plus its own print lines is one bordered card so items stay visually separate, with the shared column widths kept identical between the header table and the card tables; retain existing line-total rounding so presentation changes never alter payable totals.
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
 - catalogPriceSelection binds card photo/price to cheapest allowed colour outside excluded groups, with fallback; explicit choices override, stock is irrelevant.
+- Supplier colour matching accepts numeric and alphanumeric SS size suffixes; detail prices must match the selected colour/size, with colourless fallback only for model-wide sources.
 - stock_flags is manual per-colour `${id}::${color_code}` (bare id=legacy model-wide), never overwritten by sync; display only selected product colour, never cards. quote_requests.worksheet_discount uses admin-only RPC, never client drafts.
 - Shared worksheet/offer prints use scope="order" in existing item JSON; orderPrinting preserves offer-wide prints on deletion, preventing duplicate charges and extra storage.
 - Stock mutation controls render only after the admin role resolves; every mutation revalidates the live user and role before writing; public users see only the outlined availability label.

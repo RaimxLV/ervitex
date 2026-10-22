@@ -30,8 +30,8 @@ export function lowestPriceVariant(
   if (colors.length) candidates = candidates.filter((r) => !r.color_code || colors.some((c) => colorCodeMatches(c.code, r.color_code)));
   if (color) candidates = candidates.filter((r) => !r.color_code || colorCodeMatches(r.color_code, color.code));
   else {
-    const isWhiteRow = (r: PriceRow) => isWhiteColor(r.color_code) ||
-      colors.some((c) => isWhiteColor(c.name) && colorCodeMatches(c.code, r.color_code));
+    const isWhiteRow = (r: PriceRow) => isExcludedStartingColor(r.color_code) ||
+      colors.some((c) => isExcludedStartingColor(c.name) && colorCodeMatches(c.code, r.color_code));
     const nonWhite = candidates.filter((r) => !isWhiteRow(r));
     if (nonWhite.length) candidates = nonWhite;
   }
@@ -64,6 +64,11 @@ export function lowestPriceColorIndex<T>(colors: T[], priceFor: (color: T) => nu
 
 /** Avoti, kuru cena ir vienota visam modelim (rindas bez krāsas). */
 export const MODEL_WIDE_CATALOG_SOURCES = new Set(["ru", "etx"]);
+
+/** Exact colour only; never borrow a different variant's price in detail/quantity tables. */
+export function priceRowsForColor<T extends { color_code: string | null }>(rows: T[], source: string, color: string | null) {
+  return color === null ? rows : rows.filter((row) => colorCodeMatches(row.color_code, color) || (!row.color_code && MODEL_WIDE_CATALOG_SOURCES.has(source)));
+}
 
 /** Malfini katalogs: stils + 2 zīmju krāsa + izmērs (1742112 -> 21, S30B539 -> B5). */
 const malfiniColorKey = (styleId: string, code: string) => {

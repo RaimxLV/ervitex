@@ -68,6 +68,21 @@ describe("card starting colour excludes White and Natural only", () => {
 });
 
 describe("SS colour codes", () => {
+  it("STSK180 child numeric size and baby B2 size retain exact colour price", () => {
+    const prices = new Map([["ss:STSK180:c089", 19.25], ["ss:STSK180:c002", 19.25], ["ss:STSB920:c149", 11.38]]);
+    expect(catalogColorPrice(prices, "ss", "STSK180", { c: "STSK180C08903", n: "Aloe" })).toBe(19.25);
+    expect(catalogColorPrice(prices, "ss", "STSK180", { c: "STSK180C00212", n: "Black" })).toBe(19.25);
+    expect(catalogColorPrice(prices, "ss", "STSB920", { c: "STSB920C149B2", n: "Blue Soul" })).toBe(11.38);
+    expect(lowestPriceVariant([{ color_code: "C089", size: "3-4/98-104cm", retail_price: 19.25 }], [{ code: "C089", name: "Aloe" }], {}, "STSK180C08903")).toEqual({ color: "C089", size: "3-4/98-104cm", price: 19.25 });
+    expect(Number((19.25 * 1.21).toFixed(2))).toBe(23.29);
+  });
+  it("detail default excludes Natural just like cards, but explicit unpriced colour stays unpriced", () => {
+    const colors = [{ code: "C054", name: "Natural Raw" }, { code: "C002", name: "Black" }, { code: "C089", name: "Aloe" }];
+    const rows = [{ color_code: "C054", size: "M", retail_price: 5 }, { color_code: "C002", size: "M", retail_price: 7 }];
+    expect(lowestPriceVariant(rows, colors).color).toBe("C002");
+    expect(lowestPriceVariant(rows, colors, {}, "C089").price).toBeNull();
+    expect(lowestPriceVariant([{ color_code: "C002", size: "M", retail_price: 0 }], colors).price).toBeNull();
+  });
   it("Aloe STTU169C0891L matches price colour C089, not White C001", () => {
     expect(colorCodeMatches("STTU169C0891L", "C089")).toBe(true);
     expect(colorCodeMatches("STTU169C0891L", "C001")).toBe(false);
@@ -75,7 +90,15 @@ describe("SS colour codes", () => {
   });
 });
 
-import { catalogColorPrice } from "./catalogPriceSelection";
+import { catalogColorPrice, priceRowsForColor } from "./catalogPriceSelection";
+describe("detail colour price boundaries", () => {
+  it.each(["ss", "nwg", "mf", "pf", "bb", "utt", "fr"])("%s never borrows another colour or a colourless row", (source) => {
+    expect(priceRowsForColor([{ color_code: "black" }, { color_code: null }], source, "aloe")).toEqual([]);
+  });
+  it.each(["ru", "etx"])("%s retains model-wide prices", (source) => {
+    expect(priceRowsForColor([{ color_code: null }], source, "Black")).toEqual([{ color_code: null }]);
+  });
+});
 describe("catalogColorPrice", () => {
   const p = (e: [string, number][]) => new Map(e);
   it("RU model-wide colourless price applies to named colours", () => {
