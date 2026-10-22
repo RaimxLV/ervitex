@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/co
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl, unproxyUrl } from "@/lib/imageProxy";
 import { catalogColorParam, catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { loadNwgCatalogIdentities } from "@/lib/nwgIdentity";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
 import { catalogCategories } from "@/lib/etxCatalog";
@@ -1502,6 +1503,16 @@ interface CardProps {
 }
 
 const CatalogCard = ({ item, lang, selectedBuckets, requestLabel, noImageLabel, onNavigate, priceInfo, variantPrices, pricesReady, fromLabel, priority }: CardProps) => {
+  const [nwgColors, setNwgColors] = useState<ColorEntry[] | null>(null);
+  useEffect(() => {
+    if (item.source !== "nwg") return;
+    let alive = true;
+    loadNwgCatalogIdentities([item.id]).then(map => {
+      if (alive) setNwgColors(map.get(item.id) || []);
+    }).catch(() => { if (alive) setNwgColors([]); });
+    return () => { alive = false; };
+  }, [item.source, item.id]);
+  if (item.source === "nwg" && nwgColors) item = { ...item, colors: nwgColors.map(c => ({ ...c, bucket: bucketOf(c.h, c.n) })) };
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const [, setEtxNamesTick] = useState(0);
   useEffect(() => {

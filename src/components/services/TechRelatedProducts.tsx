@@ -8,6 +8,7 @@ import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { SOURCE_META, type CatalogSource } from "@/components/catalog/unifiedCatalogMeta";
 import { bucketOf, getBucket, type ColorBucketKey } from "@/lib/colorBuckets";
 import { catalogColorPrice, lowestPriceColorIndex } from "@/lib/catalogPriceSelection";
+import { loadNwgCatalogIdentities } from "@/lib/nwgIdentity";
 import { ETX_CATEGORY, ETX_BRAND, sublimationProducts } from "@/lib/etxCatalog";
 
 interface ColorEntry { h: string | null; n: string | null; u: string | null; c?: string | null }
@@ -209,6 +210,11 @@ const TechRelatedProducts = ({ techId }: { techId: string }) => {
       if (cancelled) return;
       const rows = ((data || []) as unknown as Row[]).filter((r) => r.name && r.image_url);
       const picked = techId === "sublimacija" ? sublimationProducts(rows) : pickRandom(rows, 4);
+      const nwg = picked.filter(r => r.source === "nwg");
+      if (nwg.length) {
+        const identities = await loadNwgCatalogIdentities(nwg.map(r => r.id)).catch(() => new Map());
+        for (const row of nwg) row.colors = identities.get(row.id) || [];
+      }
       setItems(picked);
 
       if (picked.length) {

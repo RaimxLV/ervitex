@@ -16,6 +16,7 @@
 - NWG syncs are resumable; catalog refresh and price audit apply the same brand-specific discount and markup to list prices, with purchase price fallback only when list price is missing, preventing repricing drift.
 - catalogPriceSelection binds card photo/price to cheapest allowed colour outside excluded groups, with fallback; explicit choices override, stock is irrelevant.
 - Supplier colour matching accepts numeric and alphanumeric SS size suffixes; detail prices must match the selected colour/size, with colourless fallback only for model-wide sources.
+- NWG catalogue colours are constructed from exact product/item SKU joins on visible models; orphan labels/images are never aliases, and hyphenated NWG codes never use Malfini middle-digit candidates.
 - stock_flags is manual per-colour `${id}::${color_code}` (bare id=legacy model-wide), never overwritten by sync; display only selected product colour, never cards. quote_requests.worksheet_discount uses admin-only RPC, never client drafts.
 - Shared worksheet/offer prints use scope="order" in existing item JSON; orderPrinting preserves offer-wide prints on deletion, preventing duplicate charges and extra storage.
 - Stock mutation controls render only after the admin role resolves; every mutation revalidates the live user and role before writing; public users see only the outlined availability label.

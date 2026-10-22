@@ -29,6 +29,7 @@ import { BrandLogo } from "@/components/BrandLogo";
 import { loadEtxProduct } from "@/lib/loadEtxProduct";
 import { russellImagesForColor } from "@/lib/russellImages";
 import { malfiniSwatchUrl } from "@/lib/malfiniSwatches";
+import { nwgSkuVariants, nwgColorLabel } from "@/lib/nwgIdentity";
 
 
 interface Props {
@@ -265,9 +266,9 @@ async function loadSS(styleCode: string): Promise<ProductDetail | null> {
 async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
   const [styleRes, variantsRes, imagesRes, skusRes, pricedRes] = await Promise.all([
     supabase.from("nwg_styles").select("product_number,name,brand,category,gender,fit,fabrics,commerce_text,catalog_text,usp,weight,country_of_origin,raw").eq("product_number", productNumber).maybeSingle(),
-    supabase.from("nwg_variants").select("item_number,color_name,color_code,filter_color,shade_color,main_picture_url").eq("product_number", productNumber),
+    supabase.from("nwg_variants").select("product_number,item_number,color_name,color_code,filter_color,shade_color,main_picture_url").eq("product_number", productNumber),
     supabase.from("nwg_images").select("item_number,image_url,high_res_url,large_thumbnail_url,standard_url,sort_order").eq("product_number", productNumber).order("sort_order", { ascending: true }),
-    supabase.from("nwg_skus").select("sku,item_number,size,size_name,size_sequence").eq("product_number", productNumber),
+    supabase.from("nwg_skus").select("product_number,sku,item_number,size,size_name,size_sequence").eq("product_number", productNumber),
     supabase.from("catalog_variant_prices").select("sku").eq("source", "nwg").eq("style_code", productNumber).gt("retail_price", 0),
   ]);
   const style = styleRes.data;
@@ -275,7 +276,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
   const pricedSkus = new Set((pricedRes.data || []).map((p) => p.sku));
   const skus = (skusRes.data || []).filter((k) => pricedSkus.has(k.sku));
   const pricedItems = new Set(skus.map((k) => k.item_number));
-  const variants = (variantsRes.data || []).filter((v) => pricedItems.has(v.item_number));
+  const variants = nwgSkuVariants(variantsRes.data || [], skus).filter((v) => pricedItems.has(v.item_number));
   const images = imagesRes.data || [];
   const raw = ((style as any).raw || {}) as Record<string, any>;
 
@@ -363,7 +364,7 @@ async function loadNWG(productNumber: string): Promise<ProductDetail | null> {
 
   const colors: ColorDetail[] = variants.map((v: any) => ({
     code: v.item_number,
-    name: v.color_name || v.color_code || v.item_number,
+    name: nwgColorLabel(v),
     hex: hexFromNwg(v),
     images: imgByItem.get(v.item_number) || (v.main_picture_url ? [v.main_picture_url] : []),
     sizes: orderSizes((sizesByItem.get(v.item_number) || []).map((s) => s.s)),

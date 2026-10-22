@@ -21,7 +21,7 @@ export function colorCodeCandidates(code?: string | null): string[] {
   // SS SKU "STTU169C0891L" = stils + C089 + izmērs "1L" -> C089 (krāsa vienmēr 3 cipari)
   const m = c.match(/c(\d{3})[a-z0-9]*$/i);
   if (m) out.push(`c${m[1]}`);
-  if (/^\d{3}/.test(c) && c.length >= 5) out.push(c.slice(3, 5)); // MF vidējā daļa
+  if (!c.includes("-") && /^\d{3}/.test(c) && c.length >= 5) out.push(c.slice(3, 5)); // MF only, never NWG model digits
   return [...new Set(out)];
 }
 
