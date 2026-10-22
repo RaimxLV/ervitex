@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, X, Upload } from "lucide-react";
 import { clearCatalogCache } from "@/lib/catalogCache";
-import { catalogBrandForCategory, publicCatalogBrand } from "@/lib/etxCatalog";
+import { catalogBrandForCategory, publicCatalogBrand, storedProductBrand } from "@/lib/etxCatalog";
 import { prepareTeamPhoto } from "@/lib/teamPhoto";
 
 const PRINTING_TECHS = ["DTF", "Sietspiede", "Izšūšana", "Sublimācija"];
@@ -151,7 +151,7 @@ const AdminProductForm = () => {
       description_lv: form.description_lv, description_en: form.description_en,
       long_description_lv: form.long_description_lv, long_description_en: form.long_description_en,
       material: form.material,
-      brand: catalogBrandForCategory(selectedCategory?.name_lv, selectedCategory?.slug, form.brand),
+      brand: catalogBrandForCategory(selectedCategory?.name_lv, selectedCategory?.slug, storedProductBrand(form.brand)),
       category_id: form.category_id || null,
       min_order: form.min_order,
       retail_price: retailPrice && retailPrice > 0 ? retailPrice : null,

@@ -5,11 +5,10 @@ export const ETX_PUBLIC_BRAND = "Ervitex";
 /** Secondary membership only: never duplicate catalog rows or replace their source category. */
 export function catalogCategories(row: { source: string; category: string | null; name?: string | null }): string[] {
   const categories = row.category ? [row.category] : [];
-  if (row.source === "etx" && row.category === ETX_CATEGORY && /\b(?:dvielis|dvieļi|towels?)\b/i.test(row.name || "")) {
-    categories.push("Towels");
-  }
-  if (row.source === "etx" && row.category === ETX_CATEGORY && /\bkr[uū]z(?:e|es)\b|\bmugs?\b/i.test(row.name || "")) {
-    categories.push("Mugs");
+  if (row.source === "etx" && isEtxSublimationCategory(row.category)) {
+    const text = `${row.category || ""} ${row.name || ""}`;
+    if (/\b(?:dvielis|dvieļi|towels?)\b/i.test(text)) categories.push("Towels");
+    if (/\bkr[uū]z(?:e|es)\b|\bmugs?\b/i.test(text)) categories.push("Mugs");
   }
   return [...new Set(categories)];
 }
@@ -17,6 +16,14 @@ export function catalogCategories(row: { source: string; category: string | null
 /** Legacy supplier keys stay internal; manufacturer labels use the public brand. */
 export const publicCatalogBrand = (brand: string | null | undefined, source?: string): string | null =>
   source === "etx" || brand === ETX_BRAND ? ETX_PUBLIC_BRAND : brand ?? null;
+
+/** Admin-created ETX sublimation categories (e.g. "Krūzes (sublimācija)") belong to the sublimation section too. */
+export const isEtxSublimationCategory = (category?: string | null): boolean =>
+  !!category && (category === ETX_CATEGORY || /sublim/i.test(category));
+
+/** The admin form shows the public brand; storage keeps the internal ETX key the catalogue view requires. */
+export const storedProductBrand = (brand: string): string =>
+  brand.trim() === ETX_PUBLIC_BRAND ? ETX_BRAND : brand;
 
 export const isEtxCategory = (categoryName?: string | null, categorySlug?: string | null): boolean =>
   categoryName?.trim().toLocaleLowerCase("lv") === ETX_CATEGORY.toLocaleLowerCase("lv") ||
@@ -29,4 +36,4 @@ export const catalogBrandForCategory = (
 ): string => isEtxCategory(categoryName, categorySlug) ? ETX_BRAND : brand;
 
 export const sublimationProducts = <T extends { source: string; brand: string | null; category: string | null }>(rows: T[]): T[] =>
-  rows.filter(row => row.source === "etx" && row.brand === ETX_BRAND && row.category === ETX_CATEGORY);
+  rows.filter(row => row.source === "etx" && row.brand === ETX_BRAND && isEtxSublimationCategory(row.category));
