@@ -52,3 +52,17 @@ describe("admin ETX categories map to public facets", () => {
     expect(storedProductBrand("Clique")).toBe("Clique");
   });
 });
+
+import { etxAdminCategoryFacet } from "./etxCatalog";
+describe("ETX admin LV categories reuse public facets", () => {
+  it("plain Krūzes maps to Mugs", () => expect(cc2({ source: "etx", category: "Krūzes", name: "X" })).toContain("Mugs"));
+  it("known LV names map", () => {
+    expect(etxAdminCategoryFacet("T-krekli")).toBe("T-shirts");
+    expect(etxAdminCategoryFacet("Cepures")).toBe("Caps & Hats");
+    expect(etxAdminCategoryFacet("Krūzes (sublimācija)")).toBe("Mugs");
+  });
+  it("supplier rows are untouched", () => expect(cc2({ source: "mf", category: "Krūzes", name: "x" })).toEqual(["Krūzes"]));
+});
+it("admin sublimation mug category also belongs to the sublimation section filter", () => {
+  expect(cc2({ source: "etx", category: "Krūzes (sublimācija)", name: "Balta krūze" })).toContain("Sporta formas sublimācija");
+});

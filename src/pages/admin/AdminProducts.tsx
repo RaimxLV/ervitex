@@ -277,6 +277,7 @@ const AdminProducts = () => {
                     >
                       {p.active !== false ? "Aktīvs" : "Neaktīvs"}
                     </button>
+                    {p.hidden_manual && <Badge variant="destructive" className="text-[10px]">Paslēpta klientiem</Badge>}
                     {p.featured && <Badge variant="secondary" className="text-[10px]">Izcelts</Badge>}
                     {p.is_new && <Badge className="bg-accent text-accent-foreground text-[10px]">Jauns</Badge>}
                   </div>
@@ -346,6 +347,7 @@ const AdminProducts = () => {
                     >
                       {p.active !== false ? "Aktīvs" : "Neaktīvs"}
                     </button>
+                    {p.hidden_manual && <Badge variant="destructive" className="text-[10px]">Paslēpta</Badge>}
                   </div>
                 </div>
                 <div className="flex flex-col gap-1">
