@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getOrderPrints, setOrderPrints, removeOfferItem } from "./orderPrinting";
+import { getOrderPrints, setOrderPrints, removeOfferItem, itemHasPrinting } from "./orderPrinting";
 import { itemPrintNet, offerTotals, type OfferItem } from "./offer";
 
 const items: OfferItem[] = [2, 3].map((qty, index) => ({ id: String(index), source: "ss", productId: "STTU169", code: "STTU169", name: "Creator", brand: null, image: null, colorName: "Black", colorHex: null, size: index ? "M" : "S", qty, unitPrice: 10 }));
@@ -25,5 +25,10 @@ describe("shared offer printing", () => {
     expect(getOrderPrints(edited)).toHaveLength(1);
     expect(itemPrintNet(edited[0])).toBe(4);
     expect(offerTotals(edited).print).toBe(29);
+  });
+  it("shows a product as undecorated only when it has no printing of its own and none shared", () => {
+    expect(itemHasPrinting(items[0], [])).toBe(false);
+    expect(itemHasPrinting({ ...items[0], prints: [{ method: "DTF", price: 3 }] }, [])).toBe(true);
+    expect(itemHasPrinting(items[0], getOrderPrints(setOrderPrints(items, [{ method: "Sietspiede", price: 50, mode: "total" }])))).toBe(true);
   });
 });
