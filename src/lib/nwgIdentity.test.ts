@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/integrations/supabase/client", () => ({ supabase: {} }));
 import { nwgSkuVariants, nwgColorLabel } from "./nwgIdentity";
 import { catalogColorPrice, lowestPriceVariant } from "./catalogPriceSelection";
+import { colorCodeMatches } from "./colorCodeMatch";
 
 const variant = (item: string, code: string, name: string | null = null) => ({
   product_number: "1907087", item_number: item, color_code: code, color_name: name,
@@ -25,11 +26,14 @@ describe("NWG exact SKU identity", () => {
     expect(nwgSkuVariants([real, other], [{ product_number: "different", item_number: real.item_number, sku: "x" }])).toEqual([]);
     expect(nwgSkuVariants([real, other], [real, other].map(v => ({ ...v, sku: `${v.item_number}-110` })))).toEqual([real, other]);
     expect(catalogColorPrice(new Map([["nwg:1907087:000", { price: 82.5 }]]), "nwg", "1907087", { c: other.item_number })).toBeUndefined();
+    expect(colorCodeMatches(real.item_number, other.item_number)).toBe(false);
+    expect(colorCodeMatches(real.item_number, "000")).toBe(true);
   });
   it("does not manufacture a SKU for an orphan or remove zero-stock real SKUs", () => {
     const real = variant("1907087-000", "000");
     expect(nwgSkuVariants([real], [])).toEqual([]);
     const zeroStock = { product_number: "1907087", item_number: real.item_number, sku: "1907087-000-110", availability: 0 };
     expect(nwgSkuVariants([real], [zeroStock])).toEqual([real]);
+    expect(lowestPriceVariant([{ color_code: "000", size: "110/116", retail_price: 0 }], [{ code: real.item_number, name: "000" }]).price).toBeNull();
   });
 });

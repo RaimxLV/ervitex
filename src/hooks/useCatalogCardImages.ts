@@ -130,7 +130,7 @@ export function cardImageFrames(rows: ImageRow[], color: string | null, first: s
   const candidates = colorCodeCandidates(ssColor || color).map(value => value.toLowerCase());
   // PF attēli ir piesaistīti konkrētai SKU (10650504); citu formātu atvasinājumi (MF "50") sajauktu krāsas.
   // Name-keyed sources compare whole colour names; suffix candidates ("Off-White" → "white") would mix colours.
-  const own = ["pf", "bb", "utt", "fr"].includes(source)
+  const own = ["pf", "bb", "utt", "fr", "nwg"].includes(source)
     ? rows.filter(row => !!row.color && !!color && row.color.trim().toLowerCase() === color.trim().toLowerCase())
     : rows.filter(row => row.color && colorCodeCandidates(row.color).some(value => candidates.includes(value.toLowerCase())));
   // Izvēlēta krāsa: tikai tās pašas krāsas kadri (tukšs, ja nav); modeļa kadri tikai bez krāsas.
