@@ -65,6 +65,11 @@ export function lowestPriceColorIndex<T>(colors: T[], priceFor: (color: T) => nu
 /** Avoti, kuru cena ir vienota visam modelim (rindas bez krāsas). */
 export const MODEL_WIDE_CATALOG_SOURCES = new Set(["ru", "etx"]);
 
+/** Exact colour only; never borrow a different variant's price in detail/quantity tables. */
+export function priceRowsForColor<T extends { color_code: string | null }>(rows: T[], source: string, color: string | null) {
+  return color === null ? rows : rows.filter((row) => colorCodeMatches(row.color_code, color) || (!row.color_code && MODEL_WIDE_CATALOG_SOURCES.has(source)));
+}
+
 /** Malfini katalogs: stils + 2 zīmju krāsa + izmērs (1742112 -> 21, S30B539 -> B5). */
 const malfiniColorKey = (styleId: string, code: string) => {
   const c = code.trim().toLowerCase();

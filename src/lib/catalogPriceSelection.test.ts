@@ -90,7 +90,15 @@ describe("SS colour codes", () => {
   });
 });
 
-import { catalogColorPrice } from "./catalogPriceSelection";
+import { catalogColorPrice, priceRowsForColor } from "./catalogPriceSelection";
+describe("detail colour price boundaries", () => {
+  it.each(["ss", "nwg", "mf", "pf", "bb", "utt", "fr"])("%s never borrows another colour or a colourless row", (source) => {
+    expect(priceRowsForColor([{ color_code: "black" }, { color_code: null }], source, "aloe")).toEqual([]);
+  });
+  it.each(["ru", "etx"])("%s retains model-wide prices", (source) => {
+    expect(priceRowsForColor([{ color_code: null }], source, "Black")).toEqual([{ color_code: null }]);
+  });
+});
 describe("catalogColorPrice", () => {
   const p = (e: [string, number][]) => new Map(e);
   it("RU model-wide colourless price applies to named colours", () => {

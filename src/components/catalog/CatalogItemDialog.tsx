@@ -11,7 +11,7 @@ import { thumbUrl } from "@/lib/imageProxy";
 import { canonName, resolveHex, resolveHexParts } from "@/lib/colorNameHex";
 import { colorCodeMatches } from "@/lib/colorCodeMatch";
 import { pfSkuMap } from "@/lib/pfVariantIdentity";
-import { lowestPriceVariant, MODEL_WIDE_CATALOG_SOURCES, sizeAfterColorChange } from "@/lib/catalogPriceSelection";
+import { lowestPriceVariant, MODEL_WIDE_CATALOG_SOURCES, priceRowsForColor, sizeAfterColorChange } from "@/lib/catalogPriceSelection";
 import { fabricSpecLabel, normalizeFabricText } from "@/lib/fabricDensity";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { SOURCE_META, type CatalogSource } from "./unifiedCatalogMeta";
@@ -1273,7 +1273,7 @@ const CatalogItemDialog = ({
     };
     let rows = variantPrices;
     if (currentColor) {
-      rows = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code) || (!r.color_code && MODEL_WIDE_CATALOG_SOURCES.has(source)));
+      rows = priceRowsForColor(rows, source, currentColor.code);
     }
     if (selectedSize) {
       // A SKU with its own size label (NWG duplicates) is matched by SKU, never by the shared name.
@@ -1297,7 +1297,7 @@ const CatalogItemDialog = ({
     if (!variantPrices.length) return {} as Record<string, number>;
     let rows = variantPrices;
     if (currentColor) {
-      rows = rows.filter((r) => colorCodeMatches(r.color_code, currentColor.code) || (!r.color_code && MODEL_WIDE_CATALOG_SOURCES.has(source)));
+      rows = priceRowsForColor(rows, source, currentColor.code);
     }
     const map: Record<string, number> = {};
     const pfConflict = new Set<string>();
