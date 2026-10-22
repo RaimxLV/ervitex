@@ -1,4 +1,4 @@
-import { getOrderPrints } from "@/lib/orderPrinting";
+import { getOrderPrints, itemHasPrinting } from "@/lib/orderPrinting";
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,6 +53,7 @@ const OfferPage = () => {
   }
 
   const totals = offerTotals(offer.items, offer.vat_rate, offer.discount);
+  const orderPrints = getOrderPrints(offer.items);
   const text = offerPlainText(offer, lang === "lv" ? "lv" : "en");
   const pmEmail = offer.pm_email || "birojs@ervitex.lv";
   const itemLink = (i: OfferItem) => {
@@ -204,6 +205,13 @@ const OfferPage = () => {
                           <td className="py-2 text-right font-medium tabular-nums text-foreground">{money((Number(p.price) || 0) * (p.mode === "total" ? 1 : i.qty))}</td>
                         </tr>
                       ))}
+                      {!itemHasPrinting(i, orderPrints) && (
+                        <tr className="border-t border-border/60 align-top">
+                          <td className="py-2 pr-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground" colSpan={8}>
+                            {t("Bez apdrukas", "No decoration")}
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </article>
@@ -257,14 +265,19 @@ const OfferPage = () => {
                           <div><dt className="text-muted-foreground">{t("Summa", "Total")}</dt><dd className="mt-1 font-bold">{money((Number(p.price) || 0) * (p.mode === "total" ? 1 : i.qty))}</dd></div>
                         </dl>
                       </div>
-                    ))}
+                     ))}
+                    {!itemHasPrinting(i, orderPrints) && (
+                      <p className="mt-3 border-t border-border pt-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        {t("Bez apdrukas", "No decoration")}
+                      </p>
+                    )}
               </li>
             ))}
           </ul>
 
-          {getOrderPrints(offer.items).length > 0 && <section className="mt-6 border-t border-border py-5">
+          {orderPrints.length > 0 && <section className="mt-6 border-t border-border py-5">
             <h2 className="section-kicker mb-4 font-heading text-xs font-bold uppercase text-accent">{t("Apdruka visām precēm", "Decoration for all items")}</h2>
-            {getOrderPrints(offer.items).map((p, index) => <div key={index} className="flex flex-wrap justify-between gap-3 py-2 text-sm"><span className="font-semibold">{p.method}{p.placement ? ` · ${p.placement}` : ""}</span><span className="tabular-nums">{p.price ? `${money(p.price)} ${p.mode === "total" ? t("kopā", "total") : t("/ gab.", "/ unit")}` : "—"}</span></div>)}
+            {orderPrints.map((p, index) => <div key={index} className="flex flex-wrap justify-between gap-3 py-2 text-sm"><span className="font-semibold">{p.method}{p.placement ? ` · ${p.placement}` : ""}</span><span className="tabular-nums">{p.price ? `${money(p.price)} ${p.mode === "total" ? t("kopā", "total") : t("/ gab.", "/ unit")}` : "—"}</span></div>)}
           </section>}
           <div className="mt-6 flex justify-end border-t border-border pt-5">
             <dl className="w-full space-y-1.5 text-sm sm:max-w-xs">
