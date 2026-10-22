@@ -1027,7 +1027,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
   const goToPage = (value: number) => {
     const nextPage = Math.min(Math.max(Math.round(value) || 1, 1), totalPages);
     setPage(nextPage);
-    window.scrollTo({ top: 0, behavior: window.matchMedia("(max-width: 767px), (prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    // Atlases režīmā katalogs ritinās dialoga iekšpusē, nevis logs aiz tā.
+    if (!selectionMode) window.scrollTo({ top: 0, behavior: window.matchMedia("(max-width: 767px), (prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
   };
 
   const submitPageInput = () => {
@@ -1246,7 +1247,8 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
 
 
   return (
-    <Layout>
+    <ShellComponent>
+      {!selectionMode && (
       <PageIntro
         title={isSublimationCatalog
           ? (lang === "lv" ? "Sporta formas" : "Sportswear")
@@ -1257,8 +1259,9 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
           : (lang === "lv" ? "Produktu atlase" : "Product selection")}
         compact
       />
-      {isSublimationCatalog && <SublimationCatalogIntro lang={lang} />}
-      <div className="container px-4 py-5 md:py-10">
+      )}
+      {!selectionMode && isSublimationCatalog && <SublimationCatalogIntro lang={lang} />}
+      <div className={selectionMode ? "px-1 py-2" : "container px-4 py-5 md:py-10"}>
         <div className="mb-5 space-y-3 md:mb-6">
           <div className="relative w-full md:max-w-xl">
             <Input
@@ -1269,7 +1272,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
             />
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            {isSublimationCatalog && !authLoading && isAdmin && <Button variant="outline" disabled={!loaded || !filterOrderReady} onClick={() => setOrderingProducts(true)} className="gap-2">
+            {isSublimationCatalog && !authLoading && isAdmin && !selectionMode && <Button variant="outline" disabled={!loaded || !filterOrderReady} onClick={() => setOrderingProducts(true)} className="gap-2">
               <ListOrdered className="h-4 w-4" />{lang === "lv" ? "Kartīšu secība" : "Card order"}
             </Button>}
             {/* Mobile filter trigger */}
@@ -1438,7 +1441,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
                     />
                     </Fragment>
                   ))}
-                  {isSublimationCatalog && safePage === totalPages && !q.trim() && !stockOnly && colors.size === 0 && <TeamSportswearCard lang={lang} />}
+                  {isSublimationCatalog && !selectionMode && safePage === totalPages && !q.trim() && !stockOnly && colors.size === 0 && <TeamSportswearCard lang={lang} />}
                 </div>
 
                 {totalPages > 1 && (
@@ -1513,7 +1516,7 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
           </div>
         </div>
       </div>
-    </Layout>
+    </ShellComponent>
   );
 };
 
