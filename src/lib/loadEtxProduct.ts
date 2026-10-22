@@ -25,7 +25,7 @@ export async function loadEtxProduct(id: string, lang: "lv" | "en") {
     title: lang === "lv" ? p.name_lv : p.name_en,
     code: "",
     brand: ETX_PUBLIC_BRAND,
-    category: lang === "lv" ? "Sporta formas sublimācija" : "Sublimation sportswear",
+    category: /kr[uū]z/i.test(p.name_lv) ? (lang === "lv" ? "Sublimācijas krūzes" : "Sublimation mugs") : lang === "lv" ? "Sporta formas sublimācija" : "Sublimation sportswear",
     gender: null,
     shortDescription: lang === "lv" ? p.description_lv : p.description_en,
     description: lang === "lv" ? p.long_description_lv : p.long_description_en,
@@ -38,7 +38,8 @@ export async function loadEtxProduct(id: string, lang: "lv" | "en") {
     images: gallery,
     colors: (colors.data || []).map(c => ({
       code: c.id, name: c.name, hex: c.hex_code,
-      images: gallery, sizes: availableSizes,
+      // Colour photo first so switching colour shows the matching product.
+      images: c.image_url ? [c.image_url, ...gallery.filter(u => u !== c.image_url)] : gallery, sizes: availableSizes,
     })),
   };
 }

@@ -8,6 +8,9 @@ export function catalogCategories(row: { source: string; category: string | null
   if (row.source === "etx" && row.category === ETX_CATEGORY && /\b(?:dvielis|dvieļi|towels?)\b/i.test(row.name || "")) {
     categories.push("Towels");
   }
+  if (row.source === "etx" && row.category === ETX_CATEGORY && /\bkr[uū]z(?:e|es)\b|\bmugs?\b/i.test(row.name || "")) {
+    categories.push("Mugs");
+  }
   return [...new Set(categories)];
 }
 
