@@ -1616,7 +1616,7 @@ const CatalogItemDialog = ({
               </Button>
             </div>
             {!loading && (detail || name || category) && <OrderMinimumNotice source={source} category={category || detail?.category} name={name || detail?.title} />}
-            {!loading && <MugPricePanel source={source} id={id} retail={priceInfo?.price ?? null} />}
+            {!loading && <MugPricePanel source={source} id={id} retail={priceInfo?.price ?? null} draft={!!(detail && "draft" in detail && detail.draft)} />}
           </div>
 
           <div className="space-y-6">
