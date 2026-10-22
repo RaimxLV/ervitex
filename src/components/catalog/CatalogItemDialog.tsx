@@ -1170,7 +1170,7 @@ const CatalogItemDialog = ({
           d.colors.find((c) => colorCodeMatches(c.code, wanted)) ||
           d.colors.find((c) => (c.name || "").toLowerCase() === wc) ||
           d.colors.find((c) => canonName(c.name) === wn) ||
-          (wn ? d.colors.find((c) => canonName(c.name).includes(wn) || wn.includes(canonName(c.name))) : undefined);
+          (source !== "nwg" && wn ? d.colors.find((c) => canonName(c.name).includes(wn) || wn.includes(canonName(c.name))) : undefined);
         if (hit) picked = hit.code;
         else if (source === "nwg") setRecoveredNwgColor(true);
       }

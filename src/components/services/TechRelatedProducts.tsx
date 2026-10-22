@@ -98,8 +98,7 @@ const RelatedCard = ({
   const colors = useMemo(
     () =>
       (row.colors || [])
-        .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c?.h, bucketOf(c?.h, c?.n), c?.n) }))
-        .filter((c) => !!c.hex),
+        .map((c, idx) => ({ ...c, idx, hex: sanitizeHex(c?.h, bucketOf(c?.h, c?.n), c?.n) })),
     [row.colors]
   );
 
@@ -111,8 +110,8 @@ const RelatedCard = ({
   const rawImg = displayed?.u || row.image_url;
   const price = displayed ? colorPrice(displayed) : row.source === "nwg" ? undefined : prices.get(`${row.source}:${row.id}`);
 
-  const swatches = colors.slice(0, 8).map((c) => ({
-    hex: c.hex,
+  const swatches = colors.filter(c => c.hex).slice(0, 8).map((c) => ({
+    hex: c.hex || "",
     name: c.n || "",
     active: displayed?.idx === c.idx,
     onSelect: () => setActiveIdx(activeIdx === c.idx ? null : c.idx),
