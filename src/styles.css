@@ -55,6 +55,11 @@
     --input: 0 0% 90%;
     --ring: 0 85% 50%;
     --catalog-card-media: 0 0% 100%;
+    --order-notice-surface: 210 4% 21%;
+    --order-notice-heading: 0 0% 100%;
+    --order-notice-body: 210 6% 86%;
+    --order-notice-border: 210 4% 31%;
+    --order-notice-shadow: 0 0% 0%;
 
     --office-glass: 0 0% 100%;
     --office-ink: 210 16% 15%;
@@ -377,26 +382,25 @@
     box-shadow: 0 24px 50px -26px hsl(var(--values-shadow) / 0.38);
   }
 
-  /* Order-minimum notice: black gradient panel, white text, red accents only. */
+  /* One restrained, flat quantity panel below the gallery. */
   .order-notice {
-    color: hsl(var(--promo-fg));
-    background-image:
-      radial-gradient(130% 150% at 100% 0%, hsl(var(--accent) / 0.14) 0%, transparent 55%),
-      linear-gradient(135deg, hsl(var(--mosaic-background)) 0%, hsl(var(--mosaic-graphite)) 100%);
-    border: 1px solid hsl(var(--promo-fg) / 0.08);
-    box-shadow: 0 18px 42px -24px hsl(var(--mosaic-background) / 0.9);
-    animation: order-notice-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    color: hsl(var(--order-notice-heading));
+    background-color: hsl(var(--order-notice-surface));
+    border: 1px solid hsl(var(--order-notice-border));
+    box-shadow: 0 3px 10px hsl(var(--order-notice-shadow) / 0.08);
   }
 
   .order-notice-icon {
     color: hsl(var(--accent));
-    background-color: hsl(var(--accent) / 0.14);
-    border: 1px solid hsl(var(--accent) / 0.25);
-    animation: order-notice-glow 3.2s ease-in-out infinite;
   }
 
   .order-notice-muted {
-    color: hsl(var(--promo-fg) / 0.72);
+    color: hsl(var(--order-notice-body));
+  }
+
+  .order-notice-thresholds > p {
+    border-left: 2px solid hsl(var(--order-notice-border));
+    padding-left: 0.75rem;
   }
 
   .cta-drift {
@@ -436,22 +440,6 @@
 }
 
 @layer utilities {
-  @keyframes order-notice-in {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes order-notice-glow {
-    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--accent) / 0); }
-    50% { box-shadow: 0 0 18px 2px hsl(var(--accent) / 0.3); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .order-notice, .order-notice-icon {
-      animation: none;
-    }
-  }
-
   @keyframes promo-drift {
     0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
     50% { transform: translate3d(6%, -8%, 0) scale(1.15); }

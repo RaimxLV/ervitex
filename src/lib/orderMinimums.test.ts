@@ -33,4 +33,41 @@ describe("category-specific informational order minimums", () => {
     expect(rule("Ballpoint Pens", "Polo pen")?.kind).toBe("writing");
     expect(rule("Tote Bags", "T-shirt tote bag")?.kind).toBe("bags");
   });
+  it("explicit sublimation mugs use 10, not the printed promotional minimum", () => {
+    expect(rule("Sublimation", "Ceramic mug")).toEqual({ kind: "sublimation", minimum: 10 });
+    expect(rule("Sporta formas sublimācija", "Dvielis 30 x 50 CM", "etx")).toEqual({ kind: "sublimation", minimum: 10 });
+  });
+  it("a sublimation capability does not change a mug's 10/25 policy", () => {
+    expect(rule("Standard Mugs", "Sublimation ceramic mug")).toEqual({ kind: "promotional", minimum: 10, printedMinimum: 25 });
+    expect(rule(null, "Sublimation ceramic mug")).toEqual({ kind: "promotional", minimum: 10, printedMinimum: 25 });
+  });
+  it("textile totes recommend 5 per colour only", () => {
+    expect(rule("Textiles", "Cotton tote bag", "ss")).toEqual({ kind: "bags", minimum: 10, recommended: { minimum: 5, sameSize: false } });
+    expect(rule("Bags", "T-shirt tote bag", "ss")?.recommended?.sameSize).toBe(false);
+  });
+  it("notebooks in mixed writing categories remain promotional 10/25", () => {
+    expect(rule("Notebooks & Writing", "Notebook with pen")).toEqual({ kind: "promotional", minimum: 10, printedMinimum: 25 });
+  });
+  it("unknown products use generic 10 without supplier-based recommendations", () => {
+    for (const source of ["pf", "ss", "nwg", "bb", "mf", "ru", "utt", "fr", "etx", "unknown"]) {
+      expect(rule(null, "Unknown article", source)).toEqual({ kind: "generic", minimum: 10 });
+    }
+  });
+  it("bounded actual examples from all nine sources keep category policies", () => {
+    const examples = [
+      ["ss", "Hoodies", "MINI CRUISER2.0", "textile"],
+      ["mf", "T-shirts", "Classic", "textile"],
+      ["ru", "T-shirts", "Workwear Polycotton Twill Trousers", "textile"],
+      ["utt", "Sweats & Hoodies", "Heavy Blend™ Adult Crewneck Sweatshirt", "textile"],
+      ["fr", "", "110 Organic Cap", "textile"],
+      ["bb", "", "Original 5 Panel Cap", "textile"],
+      ["nwg", "Jackets", "Sanders", "textile"],
+      ["pf", "Hard Cover Notebooks", "Teak A5 recycled hard cover notebook with lined pages", "promotional"],
+      ["etx", "Sporta formas sublimācija", "Sporta maisiņš", "sublimation"],
+    ];
+    for (const [source, category, name, kind] of examples) expect(rule(category, name, source)?.kind).toBe(kind);
+  });
+  it("uses original product type as fallback before a generic name", () => {
+    expect(getOrderMinimum({ source: "pf", category: "Office", productType: "Ballpoint Pens", name: "Rattan" })).toEqual({ kind: "writing", minimum: 25, printedMinimum: 50 });
+  });
 });

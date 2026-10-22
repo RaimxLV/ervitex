@@ -4,7 +4,7 @@
 - productContent separates care/specs; translation caches use fingerprints.
 - Fabric grammage labels and cached descriptions normalize through fabricDensity only with areal units; actual product/parcel mass retains its label and units.
 - requestOfferData preserves manager/items/prints/pricing. Cart identity includes supplier/model/color/size; restore before persisting. Sharing activates drafts; useOfferDraft serializes recovery; token refresh preserves editors.
-- Share quote selectors/tables/steps; pickers close on add/outside/Escape, reopen from headers. orderMinimums uses original category/name, never blocks. Desktop guidance below gallery; AddToQuoteBlock guidance mobile/standalone only.
+- Share quote selectors/tables/steps; pickers close on add/outside/Escape, reopen from headers. orderMinimums uses authoritative section/category then original product type/name, never supplier or translated descriptions, and never blocks. Detail gallery owns one quantity notice on all viewports; AddToQuoteBlock only renders it standalone to prevent duplicates.
 - Icons share AccentIcon and Lucide-style print-icons.
 - Public eyebrows use red line-labels; other tones are icon-only; technology use cases use centered light panels.
 - Office contours/hotspots share cover-scene coordinates; halos use feGaussianBlur polygons with oversized regions to avoid clipping.
