@@ -8,6 +8,7 @@ export function catalogCategories(row: { source: string; category: string | null
   const facet = row.source === "etx" ? etxAdminCategoryFacet(row.category) : null;
   if (facet) categories.push(facet);
   if (row.source === "etx" && isEtxSublimationCategory(row.category)) {
+    categories.push(ETX_CATEGORY);
     const text = `${row.category || ""} ${row.name || ""}`;
     if (/\b(?:dvielis|dvieļi|towels?)\b/i.test(text)) categories.push("Towels");
     if (/\bkr[uū]z(?:e|es)\b|\bmugs?\b/i.test(text)) categories.push("Mugs");
