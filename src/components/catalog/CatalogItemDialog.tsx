@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { thumbUrl } from "@/lib/imageProxy";
+import { resolveHexParts } from "@/lib/colorNameHex";
 import { colorCodeMatches } from "@/lib/colorCodeMatch";
 import { pfSkuMap } from "@/lib/pfVariantIdentity";
 import { lowestPriceVariant, sizeAfterColorChange } from "@/lib/catalogPriceSelection";
@@ -1008,7 +1009,7 @@ async function loadFR(styleCode: string): Promise<ProductDetail | null> {
 
 const SPEC_LABEL_I18N: Record<string, { lv: string; en: string }> = {
   Fit: { lv: "Piegriezums", en: "Fit" },
-  Weight: { lv: "Svars", en: "Weight" },
+  Weight: { lv: "Blīvums", en: "Weight" },
   Neckline: { lv: "Apkakle", en: "Neckline" },
   Sleeve: { lv: "Piedurknes", en: "Sleeve" },
   Category: { lv: "Kategorija", en: "Category" },
