@@ -4,9 +4,9 @@ export const ETX_PUBLIC_BRAND = "Ervitex";
 
 /** Secondary membership only: never duplicate catalog rows or replace their source category. */
 export function catalogCategories(row: { source: string; category: string | null; name?: string | null }): string[] {
-  const categories = row.category ? [row.category] : [];
+  // Known ordinary ETX admin categories use the canonical facet instead of the raw LV alias (no duplicate labels).
   const facet = row.source === "etx" ? etxAdminCategoryFacet(row.category) : null;
-  if (facet) categories.push(facet);
+  const categories = facet ? [facet] : row.category ? [row.category] : [];
   if (row.source === "etx" && isEtxSublimationCategory(row.category)) {
     categories.push(ETX_CATEGORY);
     const text = `${row.category || ""} ${row.name || ""}`;

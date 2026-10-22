@@ -309,8 +309,8 @@ const AdminProductForm = () => {
             </div>
             <div className="flex flex-wrap gap-4 sm:gap-6">
               <label className="flex items-center gap-2 text-sm"><Switch checked={form.hidden_manual} onCheckedChange={v => setForm({...form, hidden_manual: v})} /> Vienmēr paslēpt</label>
-              <span className={`self-center rounded-sm border px-2 py-0.5 text-xs font-semibold uppercase tracking-wider ${form.hidden_manual ? "border-destructive text-destructive" : "border-border text-muted-foreground"}`}>
-                {form.hidden_manual ? "Klientiem nav redzama" : "Redzama katalogā"}
+              <span className={`self-center rounded-sm border px-2 py-0.5 text-xs font-semibold uppercase tracking-wider ${!form.active || form.hidden_manual ? "border-destructive text-destructive" : "border-border text-muted-foreground"}`}>
+                {!form.active ? "Neaktīva — klientiem nav redzama" : form.hidden_manual ? "Paslēpta klientiem" : "Nav manuāli paslēpta"}
               </span>
               <label className="flex items-center gap-2 text-sm"><Switch checked={form.hide_when_oos} onCheckedChange={v => setForm({...form, hide_when_oos: v})} /> Paslēpt, ja nav noliktavā</label>
             </div>
