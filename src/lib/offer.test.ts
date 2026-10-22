@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { itemDiscountNet, itemUnitDiscountNet, itemGoodsNet, itemTotalNet, offerTotals, type OfferItem } from "./offer";
+import { itemDiscountNet, itemUnitDiscountNet, itemUnitPriceNet, itemGoodsNet, itemTotalNet, offerTotals, type OfferItem } from "./offer";
 
 const item: OfferItem = { id: "a", source: "ss", productId: "STTU169", name: "Creator", code: "STTU169", brand: null, image: null, colorName: "Black", colorHex: null, size: "M", qty: 10, unitPrice: 20 };
 
@@ -7,6 +7,9 @@ describe("individual offer discounts", () => {
   it("shows the discount per unit without changing the screenshot's line or offer totals", () => {
     const line = { ...item, qty: 2, unitPrice: 26.25, discountPercent: 10, prints: [{ method: "DTF", placement: "Priekša", price: 25 }] };
     expect(itemUnitDiscountNet(line)).toBe(2.63);
+    expect(itemUnitPriceNet(line)).toBe(23.62);
+    expect(itemUnitPriceNet(line) + itemUnitDiscountNet(line)).toBe(26.25);
+    expect(itemUnitPriceNet(item)).toBe(20);
     expect(itemUnitDiscountNet({ ...line, qty: 10 })).toBe(2.63);
     expect(itemDiscountNet(line)).toBe(5.25);
     expect(itemGoodsNet(line)).toBe(47.25);

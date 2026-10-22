@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
 import {
-   money, itemUnitDiscountNet, itemDiscountPercent, itemGoodsNet, offerTotals, offerPlainText, type Offer, type OfferItem,
+   money, itemUnitDiscountNet, itemUnitPriceNet, itemDiscountNet, itemDiscountPercent, itemGoodsNet, offerTotals, offerPlainText, type Offer, type OfferItem,
   
 } from "@/lib/offer";
 import { Printer, MessageCircle, Mail, ClipboardList, ArrowUpRight, Store } from "lucide-react";
@@ -130,7 +130,7 @@ const OfferPage = () => {
                   <th className="py-2.5 text-right font-semibold">{t("Skaits", "Qty")}</th>
                   <th className="py-2.5 text-right font-semibold">{t("Cena/gab.", "Unit")}</th>
                   <th className="py-2.5 text-right font-semibold">{t("Atlaide %", "Discount %")}</th>
-                  <th className="py-2.5 text-right font-semibold">{t("Atlaide €/gab.", "Discount €/pc")}</th>
+                  <th className="py-2.5 text-right font-semibold">{t("Cena ar atlaidi", "Unit w/ discount")}</th>
                   <th className="py-2.5 text-right font-semibold">{t("Summa", "Total")}</th>
                 </tr>
               </thead>
@@ -169,14 +169,19 @@ const OfferPage = () => {
                       {i.unitPrice ? money(i.unitPrice) : t("pēc pieprasījuma", "on request")}
                     </td>
                     <td className="py-3 text-right tabular-nums">{itemDiscountPercent(i)}%</td>
-                    <td className="py-3 text-right tabular-nums text-accent">{money(itemUnitDiscountNet(i))}</td>
+                    <td className="py-3 text-right tabular-nums whitespace-nowrap">
+                      {i.unitPrice && itemDiscountPercent(i) > 0 ? money(itemUnitPriceNet(i)) : "—"}
+                    </td>
                     <td className="py-3 text-right font-medium tabular-nums">
                       {i.unitPrice ? money(itemGoodsNet(i)) : "—"}
+                      {itemDiscountNet(i) > 0 && <span className="block text-xs font-normal text-accent">−{money(itemDiscountNet(i))}</span>}
                     </td>
                   </tr>
                   {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
-                    <tr key={k} className="border-b border-border/60 align-top text-muted-foreground">
-                      <td colSpan={3} className="py-2 pr-3">{p.method}{p.placement ? ` (${p.placement})` : ""}</td>
+                    <tr key={k} className="border-b border-border/60 bg-muted/60 align-top text-muted-foreground">
+                      <td className="py-2 pr-3">{p.method}</td>
+                      <td className="py-2 pr-3">{p.placement || ""}</td>
+                      <td className="py-2 pr-3" />
                       <td className="py-2 text-right tabular-nums">{p.mode === "total" ? "—" : i.qty}</td>
                       <td className="py-2 text-right tabular-nums">{p.mode === "total" ? "—" : money(Number(p.price))}</td>
                       <td className="py-2 text-right">—</td>
@@ -218,8 +223,8 @@ const OfferPage = () => {
                     <dl className="mt-3 grid grid-cols-4 gap-3 border-t border-border pt-3 text-xs tabular-nums">
                       <div><dt className="text-muted-foreground">{t("Cena/gab.", "Unit")}</dt><dd className="mt-1 break-words">{i.unitPrice ? money(i.unitPrice) : "—"}</dd></div>
                       <div><dt className="text-muted-foreground">{t("Atlaide %", "Discount %")}</dt><dd className="mt-1">{itemDiscountPercent(i)}%</dd></div>
-                      <div><dt className="text-muted-foreground">{t("Atlaide €/gab.", "Discount €/pc")}</dt><dd className="mt-1 break-words text-accent">{money(itemUnitDiscountNet(i))}</dd></div>
-                      <div><dt className="text-muted-foreground">{t("Summa", "Total")}</dt><dd className="mt-1 break-words font-bold">{i.unitPrice ? money(itemGoodsNet(i)) : "—"}</dd></div>
+                      <div><dt className="text-muted-foreground">{t("Cena ar atlaidi", "Unit w/ discount")}</dt><dd className="mt-1 break-words">{i.unitPrice && itemDiscountPercent(i) > 0 ? money(itemUnitPriceNet(i)) : "—"}</dd></div>
+                      <div><dt className="text-muted-foreground">{t("Summa", "Total")}</dt><dd className="mt-1 break-words font-bold">{i.unitPrice ? money(itemGoodsNet(i)) : "—"}{itemDiscountNet(i) > 0 && <span className="block text-xs font-normal text-accent">−{money(itemDiscountNet(i))}</span>}</dd></div>
                     </dl>
                     <div className="mt-2 flex items-end justify-between gap-2">
                       <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-accent">
@@ -227,8 +232,9 @@ const OfferPage = () => {
                       </span>
                     </div>
                     {(i.prints || []).filter((p) => p.scope !== "order").map((p, k) => (
-                      <div key={k} className="mt-3 border-t border-border pt-3 text-xs">
-                        <p className="font-medium">{p.method}{p.placement ? ` (${p.placement})` : ""}</p>
+                      <div key={k} className="mt-3 rounded-sm bg-muted/60 p-3 text-xs">
+                        <p className="font-medium">{p.method}</p>
+                        {p.placement && <p className="mt-0.5 text-muted-foreground">{p.placement}</p>}
                         <dl className="mt-2 grid grid-cols-3 gap-3 tabular-nums">
                           <div><dt className="text-muted-foreground">{t("Skaits", "Qty")}</dt><dd className="mt-1">{p.mode === "total" ? "—" : i.qty}</dd></div>
                           <div><dt className="text-muted-foreground">{t("Cena/gab.", "Unit")}</dt><dd className="mt-1">{p.mode === "total" ? "—" : money(Number(p.price))}</dd></div>

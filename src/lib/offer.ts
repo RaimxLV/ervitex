@@ -66,6 +66,9 @@ export const itemDiscountNet = (i: OfferItem) =>
 /** Display-only discount per unit; line totals retain their existing rounding. */
 export const itemUnitDiscountNet = (i: OfferItem) =>
   round2((i.unitPrice || 0) * itemDiscountPercent(i) / 100);
+/** Display-only unit price after discount; line totals retain their existing rounding. */
+export const itemUnitPriceNet = (i: OfferItem) =>
+  round2((i.unitPrice || 0) - itemUnitDiscountNet(i));
 export const itemGoodsNet = (i: OfferItem) =>
   round2((i.unitPrice || 0) * i.qty - itemDiscountNet(i));
 
