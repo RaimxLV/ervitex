@@ -75,6 +75,13 @@ const OfferPage = () => {
             <Store className="h-3.5 w-3.5" /> {t("Ervitex katalogs", "Ervitex catalog")}
           </Link>
           <div className="mt-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+            {isAdmin && offer.id && (
+              <Button size="sm" variant="outline" className="w-full sm:w-auto" asChild>
+                <Link to="/admin/offers/$id" params={{ id: offer.id }}>
+                  <Pencil className="mr-2 h-3.5 w-3.5" /> {t("Atpakaļ uz rediģēšanu", "Back to editing")}
+                </Link>
+              </Button>
+            )}
             <Button size="sm" variant="outline" className="w-full sm:w-auto" onClick={() => window.print()}>
               <Printer className="mr-2 h-3.5 w-3.5" /> {t("Drukāt / PDF", "Print / PDF")}
             </Button>
