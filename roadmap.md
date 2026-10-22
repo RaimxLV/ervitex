@@ -1,5 +1,5 @@
 # Roadmap
-- [ ] Kategoriju secības maiņa ar vilkšanu: priekšskatījumā, atsevišķa saglabāšana/atcelšana, izolēta pārbaude bez īstu kategoriju pārkārtošanas vai publicēšanas.
+- [x] Kategoriju secības maiņa ar vilkšanu priekšskatījumā: atsevišķa saglabāšana/atcelšana, 3 testi PASS; administratora izolētā pārbaudē vilkšana, tastatūra, Escape, saglabāšana/pārlāde un kļūdu atjaunošana PASS, 390px bez pārplūdes, build OK. Īstā secība nav mainīta, nav publicēts.
 - [x] FR306.73/6606 mērķēts imports: 21 reāls variants, 17 krāsas, 6,98/8,45 €, 16 korekti foto; live/preview pārbaudīts, 86 testi PASS. Precīzā atklāšana/brand-family sagatavota, nav izvietota. docs/audits/2026-10-22-fr6606-target-import.md.
 - [ ] 6606 Silver pareizais foto: piegādātāja Silver saite rāda Maroon; maldinošā foto saite nepublicēta, gaida korektu piegādātāja attēlu.
 - [x] Daudzumu norāžu precizējums: paneļa lomu slēpšana noņemta bez tiesību/noliktavas izmaiņām; apģērbu EN/LV tipi paplašināti ar vārdu robežām; 63 testi un 12 publiskas/admin-mock datora/telefona pārbaudes PASS. FLEXFIT6606 read-only secinājums saglabāts pārskatā; imports nav veikts.
