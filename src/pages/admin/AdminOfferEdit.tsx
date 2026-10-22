@@ -4,7 +4,8 @@ import { getOrderPrints, setOrderPrints, removeOfferItem } from "@/lib/orderPrin
 import logo from "@/assets/ervitex-logo-dark.svg";
 import { DecimalInput } from "@/components/ui/decimal-input";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { offerGroupKey, replacedOfferItem } from "@/lib/requestPresentation";
+import { applyModelSwap, offerGroupKey } from "@/lib/requestPresentation";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link, useParams } from "@/lib/router-compat";
 import { supabase } from "@/integrations/supabase/client";
 import OfferWorkspace from "@/components/quote/OfferWorkspace";
@@ -232,37 +233,39 @@ const AdminOfferEdit = () => {
     () => (swapKey ? offer.items.find((i) => groupKey(i) === swapKey) || null : null),
     [swapKey, offer.items],
   );
-  /** Nomaina modeli/krāsu visai grupai, saglabājot izmērus un daudzumus */
+  const groupCount = useMemo(() => new Set(offer.items.map((i) => groupKey(i))).size, [offer.items]);
+  const swapPriceBySize = useMemo(() => new Map(sizeRows.map((r) => [r.size, r.price])), [sizeRows]);
+  /** Cik esošo rindu izmēriem jaunajam modelim nebūs precīzas krāsas+izmēra cenas. */
+  const swapMissing = useMemo(() => {
+    if (!swapKey || !picked) return 0;
+    return offer.items.filter((i) => groupKey(i) === swapKey && swapPriceBySize.get(i.size || "-") == null).length;
+  }, [swapKey, picked, offer.items, swapPriceBySize]);
+
+  const closeSwap = () => { setSwapKey(null); setPicked(null); setQtyBySize({}); setQ(""); setHits([]); };
+  const openSwap = (key: string) => { setSwapKey(key); setPicked(null); setQtyBySize({}); setQ(""); setHits([]); };
+
+  /** Nomaina modeli/krāsu visai grupai, saglabājot izmērus, daudzumus, atlaides un apdruku */
   const swapPicked = () => {
     if (!picked || !swapKey) return;
     const color = colorRows.find((c) => c.c === activeColor) || colorRows[0] || null;
-    const priceBySize = new Map(sizeRows.map((r) => [r.size, r.price]));
+    const replacement = {
+      source: picked.source,
+      productId: picked.id,
+      name: picked.name,
+      code: picked.id,
+      brand: picked.brand,
+      image: color?.u || picked.image_url || null,
+      colorName: color?.n || null,
+      colorHex: color?.h || null,
+      colorCode: color?.c || null,
+    };
     let missing = 0;
-    setOffer((o) => ({
-      ...o,
-      items: o.items.map((i) => {
-        if (groupKey(i) !== swapKey) return i;
-        const s = i.size || "-";
-        const has = priceBySize.has(s);
-        if (!has) missing += 1;
-        return replacedOfferItem(i, {
-          source: picked.source,
-          productId: picked.id,
-          name: picked.name,
-          code: picked.id,
-          brand: picked.brand,
-          image: color?.u || picked.image_url || null,
-          colorName: color?.n || null,
-          colorHex: color?.h || null,
-          colorCode: color?.c || null,
-          unitPrice: priceBySize.get(s) ?? null,
-        });
-      }),
-    }));
-    setSwapKey(null);
-    setPicked(null);
-    setQtyBySize({});
-    setQ("");
+    setOffer((o) => {
+      const result = applyModelSwap(o.items, swapKey, replacement, swapPriceBySize);
+      missing = result.missing;
+      return { ...o, items: result.items };
+    });
+    closeSwap();
     toast({
       title: "Modelis nomainīts",
       description: missing
