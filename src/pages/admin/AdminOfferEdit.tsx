@@ -422,16 +422,20 @@ const AdminOfferEdit = () => {
                 </div>
               )}
               {swapMissing > 0 && !loadingVariants && (
-                <p role="alert" className="text-xs text-destructive">{swapMissing} esošo rindu izmēriem šim modelim nav cenas — tām cena būs jāievada manuāli.</p>
+                <p role="alert" className="text-xs text-destructive">{swapMissing} esošo rindu izmēriem šim modelim nav cenas — nomaiņu nevar apstiprināt. Izvēlies citu krāsu vai modeli, kuram visi esošie izmēri pastāv.</p>
               )}
               <div className="flex flex-wrap justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => { setPicked(null); setPrices([]); setQtyBySize({}); }}>
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Atpakaļ uz katalogu
+                </Button>
                 <Button type="button" variant="outline" onClick={closeSwap}>Atcelt</Button>
-                <Button type="button" className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants} onClick={swapPicked}>
+                <Button type="button" className="bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingVariants || swapMissing > 0} onClick={swapPicked}>
                   <Repeat className="mr-2 h-4 w-4" /> Nomainīt uz šo modeli
                 </Button>
               </div>
             </div>
           )}
+          </div>
         </DialogContent>
       </Dialog>
       <div className="quote-form">
