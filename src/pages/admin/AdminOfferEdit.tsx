@@ -30,6 +30,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { sendOffer } from "@/lib/sendOffer.functions";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { validateOfferForSend } from "@/lib/offerValidation";
+import UnifiedCatalog from "@/components/catalog/UnifiedCatalog";
+import { categoryFromName } from "@/lib/catalogCategory";
 
 
 const SIZE_ORDER = ["3XS","2XS","XXS","XS","S","M","L","XL","XL/2XL","2XL","XXL","3XL","XXXL","4XL","5XL","6XL"];
@@ -232,6 +234,11 @@ const AdminOfferEdit = () => {
   const swapTarget = useMemo(
     () => (swapKey ? offer.items.find((i) => groupKey(i) === swapKey) || null : null),
     [swapKey, offer.items],
+  );
+  /** Kataloga pārlūks sākas no nomaināmās preces kategorijas (ja no nosaukuma nolasāma). */
+  const swapInitialCategory = useMemo(
+    () => (swapTarget ? categoryFromName(swapTarget.name) : null),
+    [swapTarget],
   );
   const groupCount = useMemo(() => new Set(offer.items.map((i) => groupKey(i))).size, [offer.items]);
   const swapPriceBySize = useMemo(() => new Map(sizeRows.map((r) => [r.size, r.price])), [sizeRows]);
