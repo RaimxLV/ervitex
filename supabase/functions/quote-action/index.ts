@@ -89,16 +89,8 @@ Deno.serve(async (req) => {
     return page('Neizdevās nodot', 'Mēģini vēlreiz pēc mirkļa.', false)
   }
 
-  // 30-day signed links for attachments so the assignee can open them from e-mail.
-  const files: string[] = []
-  for (const entry of Array.isArray(quote.file_urls) ? quote.file_urls : []) {
-    if (typeof entry !== 'string' || !entry) continue
-    if (/^https?:\/\//i.test(entry)) { files.push(entry); continue }
-    const { data: signed } = await supabase.storage
-      .from('quote-attachments')
-      .createSignedUrl(entry, 60 * 60 * 24 * 30)
-    if (signed?.signedUrl) files.push(signed.signedUrl)
-  }
+  // Never release customer-supplied URLs or unchecked documents through email.
+  const fileCount = Array.isArray(quote.file_urls) ? quote.file_urls.length : 0
 
   const mailRes = await sendAppEmail('quote-assigned', person.email, {
       replyTo: quote.email,
@@ -113,7 +105,9 @@ Deno.serve(async (req) => {
         phone: quote.phone || '',
         company: quote.company || '',
         message: quote.message || '',
-        files,
+        files: [],
+        fileCount,
+        filesReviewUrl: fileCount ? 'https://www.ervitex.lv/admin/quotes' : '',
         print_method: quote.print_method || '',
         print_placement: quote.print_placement || '',
         print_colors: quote.print_colors || '',

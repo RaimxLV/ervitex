@@ -1,7 +1,8 @@
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendAppEmail } from "../_shared/send-app-email.ts";
-import { uuidPattern, scopedAttachmentPaths, canNotifyRequest } from "../_shared/request-safety.ts";
+import { uuidPattern, canNotifyRequest } from "../_shared/request-safety.ts";
+import { verifiedArtworkPaths } from "../_shared/artwork-access.ts";
 
 const OFFICE_EMAIL = "birojs@ervitex.lv";
 
@@ -46,10 +47,10 @@ Deno.serve(async (req) => {
       }
     }
     if (!canNotifyRequest(quote, submission_key, admin)) return new Response(JSON.stringify({ error: "Not allowed" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    const clean = scopedAttachmentPaths(request_id, uploadedPaths);
+    const clean = await verifiedArtworkPaths(supabase, request_id, uploadedPaths);
     if (clean.length) {
       const paths = [...new Set([...(quote.file_urls || []), ...clean])];
-      if (paths.length > 20) throw new Error("Too many attachments");
+      if (paths.length > 10) throw new Error("Too many attachments");
       const { error: updateError } = await supabase.from("quote_requests").update({ file_urls: paths }).eq("id", request_id);
       if (updateError) throw updateError;
       quote.file_urls = paths;
@@ -57,17 +58,8 @@ Deno.serve(async (req) => {
     if (!quote.assigned_pm_slug || !quote.assigned_pm_name || !quote.assigned_pm_email) {
       return new Response(JSON.stringify({ error: "Assigned manager missing" }), { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-    // Convert stored paths -> 30-day signed URLs
+    // Staff must authenticate and receive a clean verdict before downloading.
     const rawFiles: string[] = Array.isArray(quote.file_urls) ? quote.file_urls : [];
-    const signedUrls: string[] = [];
-    for (const entry of rawFiles) {
-      if (typeof entry !== "string" || !entry) continue;
-      try { scopedAttachmentPaths(request_id, [entry]); } catch { continue; }
-      const { data: signed } = await supabase.storage
-        .from("quote-attachments")
-        .createSignedUrl(entry, 60 * 60 * 24 * 30);
-      if (signed?.signedUrl) signedUrls.push(signed.signedUrl);
-    }
 
     const worksheetUrl = quote.action_token
       ? `https://www.ervitex.lv/saraksts/${quote.action_token}`
@@ -108,8 +100,10 @@ Deno.serve(async (req) => {
         templateData: {
           ...baseData,
           worksheetUrl: worksheetUrl ? `${worksheetUrl}?v=pm` : "",
-          files: signedUrls,
+          files: [],
           fileCount: rawFiles.length,
+          filesPending: rawFiles.length > 0,
+          filesReviewUrl: rawFiles.length ? "https://www.ervitex.lv/admin/quotes" : "",
         },
     });
     results.push({ to: notifyEmail, template: "quote-request", ok: officeRes.ok, error: officeRes.ok ? undefined : officeRes.error || officeRes.reason });

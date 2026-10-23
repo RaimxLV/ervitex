@@ -45,6 +45,7 @@ import { Route as AdminOffersIndexRouteImport } from './routes/admin.offers.inde
 import { Route as AdminOffersIdRouteImport } from './routes/admin.offers.$id'
 import { Route as AdminProductsIndexRouteImport } from './routes/admin.products.index'
 import { Route as AdminProductsIdRouteImport } from './routes/admin.products.$id'
+import { Route as ApiPublicArtworkUploadRouteImport } from './routes/api/public/artwork-upload'
 import { Route as CatalogItemSourceIdRouteImport } from './routes/catalog.item.$source.$id'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
@@ -228,6 +229,11 @@ const AdminProductsIdRoute = AdminProductsIdRouteImport.update({
   path: '/admin/products/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicArtworkUploadRoute = ApiPublicArtworkUploadRouteImport.update({
+  id: '/api/public/artwork-upload',
+  path: '/api/public/artwork-upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogItemSourceIdRoute = CatalogItemSourceIdRouteImport.update({
   id: '/catalog/item/$source/$id',
   path: '/catalog/item/$source/$id',
@@ -275,6 +281,7 @@ export interface FileRoutesByFullPath {
   '/offers/': typeof OffersIndexRoute
   '/admin/offers/$id': typeof AdminOffersIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
+  '/api/public/artwork-upload': typeof ApiPublicArtworkUploadRoute
   '/admin/offers/': typeof AdminOffersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/catalog/item/$source/$id': typeof CatalogItemSourceIdRoute
@@ -315,6 +322,7 @@ export interface FileRoutesByTo {
   '/offers': typeof OffersIndexRoute
   '/admin/offers/$id': typeof AdminOffersIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
+  '/api/public/artwork-upload': typeof ApiPublicArtworkUploadRoute
   '/admin/offers': typeof AdminOffersIndexRoute
   '/admin/products': typeof AdminProductsIndexRoute
   '/catalog/item/$source/$id': typeof CatalogItemSourceIdRoute
@@ -356,6 +364,7 @@ export interface FileRoutesById {
   '/offers/': typeof OffersIndexRoute
   '/admin/offers/$id': typeof AdminOffersIdRoute
   '/admin/products/$id': typeof AdminProductsIdRoute
+  '/api/public/artwork-upload': typeof ApiPublicArtworkUploadRoute
   '/admin/offers/': typeof AdminOffersIndexRoute
   '/admin/products/': typeof AdminProductsIndexRoute
   '/catalog/item/$source/$id': typeof CatalogItemSourceIdRoute
@@ -398,6 +407,7 @@ export interface FileRouteTypes {
     | '/offers/'
     | '/admin/offers/$id'
     | '/admin/products/$id'
+    | '/api/public/artwork-upload'
     | '/admin/offers/'
     | '/admin/products/'
     | '/catalog/item/$source/$id'
@@ -438,6 +448,7 @@ export interface FileRouteTypes {
     | '/offers'
     | '/admin/offers/$id'
     | '/admin/products/$id'
+    | '/api/public/artwork-upload'
     | '/admin/offers'
     | '/admin/products'
     | '/catalog/item/$source/$id'
@@ -478,6 +489,7 @@ export interface FileRouteTypes {
     | '/offers/'
     | '/admin/offers/$id'
     | '/admin/products/$id'
+    | '/api/public/artwork-upload'
     | '/admin/offers/'
     | '/admin/products/'
     | '/catalog/item/$source/$id'
@@ -519,6 +531,7 @@ export interface RootRouteChildren {
   OffersIndexRoute: typeof OffersIndexRoute
   AdminOffersIdRoute: typeof AdminOffersIdRoute
   AdminProductsIdRoute: typeof AdminProductsIdRoute
+  ApiPublicArtworkUploadRoute: typeof ApiPublicArtworkUploadRoute
   AdminOffersIndexRoute: typeof AdminOffersIndexRoute
   AdminProductsIndexRoute: typeof AdminProductsIndexRoute
   CatalogItemSourceIdRoute: typeof CatalogItemSourceIdRoute
@@ -779,6 +792,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProductsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/artwork-upload': {
+      id: '/api/public/artwork-upload'
+      path: '/api/public/artwork-upload'
+      fullPath: '/api/public/artwork-upload'
+      preLoaderRoute: typeof ApiPublicArtworkUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalog/item/$source/$id': {
       id: '/catalog/item/$source/$id'
       path: '/catalog/item/$source/$id'
@@ -831,6 +851,7 @@ const rootRouteChildren: RootRouteChildren = {
   OffersIndexRoute: OffersIndexRoute,
   AdminOffersIdRoute: AdminOffersIdRoute,
   AdminProductsIdRoute: AdminProductsIdRoute,
+  ApiPublicArtworkUploadRoute: ApiPublicArtworkUploadRoute,
   AdminOffersIndexRoute: AdminOffersIndexRoute,
   AdminProductsIndexRoute: AdminProductsIndexRoute,
   CatalogItemSourceIdRoute: CatalogItemSourceIdRoute,

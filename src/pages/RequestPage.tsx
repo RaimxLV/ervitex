@@ -17,7 +17,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadArtwork } from "@/lib/uploadArtwork";
+import { ARTWORK_ACCEPT, ARTWORK_LIMITS, artworkMetadata, checkArtworkBatch } from "@/lib/artworkPolicy";
 import { useQuoteCart } from "@/hooks/useQuoteCart";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -25,7 +26,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2, Upload, Send, Printer, Paperclip } from "lucide-react";
 
-const MAX_FILES = 10;
+const MAX_FILES = ARTWORK_LIMITS.files;
 const MAX_FILE_MB = 15;
 
 const RequestPage = () => {
@@ -64,6 +65,8 @@ const RequestPage = () => {
   const cartNet = items.reduce((s, i) => s + (i.unitPrice || 0) * i.qty, 0);
   const pendingFiles = useRef<File[] | null>(null);
   const uploaded = useRef(new Map<File, string>());
+  const uploadIds = useRef(new Map<File, string>());
+  const [quarantined, setQuarantined] = useState(false);
   const { create: createOffer, busy: creatingOffer } = useCreateOffer();
   const { isAdmin } = useAuth();
 
@@ -72,10 +75,12 @@ const RequestPage = () => {
   const handleFiles = (list: FileList | null) => {
     if (!list) return;
     const incoming = Array.from(list);
-    const combined = [...files, ...incoming].slice(0, MAX_FILES);
-    const oversized = incoming.find((f) => f.size > MAX_FILE_MB * 1024 * 1024);
-    if (oversized) {
-      toast({ title: t(`Fails ${oversized.name} pārsniedz ${MAX_FILE_MB}MB`, `File ${oversized.name} exceeds ${MAX_FILE_MB}MB`), variant: "destructive" });
+    const combined = [...files, ...incoming];
+    try {
+      checkArtworkBatch(combined.map((f) => f.size));
+      combined.forEach((f) => artworkMetadata(f.name, f.type, f.size));
+    } catch (error) {
+      toast({ title: t("Failu nevar pievienot", "File not accepted"), description: error instanceof Error ? error.message : undefined, variant: "destructive" });
       return;
     }
     setFiles(combined);
@@ -138,15 +143,12 @@ const RequestPage = () => {
         }, async (requestId, key, pending) => {
       for (const f of pendingFiles.current || []) {
         if (uploaded.current.has(f)) continue;
-        const safeName = f.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const path = `${requestId}/${crypto.randomUUID()}-${safeName}`;
-        const { error: upErr } = await supabase.storage.from("quote-attachments").upload(path, f, {
-          contentType: f.type || "application/octet-stream",
-          upsert: false,
-        });
-        if (upErr) throw upErr;
+        const fileId = uploadIds.current.get(f) || crypto.randomUUID();
+        uploadIds.current.set(f, fileId);
+        const { path, pending: pendingScan } = await uploadArtwork(f, requestId, key, fileId);
+        if (pendingScan) setQuarantined(true);
         uploaded.current.set(f, path);
-        submission.current.addPath(path);
+        submission.current.addPath(path, f.name);
       }
       return notifyRequest(requestId, key, [...pending.paths]);
       }, files.map((f) => f.name));
@@ -159,7 +161,7 @@ const RequestPage = () => {
       toast({
         title: delivered ? t("Pieprasījums nosūtīts!", "Request sent!") : t("Pieprasījums saglabāts", "Request saved"),
         description: delivered
-          ? t("Mēs sazināsimies ar Tevi tuvākajā laikā.", "We will contact you shortly.")
+          ? files.length || pending?.paths.length ? t("Pieprasījums nosūtīts. Faili pieejami tikai pēc drošības pārbaudes.", "Request sent. Files are accessible only after security review.") : t("Mēs sazināsimies ar Tevi tuvākajā laikā.", "We will contact you shortly.")
           : t(
               `Paziņojums vēl nav nosūtīts. Mēģini vēlreiz.`,
               `Notification not sent yet. Retry.`,
@@ -175,7 +177,7 @@ const RequestPage = () => {
         navigate("/");
       }
     } catch (err: any) {
-      toast({ title: t("Kļūda", "Error"), description: /rate_limited/.test(err?.message || "") ? t("Pārāk daudz pieprasījumu. Mēģini pēc minūtes.", "Too many requests. Try again in a minute.") : err.message, variant: "destructive" });
+      toast({ title: t("Kļūda", "Error"), description: /rate_limited/.test(err?.message || "") ? t("Pārāk daudz pieprasījumu. Mēģini pēc minūtes.", "Too many requests. Try again in a minute.") : /Failed to fetch|NetworkError|fetch failed/i.test(err?.message || "") ? t("Neizdevās savienoties. Mēģini vēlreiz; tas pats pieprasījums tiks saglabāts bez dublikāta.", "Connection failed. Retry; the same request will be retained without a duplicate.") : err.message, variant: "destructive" });
     } finally {
       setSending(false);
       sync();
@@ -220,7 +222,8 @@ const RequestPage = () => {
                   <Button type="button" size="sm" variant={print.method && print.method !== "none" ? "default" : "outline"} disabled={sending || locked} onClick={() => setPrint({ ...print, method: print.method && print.method !== "none" ? print.method : "consult" })}>{t("Nepieciešama apdruka", "Decoration required")}</Button>
                   <Button type="button" size="sm" variant={print.method === "none" ? "default" : "outline"} disabled={sending || locked} onClick={() => setPrint({ ...print, method: "none", placement: "", colors: "" })}>{t("Bez apdrukas", "No decoration")}</Button>
                 </div>
-                {fileLinks.length > 0 && <ul className="mt-3 space-y-2">{fileLinks.map((file) => <li key={file.url}><a href={file.url} target="_blank" rel="noopener noreferrer" className="block break-all text-sm font-medium text-accent underline underline-offset-4">{file.name} ↗</a></li>)}</ul>}
+                {fileLinks.length > 0 && <ul className="mt-3 space-y-2">{fileLinks.map((file) => <li key={file.url} className="break-all text-sm">{file.name}</li>)}</ul>}
+                {quarantined && <p role="status" className="mt-3 text-sm text-muted-foreground">{t("Faili gaida drošības pārbaudi; darbiniekiem tie vēl nav pieejami.", "Files pending security review; staff cannot access them yet.")}</p>}
               </section>
 
               {/* Items */}
@@ -288,7 +291,7 @@ const RequestPage = () => {
                     className="hidden"
                     disabled={sending || locked}
                     onChange={(e) => handleFiles(e.target.files)}
-                    accept="image/*,.pdf,.ai,.eps,.svg,.psd,.zip"
+                    accept={ARTWORK_ACCEPT}
                   />
                 </label>
                 {files.length > 0 && (

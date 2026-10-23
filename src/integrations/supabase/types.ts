@@ -1826,6 +1826,53 @@ export type Database = {
           },
         ]
       }
+      quote_artwork: {
+        Row: {
+          byte_size: number
+          created_at: string
+          id: string
+          mime: string
+          original_name: string
+          path: string
+          quote_id: string
+          sha256: string
+          status: string
+          stored: boolean
+        }
+        Insert: {
+          byte_size: number
+          created_at?: string
+          id: string
+          mime: string
+          original_name: string
+          path: string
+          quote_id: string
+          sha256: string
+          status?: string
+          stored?: boolean
+        }
+        Update: {
+          byte_size?: number
+          created_at?: string
+          id?: string
+          mime?: string
+          original_name?: string
+          path?: string
+          quote_id?: string
+          sha256?: string
+          status?: string
+          stored?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_artwork_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quote_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quote_assignment_rotation: {
         Row: {
           id: number
@@ -3478,6 +3525,19 @@ export type Database = {
       refresh_ss_public_retail_prices: { Args: never; Returns: undefined }
       refresh_ss_style_summary: { Args: never; Returns: undefined }
       refresh_utt_catalog_prices: { Args: never; Returns: number }
+      reserve_quote_artwork: {
+        Args: {
+          _digest: string
+          _file: string
+          _key: string
+          _mime: string
+          _name: string
+          _path: string
+          _request: string
+          _size: number
+        }
+        Returns: string
+      }
       restore_quote_worksheet_version: {
         Args: { _by?: string; _token: string; _version_id: string }
         Returns: boolean

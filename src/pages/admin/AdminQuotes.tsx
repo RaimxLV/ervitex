@@ -11,6 +11,8 @@ import ExpandableMessage from "@/components/quote/ExpandableMessage";
 import { CreateOfferButton } from "@/components/quote/CreateOfferButton";
 import { requestConversionSource, CONFIRMED_EMPTY_MESSAGE, type ConversionSource } from "@/lib/requestOffer";
 import { attachmentName } from "@/lib/requestPresentation";
+import { useServerFn } from "@tanstack/react-start";
+import { downloadArtwork } from "@/lib/artworkDownload.functions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from "@/components/ui/alert-dialog";
@@ -102,6 +104,7 @@ const ageBadgeClass = (age: number) =>
 const ageLabel = (age: number) => (age === 0 ? "Šodien" : age === 1 ? "Vakar" : `${age} d.`);
 
 const AdminQuotes = () => {
+  const getArtwork = useServerFn(downloadArtwork);
   const [quotes, setQuotes] = useState<QuoteRow[]>([]);
   const [loading, setLoading] = useState(true);
   // Pārrēķina "Šodien/Vakar" arī ilgi atvērtā lapā (pēc pusnakts).
@@ -160,13 +163,12 @@ const AdminQuotes = () => {
 
   /** Pielikumi glabājas privātā glabātavā — atveram ar parakstītu, laikā ierobežotu saiti. */
   const openAttachment = async (url: string) => {
-    const path = url.includes("/quote-attachments/") ? url.split("/quote-attachments/")[1] : url;
-    const { data, error } = await supabase.storage.from("quote-attachments").createSignedUrl(path, 600);
-    if (error || !data?.signedUrl) {
-      toast({ title: "Nevar atvērt failu", description: error?.message, variant: "destructive" });
-      return;
+    try {
+      const data = await getArtwork({ data: { path: url } });
+      window.location.assign(data.url);
+    } catch {
+      toast({ title: "Fails nav pieejams", description: "Fails gaida drošības pārbaudi vai ir bloķēts.", variant: "destructive" });
     }
-    window.open(data.signedUrl, "_blank", "noopener");
   };
 
   const search = q.trim().toLowerCase();
