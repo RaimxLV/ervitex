@@ -33,6 +33,13 @@ describe("request retry lifecycle", () => {
 });
 function memoryStore() { const m = new Map<string, string>(); return { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v), removeItem: (k: string) => void m.delete(k), m }; }
 describe("reload-safe pending request", () => {
+  it("generated quarantine paths retain original filename across reload", async () => {
+    const slot={store:memoryStore(),key:"artwork"}; const flow=new RequestSubmission(slot);
+    await flow.run(payload,async()=>{},async(id)=>{flow.addPath(`${id}/00000000-0000-4000-8000-000000000000-artwork.pdf`,"Makets.pdf");return false;},["Makets.pdf","Other.pdf"]);
+    const restored=new RequestSubmission(slot).restore();
+    expect(restored).not.toBeNull(); if (!restored) throw new Error("Missing recovery");
+    expect(missingAttachmentNames(restored)).toEqual(["Other.pdf"]);
+  });
   it("a reloaded tab re-notifies the same saved request without saving again, then clears", async () => {
     const store = memoryStore(); const slot = { store, key: "s" };
     const save = vi.fn().mockResolvedValue(undefined);

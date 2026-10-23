@@ -26,6 +26,8 @@ interface Props {
   message?: string
   files?: string[]
   fileCount?: number
+  filesPending?: boolean
+  filesReviewUrl?: string
   print_method?: string
   print_placement?: string
   print_colors?: string
@@ -68,6 +70,8 @@ const QuoteRequestEmail = ({
   message = '',
   files = [],
   fileCount,
+  filesPending = false,
+  filesReviewUrl = '',
   print_method = '',
   print_placement = '',
   print_colors = '',
@@ -95,6 +99,8 @@ const QuoteRequestEmail = ({
           <Section style={requestSummary}>
             <Text style={statusText}>{printStatus}</Text>
             <Text style={statusText}>PIEVIENOTI FAILI: {attachedCount}</Text>
+            {filesPending && <Text style={subtle}>Faili ir karantīnā vai gaida pārbaudi. Pieejami tikai pēc drošības pārbaudes.</Text>}
+            {filesReviewUrl && <Link href={filesReviewUrl} style={worksheetLink}>PĀRBAUDĪT FAILU STATUSU →</Link>}
             {files.map((u, i) => (
               <Text key={i} style={{ margin: '8px 0', fontSize: '14px', overflowWrap: 'anywhere' }}>
                 <Link href={u} style={worksheetLink}>{safeAttachmentName(u, `Fails ${i + 1}`)} →</Link>

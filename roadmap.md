@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Klientu failu drošības sagatavošana: servera parakstu/tipu validācija, privāta karantīna, admina lejupielādes, 46 fokusa testi un izolēta PDF/renamed-EXE/reload pārbaude datorā/390px; pamatmigrācija+privāts bucket piemēroti, esošie faili saglabāti. Frontend/funkcijas nav izvietoti; skat. docs/pending-migrations/012_customer_artwork/README.md.
+- [ ] Klientu failu aizsardzības aktivēšana: bloķē skenera pakalpojuma konfigurācija, ad-hoc limitētāja tradeoff apstiprinājums un saderīga frontend/notifier/politiku izlaiduma atļauja. Vecā tiešās augšupielādes politika joprojām live; Failed to fetch cēlonis nav reprodukcijas datos.
 - [x] Kategoriju secības maiņa ar vilkšanu priekšskatījumā: atsevišķa saglabāšana/atcelšana, 3 testi PASS; administratora izolētā pārbaudē vilkšana, tastatūra, Escape, saglabāšana/pārlāde un kļūdu atjaunošana PASS, 390px bez pārplūdes, build OK. Īstā secība nav mainīta, nav publicēts.
 - [x] FR306.73/6606 mērķēts imports: 21 reāls variants, 17 krāsas, 6,98/8,45 €, 16 korekti foto; live/preview pārbaudīts, 86 testi PASS. Precīzā atklāšana/brand-family sagatavota, nav izvietota. docs/audits/2026-10-22-fr6606-target-import.md.
 - [ ] 6606 Silver pareizais foto: piegādātāja Silver saite rāda Maroon; maldinošā foto saite nepublicēta, gaida korektu piegādātāja attēlu.

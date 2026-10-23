@@ -17,6 +17,7 @@ export type PendingRequest = {
   paths: string[];
   /** Names of attachments chosen for this request; used to report files lost on reload. */
   fileNames: string[];
+  uploadedNames?: Record<string, string>;
   /** Terminal: saved, but the notifier refused it. Never resent; cleared only by explicit discard(). */
   rejected?: boolean;
 };
@@ -60,8 +61,9 @@ export class RequestSubmission {
       else this.slot.store.removeItem(this.slot.key);
     } catch { /* in-memory retry still works */ }
   }
-  addPath(path: string) {
+  addPath(path: string, originalName?: string) {
     if (!this.pending || this.pending.paths.includes(path)) return;
+    if (originalName) this.pending.uploadedNames = { ...this.pending.uploadedNames, [path]: originalName };
     this.pending.paths.push(path); this.persist();
   }
   get isRejected() { return this.pending?.rejected === true; }
@@ -100,11 +102,11 @@ export const sessionSlot = (key: string) => {
 };
 
 /** Attachment names chosen for a pending request that have no uploaded path (lost on reload). */
-export function missingAttachmentNames(p: Pick<PendingRequest, "id" | "paths" | "fileNames">) {
-  const uploaded = p.paths.map((path) => path.slice(p.id.length + 1).replace(/^[0-9a-f-]{36}-/i, ""));
+export function missingAttachmentNames(p: Pick<PendingRequest, "id" | "paths" | "fileNames" | "uploadedNames">) {
+  const uploaded = p.paths.map((path) => p.uploadedNames?.[path] ?? path.slice(p.id.length + 1).replace(/^[0-9a-f-]{36}-/i, ""));
   const left = [...uploaded];
   return p.fileNames.filter((name) => {
-    const i = left.indexOf(name.replace(/[^a-zA-Z0-9._-]/g, "_"));
+    const i = left.findIndex((stored) => stored === name || stored === name.replace(/[^a-zA-Z0-9._-]/g, "_"));
     if (i >= 0) { left.splice(i, 1); return false; }
     return true;
   });

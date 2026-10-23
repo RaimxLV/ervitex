@@ -1,0 +1,57 @@
+import { z } from "zod";
+import { ARTWORK_LIMITS, validateArtwork } from "./artworkPolicy";
+import { scanArtwork } from "./artworkScanner.server";
+
+export const uploadHeaders = z.object({ requestId: z.string().uuid(), key: z.string().uuid(), fileId: z.string().uuid(), name: z.string().min(1).max(180), mime: z.string().max(120) });
+export async function boundedArtworkBody(request: Request) {
+  const reader = request.body?.getReader();
+  if (!reader) throw new Error("Trūkst faila.");
+  const chunks: Uint8Array[] = []; let size = 0;
+  try {
+    while (true) {
+      const { value, done } = await reader.read(); if (done) break;
+      size += value.length;
+      if (size > ARTWORK_LIMITS.fileBytes) throw new Error("Fails pārsniedz 15 MB.");
+      chunks.push(value);
+    }
+  } finally { await reader.cancel(); }
+  const bytes = new Uint8Array(size); let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
+  return bytes;
+}
+export async function handleArtworkUpload(request: Request): Promise<Response> {
+  const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
+  try {
+    const origin = request.headers.get("Origin");
+    if (!origin || origin !== new URL(request.url).origin) return json({ error: "Not allowed" }, 403);
+    const meta = uploadHeaders.parse({ requestId: request.headers.get("X-Request-Id"), key: request.headers.get("X-Submission-Key"), fileId: request.headers.get("X-File-Id"), name: decodeURIComponent(request.headers.get("X-File-Name") || ""), mime: request.headers.get("X-File-Type") || "" });
+    const { supabaseAdmin: sb } = await import("@/integrations/supabase/client.server");
+    const { data: q, error } = await sb.from("quote_requests").select("submission_key").eq("id", meta.requestId).maybeSingle();
+    if (error || !q || q.submission_key !== meta.key) return json({ error: "Not allowed" }, 403);
+    const bytes = await boundedArtworkBody(request);
+    const valid = validateArtwork(meta.name, meta.mime, bytes);
+    const sha256 = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new Uint8Array(bytes).buffer))).map((n) => n.toString(16).padStart(2,"0")).join("");
+    const db = sb;
+    const path = `${meta.requestId}/${meta.fileId}-artwork.${valid.ext}`;
+    const { data: reserved, error: reserveError } = await db.rpc("reserve_quote_artwork", { _request: meta.requestId, _key: meta.key, _file: meta.fileId, _path: path, _name: meta.name, _size: bytes.length, _digest: sha256, _mime: valid.mime });
+    if (reserveError || !reserved) return json({ error: "Failu limits vai atkārtojuma identitāte nav derīga." }, 409);
+    if (reserved === "existing") {
+      const { data: existing } = await db.from("quote_artwork").select("status").eq("id", meta.fileId).eq("quote_id", meta.requestId).maybeSingle();
+      return json({ path, status: existing?.status || "pending", message: "Fails jau saglabāts; pieejams tikai pēc drošības pārbaudes." });
+    }
+    const { error: uploadError } = await sb.storage.from("quote-quarantine").upload(path, bytes, { contentType: "application/octet-stream", upsert: false });
+    if (uploadError) {
+      // An interrupted response may leave the exact object already stored. Verify it before retrying status.
+      const { data: saved } = await sb.storage.from("quote-quarantine").download(path);
+      if (!saved || saved.size !== bytes.length) return json({ error: "Failu neizdevās saglabāt. Mēģini vēlreiz ar to pašu pieprasījumu." }, 503);
+      const storedDigest = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", await saved.arrayBuffer()))).map((n) => n.toString(16).padStart(2,"0")).join("");
+      if (storedDigest !== sha256) return json({ error: "Faila atkārtojuma identitāte neatbilst." }, 409);
+    }
+    const state = await scanArtwork(bytes, sha256);
+    const { error: stateError } = await db.from("quote_artwork").update({ status: state, stored: true }).eq("id", meta.fileId).eq("quote_id", meta.requestId);
+    if (stateError) return json({ error: "Fails saglabāts karantīnā; pārbaudes statuss nav pieejams." }, 503);
+    return json({ path, status: state, message: state === "pending" ? "Fails gaida drošības pārbaudi; darbinieki to vēl nevar atvērt." : state === "infected" ? "Fails bloķēts drošības pārbaudē." : "Fails pārbaudīts." });
+  } catch (error) {
+    return json({ error: error instanceof Error && !error.message.includes("Supabase") ? error.message : "Failu nevar pieņemt." }, 400);
+  }
+}

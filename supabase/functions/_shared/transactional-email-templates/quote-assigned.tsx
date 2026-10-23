@@ -23,6 +23,8 @@ interface Props {
   company?: string
   message?: string
   files?: string[]
+  fileCount?: number
+  filesReviewUrl?: string
   print_method?: string
   print_placement?: string
   print_colors?: string
@@ -57,7 +59,8 @@ const QuoteAssignedEmail = ({
   phone = '',
   company = '',
   message = '',
-  files = [],
+  fileCount = 0,
+  filesReviewUrl = '',
   print_method = '',
   print_placement = '',
   print_colors = '',
@@ -117,14 +120,11 @@ const QuoteAssignedEmail = ({
             </>
           ) : null}
 
-          {files.length > 0 ? (
+          {fileCount > 0 ? (
             <>
               <Heading as="h3" style={h3}>Faili</Heading>
-              <ul style={{ paddingLeft: '18px', fontSize: '13px' }}>
-                {files.map((u, i) => (
-                  <li key={i}><Link href={u}>{(u.split('?')[0] || u).split('/').pop() || u}</Link></li>
-                ))}
-              </ul>
+              <Text>Pievienoti {fileCount} faili. Lejupielāde tikai pēc drošības pārbaudes.</Text>
+              {filesReviewUrl === 'https://www.ervitex.lv/admin/quotes' ? <Link href={filesReviewUrl}>ATVĒRT PIEPRASĪJUMUS →</Link> : null}
             </>
           ) : null}
 
