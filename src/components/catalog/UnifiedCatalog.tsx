@@ -30,6 +30,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFilterOrder } from "@/hooks/useFilterOrder";
 import { applyOrder, SECTIONS_ORDER_KEY } from "@/lib/filterOrder";
 import { MANUFACTURERS } from "@/lib/manufacturers";
+import { isEtxMugCategory } from "@/lib/etxCatalog";
 import FilterOrderEditor from "@/components/catalog/FilterOrderEditor";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { ManualProductGridOrder } from "@/components/catalog/ManualProductOrder";
@@ -546,9 +547,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
             const b = normalizeText(it.brand);
             return b && b.toLowerCase() !== "unbranded" ? b : null;
           })();
-          const manufacturer = manufacturerOf(it.source, brand);
-          if (!manufacturer) return null;
           const category = normalizeCategory(it.category, it.name);
+          const baseManufacturer = manufacturerOf(it.source, brand);
+          // Ervitex sublimācijas krūzes ir atsevišķs „Ražotājs” ieraksts, nevis Sporta formas.
+          const manufacturer = baseManufacturer === "etx" && isEtxMugCategory(it.category) ? "etx-mugs" : baseManufacturer;
+          if (!manufacturer) return null;
           // Ervitex apavus netirgo — visa apavu kategorija izņemta no kataloga.
           if (category && /shoe|footwear|sneaker|boot|sandal|apav/i.test(category)) return null;
           // Paslēpts: Regatta darba apģērbs un Craft zeķes.

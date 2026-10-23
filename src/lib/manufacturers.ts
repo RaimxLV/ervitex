@@ -17,4 +17,5 @@ export const MANUFACTURERS: { key: string; label: string }[] = [
   { key: "bb", label: "Beechfield Brands" },
   { key: "mf", label: "Malfini" },
   { key: "etx", label: "Sporta formas (Sublimācija)" },
+  { key: "etx-mugs", label: "Krūzes (sublimācija)" },
 ];
