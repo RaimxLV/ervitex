@@ -14,7 +14,7 @@ import { catalogColorParam, catalogColorPrice, lowestPriceColorIndex } from "@/l
 import { loadNwgCatalogIdentities } from "@/lib/nwgIdentity";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
-import { catalogCategories } from "@/lib/etxCatalog";
+import { catalogCategories, isEtxMugCategory } from "@/lib/etxCatalog";
 import { HEADWEAR_TYPES, headwearType, isHeadwearCategory, matchesHeadwearType, type HeadwearType } from "@/lib/headwearTypes";
 import { normalizeCatalogSort, prepareQuery, rankedSearchResults, searchMatches } from "@/lib/catalogSearch";
 import { compareCatalogCodes, compareCatalogNames } from "@/lib/catalogCollation";
@@ -546,9 +546,11 @@ const UnifiedCatalog = ({ lockedSource, title, subtitle, selectionMode }: Props)
             const b = normalizeText(it.brand);
             return b && b.toLowerCase() !== "unbranded" ? b : null;
           })();
-          const manufacturer = manufacturerOf(it.source, brand);
-          if (!manufacturer) return null;
           const category = normalizeCategory(it.category, it.name);
+          const baseManufacturer = manufacturerOf(it.source, brand);
+          // Ervitex sublimācijas krūzes ir atsevišķs „Ražotājs” ieraksts, nevis Sporta formas.
+          const manufacturer = baseManufacturer === "etx" && isEtxMugCategory(it.category) ? "etx-mugs" : baseManufacturer;
+          if (!manufacturer) return null;
           // Ervitex apavus netirgo — visa apavu kategorija izņemta no kataloga.
           if (category && /shoe|footwear|sneaker|boot|sandal|apav/i.test(category)) return null;
           // Paslēpts: Regatta darba apģērbs un Craft zeķes.

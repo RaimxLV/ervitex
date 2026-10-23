@@ -63,12 +63,12 @@ describe("ETX admin LV categories reuse public facets", () => {
   });
   it("supplier rows are untouched", () => expect(cc2({ source: "mf", category: "Krūzes", name: "x" })).toEqual(["Krūzes"]));
 });
-it("admin sublimation mug category also belongs to the sublimation section filter", () => {
-  expect(cc2({ source: "etx", category: "Krūzes (sublimācija)", name: "Balta krūze" })).toContain("Sporta formas sublimācija");
+it("sublimation mugs are not in the sportswear category", () => {
+  expect(cc2({ source: "etx", category: "Krūzes (sublimācija)", name: "Balta krūze" })).toEqual(["Mugs"]);
 });
 describe("ETX ordinary categories return only canonical facet", () => {
   it("Krūzes => Mugs", () => expect(cc2({ source: "etx", category: "Krūzes", name: "X" })).toEqual(["Mugs"]));
   it("T-krekli => T-shirts", () => expect(cc2({ source: "etx", category: "T-krekli", name: "X" })).toEqual(["T-shirts"]));
-  it("sublimation mug keeps parent", () => expect(cc2({ source: "etx", category: "Krūzes (sublimācija)", name: "Balta krūze" }).sort()).toEqual(["Mugs", "Sporta formas sublimācija"]));
+  it("mug category detected", async () => { const m = await import("./etxCatalog"); expect(m.isEtxMugCategory("Krūzes (sublimācija)")).toBe(true); expect(m.isEtxMugCategory("Sporta formas sublimācija")).toBe(false); });
   it("non-ETX unchanged", () => expect(cc2({ source: "nwg", category: "T-krekli", name: "X" })).toEqual(["T-krekli"]));
 });

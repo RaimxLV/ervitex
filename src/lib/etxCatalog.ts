@@ -8,7 +8,6 @@ export function catalogCategories(row: { source: string; category: string | null
   const facet = row.source === "etx" ? etxAdminCategoryFacet(row.category) : null;
   const categories = facet ? [facet] : row.category ? [row.category] : [];
   if (row.source === "etx" && isEtxSublimationCategory(row.category)) {
-    categories.push(ETX_CATEGORY);
     const text = `${row.category || ""} ${row.name || ""}`;
     if (/\b(?:dvielis|dvieļi|towels?)\b/i.test(text)) categories.push("Towels");
     if (/\bkr[uū]z(?:e|es)\b|\bmugs?\b/i.test(text)) categories.push("Mugs");
@@ -34,6 +33,10 @@ export const publicCatalogBrand = (brand: string | null | undefined, source?: st
 /** Admin-created ETX sublimation categories (e.g. "Krūzes (sublimācija)") belong to the sublimation section too. */
 export const isEtxSublimationCategory = (category?: string | null): boolean =>
   !!category && (category === ETX_CATEGORY || /sublim/i.test(category));
+
+/** Admin ETX mug categories ("Krūzes (sublimācija)") form their own manufacturer entry, separate from sportswear. */
+export const isEtxMugCategory = (category?: string | null): boolean =>
+  !!category && /\bkr[uū]z|\bmugs?\b/i.test(category);
 
 /** The admin form shows the public brand; storage keeps the internal ETX key the catalogue view requires. */
 export const storedProductBrand = (brand: string): string =>
