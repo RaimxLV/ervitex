@@ -14,7 +14,7 @@ import { catalogColorParam, catalogColorPrice, lowestPriceColorIndex } from "@/l
 import { loadNwgCatalogIdentities } from "@/lib/nwgIdentity";
 import { readCatalogCache, writeCatalogCache } from "@/lib/catalogCache";
 import { categoryFromName, isCoarseCategory } from "@/lib/catalogCategory";
-import { catalogCategories } from "@/lib/etxCatalog";
+import { catalogCategories, isEtxMugCategory } from "@/lib/etxCatalog";
 import { HEADWEAR_TYPES, headwearType, isHeadwearCategory, matchesHeadwearType, type HeadwearType } from "@/lib/headwearTypes";
 import { normalizeCatalogSort, prepareQuery, rankedSearchResults, searchMatches } from "@/lib/catalogSearch";
 import { compareCatalogCodes, compareCatalogNames } from "@/lib/catalogCollation";
@@ -30,7 +30,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFilterOrder } from "@/hooks/useFilterOrder";
 import { applyOrder, SECTIONS_ORDER_KEY } from "@/lib/filterOrder";
 import { MANUFACTURERS } from "@/lib/manufacturers";
-import { isEtxMugCategory } from "@/lib/etxCatalog";
 import FilterOrderEditor from "@/components/catalog/FilterOrderEditor";
 import CatalogModelCard from "@/components/catalog/CatalogModelCard";
 import { ManualProductGridOrder } from "@/components/catalog/ManualProductOrder";
