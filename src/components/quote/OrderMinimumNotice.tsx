@@ -49,7 +49,7 @@ export function OrderMinimumNotice(props: { source: string; productId?: string; 
       {error && <p role="alert" className="text-sm">{error}</p>}
       <div className="flex flex-wrap gap-2">
         <Button type="submit" size="sm" disabled={busy}>{t('Saglabāt', 'Save')}</Button>
-        <Button type="button" variant="outline" size="sm" disabled={busy} onClick={() => setEditing(false)}>{t('Atcelt', 'Cancel')}</Button>
+        <Button type="button" variant="outline" size="sm" className="text-foreground" disabled={busy} onClick={() => setEditing(false)}>{t('Atcelt', 'Cancel')}</Button>
         {quantities.data && <Button type="button" variant="ghost" size="sm" disabled={busy} onClick={() => void persist(true)}>{t('Atjaunot noklusējumu', 'Restore default')}</Button>}
       </div>
     </form> : <>
