@@ -1615,7 +1615,7 @@ const CatalogItemDialog = ({
                 {copied ? label.copied : label.copy}
               </Button>
             </div>
-            {!loading && (detail || name || category) && <OrderMinimumNotice source={source} category={category || detail?.category} name={name || detail?.title} />}
+            {!loading && (detail || name || category) && <OrderMinimumNotice key={`${source}:${id}`} source={source} productId={id} category={category || detail?.category} name={name || detail?.title} />}
             {!loading && <MugPricePanel source={source} id={id} retail={priceInfo?.price ?? null} draft={!!(detail && "draft" in detail && detail.draft)} />}
           </div>
 

@@ -194,7 +194,7 @@ const AddToQuoteBlock = ({
         )}
       </div>
 
-      {showMinimumNotice && <OrderMinimumNotice source={source} category={category} name={classificationName || name} className={minimumNoticeClassName} />}
+      {showMinimumNotice && <OrderMinimumNotice key={`${source}:${productId}`} source={source} productId={productId} category={category} name={classificationName || name} className={minimumNoticeClassName} />}
       <SizeQuantityTable rows={(sizes.length ? sizes : ["-"]).map((size) => ({ size, price: priceOf(size) }))} quantities={qtyBySize} onChange={setSize} formatSize={(s) => supplierSizeLabel(source, code || productId, s, lang)} note={supplierSizeNote(source, code || productId, lang)} />
 
       {/* Summary of other colors already in cart for this product */}

@@ -4,6 +4,7 @@ import AddToQuoteBlock from "./AddToQuoteBlock";
 
 const state = vi.hoisted(() => ({ isAdmin: false }));
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => state }));
+vi.mock("@/hooks/useProductOrderMinimum", () => ({ useProductOrderMinimum: () => ({ data: null, save: vi.fn() }) }));
 vi.mock("@/hooks/useQuoteCart", () => ({ useQuoteCart: () => ({ items: [], add: vi.fn(), updateQty: vi.fn(), remove: vi.fn() }) }));
 vi.mock("@/i18n/LanguageContext", () => ({ useLanguage: () => ({ lang: "lv" }) }));
 vi.mock("./CreateOfferButton", () => ({ useCreateOffer: () => ({ create: vi.fn(), busy: false }) }));
