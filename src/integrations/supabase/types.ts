@@ -1687,6 +1687,30 @@ export type Database = {
           },
         ]
       }
+      product_order_minimums: {
+        Row: {
+          minimum: number
+          printed_minimum: number | null
+          product_id: string
+          recommended_minimum: number | null
+          source: string
+        }
+        Insert: {
+          minimum: number
+          printed_minimum?: number | null
+          product_id: string
+          recommended_minimum?: number | null
+          source: string
+        }
+        Update: {
+          minimum?: number
+          printed_minimum?: number | null
+          product_id?: string
+          recommended_minimum?: number | null
+          source?: string
+        }
+        Relationships: []
+      }
       product_sizes: {
         Row: {
           created_at: string

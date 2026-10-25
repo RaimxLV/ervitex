@@ -197,6 +197,13 @@
       "when": 1792756752397,
       "tag": "0027_quote_artwork_private_quarantine",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1792933320488,
+      "tag": "0028_product_order_minimum_overrides",
+      "breakpoints": true
     }
   ]
 }
