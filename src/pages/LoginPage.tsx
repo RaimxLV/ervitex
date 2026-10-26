@@ -26,7 +26,10 @@ const LoginPage = () => {
     if (error) {
       toast({ title: "Ielogošanās neizdevās", description: error.message, variant: "destructive" });
     } else {
-      navigate(ADMIN_HOME);
+      // Only same-origin manager request paths are honoured as a return target.
+      const back = new URLSearchParams(window.location.search).get("redirect") || "";
+      if (/^\/pieprasijums\/[0-9a-f-]{36}$/i.test(back)) window.location.assign(back);
+      else navigate(ADMIN_HOME);
     }
   };
 
