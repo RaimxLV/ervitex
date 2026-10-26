@@ -3,7 +3,6 @@ import { privateHead } from "@/lib/seo";
 import ManagerRequestPage from "@/pages/ManagerRequestPage";
 
 export const Route = createFileRoute("/pieprasijums/$id")({
-  ssr: false,
   head: () => ({
     meta: [
       ...privateHead("Pieprasījums — darbiniekiem | Ervitex").meta,
