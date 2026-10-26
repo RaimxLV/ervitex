@@ -94,7 +94,7 @@ export default function ManagerRequestPage() {
         <div className="min-w-0 flex-1 text-sm"><p className="font-medium">{i.name || "—"}</p><p className="text-xs text-muted-foreground">{[i.brand, i.code].filter(Boolean).join(" · ")}</p><p className="text-xs">{[i.colorName || i.colorCode, i.size].filter(Boolean).join(" · ")}</p></div>
         <div className="text-right text-sm tabular-nums"><p className="font-semibold">{i.qty} gab.</p>{Number(i.unitPrice) > 0 && <p className="text-xs text-muted-foreground">{eur(Number(i.unitPrice))}/gab.</p>}</div>
       </li>)}</ul>
-      {total > 0 && <p className="mt-2 text-right text-sm text-muted-foreground">Kataloga cenas kopā (ar PVN): <b className="text-foreground">{eur(total)}</b></p>}
+      {total > 0 && <p className="mt-2 text-right text-sm text-muted-foreground">Kataloga cenas kopā: <b className="text-foreground">{eur(total)}</b></p>}
     </section>}
 
     {q.message && <section className="mb-5"><h2 className="mb-2 text-sm font-bold uppercase tracking-wider">Ziņa</h2><p className="whitespace-pre-wrap break-words rounded-sm border border-border bg-card p-3 text-sm">{q.message}</p></section>}

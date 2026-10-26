@@ -39,6 +39,7 @@ import { Route as NodotTokenRouteImport } from './routes/nodot.$token'
 import { Route as OffersIndexRouteImport } from './routes/offers.index'
 import { Route as OffersIdRouteImport } from './routes/offers.$id'
 import { Route as PiedavajumsTokenRouteImport } from './routes/piedavajums.$token'
+import { Route as PieprasijumsIdRouteImport } from './routes/pieprasijums.$id'
 import { Route as SarakstsTokenRouteImport } from './routes/saraksts.$token'
 import { Route as TehnologijasSlugRouteImport } from './routes/tehnologijas.$slug'
 import { Route as AdminOffersIndexRouteImport } from './routes/admin.offers.index'
@@ -199,6 +200,11 @@ const PiedavajumsTokenRoute = PiedavajumsTokenRouteImport.update({
   path: '/piedavajums/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PieprasijumsIdRoute = PieprasijumsIdRouteImport.update({
+  id: '/pieprasijums/$id',
+  path: '/pieprasijums/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SarakstsTokenRoute = SarakstsTokenRouteImport.update({
   id: '/saraksts/$token',
   path: '/saraksts/$token',
@@ -274,6 +280,7 @@ export interface FileRoutesByFullPath {
   '/nodot/$token': typeof NodotTokenRoute
   '/offers/$id': typeof OffersIdRoute
   '/piedavajums/$token': typeof PiedavajumsTokenRoute
+  '/pieprasijums/$id': typeof PieprasijumsIdRoute
   '/saraksts/$token': typeof SarakstsTokenRoute
   '/tehnologijas/$slug': typeof TehnologijasSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -315,6 +322,7 @@ export interface FileRoutesByTo {
   '/nodot/$token': typeof NodotTokenRoute
   '/offers/$id': typeof OffersIdRoute
   '/piedavajums/$token': typeof PiedavajumsTokenRoute
+  '/pieprasijums/$id': typeof PieprasijumsIdRoute
   '/saraksts/$token': typeof SarakstsTokenRoute
   '/tehnologijas/$slug': typeof TehnologijasSlugRoute
   '/admin': typeof AdminIndexRoute
@@ -357,6 +365,7 @@ export interface FileRoutesById {
   '/nodot/$token': typeof NodotTokenRoute
   '/offers/$id': typeof OffersIdRoute
   '/piedavajums/$token': typeof PiedavajumsTokenRoute
+  '/pieprasijums/$id': typeof PieprasijumsIdRoute
   '/saraksts/$token': typeof SarakstsTokenRoute
   '/tehnologijas/$slug': typeof TehnologijasSlugRoute
   '/admin/': typeof AdminIndexRoute
@@ -400,6 +409,7 @@ export interface FileRouteTypes {
     | '/nodot/$token'
     | '/offers/$id'
     | '/piedavajums/$token'
+    | '/pieprasijums/$id'
     | '/saraksts/$token'
     | '/tehnologijas/$slug'
     | '/admin/'
@@ -441,6 +451,7 @@ export interface FileRouteTypes {
     | '/nodot/$token'
     | '/offers/$id'
     | '/piedavajums/$token'
+    | '/pieprasijums/$id'
     | '/saraksts/$token'
     | '/tehnologijas/$slug'
     | '/admin'
@@ -482,6 +493,7 @@ export interface FileRouteTypes {
     | '/nodot/$token'
     | '/offers/$id'
     | '/piedavajums/$token'
+    | '/pieprasijums/$id'
     | '/saraksts/$token'
     | '/tehnologijas/$slug'
     | '/admin/'
@@ -524,6 +536,7 @@ export interface RootRouteChildren {
   NodotTokenRoute: typeof NodotTokenRoute
   OffersIdRoute: typeof OffersIdRoute
   PiedavajumsTokenRoute: typeof PiedavajumsTokenRoute
+  PieprasijumsIdRoute: typeof PieprasijumsIdRoute
   SarakstsTokenRoute: typeof SarakstsTokenRoute
   TehnologijasSlugRoute: typeof TehnologijasSlugRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -750,6 +763,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PiedavajumsTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pieprasijums/$id': {
+      id: '/pieprasijums/$id'
+      path: '/pieprasijums/$id'
+      fullPath: '/pieprasijums/$id'
+      preLoaderRoute: typeof PieprasijumsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/saraksts/$token': {
       id: '/saraksts/$token'
       path: '/saraksts/$token'
@@ -844,6 +864,7 @@ const rootRouteChildren: RootRouteChildren = {
   NodotTokenRoute: NodotTokenRoute,
   OffersIdRoute: OffersIdRoute,
   PiedavajumsTokenRoute: PiedavajumsTokenRoute,
+  PieprasijumsIdRoute: PieprasijumsIdRoute,
   SarakstsTokenRoute: SarakstsTokenRoute,
   TehnologijasSlugRoute: TehnologijasSlugRoute,
   AdminIndexRoute: AdminIndexRoute,
