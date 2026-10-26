@@ -5,7 +5,7 @@ import { ARTWORK_LIMITS, validateArtwork } from "./artworkPolicy";
  * bytes match an allowed artwork format and bounded structural checks find no
  * active content. Result "validated" must never be presented as "scanned/clean".
  */
-export const ARTWORK_POLICY_VERSION = "policy-v1";
+export const ARTWORK_POLICY_VERSION = "policy-v2";
 export type Inspection = { ok: true; ext: string; mime: string; note: string } | { ok: false; reason: string };
 
 const MAX_INFLATE = 60 * 1024 * 1024; // total decompressed bytes inspected per file
@@ -119,27 +119,10 @@ export async function inspectZip(b: Uint8Array): Promise<string | null> {
   return null;
 }
 
-export async function inspectArtwork(name: string, mime: string, bytes: Uint8Array, nested = false): Promise<Inspection> {
-  let meta: { ext: string; mime: string };
-  try { meta = validateArtwork(name, mime, bytes); } catch (e) { return { ok: false, reason: e instanceof Error ? e.message : "Fails nav atļauts." }; }
-  if (nested && meta.ext === "zip") return { ok: false, reason: "Arhīvs arhīvā netiek pieņemts." };
-  let reason: string | null = null; const ps = bytes[0] === 0x25 && bytes[1] === 0x21;
-  switch (meta.ext) {
-    case "pdf": reason = await inspectPdf(bytes); break;
-    case "ai": reason = ps ? inspectPostScript(bytes) : await inspectPdf(bytes); break;
-    case "eps": {
-      // DOS EPS binary header: PS section offset/length at bytes 4..11.
-      if (bytes[0] === 0xc5) { const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength); const o = v.getUint32(4, true), l = v.getUint32(8, true); if (o + l > bytes.length) { reason = "EPS fails ir bojāts."; break; } reason = inspectPostScript(bytes.subarray(o, o + l)); }
-      else reason = inspectPostScript(bytes);
-      break;
-    }
-    case "svg": reason = inspectSvg(bytes); break;
-    case "png": reason = inspectPng(bytes); break;
-    case "jpg": case "jpeg": reason = inspectJpeg(bytes); break;
-    case "zip": reason = await inspectZip(bytes); break;
-    default: reason = null; // gif/webp/tiff/psd: passive raster formats, signature-validated only
-  }
-  return reason ? { ok: false, reason } : { ok: true, ...meta, note: meta.ext === "zip" ? "Arhīva saturs pārbaudīts pēc formāta" : "Formāts un saturs pārbaudīts automātiski" };
+/** Owner policy: block executables/scripts and disguised files; accept all other allowed print artwork immediately. */
+export async function inspectArtwork(name: string, mime: string, bytes: Uint8Array, _nested = false): Promise<Inspection> {
+  try { const meta = validateArtwork(name, mime, bytes); return { ok: true, ...meta, note: "Pieņemts (izpildāmo failu pārbaude)" }; }
+  catch (e) { return { ok: false, reason: e instanceof Error ? e.message : "Fails nav atļauts." }; }
 }
 
 export const ARTWORK_DOWNLOADABLE = new Set(["clean", "validated"]);
