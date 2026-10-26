@@ -1,5 +1,4 @@
 import { ARTWORK_POLICY_VERSION, inspectArtwork } from "./artworkInspect";
-import { scanArtwork, scannerConfigured } from "./artworkScanner.server";
 
 type Sb = any;
 export type ArtworkRow = { id: string; quote_id: string; path: string; bucket: string; original_name: string; byte_size: number; sha256: string; mime: string; status: string; stored: boolean; checked_sha256: string | null; policy_version: string | null; check_note: string | null; legacy: boolean };
@@ -7,16 +6,10 @@ export const ARTWORK_COLUMNS = "id,quote_id,path,bucket,original_name,byte_size,
 
 export const sha256Hex = async (bytes: Uint8Array) => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new Uint8Array(bytes).buffer))).map((n) => n.toString(16).padStart(2, "0")).join("");
 
-/** Decide an outcome for exact bytes. Scanner infected always blocks; scanner outage is "error", never clean. */
-export async function assessBytes(name: string, mime: string, bytes: Uint8Array, sha256: string) {
+/** Owner policy: no antivirus step. Executables/disguised files are rejected; everything else is accepted (not "clean"). */
+export async function assessBytes(name: string, mime: string, bytes: Uint8Array, _sha256: string) {
   const inspected = await inspectArtwork(name, mime, bytes);
   if (!inspected.ok) return { status: "rejected", note: inspected.reason, mime: null as string | null };
-  if (scannerConfigured()) {
-    const verdict = await scanArtwork(bytes, sha256);
-    if (verdict === "infected") return { status: "infected", note: "Pretvīrusu pārbaude atrada draudu.", mime: inspected.mime };
-    if (verdict === "clean") return { status: "clean", note: "Pretvīrusu pārbaude: tīrs", mime: inspected.mime };
-    return { status: "error", note: "Pretvīrusu pārbaude īslaicīgi nav pieejama. Mēģiniet vēlreiz.", mime: inspected.mime };
-  }
   return { status: "validated", note: inspected.note, mime: inspected.mime };
 }
 
