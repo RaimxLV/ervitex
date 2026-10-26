@@ -118,6 +118,7 @@ const AdminQuotes = () => {
   const [period, setPeriod] = useState("all");
   const [deleteTarget, setDeleteTarget] = useState<QuoteRow | null>(null);
   const [loadError, setLoadError] = useState(false);
+  const [fileNames, setFileNames] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   const fetchQuotes = async () => {
@@ -127,6 +128,9 @@ const AdminQuotes = () => {
       supabase.from("quote_requests").select("*").order("created_at", { ascending: false }).limit(500),
       supabase.from("quote_events").select("*").order("created_at", { ascending: false }).limit(2000),
     ]);
+    // Klientu oriģinālie failu nosaukumi (glabātuvē faili ir ar drošiem ģenerētiem nosaukumiem).
+    const art = await supabase.from("quote_artwork" as any).select("path,original_name").limit(5000);
+    if (!art.error) setFileNames(Object.fromEntries(((art.data as unknown as { path: string; original_name: string }[]) || []).map((r) => [r.path, r.original_name])));
     if (error) { setLoadError(true); toast({ title: "Neizdevās ielādēt pieprasījumus", variant: "destructive" }); }
     else setQuotes((data as unknown as QuoteRow[]) || []);
     if (!eventResult.error) setEvents((eventResult.data as QuoteEvent[]) || []);
@@ -348,7 +352,7 @@ const AdminQuotes = () => {
                       {row.file_urls.map((u, i) => (
                         <Button key={i} variant="outline" size="sm" className="h-auto min-h-9 max-w-full justify-start whitespace-normal break-all bg-background py-2 text-left text-xs" onClick={() => openAttachment(u)}>
                           <Paperclip className="mr-1.5 h-3.5 w-3.5" />
-                          {attachmentName(u)}
+                          {fileNames[u] || fileNames[u.includes("/quote-attachments/") ? u.split("/quote-attachments/")[1].split("?")[0] : u] || attachmentName(u)}
                         </Button>
                       ))}
                     </div>}
