@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ARTWORK_LIMITS, validateArtwork } from "./artworkPolicy";
-import { scanArtwork } from "./artworkScanner.server";
+import { assessBytes } from "./artworkReview.server";
+import { ARTWORK_POLICY_VERSION } from "./artworkInspect";
 
 export const uploadHeaders = z.object({ requestId: z.string().uuid(), key: z.string().uuid(), fileId: z.string().uuid(), name: z.string().min(1).max(180), mime: z.string().max(120) });
 export async function boundedArtworkBody(request: Request) {
@@ -47,10 +48,11 @@ export async function handleArtworkUpload(request: Request): Promise<Response> {
       const storedDigest = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", await saved.arrayBuffer()))).map((n) => n.toString(16).padStart(2,"0")).join("");
       if (storedDigest !== sha256) return json({ error: "Faila atkārtojuma identitāte neatbilst." }, 409);
     }
-    const state = await scanArtwork(bytes, sha256);
-    const { error: stateError } = await db.from("quote_artwork").update({ status: state, stored: true }).eq("id", meta.fileId).eq("quote_id", meta.requestId);
-    if (stateError) return json({ error: "Fails saglabāts karantīnā; pārbaudes statuss nav pieejams." }, 503);
-    return json({ path, status: state, message: state === "pending" ? "Fails gaida drošības pārbaudi; darbinieki to vēl nevar atvērt." : state === "infected" ? "Fails bloķēts drošības pārbaudē." : "Fails pārbaudīts." });
+    const result = await assessBytes(meta.name, meta.mime, bytes, sha256);
+    const { error: stateError } = await db.from("quote_artwork").update({ status: result.status, stored: true, check_note: result.note, checked_sha256: sha256, policy_version: ARTWORK_POLICY_VERSION, checked_at: new Date().toISOString() }).eq("id", meta.fileId).eq("quote_id", meta.requestId);
+    if (stateError) return json({ error: "Fails saglabāts, bet pārbaudes statusu neizdevās ierakstīt. Mēģini vēlreiz." }, 503);
+    if (result.status === "rejected" || result.status === "infected") return json({ error: `${meta.name}: ${result.note}` }, 422);
+    return json({ path, status: result.status, message: result.note });
   } catch (error) {
     return json({ error: error instanceof Error && !error.message.includes("Supabase") ? error.message : "Failu nevar pieņemt." }, 400);
   }
