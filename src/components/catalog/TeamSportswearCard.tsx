@@ -8,7 +8,7 @@ import { sportswearGross, teamSportswearPrices } from "@/lib/teamSportswear";
 export default function TeamSportswearCard({ lang }: { lang: "lv" | "en" }) {
   const lv = lang === "lv";
   const title = lv ? "Komandu sporta formas" : "Team sportswear";
-  const photoUrl = photo.url.startsWith("/") ? `https://ervitex.lovable.app${photo.url}` : photo.url;
+  const photoUrl = photo.url.startsWith("/") ? `https://www.ervitex.lv${photo.url}` : photo.url;
   const format = (price: number) => new Intl.NumberFormat(lv ? "lv-LV" : "en-IE", { style: "currency", currency: "EUR" }).format(price);
   return (
     <Dialog>

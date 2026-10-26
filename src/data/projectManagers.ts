@@ -19,7 +19,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Iepirkumu un pārdošanas daļas vadītāja", en: "Head of Purchasing and Sales" },
     email: "laura@ervitex.lv",
     phone: "+371 26164635",
-    photo: `https://ervitex.lovable.app${lauraPhoto.url}`,
+    photo: `https://www.ervitex.lv${lauraPhoto.url}`,
   },
   {
     slug: "ilona",
@@ -27,7 +27,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Projektu vadītāja", en: "Project Manager" },
     email: "ilona@ervitex.lv",
     phone: "+371 29494626",
-    photo: `https://ervitex.lovable.app${ilonaPhoto.url}`,
+    photo: `https://www.ervitex.lv${ilonaPhoto.url}`,
   },
   {
     slug: "santa",
@@ -35,7 +35,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Projektu vadītāja", en: "Project Manager" },
     email: "santa.k@ervitex.lv",
     phone: "+371 67436899",
-    photo: `https://ervitex.lovable.app${santaPhoto.url}`,
+    photo: `https://www.ervitex.lv${santaPhoto.url}`,
   },
   {
     slug: "justine",
@@ -43,7 +43,7 @@ export const PROJECT_MANAGERS: ProjectManager[] = [
     title: { lv: "Projektu vadītāja", en: "Project Manager" },
     email: "justine@ervitex.lv",
     phone: "+371 29725412",
-    photo: `https://ervitex.lovable.app${justinePhoto.url}`,
+    photo: `https://www.ervitex.lv${justinePhoto.url}`,
   },
 ];
 
