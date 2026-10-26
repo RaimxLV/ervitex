@@ -166,8 +166,8 @@ const AdminQuotes = () => {
     try {
       const data = await getArtwork({ data: { path: url } });
       window.location.assign(data.url);
-    } catch {
-      toast({ title: "Fails nav pieejams", description: "Fails gaida drošības pārbaudi vai ir bloķēts.", variant: "destructive" });
+    } catch (e) {
+      toast({ title: "Fails nav pieejams", description: e instanceof Error ? e.message : "Mēģiniet vēlreiz.", variant: "destructive" });
     }
   };
 
@@ -382,20 +382,6 @@ const AdminQuotes = () => {
                         {row.print_placement && <span>Vieta: <span className="text-foreground">{row.print_placement}</span></span>}
                         {row.print_colors && <span>Krāsas: <span className="text-foreground">{row.print_colors}</span></span>}
                         {row.deadline && <span>Termiņš: <span className="text-foreground">{row.deadline}</span></span>}
-                      </div>
-                    )}
-
-                    {row.file_urls && row.file_urls.length > 0 && (
-                      <div className="border-t border-border pt-3">
-                        <p className="mb-2 text-[11px] uppercase tracking-wider text-muted-foreground">Pielikumi</p>
-                        <div className="flex flex-wrap gap-2">
-                          {row.file_urls.map((u, i) => (
-                            <Button key={i} variant="outline" size="sm" className="h-auto min-h-9 max-w-full justify-start whitespace-normal break-all py-2 text-left text-xs" onClick={() => openAttachment(u)}>
-                              <Paperclip className="mr-1.5 h-3.5 w-3.5" />
-                              {attachmentName(u)}
-                            </Button>
-                          ))}
-                        </div>
                       </div>
                     )}
 

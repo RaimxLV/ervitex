@@ -10,5 +10,5 @@ export async function uploadArtwork(file: File, requestId: string, key: string, 
   let data: { path?: string; status?: string; error?: string };
   try { data = await response.json(); } catch { throw new Error("Failu pakalpojums neatbildēja. Mēģini vēlreiz vēlāk."); }
   if (!response.ok || !data.path) throw new Error(data.error || "Failu nevar pieņemt.");
-  return { path: data.path, pending: data.status !== "clean" };
+  return { path: data.path, pending: data.status !== "clean" && data.status !== "validated" };
 }

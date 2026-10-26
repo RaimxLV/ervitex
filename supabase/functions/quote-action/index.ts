@@ -2,6 +2,7 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { ASSIGNEES, assigneeBySlug } from '../_shared/assignees.ts'
 import { sendAppEmail } from '../_shared/send-app-email.ts'
+import { issueManagerLink } from '../_shared/manager-link.ts'
 
 const OFFICE_EMAIL = 'birojs@ervitex.lv'
 
@@ -91,6 +92,7 @@ Deno.serve(async (req) => {
 
   // Never release customer-supplied URLs or unchecked documents through email.
   const fileCount = Array.isArray(quote.file_urls) ? quote.file_urls.length : 0
+  const requestUrl = await issueManagerLink(supabase, quote.id)
 
   const mailRes = await sendAppEmail('quote-assigned', person.email, {
       replyTo: quote.email,
@@ -107,7 +109,7 @@ Deno.serve(async (req) => {
         message: quote.message || '',
         files: [],
         fileCount,
-        filesReviewUrl: fileCount ? 'https://www.ervitex.lv/admin/quotes' : '',
+        filesReviewUrl: requestUrl,
         print_method: quote.print_method || '',
         print_placement: quote.print_placement || '',
         print_colors: quote.print_colors || '',

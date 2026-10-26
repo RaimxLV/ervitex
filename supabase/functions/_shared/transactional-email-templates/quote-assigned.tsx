@@ -123,10 +123,10 @@ const QuoteAssignedEmail = ({
           {fileCount > 0 ? (
             <>
               <Heading as="h3" style={h3}>Faili</Heading>
-              <Text>Pievienoti {fileCount} faili. Lejupielāde tikai pēc drošības pārbaudes.</Text>
-              {filesReviewUrl === 'https://www.ervitex.lv/admin/quotes' ? <Link href={filesReviewUrl}>ATVĒRT PIEPRASĪJUMUS →</Link> : null}
+              <Text>Pievienoti {fileCount} faili — lejupielāde pieprasījuma logā.</Text>
             </>
           ) : null}
+          {filesReviewUrl.startsWith('https://www.ervitex.lv/pieprasijums/') ? <Section><Link href={filesReviewUrl} style={worksheetLink}>{fileCount > 0 ? 'ATVĒRT PIEPRASĪJUMU UN FAILUS →' : 'ATVĒRT PIEPRASĪJUMU →'}</Link></Section> : null}
 
           <Hr style={{ borderColor: '#eee', margin: '22px 0 0' }} />
         </Container>

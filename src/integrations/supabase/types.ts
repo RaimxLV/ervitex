@@ -1852,36 +1852,54 @@ export type Database = {
       }
       quote_artwork: {
         Row: {
+          bucket: string
           byte_size: number
+          check_note: string | null
+          checked_at: string | null
+          checked_sha256: string | null
           created_at: string
           id: string
+          legacy: boolean
           mime: string
           original_name: string
           path: string
+          policy_version: string | null
           quote_id: string
           sha256: string
           status: string
           stored: boolean
         }
         Insert: {
+          bucket?: string
           byte_size: number
+          check_note?: string | null
+          checked_at?: string | null
+          checked_sha256?: string | null
           created_at?: string
           id: string
+          legacy?: boolean
           mime: string
           original_name: string
           path: string
+          policy_version?: string | null
           quote_id: string
           sha256: string
           status?: string
           stored?: boolean
         }
         Update: {
+          bucket?: string
           byte_size?: number
+          check_note?: string | null
+          checked_at?: string | null
+          checked_sha256?: string | null
           created_at?: string
           id?: string
+          legacy?: boolean
           mime?: string
           original_name?: string
           path?: string
+          policy_version?: string | null
           quote_id?: string
           sha256?: string
           status?: string
@@ -1981,6 +1999,8 @@ export type Database = {
           file_urls: string[]
           id: string
           items: Json
+          manager_key_expires_at: string | null
+          manager_key_hash: string | null
           message: string | null
           name: string
           phone: string | null
@@ -2023,6 +2043,8 @@ export type Database = {
           file_urls?: string[]
           id?: string
           items?: Json
+          manager_key_expires_at?: string | null
+          manager_key_hash?: string | null
           message?: string | null
           name: string
           phone?: string | null
@@ -2065,6 +2087,8 @@ export type Database = {
           file_urls?: string[]
           id?: string
           items?: Json
+          manager_key_expires_at?: string | null
+          manager_key_hash?: string | null
           message?: string | null
           name?: string
           phone?: string | null
