@@ -19,7 +19,7 @@ it("server reservation limit rejects before storage",async()=>{mock.rpc.mockReso
 it("valid PDF is automatically validated (policy, not antivirus) and stays private",async()=>{const response=await handleArtworkUpload(request(undefined,new TextEncoder().encode("%PDF-1.7\nfixture\n%%EOF\n")));expect(response.status).toBe(200); const data=await response.json();expect(data.status).toBe("validated");expect(data.path).toBe(`${id}/33333333-3333-4333-8333-333333333333-artwork.pdf`);expect(mock.update).toHaveBeenCalledWith(expect.objectContaining({status:"validated",stored:true,checked_sha256:expect.stringMatching(/^[a-f0-9]{64}$/)}));});
 it("bounded stream rejects oversized body independent of content-length",async()=>{await expect(boundedArtworkBody(new Request("http://localhost",{method:"POST",body:new Uint8Array(15728641)}))).rejects.toThrow("15 MB");});
 const pdf=new TextEncoder().encode("%PDF-1.7\nfixture\n%%EOF\n");
-const hex=async(b:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",b))).map(n=>n.toString(16).padStart(2,"0")).join("");
+const hex=async(b:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",new Uint8Array(b)))).map(n=>n.toString(16).padStart(2,"0")).join("");
 const path=`${id}/33333333-3333-4333-8333-333333333333-artwork.pdf`;
 it("retry of a pending stored file resolves to validated, never stays pending",async()=>{
   mock.rpc.mockResolvedValue({data:"existing",error:null});mock.existing={status:"pending",sha256:await hex(pdf),checked_sha256:null,policy_version:null,check_note:null,path};
