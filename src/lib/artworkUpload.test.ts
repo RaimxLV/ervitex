@@ -23,8 +23,8 @@ const hex=async(b:Uint8Array)=>Array.from(new Uint8Array(await crypto.subtle.dig
 const path=`${id}/33333333-3333-4333-8333-333333333333-artwork.pdf`;
 it("retry of a pending stored file resolves to validated, never stays pending",async()=>{
   mock.rpc.mockResolvedValue({data:"existing",error:null});mock.existing={status:"pending",sha256:await hex(pdf),checked_sha256:null,policy_version:null,check_note:null,path};
-  mock.upload.mockResolvedValue({error:new Error("exists")});mock.saved=new Blob([pdf]);
-  const r=await handleArtworkUpload(request(undefined,pdf));const d=await r.json();console.log("ERR",d);
+  mock.upload.mockResolvedValue({error:new Error("exists")});mock.saved={size:pdf.length,arrayBuffer:async()=>pdf.slice().buffer};
+  const r=await handleArtworkUpload(request(undefined,pdf));const d=await r.json();
   expect(r.status).toBe(200);expect(d.status).toBe("validated");expect(JSON.stringify(d)).not.toContain("drošības pārbaudes");
   expect(mock.update).toHaveBeenCalledWith(expect.objectContaining({status:"validated"}));
 });
