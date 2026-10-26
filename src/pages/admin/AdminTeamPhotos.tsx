@@ -23,13 +23,13 @@ type PhotoSettings = {
 };
 
 const people = [
-  { slug: "vilnis", name: "Vilnis Lācis", photo: `https://ervitex.lovable.app${vilnisPhotoAsset.url}` },
-  { slug: "eriks", name: "Ēriks Lācis", photo: `https://ervitex.lovable.app${eriksPhotoAsset.url}` },
-  { slug: "laura", name: "Laura Daukšte", photo: `https://ervitex.lovable.app${lauraPhotoAsset.url}` },
-  { slug: "ilona", name: "Ilona Romanovska", photo: `https://ervitex.lovable.app${ilonaPhotoAsset.url}` },
-  { slug: "santa", name: "Santa Zvaigzne", photo: `https://ervitex.lovable.app${santaPhotoAsset.url}` },
-  { slug: "justine", name: "Justīne Strunka", photo: `https://ervitex.lovable.app${justinePhotoAsset.url}` },
-  { slug: "evita", name: "Evita Ņesterova", photo: `https://ervitex.lovable.app${evitaPhotoAsset.url}` },
+  { slug: "vilnis", name: "Vilnis Lācis", photo: `https://www.ervitex.lv${vilnisPhotoAsset.url}` },
+  { slug: "eriks", name: "Ēriks Lācis", photo: `https://www.ervitex.lv${eriksPhotoAsset.url}` },
+  { slug: "laura", name: "Laura Daukšte", photo: `https://www.ervitex.lv${lauraPhotoAsset.url}` },
+  { slug: "ilona", name: "Ilona Romanovska", photo: `https://www.ervitex.lv${ilonaPhotoAsset.url}` },
+  { slug: "santa", name: "Santa Zvaigzne", photo: `https://www.ervitex.lv${santaPhotoAsset.url}` },
+  { slug: "justine", name: "Justīne Strunka", photo: `https://www.ervitex.lv${justinePhotoAsset.url}` },
+  { slug: "evita", name: "Evita Ņesterova", photo: `https://www.ervitex.lv${evitaPhotoAsset.url}` },
 ];
 
 const defaults = (slug: string): PhotoSettings => ({ slug, zoom: 1, position_x: 50, position_y: 50 });
