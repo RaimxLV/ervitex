@@ -3,6 +3,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { sendAppEmail } from "../_shared/send-app-email.ts";
 import { uuidPattern, canNotifyRequest } from "../_shared/request-safety.ts";
 import { verifiedArtworkPaths } from "../_shared/artwork-access.ts";
+import { issueManagerLink } from "../_shared/manager-link.ts";
 
 const OFFICE_EMAIL = "birojs@ervitex.lv";
 
@@ -92,6 +93,7 @@ Deno.serve(async (req) => {
     // 1) Internal notification to the assigned project manager — with Reply-To
     //    set to the customer so staff can just hit "Reply" in their inbox.
     const notifyEmail = quote.assigned_pm_email;
+    const requestUrl = await issueManagerLink(supabase, quote.id);
     const officeRes = await sendAppEmail("quote-request", notifyEmail, {
         replyTo: quote.email,
         fromEmail: OFFICE_EMAIL,
@@ -103,7 +105,8 @@ Deno.serve(async (req) => {
           files: [],
           fileCount: rawFiles.length,
           filesPending: rawFiles.length > 0,
-          filesReviewUrl: rawFiles.length ? "https://www.ervitex.lv/admin/quotes" : "",
+          // Primary staff link: focused request window with files (request-scoped manager key).
+          filesReviewUrl: requestUrl,
         },
     });
     results.push({ to: notifyEmail, template: "quote-request", ok: officeRes.ok, error: officeRes.ok ? undefined : officeRes.error || officeRes.reason });

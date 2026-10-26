@@ -2,6 +2,7 @@ import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { ASSIGNEES, assigneeBySlug } from '../_shared/assignees.ts'
 import { sendAppEmail } from '../_shared/send-app-email.ts'
+import { issueManagerLink } from '../_shared/manager-link.ts'
 
 const OFFICE_EMAIL = 'birojs@ervitex.lv'
 
