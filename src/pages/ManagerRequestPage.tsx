@@ -79,7 +79,7 @@ export default function ManagerRequestPage() {
           const blocked = f.status === "rejected" || f.status === "infected";
           return <li key={f.id} className="rounded-sm border border-border bg-card p-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="min-w-0"><p className="break-all font-medium">{f.name}</p><p className="flex items-center gap-1 text-xs text-muted-foreground">{blocked ? <ShieldAlert className="h-3.5 w-3.5 text-destructive" /> : <ShieldCheck className="h-3.5 w-3.5" />}{kb(f.size)} · {f.note || (f.status === "validated" ? "Pārbaudīts automātiski" : f.status)}</p></div>
+              <div className="min-w-0"><p className="break-all font-medium">{f.name}</p><p className="flex items-center gap-1 text-xs text-muted-foreground">{blocked ? <ShieldAlert className="h-3.5 w-3.5 text-destructive" /> : <ShieldCheck className="h-3.5 w-3.5" />}{kb(f.size)} · {f.note || (f.status === "validated" ? "Pieņemts" : f.status)}</p></div>
               {f.downloadable ? <Button size="sm" disabled={busy === f.id} onClick={() => get(f.id)}><Download className="mr-2 h-4 w-4" />Lejupielādēt</Button>
                 : !blocked ? <Button size="sm" variant="outline" disabled={busy === f.id} onClick={() => get(f.id, true)}><RefreshCw className="mr-2 h-4 w-4" />Pārbaudīt vēlreiz</Button>
                 : <span className="text-xs font-semibold text-destructive">Bloķēts</span>}

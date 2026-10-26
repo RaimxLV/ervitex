@@ -38,7 +38,6 @@ export function validateArtwork(name: string, mime: string, bytes: Uint8Array) {
     svg: /^\s*(?:<\?xml[^>]*>\s*)?(?:<!--[^]*?-->\s*)?<svg[\s>]/i.test(head),
   };
   if (!matches[meta.ext]) throw new Error("Faila saturs neatbilst formātam.");
-  if (meta.ext === "svg" && /<!DOCTYPE|<!ENTITY|<script\b|\bon\w+\s*=|(?:href\s*=\s*["']\s*(?:https?:|data:|javascript:))|<foreignObject\b/i.test(ascii(0, bytes.length))) throw new Error("Aktīvs SVG saturs nav atļauts.");
   return { ...meta, mime: meta.ext === "ai" && ps ? "application/postscript" : meta.mime };
 }
 export function checkArtworkBatch(sizes: readonly number[]) {
