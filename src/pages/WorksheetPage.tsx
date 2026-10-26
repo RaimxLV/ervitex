@@ -47,6 +47,12 @@ const WorksheetPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const isStaff = isAdmin;
+  // Vecie PM e-pasti ved uz sarakstu; darbiniekam no tā var atvērt konkrētā pieprasījuma logu.
+  const [requestId, setRequestId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isAdmin || !token) return;
+    void supabase.from("quote_requests").select("id").eq("action_token", token).maybeSingle().then(({ data }) => setRequestId((data as { id: string } | null)?.id || null));
+  }, [isAdmin, token]);
   const publicUrl = `https://www.ervitex.lv/saraksts/${token}`;
 
   const copyEmailLink = async () => {
@@ -348,6 +354,11 @@ const WorksheetPage = () => {
               <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground print:hidden">
                 {saveState === "saving" ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                 <span>{saveState === "saving" ? "Saglabā melnrakstu…" : saveState === "error" ? "Neizdevās saglabāt" : "Izmaiņas vēl nav apstiprinātas"}</span>
+              </div>
+            )}
+            {isAdmin && requestId && (
+              <div className="mt-3 print:hidden">
+                <Button size="sm" asChild><a href={`/pieprasijums/${requestId}`}>Atvērt pieprasījumu un failus</a></Button>
               </div>
             )}
             {readOnly && isAdmin && (
