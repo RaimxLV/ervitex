@@ -40,8 +40,13 @@ export async function handleArtworkUpload(request: Request): Promise<Response> {
     const { data: reserved, error: reserveError } = await db.rpc("reserve_quote_artwork", { _request: meta.requestId, _key: meta.key, _file: meta.fileId, _path: path, _name: meta.name, _size: bytes.length, _digest: sha256, _mime: valid.mime });
     if (reserveError || !reserved) return json({ error: "Failu limits vai atkārtojuma identitāte nav derīga." }, 409);
     if (reserved === "existing") {
-      const { data: existing } = await db.from("quote_artwork").select("status").eq("id", meta.fileId).eq("quote_id", meta.requestId).maybeSingle();
-      return json({ path, status: existing?.status || "pending", message: "Fails jau saglabāts; pieejams tikai pēc drošības pārbaudes." });
+      // Idempotent retry: same file id must carry the exact same bytes; final verdicts are preserved.
+      const { data: existing, error: existingError } = await db.from("quote_artwork").select("status,sha256,checked_sha256,policy_version,check_note,path").eq("id", meta.fileId).eq("quote_id", meta.requestId).maybeSingle();
+      if (existingError || !existing) return json({ error: "Failu neizdevās nolasīt. Mēģini vēlreiz." }, 503);
+      if (existing.sha256 !== sha256 || existing.path !== path) return json({ error: "Faila atkārtojuma identitāte neatbilst." }, 409);
+      if (existing.status === "infected" || existing.status === "rejected") return json({ error: `${meta.name}: ${existing.check_note || "Fails nav pieņemts."}` }, 422);
+      if (existing.status === "validated" && existing.checked_sha256 === sha256 && existing.policy_version === ARTWORK_POLICY_VERSION) return json({ path, status: existing.status, message: existing.check_note });
+      // Otherwise (pending/error/old policy) continue through the same store-and-accept path below.
     }
     const { error: uploadError } = await sb.storage.from("quote-quarantine").upload(path, bytes, { contentType: "application/octet-stream", upsert: false });
     if (uploadError) {
