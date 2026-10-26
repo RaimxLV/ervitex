@@ -1,7 +1,9 @@
 import { scanVerdict, type ScanState } from "./artworkPolicy";
 
+export const scannerConfigured = () => !!process.env['ARTWORK_SCANNER_URL'] && !!process.env['ARTWORK_SCANNER_TOKEN'];
+
 /** A configured, private scanner must return a completed verdict bound to these exact bytes.
- * No archive extraction/document execution happens in this application.
+ * "pending" here means no verdict (missing/outage) and is never treated as clean.
  */
 export async function scanArtwork(bytes: Uint8Array, sha256: string): Promise<ScanState> {
   const url = process.env['ARTWORK_SCANNER_URL'];
@@ -27,7 +29,6 @@ export async function scanArtwork(bytes: Uint8Array, sha256: string): Promise<Sc
     } finally { await reader.cancel(); }
     const merged = new Uint8Array(total); let offset = 0;
     for (const chunk of chunks) { merged.set(chunk,offset); offset+=chunk.length; }
-    const text = new TextDecoder().decode(merged);
-    return scanVerdict(JSON.parse(text), sha256);
+    return scanVerdict(JSON.parse(new TextDecoder().decode(merged)), sha256);
   } catch { return "pending"; }
 }
