@@ -1,5 +1,5 @@
 # Architecture rules
-- Customer artwork enters private quarantine through the capability-validated bounded server route; only a complete digest-bound malware verdict permits an admin-only forced download. Legacy attachments are never auto-certified, and enforcement migration must be released with compatible customer/notifier code.
+- Customer artwork is stored privately and released only by artworkReleasable: a configured scanner's digest-bound verdict (infected always blocks, outage is a retryable error) or, without a scanner, the automatic policy state `validated` (format/content checks, not antivirus) bound to the exact SHA-256 and policy version; staff open it via the focused /pieprasijums/:id window using a request-scoped manager key (hash stored) or admin sign-in, never the customer action_token.
 
 - Menu/catalog share searchMatches: shorthand uses source/prefix/token metadata, not ID lists; related codes need exact-token anchors; redirects keep facets.
 - productContent separates care/specs; translation caches use fingerprints.
