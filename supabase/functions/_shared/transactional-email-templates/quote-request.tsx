@@ -99,8 +99,8 @@ const QuoteRequestEmail = ({
           <Section style={requestSummary}>
             <Text style={statusText}>{printStatus}</Text>
             <Text style={statusText}>PIEVIENOTI FAILI: {attachedCount}</Text>
-            {filesPending && <Text style={subtle}>Faili ir karantīnā vai gaida pārbaudi. Pieejami tikai pēc drošības pārbaudes.</Text>}
-            {filesReviewUrl && <Link href={filesReviewUrl} style={worksheetLink}>PĀRBAUDĪT FAILU STATUSU →</Link>}
+            {filesPending && <Text style={subtle}>Faili automātiski pārbaudīti un lejupielādējami pieprasījuma logā.</Text>}
+            {filesReviewUrl && <Link href={filesReviewUrl} style={worksheetLink}>{attachedCount ? 'ATVĒRT PIEPRASĪJUMU UN FAILUS →' : 'ATVĒRT PIEPRASĪJUMU →'}</Link>}
             {files.map((u, i) => (
               <Text key={i} style={{ margin: '8px 0', fontSize: '14px', overflowWrap: 'anywhere' }}>
                 <Link href={u} style={worksheetLink}>{safeAttachmentName(u, `Fails ${i + 1}`)} →</Link>
