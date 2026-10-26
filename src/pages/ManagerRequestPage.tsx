@@ -6,6 +6,8 @@ import { Download, Mail, Paperclip, Phone, Printer, RefreshCw, ShieldAlert, Shie
 import { Button } from "@/components/ui/button";
 import { downloadManagerArtwork, getManagerRequest } from "@/lib/managerRequest.functions";
 
+const BILLING: Record<string, string> = { company: "Uzņēmums", regNo: "Reģ. Nr.", vatNo: "PVN Nr.", address: "Juridiskā adrese", delivery: "Piegādes adrese", bank: "Banka", iban: "Konta numurs (IBAN)", bic: "SWIFT/BIC" };
+const METHOD: Record<string, string> = { consult: "Nezinu / konsultēties", silkscreen: "Sietspiede", dtf: "DTF", termodruka: "Termodruka", embroidery: "Izšūšana", sublimation: "Sublimācija", other: "Cita", none: "Bez apdrukas" };
 const eur = (n: number) => `${n.toFixed(2).replace(".", ",")} €`;
 const kb = (n: number) => (n > 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
 
@@ -67,7 +69,7 @@ export default function ManagerRequestPage() {
 
     {(printNeeded || q.deadline) && <section className="mb-5 rounded-sm border border-accent/40 bg-accent/10 p-3 text-sm">
       {printNeeded && <p className="flex items-center gap-2 font-bold uppercase tracking-wider text-accent"><Printer className="h-4 w-4" />Apdruka nepieciešama</p>}
-      <p className="mt-1 flex flex-wrap gap-x-4">{q.print_method && <span>Tehnoloģija: <b>{q.print_method}</b></span>}{q.print_placement && <span>Vieta: <b>{q.print_placement}</b></span>}{q.print_colors && <span>Krāsas: <b>{q.print_colors}</b></span>}{q.deadline && <span>Termiņš: <b>{q.deadline}</b></span>}</p>
+      <p className="mt-1 flex flex-wrap gap-x-4">{q.print_method && <span>Tehnoloģija: <b>{METHOD[q.print_method] || q.print_method}</b></span>}{q.print_placement && <span>Vieta: <b>{q.print_placement}</b></span>}{q.print_colors && <span>Krāsas: <b>{q.print_colors}</b></span>}{q.deadline && <span>Termiņš: <b>{q.deadline}</b></span>}</p>
     </section>}
 
     <section className="mb-5">
@@ -98,7 +100,7 @@ export default function ManagerRequestPage() {
     </section>}
 
     {q.message && <section className="mb-5"><h2 className="mb-2 text-sm font-bold uppercase tracking-wider">Ziņa</h2><p className="whitespace-pre-wrap break-words rounded-sm border border-border bg-card p-3 text-sm">{q.message}</p></section>}
-    {q.billing && Object.values(q.billing).some(Boolean) && <section className="mb-5 text-sm"><h2 className="mb-2 font-bold uppercase tracking-wider">Rekvizīti</h2>{Object.entries(q.billing as Record<string, string>).filter(([, v]) => v).map(([k, v]) => <p key={k}><span className="text-muted-foreground">{k}: </span>{v}</p>)}</section>}
+    {q.billing && Object.values(q.billing).some(Boolean) && <section className="mb-5 text-sm"><h2 className="mb-2 font-bold uppercase tracking-wider">Rekvizīti</h2>{Object.keys(BILLING).filter((k) => (q.billing as Record<string, string>)[k]).map((k) => <p key={k}><span className="text-muted-foreground">{BILLING[k]}: </span>{(q.billing as Record<string, string>)[k]}</p>)}</section>}
   </Shell>;
 }
 
