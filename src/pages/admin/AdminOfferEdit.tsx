@@ -534,7 +534,10 @@ const AdminOfferEdit = () => {
                   })();
                   document.getElementById("preces-izvele")?.scrollIntoView({ block: "start" });
                 }} onQuantity={(id, qty) => patchItem(id, { qty })} onPrice={(id, unitPrice) => patchItem(id, { unitPrice })} onDiscount={(id, discountPercent) => patchItem(id, { discountPercent })} onRemove={removeItem}
-                groupAction={(i) => <Button type="button" size="sm" variant="outline" className="mt-2" onClick={() => openSwap(groupKey(i))}><Repeat className="mr-2 h-4 w-4" />Mainīt modeli</Button>}
+                groupAction={(i) => <>
+                  <Button type="button" size="sm" variant="outline" className="mt-2" onClick={() => openSwap(groupKey(i))}><Repeat className="mr-2 h-4 w-4" />Mainīt modeli</Button>
+                  <Textarea aria-label={`Komentārs: ${i.name}`} rows={2} className="mt-2 text-sm" placeholder="Komentārs precei" value={i.note || ""} onChange={(e) => { const note = e.target.value; const key = groupKey(i); setOffer((o) => ({ ...o, items: o.items.map((x) => (groupKey(x) === key ? { ...x, note } : x)) })); }} />
+                </>}
                 itemDetails={(i) => <PrintRows value={(i.prints || []).filter((p) => p.scope !== "order")} onChange={(prints) => patchItem(i.id, { prints: [...prints, ...(i.prints || []).filter((p) => p.scope === "order")] })} addLabel="Apdruka" preset={null} />}
               /></div>
 
