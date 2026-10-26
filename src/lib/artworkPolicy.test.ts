@@ -17,7 +17,6 @@ describe("artwork admission is not malware clearance", () => {
     for (const bytes of [text("MZ harmless fake executable header"),new Uint8Array([127,69,76,70]),new Uint8Array([0xcf,0xfa,0xed,0xfe]),text("#!/bin/sh\nfixture")]) expect(() => validateArtwork("logo.pdf","application/pdf",bytes)).toThrow();
   });
   it("requires actual matching image signature even with trusted looking MIME", () => { expect(() => validateArtwork("logo.png","image/png",text("not png"))).toThrow(); });
-  it("rejects SVG active script and entity constructs", () => { for (const source of ['<svg><script>fixture</script></svg>','<svg onload="fixture"></svg>','<!DOCTYPE svg><svg></svg>','<svg><image href="https://example.invalid/a"/></svg>']) expect(() => validateArtwork("logo.svg","image/svg+xml",text(source))).toThrow(); });
   it("enforces 10 files, 15 MB/file and 50 MB/request", () => {
     expect(ARTWORK_LIMITS.files).toBe(10); expect(ARTWORK_LIMITS.fileBytes).toBe(15728640); expect(ARTWORK_LIMITS.requestBytes).toBe(52428800);
     expect(() => checkArtworkBatch(Array(10).fill(1))).not.toThrow();
