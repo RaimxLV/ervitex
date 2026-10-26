@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ARTWORK_LIMITS, validateArtwork } from "./artworkPolicy";
 import { assessBytes } from "./artworkReview.server";
-import { ARTWORK_POLICY_VERSION } from "./artworkInspect";
+import { ARTWORK_POLICY_VERSION, inspectArtwork } from "./artworkInspect";
 
 export const uploadHeaders = z.object({ requestId: z.string().uuid(), key: z.string().uuid(), fileId: z.string().uuid(), name: z.string().min(1).max(180), mime: z.string().max(120) });
 export async function boundedArtworkBody(request: Request) {
@@ -31,6 +31,9 @@ export async function handleArtworkUpload(request: Request): Promise<Response> {
     if (error || !q || q.submission_key !== meta.key) return json({ error: "Not allowed" }, 403);
     const bytes = await boundedArtworkBody(request);
     const valid = validateArtwork(meta.name, meta.mime, bytes);
+    // Unsafe/unsupported content is refused immediately with a reason, before anything is reserved or stored.
+    const pre = await inspectArtwork(meta.name, meta.mime, bytes);
+    if (!pre.ok) return json({ error: `${meta.name}: ${pre.reason}` }, 400);
     const sha256 = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new Uint8Array(bytes).buffer))).map((n) => n.toString(16).padStart(2,"0")).join("");
     const db = sb;
     const path = `${meta.requestId}/${meta.fileId}-artwork.${valid.ext}`;
