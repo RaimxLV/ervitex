@@ -19,7 +19,6 @@ import { Link } from "@/lib/router-compat";
 import { ColorSelector } from "@/components/quote/ColorSelector";
 import AddToQuoteBlock from "@/components/quote/AddToQuoteBlock";
 import { OrderMinimumNotice } from "@/components/quote/OrderMinimumNotice";
-import { MugPricePanel } from "@/components/quote/MugPricePanel";
 import { Check, Share2, Link2 } from "lucide-react";
 import { AccentIcon } from "@/components/ui/accent-icon";
 import { assignCareIcons } from "./CareIcons";
@@ -1616,7 +1615,7 @@ const CatalogItemDialog = ({
               </Button>
             </div>
             {!loading && (detail || name || category) && <OrderMinimumNotice key={`${source}:${id}`} source={source} productId={id} category={category || detail?.category} name={name || detail?.title} />}
-            {!loading && <MugPricePanel source={source} id={id} retail={priceInfo?.price ?? null} draft={!!(detail && "draft" in detail && detail.draft)} />}
+            {null}
           </div>
 
           <div className="space-y-6">
