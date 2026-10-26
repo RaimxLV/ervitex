@@ -1,0 +1,12 @@
+ALTER TABLE public.quote_artwork DROP CONSTRAINT quote_artwork_status_check;
+ALTER TABLE public.quote_artwork ADD CONSTRAINT quote_artwork_status_check CHECK (status IN ('pending','clean','infected','validated','rejected','error'));
+ALTER TABLE public.quote_artwork ADD COLUMN IF NOT EXISTS bucket text NOT NULL DEFAULT 'quote-quarantine' CHECK (bucket IN ('quote-quarantine','quote-attachments'));
+ALTER TABLE public.quote_artwork ADD COLUMN IF NOT EXISTS checked_sha256 text;
+ALTER TABLE public.quote_artwork ADD COLUMN IF NOT EXISTS policy_version text;
+ALTER TABLE public.quote_artwork ADD COLUMN IF NOT EXISTS check_note text;
+ALTER TABLE public.quote_artwork ADD COLUMN IF NOT EXISTS checked_at timestamptz;
+ALTER TABLE public.quote_artwork ADD COLUMN IF NOT EXISTS legacy boolean NOT NULL DEFAULT false;
+COMMENT ON COLUMN public.quote_artwork.status IS 'validated = passed automatic file-type/content policy (NOT antivirus); clean/infected only from a configured scanner verdict bound to sha256';
+ALTER TABLE public.quote_requests ADD COLUMN IF NOT EXISTS manager_key_hash text;
+ALTER TABLE public.quote_requests ADD COLUMN IF NOT EXISTS manager_key_expires_at timestamptz;
+REVOKE SELECT (manager_key_hash) ON public.quote_requests FROM anon, authenticated;
