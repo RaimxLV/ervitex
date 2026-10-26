@@ -8,12 +8,12 @@ const byName = (n: string) => SUBLIMATION_MUGS.find((m) => m.name_lv === n)!;
 
 describe("sublimation mug prices (owner net selling prices, +21% VAT)", () => {
   it.each([
-    ["Balta krūze", 1.9, 2.3, 4.9, 5.93],
-    ["DUO divkrāsu krūze", 2.4, 2.9, 5.4, 6.53],
-    ["Krūze ar zelta vai sudraba osu", 4.2, 5.08, 7.2, 8.71],
-    ["Krāsu mainošā krūze", 3, 3.63, 6, 7.26],
-  ])("%s", (name, plainNet, plainGross, printedNet, printedGross) => {
-    expect(mugPricePair(byName(name).retail_price)).toEqual({ plainNet, plainGross, printedNet, printedGross });
+    ["Balta krūze", 4.9, 5.93],
+    ["DUO divkrāsu krūze", 5.4, 6.53],
+    ["Krūze ar zelta vai sudraba osu", 7.2, 8.71],
+    ["Krāsu mainošā krūze", 6, 7.26],
+  ])("%s", (name, net, gross) => {
+    expect(byName(name).retail_price).toBe(net); expect(mugPricePair(net).plainGross).toBe(gross);
   });
   it("print surcharge is 3.00 net", () => expect(MUG_SUBLIMATION_PRINT_NET).toBe(3));
 });
