@@ -29,3 +29,6 @@ Harmless synthetic fixtures only. Tests cover signatures/MIME/filename disguises
 - Release binding: download only when `checked_sha256 = sha256` and policy version current, re-read from storage bytes. Legacy `quote-attachments` objects are registered on demand (row `legacy=true`) and pass the same policy when a request window or admin button opens them.
 - Migration `0030_artwork_automatic_policy` applied (additive: statuses, bucket/checked columns, manager key hash/expiry).
 - Staff window `/pieprasijums/:id`: request-scoped manager key in URL fragment (SHA-256 stored, 90 days, issued once per request) or admin sign-in with exact return. Customer `/saraksts` never shows files.
+
+## 2026-10-26 (later) — owner: "to pārbaudi atceļam; galvenais lai exe nepieņem"
+- Antivirus/scanner step and deep PDF/SVG/ZIP/EPS content checks removed (`policy-v2`). Only extension allowlist, byte-signature match, executable/script signature and double-extension blocking remain, plus size/count limits. Accepted files are `validated` = "Pieņemts", NOT scanned. Private storage and staff-only downloads unchanged.

@@ -1,5 +1,5 @@
 # Architecture rules
-- Customer artwork is stored privately and released only by artworkReleasable: a configured scanner's digest-bound verdict (infected always blocks, outage is a retryable error) or, without a scanner, the automatic policy state `validated` (format/content checks, not antivirus) bound to the exact SHA-256 and policy version; staff open it via the focused /pieprasijums/:id window using a request-scoped manager key (hash stored) or admin sign-in, never the customer action_token.
+- Customer artwork is stored privately and released only by artworkReleasable: the owner policy rejects executables/scripts/disguised or double-extension files and accepts other allowed artwork immediately as `validated` (never called antivirus-clean), bound to the exact SHA-256 and policy version; staff open it via the focused /pieprasijums/:id window using a request-scoped manager key (hash stored) or admin sign-in, never the customer action_token.
 
 - Menu/catalog share searchMatches: shorthand uses source/prefix/token metadata, not ID lists; related codes need exact-token anchors; redirects keep facets.
 - productContent separates care/specs; translation caches use fingerprints.
