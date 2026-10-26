@@ -212,6 +212,11 @@ const OfferPage = () => {
                           </td>
                         </tr>
                       )}
+                      {i.note?.trim() && (
+                        <tr className="border-t border-border/60 align-top">
+                          <td className="whitespace-pre-line py-2 pr-3 text-sm text-foreground" colSpan={8}><span className="font-semibold">{t("Komentārs", "Comment")}:</span> {i.note}</td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </article>
@@ -242,6 +247,7 @@ const OfferPage = () => {
                       {i.size && <span>{t("Izmērs", "Size")}: {i.size}</span>}
                       <span>{t("Skaits", "Qty")}: {i.qty}</span>
                     </div>
+                    {i.note?.trim() && <p className="mt-3 whitespace-pre-line text-sm text-foreground"><span className="font-semibold">{t("Komentārs", "Comment")}:</span> {i.note}</p>}
                   </div>
                 </Link>
                     <dl className="mt-3 grid grid-cols-4 gap-3 border-t border-border pt-3 text-xs tabular-nums">

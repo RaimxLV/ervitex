@@ -6,6 +6,7 @@ export const offerItemsSchema = z.array(z.object({
   qty: z.number().int().min(1).max(100000),
   size: z.string().max(100).nullable().optional(), colorName: z.string().max(300).nullable().optional(),
   unitPrice: amount.nullable(), discountPercent: z.number().finite().min(0).max(100).nullable().optional(),
+  note: z.string().max(1000).nullable().optional(),
   prints: z.array(z.object({ method: z.string().min(1).max(300), placement: z.string().max(300).nullable().optional(), price: amount.nullable(), mode: z.enum(["unit", "total"]).optional(), scope: z.enum(["item", "order"]).optional() })).max(50).optional(),
 }).passthrough()).max(300);
 
