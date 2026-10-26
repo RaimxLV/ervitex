@@ -327,6 +327,7 @@ const AdminQuotes = () => {
                   />
                 </Button>
                 <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-2.5 sm:px-5">
+                  <Button asChild variant="outline" size="sm"><a href={`/pieprasijums/${row.id}`} target="_blank" rel="noreferrer">Atvērt atsevišķi</a></Button>
                   {row.action_token && <Button asChild size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90"><a href={worksheetPath(row.action_token)} target="_blank" rel="noreferrer"><ClipboardList />Preču saraksts</a></Button>}
                   <CreateOfferButton requestId={row.id} compact blockedReason={requestConversionSource(row as unknown as ConversionSource) === "confirmed_empty" ? CONFIRMED_EMPTY_MESSAGE : undefined} />
                   <Button asChild variant="outline" size="sm"><a href={`mailto:${row.email}?subject=${encodeURIComponent("Cenu pieprasījums")}`}><Mail />Rakstīt</a></Button>
