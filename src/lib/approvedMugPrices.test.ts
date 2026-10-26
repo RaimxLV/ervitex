@@ -10,10 +10,10 @@ const key = env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 describe("approved mugs: anonymous catalogue prices are owner net prices", () => {
   it.each([
-    ["0001", 1.90, 2.30],
-    ["0002", 2.40, 2.90],
-    ["0003", 4.20, 5.08],
-    ["0004", 3.00, 3.63],
+    ["0001", 4.90, 5.93],
+    ["0002", 5.40, 6.53],
+    ["0003", 7.20, 8.71],
+    ["0004", 6.00, 7.26],
   ])("mug %s", async (suffix, net, gross) => {
     if (!url || !key) throw new Error("Anonymous catalogue configuration is required for this read-only price check");
     const id = `7e1a0c00-0000-4000-8000-00000000${suffix}`;

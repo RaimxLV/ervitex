@@ -31,14 +31,14 @@ export interface MugSeed {
 /** Source: old Ervitex site /index.php/kruzes (owner images, mirrored to own CDN). Prices are owner-provided net selling prices. */
 export const SUBLIMATION_MUGS: MugSeed[] = [
   {
-    id: "7e1a0c00-0000-4000-8000-000000000001", name_lv: "Balta krūze", name_en: "White mug", retail_price: 1.9, area: "210 × 85 mm",
+    id: "7e1a0c00-0000-4000-8000-000000000001", name_lv: "Balta krūze", name_en: "White mug", retail_price: 4.9, area: "210 × 85 mm",
     description_lv: "Keramikas cilindra veida krūze sublimācijas apdrukai. Tilpums 300 ml. Neierobežots krāsu skaits, apdrukas laukums 210 × 85 mm.",
     description_en: "Ceramic cylindrical mug for sublimation printing. Capacity 300 ml. Unlimited colours, print area 210 × 85 mm.",
     gallery: [A + "3976eee6-77d3-485a-9a71-80f9acdb7a4f/kruze-mug-blanc-800x800.jpg"],
     colors: [{ id: "7e1a0c00-0000-4000-8001-000000000001", name: "Balta", hex: "#ffffff", image: A + "3976eee6-77d3-485a-9a71-80f9acdb7a4f/kruze-mug-blanc-800x800.jpg" }],
   },
   {
-    id: "7e1a0c00-0000-4000-8000-000000000002", name_lv: "DUO divkrāsu krūze", name_en: "DUO two-tone mug", retail_price: 2.4, area: "210 × 85 mm",
+    id: "7e1a0c00-0000-4000-8000-000000000002", name_lv: "DUO divkrāsu krūze", name_en: "DUO two-tone mug", retail_price: 5.4, area: "210 × 85 mm",
     description_lv: "Keramikas cilindra veida krūze ar krāsainu iekšpusi vai iekšpusi un osu. Tilpums 300 ml. Neierobežots krāsu skaits, apdrukas laukums 210 × 85 mm.",
     description_en: "Ceramic cylindrical mug with a coloured inside or inside and handle. Capacity 300 ml. Unlimited colours, print area 210 × 85 mm.",
     gallery: [A + "46f458fa-1065-4a8b-969e-1866c3313e72/kruze-kruzes.jpg"],
@@ -62,7 +62,7 @@ export const SUBLIMATION_MUGS: MugSeed[] = [
     })),
   },
   {
-    id: "7e1a0c00-0000-4000-8000-000000000003", name_lv: "Krūze ar zelta vai sudraba osu", name_en: "Mug with gold or silver handle", retail_price: 4.2, area: "210 × 80 mm",
+    id: "7e1a0c00-0000-4000-8000-000000000003", name_lv: "Krūze ar zelta vai sudraba osu", name_en: "Mug with gold or silver handle", retail_price: 7.2, area: "210 × 80 mm",
     description_lv: "Keramikas cilindra veida krūze ar zelta vai sudraba krāsas osu. Tilpums 300 ml. Neierobežots krāsu skaits, apdrukas laukums 210 × 80 mm.",
     description_en: "Ceramic cylindrical mug with a gold or silver coloured handle. Capacity 300 ml. Unlimited colours, print area 210 × 80 mm.",
     gallery: [A + "9f232f15-2de9-4c9f-a88b-44287aaada97/kruze-kruze_zelta-sudraba-osa.jpg"],
@@ -72,7 +72,7 @@ export const SUBLIMATION_MUGS: MugSeed[] = [
     ],
   },
   {
-    id: "7e1a0c00-0000-4000-8000-000000000004", name_lv: "Krāsu mainošā krūze", name_en: "Colour-changing mug", retail_price: 3, area: "210 × 85 mm",
+    id: "7e1a0c00-0000-4000-8000-000000000004", name_lv: "Krāsu mainošā krūze", name_en: "Colour-changing mug", retail_price: 6, area: "210 × 85 mm",
     description_lv: "Keramikas cilindra veida krūze, kas karstumā maina krāsu — krūze kļūst balta un redzama apdruka. Tilpums 300 ml. Apdrukas laukums 210 × 85 mm.",
     description_en: "Ceramic cylindrical mug that changes colour when hot — it turns white and the print appears. Capacity 300 ml. Print area 210 × 85 mm.",
     gallery: [A + "b3262318-95d9-4aa8-b700-e0ec30143047/kruze-magic_mug_2.jpg"],
