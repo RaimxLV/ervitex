@@ -8,13 +8,15 @@ const types: Record<string, string[]> = {
   zip: ["application/zip", "application/x-zip-compressed"],
 };
 export const ARTWORK_ACCEPT = Object.keys(types).map((ext) => `.${ext}`).join(",");
+const ACTIVE_SUFFIXES = new Set(["exe","com","bat","cmd","scr","pif","msi","msp","dll","sys","cpl","jar","js","jse","mjs","vbs","vbe","wsf","wsh","ps1","psm1","sh","bash","zsh","php","phtml","py","pl","rb","cgi","asp","aspx","jsp","html","htm","xhtml","hta","lnk","reg","app","dmg","pkg","deb","rpm","apk","elf","bin","run","command","scf","url","iso","img"]);
 export function artworkMetadata(name: string, mime: string, size: number) {
   if (!Number.isInteger(size) || size < 1 || size > ARTWORK_LIMITS.fileBytes) throw new Error("Faila izmērs nav atļauts (līdz 15 MB).");
-  // No paths, controls, Unicode direction overrides, multiple suffixes or active extensions.
+  // No paths, controls, Unicode direction overrides, empty segments or executable/script suffix segments anywhere.
   if (name.length > 180 || /[/\\\x00-\x1f\x7f\u202a-\u202e\u2066-\u2069]/.test(name)) throw new Error("Nederīgs faila nosaukums.");
   const parts = name.split(".");
   const ext = parts.pop()?.toLowerCase() || "";
-  if (parts.length !== 1 || !parts[0]?.trim() || !types[ext]) throw new Error("Faila formāts vai dubultais paplašinājums nav atļauts.");
+  if (parts.length < 1 || !parts[0]?.trim() || parts.some((p) => !p.trim()) || !types[ext]) throw new Error("Faila formāts nav atļauts.");
+  if (parts.slice(1).some((p) => ACTIVE_SUFFIXES.has(p.trim().toLowerCase()))) throw new Error("Izpildāmi faili un skripti nav atļauti.");
   const declared = mime.toLowerCase().split(";")[0].trim();
   if (declared && declared !== "application/octet-stream" && !types[ext].includes(declared)) throw new Error("Faila tips neatbilst paplašinājumam.");
   return { ext, mime: types[ext][0] };

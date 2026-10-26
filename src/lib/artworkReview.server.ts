@@ -15,9 +15,13 @@ export async function assessBytes(name: string, mime: string, bytes: Uint8Array,
 
 /** Re-read stored bytes, bind the outcome to their digest and persist it. Original bytes are never modified. */
 export async function reassess(sb: Sb, row: ArtworkRow): Promise<ArtworkRow> {
+  // A known infected verdict is final; retries never overwrite it.
+  if (row.status === "infected") return row;
   const save = async (patch: Partial<ArtworkRow>) => {
     const next = { ...patch, checked_at: new Date().toISOString(), policy_version: ARTWORK_POLICY_VERSION };
-    await sb.from("quote_artwork").update(next).eq("id", row.id).eq("quote_id", row.quote_id);
+    const { error } = await sb.from("quote_artwork").update(next).eq("id", row.id).eq("quote_id", row.quote_id).neq("status", "infected");
+    // Never report an unpersisted outcome as releasable.
+    if (error) return { ...row, status: "error", check_note: "Pārbaudes rezultātu neizdevās saglabāt. Mēģiniet vēlreiz.", checked_sha256: null } as ArtworkRow;
     return { ...row, ...next } as ArtworkRow;
   };
   try {
