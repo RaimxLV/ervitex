@@ -161,7 +161,7 @@ const RequestPage = () => {
       toast({
         title: delivered ? t("Pieprasījums nosūtīts!", "Request sent!") : t("Pieprasījums saglabāts", "Request saved"),
         description: delivered
-          ? files.length || pending?.paths.length ? t("Pieprasījums nosūtīts. Faili pieejami tikai pēc drošības pārbaudes.", "Request sent. Files are accessible only after security review.") : t("Mēs sazināsimies ar Tevi tuvākajā laikā.", "We will contact you shortly.")
+          ? files.length || pending?.paths.length ? t("Pieprasījums nosūtīts. Faili saņemti.", "Request sent. Files received.") : t("Mēs sazināsimies ar Tevi tuvākajā laikā.", "We will contact you shortly.")
           : t(
               `Paziņojums vēl nav nosūtīts. Mēģini vēlreiz.`,
               `Notification not sent yet. Retry.`,
