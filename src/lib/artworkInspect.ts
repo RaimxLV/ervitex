@@ -13,7 +13,8 @@ const MAX_ZIP_ENTRIES = 50;
 const latin1 = (b: Uint8Array) => { let s = ""; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode(...b.subarray(i, i + 0x8000)); return s; };
 
 async function inflate(data: Uint8Array, format: "deflate" | "deflate-raw", budget: { left: number }): Promise<Uint8Array> {
-  const stream = new Blob([new Uint8Array(data).buffer]).stream().pipeThrough(new DecompressionStream(format));
+  const copy = new Uint8Array(data);
+  const stream = new ReadableStream<Uint8Array>({ start(c) { c.enqueue(copy); c.close(); } }).pipeThrough(new DecompressionStream(format) as unknown as ReadableWritablePair<Uint8Array, Uint8Array>);
   const reader = stream.getReader(); const parts: Uint8Array[] = []; let n = 0;
   try {
     while (true) {
