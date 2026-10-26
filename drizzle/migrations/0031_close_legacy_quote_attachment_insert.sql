@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Quote attachments upload bound to request" ON storage.objects;

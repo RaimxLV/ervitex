@@ -218,6 +218,13 @@
       "when": 1793020035785,
       "tag": "0030_artwork_automatic_policy",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1793021351106,
+      "tag": "0031_close_legacy_quote_attachment_insert",
+      "breakpoints": true
     }
   ]
 }
